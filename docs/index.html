@@ -4,34 +4,89 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ScanGoal ROI</title>
 <style>
-:root{--bg:#fafaf8;--fg:#1c1c1a;--mut:#6b6b66;--line:#deded8;--pos:#1a7f4b;--neg:#b3362c}
-@media(prefers-color-scheme:dark){:root{--bg:#161614;--fg:#ececE6;--mut:#9a9a92;--line:#33332f;--pos:#5fca8f;--neg:#ef8479}}
-body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}
-main{max-width:860px;margin:auto}h1{font-size:22px;margin:0 0 4px}p{color:var(--mut);margin:4px 0 16px}
-.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--mut);font-size:13px}
+:root{--bg:#f7f6f2;--card:#fffefb;--fg:#1d1c19;--mut:#6f6d66;--line:#e3e1d9;--pos:#17784a;--neg:#b23a2e;--acc:#c2570c;--bar:#e9e6dc}
+@media(prefers-color-scheme:dark){:root{--bg:#141412;--card:#1c1c19;--fg:#ecebe5;--mut:#9c9a91;--line:#30302b;--pos:#62c992;--neg:#ee867b;--acc:#f0935a;--bar:#2a2a25}}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 16px 48px;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1040px;margin:auto}
+h1{font-size:24px;margin:0;letter-spacing:-.01em}h2{font-size:16px;margin:32px 0 4px}
+.sub{color:var(--mut);margin:2px 0 0;font-size:14px}
+.status{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:99px;font-size:13px;border:1px solid var(--line);background:var(--card)}
+.status.warn{border-color:var(--neg);color:var(--neg)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:20px 0 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2}.kpi span{color:var(--mut);font-size:13px}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--mut);font-size:12.5px}
+td.l{text-align:left}td.wrapc{white-space:normal;min-width:220px}
 .pos{color:var(--pos)}.neg{color:var(--neg)}.mut{color:var(--mut)}
+.prog{display:inline-block;width:70px;height:6px;border-radius:3px;background:var(--bar);vertical-align:middle;margin-left:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--acc)}
+svg.sp{vertical-align:middle}
+.note{color:var(--mut);font-size:13.5px;margin:6px 0 0;max-width:75ch}
+.tag{font-size:12px;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
 </style>
 </head>
 <body><main>
 <h1>ScanGoal ROI</h1>
-<p id="meta">A carregar…</p>
-<div class="wrap"><table><thead><tr><th>Grupo</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>ROI</th><th>IC 95 %</th><th>ROI odd −2 %</th><th>ROI odd −5 %</th><th>Estado</th></tr></thead><tbody id="rows"></tbody></table></div>
-<p>Regra fixa: 1 unidade na seleção indicada, à odd do primeiro sinal. Menos de 300 apostas liquidadas num grupo = sem conclusão. Não é aconselhamento de apostas.</p>
+<p class="sub">Medição do ROI dos sinais do bot ScanGoal com regras fixas. Não é aconselhamento de apostas.</p>
+<span class="status" id="status">A carregar…</span>
+
+<div class="kpis" id="kpis"></div>
+
+<h2>Grupos principais</h2>
+<p class="note">1 unidade por aposta, à odd do primeiro sinal de cada jogo e seleção. Um grupo só é conclusivo a partir de <span id="minset">300</span> apostas liquidadas.</p>
+<div class="wrap"><table><thead><tr><th>Grupo</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Unidades</th><th>ROI</th><th>IC 95 %</th><th>ROI odd −2 %</th><th>ROI odd −5 %</th><th>Evolução</th></tr></thead><tbody id="groups"></tbody></table></div>
+
+<h2>Perguntas pré-definidas <span class="tag">exploratório</span></h2>
+<p class="note">Cortes escritos antes de haver dados. Servem para escolher o que testar em dados novos; não contam como conclusão.</p>
+<div class="wrap"><table><thead><tr><th>Pergunta</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>ROI</th><th>IC 95 %</th></tr></thead><tbody id="questions"></tbody></table></div>
+
+<h2>Últimas apostas</h2>
+<div class="wrap"><table><thead><tr><th>Sinal (UTC)</th><th>Jogo</th><th>Seleção</th><th>Grupo</th><th>Odd</th><th>Reforço</th><th>Final</th><th>Resultado</th></tr></thead><tbody id="recent"></tbody></table></div>
+
+<h2>Controlo de qualidade</h2>
+<p class="note" id="audit"></p>
 </main>
 <script>
-const pct=v=>(v*100).toFixed(1)+' %', cls=v=>v>0?'pos':v<0?'neg':'';
+const $=id=>document.getElementById(id), pct=v=>(v*100).toFixed(1).replace('.',',')+' %', cls=v=>v>0?'pos':v<0?'neg':'';
+const num=v=>v==null?'—':String(v).replace('.',',');
+function td(tr,t,c){const e=document.createElement('td');if(t instanceof Node)e.appendChild(t);else e.textContent=t;if(c)e.className=c;tr.appendChild(e);return e}
+function spark(vals){
+  const ns='http://www.w3.org/2000/svg',w=90,h=24,s=document.createElementNS(ns,'svg');s.setAttribute('width',w);s.setAttribute('height',h);s.setAttribute('class','sp');
+  if(!vals||vals.length<2)return document.createTextNode('—');
+  const all=[0,...vals],mn=Math.min(...all),mx=Math.max(...all),r=(mx-mn)||1,y=v=>h-2-(v-mn)/r*(h-4),x=i=>i/(all.length-1)*w;
+  const z=document.createElementNS(ns,'line');z.setAttribute('x1',0);z.setAttribute('x2',w);z.setAttribute('y1',y(0));z.setAttribute('y2',y(0));z.setAttribute('stroke','var(--line)');s.appendChild(z);
+  const p=document.createElementNS(ns,'polyline');p.setAttribute('points',all.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '));p.setAttribute('fill','none');p.setAttribute('stroke-width',1.6);
+  p.setAttribute('stroke',vals[vals.length-1]>=0?'var(--pos)':'var(--neg)');s.appendChild(p);return s}
+function roiCells(tr,g,full){
+  const r=g.roi;
+  if(!r){td(tr,'—','mut');td(tr,'—','mut');if(full){td(tr,'—','mut');td(tr,'—','mut')}return}
+  const a=r['odd-0%'];td(tr,pct(a.roi),cls(a.roi));td(tr,a.ci95?pct(a.ci95[0])+' a '+pct(a.ci95[1]):'—','mut');
+  if(full){td(tr,pct(r['odd-2%'].roi),cls(r['odd-2%'].roi));td(tr,pct(r['odd-5%'].roi),cls(r['odd-5%'].roi))}}
+function settledCell(tr,g,min){const s=document.createElement('span');s.textContent=g.settled;const b=document.createElement('span');b.className='prog';b.title=g.settled+' de '+min;
+  const i=document.createElement('i');i.style.width=Math.min(100,g.settled/min*100)+'%';b.appendChild(i);const f=document.createDocumentFragment();f.append(s,b);td(tr,f)}
 fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
-  document.getElementById('meta').textContent=`${d.messages} mensagens · ${d.unique_bets} apostas únicas · ${d.unparsed} por ler · ${d.edited_versions_changing_signal} sinais alterados pelo bot`;
-  const tb=document.getElementById('rows');
-  for(const [name,g] of Object.entries(d.groups)){
-    const tr=document.createElement('tr'), r=g.roi, cell=(t,c)=>{const td=document.createElement('td');td.textContent=t;if(c)td.className=c;tr.appendChild(td)};
-    cell(name);cell(g.bets);cell(g.settled);cell(g.wins);
-    if(r){const a=r['odd-0%'];cell(pct(a.roi),cls(a.roi));cell(a.ci95?`${pct(a.ci95[0])} a ${pct(a.ci95[1])}`:'—','mut');cell(pct(r['odd-2%'].roi),cls(r['odd-2%'].roi));cell(pct(r['odd-5%'].roi),cls(r['odd-5%'].roi))}
-    else{cell('—','mut');cell('—','mut');cell('—','mut');cell('—','mut')}
-    cell(g.note==='ok'?'ok':'sem conclusão','mut');tb.appendChild(tr);
-  }
-}).catch(()=>{document.getElementById('meta').textContent='Ainda sem dados.'});
+  const last=d.audit&&d.audit.last_collected_at_utc, age=last?(Date.now()-Date.parse(last))/60000:null, st=$('status');
+  st.textContent=last?('Última recolha: '+new Date(last).toLocaleString('pt-PT')+(age>45?' · recolha parada há '+Math.round(age/60)+' h':'')):'Sem recolhas ainda';
+  if(age==null||age>45)st.classList.add('warn');
+  const days=d.first_signal_utc?Math.max(1,Math.round((Date.now()-Date.parse(d.first_signal_utc))/864e5)):0;
+  [[d.messages,'mensagens lidas'],[d.unique_bets,'apostas únicas'],[d.settled_bets,'apostas liquidadas'],[days,'dias de dados'],[d.unparsed,'mensagens por ler']].forEach(([v,l])=>{
+    const k=document.createElement('div');k.className='kpi';const b=document.createElement('b');b.textContent=v;const s=document.createElement('span');s.textContent=l;k.append(b,s);$('kpis').appendChild(k)});
+  $('minset').textContent=d.min_settled;
+  for(const [name,g] of Object.entries(d.groups)){const tr=document.createElement('tr');td(tr,name);td(tr,g.bets);settledCell(tr,g,d.min_settled);td(tr,g.wins);td(tr,num(g.avg_odds));
+    td(tr,g.settled?num(g.units):'—',g.settled?cls(g.units):'mut');roiCells(tr,g,true);td(tr,spark(g.cumulative));$('groups').appendChild(tr)}
+  for(const [name,g] of Object.entries(d.questions)){const tr=document.createElement('tr');td(tr,name,'wrapc');td(tr,g.bets);td(tr,g.settled);td(tr,g.wins);td(tr,num(g.avg_odds));roiCells(tr,g,false);$('questions').appendChild(tr)}
+  for(const b of d.recent_bets){const tr=document.createElement('tr');td(tr,b.date_utc.slice(5,16).replace('T',' '));td(tr,b.match,'l');td(tr,b.selection,'l');td(tr,b.group,'l mut');td(tr,num(b.odds));
+    td(tr,b.max_mult>1?'×'+b.max_mult:'—','mut');td(tr,b.ft?b.ft[0]+':'+b.ft[1]:'—','mut');
+    const w=b.w;td(tr,w==null?(b.ft?'não liquidável':'em aberto'):w>0?(w<1?'meia ganha':'ganha'):w<0?(w>-1?'meia perdida':'perdida'):'devolvida',w==null?'mut':cls(w));$('recent').appendChild(tr)}
+  if(!d.recent_bets.length){const tr=document.createElement('tr');const c=td(tr,'Ainda sem apostas registadas.','mut');c.colSpan=8;$('recent').appendChild(tr)}
+  const a=d.audit||{};
+  $('audit').textContent=`${a.versions||0} versões de mensagens guardadas · ${a.edits_changing_signal||0} sinais alterados pelo bot depois de publicados · ${a.bot_mark_disagreements||0} resultados em que a marca do bot difere da liquidação própria · ${d.excluded_first_seen_with_result} sinais excluídos por terem sido vistos já com resultado · ${d.excluded_low_odds} excluídos por odd abaixo de 1,10 · ${d.unsettled_market} com resultado mas mercado não liquidável`
+    +(d.unparsed_samples&&d.unparsed_samples.length?' · formatos por ler: '+d.unparsed_samples.join(' | '):'');
+}).catch(()=>{$('status').textContent='Ainda sem dados.';$('status').classList.add('warn')});
 </script>
 </body></html>

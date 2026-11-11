@@ -54,6 +54,7 @@ class Parser(unittest.TestCase):
         a, b = parse(STAKE), parse(STAKE_FT)
         self.assertEqual((a['market'], a['selection'], a['odds'], a['total']), ('Asian Total', 'Under 3.25', 1.70, 15000))
         self.assertNotIn('ft', a)
+        self.assertEqual((a['phase'], a['teams'], a['score_at_signal']), ('live', ['Bosnia U19', 'San Marino U19'], [0, 0]))
         self.assertEqual((b['ft'], b['bot_mark']), ([4, 1], False))
 
     def test_open_game(self):
@@ -86,7 +87,51 @@ class Settle(unittest.TestCase):
         self.assertEqual(settle('1X2', 'X', [1, 1]), 1)
         self.assertEqual(settle('1X2', '2', [1, 0]), -1)
         self.assertEqual(settle('Both Teams to Score', 'No', [4, 1]), -1)
-        self.assertIsNone(settle('Double Chance', 'Draw or Faroe Islands', [4, 1]))
+        teams = ['Serbia U19', 'Faroe Islands U19']
+        self.assertEqual(settle('Double Chance', 'Draw or Faroe Islands', [4, 1], teams), -1)
+        self.assertEqual(settle('Double Chance', 'Draw or Faroe Islands', [1, 1], teams), 1)
+        self.assertEqual(settle('Double Chance', 'Serbia or Faroe Islands', [0, 2], teams), 1)
+        self.assertIsNone(settle('Double Chance', 'Draw or Unknown FC', [1, 1], teams))
+        self.assertIsNone(settle('Double Chance', 'Draw or Faroe Islands', [1, 1]))  # sem equipas: não liquida
+
+
+class Report(unittest.TestCase):
+    def run_report(self, rows):
+        from scangoal import report
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                store.append_versions(rows)
+                return report.build()
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+    def row(self, mid, text, date='2026-11-11T17:49:00+00:00'):
+        return {'message_id': mid, 'date_utc': date, 'edit_date_utc': None, 'collected_at_utc': '2026-11-11T18:00:00+00:00', 'text': text}
+
+    def test_first_signal_rule_reinforcement_and_exclusions(self):
+        x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
+        ft_for_barnsley = STAKE_FT.replace('bosnia-u19-vs-san-marino-u19-20261111', 'barnsley-vs-oldham-20261111')
+        rows = [self.row(1, x4), self.row(2, BETFAIR_PRE), self.row(3, STAKE), self.row(4, OPEN),
+                self.row(5, ft_for_barnsley)]  # 5: vista já com resultado -> não é aposta, mas dá o FT 4:1 ao jogo
+        r = self.run_report(rows)
+        self.assertEqual((r['unique_bets'], r['excluded_first_seen_with_result'], r['unparsed']), (3, 1, 0))
+        g = r['groups']['BETFAIR/pre/mkt>=10K']
+        self.assertEqual((g['bets'], g['settled'], g['wins']), (1, 1, 1))
+        self.assertEqual(g['roi']['odd-0%']['roi'], 0.83)           # odd do PRIMEIRO sinal, não a do reforço
+        self.assertFalse(g['conclusive'])
+        q1 = r['questions']['Q1 Betfair: só apostas que chegaram a ×4, à odd do sinal ×4']
+        self.assertEqual((q1['settled'], q1['roi']['odd-0%']['roi']), (1, 0.83))
+        self.assertEqual(r['recent_bets'][-1]['max_mult'], 8)
+        self.assertEqual(r['recent_bets'][-1]['match'], 'Barnsley — Oldham')
+
+    def test_edit_adds_result_and_audit(self):
+        rows = [self.row(3, STAKE), self.row(3, STAKE_FT), self.row(4, OPEN),
+                self.row(4, OPEN.replace('1.81', '2.50') + '\n\n🏁 FT 1:5 · Over 5 ✅')]
+        r = self.run_report(rows)
+        self.assertEqual(r['audit']['edits_changing_signal'], 1)     # a 2.ª versão do Open game mudou a odd
+        self.assertEqual(r['groups']['STAKE_LOAD/live']['roi']['odd-0%']['roi'], -1.0)
+        self.assertEqual((r['groups']['OPEN_GAME']['wins'], r['groups']['OPEN_GAME']['roi']['odd-0%']['roi']), (1, 0.81))  # odd original
 
 
 class Store(unittest.TestCase):

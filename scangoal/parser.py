@@ -57,19 +57,27 @@ def parse(text):
             mult = re.search(r'×(\d+)', h)
             m['mult'] = int(mult[1]) if mult else 1
             s = re.search(r'^([12X]) · (.+?) @([\d.]+) · \$([\d.]+K?)', lines[2])
+            m['teams'] = [t.strip() for t in lines[1].split(' · ')[0].split('—', 1)]
             v = re.search(r'market share (\d+)% · whole 1X2 market \$([\d.]+K?)', text)
             m.update(market='1X2', selection=s[1], odds=float(s[3]), sel_volume=money(s[4]),
                      share=int(v[1]), mkt_volume=money(v[2]), bet=True)
         elif h.startswith('💸'):
             s = re.search(r'📊 (.+?) → (.+?) @ ([\d.]+)', text)
             b = re.search(r'🧾 (\d+) bets? · biggest \$([\d.]+K?)', text)
-            m.update(type='STAKE_LOAD', phase='unknown', kickoff_utc=kickoff_utc(lines[1]), market=s[1],
+            if '—' in lines[2]:
+                teams, phase, score = [t.strip() for t in lines[2].split('—', 1)], 'pre', None
+            else:
+                a, c = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]), re.match(r'(.+?)\s+(\d+)\s*$', lines[3])
+                teams, phase, score = [a[1].strip(), c[1].strip()], 'live', [int(a[2]), int(c[2])]
+            m.update(type='STAKE_LOAD', phase=phase, teams=teams, score_at_signal=score,
+                     kickoff_utc=kickoff_utc(lines[1]), market=s[1],
                      selection=s[2], odds=float(s[3]), total=money(re.search(r'\$([\d.]+K?)', h)[1]),
                      n_bets=int(b[1]) if b else None, bet=True)
         elif h.startswith('🔥') or h.startswith('🎯'):
             s = re.search(r'💰 O ([\d.]+): ([\d.]+)', text)
             mn = re.search(r"· (\d+)'", lines[1])
             a, b = re.search(r'(\d+)\s*$', lines[2]), re.search(r'(\d+)\s*$', lines[3])
+            m['teams'] = [re.sub(r'\s+\d+\s*$', '', lines[2]).strip(), re.sub(r'\s+\d+\s*$', '', lines[3]).strip()]
             m.update(type='OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM', phase='live', market='Asian Total',
                      selection='Over %s' % s[1], odds=float(s[2]), minute=int(mn[1]),
                      score_at_signal=[int(a[1]), int(b[1])], bet=True)
@@ -82,9 +90,23 @@ def parse(text):
     return m
 
 
-def settle(market, selection, ft):
+def _side(token, teams):
+    """'Draw' -> X; nome de equipa (prefixo/contido, sem ambiguidade) -> 1 ou 2; caso contrário None."""
+    t = token.strip().lower()
+    if t == 'draw':
+        return 'X'
+    hits = [k for k, name in zip('12', teams or []) if name and (name.lower().startswith(t) or t in name.lower())]
+    return hits[0] if len(hits) == 1 else None
+
+
+def settle(market, selection, ft, teams=None):
     """Lucro em unidades de (odd-1): 1 ganha, -1 perde, 0 devolve, ±0.5 meia. None = mercado não liquidável aqui."""
     h, a = ft
+    if market == 'Double Chance':
+        sides = [_side(tok, teams) for tok in selection.split(' or ')]
+        if len(sides) != 2 or None in sides or sides[0] == sides[1]:
+            return None
+        return 1.0 if ('1' if h > a else '2' if a > h else 'X') in sides else -1.0
     if market == 'Asian Total':
         side, line = selection.split()[0], float(selection.split()[1])
         parts = [line] if (line * 2) % 1 == 0 else [line - .25, line + .25]

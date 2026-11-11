@@ -6,4 +6,4 @@ from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 
 with TelegramClient(StringSession(), int(os.environ['TG_API_ID']), os.environ['TG_API_HASH']) as client:
-    print(client.session.save())
+    print('AUTORIZADO. TG_SESSION:\n' + client.session.save() if client.is_user_authorized() else 'NÃO AUTORIZADO')
