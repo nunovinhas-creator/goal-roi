@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ScanGoal ROI</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1c1c1a;--mut:#6b6b66;--line:#deded8;--pos:#1a7f4b;--neg:#b3362c}
+@media(prefers-color-scheme:dark){:root{--bg:#161614;--fg:#ececE6;--mut:#9a9a92;--line:#33332f;--pos:#5fca8f;--neg:#ef8479}}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}
+main{max-width:860px;margin:auto}h1{font-size:22px;margin:0 0 4px}p{color:var(--mut);margin:4px 0 16px}
+.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--mut);font-size:13px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.mut{color:var(--mut)}
+</style>
+</head>
+<body><main>
+<h1>ScanGoal ROI</h1>
+<p id="meta">A carregar…</p>
+<div class="wrap"><table><thead><tr><th>Grupo</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>ROI</th><th>IC 95 %</th><th>ROI odd −2 %</th><th>ROI odd −5 %</th><th>Estado</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p>Regra fixa: 1 unidade na seleção indicada, à odd do primeiro sinal. Menos de 300 apostas liquidadas num grupo = sem conclusão. Não é aconselhamento de apostas.</p>
+</main>
+<script>
+const pct=v=>(v*100).toFixed(1)+' %', cls=v=>v>0?'pos':v<0?'neg':'';
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+  document.getElementById('meta').textContent=`${d.messages} mensagens · ${d.unique_bets} apostas únicas · ${d.unparsed} por ler · ${d.edited_versions_changing_signal} sinais alterados pelo bot`;
+  const tb=document.getElementById('rows');
+  for(const [name,g] of Object.entries(d.groups)){
+    const tr=document.createElement('tr'), r=g.roi, cell=(t,c)=>{const td=document.createElement('td');td.textContent=t;if(c)td.className=c;tr.appendChild(td)};
+    cell(name);cell(g.bets);cell(g.settled);cell(g.wins);
+    if(r){const a=r['odd-0%'];cell(pct(a.roi),cls(a.roi));cell(a.ci95?`${pct(a.ci95[0])} a ${pct(a.ci95[1])}`:'—','mut');cell(pct(r['odd-2%'].roi),cls(r['odd-2%'].roi));cell(pct(r['odd-5%'].roi),cls(r['odd-5%'].roi))}
+    else{cell('—','mut');cell('—','mut');cell('—','mut');cell('—','mut')}
+    cell(g.note==='ok'?'ok':'sem conclusão','mut');tb.appendChild(tr);
+  }
+}).catch(()=>{document.getElementById('meta').textContent='Ainda sem dados.'});
+</script>
+</body></html>

@@ -1,0 +1,108 @@
+import json, os, tempfile, unittest
+from pathlib import Path
+
+from scangoal import store
+from scangoal.parser import kickoff_utc, parse, settle, split
+
+BETFAIR_PRE = """💷💷 🟨 Betfair ×8 · 11 nov 2026 22:00
+Barnsley — Oldham · England EFL Trophy
+1 · Barnsley @1.60 · $34K
+📊 market share 78% · whole 1X2 market $43K · pre-match
+https://scangoal.com/match/barnsley-vs-oldham-20261111?lang=en
+
+⚠️ Not a bet and not a forecast: the signal flags a statistical anomaly in the match. The decision and the risk are yours."""
+BETFAIR_LIVE = """💷 🟨 Betfair · LIVE
+Kucukcekmece Sinopspor — Fatsa Belediyespor · 🇹🇷 Turkish 3 Lig
+X · Draw @1.94 · $21K
+📊 market share 95% · whole 1X2 market $23K · live
+https://scangoal.com/match/kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111?lang=en"""
+STAKE = """💸 🟦 Stake money load — $15K
+UEFA U19 Championship · 11 nov 2026 18:30
+Bosnia U19     0
+San Marino U19 0
+📊 Asian Total → Under 3.25 @ 1.70
+🧾 1 bet · biggest $15K
+https://scangoal.com/match/bosnia-u19-vs-san-marino-u19-20261111?lang=en"""
+STAKE_FT = STAKE + "\n\n🏁 FT 4:1 · Asian Total → Under 3.25 ❌\n⚽  27'   1 - 0"
+OPEN = """🔥 Open game — heading for over
+ UEFA Women's Europa Cup · 45'
+Czarni Sosnowiec Women 0
+SK Brann Women         4
+Rhythm 87/100 · Over 100%
+💰 O 5: 1.81
+https://scangoal.com/match/czarni-sosnowiec-women-vs-sk-brann-women-20261111?lang=en"""
+BREW = """⏳ Goal brewing — goal chance in the next 15′ above usual
+🇸🇰 Slovakian 1 Liga Women · 25'
+FC Petrzalka Women   1
+Spartak Trnava Women 1
+Goal in 15′: 50% · usual 37%"""
+
+
+class Parser(unittest.TestCase):
+    def test_betfair_pre(self):
+        p = parse(BETFAIR_PRE)
+        self.assertEqual((p['type'], p['phase'], p['mult'], p['selection'], p['odds']), ('BETFAIR', 'pre', 8, '1', 1.60))
+        self.assertEqual((p['sel_volume'], p['share'], p['mkt_volume']), (34000, 78, 43000))
+        self.assertEqual(p['match_id'], 'barnsley-vs-oldham-20261111')
+        self.assertEqual(p['kickoff_utc'], '2026-11-11T19:00+00:00')  # Moscovo 22:00 = 19:00 UTC
+
+    def test_betfair_live_draw(self):
+        p = parse(BETFAIR_LIVE)
+        self.assertEqual((p['phase'], p['mult'], p['selection'], p['kickoff_utc']), ('live', 1, 'X', None))
+
+    def test_stake_before_and_after_edit(self):
+        a, b = parse(STAKE), parse(STAKE_FT)
+        self.assertEqual((a['market'], a['selection'], a['odds'], a['total']), ('Asian Total', 'Under 3.25', 1.70, 15000))
+        self.assertNotIn('ft', a)
+        self.assertEqual((b['ft'], b['bot_mark']), ([4, 1], False))
+
+    def test_open_game(self):
+        p = parse(OPEN)
+        self.assertEqual((p['type'], p['selection'], p['odds'], p['minute'], p['score_at_signal']), ('OPEN_GAME', 'Over 5', 1.81, 45, [0, 4]))
+
+    def test_non_bets_and_unknown(self):
+        self.assertFalse(parse(BREW)['bet'])
+        self.assertIsNone(parse('hello')['type'])
+        broken = parse('💷 🟨 Betfair · LIVE\nA — B\nsomething else')
+        self.assertEqual((broken['bet'], broken['error']), (False, 'fields_missing'))
+
+    def test_split(self):
+        self.assertEqual(len(list(split('ScanGoal:\n' + BETFAIR_PRE + '\n\n' + STAKE_FT + '\n\n' + OPEN))), 3)
+
+    def test_kickoff_month_unknown(self):
+        self.assertIsNone(kickoff_utc('11 xyz 2026 22:00'))
+
+
+class Settle(unittest.TestCase):
+    def test_asian_totals(self):
+        self.assertEqual(settle('Asian Total', 'Over 2.5', [2, 0]), -1)
+        self.assertEqual(settle('Asian Total', 'Over 5', [1, 4]), 0)        # devolução
+        self.assertEqual(settle('Asian Total', 'Over 4.75', [3, 2]), 0.5)   # meia vitória
+        self.assertEqual(settle('Asian Total', 'Under 3.25', [2, 1]), 0.5)
+        self.assertEqual(settle('Asian Total', 'Over 0.75', [0, 0]), -1)
+        self.assertEqual(settle('Asian Total', 'Over 1.25', [1, 0]), -0.5)
+
+    def test_other_markets(self):
+        self.assertEqual(settle('1X2', 'X', [1, 1]), 1)
+        self.assertEqual(settle('1X2', '2', [1, 0]), -1)
+        self.assertEqual(settle('Both Teams to Score', 'No', [4, 1]), -1)
+        self.assertIsNone(settle('Double Chance', 'Draw or Faroe Islands', [4, 1]))
+
+
+class Store(unittest.TestCase):
+    def test_append_only_versions(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                row = {'message_id': 7, 'date_utc': 't', 'edit_date_utc': None, 'collected_at_utc': 'c'}
+                self.assertEqual(store.append_versions([dict(row, text=STAKE)]), 1)
+                self.assertEqual(store.append_versions([dict(row, text=STAKE)]), 0)       # idempotente
+                self.assertEqual(store.append_versions([dict(row, text=STAKE_FT)]), 1)    # edição = nova versão
+                lines = [json.loads(l) for l in (Path(d) / 'messages.jsonl').read_text(encoding='utf-8').splitlines()]
+                self.assertEqual([('ft' in parse(l['text'])) for l in lines], [False, True])
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+
+if __name__ == '__main__':
+    unittest.main()

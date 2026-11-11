@@ -1,0 +1,36 @@
+name: Collect ScanGoal
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '3-53/10 * * * *'   # 10 em 10 min (repositório público: minutos de Actions sem limite)
+permissions:
+  contents: write
+concurrency:
+  group: scangoal-write
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Read bot conversation (read-only)
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION: ${{ secrets.TG_SESSION }}
+          TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
+        run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
+      - name: Report (fixed rules, no LLM)
+        run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      - name: Commit data
+        run: |
+          git add data docs/report.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
+          git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
