@@ -98,6 +98,11 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 ## Simulador de banca
 Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas liquidadas do saldo estrito, por ordem, com escolha de tipos de sinal e de corte na odd. Corre no navegador; não altera dados.
 
+## Liquidação
+- A Highlightly é consultada de 90 em 90 minutos, a partir de 1h50 depois do início do jogo (ou 1h45 depois de um sinal ao vivo). Só o estado "terminado" liquida.
+- Um jogo ausente da lista completa do dia, 8 horas depois e em duas leituras, fica marcado como não coberto: deixa de gastar pedidos e a página mostra-o em "Jogos por liquidar".
+- `data/manual_results.json` aceita resultados revistos à mão: `{"<id do jogo>": {"ft": [casa, fora], "source": "onde foi visto"}}`. Só entram quando nenhuma outra fonte tem o jogo; divergências são contadas.
+
 ## Recolha
 O agendamento do GitHub não dispara neste repositório. Cada execução espera 8 minutos e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
 
