@@ -53,12 +53,23 @@ jobs:
         run: python -u -m scangoal.llm
       - name: Report (fixed rules)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      - name: Telegram notices through the user's bot (skipped without keys)
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python -u -m scangoal.notify
       - name: Commit data
         run: |
           git add data docs/report.json docs/bets.csv
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Tell the user when a collection fails (at most once an hour)
+        if: ${{ failure() }}
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python -u -m scangoal.notify --failure
       # O agendamento do GitHub não dispara neste repositório. Cada execução espera e lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
       - name: Wait, then start the next collection

@@ -149,7 +149,9 @@ def build(signals, registry, min_settled):
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
     return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts,
-            'expected_by_chance': round(0.05 * tested, 1), 'top': [r for r in rows if r['n'] >= 5][:25],
+            'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect')}
+                    for r in rows if r['n'] >= 5][:150],
+            'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
             'abandoned': [r for r in rows if r['status'] == 'abandonada'][:10],
             'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
