@@ -40,7 +40,7 @@ jobs:
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
       - name: Commit data
         run: |
-          git add data docs/report.json
+          git add data docs/report.json docs/bets.csv
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"

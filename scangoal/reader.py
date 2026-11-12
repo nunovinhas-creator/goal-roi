@@ -4,7 +4,7 @@ Segredos: TG_API_ID, TG_API_HASH, TG_SESSION (StringSession gerada por scripts/a
 e TG_SCANGOAL (ex.: @scangoal_bot). Nunca envia mensagens. Relê as últimas RECENT mensagens
 em cada execução para apanhar as edições em que o bot acrescenta o resultado final.
 """
-import asyncio, os, sys
+import asyncio, json, os, sys
 from datetime import datetime, timezone
 
 RECENT = int(os.environ.get('SCANGOAL_RECENT', '400'))
@@ -48,6 +48,8 @@ async def collect():
     finally:
         await client.disconnect()
     added = append_versions(rows)
+    # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
+    (data_dir() / 'state.json').write_text(json.dumps({'last_run_utc': now, 'read': len(rows), 'new_versions': added}) + '\n', encoding='utf-8')
     if last_id and oldest and oldest > last_id + 1:
         print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)

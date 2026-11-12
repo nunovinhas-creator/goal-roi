@@ -46,6 +46,7 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .plot .cap{position:absolute;left:0;right:0;bottom:-2px;display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);pointer-events:none}
 .read{font-size:14px;color:var(--mut);margin-top:6px}
 .read b{color:var(--ink)}
+.eta{font-size:13px;margin-top:2px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-size:13.5px;font-weight:650;white-space:nowrap}
 .chip.good{background:var(--good-bg);color:var(--good)}.chip.bad{background:var(--bad-bg);color:var(--bad)}
 .chip.wait{background:var(--wait-bg);color:var(--wait)}.chip.none{background:var(--none-bg);color:var(--mut)}
@@ -79,6 +80,7 @@ details{margin-top:12px}summary{cursor:pointer;font-weight:650;padding:4px 0}
 .note{color:var(--mut);font-size:14.5px;margin:6px 0 0;max-width:75ch}
 .qc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 24px;margin:0}
 .qc div{border-top:1px solid var(--line);padding-top:8px}.qc dt{color:var(--mut);font-size:14px}.qc dd{margin:0;font-weight:700;font-size:19px}
+a{color:var(--mark)}
 footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 @media(max-width:760px){
   h1{font-size:28px}.answer p{font-size:18.5px}
@@ -128,6 +130,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <h2>Sorte e risco</h2>
 <div class="duo" id="risk"></div>
 
+<h2>Dia a dia</h2>
+<div class="panel wrap"><table><thead><tr><th>Dia</th><th>Apostas</th><th>Com resultado</th><th>Ganhas</th><th>Saldo do dia</th></tr></thead><tbody id="daily"></tbody></table></div>
+
 <h2>Últimas apostas</h2>
 <div class="panel">
   <div class="filters" id="filters" role="group" aria-label="Filtrar apostas"></div>
@@ -138,7 +143,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Cortes escritos antes de haver dados. Servem para escolher o que testar a seguir; não contam como conclusão.</p>
 <div class="wrap"><table><thead><tr><th>Pergunta</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>ROI</th><th>Entre</th></tr></thead><tbody id="questions"></tbody></table></div></details>
 
-<details class="panel"><summary>Controlo de qualidade dos dados</summary><dl class="qc" id="qc"></dl></details>
+<details class="panel"><summary>Controlo de qualidade dos dados</summary><dl class="qc" id="qc"></dl>
+<div id="names"></div></details>
+<p class="note"><a href="bets.csv" download>Descarregar todas as apostas (CSV, abre no Excel)</a></p>
 
 <footer>Medição independente, sem ligação ao ScanGoal. Não é aconselhamento de apostas.</footer>
 </main>
@@ -200,6 +207,7 @@ function signals(d){
     const r=el('div',{class:'read'});
     if(n){r.append(el('b',{},hitsOf(g.hits,n)),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?`, precisa de ${pct(g.break_even)}`:'')+(g.prob_above!=null?`. Probabilidade de estar acima do mínimo: ${pct(g.prob_above)}`:'')+(g.signals>g.with_result?`. ${g.signals-g.with_result} à espera de resultado`:'')))}
     else r.textContent=`${g.signals} sinais, ainda sem resultado`;
+    if(n&&n<d.min_settled&&g.per_day){const e=el('div',{class:'eta'});e.textContent=`Ritmo: ${num(g.per_day)} resultados por dia. `+(n<30&&g.days_to_hint!=null?`Primeiro indício em cerca de ${g.days_to_hint} ${g.days_to_hint===1?'dia':'dias'}; `:'')+`conclusão em cerca de ${g.days_to_conclusion} dias.`;r.appendChild(e)}
     b.appendChild(r);
     const [kind,text]=verdict(g,d.min_settled);
     row.append(a,b,chip(kind,text));box.appendChild(row);
@@ -227,7 +235,7 @@ function answer(d){
 }
 
 function fresh(d){
-  const last=d.audit&&d.audit.last_collected_at_utc, f=$('fresh'), age=last?(Date.now()-Date.parse(last))/60000:null;
+  const last=d.audit&&(d.audit.collector_last_run_utc||d.audit.last_collected_at_utc), f=$('fresh'), age=last?(Date.now()-Date.parse(last))/60000:null;
   const when=last?new Date(last).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
   f.lastElementChild.textContent=last?(age>45?`Recolha parada desde ${when}`:`Atualizado em ${when}`):'Sem recolhas ainda';
   if(age==null||age>45)f.classList.add('stale');
@@ -296,7 +304,10 @@ function tables(d){
     const f=document.createDocumentFragment(), b=el('span',{class:'prog',title:`${g.settled} de ${d.min_settled}`}), i=el('i');i.style.width=Math.min(100,g.settled/d.min_settled*100)+'%';b.appendChild(i);
     f.append(document.createTextNode(`${g.settled} de ${g.bets}`),b);td(tr,f);td(tr,g.wins);td(tr,num(g.avg_odds));td(tr,g.settled?sign(g.units):'—',g.settled?cls(g.units):'mut');roi(tr,g,true);$('groups').appendChild(tr)}
   for(const [name,g] of Object.entries(d.questions||{})){const tr=el('tr');td(tr,name.replace(/^Q\d+ /,''),'name');td(tr,`${g.settled} de ${g.bets}`);td(tr,g.wins);td(tr,num(g.avg_odds));roi(tr,g,false);$('questions').appendChild(tr)}
+  for(const x of (d.daily||[]).slice().reverse()){const tr=el('tr');td(tr,new Date(x.day+'T12:00:00Z').toLocaleDateString('pt-PT',{weekday:'short',day:'2-digit',month:'2-digit'}));td(tr,x.bets);td(tr,x.settled);td(tr,x.wins);td(tr,x.settled?sign(x.units):'—',x.settled?cls(x.units):'mut');$('daily').appendChild(tr)}
   const a=d.audit||{};
+  if((a.name_review||[]).length){const box=$('names');box.appendChild(el('p',{class:'note'},'Jogos em que o nome das equipas difere entre o bot e a fonte de resultados. Ficam em aberto até o nome ser confirmado à mão:'));
+    const ul=el('ul',{class:'note'});for(const n of a.name_review)ul.appendChild(el('li',{},`${n.bot.join(' — ')} ↔ ${n.bsd_candidates.map(c=>c.join(' — ')).join(' ou ')} (${n.provider})`));box.appendChild(ul)}
   [[a.versions,'versões de mensagens guardadas'],[d.unparsed,'mensagens em formato desconhecido'],[a.edits_changing_signal,'sinais que o bot alterou depois de publicar'],
    [a.bot_mark_disagreements,'resultados em que a marca do bot difere das nossas contas'],[d.excluded_first_seen_with_result,'sinais lidos já com resultado (fora do saldo)'],
    [d.excluded_low_odds,'sinais com odd abaixo de 1,10 (ignorados)'],[a.hl_results,'resultados obtidos na Highlightly'],[a.hl_vs_bot_disagreements,'divergências entre a Highlightly e o bot'],
