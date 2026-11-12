@@ -16,7 +16,7 @@ from .store import data_dir
 ROOT = 'https://sports.highlightly.net/football/matches/'
 MAX_REQUESTS = int(os.environ.get('HL_DETAILS_MAX', '5'))
 MIN_INTERVAL_MIN = int(os.environ.get('HL_DETAILS_INTERVAL_MIN', '120'))
-MIN_REMAINING = 15
+MIN_REMAINING = 30          # os resultados têm prioridade sobre os minutos dos golos na quota do dia
 GOAL_TYPES = {'goal': 0, 'penalty': 0, 'own goal': 1}     # 1 = pode estar atribuído à equipa de quem marcou na própria baliza
 UTC = timezone.utc
 

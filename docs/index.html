@@ -211,6 +211,10 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Cortes escritos antes de haver dados. Servem para escolher o que testar a seguir; não contam como conclusão.</p>
 <div class="wrap"><table><thead><tr><th>Pergunta</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>ROI</th><th>Entre</th></tr></thead><tbody id="questions"></tbody></table></div></details>
 
+<h2>Jogos por liquidar</h2>
+<p class="note" id="unsnote"></p>
+<div class="panel wrap"><table><thead><tr><th style="text-align:left">Jogo</th><th style="text-align:left">Competição</th><th>Sinal</th><th style="text-align:left">Motivo</th><th>Resultado</th></tr></thead><tbody id="uns"></tbody></table></div>
+
 <details class="panel"><summary>Controlo de qualidade dos dados</summary><dl class="qc" id="qc"></dl>
 <div id="names"></div></details>
 <p class="note"><a href="bets.csv" download>Descarregar todas as apostas (CSV, abre no Excel)</a></p>
@@ -432,6 +436,15 @@ const T=B.llm_today||{};
   for(const x of B.watch){const r=x.reasons[0], p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}. Encaixa em ${x.reasons.length} ${x.reasons.length===1?'hipótese':'hipóteses'}; a melhor: ${r.id.split(' | ')[1]} (${pct(r.hit_rate)} em ${r.n}, ${r.status}).`));w.appendChild(p)}
 }
 
+function unsettledUI(d){
+  const U=d.unsettled||[], a=d.audit||{};
+  $('unsnote').textContent=U.length?`${U.length} ${U.length===1?'jogo terminou':'jogos terminaram'} há mais de 2 horas e ${U.length===1?'continua':'continuam'} sem resultado. As fontes são consultadas de 90 em 90 minutos. Quando um jogo não existe em nenhuma fonte, podes procurar o resultado e dizê-lo: entra como resultado manual${a.manual_results?` (já há ${a.manual_results})`:''}.`:'Todos os jogos terminados há mais de 2 horas têm resultado.';
+  for(const u of U){const tr=el('tr');td(tr,u.match||u.match_id,'l');td(tr,u.league||'—','l');td(tr,new Date(u.date_utc).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),'mut');td(tr,u.why[0].toUpperCase()+u.why.slice(1),'l');
+    const c=td(tr,''),day=new Date(u.kickoff_utc||u.date_utc).toLocaleDateString('pt-PT');
+    c.appendChild(el('a',{href:'https://www.google.com/search?q='+encodeURIComponent(`${u.match.replace(' — ',' vs ')} ${day} resultado`),target:'_blank',rel:'noopener'},'Procurar'));$('uns').appendChild(tr)}
+  if(!U.length){const tr=el('tr');td(tr,'Nada por liquidar.','mut').colSpan=5;$('uns').appendChild(tr)}
+}
+
 function simulator(d){
   const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
   for(const t of types){const l=el('label'),c=el('input',{type:'checkbox'});c.checked=true;c.addEventListener('change',()=>{c.checked?on.add(t):on.delete(t);run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));$('simtypes').appendChild(l)}
@@ -479,6 +492,7 @@ function tables(d){
    [`${a.stake_sent_45_after_kickoff??0}`,'sinais Stake chegados mais de 45 min depois do início'],[`${a.stake_no_score_after_kickoff??0} de ${a.stake_original_seen??0}`,'sinais Stake originais sem marcador, já com o jogo a decorrer'],
    [`${a.goal_lists_consistent??0} de ${a.goal_lists??0}`,'listas de golos do bot que batem certo'],
    [`${(a.goal_minutes_matches??0)-(a.goal_minutes_inconsistent??0)} de ${a.goal_minutes_matches??0}`,'jogos com minutos dos golos confirmados pela Highlightly'],
+   [a.manual_results??0,'resultados introduzidos à mão'],[a.manual_vs_other_disagreements??0,'resultados manuais diferentes dos de outra fonte'],
    [d.excluded_low_odds,'sinais com odd abaixo de 1,10 (ignorados)'],[a.hl_results,'resultados obtidos na Highlightly'],[a.hl_vs_bot_disagreements,'divergências entre a Highlightly e o bot'],
    [a.hl_near_misses,'jogos com nome de equipa por rever'],[a.bsd_results,'resultados obtidos na BSD']].forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v??0)));$('qc').appendChild(w)});
 }
@@ -520,7 +534,7 @@ function recent(d){
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 </script>
 </body></html>

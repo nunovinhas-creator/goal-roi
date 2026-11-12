@@ -118,7 +118,9 @@ def pending_targets(now, max_age_days=MAX_AGE_DAYS):
         if not (b['type'] == 'BETFAIR' or b['ft'] is None) or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
             continue
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
-        if timedelta(hours=2, minutes=30) <= now - ref <= timedelta(days=max_age_days):
+        # Só o estado "terminado" da fonte liquida; por isso pode pedir-se cedo e repetir: 1h50 depois do início, ou 1h45 depois de um sinal ao vivo.
+        wait = timedelta(minutes=110) if b['kickoff_utc'] else timedelta(minutes=105)
+        if wait <= now - ref <= timedelta(days=max_age_days):
             out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'],
                                              'days': sorted({ref.date().isoformat(), (ref - timedelta(minutes=150)).date().isoformat()})})
     return out

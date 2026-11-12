@@ -776,6 +776,41 @@ https://scangoal.com/match/armenia-vs-cyprus-20261112?lang=en"""
         self.assertEqual((r['unparsed'], sorted(r['groups']), r['settled_bets'], r['accuracy']['POLYMARKET']['hits']), (0, ['POLYMARKET/live', 'POLYMARKET/pre'], 2, 2))
 
 
+class Settlement(Hardening):
+    def test_manual_result_settles_and_missing_matches_are_listed_with_a_reason(self):
+        live = BETFAIR_LIVE
+        mid = 'kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111'
+        other = BETFAIR_LIVE.replace(mid, 'x-vs-y-20261111')
+        rows = [self.row(1, live, '2026-11-11T12:10:00+00:00'), self.row(2, other, '2026-11-11T12:20:00+00:00')]
+        r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
+        self.assertEqual(sorted((u['match_id'], u['why']) for u in r['unsettled']),
+                         [(mid, 'à espera da fonte de resultados'), ('x-vs-y-20261111', 'as fontes não cobrem este jogo')])
+        self.assertEqual(r['accuracy']['BETFAIR/live']['no_source'], 1)
+        r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação'}}})
+        bet = [b for b in r['recent_bets'] if b['match_id'] == mid][0]
+        self.assertEqual((bet['ft'], bet['settled_by'], r['audit']['manual_results'], len(r['unsettled'])), ([1, 1], 'resultado manual', 1, 1))
+
+    def test_highlightly_gives_up_only_after_two_complete_late_checks(self):
+        from scangoal import results_hl
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                store.append_versions([self.row(1, BETFAIR_LIVE, '2026-11-11T12:10:00+00:00')])
+                page = {'data': [], 'pagination': {'totalCount': 0}}
+                fetch = lambda params, token: (page, 90)
+                t = datetime.fromisoformat('2026-11-11T15:00:00+00:00')
+                st = results_hl.run(fetch, t, 'k')
+                self.assertEqual((st['misses'], st['not_covered']), ({}, {}))                          # menos de 8 horas: ainda pode aparecer
+                st = results_hl.run(fetch, t + timedelta(hours=8), 'k')
+                self.assertEqual((len(st['misses']), st['not_covered']), (1, {}))
+                st = results_hl.run(fetch, t + timedelta(hours=10), 'k')
+                self.assertEqual(len(st['not_covered']), 1)
+                st = results_hl.run(fetch, t + timedelta(hours=12), 'k')
+                self.assertEqual((st['stats']['targets'], st['stats']['requests']), (0, 0))            # deixa de gastar pedidos com este jogo
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence

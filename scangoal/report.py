@@ -84,7 +84,7 @@ def note_ft(b, notes):
     return None
 
 
-def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None):
+def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=()):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto."""
     out, dead = {}, set()
     for m in msgs:
@@ -127,7 +127,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             f, from_bsd = bsd[b['match_id']]['ft'], True
         b['ft'], b['w'], b['settled_by'] = f, None, None
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
-        b['no_source'] = not f and now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS)
+        b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
         det = (details or {}).get(b['match_id'])
         det = det if det and det.get('consistent') else None
         b['next_goal_min'] = next_goal(b, det)
@@ -333,6 +333,22 @@ def match_stories(match_ids, msgs, ft, bsd, details):
     return out
 
 
+def unsettled(signals, now=None):
+    """Jogos com sinais sem resultado há mais de 2 horas, com o motivo. Um por jogo."""
+    now, out = now or datetime.now(timezone.utc), {}
+    for b in signals:
+        ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
+        if b['w'] is not None or now - ref < timedelta(hours=2):
+            continue
+        why = 'mercado que o resultado final não decide' if b['ft'] else 'as fontes não cobrem este jogo' if b['no_source'] else 'à espera da fonte de resultados'
+        if b['type'] == 'GOAL_BREWING' and not b['no_source']:
+            why = 'à espera dos minutos dos golos'
+        u = out.setdefault(b['match_id'], {'match_id': b['match_id'], 'match': ' — '.join(b['teams'] or []), 'league': b.get('league'), 'date_utc': b['date_utc'],
+                                           'kickoff_utc': b['kickoff_utc'], 'why': why, 'signals': 0})
+        u['signals'] += 1
+    return sorted(out.values(), key=lambda u: u['date_utc'], reverse=True)[:60]
+
+
 def daily(bets):
     by = collections.OrderedDict()
     for b in bets:
@@ -388,6 +404,13 @@ def build(csv_path=None, register=False):
         details = {}
     audit['goal_minutes_matches'] = len(details)
     audit['goal_minutes_inconsistent'] = sum(1 for d in details.values() if not d.get('consistent'))
+    manual = brain.load_registry(data_dir() / 'manual_results.json')   # {jogo: {ft: [c, f], source: onde foi visto}}; só entradas revistas à mão
+    audit['manual_results'] = len(manual)
+    audit['manual_vs_other_disagreements'] = sum(1 for m, r in manual.items() if (ft.get(m) or (bsd.get(m) or {}).get('ft')) not in (None, tuple(r['ft']), list(r['ft'])))
+    for m, r in manual.items():
+        if m not in bsd and isinstance(r.get('ft'), list) and len(r['ft']) == 2:
+            bsd[m] = {'ft': [int(r['ft'][0]), int(r['ft'][1])], 'provider': 'manual'}
+    not_covered = set(st_hl.get('not_covered') or {}) - set(bsd)
     for m, d in details.items():   # jogo decidido depois dos 90 minutos: vale o marcador aos 90, reconstruído pelos minutos dos golos
         if m not in bsd and d.get('consistent') and d.get('score_90') and re.search(r'extra time|penalt', d.get('status') or '', re.I):
             bsd[m] = {'ft': d['score_90'], 'provider': 'HL aos 90 min'}
@@ -400,8 +423,8 @@ def build(csv_path=None, register=False):
     audit['deleted_by_bot'] = len(state.get('missing_ids') or [])
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
-    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details)
-    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details)
+    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered)
+    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered)
     by = collections.OrderedDict()
     for b in bets:
         by.setdefault(b['group'], []).append(b)
@@ -448,7 +471,7 @@ def build(csv_path=None, register=False):
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
-        'questions': questions(bets), 'recent_bets': recent, 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
+        'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 
