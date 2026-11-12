@@ -1,13 +1,13 @@
 {
- "generated_at_utc": "2026-11-12T10:03:26+00:00",
- "messages": 97,
+ "generated_at_utc": "2026-11-12T10:39:44+00:00",
+ "messages": 100,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 5,
-  "BETFAIR": 56,
+  "BETFAIR": 58,
   "STAKE_LOAD": 10,
   "OPEN_GAME": 11,
-  "TOTALS_FORM": 4,
+  "TOTALS_FORM": 5,
   "WEAKENED_LINEUP": 1,
   "OPEN_GAME_NO_ODDS": 2,
   "FULL_TIME_NOTE": 1
@@ -17,118 +17,147 @@
  "excluded_first_seen_with_result": 25,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 97,
+  "versions": 100,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-12T10:03:24+00:00",
+  "last_collected_at_utc": "2026-11-12T10:39:40+00:00",
+  "hl_results": 20,
+  "hl_vs_bot_disagreements": 0,
+  "hl_near_misses": 0,
+  "hl_last_run_utc": "2026-11-12T10:39:42+00:00",
   "bsd_results": 0,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 0,
-  "bsd_last_run_utc": "2026-11-12T10:03:25+00:00"
+  "bsd_last_run_utc": "2026-11-12T10:39:43+00:00",
+  "hl_vs_bsd_disagreements": 0
  },
- "unique_bets": 28,
- "settled_bets": 6,
+ "unique_bets": 31,
+ "settled_bets": 21,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T12:39:51+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
-   "bets": 15,
-   "settled": 1,
-   "wins": 0,
+   "bets": 16,
+   "settled": 11,
+   "wins": 5,
    "pushes": 0,
-   "units": -1.0,
-   "avg_odds": 2.3,
+   "units": -0.01,
+   "avg_odds": 2.142,
    "roi": {
     "odd-0%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.0009,
+     "ci95": [
+      -0.7136,
+      0.7118
+     ]
     },
     "odd-2%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.0209,
+     "ci95": [
+      -0.7193,
+      0.6775
+     ]
     },
     "odd-5%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.0509,
+     "ci95": [
+      -0.7279,
+      0.6262
+     ]
     }
    },
    "cumulative": [
-    -1.0
+    0.48,
+    2.18,
+    1.18,
+    2.9,
+    4.32,
+    3.32,
+    2.32,
+    1.32,
+    1.99,
+    0.99,
+    -0.01
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
    "bets": 6,
-   "settled": 2,
-   "wins": 1,
+   "settled": 5,
+   "wins": 2,
    "pushes": 0,
-   "units": -0.13,
-   "avg_odds": 4.035,
+   "units": -1.52,
+   "avg_odds": 2.62,
    "roi": {
     "odd-0%": {
-     "roi": -0.065,
+     "roi": -0.304,
      "ci95": [
-      -1.8976,
-      1.7676
+      -1.1433,
+      0.5353
      ]
     },
     "odd-2%": {
-     "roi": -0.0837,
+     "roi": -0.3179,
      "ci95": [
-      -1.8796,
-      1.7122
+      -1.1404,
+      0.5045
      ]
     },
     "odd-5%": {
-     "roi": -0.1118,
+     "roi": -0.3388,
      "ci95": [
-      -1.8527,
-      1.6292
+      -1.1361,
+      0.4585
      ]
     }
    },
    "cumulative": [
-    0.87,
-    -0.13
+    -1.0,
+    -2.0,
+    -1.13,
+    -0.52,
+    -1.52
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/pre/mkt<10K": {
-   "bets": 5,
-   "settled": 2,
-   "wins": 2,
+   "bets": 6,
+   "settled": 4,
+   "wins": 4,
    "pushes": 0,
-   "units": 1.19,
-   "avg_odds": 1.595,
+   "units": 2.91,
+   "avg_odds": 1.728,
    "roi": {
     "odd-0%": {
-     "roi": 0.595,
+     "roi": 0.7275,
      "ci95": [
-      0.4088,
-      0.7812
+      0.5446,
+      0.9104
      ]
     },
     "odd-2%": {
-     "roi": 0.5631,
+     "roi": 0.6929,
      "ci95": [
-      0.3806,
-      0.7456
+      0.5137,
+      0.8722
      ]
     },
     "odd-5%": {
-     "roi": 0.5152,
+     "roi": 0.6411,
      "ci95": [
-      0.3384,
-      0.6921
+      0.4674,
+      0.8149
      ]
     }
    },
    "cumulative": [
-    0.5,
-    1.19
+    0.77,
+    1.27,
+    2.22,
+    2.91
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -159,40 +188,52 @@
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
+  },
+  "TOTALS_FORM": {
+   "bets": 1,
+   "settled": 0,
+   "wins": 0,
+   "pushes": 0,
+   "units": 0.0,
+   "avg_odds": null,
+   "roi": null,
+   "cumulative": [],
+   "conclusive": false,
+   "note": "sem conclusão (<300 liquidadas)"
   }
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 21,
-   "with_result": 3,
-   "hits": 1,
-   "misses": 2,
+   "signals": 22,
+   "with_result": 16,
+   "hits": 7,
+   "misses": 9,
    "pushes": 0,
-   "hit_rate": 0.3333,
+   "hit_rate": 0.4375,
    "ci95": [
-    0.0615,
-    0.7923
+    0.231,
+    0.6682
    ],
-   "avg_odds": 3.457,
-   "break_even": 0.3769,
-   "roi_announced_odds": -0.3767,
+   "avg_odds": 2.291,
+   "break_even": 0.4912,
+   "roi_announced_odds": -0.0956,
    "seen_late": 0,
    "by_bot_mark": 0
   },
   "BETFAIR/pre": {
-   "signals": 7,
-   "with_result": 3,
-   "hits": 2,
+   "signals": 8,
+   "with_result": 5,
+   "hits": 4,
    "misses": 1,
    "pushes": 0,
-   "hit_rate": 0.6667,
+   "hit_rate": 0.8,
    "ci95": [
-    0.2077,
-    0.9385
+    0.3755,
+    0.9638
    ],
-   "avg_odds": 1.643,
-   "break_even": 0.611,
-   "roi_announced_odds": 0.0633,
+   "avg_odds": 1.73,
+   "break_even": 0.5822,
+   "roi_announced_odds": 0.382,
    "seen_late": 0,
    "by_bot_mark": 0
   },
@@ -248,7 +289,7 @@
    "by_bot_mark": 0
   },
   "TOTALS_FORM": {
-   "signals": 4,
+   "signals": 5,
    "with_result": 4,
    "hits": 2,
    "misses": 2,
@@ -268,31 +309,31 @@
  "questions": {
   "Q1 Betfair: só apostas que chegaram a ×4, à odd do sinal ×4": {
    "bets": 10,
-   "settled": 4,
-   "wins": 2,
+   "settled": 9,
+   "wins": 5,
    "pushes": 0,
-   "units": -0.25,
-   "avg_odds": 2.418,
+   "units": 0.51,
+   "avg_odds": 2.289,
    "roi": {
     "odd-0%": {
-     "roi": -0.0625,
+     "roi": 0.0567,
      "ci95": [
-      -1.1444,
-      1.0194
+      -0.6046,
+      0.718
      ]
     },
     "odd-2%": {
-     "roi": -0.0812,
+     "roi": 0.0355,
      "ci95": [
-      -1.1415,
-      0.979
+      -0.6126,
+      0.6836
      ]
     },
     "odd-5%": {
-     "roi": -0.1094,
+     "roi": 0.0038,
      "ci95": [
-      -1.1371,
-      0.9184
+      -0.6244,
+      0.6321
      ]
     }
    },
@@ -300,24 +341,33 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 13,
-   "settled": 1,
-   "wins": 0,
+   "bets": 15,
+   "settled": 8,
+   "wins": 3,
    "pushes": 0,
-   "units": -1.0,
-   "avg_odds": 6.2,
+   "units": -1.21,
+   "avg_odds": 2.576,
    "roi": {
     "odd-0%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.1512,
+     "ci95": [
+      -0.9866,
+      0.6841
+     ]
     },
     "odd-2%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.1682,
+     "ci95": [
+      -0.9869,
+      0.6504
+     ]
     },
     "odd-5%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": -0.1937,
+     "ci95": [
+      -0.9873,
+      0.5999
+     ]
     }
    },
    "conclusive": false,
@@ -325,42 +375,64 @@
   },
   "Q3 Betfair: odd [1.10; 1.50)": {
    "bets": 3,
-   "settled": 0,
-   "wins": 0,
+   "settled": 2,
+   "wins": 1,
    "pushes": 0,
-   "units": 0.0,
-   "avg_odds": null,
-   "roi": null,
+   "units": -0.52,
+   "avg_odds": 1.4,
+   "roi": {
+    "odd-0%": {
+     "roi": -0.26,
+     "ci95": [
+      -1.7104,
+      1.1904
+     ]
+    },
+    "odd-2%": {
+     "roi": -0.2748,
+     "ci95": [
+      -1.6962,
+      1.1466
+     ]
+    },
+    "odd-5%": {
+     "roi": -0.297,
+     "ci95": [
+      -1.6749,
+      1.0809
+     ]
+    }
+   },
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [1.50; 2.50)": {
-   "bets": 21,
-   "settled": 5,
-   "wins": 3,
+   "bets": 22,
+   "settled": 16,
+   "wins": 8,
    "pushes": 0,
-   "units": 0.06,
-   "avg_odds": 1.82,
+   "units": -1.52,
+   "avg_odds": 1.931,
    "roi": {
     "odd-0%": {
-     "roi": 0.012,
+     "roi": -0.095,
      "ci95": [
-      -0.8058,
-      0.8298
+      -0.5628,
+      0.3728
      ]
     },
     "odd-2%": {
-     "roi": -0.0082,
+     "roi": -0.1131,
      "ci95": [
-      -0.8097,
-      0.7933
+      -0.5715,
+      0.3453
      ]
     },
     "odd-5%": {
-     "roi": -0.0386,
+     "roi": -0.1403,
      "ci95": [
-      -0.8156,
-      0.7384
+      -0.5847,
+      0.3042
      ]
     }
    },
@@ -368,24 +440,33 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 4,
-   "settled": 1,
-   "wins": 0,
+   "bets": 5,
+   "settled": 3,
+   "wins": 2,
    "pushes": 0,
-   "units": -1.0,
-   "avg_odds": 6.2,
+   "units": 2.42,
+   "avg_odds": 3.873,
    "roi": {
     "odd-0%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": 0.8067,
+     "ci95": [
+      -0.9639,
+      2.5772
+     ]
     },
     "odd-2%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": 0.7705,
+     "ci95": [
+      -0.9646,
+      2.5057
+     ]
     },
     "odd-5%": {
-     "roi": -1.0,
-     "ci95": null
+     "roi": 0.7163,
+     "ci95": [
+      -0.9657,
+      2.3984
+     ]
     }
    },
    "conclusive": false,
@@ -393,31 +474,31 @@
   },
   "Q4 Betfair: quota de mercado >= 80 %": {
    "bets": 14,
-   "settled": 3,
-   "wins": 2,
+   "settled": 8,
+   "wins": 6,
    "pushes": 0,
-   "units": 0.37,
-   "avg_odds": 3.19,
+   "units": 2.08,
+   "avg_odds": 2.297,
    "roi": {
     "odd-0%": {
-     "roi": 0.1233,
+     "roi": 0.26,
      "ci95": [
-      -0.9973,
-      1.2439
+      -0.2906,
+      0.8106
      ]
     },
     "odd-2%": {
-     "roi": 0.1009,
+     "roi": 0.2348,
      "ci95": [
-      -0.9973,
-      1.199
+      -0.3048,
+      0.7744
      ]
     },
     "odd-5%": {
-     "roi": 0.0672,
+     "roi": 0.197,
      "ci95": [
-      -0.9974,
-      1.1317
+      -0.3261,
+      0.7201
      ]
     }
    },
@@ -425,32 +506,32 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q5 Betfair pré-jogo: sinal a mais de 60 min do início": {
-   "bets": 7,
-   "settled": 3,
-   "wins": 2,
+   "bets": 8,
+   "settled": 5,
+   "wins": 4,
    "pushes": 0,
-   "units": 0.19,
-   "avg_odds": 1.643,
+   "units": 1.91,
+   "avg_odds": 1.73,
    "roi": {
     "odd-0%": {
-     "roi": 0.0633,
+     "roi": 0.382,
      "ci95": [
-      -0.9843,
-      1.1109
+      -0.3098,
+      1.0738
      ]
     },
     "odd-2%": {
-     "roi": 0.0421,
+     "roi": 0.3544,
      "ci95": [
-      -0.9846,
-      1.0687
+      -0.3236,
+      1.0324
      ]
     },
     "odd-5%": {
-     "roi": 0.0102,
+     "roi": 0.3129,
      "ci95": [
-      -0.9851,
-      1.0054
+      -0.3443,
+      0.9701
      ]
     }
    },
@@ -491,32 +572,32 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 28,
-   "settled": 6,
-   "wins": 3,
+   "bets": 31,
+   "settled": 21,
+   "wins": 11,
    "pushes": 0,
-   "units": -0.94,
-   "avg_odds": 2.55,
+   "units": 0.38,
+   "avg_odds": 2.158,
    "roi": {
     "odd-0%": {
-     "roi": -0.1567,
+     "roi": 0.0181,
      "ci95": [
-      -0.9018,
-      0.5885
+      -0.4293,
+      0.4655
      ]
     },
     "odd-2%": {
-     "roi": -0.1735,
+     "roi": -0.0023,
      "ci95": [
-      -0.9038,
-      0.5567
+      -0.4408,
+      0.4362
      ]
     },
     "odd-5%": {
-     "roi": -0.1988,
+     "roi": -0.0328,
      "ci95": [
-      -0.9067,
-      0.509
+      -0.4579,
+      0.3923
      ]
     }
    },
@@ -525,6 +606,42 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-12T10:28:10+00:00",
+   "group": "TOTALS_FORM",
+   "match": "Kazakhstan U21 — Belarus U21",
+   "selection": "Over 0.5",
+   "odds": 1.64,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-12T10:06:55+00:00",
+   "group": "BETFAIR/live/mkt<10K",
+   "match": "Kuala Lumpur FA U20 — Kuching City U20",
+   "selection": "Kuala Lumpur FA U20",
+   "odds": 1.6,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-12T10:05:16+00:00",
+   "group": "BETFAIR/pre/mkt<10K",
+   "match": "Luxembourg — Estonia",
+   "selection": "Empate",
+   "odds": 3.2,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-12T09:12:19+00:00",
    "group": "BETFAIR/live/mkt<10K",
@@ -570,9 +687,12 @@
    "match": "Independiente Petrolero — Always Ready",
    "selection": "Always Ready",
    "odds": 2.14,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -582,9 +702,12 @@
    "match": "Fuerte San Francisco — Alianza San Salvador",
    "selection": "Alianza San Salvador",
    "odds": 2.06,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -594,9 +717,12 @@
    "match": "Hammarby Women — Spartak Myjava Women",
    "selection": "Hammarby Women",
    "odds": 1.61,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    4,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 2,
    "max_mult": 8
   },
@@ -606,9 +732,12 @@
    "match": "Colombe du Dja et Lobo — Victoria United",
    "selection": "Colombe du Dja et Lobo",
    "odds": 1.67,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    1
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -633,9 +762,12 @@
    "match": "SK Artis Brno — Jablonec",
    "selection": "Jablonec",
    "odds": 2.04,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    1
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 3,
    "max_mult": 4
   },
@@ -645,9 +777,12 @@
    "match": "Rwanda U23 — Cameroon U23",
    "selection": "Empate",
    "odds": 2.24,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    3
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 3,
    "max_mult": 4
   },
@@ -672,9 +807,12 @@
    "match": "Spain U19 — Iceland U19",
    "selection": "Spain U19",
    "odds": 2.1,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    2
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -684,9 +822,12 @@
    "match": "Kazakhstan U19 — Scotland U19",
    "selection": "Scotland U19",
    "odds": 2.42,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    3
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -696,9 +837,12 @@
    "match": "Republic of Ireland U19 — Greece U19",
    "selection": "Republic of Ireland U19",
    "odds": 2.72,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 2,
    "max_mult": 2
   },
@@ -735,9 +879,12 @@
    "match": "Czech Republic U19 — Netherlands U19",
    "selection": "Netherlands U19",
    "odds": 1.79,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 2,
    "max_mult": 2
   },
@@ -759,9 +906,12 @@
    "match": "Quindio — Tigres FC Zipaquira",
    "selection": "Quindio",
    "odds": 1.95,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 4,
    "max_mult": 8
   },
@@ -783,9 +933,12 @@
    "match": "Macedonia U19 — Northern Ireland U19",
    "selection": "Empate",
    "odds": 2.7,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -810,9 +963,12 @@
    "match": "Nove Zamky — Zemplin Michalovce",
    "selection": "Zemplin Michalovce",
    "odds": 1.48,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    2
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 2,
    "max_mult": 2
   },
@@ -822,9 +978,12 @@
    "match": "Barnsley — Oldham",
    "selection": "Barnsley",
    "odds": 1.77,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    5,
+    2
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 4,
    "max_mult": 16
   },
@@ -849,9 +1008,12 @@
    "match": "Ukraine U19 — Israel U19",
    "selection": "Israel U19",
    "odds": 1.32,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    3,
+    2
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -878,6 +1040,176 @@
    "settled_by": null,
    "n_signals": 1,
    "max_mult": 1
+  }
+ ],
+ "timeline": [
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": -1.0,
+   "g": -1.0,
+   "m": "Ukraine U19 — Israel U19",
+   "s": "Israel U19",
+   "o": 1.32
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": -2.0,
+   "g": -1.0,
+   "m": "Sheff Wed — Accrington",
+   "s": "Sheff Wed",
+   "o": 1.74
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": -1.23,
+   "g": 0.77,
+   "m": "Barnsley — Oldham",
+   "s": "Barnsley",
+   "o": 1.77
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": -0.75,
+   "g": 0.48,
+   "m": "Nove Zamky — Zemplin Michalovce",
+   "s": "Zemplin Michalovce",
+   "o": 1.48
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": -0.25,
+   "g": 0.5,
+   "m": "Italy U19 — Romania U19",
+   "s": "Italy U19",
+   "o": 1.5
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": 1.45,
+   "g": 1.7,
+   "m": "Macedonia U19 — Northern Ireland U19",
+   "s": "Empate",
+   "o": 2.7
+  },
+  {
+   "d": "2026-11-11T12:39:51+00:00",
+   "u": 2.4,
+   "g": 0.95,
+   "m": "Quindio — Tigres FC Zipaquira",
+   "s": "Quindio",
+   "o": 1.95
+  },
+  {
+   "d": "2026-11-11T13:36:42+00:00",
+   "u": 1.4,
+   "g": -1.0,
+   "m": "Czech Republic U19 — Netherlands U19",
+   "s": "Netherlands U19",
+   "o": 1.79
+  },
+  {
+   "d": "2026-11-11T14:00:29+00:00",
+   "u": 2.09,
+   "g": 0.69,
+   "m": "Brondby Women — Rosenborg Women",
+   "s": "Brondby Women",
+   "o": 1.69
+  },
+  {
+   "d": "2026-11-11T14:09:13+00:00",
+   "u": 3.81,
+   "g": 1.72,
+   "m": "Republic of Ireland U19 — Greece U19",
+   "s": "Republic of Ireland U19",
+   "o": 2.72
+  },
+  {
+   "d": "2026-11-11T16:02:36+00:00",
+   "u": 5.23,
+   "g": 1.42,
+   "m": "Kazakhstan U19 — Scotland U19",
+   "s": "Scotland U19",
+   "o": 2.42
+  },
+  {
+   "d": "2026-11-11T16:40:11+00:00",
+   "u": 4.23,
+   "g": -1.0,
+   "m": "Spain U19 — Iceland U19",
+   "s": "Spain U19",
+   "o": 2.1
+  },
+  {
+   "d": "2026-11-11T16:51:21+00:00",
+   "u": 5.1,
+   "g": 0.87,
+   "m": "Serbia U19 — Faroe Islands U19",
+   "s": "Serbia U19",
+   "o": 1.87
+  },
+  {
+   "d": "2026-11-11T16:53:08+00:00",
+   "u": 4.1,
+   "g": -1.0,
+   "m": "Rwanda U23 — Cameroon U23",
+   "s": "Empate",
+   "o": 2.24
+  },
+  {
+   "d": "2026-11-11T17:08:12+00:00",
+   "u": 3.1,
+   "g": -1.0,
+   "m": "SK Artis Brno — Jablonec",
+   "s": "Jablonec",
+   "o": 2.04
+  },
+  {
+   "d": "2026-11-11T18:16:09+00:00",
+   "u": 2.1,
+   "g": -1.0,
+   "m": "Malmo FF Women — Ajax Women",
+   "s": "Malmo FF Women",
+   "o": 2.3
+  },
+  {
+   "d": "2026-11-11T18:30:29+00:00",
+   "u": 2.77,
+   "g": 0.67,
+   "m": "Colombe du Dja et Lobo — Victoria United",
+   "s": "Colombe du Dja et Lobo",
+   "o": 1.67
+  },
+  {
+   "d": "2026-11-11T19:13:50+00:00",
+   "u": 3.38,
+   "g": 0.61,
+   "m": "Hammarby Women — Spartak Myjava Women",
+   "s": "Hammarby Women",
+   "o": 1.61
+  },
+  {
+   "d": "2026-11-11T21:44:43+00:00",
+   "u": 2.38,
+   "g": -1.0,
+   "m": "Fuerte San Francisco — Alianza San Salvador",
+   "s": "Alianza San Salvador",
+   "o": 2.06
+  },
+  {
+   "d": "2026-11-11T22:38:18+00:00",
+   "u": 1.38,
+   "g": -1.0,
+   "m": "Independiente Petrolero — Always Ready",
+   "s": "Always Ready",
+   "o": 2.14
+  },
+  {
+   "d": "2026-11-12T00:45:49+00:00",
+   "u": 0.38,
+   "g": -1.0,
+   "m": "Real Soacha Cundinamarca — Real Cartagena",
+   "s": "Real Soacha Cundinamarca",
+   "o": 6.2
   }
  ]
 }
