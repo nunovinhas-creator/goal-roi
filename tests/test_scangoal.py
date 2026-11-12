@@ -490,6 +490,27 @@ class Brain(Hardening):
         self.assertEqual((ep[('live', 4)]['n'], ep[('live', 4)]['roi']), (1, 2.0))          # só uma chegou a ×4, e a odd era 3,0
         self.assertEqual(ep[('live', 8)]['signals'], 0)
 
+    def test_board_shows_best_and_worst_tactics_and_fresh_open_signals(self):
+        from scangoal import brain
+        row = lambda hid, fam, n, hits, prob, open_=(), tradable=True, status='em observação': {
+            'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
+            'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
+        now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
+        sig = lambda key, date, ko=None: {'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
+        rows = [row('a', 'Jogo aberto', 12, 11, 0.97, [sig('k1', '2026-11-12T19:40:00+00:00'), sig('k2', '2026-11-12T10:00:00+00:00'), sig('k3', '2026-11-12T12:00:00+00:00', '2026-11-12T22:00:00+00:00')]),
+                row('a2', 'Jogo aberto', 12, 11, 0.96),                 # mesma amostra que "a": repetida
+                row('b', 'Jogo aberto', 10, 8, 0.90), row('c', 'Jogo aberto', 9, 7, 0.85),        # a família já tem duas
+                row('d', 'Betfair', 7, 7, 0.99),                        # menos de 8 resultados
+                row('e', 'Betfair', 20, 15, 0.93, tradable=False),      # só se sabe depois do sinal
+                row('f', 'Stake', 40, 30, 0.97, status='promissora'), row('g', 'Stake', 10, 2, 0.05), row('h', 'Betfair', 30, 14, 0.5)]
+        b = brain.board(rows, now)
+        self.assertEqual([c['id'] for c in b['best']], ['f', 'a', 'b'])                         # mesma probabilidade: primeiro a que tem mais resultados
+        self.assertEqual([(c['level'], c['missing']) for c in b['best']], [('promissora', 0), ('indício inicial', 18), ('indício inicial', 20)])
+        self.assertEqual([c['id'] for c in b['avoid']], ['g'])
+        self.assertEqual(sorted(o['date_utc'][11:16] for o in b['open']), ['12:00', '19:40'])   # recente ou com jogo por começar; o das 10:00 já passou
+        whole = brain.board(rows, now, {'Stake': 42, 'Jogo aberto': 100})
+        self.assertEqual([(c['id'], c['conditions']) for c in whole['best']][0], ('f', []))            # apanha quase todos os sinais Stake: é o tipo inteiro
+
     def test_manual_hypothesis_only_counts_signals_after_it_was_written(self):
         from scangoal import brain
         sigs = [self.sig(i, 20, True) for i in range(10)]

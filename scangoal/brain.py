@@ -19,6 +19,7 @@ from .parser import competition_kind
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
 MAX_HYPOTHESES = 300
 HINT_AT, STRONG_AT = 30, 100
+BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de resultados e limiares de probabilidade
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
 
 
@@ -133,8 +134,57 @@ def evaluate(signals, registry, min_settled):
     return rows, tested, bar
 
 
+def board(rows, now=None, family_n=None):
+    """Quadro em destaque: as táticas apostáveis com melhor e pior evidência até agora, e os sinais em aberto que encaixam nas melhores.
+
+    Antes dos 30 resultados uma tática é só um "indício inicial"; o quadro diz sempre quantos resultados tem e quantos faltam.
+    """
+    now = now or datetime.now(timezone.utc)
+    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['n'] >= BOARD_MIN]
+
+    def pick(ordered, limit):
+        out, per_family, samples = [], {}, set()
+        for r in ordered:
+            whole = bool(family_n) and r['n'] >= 0.9 * family_n.get(r['family'], 1e9)   # apanha quase todos os sinais do tipo: é o tipo inteiro
+            r['whole'] = whole
+            sample = (r['family'], 'todos') if whole else (r['family'], r['n'], r['hits'])
+            if sample in samples or per_family.get(r['family'], 0) >= 2:
+                continue   # mesma amostra que uma tática já escolhida, ou família já com duas
+            samples.add(sample)
+            per_family[r['family']] = per_family.get(r['family'], 0) + 1
+            out.append(r)
+            if len(out) >= limit:
+                break
+        return out
+
+    def card(r):
+        return {'id': r['id'], 'family': r['family'], 'conditions': [] if r.get('whole') else r['conditions'], 'n': r['n'], 'hits': r['hits'], 'hit_rate': r['hit_rate'],
+                'break_even': r['break_even'], 'prob_above': r['prob_above'], 'roi': r['roi'], 'source': r['source'], 'reason': r.get('reason'),
+                'level': r['status'] if r['status'] != 'em observação' else 'indício inicial', 'missing': max(0, HINT_AT - r['n'])}
+
+    best = pick(sorted((r for r in cand if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada'), key=lambda r: (-r['prob_above'], -r['n'])), 5)
+    avoid = pick(sorted((r for r in cand if r['prob_above'] <= BOARD_BAD), key=lambda r: (r['prob_above'], -r['n'])), 3)
+    live = {}
+    for r in best:
+        for b in r['open']:
+            ko = datetime.fromisoformat(b['kickoff_utc']) if b.get('kickoff_utc') else None
+            fresh = (ko is not None and ko > now) or (now - datetime.fromisoformat(b['date_utc'])).total_seconds() <= 3600
+            if fresh and b['key'] not in live:
+                teams = b['teams'] or ['equipa da casa', 'equipa de fora']
+                sel = {'1': teams[0], '2': teams[1], 'X': 'Empate'}.get(b['selection'], b['selection']) if b['market'] == '1X2' else b['selection']
+                live[b['key']] = {'date_utc': b['date_utc'], 'kickoff_utc': b.get('kickoff_utc'), 'match': ' — '.join(b['teams'] or []), 'selection': sel,
+                                  'market': b['market'], 'odds': b['odds'], 'tactic': r['id']}
+    return {'best': [card(r) for r in best], 'avoid': [card(r) for r in avoid], 'open': sorted(live.values(), key=lambda x: x['date_utc'], reverse=True)[:8],
+            'min_results': BOARD_MIN, 'hint_at': HINT_AT}
+
+
 def build(signals, registry, min_settled):
     rows, tested, bar = evaluate(signals, registry, min_settled)
+    fams = {}
+    for b in signals:
+        if b['w'] is not None and b['w'] != 0 and b['odds']:
+            fams[insights.family(b)] = fams.get(insights.family(b), 0) + 1
+    brd = board(rows, family_n=fams)
     counts = {}
     for r in rows:
         counts[r['status']] = counts.get(r['status'], 0) + 1
@@ -148,7 +198,7 @@ def build(signals, registry, min_settled):
     for r in rows:
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
-    return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts,
+    return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd,
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect')}
                     for r in rows if r['n'] >= 5][:150],
             'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
