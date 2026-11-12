@@ -26,6 +26,10 @@ jobs:
           TG_SESSION: ${{ secrets.TG_SESSION }}
           TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
         run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
+      - name: Results from BSD (hourly at most; skipped without key)
+        env:
+          BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
+        run: python -u -m scangoal.results_bsd
       - name: Report (fixed rules, no LLM)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
       - name: Commit data

@@ -69,7 +69,7 @@ def note_ft(b, notes):
     return None
 
 
-def build_bets(msgs, ft, marks=None, notes=(), strict=True):
+def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto."""
     out = {}
     for m in msgs:
@@ -95,6 +95,9 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True):
     for b in bets:
         b['group'] = group(b)
         f = ft.get(b['match_id']) or note_ft(b, notes)
+        from_bsd = False
+        if not f and bsd and b['match_id'] in bsd:
+            f, from_bsd = bsd[b['match_id']]['ft'], True
         b['ft'], b['w'], b['settled_by'] = f, None, None
         if not f:
             continue
@@ -103,7 +106,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True):
             continue
         own = settle(b['market'], b['selection'], f, b['teams'])
         if own is not None:
-            b['w'], b['settled_by'] = own, 'resultado'
+            b['w'], b['settled_by'] = own, 'resultado BSD' if from_bsd else 'resultado'
         elif marks and b['key'] in marks:  # mercado que o resultado final não decide: vale a marca do bot
             b['w'], b['settled_by'] = (1.0 if marks[b['key']] else -1.0), 'marca do bot'
     return bets
@@ -215,8 +218,18 @@ def questions(bets):
 
 def build():
     msgs, ft, marks, notes, audit = load()
-    bets = build_bets(msgs, ft, marks, notes)
-    signals = build_bets(msgs, ft, marks, notes, strict=False)
+    bsd_state = {}
+    try:
+        bsd_state = json.loads((data_dir() / 'results_bsd.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        pass
+    bsd = bsd_state.get('results') or {}
+    audit['bsd_results'] = len(bsd)
+    audit['bsd_vs_bot_disagreements'] = sum(1 for m, r in bsd.items() if m in ft and ft[m] != r['ft'])
+    audit['bsd_near_misses'] = len(bsd_state.get('near_misses') or {})
+    audit['bsd_last_run_utc'] = bsd_state.get('last_run_utc')
+    bets = build_bets(msgs, ft, marks, notes, bsd=bsd)
+    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd)
     by = collections.OrderedDict()
     for b in bets:
         by.setdefault(b['group'], []).append(b)

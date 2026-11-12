@@ -29,6 +29,13 @@ Uma pergunta nova só entra aqui com data, e só vale para dados posteriores a e
 ## Controlo de qualidade
 O relatório conta: mensagens por ler (formatos novos), sinais que o bot alterou depois de publicar, resultados em que a marca ✅/❌ do bot difere da liquidação própria, e exclusões.
 
+## Resultados pela BSD
+Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai buscá-los à API BSD, no máximo uma vez por hora e 12 pedidos por execução.
+- Só liquida com nomes de casa e de fora iguais (depois de normalizar), hora compatível e um único candidato. Nunca por semelhança.
+- Nomes diferentes entre o bot e a BSD ficam em `near_misses` (em `data/results_bsd.json`) e só passam a contar depois de acrescentados à mão a `data/team_aliases.json`.
+- O resultado do bot tem prioridade; quando ambos existem, o relatório conta as divergências.
+- Secret: `BSD_API_KEY`. Sem ele, este passo não faz nada.
+
 ## Página
 GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `docs/report.json`, atualizado a cada recolha.
 
@@ -36,6 +43,6 @@ GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `d
 `TG_API_ID`, `TG_API_HASH`, `TG_SESSION` (gerar com `scripts/authorize_qr.py` num computador, ou `scripts/authorize.py` por código; sessão própria), `TG_SCANGOAL` = `@scangoal_bot`.
 
 ## Limitações
-- Sinais Betfair não trazem resultado; só são liquidados quando outra mensagem do mesmo jogo o traz.
+- Sinais Betfair não trazem resultado; dependem de outra mensagem do mesmo jogo ou da BSD com nomes exatamente iguais.
 - A odd anunciada pode não ser obtível, sobretudo ao vivo e em mercados pequenos.
 - Camadas seguintes (perguntas pré-definidas; resumo por LLM a partir dos números) só depois de haver dados.

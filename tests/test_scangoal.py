@@ -175,6 +175,75 @@ class Report(unittest.TestCase):
         self.assertEqual(r['groups']['STAKE_LOAD/live']['bets'], 1)                                   # a vista já com resultado não entra no ROI
 
 
+class BSD(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ['SCANGOAL_DATA_DIR'] = self.dir.name
+        live = BETFAIR_LIVE.replace('Kucukcekmece Sinopspor — Fatsa Belediyespor', 'Sheff Wed — Accrington FC')
+        rows = [{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': BETFAIR_PRE},
+                {'message_id': 2, 'date_utc': '2026-11-11T19:40:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': live}]
+        store.append_versions(rows)
+
+    def tearDown(self):
+        del os.environ['SCANGOAL_DATA_DIR']
+        self.dir.cleanup()
+
+    def ev(self, i, home, away, when, h=2, a=0, status='finished'):
+        return {'id': i, 'status': status, 'event_date': when, 'home_team': {'name': home}, 'away_team': away, 'home_score': h, 'away_score': a}
+
+    def run_bsd(self, pages, **kw):
+        from datetime import datetime, timezone
+        from scangoal import results_bsd
+        calls = []
+
+        def fetch(url, token):
+            calls.append(url)
+            assert token == 'k' and url.startswith(results_bsd.ROOT)
+            return pages[len(calls) - 1]
+        now = kw.pop('now', datetime(2026, 11, 12, 9, 0, tzinfo=timezone.utc))
+        return results_bsd.run(fetch=fetch, now=now, token='k'), calls
+
+    def test_exact_identity_time_window_and_no_fuzzy(self):
+        page1 = {'results': [self.ev(10, 'Barnsley FC', 'Oldham', '2026-11-11T19:00:00Z', 2, 1),
+                             self.ev(11, 'Barnsley', 'Oldham', '2026-11-10T19:00:00Z', 5, 5),            # mesmo par, outro dia: ignorado
+                             self.ev(12, 'Sheffield Wednesday', 'Accrington', '2026-11-11T19:00:00Z')],  # nome diferente: não liquida
+                 'next': None}
+        state, calls = self.run_bsd([page1])
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(state['results']['barnsley-vs-oldham-20261111']['ft'], [2, 1])
+        self.assertEqual(list(state['results']), ['barnsley-vs-oldham-20261111'])
+        self.assertIn('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', state['near_misses'])
+        from scangoal import report
+        r = report.build()
+        self.assertEqual((r['audit']['bsd_results'], r['groups']['BETFAIR/pre/mkt>=10K']['wins']), (1, 1))
+        self.assertEqual(r['recent_bets'][-1]['settled_by'], 'resultado BSD')
+
+    def test_alias_file_is_the_only_way_to_bridge_names(self):
+        (Path(self.dir.name) / 'team_aliases.json').write_text(json.dumps({'_comment': 'x', 'Sheff Wed': 'Sheffield Wednesday'}), encoding='utf-8')
+        page = {'results': [self.ev(12, 'Sheffield Wednesday', 'Accrington', '2026-11-11T19:00:00Z', 0, 0)], 'next': None}
+        state, _ = self.run_bsd([page])
+        self.assertEqual(state['results']['kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111']['ft'], [0, 0])   # sinal às 19:40, jogo às 19:00
+
+    def test_unfinished_ambiguous_throttle_and_missing_key(self):
+        from datetime import datetime, timezone
+        from scangoal import results_bsd
+        dup = {'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z'), self.ev(13, 'Barnsley', 'Oldham', '2026-11-11T19:30:00Z'),
+                           self.ev(14, 'Sheff Wed', 'Accrington', '2026-11-11T19:00:00Z', status='inprogress')], 'next': None}
+        state, _ = self.run_bsd([dup])
+        self.assertEqual(state['results'], {})                                   # dois candidatos / não terminado: fica em aberto
+        _, calls = self.run_bsd([dup], now=datetime(2026, 11, 12, 9, 20, tzinfo=timezone.utc))
+        self.assertEqual(calls, [])                                              # menos de 50 min depois: não repete pedidos
+        self.assertIsNone(results_bsd.run(token=''))
+
+    def test_pagination_follows_next_and_respects_cap(self):
+        from scangoal import results_bsd
+        p1 = {'results': [self.ev(1, 'A', 'B', '2026-11-11T19:00:00Z')], 'next': results_bsd.ROOT + '?page=2'}
+        p2 = {'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z', 1, 1)], 'next': results_bsd.ROOT + '?page=3'}
+        p3 = {'results': [], 'next': None}
+        state, calls = self.run_bsd([p1, p2, p3])
+        self.assertEqual((len(calls), state['results']['barnsley-vs-oldham-20261111']['ft']), (3, [1, 1]))
+
+
 class Store(unittest.TestCase):
     def test_append_only_versions(self):
         with tempfile.TemporaryDirectory() as d:
