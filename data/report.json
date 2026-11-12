@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-12T17:30:52+00:00",
+ "generated_at_utc": "2026-11-12T17:39:12+00:00",
  "messages": 133,
  "types": {
   "SERVICE": 7,
@@ -37,7 +37,7 @@
   "bsd_last_run_utc": "2026-11-12T16:49:12+00:00",
   "goal_minutes_matches": 10,
   "goal_minutes_inconsistent": 0,
-  "collector_last_run_utc": "2026-11-12T17:30:39+00:00",
+  "collector_last_run_utc": "2026-11-12T17:39:09+00:00",
   "name_review": [],
   "deleted_by_bot": 0,
   "ended_after_90": 0,
@@ -347,7 +347,7 @@
    "by_bot_mark": 0,
    "per_day": 5.0,
    "days_to_hint": 5,
-   "days_to_conclusion": 59,
+   "days_to_conclusion": 60,
    "prudent_rate": 0.6697,
    "prob_above": 0.8028
   },
@@ -396,7 +396,7 @@
    "roi_announced_odds": 0.8019,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 14.8,
+   "per_day": 14.7,
    "days_to_hint": 1,
    "days_to_conclusion": 20,
    "prudent_rate": 0.7915,
@@ -450,7 +450,7 @@
    "roi_announced_odds": -0.4389,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 7.6,
+   "per_day": 7.5,
    "days_to_hint": 3,
    "days_to_conclusion": 39,
    "prudent_rate": 0.4622,
@@ -1131,9 +1131,13 @@
     "expect": null
    },
    {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
     "family": "Jogo aberto",
     "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
      [
       "Golos em falta para ganhar",
       "até 1 golo"
@@ -1150,13 +1154,9 @@
     "expect": null
    },
    {
-    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "family": "Jogo aberto",
     "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
      [
       "Golos em falta para ganhar",
       "até 1 golo"
