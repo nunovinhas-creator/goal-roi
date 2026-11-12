@@ -84,29 +84,29 @@ def score_of(event):
 
 def match_events(targets, events, aliases):
     """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
-    al = lambda name: norm_team(aliases.get(norm_team(name), name))
+    names = lambda name: {norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}
     found, near = {}, {}
     index = {}
     for ev in events:
         if isinstance(ev, dict):
             index.setdefault((norm_team(name_of(ev, 'home_team')), norm_team(name_of(ev, 'away_team'))), []).append(ev)
     for mid, t in targets.items():
-        home, away = al(t['teams'][0]), al(t['teams'][1])
-        cands = [ev for ev in index.get((home, away), []) if time_ok(t, kickoff_of(ev))]
+        homes, aways = names(t['teams'][0]), names(t['teams'][1])
+        cands = [ev for h in homes for a in aways for ev in index.get((h, a), []) if time_ok(t, kickoff_of(ev))]
         scored = [(ev, score_of(ev)) for ev in cands]
         if len(cands) == 1 and scored[0][1]:
             ev = cands[0]
             found[mid] = {'ft': scored[0][1], 'bsd_id': ev['id'], 'home': name_of(ev, 'home_team'), 'away': name_of(ev, 'away_team'),
                           'event_date': kickoff_of(ev).isoformat(timespec='minutes')}
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
-            n = [[name_of(ev, 'home_team'), name_of(ev, 'away_team')] for (h, a), evs in index.items() if (h == home) != (a == away)
+            n = [[name_of(ev, 'home_team'), name_of(ev, 'away_team')] for (h, a), evs in index.items() if (h in homes) != (a in aways)
                  for ev in evs if time_ok(t, kickoff_of(ev))]
             if n:
                 near[mid] = {'bot': t['teams'], 'bsd_candidates': n[:3]}
     return found, near
 
 
-def pending_targets(now):
+def pending_targets(now, max_age_days=MAX_AGE_DAYS):
     """Jogos com apostas, sem resultado guardado da BSD, já terminados há tempo suficiente e não demasiado antigos."""
     from .report import build_bets, load
     msgs, ft, marks, notes, _ = load()
@@ -115,10 +115,16 @@ def pending_targets(now):
         if b['type'] != 'BETFAIR' or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
             continue
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
-        if timedelta(hours=2, minutes=30) <= now - ref <= timedelta(days=MAX_AGE_DAYS):
+        if timedelta(hours=2, minutes=30) <= now - ref <= timedelta(days=max_age_days):
             out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'],
                                              'days': sorted({ref.date().isoformat(), (ref - timedelta(minutes=150)).date().isoformat()})})
     return out
+
+
+def load_aliases():
+    """data/team_aliases.json: {"nome no bot": ["nome aceite num fornecedor", ...]}. Só entradas revistas à mão."""
+    raw = load_json(data_dir() / 'team_aliases.json', {})
+    return {norm_team(k): ([v] if isinstance(v, str) else list(v)) for k, v in raw.items() if not k.startswith('_')}
 
 
 def load_json(path, default):
@@ -139,7 +145,7 @@ def run(fetch=request_json, now=None, token=None):
     if state['last_run_utc'] and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
         print('BSD_SKIPPED_TOO_SOON')
         return state
-    aliases = {norm_team(k): v for k, v in load_json(data_dir() / 'team_aliases.json', {}).items() if not k.startswith('_')}
+    aliases = load_aliases()
     targets = {m: t for m, t in pending_targets(now).items() if m not in state['results']}
     requests, capped, events, per_day = 0, False, [], {}
     if targets:

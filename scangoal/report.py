@@ -106,7 +106,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
             continue
         own = settle(b['market'], b['selection'], f, b['teams'])
         if own is not None:
-            b['w'], b['settled_by'] = own, 'resultado BSD' if from_bsd else 'resultado'
+            b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
         elif marks and b['key'] in marks:  # mercado que o resultado final não decide: vale a marca do bot
             b['w'], b['settled_by'] = (1.0 if marks[b['key']] else -1.0), 'marca do bot'
     return bets
@@ -218,16 +218,21 @@ def questions(bets):
 
 def build():
     msgs, ft, marks, notes, audit = load()
-    bsd_state = {}
-    try:
-        bsd_state = json.loads((data_dir() / 'results_bsd.json').read_text(encoding='utf-8'))
-    except (OSError, ValueError):
-        pass
-    bsd = bsd_state.get('results') or {}
-    audit['bsd_results'] = len(bsd)
-    audit['bsd_vs_bot_disagreements'] = sum(1 for m, r in bsd.items() if m in ft and ft[m] != r['ft'])
-    audit['bsd_near_misses'] = len(bsd_state.get('near_misses') or {})
-    audit['bsd_last_run_utc'] = bsd_state.get('last_run_utc')
+    ext, bsd = {}, {}                                   # resultados externos: Highlightly primeiro, depois BSD
+    for name in ('hl', 'bsd'):
+        try:
+            st = json.loads((data_dir() / ('results_%s.json' % name)).read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            st = {}
+        res = st.get('results') or {}
+        audit[name + '_results'] = len(res)
+        audit[name + '_vs_bot_disagreements'] = sum(1 for m, r in res.items() if m in ft and ft[m] != r['ft'])
+        audit[name + '_near_misses'] = len(st.get('near_misses') or {})
+        audit[name + '_last_run_utc'] = st.get('last_run_utc')
+        ext[name] = res
+        for m, r in res.items():
+            bsd.setdefault(m, dict(r, provider=name.upper()))
+    audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
     bets = build_bets(msgs, ft, marks, notes, bsd=bsd)
     signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd)
     by = collections.OrderedDict()

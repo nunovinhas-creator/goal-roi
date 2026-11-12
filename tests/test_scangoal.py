@@ -219,7 +219,7 @@ class BSD(unittest.TestCase):
         self.assertEqual(r['recent_bets'][-1]['settled_by'], 'resultado BSD')
 
     def test_alias_file_is_the_only_way_to_bridge_names(self):
-        (Path(self.dir.name) / 'team_aliases.json').write_text(json.dumps({'_comment': 'x', 'Sheff Wed': 'Sheffield Wednesday'}), encoding='utf-8')
+        (Path(self.dir.name) / 'team_aliases.json').write_text(json.dumps({'_comment': 'x', 'Sheff Wed': ['Sheffield Wednesday']}), encoding='utf-8')
         page = {'results': [self.ev(12, 'Sheffield Wednesday', 'Accrington', '2026-11-11T19:00:00Z', 0, 0)], 'next': None}
         state, _ = self.run_bsd([page])
         self.assertEqual(state['results']['kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111']['ft'], [0, 0])   # sinal às 19:40, jogo às 19:00
@@ -243,6 +243,42 @@ class BSD(unittest.TestCase):
         self.assertEqual((len(calls), state['results']['barnsley-vs-oldham-20261111']['ft']), (2, [1, 1]))
         self.assertIn('offset=1', calls[1])
         self.assertEqual(state['stats']['per_day'], {'2026-11-11': {'count_reported': 2, 'events_read': 2}})
+
+
+class Highlightly(BSD):
+    def hl(self, i, home, away, when, score='2 - 1', desc='Finished'):
+        return {'id': i, 'date': when, 'homeTeam': {'name': home}, 'awayTeam': {'name': away}, 'league': {'name': 'L'},
+                'state': {'description': desc, 'score': {'current': score, 'penalties': None}}}
+
+    def run_hl(self, pages, remaining=90, now=None):
+        from datetime import datetime, timezone
+        from scangoal import results_hl
+        calls = []
+
+        def fetch(params, token):
+            calls.append(params)
+            assert token == 'k'
+            return pages[len(calls) - 1], remaining
+        return results_hl.run(fetch=fetch, now=now or datetime(2026, 11, 12, 9, 0, tzinfo=timezone.utc), token='k'), calls
+
+    def test_finished_only_and_report_priority(self):
+        (Path(self.dir.name) / 'team_aliases.json').write_text(json.dumps({'Sheff Wed': ['Sheffield Wednesday']}), encoding='utf-8')
+        page = {'data': [self.hl(1, 'Barnsley', 'Oldham', '2026-11-11T19:00:00.000Z', '5 - 2'),
+                         self.hl(2, 'Sheffield Wednesday', 'Accrington', '2026-11-11T19:00:00.000Z', '1 - 1', 'Finished after penalties')],
+                'pagination': {'totalCount': 2}}
+        state, calls = self.run_hl([page])
+        self.assertEqual(calls, [{'date': '2026-11-11', 'limit': 100, 'offset': 0}])
+        self.assertEqual({m: r['ft'] for m, r in state['results'].items()}, {'barnsley-vs-oldham-20261111': [5, 2]})   # penáltis: fica em aberto
+        from scangoal import report
+        r = report.build()
+        self.assertEqual((r['audit']['hl_results'], r['recent_bets'][-1]['settled_by']), (1, 'resultado HL'))
+
+    def test_quota_guard_pagination_and_throttle(self):
+        p1 = {'data': [self.hl(9, 'A', 'B', '2026-11-11T19:00:00.000Z')], 'pagination': {'totalCount': 2}}
+        state, calls = self.run_hl([p1, p1], remaining=10)
+        self.assertEqual((len(calls), state['stats']['stopped']), (1, 'daily_quota_low'))
+        _, calls = self.run_hl([p1])
+        self.assertEqual(calls, [])                                              # menos de 4 horas depois
 
 
 class Store(unittest.TestCase):

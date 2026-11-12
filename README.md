@@ -29,6 +29,11 @@ Uma pergunta nova só entra aqui com data, e só vale para dados posteriores a e
 ## Controlo de qualidade
 O relatório conta: mensagens por ler (formatos novos), sinais que o bot alterou depois de publicar, resultados em que a marca ✅/❌ do bot difere da liquidação própria, e exclusões.
 
+## Resultados pela Highlightly (fonte principal para o Betfair)
+`scangoal/results_hl.py`: no máximo de 4 em 4 horas, até 8 pedidos por execução, e pára se restarem menos de 15 pedidos do limite diário (100).
+Mesmas regras de identidade da BSD. Só conta jogos no estado "Finished"; prolongamento, penáltis e resultados atribuídos ficam em aberto.
+Secret: `HIGHLIGHTLY_KEY`. Aliases revistos em `data/team_aliases.json` (`"nome no bot": ["nome no fornecedor"]`).
+
 ## Resultados pela BSD
 Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai buscá-los à API BSD, no máximo uma vez por hora e 12 pedidos por execução.
 - Só liquida com nomes de casa e de fora iguais (depois de normalizar), hora compatível e um único candidato. Nunca por semelhança.
