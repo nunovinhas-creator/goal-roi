@@ -422,6 +422,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Competição = liga & Tamanho do mercado = 10 mil $ ou mais": {
+  "born_utc": "2026-11-12T23:20:32+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "mercado grande em ligas",
+  "source": "llm"
+ },
  "Betfair | Competição = liga & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [

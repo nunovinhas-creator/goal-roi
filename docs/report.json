@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-12T23:12:15+00:00",
+ "generated_at_utc": "2026-11-12T23:20:43+00:00",
  "messages": 155,
  "types": {
   "SERVICE": 7,
@@ -31,12 +31,12 @@
   "bsd_results": 3,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 1,
-  "bsd_last_run_utc": "2026-11-12T22:30:29+00:00",
+  "bsd_last_run_utc": "2026-11-12T23:20:31+00:00",
   "goal_minutes_matches": 20,
   "goal_minutes_inconsistent": 0,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-12T23:12:13+00:00",
+  "collector_last_run_utc": "2026-11-12T23:20:30+00:00",
   "name_review": [
    {
     "bot": [
@@ -466,7 +466,7 @@
    "roi_announced_odds": 0.0129,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 16.7,
+   "per_day": 16.6,
    "days_to_hint": 1,
    "days_to_conclusion": 17,
    "prudent_rate": 0.5006,
@@ -503,7 +503,7 @@
    "roi_announced_odds": 0.58,
    "seen_late": 5,
    "by_bot_mark": 0,
-   "per_day": 4.9,
+   "per_day": 4.8,
    "days_to_hint": 5,
    "days_to_conclusion": 61,
    "prudent_rate": 0.6789,
@@ -541,8 +541,8 @@
    "seen_late": 0,
    "by_bot_mark": 0,
    "per_day": 0.7,
-   "days_to_hint": 42,
-   "days_to_conclusion": 433,
+   "days_to_hint": 43,
+   "days_to_conclusion": 435,
    "prudent_rate": 0.3364,
    "prob_above": 0.383,
    "edge": -0.0336,
@@ -579,7 +579,7 @@
    "by_bot_mark": 0,
    "per_day": 12.9,
    "days_to_hint": 2,
-   "days_to_conclusion": 22,
+   "days_to_conclusion": 23,
    "prudent_rate": 0.8037,
    "prob_above": 0.998,
    "edge": 0.2641,
@@ -616,7 +616,7 @@
    "by_bot_mark": 0,
    "per_day": 1.7,
    "days_to_hint": 17,
-   "days_to_conclusion": 172,
+   "days_to_conclusion": 173,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -727,7 +727,7 @@
    "by_bot_mark": 0,
    "per_day": 6.5,
    "days_to_hint": 4,
-   "days_to_conclusion": 45,
+   "days_to_conclusion": 46,
    "prudent_rate": 0.5445,
    "prob_above": 0.3177,
    "edge": -0.0584,
@@ -763,8 +763,8 @@
    "seen_late": 0,
    "by_bot_mark": 0,
    "per_day": 1.6,
-   "days_to_hint": 17,
-   "days_to_conclusion": 181,
+   "days_to_hint": 18,
+   "days_to_conclusion": 182,
    "prudent_rate": 0.5254,
    "prob_above": 0.4902,
    "edge": -0.0051,
@@ -1583,11 +1583,11 @@
   }
  },
  "brain": {
-  "hypotheses": 267,
+  "hypotheses": 268,
   "tested": 1,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 267
+   "em observação": 268
   },
   "board": {
    "best": [
@@ -1814,7 +1814,7 @@
      "as_expected": 81
     },
     "llm/novas": {
-     "hypotheses": 4,
+     "hypotheses": 5,
      "judged": 0,
      "as_expected": 0
     },
@@ -6417,6 +6417,43 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Competição = liga & Tamanho do mercado = 10 mil $ ou mais",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Competição",
+      "liga"
+     ],
+     [
+      "Tamanho do mercado",
+      "10 mil $ ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-12T23:20:32+00:00",
+    "reason": "mercado grande em ligas",
+    "expect": "acima",
+    "mode": "novas",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Forma de golos | Golos até ao sinal = nenhum & Minuto = 31 a 60",
     "family": "Forma de golos",
     "conditions": [
@@ -6755,7 +6792,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 9,
+  "llm_total": 10,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -6763,15 +6800,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 8,
-  "llm_last_run_utc": "2026-11-12T22:21:56+00:00",
+  "llm_runs": 9,
+  "llm_last_run_utc": "2026-11-12T23:20:32+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-12",
-   "calls_today": 7,
-   "neurons_today": 1070.6,
-   "accepted_today": 6,
-   "last_mode": "notas"
+   "calls_today": 8,
+   "neurons_today": 1224.8,
+   "accepted_today": 7,
+   "last_mode": "novas"
   },
   "notes": [
    {
