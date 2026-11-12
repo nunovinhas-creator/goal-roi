@@ -177,8 +177,8 @@ def baseline_more_goals(minute):
 def group(b):
     if b['type'] == 'BETFAIR':
         return 'BETFAIR/%s/%s' % (b['phase'], 'mkt>=10K' if b['mkt_volume'] >= 10000 else 'mkt<10K')
-    if b['type'] == 'STAKE_LOAD':
-        return 'STAKE_LOAD/%s' % b['phase']
+    if b['type'] in ('STAKE_LOAD', 'POLYMARKET'):
+        return '%s/%s' % (b['type'], b['phase'])
 
     return b['type']
 

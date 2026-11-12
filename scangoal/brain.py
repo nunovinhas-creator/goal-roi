@@ -51,7 +51,7 @@ def atoms(b, multi, earlier=None):
         out.append(('Seleção', {'1': 'equipa da casa', 'X': 'empate', '2': 'equipa de fora'}.get(b.get('selection'))))
         if b.get('sel_volume') is not None:
             out.append(('Volume na seleção', '10 mil $ ou mais' if b['sel_volume'] >= 10000 else 'menos de 10 mil $'))
-    if b['type'] == 'STAKE_LOAD':
+    if b['type'] in ('STAKE_LOAD', 'POLYMARKET'):
         if b.get('total') is not None:
             out.append(('Valor da aposta', '10 mil $ ou mais' if b['total'] >= 10000 else 'menos de 10 mil $'))
         if b.get('n_bets') is not None:

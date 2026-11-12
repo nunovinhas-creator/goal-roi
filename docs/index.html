@@ -211,6 +211,7 @@ const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resu
  'BETFAIR/live':['Dinheiro na Betfair, durante o jogo','Igual, mas com o jogo a decorrer'],
  'OPEN_GAME':['Jogo aberto, com odd','Jogo com ritmo alto: aposta em mais golos'],
  'OPEN_GAME_NO_ODDS':['Jogo aberto, sem odd','Acerta se houver pelo menos mais um golo'],
+ 'POLYMARKET':['Dinheiro na Polymarket','Segue transações de valor elevado num mercado de previsões'],
  'STAKE_LOAD':['Aposta grande na Stake','Segue uma aposta de valor elevado. A odd indicada pode já não existir quando o aviso chega'],
  'TOTALS_FORM':['Forma de golos a 100 %','As duas equipas costumam passar esta linha de golos'],
  'TOTALS_FORM_NO_ODDS':['Forma de golos, sem odd','Acerta se houver pelo menos mais um golo'],
@@ -218,7 +219,7 @@ const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resu
  'WEAKENED_LINEUP':['Alinhamento enfraquecido','Aposta contra a equipa que entra sem os titulares habituais, ao handicap indicado']};
 const GROUPS={'BETFAIR/pre/mkt>=10K':'Betfair antes do jogo, mercado grande','BETFAIR/pre/mkt<10K':'Betfair antes do jogo, mercado pequeno',
  'BETFAIR/live/mkt>=10K':'Betfair durante o jogo, mercado grande','BETFAIR/live/mkt<10K':'Betfair durante o jogo, mercado pequeno',
- 'STAKE_LOAD/pre':'Stake antes do jogo','STAKE_LOAD/live':'Stake durante o jogo','OPEN_GAME':'Jogo aberto','TOTALS_FORM':'Forma de golos','WEAKENED_LINEUP':'Alinhamento enfraquecido'};
+ 'POLYMARKET/pre':'Polymarket antes do jogo','POLYMARKET/live':'Polymarket durante o jogo','STAKE_LOAD/pre':'Stake antes do jogo','STAKE_LOAD/live':'Stake durante o jogo','OPEN_GAME':'Jogo aberto','TOTALS_FORM':'Forma de golos','WEAKENED_LINEUP':'Alinhamento enfraquecido'};
 const gname=g=>GROUPS[g]||g;
 
 function verdict(g,min){
@@ -451,7 +452,7 @@ function tables(d){
 function outcome(b){const w=b.w;
   if(w==null)return b.ft?['none','Não liquidável']:['none','Em aberto'];
   if(w>0)return['good',w<1?'Meia ganha':'Ganha'];if(w<0)return['bad',w>-1?'Meia perdida':'Perdida'];return['wait','Devolvida']}
-const KIND={BETFAIR:'Betfair',STAKE_LOAD:'Stake',OPEN_GAME:'Jogo aberto',OPEN_GAME_NO_ODDS:'Jogo aberto, sem odd',TOTALS_FORM:'Forma de golos',TOTALS_FORM_NO_ODDS:'Forma de golos, sem odd',GOAL_BREWING:'Golo a caminho',WEAKENED_LINEUP:'Alinhamento enfraquecido',FULL_TIME_NOTE:'Fim do jogo'};
+const KIND={BETFAIR:'Betfair',STAKE_LOAD:'Stake',POLYMARKET:'Polymarket',OPEN_GAME:'Jogo aberto',OPEN_GAME_NO_ODDS:'Jogo aberto, sem odd',TOTALS_FORM:'Forma de golos',TOTALS_FORM_NO_ODDS:'Forma de golos, sem odd',GOAL_BREWING:'Golo a caminho',WEAKENED_LINEUP:'Alinhamento enfraquecido',FULL_TIME_NOTE:'Fim do jogo'};
 function story(m){
   const box=el('div',{class:'story'});
   if(!m){box.appendChild(el('p',{class:'note'},'Sem detalhe para este jogo.'));return box}

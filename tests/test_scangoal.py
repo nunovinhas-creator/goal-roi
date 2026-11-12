@@ -730,6 +730,31 @@ class Notify(unittest.TestCase):
         self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
 
 
+class Polymarket(Hardening):
+    PRE = """📈 🔷 Polymarket · 12 nov 2026 20:00
+Armenia — Cyprus · UEFA Nations League
+Under 2.5 @1.69 · $15K
+🧾 3 trades · biggest $7.9K · market share 69%
+Total on Under 2.5 this match: $21K
+https://scangoal.com/match/armenia-vs-cyprus-20261112?lang=en"""
+    LIVE = PRE.replace('Polymarket · 12 nov 2026 20:00', "Polymarket · LIVE 25' 0:1").replace('Under 2.5 @1.69 · $15K', 'Under 3.5 @1.67–1.69 · $8.7K')
+
+    def test_parsed_as_bets_with_lowest_odds_of_a_range(self):
+        p, q = parse(self.PRE), parse(self.LIVE)
+        self.assertEqual((p['type'], p['phase'], p['market'], p['selection'], p['odds'], p['total'], p['n_bets'], p['share'], p['kickoff_utc']),
+                         ('POLYMARKET', 'pre', 'Asian Total', 'Under 2.5', 1.69, 15000.0, 3, 69, '2026-11-12T17:00+00:00'))
+        self.assertEqual((q['phase'], q['minute'], q['score_at_signal'], q['selection'], q['odds']), ('live', 25, [0, 1], 'Under 3.5', 1.67))
+        self.assertEqual((parse(self.PRE.replace('Under 2.5 @', 'Cyprus @'))['market'], parse(self.PRE.replace('Under 2.5 @', 'Cyprus @'))['selection']), ('1X2', '2'))
+        self.assertEqual(parse(self.PRE.replace('Under 2.5 @', 'Draw @'))['selection'], 'X')
+        self.assertEqual(parse(self.PRE.replace('Under 2.5 @', 'Cyprus to qualify @'))['market'], 'Polymarket')
+
+    def test_settled_and_grouped_by_phase(self):
+        rows = [self.row(1, self.PRE, '2026-11-12T16:07:00+00:00'), self.row(2, self.LIVE, '2026-11-12T17:29:00+00:00'),
+                self.row(1, self.PRE + '\n\n🏁 FT 1:1 · Under 2.5 ✅', '2026-11-12T16:07:00+00:00')]
+        r, _ = self.build(rows)
+        self.assertEqual((r['unparsed'], sorted(r['groups']), r['settled_bets'], r['accuracy']['POLYMARKET']['hits']), (0, ['POLYMARKET/live', 'POLYMARKET/pre'], 2, 2))
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence

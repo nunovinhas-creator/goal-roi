@@ -95,6 +95,8 @@ def parse(text):
                      kickoff_utc=kickoff_utc(lines[1]), market=s[1],
                      selection=s[2], odds=float(s[3]), total=money(re.search(r'\$([\d.]+K?)', h)[1]),
                      n_bets=int(b[1]) if b else None, bet=True)
+        elif 'Polymarket' in h:
+            polymarket(m, h, lines, text)
         elif h.startswith('🔥') or h.startswith('🎯'):
             s = re.search(r'💰 O ([\d.]+): ([\d.]+)', text)
             mn = re.search(r"· (\d+)'", lines[1])
@@ -124,6 +126,28 @@ def parse(text):
     except (TypeError, IndexError, ValueError):
         m.update(error='fields_missing', bet=False)
     return m
+
+
+def polymarket(m, h, lines, text):
+    """Dinheiro na Polymarket: seleção, odd (a mais baixa quando vem um intervalo), valor, número de transações e quota."""
+    m['type'] = 'POLYMARKET'
+    s = re.match(r'^(.+?) @([\d.]+)(?:[–-][\d.]+)? · \$([\d.]+K?)', lines[2]) if len(lines) > 2 else None
+    head = lines[1].rsplit(' · ', 1) if len(lines) > 1 else []
+    teams = [t.strip() for t in head[0].split('—', 1)] if head and '—' in head[0] else None
+    if not s or not teams or len(teams) != 2:
+        return
+    live = re.search(r"LIVE (\d+)(?:\+\d+)?' (\d+):(\d+)", h)
+    tr, sh = re.search(r'🧾 (\d+) trades?', text), re.search(r'market share (\d+)%', text)
+    sel = s[1].strip()
+    if re.match(r'^(Over|Under) [\d.]+$', sel):
+        market = 'Asian Total'
+    elif sel in teams or sel.lower() == 'draw':
+        market, sel = '1X2', 'X' if sel.lower() == 'draw' else '12'[teams.index(sel)]
+    else:
+        market = 'Polymarket'          # mercado que o resultado final não decide por regra: fica para a marca do bot
+    m.update(phase='live' if live else 'pre', teams=teams, league=clean_league(head[1]) if len(head) > 1 else None, kickoff_utc=None if live else kickoff_utc(h),
+             minute=int(live[1]) if live else None, score_at_signal=[int(live[2]), int(live[3])] if live else None,
+             market=market, selection=sel, odds=float(s[2]), total=money(s[3]), n_bets=int(tr[1]) if tr else None, share=int(sh[1]) if sh else None, bet=True)
 
 
 def goal_brewing(m, lines, text):
