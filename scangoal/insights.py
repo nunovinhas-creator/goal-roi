@@ -190,6 +190,33 @@ def next_goal(signals):
     return {'n': len(mins), 'median_min': mins[len(mins) // 2] if mins else None}
 
 
+REGIME_MIN, REGIME_RECENT = 80, 40
+
+
+def regime(signals):
+    """Mudança de comportamento: os últimos 40 resultados de cada tipo contra os anteriores (precisa de 80 no total).
+
+    Compara a diferença entre acerto e taxa necessária nos dois períodos; |z| >= 2 assinala a mudança.
+    """
+    by = {}
+    for b in signals:
+        if b['w'] is not None and b['w'] != 0 and b['odds']:
+            by.setdefault(b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase'], []).append(b)
+    out = []
+    for name, rows in sorted(by.items()):
+        rows.sort(key=lambda b: b['date_utc'])
+        row = {'type': name, 'n': len(rows), 'needed': REGIME_MIN, 'state': 'poucos dados'}
+        if len(rows) >= REGIME_MIN:
+            old, new = summarize(rows[:-REGIME_RECENT]), summarize(rows[-REGIME_RECENT:])
+            edge = lambda s: s['hit_rate'] - s['break_even']
+            se = math.sqrt(old['hit_rate'] * (1 - old['hit_rate']) / old['n'] + new['hit_rate'] * (1 - new['hit_rate']) / new['n'])
+            z = (edge(new) - edge(old)) / se if se else 0.0
+            row.update(before={k: old[k] for k in ('n', 'hit_rate', 'break_even', 'roi')}, recent={k: new[k] for k in ('n', 'hit_rate', 'break_even', 'roi')},
+                       z=round(z, 2), state='piorou' if z <= -2 else 'melhorou' if z >= 2 else 'estável')
+        out.append(row)
+    return out
+
+
 def luck_and_risk(bets):
     """Saldo real contra o que a pura sorte explicaria se as odds fossem justas; e pior sequência."""
     done = [b for b in bets if b['w'] is not None]
@@ -215,7 +242,7 @@ def dec(v, places=2, plus=False):
     return format(v, ('+' if plus else '') + '.%df' % places).replace('.', ',')
 
 
-def narrative(acc, segs, tested, move, calib, luck, min_settled):
+def narrative(acc, segs, tested, move, calib, luck, min_settled, regime=None):
     """Frases simples, geradas por regras a partir dos números. Nunca afirmam mais do que a amostra permite."""
     out = []
     rated = [(k, g) for k, g in acc.items() if g.get('prob_above') is not None and not g.get('baseline') and g['hits'] + g['misses'] >= 5]
@@ -241,6 +268,10 @@ def narrative(acc, segs, tested, move, calib, luck, min_settled):
         out.append('%s, %s = %s: %d em %d (%s contra %s necessários). Indício %s.'
                    % (s['family'], s['dimension'].lower(), s['value'], s['hits'], s['n'], pct(s['hit_rate']), pct(s['break_even']),
                       'positivo' if s['prob_above'] >= 0.95 else 'negativo'))
+    for r in regime or ():
+        if r['state'] in ('piorou', 'melhorou'):
+            out.append('Mudança de comportamento em %s: nos últimos %d resultados o acerto foi %s, contra %s antes (%s).'
+                       % (LABELS.get(r['type'], r['type']), r['recent']['n'], pct(r['recent']['hit_rate']), pct(r['before']['hit_rate']), r['state']))
     if tested:
         out.append('Foram comparados %d segmentos; com tantos cortes, alguns parecem bons ou maus só por acaso. Um segmento só conta depois de se repetir em dados novos e de chegar a %d resultados.'
                    % (tested, min_settled))
@@ -254,6 +285,7 @@ def build(signals, bets, accuracy, min_settled):
         g.update(evidence(g.get('eff_hits', g['hits']), g.get('eff_misses', g['misses']), g['break_even']))
     segs, tested = segments(signals)
     move, calib, luck = price_move(signals), calibration(signals), luck_and_risk(bets)
-    return {'bot_confidence': bot_confidence(signals), 'next_goal': next_goal(signals), 'segments': segs[:40], 'segments_tested': tested, 'price_move': move, 'calibration': calib, 'luck': luck,
-            'narrative': narrative(accuracy, segs, tested, move, calib, luck, min_settled),
+    reg = regime(signals)
+    return {'regime': reg, 'bot_confidence': bot_confidence(signals), 'next_goal': next_goal(signals), 'segments': segs[:40], 'segments_tested': tested, 'price_move': move, 'calibration': calib, 'luck': luck,
+            'narrative': narrative(accuracy, segs, tested, move, calib, luck, min_settled, reg),
             'method': {'prior_weight': PRIOR_WEIGHT, 'min_segment': MIN_SEGMENT, 'hint_at': HINT_AT}}

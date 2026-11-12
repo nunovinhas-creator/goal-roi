@@ -658,6 +658,29 @@ class LanguageModel(Hardening):
                 del os.environ['SCANGOAL_DATA_DIR']
 
 
+class RegimeAndStories(Hardening):
+    def test_regime_needs_80_results_and_flags_a_real_change(self):
+        from scangoal.insights import regime
+        mk = lambda i, win: {'type': 'OPEN_GAME', 'phase': 'live', 'w': 1.0 if win else -1.0, 'odds': 2.0, 'date_utc': '2026-11-%02dT%02d:%02d:00+00:00' % (1 + i // 60, i % 24, i % 60)}
+        few = regime([mk(i, True) for i in range(79)])[0]
+        self.assertEqual((few['state'], few['n'], few['needed']), ('poucos dados', 79, 80))
+        rows = [mk(i, i % 10 != 0) for i in range(60)] + [mk(60 + i, i % 4 == 0) for i in range(40)]     # 90 % antes, 25 % nos últimos 40
+        worse = regime(rows)[0]
+        self.assertEqual((worse['state'], worse['before']['hit_rate'], worse['recent']['hit_rate']), ('piorou', 0.9, 0.25))
+        steady = regime([mk(i, i % 2 == 0) for i in range(100)])[0]
+        self.assertEqual(steady['state'], 'estável')
+
+    def test_match_story_lists_every_signal_goals_and_result(self):
+        brew = BREW + '\nhttps://scangoal.com/match/barnsley-vs-oldham-20261111?lang=en'
+        details = {'details_hl.json': {'details': {'barnsley-vs-oldham-20261111': {'status': 'Finished', 'final': [2, 1], 'consistent': True, 'score_90': [2, 1],
+                                                                                  'goals': [[5, 0, 'home'], [20, 0, 'away'], [38, 0, 'home']]}}}}
+        r, _ = self.build([self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, brew, '2026-11-11T19:30:00+00:00')], details)
+        story = r['matches'][r['recent_bets'][0]['match_id']]
+        self.assertEqual([e['k'] for e in story['events']], ['BETFAIR', 'GOAL_BREWING'])                 # inclui o sinal que não é aposta
+        self.assertEqual((story['goals'], story['goals_source'], story['ft']), ([[5, '1-0'], [20, '1-1'], [38, '2-1']], 'Highlightly', [2, 1]))
+        self.assertEqual((story['events'][0]['mult'], story['events'][1]['bot_prob']), (8, 50))
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence
