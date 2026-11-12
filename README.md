@@ -49,6 +49,13 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - O resultado do bot tem prioridade; quando ambos existem, o relatório conta as divergências.
 - Secret: `BSD_API_KEY`. Sem ele, este passo não faz nada.
 
+## Robustez
+- O intervalo do ROI agrupa as apostas por jogo: várias apostas no mesmo jogo não são independentes.
+- A fase dos sinais Stake (antes ou durante o jogo) vem da hora da mensagem face à hora do jogo; o bot reescreve as linhas das equipas quando edita.
+- `data/state.json` regista cada recolha, mesmo sem mensagens novas; a página usa-o para avisar se a recolha parar.
+- Tipos que o bot costuma liquidar também são procurados nas fontes externas quando ficam sem resultado.
+- `docs/bets.csv`: todas as apostas e sinais, um por linha.
+
 ## Página
 GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `docs/report.json`, atualizado a cada recolha.
 

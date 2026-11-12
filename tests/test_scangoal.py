@@ -281,6 +281,53 @@ class Highlightly(BSD):
         self.assertEqual(calls, [])                                              # menos de 4 horas depois
 
 
+class Hardening(unittest.TestCase):
+    def build(self, rows, extra=None):
+        from scangoal import report
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                store.append_versions(rows)
+                for name, content in (extra or {}).items():
+                    (Path(d) / name).write_text(json.dumps(content), encoding='utf-8')
+                csv_path = Path(d) / 'bets.csv'
+                return report.build(csv_path), csv_path.read_text(encoding='utf-8')
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+    def row(self, i, text, date):
+        return {'message_id': i, 'date_utc': date, 'edit_date_utc': None, 'collected_at_utc': '2026-11-11T12:00:00+00:00', 'text': text}
+
+    def test_stake_phase_comes_from_time_not_from_layout(self):
+        pre_layout = STAKE.replace('Bosnia U19     0\nSan Marino U19 0', 'Bosnia U19 — San Marino U19')       # o bot reescreve ao editar
+        r, _ = self.build([self.row(1, pre_layout, '2026-11-11T16:00:00+00:00'),                                 # jogo às 15:30 UTC: ao vivo
+                           self.row(2, STAKE.replace('bosnia-u19', 'x-u19'), '2026-11-11T15:00:00+00:00')])      # antes das 15:30: pré-jogo
+        self.assertEqual({g: v['bets'] for g, v in r['groups'].items()}, {'STAKE_LOAD/live': 1, 'STAKE_LOAD/pre': 1})
+
+    def test_interval_groups_bets_of_the_same_match(self):
+        from scangoal.report import stats
+        same = [{'w': 1.0, 'odds': 2.0, 'match_id': 'a'}] * 4 + [{'w': -1.0, 'odds': 2.0, 'match_id': 'b'}] * 4
+        spread = [{'w': 1.0, 'odds': 2.0, 'match_id': 'm%d' % i} for i in range(4)] + [{'w': -1.0, 'odds': 2.0, 'match_id': 'n%d' % i} for i in range(4)]
+        wide, narrow = stats(same)['odd-0%']['ci95'], stats(spread)['odd-0%']['ci95']
+        self.assertGreater(wide[1] - wide[0], narrow[1] - narrow[0])       # 8 apostas em 2 jogos valem menos do que em 8 jogos
+        self.assertIsNone(stats(same[:4])['odd-0%']['ci95'])               # um só jogo: sem intervalo
+
+    def test_collector_state_daily_csv_and_name_review(self):
+        rows = [self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, OPEN, '2026-11-12T10:00:00+00:00'),
+                self.row(2, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅', '2026-11-12T10:00:00+00:00')]
+        extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'read': 2, 'new_versions': 0},
+                 'results_hl.json': {'results': {}, 'near_misses': {'m': {'bot': ['Sheff Wed', 'Accrington'], 'bsd_candidates': [['Sheffield Wednesday', 'Accrington']]}}}}
+        r, csv_text = self.build(rows, extra)
+        self.assertEqual(r['audit']['collector_last_run_utc'], '2026-11-12T11:00:00+00:00')     # hora da recolha, não da última mensagem
+        self.assertEqual(r['audit']['name_review'][0]['bot'], ['Sheff Wed', 'Accrington'])
+        self.assertEqual([(d['day'], d['bets'], d['settled'], d['units']) for d in r['daily']], [('2026-11-11', 1, 0, 0.0), ('2026-11-12', 1, 1, 0.81)])
+        lines = csv_text.strip().splitlines()
+        self.assertEqual(len(lines), 3)
+        self.assertIn(';Barnsley;Oldham;1X2;1;1,6;', lines[1])
+        self.assertTrue(lines[2].endswith(';1-5;ganha;0,81;resultado;sim'))
+        self.assertIn('days_to_conclusion', r['accuracy']['OPEN_GAME'])
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence

@@ -112,7 +112,8 @@ def pending_targets(now, max_age_days=MAX_AGE_DAYS):
     msgs, ft, marks, notes, _ = load()
     out = {}
     for b in build_bets(msgs, ft, marks, notes, strict=False):
-        if b['type'] != 'BETFAIR' or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
+        # Betfair: sempre (o bot nunca dá o resultado). Outros tipos: só se o bot não o deu.
+        if not (b['type'] == 'BETFAIR' or b['ft'] is None) or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
             continue
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         if timedelta(hours=2, minutes=30) <= now - ref <= timedelta(days=max_age_days):

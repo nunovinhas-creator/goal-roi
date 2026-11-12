@@ -4,7 +4,7 @@ Regra principal: 1 unidade na seleção indicada, à odd do PRIMEIRO sinal de ca
 Sinal = primeira versão da mensagem; resultado = FT em qualquer versão de qualquer mensagem do mesmo jogo.
 Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunca contam como conclusão).
 """
-import collections, json, math
+import collections, csv, json, math, pathlib
 from datetime import datetime, timezone
 
 from . import insights
@@ -94,6 +94,8 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
             b['odds_at_x4'] = m['odds']
     bets = sorted(out.values(), key=lambda b: (b['date_utc'], b['message_id']))
     for b in bets:
+        if b['type'] == 'STAKE_LOAD' and b['kickoff_utc']:   # o bot reescreve as linhas das equipas ao editar: a hora decide a fase
+            b['phase'] = 'pre' if datetime.fromisoformat(b['date_utc']) < datetime.fromisoformat(b['kickoff_utc']) else 'live'
         b['group'] = group(b)
         f = ft.get(b['match_id']) or note_ft(b, notes)
         from_bsd = False
@@ -136,7 +138,10 @@ def pl(w, odds, hc=0.0):
 
 
 def stats(rows, odds_key='odds'):
-    """rows: apostas liquidadas. ROI médio por aposta, IC 95 % (aprox. normal) e variantes com perda de odd."""
+    """rows: apostas liquidadas. ROI médio por aposta e IC 95 % (aprox. normal).
+
+    O erro-padrão agrupa as apostas por jogo: várias apostas no mesmo jogo não são independentes.
+    """
     n = len(rows)
     if not n:
         return None
@@ -144,8 +149,12 @@ def stats(rows, odds_key='odds'):
     for hc in HAIRCUTS:
         xs = [pl(r['w'], r[odds_key], hc) for r in rows]
         mean = sum(xs) / n
-        if n > 1:
-            half = 1.96 * math.sqrt(sum((x - mean) ** 2 for x in xs) / (n - 1)) / math.sqrt(n)
+        clusters = {}
+        for r, x in zip(rows, xs):
+            clusters[r['match_id']] = clusters.get(r['match_id'], 0.0) + (x - mean)
+        g = len(clusters)
+        if g > 1:
+            half = 1.96 * math.sqrt(g / (g - 1) * sum(v * v for v in clusters.values())) / n
             ci = [round(mean - half, 4), round(mean + half, 4)]
         else:
             ci = None
@@ -160,7 +169,7 @@ def block(rows, odds_key='odds'):
     for r in settled:
         s += pl(r['w'], r[odds_key])
         cum.append(round(s, 2))
-    return {'bets': len(rows), 'settled': n, 'wins': sum(1 for r in settled if r['w'] > 0), 'pushes': sum(1 for r in settled if r['w'] == 0),
+    return {'bets': len(rows), 'settled': n, 'matches': len({r['match_id'] for r in settled}), 'wins': sum(1 for r in settled if r['w'] > 0), 'pushes': sum(1 for r in settled if r['w'] == 0),
             'units': round(s, 2), 'avg_odds': round(sum(r[odds_key] for r in settled) / n, 3) if n else None,
             'roi': stats(settled, odds_key), 'cumulative': cum[-400:],
             'conclusive': n >= MIN_SETTLED, 'note': 'ok' if n >= MIN_SETTLED else 'sem conclusão (<%d liquidadas)' % MIN_SETTLED}
@@ -188,6 +197,11 @@ def accuracy(signals):
                      if any(r['odds'] for r in done) else None,
                      'seen_late': sum(1 for r in done if r['had_ft_at_first_sight']),
                      'by_bot_mark': sum(1 for r in done if r['settled_by'] == 'marca do bot')}
+        days = max(1.0, (datetime.now(timezone.utc) - datetime.fromisoformat(min(r['date_utc'] for r in rows))).total_seconds() / 86400)
+        rate = (hits + miss) / days
+        out[name]['per_day'] = round(rate, 1)
+        out[name]['days_to_hint'] = max(0, math.ceil((30 - hits - miss) / rate)) if rate else None
+        out[name]['days_to_conclusion'] = max(0, math.ceil((MIN_SETTLED - hits - miss) / rate)) if rate else None
     return out
 
 
@@ -224,9 +238,38 @@ def timeline(bets):
     return out[-600:]
 
 
-def build():
+def daily(bets):
+    by = collections.OrderedDict()
+    for b in bets:
+        d = by.setdefault(b['date_utc'][:10], {'bets': 0, 'settled': 0, 'wins': 0, 'units': 0.0})
+        d['bets'] += 1
+        if b['w'] is not None:
+            d['settled'] += 1
+            d['wins'] += b['w'] > 0
+            d['units'] = round(d['units'] + pl(b['w'], b['odds']), 2)
+    return [dict(v, day=k) for k, v in by.items()][-45:]
+
+
+def write_csv(signals, path):
+    """Todas as apostas e sinais, um por linha, para análise própria (Excel)."""
+    cols = ['date_utc', 'type', 'phase', 'league', 'home', 'away', 'market', 'selection', 'odds', 'odds_last', 'n_signals', 'max_mult', 'share',
+            'mkt_volume', 'minute', 'lead_min', 'ft', 'result', 'units', 'settled_by', 'in_roi']
+    with path.open('w', encoding='utf-8', newline='') as f:
+        wr = csv.writer(f, delimiter=';')
+        wr.writerow(cols)
+        for b in signals:
+            t = (b['teams'] or ['', '']) + ['']
+            res = '' if b['w'] is None else 'ganha' if b['w'] > 0 else 'perdida' if b['w'] < 0 else 'devolvida'
+            units = '' if b['w'] is None or not b['odds'] else ('%.2f' % pl(b['w'], b['odds'])).replace('.', ',')
+            wr.writerow([b['date_utc'], b['type'], b['phase'], b.get('league') or '', t[0], t[1], b['market'] or '', b['selection'] or '',
+                         str(b['odds'] or '').replace('.', ','), str(b['odds_last'] or '').replace('.', ','), b['n_signals'], b['max_mult'], b['share'] or '',
+                         b['mkt_volume'] or '', b['minute'] if b['minute'] is not None else '', b['lead_min'] if b['lead_min'] is not None else '',
+                         '%d-%d' % tuple(b['ft']) if b['ft'] else '', res, units, b['settled_by'] or '', 'não' if b['had_ft_at_first_sight'] else 'sim'])
+
+
+def build(csv_path=None):
     msgs, ft, marks, notes, audit = load()
-    ext, bsd = {}, {}                                   # resultados externos: Highlightly primeiro, depois BSD
+    ext, bsd, near = {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
     for name in ('hl', 'bsd'):
         try:
             st = json.loads((data_dir() / ('results_%s.json' % name)).read_text(encoding='utf-8'))
@@ -236,10 +279,17 @@ def build():
         audit[name + '_results'] = len(res)
         audit[name + '_vs_bot_disagreements'] = sum(1 for m, r in res.items() if m in ft and ft[m] != r['ft'])
         audit[name + '_near_misses'] = len(st.get('near_misses') or {})
+        near[name] = st.get('near_misses') or {}
         audit[name + '_last_run_utc'] = st.get('last_run_utc')
         ext[name] = res
         for m, r in res.items():
             bsd.setdefault(m, dict(r, provider=name.upper()))
+    try:
+        state = json.loads((data_dir() / 'state.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        state = {}
+    audit['collector_last_run_utc'] = state.get('last_run_utc') or audit['last_collected_at_utc']
+    audit['name_review'] = [dict(n, provider=name.upper()) for name in ('hl', 'bsd') for n in (near.get(name) or {}).values()][:30]
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
     bets = build_bets(msgs, ft, marks, notes, bsd=bsd)
     signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd)
@@ -250,6 +300,8 @@ def build():
     recent = [{'date_utc': b['date_utc'], 'group': b['group'], 'match': ' — '.join(b['teams'] or []) or b['match_id'], 'selection': label(b), 'odds': b['odds'], 'ft': b['ft'], 'w': b['w'], 'settled_by': b['settled_by'],
                'n_signals': b['n_signals'], 'max_mult': b['max_mult']} for b in bets[-60:]][::-1]
     acc = accuracy(signals)
+    if csv_path:
+        write_csv(signals, csv_path)
     ins = insights.build(signals, bets, acc, MIN_SETTLED)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
@@ -262,12 +314,13 @@ def build():
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins,
-        'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets),
+        'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 
 def main():
-    report = build()
+    docs = pathlib.Path('docs')
+    report = build(docs / 'bets.csv' if docs.is_dir() else None)
     out = data_dir() / 'report.json'
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
