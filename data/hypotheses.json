@@ -1823,6 +1823,23 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Tamanho do mercado = 10 mil $ ou mais & Volume na seleção = 10 mil $ ou mais": {
+  "born_utc": "2026-11-12T15:33:31+00:00",
+  "conditions": [
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ],
+   [
+    "Volume na seleção",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercado com volume alto",
+  "source": "llm"
+ },
  "Betfair | Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -1855,6 +1872,23 @@
   ],
   "family": "Betfair",
   "source": "gerador"
+ },
+ "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-12T15:33:31+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ]
+  ],
+  "family": "Forma de golos",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos da liga com pouco espaço para ganhar",
+  "source": "llm"
  },
  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais": {
   "born_utc": "2026-11-12T15:16:56+00:00",
@@ -2178,6 +2212,23 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Mercado = golos (total asiático) & Número de apostas = várias": {
+  "born_utc": "2026-11-12T15:33:31+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "golos (total asiático)"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ]
+  ],
+  "family": "Stake",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Apostas múltiplas em mercado de golos",
+  "source": "llm"
  },
  "Stake | Número de apostas = uma": {
   "born_utc": "2026-11-12T15:25:14+00:00",
