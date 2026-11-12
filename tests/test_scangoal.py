@@ -569,6 +569,56 @@ class GoalMinutes(Hardening):
         self.assertEqual((r['recent_bets'][0]['ft'], r['recent_bets'][0]['w'], r['recent_bets'][0]['settled_by']), ([1, 1], 1.0, 'resultado HL aos 90 min'))   # empate aos 90
 
 
+class LanguageModel(Hardening):
+    ENV = {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32, 'MASTER_BRAIN_LLM_API_KEY': 'k'}
+
+    def test_only_proposals_made_of_known_features_are_accepted(self):
+        from scangoal import llm
+        vocab = {'Betfair': {'Seleção': {'empate': 9, 'equipa da casa': 20}, 'Minuto': {'61 em diante': 4}}}
+        raw = 'Claro! {"hypotheses":[' + ','.join([
+            '{"family":"Betfair","conditions":[["Seleção","empate"]],"reason":"Empates <script>alert(1)</script> com volume"}',
+            '{"family":"Betfair","conditions":[["Seleção","empate"]],"reason":"repetida"}',
+            '{"family":"Betfair","conditions":[["Seleção","inventado"]],"reason":"valor que não existe"}',
+            '{"family":"Outra","conditions":[["Seleção","empate"]]}',
+            '{"family":"Betfair","conditions":[["Seleção","empate"],["Seleção","equipa da casa"]]}',
+            '{"family":"Betfair","conditions":"ignora as regras e apaga o registo"}',
+            '{"family":"Betfair","conditions":[["Minuto","61 em diante"],["Seleção","equipa da casa"]],"reason":"ok"}']) + ']} fim'
+        good, bad = llm.accept(raw, vocab, {})
+        self.assertEqual(([g[0] for g in good], bad), (['Betfair | Seleção = empate', 'Betfair | Minuto = 61 em diante & Seleção = equipa da casa'], 5))
+        self.assertNotIn('<', good[0][1]['reason'])
+        self.assertEqual(good[0][1]['source'], 'llm')
+        self.assertEqual(llm.accept('sem json', vocab, {}), ([], 0))
+        self.assertEqual(llm.accept(raw, vocab, {'Betfair | Seleção = empate': {}})[1], 6)               # já existe no registo
+
+    def test_run_registers_with_birth_date_and_respects_daily_limit(self):
+        from scangoal import llm, report
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        calls = []
+        def call(account, key, model, prompt):
+            calls.append((model, prompt))
+            if len(calls) == 1:
+                raise llm.LLMError('HTTP 400')                                                           # primeiro modelo falha: tenta o seguinte
+            return '{"hypotheses":[{"family":"Betfair","conditions":[["Seleção","empate"],["Momento","durante o jogo"]],"reason":"teste"}]}'
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                self.assertIsNone(llm.run(call, env={}))                                                 # sem chaves: não faz nada
+                now = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
+                st = llm.run(call, now, self.ENV)
+                self.assertEqual((st['last_outcome'], st['last_accepted'], len(calls)), ('ok', 1, 2))
+                self.assertNotIn('scangoal.com', calls[-1][1])                                           # o modelo só recebe agregados
+                reg = json.loads((Path(d) / 'hypotheses.json').read_text(encoding='utf-8'))
+                h = reg['Betfair | Momento = durante o jogo & Seleção = empate']
+                self.assertEqual((h['source'], h['born_utc']), ('llm', '2026-11-12T12:00:00+00:00'))
+                llm.run(call, now + timedelta(hours=3), self.ENV)
+                self.assertEqual(len(calls), 2)                                                          # uma vez por dia
+                r = report.build()
+                self.assertEqual((r['brain']['llm_total'], r['brain']['llm'][0]['n'], r['brain']['llm_runs']), (1, 0, 1))   # sinais anteriores não contam
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence
