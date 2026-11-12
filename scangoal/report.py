@@ -216,6 +216,18 @@ def questions(bets):
     return q
 
 
+def timeline(bets):
+    """Saldo acumulado (unidades) das apostas liquidadas, por ordem do sinal. Últimas 600."""
+    out, total = [], 0.0
+    for b in bets:
+        if b['w'] is None:
+            continue
+        gain = pl(b['w'], b['odds'])
+        total += gain
+        out.append({'d': b['date_utc'], 'u': round(total, 2), 'g': round(gain, 2), 'm': ' — '.join(b['teams'] or []), 's': label(b), 'o': b['odds']})
+    return out[-600:]
+
+
 def build():
     msgs, ft, marks, notes, audit = load()
     ext, bsd = {}, {}                                   # resultados externos: Highlightly primeiro, depois BSD
@@ -252,7 +264,7 @@ def build():
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': accuracy(signals),
-        'questions': questions(bets), 'recent_bets': recent,
+        'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets),
     }
 
 
