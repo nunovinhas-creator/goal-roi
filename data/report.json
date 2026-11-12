@@ -1,12 +1,12 @@
 {
- "generated_at_utc": "2026-11-12T16:24:10+00:00",
- "messages": 125,
+ "generated_at_utc": "2026-11-12T16:32:35+00:00",
+ "messages": 126,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 5,
   "BETFAIR": 74,
   "STAKE_LOAD": 12,
-  "OPEN_GAME": 15,
+  "OPEN_GAME": 16,
   "TOTALS_FORM": 5,
   "WEAKENED_LINEUP": 2,
   "OPEN_GAME_NO_ODDS": 2,
@@ -22,10 +22,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 127,
+  "versions": 128,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-12T16:24:08+00:00",
+  "last_collected_at_utc": "2026-11-12T16:32:23+00:00",
   "hl_results": 20,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 0,
@@ -36,7 +36,7 @@
   "bsd_last_run_utc": "2026-11-12T15:58:43+00:00",
   "goal_minutes_matches": 5,
   "goal_minutes_inconsistent": 0,
-  "collector_last_run_utc": "2026-11-12T16:24:08+00:00",
+  "collector_last_run_utc": "2026-11-12T16:32:23+00:00",
   "name_review": [],
   "deleted_by_bot": 0,
   "ended_after_90": 0,
@@ -47,7 +47,7 @@
   "goal_lists": 28,
   "goal_lists_consistent": 16
  },
- "unique_bets": 34,
+ "unique_bets": 35,
  "settled_bets": 17,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -166,7 +166,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "OPEN_GAME": {
-   "bets": 2,
+   "bets": 3,
    "settled": 1,
    "matches": 1,
    "wins": 1,
@@ -353,7 +353,7 @@
    "prob_above": null
   },
   "OPEN_GAME": {
-   "signals": 15,
+   "signals": 16,
    "with_result": 14,
    "hits": 13,
    "misses": 1,
@@ -427,9 +427,9 @@
    "roi_announced_odds": -0.4389,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 7.9,
+   "per_day": 7.8,
    "days_to_hint": 3,
-   "days_to_conclusion": 37,
+   "days_to_conclusion": 38,
    "prudent_rate": 0.4622,
    "prob_above": 0.1552
   },
@@ -568,7 +568,7 @@
   "segments": [
    {
     "n": 16,
-    "signals": 17,
+    "signals": 18,
     "hits": 15,
     "misses": 1,
     "hit_rate": 0.9667,
@@ -604,7 +604,7 @@
    },
    {
     "n": 11,
-    "signals": 12,
+    "signals": 13,
     "hits": 10,
     "misses": 1,
     "hit_rate": 0.95,
@@ -622,7 +622,7 @@
    },
    {
     "n": 11,
-    "signals": 12,
+    "signals": 13,
     "hits": 10,
     "misses": 1,
     "hit_rate": 0.95,
@@ -694,7 +694,7 @@
    },
    {
     "n": 15,
-    "signals": 33,
+    "signals": 32,
     "hits": 8,
     "misses": 7,
     "hit_rate": 0.5333,
@@ -843,7 +843,7 @@
    },
    {
     "n": 34,
-    "signals": 45,
+    "signals": 46,
     "hits": 23,
     "misses": 11,
     "hit_rate": 0.6769,
@@ -912,11 +912,11 @@
   }
  },
  "brain": {
-  "hypotheses": 170,
+  "hypotheses": 177,
   "tested": 0,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 170
+   "em observação": 177
   },
   "expected_by_chance": 0.0,
   "top": [
@@ -1190,6 +1190,29 @@
      [
       "Hora (UTC)",
       "tarde"
+     ]
+    ],
+    "n": 7,
+    "hits": 7,
+    "hit_rate": 1.0,
+    "break_even": 0.5136,
+    "prob_above": 0.9584,
+    "roi": 0.9729,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
      ]
     ],
     "n": 7,
@@ -1823,6 +1846,29 @@
     "expect": null
    },
    {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ]
+    ],
+    "n": 6,
+    "hits": 5,
+    "hit_rate": 0.9091,
+    "break_even": 0.5263,
+    "prob_above": 0.8694,
+    "roi": 0.646,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
     "id": "Betfair | Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
     "family": "Betfair",
     "conditions": [
@@ -1866,6 +1912,52 @@
     "roi": 0.5871,
     "status": "em observação",
     "tradable": false,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "menos de 90"
+     ]
+    ],
+    "n": 6,
+    "hits": 5,
+    "hit_rate": 0.9091,
+    "break_even": 0.532,
+    "prob_above": 0.8666,
+    "roi": 0.622,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ]
+    ],
+    "n": 6,
+    "hits": 5,
+    "hit_rate": 0.9091,
+    "break_even": 0.5363,
+    "prob_above": 0.8646,
+    "roi": 0.65,
+    "status": "em observação",
+    "tradable": true,
     "expect": null
    },
    {
@@ -4004,6 +4096,29 @@
     "expect": null
    },
    {
+    "id": "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Seleção = equipa de fora",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ],
+     [
+      "Seleção",
+      "equipa de fora"
+     ]
+    ],
+    "n": 7,
+    "hits": 2,
+    "hit_rate": 0.2857,
+    "break_even": 0.5497,
+    "prob_above": 0.183,
+    "roi": -0.4429,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null
+   },
+   {
     "id": "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
     "family": "Stake",
     "conditions": [
@@ -4098,6 +4213,76 @@
     "roi": null,
     "prudent_rate": null,
     "prob_above": null,
+    "id": "Betfair | Quota de mercado = 80 % ou mais & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ],
+     [
+      "Seleção",
+      "equipa da casa"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-12T16:32:25+00:00",
+    "reason": "Jogos com quota alta e mercado pequeno",
+    "expect": "acima",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "prudent_rate": null,
+    "prob_above": null,
+    "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Confiança indicada pelo bot",
+      "95 % ou mais"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-12T16:32:25+00:00",
+    "reason": "Jogos com alta confiança e sem sinais anteriores",
+    "expect": "acima",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "prudent_rate": null,
+    "prob_above": null,
     "id": "Betfair | Tamanho do mercado = 10 mil $ ou mais & Volume na seleção = 10 mil $ ou mais",
     "family": "Betfair",
     "conditions": [
@@ -4181,7 +4366,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 3,
+  "llm_total": 5,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -4189,15 +4374,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 1,
-  "llm_last_run_utc": "2026-11-12T15:33:31+00:00",
+  "llm_runs": 2,
+  "llm_last_run_utc": "2026-11-12T16:32:25+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
-   "day": null,
-   "calls_today": null,
-   "neurons_today": null,
-   "accepted_today": null,
-   "last_mode": null
+   "day": "2026-11-12",
+   "calls_today": 1,
+   "neurons_today": 165.9,
+   "accepted_today": 2,
+   "last_mode": "refinar"
   },
   "notes": [],
   "entry_points": [
@@ -4559,7 +4744,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q6 Open game: sinal do minuto 46 em diante": {
-   "bets": 1,
+   "bets": 2,
    "settled": 0,
    "matches": 0,
    "wins": 0,
@@ -4571,7 +4756,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 34,
+   "bets": 35,
    "settled": 17,
    "matches": 17,
    "wins": 8,
@@ -4606,6 +4791,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-12T16:28:20+00:00",
+   "match_id": "uzbekistan-vs-russia-20261112",
+   "group": "OPEN_GAME",
+   "match": "Uzbekistan — Russia",
+   "selection": "Over 3",
+   "odds": 1.79,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-12T16:14:12+00:00",
    "match_id": "shabab-al-aqaba-sc-vs-hay-al-amir-hassan-20261112",
@@ -6181,6 +6379,21 @@
      "share": 72,
      "mkt_volume": 42000.0,
      "market": "1X2"
+    },
+    {
+     "d": "2026-11-12T16:28:20+00:00",
+     "k": "OPEN_GAME",
+     "phase": "live",
+     "selection": "Over 3",
+     "odds": 1.79,
+     "minute": 63,
+     "score_at_signal": [
+      2,
+      0
+     ],
+     "rhythm": 89,
+     "bot_over_pct": 74,
+     "market": "Asian Total"
     }
    ],
    "goals": null,
@@ -6488,7 +6701,7 @@
    "day": "2026-11-11"
   },
   {
-   "bets": 19,
+   "bets": 20,
    "settled": 4,
    "wins": 3,
    "units": 1.49,

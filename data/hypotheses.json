@@ -1252,6 +1252,21 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Seleção = equipa de fora": {
+  "born_utc": "2026-11-12T16:32:35+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Seleção",
+    "equipa de fora"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -1322,6 +1337,29 @@
   ],
   "family": "Betfair",
   "source": "gerador"
+ },
+ "Betfair | Quota de mercado = 80 % ou mais & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-12T16:32:25+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ],
+   [
+    "Seleção",
+    "equipa da casa"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos com quota alta e mercado pequeno",
+  "source": "llm"
  },
  "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-12T15:25:14+00:00",
@@ -1931,6 +1969,29 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-12T16:32:25+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos com alta confiança e sem sinais anteriores",
+  "source": "llm"
+ },
  "Jogo aberto | Confiança indicada pelo bot = menos de 95 %": {
   "born_utc": "2026-11-12T16:15:53+00:00",
   "conditions": [
@@ -1959,6 +2020,21 @@
    [
     "Faixa de odd",
     "odd 1,50 a 2,00"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-12T16:32:35+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
    ]
   ],
   "family": "Jogo aberto",
@@ -2098,6 +2174,21 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60": {
+  "born_utc": "2026-11-12T16:32:35+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-12T15:25:14+00:00",
   "conditions": [
@@ -2134,6 +2225,21 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-12T16:32:35+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -2257,6 +2363,21 @@
    [
     "Parte do jogo",
     "2.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-12T16:32:35+00:00",
+  "conditions": [
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
    ]
   ],
   "family": "Jogo aberto",
