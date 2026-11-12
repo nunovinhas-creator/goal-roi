@@ -99,7 +99,7 @@ def match_events(targets, events, aliases, unfinished=None):
             found[mid] = {'ft': scored[0][1], 'bsd_id': ev['id'], 'home': name_of(ev, 'home_team'), 'away': name_of(ev, 'away_team'),
                           'event_date': kickoff_of(ev).isoformat(timespec='minutes')}
         elif len(cands) == 1 and unfinished is not None:
-            unfinished[mid] = str(cands[0].get('status'))
+            unfinished[mid] = {'status': str(cands[0].get('status')), 'id': cands[0].get('id')}
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
             n = [[name_of(ev, 'home_team'), name_of(ev, 'away_team')] for (h, a), evs in index.items() if (h in homes) != (a in aways)
                  for ev in evs if time_ok(t, kickoff_of(ev))]
