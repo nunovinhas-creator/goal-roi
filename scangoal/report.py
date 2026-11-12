@@ -100,9 +100,11 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if b is None:
             b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
                                                  'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league',
-                                                 'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals', 'window', 'bot_prob', 'usual_prob')}
-            b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None)
+                                                 'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals', 'window', 'bot_prob', 'usual_prob', 'total', 'n_bets', 'sel_volume')}
+            b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None, steps=[])
         b['n_signals'] += 1
+        if m['type'] == 'BETFAIR':
+            b['steps'].append([m.get('mult', 1), m['odds']])
         b['odds_last'], b['share_last'] = m.get('odds'), m.get('share')
         b['max_mult'] = max(b['max_mult'], m.get('mult', 1))
         if m.get('mult', 1) >= 4 and b['odds_at_x4'] is None:
@@ -391,6 +393,7 @@ def build(csv_path=None, register=False):
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     brn = brain.build(signals, registry, MIN_SETTLED)
+    brn['entry_points'] = brain.entry_points(signals)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),

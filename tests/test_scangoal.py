@@ -476,6 +476,20 @@ class Brain(Hardening):
         self.assertTrue(all('Reforço' not in r['id'] for w in out['watch'] for r in w['reasons']))
         self.assertEqual(out['expected_by_chance'], round(0.05 * out['tested'], 1))
 
+    def test_new_features_and_entry_points(self):
+        from scangoal import brain
+        first = dict(self.sig(1, 20, True), steps=[[1, 2.0], [2, 2.4], [4, 3.0]], selection='2', sel_volume=12000, league='Liga X')
+        other = dict(self.sig(1, 21, True), type='OPEN_GAME', market='Asian Total', selection='Over 2.5', score_at_signal=[1, 1], minute=70, date_utc='2026-11-11T21:00:00+00:00')
+        first['date_utc'] = '2026-11-11T20:00:00+00:00'
+        idx = brain.earlier_index([first, other])
+        a, b = dict(brain.atoms(first, set(), idx)), dict(brain.atoms(other, set(), idx))
+        self.assertEqual((a['Seleção'], a['Volume na seleção'], a['Liga'], a['Sinal anterior de outro tipo no mesmo jogo']), ('equipa de fora', '10 mil $ ou mais', 'Liga X', 'não'))
+        self.assertEqual((b['Sinal anterior de outro tipo no mesmo jogo'], b['Marcador no momento'], b['Golos até ao sinal'], b['Minuto']), ('sim', 'empatado', '1 ou 2', '61 em diante'))
+        ep = {(e['phase'], e['level']): e for e in brain.entry_points([first, dict(self.sig(2, 20, False), steps=[[1, 2.0]])])}
+        self.assertEqual((ep[('live', 1)]['n'], ep[('live', 1)]['roi']), (2, 0.0))          # uma ganha a 2,0 e uma perdida
+        self.assertEqual((ep[('live', 4)]['n'], ep[('live', 4)]['roi']), (1, 2.0))          # só uma chegou a ×4, e a odd era 3,0
+        self.assertEqual(ep[('live', 8)]['signals'], 0)
+
     def test_manual_hypothesis_only_counts_signals_after_it_was_written(self):
         from scangoal import brain
         sigs = [self.sig(i, 20, True) for i in range(10)]

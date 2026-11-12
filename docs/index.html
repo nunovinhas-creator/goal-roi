@@ -129,6 +129,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note" id="brainnote"></p>
 <div class="facts" id="braincounts"></div>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table></div>
+<h3 class="sub">Entrar ao primeiro sinal ou esperar pelo reforço?</h3>
+<p class="note">Sinais Betfair. Cada linha simula entrar só quando o sinal chega a esse reforço, à odd desse momento.</p>
+<div class="panel wrap"><table><thead><tr><th>Momento</th><th style="text-align:left">Entrada</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="entry"></tbody></table></div>
 <h3 class="sub">A seguir agora</h3>
 <p class="note">Sinais ainda em aberto que encaixam numa hipótese promissora, forte ou confirmada. São indícios para observar, não recomendações.</p>
 <div class="panel" id="watch"></div>
@@ -329,6 +332,8 @@ function brainUI(d){
     td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
     td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('hyps').appendChild(tr)}
   if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=8;$('hyps').appendChild(tr)}
+  for(const e of B.entry_points||[]){if(!e.signals)continue;const tr=el('tr');td(tr,e.phase==='pre'?'Antes do jogo':'Durante o jogo','l');td(tr,e.level===1?'Ao primeiro sinal':`Ao reforço ×${e.level}`,'l');td(tr,e.n);
+    td(tr,e.hit_rate!=null?pct(e.hit_rate):'—');td(tr,e.break_even!=null?pct(e.break_even):'—','mut');td(tr,e.prob_above!=null?pct(e.prob_above):'—',e.prob_above==null?'mut':e.prob_above>=.9?'pos':e.prob_above<=.1?'neg':'');td(tr,e.roi!=null?pct(e.roi,1):'—',e.roi==null?'mut':cls(e.roi));$('entry').appendChild(tr)}
   const w=$('watch');
   if(!B.watch.length)w.appendChild(el('p',{class:'note'},`Ainda nenhuma hipótese chegou a promissora (são precisos ${B.rules.hint_at} resultados). A lista aparece aqui quando isso acontecer.`));
   for(const x of B.watch){const r=x.reasons[0], p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}. Encaixa em ${x.reasons.length} ${x.reasons.length===1?'hipótese':'hipóteses'}; a melhor: ${r.id.split(' | ')[1]} (${pct(r.hit_rate)} em ${r.n}, ${r.status}).`));w.appendChild(p)}
