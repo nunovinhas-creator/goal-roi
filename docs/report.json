@@ -1,28 +1,31 @@
 {
- "generated_at_utc": "2026-11-12T16:07:01+00:00",
- "messages": 122,
+ "generated_at_utc": "2026-11-12T16:15:53+00:00",
+ "messages": 124,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 5,
   "BETFAIR": 74,
   "STAKE_LOAD": 11,
-  "OPEN_GAME": 14,
+  "OPEN_GAME": 15,
   "TOTALS_FORM": 5,
   "WEAKENED_LINEUP": 2,
   "OPEN_GAME_NO_ODDS": 2,
-  "FULL_TIME_NOTE": 2
+  "FULL_TIME_NOTE": 2,
+  "None": 1
  },
- "unparsed": 0,
- "unparsed_samples": [],
+ "unparsed": 1,
+ "unparsed_samples": [
+  "📈 🔷 Polymarket · 12 nov 2026 20:00"
+ ],
  "excluded_first_seen_with_result": 27,
  "excluded_edited_before_seen": 1,
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 124,
+  "versions": 126,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-12T15:58:42+00:00",
+  "last_collected_at_utc": "2026-11-12T16:15:52+00:00",
   "hl_results": 20,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 0,
@@ -33,7 +36,7 @@
   "bsd_last_run_utc": "2026-11-12T15:58:43+00:00",
   "goal_minutes_matches": 5,
   "goal_minutes_inconsistent": 0,
-  "collector_last_run_utc": "2026-11-12T16:06:59+00:00",
+  "collector_last_run_utc": "2026-11-12T16:15:52+00:00",
   "name_review": [],
   "deleted_by_bot": 0,
   "ended_after_90": 0,
@@ -44,7 +47,7 @@
   "goal_lists": 28,
   "goal_lists_consistent": 16
  },
- "unique_bets": 33,
+ "unique_bets": 34,
  "settled_bets": 17,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -163,7 +166,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "OPEN_GAME": {
-   "bets": 1,
+   "bets": 2,
    "settled": 1,
    "matches": 1,
    "wins": 1,
@@ -292,7 +295,7 @@
    "roi_announced_odds": -0.0956,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 14.0,
+   "per_day": 13.9,
    "days_to_hint": 2,
    "days_to_conclusion": 21,
    "prudent_rate": 0.4582,
@@ -319,7 +322,7 @@
    "roi_announced_odds": 0.382,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 4.4,
+   "per_day": 4.3,
    "days_to_hint": 6,
    "days_to_conclusion": 68,
    "prudent_rate": 0.6548,
@@ -350,7 +353,7 @@
    "prob_above": null
   },
   "OPEN_GAME": {
-   "signals": 14,
+   "signals": 15,
    "with_result": 14,
    "hits": 13,
    "misses": 1,
@@ -370,7 +373,7 @@
    "roi_announced_odds": 0.8107,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 13.7,
+   "per_day": 13.6,
    "days_to_hint": 2,
    "days_to_conclusion": 21,
    "prudent_rate": 0.7705,
@@ -424,7 +427,7 @@
    "roi_announced_odds": -0.4389,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 8.0,
+   "per_day": 7.9,
    "days_to_hint": 3,
    "days_to_conclusion": 37,
    "prudent_rate": 0.4622,
@@ -565,7 +568,7 @@
   "segments": [
    {
     "n": 16,
-    "signals": 16,
+    "signals": 17,
     "hits": 15,
     "misses": 1,
     "hit_rate": 0.9667,
@@ -583,7 +586,7 @@
    },
    {
     "n": 11,
-    "signals": 11,
+    "signals": 12,
     "hits": 10,
     "misses": 1,
     "hit_rate": 0.9524,
@@ -601,7 +604,7 @@
    },
    {
     "n": 11,
-    "signals": 11,
+    "signals": 12,
     "hits": 10,
     "misses": 1,
     "hit_rate": 0.95,
@@ -619,7 +622,7 @@
    },
    {
     "n": 11,
-    "signals": 11,
+    "signals": 12,
     "hits": 10,
     "misses": 1,
     "hit_rate": 0.95,
@@ -840,7 +843,7 @@
    },
    {
     "n": 34,
-    "signals": 44,
+    "signals": 45,
     "hits": 23,
     "misses": 11,
     "hit_rate": 0.6769,
@@ -909,11 +912,11 @@
   }
  },
  "brain": {
-  "hypotheses": 161,
+  "hypotheses": 170,
   "tested": 0,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 161
+   "em observação": 170
   },
   "expected_by_chance": 0.0,
   "top": [
@@ -1181,6 +1184,25 @@
     "expect": null
    },
    {
+    "id": "Jogo aberto | Hora (UTC) = tarde",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ]
+    ],
+    "n": 7,
+    "hits": 7,
+    "hit_rate": 1.0,
+    "break_even": 0.5136,
+    "prob_above": 0.9584,
+    "roi": 0.9729,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
     "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais",
     "family": "Jogo aberto",
     "conditions": [
@@ -1265,6 +1287,44 @@
     "expect": null
    },
    {
+    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Confiança indicada pelo bot",
+      "menos de 95 %"
+     ]
+    ],
+    "n": 7,
+    "hits": 7,
+    "hit_rate": 1.0,
+    "break_even": 0.5088,
+    "prob_above": 0.9499,
+    "roi": 0.9371,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ]
+    ],
+    "n": 7,
+    "hits": 7,
+    "hit_rate": 1.0,
+    "break_even": 0.5088,
+    "prob_above": 0.9499,
+    "roi": 0.9371,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
     "id": "Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
     "family": "Jogo aberto",
     "conditions": [
@@ -1329,6 +1389,29 @@
     "break_even": 0.5062,
     "prob_above": 0.9446,
     "roi": 0.8157,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ]
+    ],
+    "n": 7,
+    "hits": 7,
+    "hit_rate": 1.0,
+    "break_even": 0.5412,
+    "prob_above": 0.941,
+    "roi": 0.7943,
     "status": "em observação",
     "tradable": true,
     "expect": null
@@ -1445,6 +1528,52 @@
     "expect": null
    },
    {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.9231,
+    "break_even": 0.5115,
+    "prob_above": 0.9151,
+    "roi": 0.7667,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.9231,
+    "break_even": 0.5115,
+    "prob_above": 0.9151,
+    "roi": 0.7667,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
     "id": "Betfair | Quota depois do sinal = desceu & Seleção = equipa da casa",
     "family": "Betfair",
     "conditions": [
@@ -1465,6 +1594,71 @@
     "roi": 0.6388,
     "status": "em observação",
     "tradable": false,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Ritmo indicado pelo bot",
+      "menos de 90"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.9231,
+    "break_even": 0.5354,
+    "prob_above": 0.9049,
+    "roi": 0.6533,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.9231,
+    "break_even": 0.5364,
+    "prob_above": 0.9045,
+    "roi": 0.6483,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null
+   },
+   {
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.9231,
+    "break_even": 0.5364,
+    "prob_above": 0.9045,
+    "roi": 0.6483,
+    "status": "em observação",
+    "tradable": true,
     "expect": null
    },
    {
@@ -4365,7 +4559,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q6 Open game: sinal do minuto 46 em diante": {
-   "bets": 0,
+   "bets": 1,
    "settled": 0,
    "matches": 0,
    "wins": 0,
@@ -4377,7 +4571,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 33,
+   "bets": 34,
    "settled": 17,
    "matches": 17,
    "wins": 8,
@@ -4412,6 +4606,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-12T16:14:12+00:00",
+   "match_id": "shabab-al-aqaba-sc-vs-hay-al-amir-hassan-20261112",
+   "group": "OPEN_GAME",
+   "match": "Shabab Al-Aqaba SC — Hay AL Amir Hassan",
+   "selection": "Over 3",
+   "odds": 1.69,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-12T15:14:04+00:00",
    "match_id": "armenia-vs-cyprus-20261112",
@@ -6063,6 +6270,32 @@
    "goals": null,
    "goals_source": null,
    "ft": null
+  },
+  "shabab-al-aqaba-sc-vs-hay-al-amir-hassan-20261112": {
+   "teams": [
+    "Shabab Al-Aqaba SC",
+    "Hay AL Amir Hassan"
+   ],
+   "events": [
+    {
+     "d": "2026-11-12T16:14:12+00:00",
+     "k": "OPEN_GAME",
+     "phase": "live",
+     "selection": "Over 3",
+     "odds": 1.69,
+     "minute": 55,
+     "score_at_signal": [
+      0,
+      2
+     ],
+     "rhythm": 84,
+     "bot_over_pct": 82,
+     "market": "Asian Total"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
   }
  },
  "timeline": [
@@ -6246,7 +6479,7 @@
    "day": "2026-11-11"
   },
   {
-   "bets": 18,
+   "bets": 19,
    "settled": 4,
    "wins": 3,
    "units": 1.49,
