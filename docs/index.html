@@ -77,6 +77,9 @@ td.l{text-align:left}td.name{white-space:normal;min-width:160px}
 .filters button:focus-visible,summary:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
 .bet{display:grid;grid-template-columns:86px 1fr auto;gap:2px 14px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
 .bet:first-child{border-top:0}
+.bet{cursor:pointer}.bet:hover .what b{text-decoration:underline}.bet:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+.story{padding:4px 0 14px 100px;font-size:14px}.story p{margin:3px 0}.story .when{color:var(--mut);font-variant-numeric:tabular-nums}
+@media(max-width:640px){.story{padding-left:0}}
 .bet .when{color:var(--mut);font-size:13.5px}.bet .what b{font-weight:650}.bet .what div{color:var(--mut);font-size:14px}
 details{margin-top:12px}summary{cursor:pointer;font-weight:650;padding:4px 0}
 .note{color:var(--mut);font-size:14.5px;margin:6px 0 0;max-width:75ch}
@@ -146,6 +149,10 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Nos sinais de jogo aberto o bot indica uma percentagem “Over”. Aqui compara-se essa percentagem com o que aconteceu. <span id="nextgoal"></span></p>
 <div class="panel wrap"><table><thead><tr><th>Confiança indicada</th><th>Resultados</th><th>Média indicada</th><th>Acerto real</th><th>A odd exige</th></tr></thead><tbody id="conf"></tbody></table></div>
 
+<h2>Algum sinal mudou de comportamento?</h2>
+<p class="note">Compara os últimos 40 resultados de cada tipo com os anteriores. Serve para dar conta cedo de um sinal que deixou de funcionar, ou que começou a funcionar.</p>
+<div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Resultados</th><th>Acerto antes</th><th>Acerto recente</th><th>ROI antes</th><th>ROI recente</th><th>Estado</th></tr></thead><tbody id="regime"></tbody></table></div>
+
 <h2>Onde os sinais funcionam melhor e pior</h2>
 <p class="note" id="segnote"></p>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Corte</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="segs"></tbody></table></div>
@@ -157,6 +164,7 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <div class="panel wrap"><table><thead><tr><th>Dia</th><th>Apostas</th><th>Com resultado</th><th>Ganhas</th><th>Saldo do dia</th></tr></thead><tbody id="daily"></tbody></table></div>
 
 <h2>Últimas apostas</h2>
+<p class="note">Clica numa aposta para ver todos os sinais desse jogo por ordem, com os golos.</p>
 <div class="panel">
   <div class="filters" id="filters" role="group" aria-label="Filtrar apostas"></div>
   <div id="recent"></div>
@@ -316,6 +324,10 @@ function insights(d){
     b.appendChild(r);const v=verdict({hits:c.hits,misses:c.misses,break_even:c.break_even,ci95:c.ci95},d.min_settled);row.append(a,b,chip(v[0],v[1]));$('calib').appendChild(row)}
   for(const c of I.bot_confidence||[]){const tr=el('tr');td(tr,c.band,'name');td(tr,c.n);td(tr,c.stated!=null?pct(c.stated):'—','mut');td(tr,c.hit_rate!=null?pct(c.hit_rate):'—');td(tr,c.break_even!=null?pct(c.break_even):'—','mut');$('conf').appendChild(tr)}
   const ng=I.next_goal;if(ng&&ng.n)$('nextgoal').textContent=`Depois de um sinal de jogo aberto, o golo seguinte demorou tipicamente ${ng.median_min} minutos (${ng.n} ${ng.n===1?'caso':'casos'} em que a lista de golos do bot bate certo com o resultado).`;
+  for(const r of I.regime||[]){const tr=el('tr');td(tr,(NAMES[r.type]||[r.type])[0],'name');
+    if(r.before){td(tr,r.n);td(tr,pct(r.before.hit_rate));td(tr,pct(r.recent.hit_rate));td(tr,pct(r.before.roi,1),cls(r.before.roi));td(tr,pct(r.recent.roi,1),cls(r.recent.roi));td(tr,chip(r.state==='piorou'?'bad':r.state==='melhorou'?'good':'wait',r.state[0].toUpperCase()+r.state.slice(1)))}
+    else{td(tr,`${r.n} de ${r.needed}`);for(let i=0;i<4;i++)td(tr,'—','mut');td(tr,chip('none','Poucos dados'))}
+    $('regime').appendChild(tr)}
   $('segnote').textContent=`Cada linha é um corte dos sinais com pelo menos ${I.method.min_segment} resultados, ordenado da melhor para a pior evidência. Foram comparados ${I.segments_tested} cortes: quantos mais se comparam, mais provável é algum parecer bom por acaso. Servem para escolher o que confirmar em dados novos.`;
   for(const g of I.segments){const tr=el('tr');td(tr,g.family,'l');td(tr,`${g.dimension}: ${g.value}`,'name');td(tr,g.n);td(tr,pct(g.hit_rate));td(tr,g.break_even!=null?pct(g.break_even):'—','mut');
     td(tr,g.prob_above!=null?pct(g.prob_above):'—',g.prob_above==null?'mut':g.prob_above>=.9?'pos':g.prob_above<=.1?'neg':'');td(tr,g.roi!=null?pct(g.roi,1):'—',g.roi==null?'mut':cls(g.roi));$('segs').appendChild(tr)}
@@ -381,6 +393,21 @@ function tables(d){
 function outcome(b){const w=b.w;
   if(w==null)return b.ft?['none','Não liquidável']:['none','Em aberto'];
   if(w>0)return['good',w<1?'Meia ganha':'Ganha'];if(w<0)return['bad',w>-1?'Meia perdida':'Perdida'];return['wait','Devolvida']}
+const KIND={BETFAIR:'Betfair',STAKE_LOAD:'Stake',OPEN_GAME:'Jogo aberto',OPEN_GAME_NO_ODDS:'Jogo aberto, sem odd',TOTALS_FORM:'Forma de golos',TOTALS_FORM_NO_ODDS:'Forma de golos, sem odd',GOAL_BREWING:'Golo a caminho',WEAKENED_LINEUP:'Alinhamento enfraquecido',FULL_TIME_NOTE:'Fim do jogo'};
+function story(m){
+  const box=el('div',{class:'story'});
+  if(!m){box.appendChild(el('p',{class:'note'},'Sem detalhe para este jogo.'));return box}
+  const t=m.teams||['equipa da casa','equipa de fora'], money=v=>v>=1000?num(Math.round(v/100)/10)+' mil $':num(v)+' $';
+  for(const e of m.events){const bits=[KIND[e.k]||e.k];
+    if(e.k==='BETFAIR'){bits[0]+=e.phase==='pre'?', antes do jogo':', durante o jogo';bits.push(`${({1:t[0],2:t[1],X:'Empate'})[e.selection]||e.selection} @ ${num(e.odds)}`);if(e.mult>1)bits.push(`reforço ×${e.mult}`);if(e.share!=null)bits.push(`${e.share} % de ${money(e.mkt_volume)}`)}
+    else if(e.k==='GOAL_BREWING'){bits.push(`golo nos próximos ${e.window} min: ${e.bot_prob} % (habitual ${e.usual_prob} %)`)}
+    else if(e.selection){bits.push(`${e.market&&e.market!=='Asian Total'?e.market+': ':''}${e.selection}${e.odds?' @ '+num(e.odds):''}`);if(e.total)bits.push(money(e.total));if(e.rhythm!=null)bits.push(`ritmo ${e.rhythm}, confiança ${e.bot_over_pct} %`)}
+    if(e.minute!=null)bits.push(`minuto ${e.minute}${e.score_at_signal?`, ${e.score_at_signal[0]}-${e.score_at_signal[1]}`:''}`);
+    const p=el('p');p.append(el('span',{class:'when'},new Date(e.d).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})+' '),document.createTextNode(bits.join(' · ')));box.appendChild(p)}
+  if(m.goals&&m.goals.length)box.appendChild(el('p',{},`Golos${m.goals_source==='bot'?' (lista do bot, pode estar incompleta)':''}: `+m.goals.map(g=>`${g[0]}' ${g[1]}`).join(', ')+'.'));
+  if(m.ft)box.appendChild(el('p',{},`Resultado final: ${m.ft[0]}-${m.ft[1]}.`));
+  return box;
+}
 function recent(d){
   const all=d.recent_bets||[], box=$('recent'), F=[['todas','Todas',()=>true],['ganhas','Ganhas',b=>b.w>0],['perdidas','Perdidas',b=>b.w<0],['abertas','Em aberto',b=>b.w==null]];
   let limit=12;
@@ -390,7 +417,10 @@ function recent(d){
       r.appendChild(el('div',{class:'when'},t.toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})));
       const w=el('div',{class:'what'});w.append(el('b',{},`${b.selection}`),document.createTextNode(b.odds?` @ ${num(b.odds)}`:''));
       w.appendChild(el('div',{},`${b.match}${b.ft?`, final ${b.ft[0]}-${b.ft[1]}`:''}. ${gname(b.group)}${b.max_mult>1?`, reforçado ×${b.max_mult}`:''}`));
-      r.appendChild(w);const [k,txt]=outcome(b);r.appendChild(chip(k,txt));box.appendChild(r)}
+      r.appendChild(w);const [k,txt]=outcome(b);r.appendChild(chip(k,txt));box.appendChild(r);
+      r.setAttribute('role','button');r.setAttribute('tabindex','0');r.setAttribute('aria-expanded','false');r.title='Ver todos os sinais deste jogo';
+      const toggle=()=>{const open=r.nextElementSibling&&r.nextElementSibling.classList.contains('story');if(open){r.nextElementSibling.remove();r.setAttribute('aria-expanded','false')}else{r.after(story((d.matches||{})[b.match_id]));r.setAttribute('aria-expanded','true')}};
+      r.addEventListener('click',toggle);r.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggle()}})}
     if(every.length>rows.length){const more=el('button',{type:'button',class:'more'},`Mostrar as ${every.length} apostas`);more.addEventListener('click',()=>{limit=1e9;draw(fn)});box.appendChild(more)}};
   F.forEach(([id,label,fn],i)=>{const btn=el('button',{type:'button','aria-pressed':i===0?'true':'false'},`${label} (${all.filter(fn).length})`);
     btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');limit=12;draw(fn)});$('filters').appendChild(btn)});

@@ -304,6 +304,35 @@ def timeline(bets):
     return out[-600:]
 
 
+def match_stories(match_ids, msgs, ft, bsd, details):
+    """Por jogo: todos os sinais por ordem (incluindo os que não são aposta), os golos com minuto e o resultado."""
+    keep = ('selection', 'odds', 'mult', 'minute', 'score_at_signal', 'share', 'mkt_volume', 'bot_prob', 'usual_prob', 'window', 'rhythm', 'bot_over_pct', 'market', 'total')
+    out = {}
+    for m in msgs:
+        mid = m.get('match_id')
+        if mid not in match_ids or m.get('type') in (None, 'SERVICE'):
+            continue
+        s = out.setdefault(mid, {'teams': None, 'events': [], 'goals': None, 'goals_source': None, 'ft': None})
+        s['teams'] = s['teams'] or m.get('teams')
+        ev = {'d': m['date_utc'], 'k': m['type'], 'phase': m.get('phase')}
+        ev.update({k: m[k] for k in keep if m.get(k) is not None})
+        s['events'].append(ev)
+        if m.get('goals') and not s['goals']:
+            s['goals'], s['goals_source'] = [[g[0], '%d-%d' % (g[1], g[2])] for g in m['goals']], 'bot'
+    for mid, s in out.items():
+        det = (details or {}).get(mid)
+        if det and det.get('consistent'):
+            h = a = 0
+            goals = []
+            for minute, _, side in det['goals']:
+                h, a = h + (side == 'home'), a + (side == 'away')
+                goals.append([minute, '%d-%d' % (h, a)])
+            s['goals'], s['goals_source'] = goals, 'Highlightly'
+        s['ft'] = ft.get(mid) or (bsd.get(mid) or {}).get('ft') or (det or {}).get('final')
+        s['events'] = s['events'][:25]
+    return out
+
+
 def daily(bets):
     by = collections.OrderedDict()
     for b in bets:
@@ -377,7 +406,7 @@ def build(csv_path=None, register=False):
     for b in bets:
         by.setdefault(b['group'], []).append(b)
     unparsed = [m for m in msgs if m.get('type') is None or m.get('error')]
-    recent = [{'date_utc': b['date_utc'], 'group': b['group'], 'match': ' — '.join(b['teams'] or []) or b['match_id'], 'selection': label(b), 'odds': b['odds'], 'ft': b['ft'], 'w': b['w'], 'settled_by': b['settled_by'],
+    recent = [{'date_utc': b['date_utc'], 'match_id': b['match_id'], 'group': b['group'], 'match': ' — '.join(b['teams'] or []) or b['match_id'], 'selection': label(b), 'odds': b['odds'], 'ft': b['ft'], 'w': b['w'], 'settled_by': b['settled_by'],
                'n_signals': b['n_signals'], 'max_mult': b['max_mult']} for b in bets[-60:]][::-1]
     stake = [b for b in signals if b['type'] == 'STAKE_LOAD']
     audit['stake_original_seen'] = sum(1 for b in stake if not b['edited_at_first_sight'])
@@ -419,7 +448,7 @@ def build(csv_path=None, register=False):
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
-        'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets), 'daily': daily(bets),
+        'questions': questions(bets), 'recent_bets': recent, 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 
