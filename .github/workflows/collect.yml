@@ -29,6 +29,7 @@ jobs:
       - name: Results from BSD (hourly at most; skipped without key)
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
+          BSD_MIN_INTERVAL_MIN: ${{ github.event_name == 'workflow_dispatch' && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
       - name: Report (fixed rules, no LLM)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
