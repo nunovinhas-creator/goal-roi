@@ -1,4 +1,5 @@
 import json, os, tempfile, unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from scangoal import store
@@ -420,14 +421,14 @@ Liverpool Women — Aston Villa Women
         from scangoal import results_bsd
         old = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'old-game')
         extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'missing_ids': [7, 9]},
-                 'results_hl.json': {'results': {}, 'near_misses': {}, 'not_regular_time': {'m': 'Finished after extra time'}}}
+                 'results_hl.json': {'results': {}, 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
         r, _ = self.build([self.row(1, old, '2026-01-01T12:00:00+00:00')], extra)
         self.assertEqual((r['accuracy']['BETFAIR/live']['no_source'], r['audit']['deleted_by_bot'], r['audit']['ended_after_90']), (1, 2, 1))
         target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None}}
         ev = {'id': 1, 'status': 'Finished after extra time', 'event_date': '2026-11-11T12:00:00+00:00', 'home_team': 'A', 'away_team': 'B', 'home_score': None, 'away_score': None}
         unfinished = {}
         found, near = results_bsd.match_events(target, [ev], {}, unfinished)
-        self.assertEqual((found, near, unfinished), ({}, {}, {'m': 'Finished after extra time'}))
+        self.assertEqual((found, near, unfinished), ({}, {}, {'m': {'status': 'Finished after extra time', 'id': 1}}))
         wf = Path('.github/workflows/collect.yml').read_text(encoding='utf-8')
         self.assertNotIn("github.event_name == 'workflow_dispatch' && '0'", wf)                         # execução manual já não gasta quota sozinha
         self.assertIn('gh workflow run collect.yml', wf)
@@ -497,6 +498,61 @@ class Brain(Hardening):
                 self.assertTrue((Path(d) / 'hypotheses.json').exists())
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
+
+
+class GoalMinutes(Hardening):
+    def hl(self, status, score, events):
+        ev = [{'team': {'name': team}, 'time': time, 'type': kind} for time, team, kind in events]
+        return [{'id': 9, 'homeTeam': {'name': 'A'}, 'awayTeam': {'name': 'B'}, 'state': {'description': status, 'score': {'current': score}}, 'events': ev}]
+
+    def test_goals_must_add_up_to_the_final_score(self):
+        from scangoal.details_hl import to_details
+        d = to_details(self.hl('Finished', '2 - 1', [('12', 'A', 'Goal'), ('45+2', 'B', 'Penalty'), ('30', 'A', 'Yellow Card'), ('88', 'B', 'Own Goal')]))
+        self.assertEqual((d['consistent'], d['goals'], d['score_90']), (True, [[12, 0, 'home'], [45, 2, 'away'], [88, 0, 'home']], [2, 1]))   # auto-golo trocado de lado
+        d = to_details(self.hl('Finished', '3 - 0', [('12', 'A', 'Goal')]))
+        self.assertEqual((d['consistent'], d['score_90']), (False, None))                               # falta um golo na fonte: não se usa
+        d = to_details(self.hl('Finished after extra time', '2 - 1', [('10', 'A', 'Goal'), ('80', 'B', 'Goal'), ('105', 'A', 'Goal')]))
+        self.assertEqual((d['consistent'], d['score_90']), (True, [1, 1]))                              # aos 90 minutos estava 1-1
+
+    def test_budget_priority_and_unfinished_are_respected(self):
+        from scangoal import details_hl
+        with tempfile.TemporaryDirectory() as dd:
+            os.environ['SCANGOAL_DATA_DIR'] = dd
+            try:
+                res = {'m%d' % i: {'ft': [1, 0], 'bsd_id': i, 'matched_at_utc': '2026-11-12T0%d:00:00+00:00' % i} for i in range(1, 8)}
+                (Path(dd) / 'results_hl.json').write_text(json.dumps({'results': res, 'not_regular_time': {'x': {'status': 'Finished after extra time', 'id': 99}}}))
+                asked = []
+                def fetch(i, token):
+                    asked.append(i)
+                    return self.hl('Second half' if i == 3 else 'Finished', '1 - 0', [('5', 'A', 'Goal')]), 14 if len(asked) == 4 else 50
+                now = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
+                st = details_hl.run(fetch, now, 'k', priority={'m3'})
+                self.assertEqual(asked[:2], [3, 99])                                                    # primeiro os que desbloqueiam medições
+                self.assertEqual((len(asked), st['stats']['stopped']), (4, 'daily_quota_low'))          # pára quando a quota do dia fica curta
+                self.assertNotIn('m3', st['details'])                                                   # ainda a decorrer na fonte: fica para depois
+                self.assertEqual(details_hl.run(fetch, now + timedelta(minutes=30), 'k', priority=set())['stats'], st['stats'])   # cedo demais: não pede nada
+                self.assertIsNone(details_hl.run(fetch, now, ''))
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+    def test_goal_brewing_is_measured_with_goal_minutes_and_extra_time_uses_90_minutes(self):
+        brew = BREW + '\nhttps://scangoal.com/match/petrzalka-vs-trnava-20261111?lang=en'
+        p = parse(brew)
+        self.assertEqual((p['window'], p['bot_prob'], p['usual_prob'], p['minute'], p['score_at_signal']), (15, 50, 37, 25, [1, 1]))
+        def details(goals, status='Finished', final=None):
+            return {'details_hl.json': {'details': {'petrzalka-vs-trnava-20261111': {'status': status, 'final': final or [2, 2], 'goals': goals, 'consistent': True, 'score_90': final or [2, 2]}}}}
+        base = [[5, 0, 'home'], [20, 0, 'away']]
+        r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')], details(base + [[38, 0, 'home'], [80, 0, 'away']]))
+        g = r['accuracy']['GOAL_BREWING']
+        self.assertEqual((g['hits'], g['misses'], g['break_even'], g['baseline']), (1, 0, 0.37, True))  # golo aos 38: dentro de 25+15
+        self.assertEqual(r['unique_bets'], 0)                                                           # sem odd: não entra no saldo
+        r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')], details(base + [[41, 0, 'home'], [80, 0, 'away']]))
+        self.assertEqual(r['accuracy']['GOAL_BREWING']['misses'], 1)                                    # golo aos 41: fora da janela
+        r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')])
+        self.assertEqual(r['accuracy']['GOAL_BREWING']['with_result'], 0)                               # sem minutos dos golos: fica em aberto
+        live = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'petrzalka-vs-trnava-20261111')
+        r, _ = self.build([self.row(1, live, '2026-11-11T16:00:00+00:00')], details([[10, 0, 'home'], [80, 0, 'away'], [105, 0, 'home']], 'Finished after extra time', [1, 1]))
+        self.assertEqual((r['recent_bets'][0]['ft'], r['recent_bets'][0]['w'], r['recent_bets'][0]['settled_by']), ([1, 1], 1.0, 'resultado HL aos 90 min'))   # empate aos 90
 
 
 class Insights(unittest.TestCase):

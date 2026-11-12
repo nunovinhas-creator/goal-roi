@@ -83,16 +83,16 @@ def note_ft(b, notes):
     return None
 
 
-def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
+def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto."""
     out, dead = {}, set()
     for m in msgs:
-        no_odds = str(m.get('type')).endswith('_NO_ODDS')
+        no_odds = str(m.get('type')).endswith('_NO_ODDS') or (m.get('type') == 'GOAL_BREWING' and m.get('window'))
         if not (m.get('bet') or (no_odds and not strict)):
             continue
         if m.get('bet') and m['odds'] < MIN_ODDS:
             continue
-        k = key_of(m)
+        k = key_of(m) + ((m['minute'],) if m['type'] == 'GOAL_BREWING' else ())   # cada aviso de golo é medido à parte
         if strict and (k in dead or (k not in out and not provenance_ok(m))):
             dead.add(k)   # o primeiro sinal desta aposta não tem origem provada: a aposta inteira fica fora do ROI
             continue
@@ -100,7 +100,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
         if b is None:
             b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
                                                  'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league',
-                                                 'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals')}
+                                                 'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals', 'window', 'bot_prob', 'usual_prob')}
             b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None)
         b['n_signals'] += 1
         b['odds_last'], b['share_last'] = m.get('odds'), m.get('share')
@@ -125,7 +125,15 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
         b['ft'], b['w'], b['settled_by'] = f, None, None
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS)
-        b['next_goal_min'] = next_goal(b)
+        det = (details or {}).get(b['match_id'])
+        det = det if det and det.get('consistent') else None
+        b['next_goal_min'] = next_goal(b, det)
+        if b['type'] == 'GOAL_BREWING':   # acerta se o golo seguinte ao sinal cair dentro da janela indicada; só com minutos de fonte externa
+            if det:
+                nxt = det['goals'][sum(b['score_at_signal']):][:1]
+                b['ft'], b['settled_by'] = det['final'], 'minutos dos golos (Highlightly)'
+                b['w'] = 1.0 if nxt and nxt[0][0] <= b['minute'] + b['window'] else -1.0
+            continue
         if not f:
             continue
         if b['market'] is None:  # sinal sem odd: acerta se houve pelo menos mais um golo depois do sinal
@@ -146,8 +154,11 @@ def provenance_ok(m):
     return not (m['had_ft_at_first_sight'] or m['edited_at_first_sight'] or m['burst'])
 
 
-def next_goal(b):
-    """Minutos entre o sinal e o golo seguinte, só quando a lista de golos do bot bate certo com o marcador."""
+def next_goal(b, det=None):
+    """Minutos entre o sinal e o golo seguinte: pela fonte externa quando existe; senão pela lista do bot, só se bater certo."""
+    if det and b.get('score_at_signal') and b.get('minute') is not None:
+        nxt = det['goals'][sum(b['score_at_signal']):][:1]
+        return max(0, nxt[0][0] - b['minute']) if nxt else None
     g, s = b.get('goals'), b.get('score_at_signal')
     if not g or not s or b.get('minute') is None or not b['ft']:
         return None
@@ -170,6 +181,8 @@ def group(b):
 
 
 def label(b):
+    if b['type'] == 'GOAL_BREWING':
+        return 'golo nos próximos %d min' % b['window']
     if b['market'] is None:
         return 'mais um golo (sem odd)'
     if b['market'] == '1X2':
@@ -236,7 +249,7 @@ def accuracy(signals):
         eh, em = insights.effective(done)   # meia vitória = meio acerto; meia derrota = meia falha
         priced = [r for r in done if r['odds'] and r['w'] != 0]
         no_odds = [r for r in done if not r['odds'] and r.get('minute') is not None]
-        base = round(sum(baseline_more_goals(r['minute']) for r in no_odds) / len(no_odds), 4) if no_odds and not priced else None
+        base = round(sum(r['usual_prob'] / 100 if r.get('usual_prob') else baseline_more_goals(r['minute']) for r in no_odds) / len(no_odds), 4) if no_odds and not priced else None
         out[name] = {'signals': len(rows), 'with_result': len(done), 'hits': hits, 'misses': miss, 'pushes': len(done) - hits - miss,
                      'eff_hits': eh, 'eff_misses': em, 'no_source': sum(1 for r in rows if r['no_source']),
                      'unsettleable': sum(1 for r in rows if r['ft'] and r['w'] is None),
@@ -338,6 +351,15 @@ def build(csv_path=None, register=False):
         for m, r in res.items():
             bsd.setdefault(m, dict(r, provider=name.upper()))
     try:
+        details = json.loads((data_dir() / 'details_hl.json').read_text(encoding='utf-8')).get('details') or {}
+    except (OSError, ValueError):
+        details = {}
+    audit['goal_minutes_matches'] = len(details)
+    audit['goal_minutes_inconsistent'] = sum(1 for d in details.values() if not d.get('consistent'))
+    for m, d in details.items():   # jogo decidido depois dos 90 minutos: vale o marcador aos 90, reconstruído pelos minutos dos golos
+        if m not in bsd and d.get('consistent') and d.get('score_90') and re.search(r'extra time|penalt', d.get('status') or '', re.I):
+            bsd[m] = {'ft': d['score_90'], 'provider': 'HL aos 90 min'}
+    try:
         state = json.loads((data_dir() / 'state.json').read_text(encoding='utf-8'))
     except (OSError, ValueError):
         state = {}
@@ -346,8 +368,8 @@ def build(csv_path=None, register=False):
     audit['deleted_by_bot'] = len(state.get('missing_ids') or [])
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
-    bets = build_bets(msgs, ft, marks, notes, bsd=bsd)
-    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd)
+    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details)
+    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details)
     by = collections.OrderedDict()
     for b in bets:
         by.setdefault(b['group'], []).append(b)

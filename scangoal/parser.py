@@ -117,12 +117,24 @@ def parse(text):
             m['type'] = 'SERVICE'
         elif h.startswith('⏳'):
             m['type'] = 'GOAL_BREWING'
+            goal_brewing(m, lines, text)
         elif h.startswith('🟥'):
             m['type'] = 'WEAKENED_LINEUP'
             weakened_lineup(m, lines, text)
     except (TypeError, IndexError, ValueError):
         m.update(error='fields_missing', bet=False)
     return m
+
+
+def goal_brewing(m, lines, text):
+    """Golo a caminho: janela em minutos, probabilidade indicada e habitual. Mede-se com os minutos dos golos (fonte externa)."""
+    w, pr = re.search(r'next (\d+)′', lines[0]), re.search(r'Goal in \d+′: (\d+)% · usual (\d+)%', text)
+    mn = re.search(r"· (\d+)'", lines[1]) if len(lines) > 1 else None
+    a = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]) if len(lines) > 3 else None
+    b = re.match(r'(.+?)\s+(\d+)\s*$', lines[3]) if len(lines) > 3 else None
+    if w and pr and mn and a and b:
+        m.update(phase='live', window=int(w[1]), bot_prob=int(pr[1]), usual_prob=int(pr[2]), minute=int(mn[1]),
+                 league=clean_league(lines[1].rsplit(' · ', 1)[0]), teams=[a[1].strip(), b[1].strip()], score_at_signal=[int(a[2]), int(b[2])])
 
 
 def weakened_lineup(m, lines, text):

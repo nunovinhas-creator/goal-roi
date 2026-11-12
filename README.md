@@ -66,6 +66,13 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - A lista de golos do bot só é usada quando bate certo com o marcador do sinal e com o resultado final.
 - Sinais Stake: a odd indicada pode já não existir quando o aviso chega; o controlo de qualidade conta os avisos tardios.
 
+## Minutos dos golos
+`scangoal/details_hl.py` pede à Highlightly os golos com minuto de cada jogo já identificado (5 jogos de 2 em 2 horas, dentro da quota gratuita). Um jogo só é usado se os golos somados derem o resultado final.
+- "Goal brewing": acerta se o golo seguinte ao sinal cair dentro da janela indicada; compara-se com a probabilidade habitual que o próprio bot indica.
+- Jogos decididos depois dos 90 minutos: vale o marcador aos 90, reconstruído pelos minutos.
+- Tempo até ao golo seguinte: fonte externa primeiro; a lista do bot só quando bate certo.
+- As odds da Highlightly não estão disponíveis no plano gratuito.
+
 ## Cérebro (hipóteses)
 `scangoal/brain.py` combina as características de cada sinal em hipóteses de 1 ou 2 condições e regista-as em `data/hypotheses.json` (o registo só cresce).
 - O gerador só conta quantos sinais têm cada combinação; nunca lê resultados. Por isso estas hipóteses são avaliadas em todos os dados.

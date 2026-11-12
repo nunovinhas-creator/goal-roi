@@ -176,6 +176,7 @@ const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resu
  'STAKE_LOAD':['Aposta grande na Stake','Segue uma aposta de valor elevado. A odd indicada pode já não existir quando o aviso chega'],
  'TOTALS_FORM':['Forma de golos a 100 %','As duas equipas costumam passar esta linha de golos'],
  'TOTALS_FORM_NO_ODDS':['Forma de golos, sem odd','Acerta se houver pelo menos mais um golo'],
+ 'GOAL_BREWING':['Golo a caminho','O bot diz que a probabilidade de golo nos próximos minutos está acima do habitual. Acerta se o golo cair nessa janela'],
  'WEAKENED_LINEUP':['Alinhamento enfraquecido','Aposta contra a equipa que entra sem os titulares habituais, ao handicap indicado']};
 const GROUPS={'BETFAIR/pre/mkt>=10K':'Betfair antes do jogo, mercado grande','BETFAIR/pre/mkt<10K':'Betfair antes do jogo, mercado pequeno',
  'BETFAIR/live/mkt>=10K':'Betfair durante o jogo, mercado grande','BETFAIR/live/mkt<10K':'Betfair durante o jogo, mercado pequeno',
@@ -228,7 +229,7 @@ function signals(d){
     const a=el('div');a.append(el('h3',{},title),el('div',{class:'cnt'},desc));
     const b=el('div',{class:'plotcell'});b.appendChild(plot(g));
     const r=el('div',{class:'read'});
-    if(n){r.append(el('b',{},hitsOf(g.hits,n)),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?(g.baseline?`, num jogo médio seria ${pct(g.break_even)}`:`, precisa de ${pct(g.break_even)}`):'')+(g.prob_above!=null?`. Probabilidade de estar acima ${g.baseline?'do habitual':'do mínimo'}: ${pct(g.prob_above)}`:'')+pending(g)))}
+    if(n){r.append(el('b',{},hitsOf(g.hits,n)),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?(g.baseline?`, o habitual seria ${pct(g.break_even)}`:`, precisa de ${pct(g.break_even)}`):'')+(g.prob_above!=null?`. Probabilidade de estar acima ${g.baseline?'do habitual':'do mínimo'}: ${pct(g.prob_above)}`:'')+pending(g)))}
     else r.textContent=`${g.signals} ${g.signals===1?'sinal':'sinais'}, ainda sem resultado`+pending(g);
     if(n&&n<d.min_settled&&g.per_day){const e=el('div',{class:'eta'});e.textContent=`Ritmo: ${num(g.per_day)} resultados por dia. `+(n<30&&g.days_to_hint!=null?`Primeiro indício em cerca de ${g.days_to_hint} ${g.days_to_hint===1?'dia':'dias'}; `:'')+`conclusão em cerca de ${g.days_to_conclusion} dias.`;r.appendChild(e)}
     b.appendChild(r);
@@ -354,6 +355,7 @@ function tables(d){
    [a.deleted_by_bot,'mensagens que o bot apagou depois de publicar'],[a.ended_after_90,'jogos decididos depois dos 90 minutos (em aberto)'],
    [`${a.stake_sent_45_after_kickoff??0}`,'sinais Stake chegados mais de 45 min depois do início'],[`${a.stake_no_score_after_kickoff??0} de ${a.stake_original_seen??0}`,'sinais Stake originais sem marcador, já com o jogo a decorrer'],
    [`${a.goal_lists_consistent??0} de ${a.goal_lists??0}`,'listas de golos do bot que batem certo'],
+   [`${(a.goal_minutes_matches??0)-(a.goal_minutes_inconsistent??0)} de ${a.goal_minutes_matches??0}`,'jogos com minutos dos golos confirmados pela Highlightly'],
    [d.excluded_low_odds,'sinais com odd abaixo de 1,10 (ignorados)'],[a.hl_results,'resultados obtidos na Highlightly'],[a.hl_vs_bot_disagreements,'divergências entre a Highlightly e o bot'],
    [a.hl_near_misses,'jogos com nome de equipa por rever'],[a.bsd_results,'resultados obtidos na BSD']].forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v??0)));$('qc').appendChild(w)});
 }

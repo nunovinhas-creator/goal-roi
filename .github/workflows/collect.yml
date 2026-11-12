@@ -37,6 +37,10 @@ jobs:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           HL_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '240' }}
         run: python -u -m scangoal.results_hl
+      - name: Goal minutes from Highlightly (every 2 hours at most, 5 matches per run)
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+        run: python -u -m scangoal.details_hl
       - name: Results from BSD (hourly at most; skipped without key)
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}

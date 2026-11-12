@@ -45,7 +45,7 @@ def beta_cdf(x, a, b):
 
 LABELS = {'BETFAIR/pre': 'dinheiro na Betfair antes do jogo', 'BETFAIR/live': 'dinheiro na Betfair durante o jogo', 'OPEN_GAME': 'jogo aberto com odd',
           'OPEN_GAME_NO_ODDS': 'jogo aberto sem odd', 'STAKE_LOAD': 'aposta grande na Stake', 'TOTALS_FORM': 'forma de golos',
-          'TOTALS_FORM_NO_ODDS': 'forma de golos sem odd', 'WEAKENED_LINEUP': 'contra a equipa com alinhamento enfraquecido'}
+          'TOTALS_FORM_NO_ODDS': 'forma de golos sem odd', 'WEAKENED_LINEUP': 'contra a equipa com alinhamento enfraquecido', 'GOAL_BREWING': 'golo a caminho'}
 
 
 def wilson(k, n):
@@ -90,7 +90,7 @@ def summarize(rows):
 
 def family(b):
     return {'BETFAIR': 'Betfair', 'STAKE_LOAD': 'Stake', 'OPEN_GAME': 'Jogo aberto', 'OPEN_GAME_NO_ODDS': 'Jogo aberto',
-            'TOTALS_FORM': 'Forma de golos', 'TOTALS_FORM_NO_ODDS': 'Forma de golos', 'WEAKENED_LINEUP': 'Alinhamento enfraquecido'}.get(b['type'], b['type'])
+            'TOTALS_FORM': 'Forma de golos', 'TOTALS_FORM_NO_ODDS': 'Forma de golos', 'WEAKENED_LINEUP': 'Alinhamento enfraquecido', 'GOAL_BREWING': 'Golo a caminho'}.get(b['type'], b['type'])
 
 
 def odds_band(o):
@@ -120,6 +120,9 @@ def dimensions(b, multi):
         if b['market'] and b['score_at_signal']:
             need = float(b['selection'].split()[1]) - sum(b['score_at_signal'])
             out.append(('Golos em falta para ganhar', 'até 1 golo' if need <= 1 else 'entre 1 e 2 golos' if need <= 2 else 'mais de 2 golos'))
+    if b['type'] == 'GOAL_BREWING':
+        out += [('Parte do jogo', '1.ª parte' if (b['minute'] or 0) < 46 else '2.ª parte'),
+                ('Vantagem indicada pelo bot', '15 pontos ou mais acima do habitual' if b['bot_prob'] - b['usual_prob'] >= 15 else 'menos de 15 pontos acima do habitual')]
     if b['type'] == 'STAKE_LOAD':
         late = b.get('after_kickoff_min')
         out += [('Momento do aviso', None if late is None else 'antes do início' if late < 0 else 'até 45 min depois do início' if late <= 45 else 'mais de 45 min depois do início'),
