@@ -14,6 +14,13 @@ Mede o ROI dos sinais do bot Telegram @scangoal_bot com regras fixas. Não faz a
 - Grupos: BETFAIR pré/ao vivo × mercado ≥/< 10 mil dólares; STAKE_LOAD pré/ao vivo; OPEN_GAME; TOTALS_FORM.
 - Menos de 300 apostas liquidadas num grupo = sem conclusão.
 
+## Taxa de acerto
+Tabela à parte, com todos os sinais que têm resultado (inclui os lidos já com resultado, que ficam fora do ROI).
+- Acerto = aposta ganha ou meia ganha pela liquidação própria; devoluções não contam.
+- Mercados que o resultado final não decide (ex.: "2nd Team to Score") usam a marca ✅/❌ do bot.
+- Sinais sem odd ("Open game" sem linha): acerto = pelo menos mais um golo depois do sinal (regra fixada a 12/11/2026).
+- "Taxa necessária" = média de 1/odd, a taxa de acerto que dá lucro zero.
+
 ## Perguntas pré-definidas (exploratórias)
 Escritas a 11/11/2026, antes de haver dados; aparecem no relatório mas nunca contam como conclusão:
 Q1 entrar só ao ×4; Q2 sinal sem reforço; Q3 faixas de odd; Q4 quota de mercado ≥ 80 %; Q5 antecedência do sinal pré-jogo; Q6 minuto do sinal Open game; Q7 todas as apostas.

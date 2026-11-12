@@ -41,6 +41,10 @@ svg.sp{vertical-align:middle}
 <p class="note">1 unidade por aposta, à odd do primeiro sinal de cada jogo e seleção. Um grupo só é conclusivo a partir de <span id="minset">300</span> apostas liquidadas.</p>
 <div class="wrap"><table><thead><tr><th>Grupo</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Unidades</th><th>ROI</th><th>IC 95 %</th><th>ROI odd −2 %</th><th>ROI odd −5 %</th><th>Evolução</th></tr></thead><tbody id="groups"></tbody></table></div>
 
+<h2>Taxa de acerto por tipo de sinal</h2>
+<p class="note">Todos os sinais com resultado, incluindo os que já foram lidos com o resultado e os que não trazem odd (nesses, acerto = pelo menos mais um golo depois do sinal). A taxa necessária é a que dá lucro zero às odds anunciadas.</p>
+<div class="wrap"><table><thead><tr><th>Tipo</th><th>Sinais</th><th>Com resultado</th><th>Acertos</th><th>Falhas</th><th>Devolvidas</th><th>Taxa de acerto</th><th>IC 95 %</th><th>Taxa necessária</th><th>Odd média</th><th>ROI à odd anunciada</th></tr></thead><tbody id="accuracy"></tbody></table></div>
+
 <h2>Perguntas pré-definidas <span class="tag">exploratório</span></h2>
 <p class="note">Cortes escritos antes de haver dados. Servem para escolher o que testar em dados novos; não contam como conclusão.</p>
 <div class="wrap"><table><thead><tr><th>Pergunta</th><th>Apostas</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>ROI</th><th>IC 95 %</th></tr></thead><tbody id="questions"></tbody></table></div>
@@ -79,10 +83,13 @@ fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
   $('minset').textContent=d.min_settled;
   for(const [name,g] of Object.entries(d.groups)){const tr=document.createElement('tr');td(tr,name);td(tr,g.bets);settledCell(tr,g,d.min_settled);td(tr,g.wins);td(tr,num(g.avg_odds));
     td(tr,g.settled?num(g.units):'—',g.settled?cls(g.units):'mut');roiCells(tr,g,true);td(tr,spark(g.cumulative));$('groups').appendChild(tr)}
+  for(const [name,g] of Object.entries(d.accuracy||{})){const tr=document.createElement('tr');td(tr,name);td(tr,g.signals);td(tr,g.with_result);td(tr,g.hits);td(tr,g.misses);td(tr,g.pushes);
+    const hr=g.hit_rate,be=g.break_even;td(tr,hr==null?'—':pct(hr),hr==null||be==null?'':hr>be?'pos':'neg');td(tr,g.ci95?pct(g.ci95[0])+' a '+pct(g.ci95[1]):'—','mut');
+    td(tr,be==null?'—':pct(be),'mut');td(tr,num(g.avg_odds));td(tr,g.roi_announced_odds==null?'—':pct(g.roi_announced_odds),g.roi_announced_odds==null?'mut':cls(g.roi_announced_odds));$('accuracy').appendChild(tr)}
   for(const [name,g] of Object.entries(d.questions)){const tr=document.createElement('tr');td(tr,name,'wrapc');td(tr,g.bets);td(tr,g.settled);td(tr,g.wins);td(tr,num(g.avg_odds));roiCells(tr,g,false);$('questions').appendChild(tr)}
   for(const b of d.recent_bets){const tr=document.createElement('tr');td(tr,b.date_utc.slice(5,16).replace('T',' '));td(tr,b.match,'l');td(tr,b.selection,'l');td(tr,b.group,'l mut');td(tr,num(b.odds));
     td(tr,b.max_mult>1?'×'+b.max_mult:'—','mut');td(tr,b.ft?b.ft[0]+':'+b.ft[1]:'—','mut');
-    const w=b.w;td(tr,w==null?(b.ft?'não liquidável':'em aberto'):w>0?(w<1?'meia ganha':'ganha'):w<0?(w>-1?'meia perdida':'perdida'):'devolvida',w==null?'mut':cls(w));$('recent').appendChild(tr)}
+    const w=b.w;td(tr,(w==null?(b.ft?'não liquidável':'em aberto'):w>0?(w<1?'meia ganha':'ganha'):w<0?(w>-1?'meia perdida':'perdida'):'devolvida')+(b.settled_by==='marca do bot'?' (marca do bot)':''),w==null?'mut':cls(w));$('recent').appendChild(tr)}
   if(!d.recent_bets.length){const tr=document.createElement('tr');const c=td(tr,'Ainda sem apostas registadas.','mut');c.colSpan=8;$('recent').appendChild(tr)}
   const a=d.audit||{};
   $('audit').textContent=`${a.versions||0} versões de mensagens guardadas · ${a.edits_changing_signal||0} sinais alterados pelo bot depois de publicados · ${a.bot_mark_disagreements||0} resultados em que a marca do bot difere da liquidação própria · ${d.excluded_first_seen_with_result} sinais excluídos por terem sido vistos já com resultado · ${d.excluded_low_odds} excluídos por odd abaixo de 1,10 · ${d.unsettled_market} com resultado mas mercado não liquidável`

@@ -10,6 +10,14 @@ from datetime import datetime, timezone
 RECENT = int(os.environ.get('SCANGOAL_RECENT', '400'))
 
 
+def buttons(msg):
+    """Texto e URL dos botões da mensagem (metadados; ajudam a descobrir o que o bot oferece)."""
+    try:
+        return [[b.text, getattr(b, 'url', None)] for row in (msg.buttons or []) for b in row] or None
+    except Exception:
+        return None
+
+
 def iso(dt):
     return dt.astimezone(timezone.utc).isoformat(timespec='seconds') if dt else None
 
@@ -36,7 +44,7 @@ async def collect():
                 if getattr(msg, 'out', False) or not (msg.raw_text or '').strip():
                     continue
                 rows.append({'message_id': msg.id, 'date_utc': iso(msg.date), 'edit_date_utc': iso(getattr(msg, 'edit_date', None)),
-                             'text': msg.raw_text, 'collected_at_utc': now})
+                             'text': msg.raw_text, 'buttons': buttons(msg), 'collected_at_utc': now})
     finally:
         await client.disconnect()
     added = append_versions(rows)
