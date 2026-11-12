@@ -30,6 +30,11 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .answer small{display:block;margin-top:8px;font-size:14.5px;font-weight:400;opacity:.8;max-width:75ch}
 .facts{display:flex;flex-wrap:wrap;gap:6px 28px;margin:16px 2px 0;color:var(--mut);font-size:15px}
 .facts b{color:var(--ink);font-weight:700}
+.says{margin:12px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.says li{padding:13px 20px;border-top:1px solid var(--line);max-width:none}.says li:first-child{border-top:0}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
+.duo .panel{margin-top:0}.duo h3{margin:0 0 6px;font:700 16.5px/1.25 Archivo,sans-serif}
+.big{font:800 30px/1.1 Archivo,sans-serif;font-stretch:108%}.duo p{margin:6px 0 0;color:var(--mut);font-size:14.5px}
 
 .sig{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
 .row{display:grid;grid-template-columns:minmax(210px,1.1fr) minmax(260px,2fr) auto;gap:6px 22px;align-items:center;padding:16px 20px;border-top:1px solid var(--line)}
@@ -64,6 +69,7 @@ td.l{text-align:left}td.name{white-space:normal;min-width:160px}
 .prog i{display:block;height:100%;background:var(--mark)}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
 .filters button{font:600 14px Archivo,sans-serif;padding:6px 13px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.more{font:600 14px Archivo,sans-serif;margin-top:12px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .filters button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .filters button:focus-visible,summary:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
 .bet{display:grid;grid-template-columns:86px 1fr auto;gap:2px 14px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
@@ -91,6 +97,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <section class="answer" aria-live="polite"><p id="answer">A carregar os dados…</p><small id="answer2"></small></section>
 <div class="facts" id="facts"></div>
 
+<h2>O que os dados dizem hoje</h2>
+<ul class="says" id="says"></ul>
+
 <h2>Cada tipo de sinal acerta o suficiente?</h2>
 <p class="note">Para dar lucro, um sinal tem de acertar mais vezes do que a odd exige. O ponto mostra a taxa de acerto medida; a faixa mostra onde o valor real pode estar; o traço vertical é o mínimo necessário.</p>
 <div class="legend"><span><i class="k-dot"></i>taxa de acerto medida</span><span><i class="k-band"></i>margem de incerteza (95 %)</span><span><i class="k-tick"></i>mínimo para não perder dinheiro</span></div>
@@ -103,6 +112,21 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <h2>Lucro por grupo</h2>
 <p class="note">Um grupo só conta como conclusivo com <span id="minset">300</span> apostas liquidadas. As colunas “odd −2 %” e “odd −5 %” mostram o que sobra se não conseguires a odd anunciada.</p>
 <div class="panel wrap"><table><thead><tr><th>Grupo</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Saldo</th><th>ROI</th><th>Entre</th><th>Odd −2 %</th><th>Odd −5 %</th></tr></thead><tbody id="groups"></tbody></table></div>
+
+<h2>A odd mexe a favor do sinal?</h2>
+<p class="note">Quando o bot reforça um sinal Betfair, traz a odd mais recente. Se a odd desce depois do primeiro sinal, o mercado concordou com ele. É um indicador mais rápido do que esperar pelos resultados.</p>
+<div class="duo" id="move"></div>
+
+<h2>O bot acerta mais nos favoritos ou nas surpresas?</h2>
+<p class="note">Todos os sinais com odd, agrupados por faixa. O traço é a taxa que a própria odd exige; o ponto é o que aconteceu.</p>
+<div class="sig" id="calib"></div>
+
+<h2>Onde os sinais funcionam melhor e pior</h2>
+<p class="note" id="segnote"></p>
+<div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Corte</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="segs"></tbody></table></div>
+
+<h2>Sorte e risco</h2>
+<div class="duo" id="risk"></div>
 
 <h2>Últimas apostas</h2>
 <div class="panel">
@@ -123,7 +147,7 @@ const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs={},text)=>{const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e};
 const sv=(tag,attrs={})=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e};
 const pct=(v,d=0)=>(v*100).toFixed(d).replace('.',',')+' %', num=v=>v==null?'—':String(v).replace('.',','), cls=v=>v>0?'pos':v<0?'neg':'';
-const sign=v=>(v>0?'+':'')+num(v);
+const sign=v=>(v>0?'+':'')+num(v), hitsOf=(h,n)=>`${h} ${h===1?'acerto':'acertos'} em ${n}`;
 const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resultado (1X2) que está a receber volume fora do normal'],
  'BETFAIR/live':['Dinheiro na Betfair, durante o jogo','Igual, mas com o jogo a decorrer'],
  'OPEN_GAME':['Jogo aberto, com odd','Jogo com ritmo alto: aposta em mais golos'],
@@ -174,7 +198,7 @@ function signals(d){
     const a=el('div');a.append(el('h3',{},title),el('div',{class:'cnt'},desc));
     const b=el('div',{class:'plotcell'});b.appendChild(plot(g));
     const r=el('div',{class:'read'});
-    if(n){r.append(el('b',{},`${g.hits} acertos em ${n}`),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?`, precisa de ${pct(g.break_even)}`:'')+(g.signals>g.with_result?`. ${g.signals-g.with_result} à espera de resultado`:'')))}
+    if(n){r.append(el('b',{},hitsOf(g.hits,n)),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?`, precisa de ${pct(g.break_even)}`:'')+(g.prob_above!=null?`. Probabilidade de estar acima do mínimo: ${pct(g.prob_above)}`:'')+(g.signals>g.with_result?`. ${g.signals-g.with_result} à espera de resultado`:'')))}
     else r.textContent=`${g.signals} sinais, ainda sem resultado`;
     b.appendChild(r);
     const [kind,text]=verdict(g,d.min_settled);
@@ -235,6 +259,32 @@ function chart(d){
   s.addEventListener('mousemove',move);s.addEventListener('touchstart',move,{passive:true});s.addEventListener('touchmove',move,{passive:true});s.addEventListener('mouseleave',out);
 }
 
+function insights(d){
+  const I=d.insights; if(!I)return;
+  for(const t of I.narrative)$('says').appendChild(el('li',{},t));
+  const mv=(title,m,note)=>{const p=el('div',{class:'panel'});p.appendChild(el('h3',{},title));
+    if(!m.n){p.appendChild(el('p',{},'Ainda sem apostas com reforço.'))}
+    else{p.appendChild(el('div',{class:'big'},`${m.shortened} de ${m.n}`));p.appendChild(el('p',{},`apostas em que a odd desceu depois do sinal. Subiu em ${m.drifted}. Variação típica: ${m.median_move_pct>0?'+':''}${num(m.median_move_pct)} %.`));
+      const a=m.when_shortened,b=m.when_drifted;p.appendChild(el('p',{},`Quando desceu: ${hitsOf(a.hits,a.n)}. Quando subiu: ${hitsOf(b.hits,b.n)}.`))}
+    p.appendChild(el('p',{},note));$('move').appendChild(p)};
+  mv('Antes do jogo',I.price_move.pre,'Aqui a odd só mexe por dinheiro e notícias, por isso é o indicador mais limpo.');
+  mv('Durante o jogo',I.price_move.live,'Aqui a odd também mexe com o relógio e os golos; serve só de contexto.');
+  for(const c of I.calibration){const row=el('div',{class:'row'}), a=el('div');a.append(el('h3',{},c.band.replace('odd','Odd')),el('div',{class:'cnt'},`${c.signals} sinais`));
+    const b=el('div',{class:'plotcell'});b.appendChild(plot(c));const r=el('div',{class:'read'});
+    if(c.n)r.append(el('b',{},hitsOf(c.hits,c.n)),document.createTextNode(` (${pct(c.hit_rate)}), a odd exige ${pct(c.break_even)}`));else r.textContent='Ainda sem resultados';
+    b.appendChild(r);const v=verdict({hits:c.hits,misses:c.misses,break_even:c.break_even,ci95:c.ci95},d.min_settled);row.append(a,b,chip(v[0],v[1]));$('calib').appendChild(row)}
+  $('segnote').textContent=`Cada linha é um corte dos sinais com pelo menos ${I.method.min_segment} resultados, ordenado da melhor para a pior evidência. Foram comparados ${I.segments_tested} cortes: quantos mais se comparam, mais provável é algum parecer bom por acaso. Servem para escolher o que confirmar em dados novos.`;
+  for(const g of I.segments){const tr=el('tr');td(tr,g.family,'l');td(tr,`${g.dimension}: ${g.value}`,'name');td(tr,g.n);td(tr,pct(g.hit_rate));td(tr,g.break_even!=null?pct(g.break_even):'—','mut');
+    td(tr,g.prob_above!=null?pct(g.prob_above):'—',g.prob_above==null?'mut':g.prob_above>=.9?'pos':g.prob_above<=.1?'neg':'');td(tr,g.roi!=null?pct(g.roi,1):'—',g.roi==null?'mut':cls(g.roi));$('segs').appendChild(tr)}
+  if(!I.segments.length){const tr=el('tr');td(tr,`Ainda nenhum corte tem ${I.method.min_segment} resultados.`,'mut').colSpan=7;$('segs').appendChild(tr)}
+  const L=I.luck, card=(title,big,text)=>{const p=el('div',{class:'panel'});p.append(el('h3',{},title),el('div',{class:'big'},big),el('p',{},text));$('risk').appendChild(p)};
+  if(L.n){const z=L.z||0;
+    card('Saldo contra a sorte',`${sign(L.units)} un.`,`Em ${L.n} apostas a odds justas, a sorte sozinha faz o saldo oscilar cerca de ±${num(Math.round(2*L.luck_sd*10)/10)} unidades. ${Math.abs(z)<2?'O saldo atual está dentro dessa margem: ainda não distingue jeito de sorte.':z>0?'O saldo está acima dessa margem.':'O saldo está abaixo dessa margem.'}`);
+    card('Maior queda',`−${num(L.max_drawdown)} un.`,'A maior descida do saldo desde um máximo. Indica a banca mínima para aguentar uma fase má.');
+    card('Pior sequência',`${L.longest_losing_run} seguidas`,'O maior número de apostas perdidas de seguida até agora.')}
+  else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
+}
+
 function td(tr,t,c){const e=el('td',c?{class:c}:{});if(t instanceof Node)e.appendChild(t);else e.textContent=t;tr.appendChild(e);return e}
 function roi(tr,g,full){const r=g.roi;
   if(!r){for(let i=0;i<(full?4:2);i++)td(tr,'—','mut');return}
@@ -258,19 +308,21 @@ function outcome(b){const w=b.w;
   if(w>0)return['good',w<1?'Meia ganha':'Ganha'];if(w<0)return['bad',w>-1?'Meia perdida':'Perdida'];return['wait','Devolvida']}
 function recent(d){
   const all=d.recent_bets||[], box=$('recent'), F=[['todas','Todas',()=>true],['ganhas','Ganhas',b=>b.w>0],['perdidas','Perdidas',b=>b.w<0],['abertas','Em aberto',b=>b.w==null]];
-  const draw=fn=>{box.textContent='';const rows=all.filter(fn);
+  let limit=12;
+  const draw=fn=>{box.textContent='';const every=all.filter(fn), rows=every.slice(0,limit);
     if(!rows.length){box.appendChild(el('p',{class:'note'},'Nenhuma aposta neste filtro.'));return}
     for(const b of rows){const r=el('div',{class:'bet'}), t=new Date(b.date_utc);
       r.appendChild(el('div',{class:'when'},t.toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})));
       const w=el('div',{class:'what'});w.append(el('b',{},`${b.selection}`),document.createTextNode(b.odds?` @ ${num(b.odds)}`:''));
       w.appendChild(el('div',{},`${b.match}${b.ft?`, final ${b.ft[0]}-${b.ft[1]}`:''}. ${gname(b.group)}${b.max_mult>1?`, reforçado ×${b.max_mult}`:''}`));
-      r.appendChild(w);const [k,txt]=outcome(b);r.appendChild(chip(k,txt));box.appendChild(r)}};
+      r.appendChild(w);const [k,txt]=outcome(b);r.appendChild(chip(k,txt));box.appendChild(r)}
+    if(every.length>rows.length){const more=el('button',{type:'button',class:'more'},`Mostrar as ${every.length} apostas`);more.addEventListener('click',()=>{limit=1e9;draw(fn)});box.appendChild(more)}};
   F.forEach(([id,label,fn],i)=>{const btn=el('button',{type:'button','aria-pressed':i===0?'true':'false'},`${label} (${all.filter(fn).length})`);
-    btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');draw(fn)});$('filters').appendChild(btn)});
+    btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');limit=12;draw(fn)});$('filters').appendChild(btn)});
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);chart(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);chart(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 </script>
 </body></html>

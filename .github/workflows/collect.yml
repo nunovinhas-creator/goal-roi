@@ -2,7 +2,7 @@ name: Collect ScanGoal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '3-53/10 * * * *'   # 10 em 10 min (repositório público: minutos de Actions sem limite)
+    - cron: '3,13,23,33,43,53 * * * *'   # de 10 em 10 minutos (lista explícita)
 permissions:
   contents: write
 concurrency:
