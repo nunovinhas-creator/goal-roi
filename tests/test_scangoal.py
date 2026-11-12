@@ -811,6 +811,11 @@ class Settlement(Hardening):
                 del os.environ['SCANGOAL_DATA_DIR']
 
 
+class PageName(unittest.TestCase):
+    def test_page_does_not_name_the_bot(self):
+        self.assertNotIn('scangoal', Path('docs/index.html').read_text(encoding='utf-8').lower())
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence
