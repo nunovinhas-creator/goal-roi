@@ -17,15 +17,46 @@ from . import insights
 from .parser import competition_kind
 
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
-MAX_HYPOTHESES = 200
+MAX_HYPOTHESES = 300
 HINT_AT, STRONG_AT = 30, 100
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
 
 
-def atoms(b, multi):
+def earlier_index(signals):
+    """Por jogo: (hora, família) de cada sinal, para saber se já havia outro tipo de sinal antes."""
+    idx = {}
+    for b in signals:
+        idx.setdefault(b['match_id'], []).append((b['date_utc'], insights.family(b)))
+    return idx
+
+
+def atoms(b, multi, earlier=None):
     """Características de um sinal: as dimensões fixas da análise e mais algumas próprias do cérebro."""
     b['kind'] = competition_kind(b.get('league'), b.get('teams'))
     out = insights.dimensions(b, multi)
+    fam = insights.family(b)
+    if b.get('league'):
+        out.append(('Liga', b['league']))
+    if earlier is not None:
+        before = any(d < b['date_utc'] and f != fam for d, f in earlier.get(b['match_id'], ()))
+        out.append(('Sinal anterior de outro tipo no mesmo jogo', 'sim' if before else 'não'))
+    s = b.get('score_at_signal')
+    if s:
+        gap = abs(s[0] - s[1])
+        out += [('Marcador no momento', 'empatado' if gap == 0 else 'diferença de 1 golo' if gap == 1 else 'diferença de 2 ou mais golos'),
+                ('Golos até ao sinal', 'nenhum' if sum(s) == 0 else '1 ou 2' if sum(s) <= 2 else '3 ou mais')]
+    if b.get('minute') is not None:
+        out.append(('Minuto', 'até ao 30' if b['minute'] <= 30 else '31 a 60' if b['minute'] <= 60 else '61 em diante'))
+    if b['type'] == 'BETFAIR':
+        out.append(('Seleção', {'1': 'equipa da casa', 'X': 'empate', '2': 'equipa de fora'}.get(b.get('selection'))))
+        if b.get('sel_volume') is not None:
+            out.append(('Volume na seleção', '10 mil $ ou mais' if b['sel_volume'] >= 10000 else 'menos de 10 mil $'))
+    if b['type'] == 'STAKE_LOAD':
+        if b.get('total') is not None:
+            out.append(('Valor da aposta', '10 mil $ ou mais' if b['total'] >= 10000 else 'menos de 10 mil $'))
+        if b.get('n_bets') is not None:
+            out.append(('Número de apostas', 'uma' if b['n_bets'] == 1 else 'várias'))
+    out = [(d, v) for d, v in out if v]
     hour = datetime.fromisoformat(b['date_utc']).hour
     out.append(('Hora (UTC)', 'madrugada' if hour < 6 else 'manhã' if hour < 12 else 'tarde' if hour < 18 else 'noite'))
     if b['type'] == 'BETFAIR':
@@ -49,9 +80,9 @@ def multi_matches(signals):
 
 def candidates(signals):
     """Combinações de 1 e 2 características por família, com o número de sinais que as têm. Não lê resultados."""
-    multi, support = multi_matches(signals), {}
+    multi, support, earlier = multi_matches(signals), {}, earlier_index(signals)
     for b in signals:
-        fam, at = insights.family(b), sorted(set(atoms(b, multi)))
+        fam, at = insights.family(b), sorted(set(atoms(b, multi, earlier)))
         combos = [(a,) for a in at] + [c for c in itertools.combinations(at, 2) if c[0][0] != c[1][0]]
         for c in combos:
             support[(fam, c)] = support.get((fam, c), 0) + 1
@@ -86,8 +117,8 @@ def status_of(n, prob, corrected_bar, min_settled):
 
 
 def evaluate(signals, registry, min_settled):
-    multi = multi_matches(signals)
-    have = [(b, insights.family(b), set(atoms(b, multi))) for b in signals]
+    multi, earlier = multi_matches(signals), earlier_index(signals)
+    have = [(b, insights.family(b), set(atoms(b, multi, earlier))) for b in signals]
     rows = []
     for hid, h in registry.items():
         conds = {tuple(c) for c in h['conditions']}
@@ -122,6 +153,23 @@ def build(signals, registry, min_settled):
             'abandoned': [r for r in rows if r['status'] == 'abandonada'][:10],
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
             'rules': {'min_support': MIN_SUPPORT, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
+
+
+def entry_points(signals):
+    """Betfair: entrar ao primeiro sinal ou esperar pelo reforço? Cada linha usa a odd do primeiro sinal que chegou a esse reforço."""
+    out = []
+    for phase in ('pre', 'live'):
+        rows = [b for b in signals if b['type'] == 'BETFAIR' and b['phase'] == phase and b.get('steps')]
+        for level in (1, 2, 4, 8, 16):
+            virtual = []
+            for b in rows:
+                odds = next((o for m, o in b['steps'] if m >= level), None)
+                if odds is not None:
+                    virtual.append(dict(b, odds=odds))
+            s = insights.summarize(virtual)
+            out.append({'phase': phase, 'level': level, 'signals': s['signals'], 'n': s['n'], 'hits': s['hits'], 'hit_rate': s['hit_rate'],
+                        'break_even': s['break_even'], 'roi': s['roi'], 'prob_above': s['prob_above']})
+    return out
 
 
 def load_registry(path):
