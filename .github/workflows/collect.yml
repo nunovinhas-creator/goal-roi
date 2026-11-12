@@ -26,6 +26,11 @@ jobs:
           TG_SESSION: ${{ secrets.TG_SESSION }}
           TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
         run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
+      - name: Results from Highlightly (every 4 hours at most; skipped without key)
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+          HL_MIN_INTERVAL_MIN: ${{ github.event_name == 'workflow_dispatch' && '0' || '240' }}
+        run: python -u -m scangoal.results_hl
       - name: Results from BSD (hourly at most; skipped without key)
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
