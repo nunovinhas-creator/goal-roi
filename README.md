@@ -100,6 +100,13 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Resumo diário depois das 21:00 UTC.
 - Aviso quando uma recolha falha (no máximo um por hora). Se a cadeia de recolha parar por completo, não há quem avise: a página mostra "Recolha parada".
 
+### Alertas de táticas validadas
+- Uma tática está validada quando chega a "forte" (100 ou mais resultados e fasquia corrigida pelo número de hipóteses testadas) ou "confirmada" (300 ou mais).
+- Cada jogo que encaixe numa tática validada gera um ALERTA com o jogo, a seleção, a odd, a hora, a vantagem estimada e a odd mínima para valer a pena (1 a dividir pela taxa de acerto prudente).
+- O alerta só sai enquanto dá para apostar: jogo ainda por começar, ou sinal com 30 minutos no máximo. Sai uma só vez por jogo.
+- O estado é recalculado em cada recolha. Se a tática deixar de estar validada, sai um aviso e deixa de gerar alertas; se outra passar a validada, começa a gerar.
+- Hipóteses "promissoras" continuam a sair como indício, com texto diferente.
+
 ## Simulador de banca
 Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas liquidadas do saldo estrito, por ordem, com escolha de tipos de sinal e de corte na odd. Corre no navegador; não altera dados.
 

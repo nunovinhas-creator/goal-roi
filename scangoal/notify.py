@@ -1,11 +1,14 @@
 """Avisos pelo Telegram, por um bot do utilizador (API de bots; não usa a conta que lê o ScanGoal).
 
-Envia: sinais em aberto que encaixam numa hipótese promissora ou melhor; hipóteses que mudam de estado;
+Envia: ALERTA para cada jogo que encaixa numa tática validada (forte ou confirmada), só enquanto ainda dá para apostar;
+aviso quando uma tática passa a validada ou deixa de o ser (e nesse caso deixa de gerar alertas);
+sinais em aberto que encaixam numa hipótese promissora (indício); hipóteses que mudam de estado;
 mudanças de comportamento de um tipo de sinal; e um resumo diário depois das 21:00 UTC.
 Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nunca é impresso). Sem eles, não faz nada.
 """
 import json, os, sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -15,6 +18,9 @@ from .store import data_dir
 
 SUMMARY_HOUR_UTC = 21
 MAX_WATCH_PER_RUN = 5
+VALID = ('forte', 'confirmada')   # tática validada: 100 ou mais resultados e fasquia corrigida pelo número de hipóteses testadas
+ALERT_MAX_AGE_MIN = 30            # alerta só se o jogo ainda não começou ou se o sinal tem no máximo 30 minutos
+LISBON = ZoneInfo('Europe/Lisbon')
 PAGE = 'https://nunovinhas-creator.github.io/goal-roi/'
 KIND = {'BETFAIR/pre': 'Betfair antes do jogo', 'BETFAIR/live': 'Betfair durante o jogo', 'STAKE_LOAD': 'Stake', 'POLYMARKET': 'Polymarket', 'OPEN_GAME': 'Jogo aberto',
         'TOTALS_FORM': 'Forma de golos', 'WEAKENED_LINEUP': 'Alinhamento enfraquecido', 'GOAL_BREWING': 'Golo a caminho',
@@ -51,17 +57,48 @@ def dec(v):
     return ('%+.2f' % v).replace('.', ',')
 
 
+def still_bettable(w, now):
+    ko = w.get('kickoff_utc')
+    if ko:
+        ko = datetime.fromisoformat(ko)
+        if (ko if ko.tzinfo else ko.replace(tzinfo=UTC)) > now:
+            return True
+    return now - datetime.fromisoformat(w['date_utc']) <= timedelta(minutes=ALERT_MAX_AGE_MIN)
+
+
+def alert(w, r):
+    """Texto do alerta de um jogo que encaixa numa tática validada."""
+    ko = w.get('kickoff_utc') and datetime.fromisoformat(w['kickoff_utc'])
+    ko = ko and (ko if ko.tzinfo else ko.replace(tzinfo=UTC)).astimezone(LISBON)
+    ci = r.get('edge_ci')
+    lines = ['🟢 ALERTA: tática validada (%s)' % r['status'], w.get('match') or 'Jogo',
+             '%s%s' % (w.get('selection') or 'mais um golo', (' @ ' + str(w['odds']).replace('.', ',')) if w.get('odds') else ''),
+             'Jogo às %s (hora de Lisboa).' % ko.strftime('%H:%M de %d/%m') if ko else None,
+             'Tática: %s' % r['id'],
+             'Acertou %s em %d resultados; a odd exige %s.' % (pct(r['hit_rate']), r['n'], pct(r.get('break_even'))),
+             'Vantagem estimada: %s pontos (entre %s e %s).' % (pts(r.get('edge')), pts(ci[0]), pts(ci[1])) if ci else None,
+             'Odd mínima para valer a pena: %s.' % ('%.2f' % (1 / r['prudent_rate'])).replace('.', ',') if r.get('prudent_rate') else None,
+             'Resultados passados não garantem os futuros; a decisão é tua.']
+    return '\n'.join(x for x in lines if x)
+
+
 def messages(report, state, now):
     """Relatório + estado anterior -> lista de textos a enviar. Atualiza o estado."""
     out, brain, ins = [], report.get('brain') or {}, report.get('insights') or {}
     if not state.get('hello'):
         state['hello'] = True
-        out.append('Avisos do goal-roi ligados. Vais receber: sinais que encaixam em hipóteses promissoras, mudanças de estado e um resumo diário.\n' + PAGE)
+        out.append('Avisos do goal-roi ligados. Vais receber: alertas de jogos que encaixam em táticas validadas, sinais que encaixam em hipóteses promissoras, mudanças de estado e um resumo diário.\n' + PAGE)
     sent = set(state.get('watch_sent') or [])
     fresh = []
-    for w in brain.get('watch') or []:
+    for w in sorted(brain.get('watch') or [], key=lambda w: not any(x['status'] in VALID for x in w['reasons'])):   # alertas validados primeiro
         key = '%s|%s|%s' % (w.get('date_utc'), w.get('match'), w.get('selection'))
         if key in sent or len(fresh) >= MAX_WATCH_PER_RUN:
+            continue
+        valid = next((x for x in w['reasons'] if x['status'] in VALID), None)
+        if valid:
+            if still_bettable(w, now):   # fora de tempo: não serve de alerta nem de indício
+                sent.add(key)
+                fresh.append(alert(w, valid))
             continue
         sent.add(key)
         r = w['reasons'][0]
@@ -76,10 +113,19 @@ def messages(report, state, now):
     old, new = state.get('statuses'), brain.get('status_list') or {}
     if old is not None:
         for hid, st in sorted(new.items()):
-            if old.get(hid) != st:
+            if old.get(hid) == st:
+                continue
+            if st in VALID and old.get(hid) not in VALID:
+                out.append('✅ Tática validada, passou a %s:\n%s\nA partir de agora, cada jogo que encaixe nela gera um alerta.' % (st, hid))
+            elif old.get(hid) in VALID and st not in VALID:
+                out.append('⛔ Tática deixou de estar validada, passou a %s:\n%s\nDeixa de gerar alertas.' % (st, hid))
+            else:
                 out.append('Hipótese passou a %s:\n%s' % (st, hid))
         for hid in sorted(set(old) - set(new)):
-            out.append('Hipótese voltou a "em observação":\n%s' % hid)
+            if old[hid] in VALID:
+                out.append('⛔ Tática deixou de estar validada, voltou a "em observação":\n%s\nDeixa de gerar alertas.' % hid)
+            else:
+                out.append('Hipótese voltou a "em observação":\n%s' % hid)
     state['statuses'] = new
     old_reg = state.get('regime') or {}
     for r in ins.get('regime') or []:

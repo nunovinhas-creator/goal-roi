@@ -731,6 +731,31 @@ class Notify(unittest.TestCase):
         self.assertIn('saldo do dia +0,85 un.', evening[0])
         self.assertEqual(notify.messages(rep, state, datetime.fromisoformat('2026-11-12T22:00:00+00:00')), [])   # um resumo por dia
 
+    def test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation(self):
+        from scangoal import notify
+        noon = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
+        strong = {'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'forte', 'n': 120, 'hit_rate': 0.7, 'prob_above': 0.9999, 'break_even': 0.55,
+                  'edge': 0.14, 'edge_ci': [0.07, 0.2], 'prudent_rate': 0.69}
+        game = lambda date, ko=None: {'date_utc': date, 'kickoff_utc': ko, 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9, 'reasons': [strong]}
+        rep = self.report()
+        rep['brain']['watch'] = [game('2026-11-12T11:50:00+00:00'), game('2026-11-12T09:00:00+00:00'), game('2026-11-12T08:00:00+00:00', '2026-11-12T20:00')]
+        rep['brain']['status_list'] = {'h1': 'forte'}
+        state = {'hello': True, 'statuses': {'h1': 'promissora'}}
+        out = notify.messages(rep, state, noon)
+        alerts = [m for m in out if m.startswith('🟢 ALERTA')]
+        self.assertEqual(len(alerts), 2)                                               # o sinal de há 3 horas, com o jogo já a decorrer, não gera alerta
+        self.assertIn('Odd mínima para valer a pena: 1,45.', alerts[0])
+        self.assertIn('Vantagem estimada: +14 pontos (entre +7 e +20).', alerts[0])
+        self.assertTrue(any('Jogo às 20:00 de 12/11' in m for m in alerts))
+        self.assertTrue(any(m.startswith('✅ Tática validada, passou a forte') for m in out))
+        self.assertEqual(notify.messages(rep, state, noon), [])                        # cada alerta sai uma só vez
+        rep['brain']['status_list'] = {'h1': 'promissora'}
+        self.assertTrue(notify.messages(rep, state, noon)[0].startswith('⛔ Tática deixou de estar validada, passou a promissora'))
+        rep['brain']['status_list'] = {'h1': 'forte'}
+        notify.messages(rep, state, noon)
+        rep['brain']['status_list'] = {}
+        self.assertIn('voltou a "em observação"', notify.messages(rep, state, noon)[0])
+
     def test_run_needs_keys_never_prints_token_and_failure_is_hourly(self):
         from scangoal import notify
         sent = []
