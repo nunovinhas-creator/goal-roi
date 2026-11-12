@@ -56,6 +56,19 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Tipos que o bot costuma liquidar também são procurados nas fontes externas quando ficam sem resultado.
 - `docs/bets.csv`: todas as apostas e sinais, um por linha.
 
+## Regras de origem e de liquidação (12/11/2026)
+- Ficam fora do ROI (continuam na taxa de acerto): sinais lidos já com resultado, sinais já editados quando foram lidos, e sinais Betfair chegados em lote (5 ou mais no mesmo segundo). Se o primeiro sinal de uma aposta fica fora, a aposta inteira fica fora.
+- Handicap asiático durante o jogo: só a marca ✅/❌ do bot decide (ao vivo o handicap conta a partir do resultado no momento da aposta).
+- Meia vitória conta meio acerto; meia derrota, meia falha.
+- Sinais sem odd: a taxa de acerto compara-se com a taxa habitual de "mais um golo" num jogo médio, a partir do minuto do sinal.
+- Alinhamento enfraquecido: aposta contra a equipa enfraquecida, ao handicap e odd da mensagem; só quando há exatamente uma.
+- Jogos decididos depois dos 90 minutos ficam em aberto e são contados. Sem resultado ao fim de 3 dias: "sem resultado disponível".
+- A lista de golos do bot só é usada quando bate certo com o marcador do sinal e com o resultado final.
+- Sinais Stake: a odd indicada pode já não existir quando o aviso chega; o controlo de qualidade conta os avisos tardios.
+
+## Recolha
+O agendamento do GitHub não dispara neste repositório. Cada execução espera 8 minutos e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
+
 ## Página
 GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `docs/report.json`, atualizado a cada recolha.
 

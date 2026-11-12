@@ -45,7 +45,7 @@ def beta_cdf(x, a, b):
 
 LABELS = {'BETFAIR/pre': 'dinheiro na Betfair antes do jogo', 'BETFAIR/live': 'dinheiro na Betfair durante o jogo', 'OPEN_GAME': 'jogo aberto com odd',
           'OPEN_GAME_NO_ODDS': 'jogo aberto sem odd', 'STAKE_LOAD': 'aposta grande na Stake', 'TOTALS_FORM': 'forma de golos',
-          'TOTALS_FORM_NO_ODDS': 'forma de golos sem odd'}
+          'TOTALS_FORM_NO_ODDS': 'forma de golos sem odd', 'WEAKENED_LINEUP': 'contra a equipa com alinhamento enfraquecido'}
 
 
 def wilson(k, n):
@@ -68,6 +68,11 @@ def evidence(hits, misses, break_even):
     return {'prudent_rate': round(a / (a + b), 4), 'prob_above': round(1.0 - beta_cdf(break_even, a, b), 4)}
 
 
+def effective(done):
+    """Acertos e falhas efetivos: meia vitória conta meio acerto, meia derrota meia falha, devolvida não conta."""
+    return (round(sum(r['w'] for r in done if r['w'] > 0), 2), round(-sum(r['w'] for r in done if r['w'] < 0), 2))
+
+
 def summarize(rows):
     """Resumo de um conjunto de sinais com resultado: acerto, taxa necessária, evidência e ROI à odd anunciada."""
     done = [r for r in rows if r['w'] is not None]
@@ -75,16 +80,17 @@ def summarize(rows):
     priced = [r for r in done if r['odds'] and r['w'] != 0]
     be = sum(1 / r['odds'] for r in priced) / len(priced) if priced else None
     pls = [(r['w'] * (r['odds'] - 1) if r['w'] > 0 else r['w']) for r in done if r['odds']]
+    eh, em = effective(done)
     out = {'n': hits + misses, 'signals': len(rows), 'hits': hits, 'misses': misses,
-           'hit_rate': round(hits / (hits + misses), 4) if hits + misses else None, 'ci95': wilson(hits, hits + misses),
+           'hit_rate': round(eh / (eh + em), 4) if eh + em else None, 'ci95': wilson(eh, eh + em),
            'break_even': round(be, 4) if be else None, 'roi': round(sum(pls) / len(pls), 4) if pls else None}
-    out.update(evidence(hits, misses, be))
+    out.update(evidence(eh, em, be))
     return out
 
 
 def family(b):
     return {'BETFAIR': 'Betfair', 'STAKE_LOAD': 'Stake', 'OPEN_GAME': 'Jogo aberto', 'OPEN_GAME_NO_ODDS': 'Jogo aberto',
-            'TOTALS_FORM': 'Forma de golos', 'TOTALS_FORM_NO_ODDS': 'Forma de golos'}.get(b['type'], b['type'])
+            'TOTALS_FORM': 'Forma de golos', 'TOTALS_FORM_NO_ODDS': 'Forma de golos', 'WEAKENED_LINEUP': 'Alinhamento enfraquecido'}.get(b['type'], b['type'])
 
 
 def odds_band(o):
@@ -107,11 +113,16 @@ def dimensions(b, multi):
             out.append(('Antecedência', 'mais de 60 min' if b['lead_min'] > 60 else '60 min ou menos'))
     if b['type'].startswith('OPEN_GAME') or b['type'].startswith('TOTALS_FORM'):
         out.append(('Parte do jogo', '1.ª parte' if (b['minute'] or 0) < 46 else '2.ª parte'))
+        if b.get('bot_over_pct') is not None:
+            out.append(('Confiança indicada pelo bot', '95 % ou mais' if b['bot_over_pct'] >= 95 else 'menos de 95 %'))
+        if b.get('rhythm') is not None:
+            out.append(('Ritmo indicado pelo bot', '90 ou mais' if b['rhythm'] >= 90 else 'menos de 90'))
         if b['market'] and b['score_at_signal']:
             need = float(b['selection'].split()[1]) - sum(b['score_at_signal'])
             out.append(('Golos em falta para ganhar', 'até 1 golo' if need <= 1 else 'entre 1 e 2 golos' if need <= 2 else 'mais de 2 golos'))
     if b['type'] == 'STAKE_LOAD':
-        out += [('Momento', 'antes do jogo' if b['phase'] == 'pre' else 'durante o jogo'),
+        late = b.get('after_kickoff_min')
+        out += [('Momento do aviso', None if late is None else 'antes do início' if late < 0 else 'até 45 min depois do início' if late <= 45 else 'mais de 45 min depois do início'),
                 ('Mercado', 'golos (total asiático)' if b['market'] == 'Asian Total' else 'outros mercados')]
     return [(d, v) for d, v in out if v]
 
@@ -159,6 +170,23 @@ def calibration(signals):
     return out
 
 
+def bot_confidence(signals):
+    """Jogo aberto com odd: a percentagem "Over" que o bot indica contra o que aconteceu."""
+    out = []
+    for name, lo, hi in (('menos de 85 %', 0, 85), ('85 a 94 %', 85, 95), ('95 a 99 %', 95, 100), ('100 %', 100, 101)):
+        rows = [b for b in signals if b['type'] == 'OPEN_GAME' and b.get('bot_over_pct') is not None and lo <= b['bot_over_pct'] < hi]
+        s = summarize(rows)
+        done = [b for b in rows if b['w'] is not None and b['w'] != 0]
+        out.append({'band': name, 'n': s['n'], 'hits': s['hits'], 'hit_rate': s['hit_rate'], 'break_even': s['break_even'],
+                    'stated': round(sum(b['bot_over_pct'] for b in done) / len(done) / 100, 4) if done else None})
+    return out
+
+
+def next_goal(signals):
+    mins = sorted(b['next_goal_min'] for b in signals if b['type'].startswith('OPEN_GAME') and b.get('next_goal_min') is not None)
+    return {'n': len(mins), 'median_min': mins[len(mins) // 2] if mins else None}
+
+
 def luck_and_risk(bets):
     """Saldo real contra o que a pura sorte explicaria se as odds fossem justas; e pior sequência."""
     done = [b for b in bets if b['w'] is not None]
@@ -187,7 +215,7 @@ def dec(v, places=2, plus=False):
 def narrative(acc, segs, tested, move, calib, luck, min_settled):
     """Frases simples, geradas por regras a partir dos números. Nunca afirmam mais do que a amostra permite."""
     out = []
-    rated = [(k, g) for k, g in acc.items() if g.get('prob_above') is not None and g['hits'] + g['misses'] >= 5]
+    rated = [(k, g) for k, g in acc.items() if g.get('prob_above') is not None and not g.get('baseline') and g['hits'] + g['misses'] >= 5]
     for k, g in sorted(rated, key=lambda kv: -kv[1]['prob_above'])[:1]:
         n = g['hits'] + g['misses']
         out.append('O tipo de sinal com melhor evidência é %s: acertou %d em %d, precisa de %s, e a probabilidade de estar acima do mínimo é %s%s.'
@@ -220,9 +248,9 @@ def narrative(acc, segs, tested, move, calib, luck, min_settled):
 
 def build(signals, bets, accuracy, min_settled):
     for k, g in accuracy.items():
-        g.update(evidence(g['hits'], g['misses'], g['break_even']))
+        g.update(evidence(g.get('eff_hits', g['hits']), g.get('eff_misses', g['misses']), g['break_even']))
     segs, tested = segments(signals)
     move, calib, luck = price_move(signals), calibration(signals), luck_and_risk(bets)
-    return {'segments': segs[:40], 'segments_tested': tested, 'price_move': move, 'calibration': calib, 'luck': luck,
+    return {'bot_confidence': bot_confidence(signals), 'next_goal': next_goal(signals), 'segments': segs[:40], 'segments_tested': tested, 'price_move': move, 'calibration': calib, 'luck': luck,
             'narrative': narrative(accuracy, segs, tested, move, calib, luck, min_settled),
             'method': {'prior_weight': PRIOR_WEIGHT, 'min_segment': MIN_SEGMENT, 'hint_at': HINT_AT}}

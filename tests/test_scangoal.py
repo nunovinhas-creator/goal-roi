@@ -300,9 +300,13 @@ class Hardening(unittest.TestCase):
 
     def test_stake_phase_comes_from_time_not_from_layout(self):
         pre_layout = STAKE.replace('Bosnia U19     0\nSan Marino U19 0', 'Bosnia U19 — San Marino U19')       # o bot reescreve ao editar
-        r, _ = self.build([self.row(1, pre_layout, '2026-11-11T16:00:00+00:00'),                                 # jogo às 15:30 UTC: ao vivo
-                           self.row(2, STAKE.replace('bosnia-u19', 'x-u19'), '2026-11-11T15:00:00+00:00')])      # antes das 15:30: pré-jogo
-        self.assertEqual({g: v['bets'] for g, v in r['groups'].items()}, {'STAKE_LOAD/live': 1, 'STAKE_LOAD/pre': 1})
+        seen_edited = lambda i, text, date: dict(self.row(i, text, date), edit_date_utc='2026-11-11T17:00:00+00:00')
+        r, _ = self.build([seen_edited(1, pre_layout, '2026-11-11T16:00:00+00:00')])                              # jogo às 15:30 UTC: ao vivo
+        self.assertEqual(list(r['accuracy']), ['STAKE_LOAD'])
+        self.assertEqual(r['insights']['segments_tested'], 0)
+        from scangoal import report
+        b = {'type': 'STAKE_LOAD', 'phase': 'pre'}
+        self.assertEqual(report.group(b), 'STAKE_LOAD/pre')
 
     def test_interval_groups_bets_of_the_same_match(self):
         from scangoal.report import stats
@@ -326,6 +330,107 @@ class Hardening(unittest.TestCase):
         self.assertIn(';Barnsley;Oldham;1X2;1;1,6;', lines[1])
         self.assertTrue(lines[2].endswith(';1-5;ganha;0,81;resultado;sim'))
         self.assertIn('days_to_conclusion', r['accuracy']['OPEN_GAME'])
+
+
+class AuditFixes(Hardening):
+    WEAK = """🟥 WEAKENED LINEUP
+League Cup Women · 22:00 (in 54 min)
+Liverpool Women — Aston Villa Women
+
+🔻 Liverpool Women: 3 of 13 usual starters start
+🟡 Aston Villa Women: 5 of 13 usual starters start, 5 on the bench — rotation
+
+📊 Handicap: Liverpool Women −1 · 1.89  |  Aston Villa Women +1 · 1.89"""
+
+    def edited(self, i, text, date):
+        return dict(self.row(i, text, date), edit_date_utc='2026-11-11T16:39:00+00:00')
+
+    def test_provenance_edited_and_burst_stay_out_of_roi(self):
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(7)]
+        rows = [self.row(i, live[i], '2026-11-11T12:39:51+00:00') for i in range(5)]                    # lote de 5 no mesmo segundo
+        rows += [self.row(10, live[0].replace('Betfair · LIVE', 'Betfair ×2 · LIVE'), '2026-11-11T12:50:00+00:00'),   # reforço de uma aposta do lote
+                 self.edited(11, live[5], '2026-11-11T16:02:00+00:00'),                                 # já editada quando foi lida
+                 self.row(12, live[6], '2026-11-11T17:00:00+00:00')]
+        r, csv_text = self.build(rows)
+        self.assertEqual((r['unique_bets'], r['excluded_burst'], r['excluded_edited_before_seen']), (1, 5, 1))
+        self.assertEqual(r['accuracy']['BETFAIR/live']['signals'], 7)                                   # a taxa de acerto continua a ver todos
+        self.assertEqual(sum(1 for l in csv_text.splitlines() if l.endswith(';sim')), 1)
+
+    def test_result_edit_is_not_counted_as_a_changed_signal(self):
+        warn = '\n\n⚠️ Not a bet and not a forecast: the signal flags a statistical anomaly in the match.'
+        date = '2026-11-11T16:00:00+00:00'
+        r, _ = self.build([self.row(1, OPEN + warn, date), self.row(1, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅' + warn, date)])
+        self.assertEqual(r['audit']['edits_changing_signal'], 0)
+        r, _ = self.build([self.row(1, OPEN + warn, date), self.row(1, OPEN.replace('1.81', '2.50') + '\n\n🏁 FT 1:5 · Over 5 ✅' + warn, date)])
+        self.assertEqual(r['audit']['edits_changing_signal'], 1)
+
+    def test_live_asian_handicap_needs_the_bot_mark(self):
+        ah = STAKE.replace('Asian Total → Under 3.25 @ 1.70', 'Asian Handicap → Bosnia U19 (-1.5) @ 1.60')
+        r, _ = self.build([self.row(1, ah, '2026-11-11T16:00:00+00:00'), self.row(1, ah + '\n\n🏁 FT 4:1', '2026-11-11T16:00:00+00:00')])
+        self.assertEqual((r['settled_bets'], r['accuracy']['STAKE_LOAD']['unsettleable']), (0, 1))     # 4:1 cobriria -1,5, mas ao vivo não se sabe
+        r, _ = self.build([self.row(1, ah, '2026-11-11T16:00:00+00:00'),
+                           self.row(1, ah + '\n\n🏁 FT 4:1 · Asian Handicap → Bosnia U19 (-1.5) ❌', '2026-11-11T16:00:00+00:00')])
+        self.assertEqual(r['recent_bets'][0]['settled_by'], 'marca do bot')
+        self.assertEqual(r['recent_bets'][0]['w'], -1.0)
+
+    def test_stake_original_layout_is_trusted_and_late_arrival_is_counted(self):
+        r, _ = self.build([self.row(1, STAKE, '2026-11-11T16:30:00+00:00')])                            # original com marcador: ao vivo
+        self.assertEqual(list(r['groups']), ['STAKE_LOAD/live'])
+        self.assertEqual((r['audit']['stake_original_seen'], r['audit']['stake_sent_45_after_kickoff'], r['audit']['stake_no_score_after_kickoff']), (1, 1, 0))
+        no_score = STAKE.replace('Bosnia U19     0\nSan Marino U19 0', 'Bosnia U19 — San Marino U19')
+        r, _ = self.build([self.row(1, no_score, '2026-11-11T16:30:00+00:00')])                         # original sem marcador, 60 min depois do início
+        self.assertEqual((list(r['groups']), r['audit']['stake_no_score_after_kickoff']), (['STAKE_LOAD/pre'], 1))
+
+    def test_half_results_count_as_half_and_no_odds_gets_a_baseline(self):
+        from scangoal.insights import effective, summarize
+        rows = [{'w': 0.5, 'odds': 2.0}, {'w': -0.5, 'odds': 2.0}, {'w': 1.0, 'odds': 2.0}, {'w': 0.0, 'odds': 2.0}]
+        self.assertEqual(effective(rows), (1.5, 0.5))
+        self.assertEqual(summarize(rows)['hit_rate'], 0.75)
+        no_odds = OPEN.replace('💰 O 5: 1.81\n', '')
+        r, _ = self.build([self.row(1, no_odds, '2026-11-11T16:00:00+00:00'), self.row(1, no_odds + '\n\n🏁 FT 0:5', '2026-11-11T16:00:00+00:00')])
+        g = r['accuracy']['OPEN_GAME_NO_ODDS']
+        self.assertTrue(g['baseline'])
+        self.assertAlmostEqual(g['break_even'], 0.7585, places=3)                                       # minuto 45: 1 - exp(-2,7/95 * 50)
+        self.assertIsNotNone(g['prob_above'])
+
+    def test_bot_fields_goal_list_and_confidence_table(self):
+        p = parse(OPEN + "\n\n🏁 FT 1:5 · Over 5 ✅\n⚽  60'   0 - 5\n⚽  90+2'   1 - 5")
+        self.assertEqual((p['rhythm'], p['bot_over_pct'], p['goals']), (87, 100, [[60, 0, 5], [90, 1, 5]]))
+        date = '2026-11-11T16:00:00+00:00'
+        good = OPEN + "\n\n🏁 FT 1:5 · Over 5 ✅\n⚽  60'   0 - 5\n⚽  90'   1 - 5"
+        r, csv_text = self.build([self.row(1, OPEN, date), self.row(1, good, date)])
+        self.assertEqual(r['insights']['next_goal'], {'n': 1, 'median_min': 15})
+        self.assertEqual([c['n'] for c in r['insights']['bot_confidence']], [0, 0, 0, 1])
+        bad = OPEN + "\n\n🏁 FT 1:5 · Over 5 ✅\n⚽  90'   1 - 5"                                      # lista incompleta: não se usa
+        r, _ = self.build([self.row(1, OPEN, date), self.row(1, bad, date)])
+        self.assertEqual((r['insights']['next_goal']['n'], r['audit']['goal_lists'], r['audit']['goal_lists_consistent']), (0, 1, 0))
+
+    def test_weakened_lineup_bets_against_the_weakened_side(self):
+        p = parse(self.WEAK)
+        self.assertEqual((p['market'], p['selection'], p['odds'], p['bet']), ('Asian Handicap', 'Aston Villa Women (+1)', 1.89, True))
+        both = self.WEAK.replace('🟡 Aston Villa Women', '🔻 Aston Villa Women')
+        self.assertFalse(parse(both)['bet'])                                                            # duas equipas enfraquecidas: sem aposta
+        note = '🏁 Full time: Liverpool Women 1:1 Aston Villa Women'
+        r, _ = self.build([self.row(1, self.WEAK, '2026-11-11T18:06:00+00:00'), self.row(2, note, '2026-11-11T21:00:00+00:00')])
+        g = r['groups']['WEAKENED_LINEUP']
+        self.assertEqual((g['settled'], g['wins'], r['unparsed']), (1, 1, 0))
+        self.assertEqual(settle('Asian Handicap', 'Aston Villa Women (+1)', [2, 1], p['teams']), 0.0)
+
+    def test_no_source_extra_time_deleted_and_quota_inputs(self):
+        from scangoal import results_bsd
+        old = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'old-game')
+        extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'missing_ids': [7, 9]},
+                 'results_hl.json': {'results': {}, 'near_misses': {}, 'not_regular_time': {'m': 'Finished after extra time'}}}
+        r, _ = self.build([self.row(1, old, '2026-01-01T12:00:00+00:00')], extra)
+        self.assertEqual((r['accuracy']['BETFAIR/live']['no_source'], r['audit']['deleted_by_bot'], r['audit']['ended_after_90']), (1, 2, 1))
+        target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None}}
+        ev = {'id': 1, 'status': 'Finished after extra time', 'event_date': '2026-11-11T12:00:00+00:00', 'home_team': 'A', 'away_team': 'B', 'home_score': None, 'away_score': None}
+        unfinished = {}
+        found, near = results_bsd.match_events(target, [ev], {}, unfinished)
+        self.assertEqual((found, near, unfinished), ({}, {}, {'m': 'Finished after extra time'}))
+        wf = Path('.github/workflows/collect.yml').read_text(encoding='utf-8')
+        self.assertNotIn("github.event_name == 'workflow_dispatch' && '0'", wf)                         # execução manual já não gasta quota sozinha
+        self.assertIn('gh workflow run collect.yml', wf)
 
 
 class Insights(unittest.TestCase):

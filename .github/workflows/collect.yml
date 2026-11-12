@@ -1,17 +1,23 @@
 name: Collect ScanGoal
 on:
   workflow_dispatch:
+    inputs:
+      force_results:
+        description: 'Consultar já as fontes de resultados (gasta quota)'
+        type: boolean
+        default: false
   schedule:
     - cron: '3,13,23,33,43,53 * * * *'   # de 10 em 10 minutos (lista explícita)
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: scangoal-write
   cancel-in-progress: false
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,12 +35,12 @@ jobs:
       - name: Results from Highlightly (every 4 hours at most; skipped without key)
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
-          HL_MIN_INTERVAL_MIN: ${{ github.event_name == 'workflow_dispatch' && '0' || '240' }}
+          HL_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '240' }}
         run: python -u -m scangoal.results_hl
       - name: Results from BSD (hourly at most; skipped without key)
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
-          BSD_MIN_INTERVAL_MIN: ${{ github.event_name == 'workflow_dispatch' && '0' || '50' }}
+          BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
       - name: Report (fixed rules, no LLM)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
@@ -44,3 +50,12 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+      # O agendamento do GitHub não dispara neste repositório. Cada execução espera e lança a seguinte (permitido ao GITHUB_TOKEN
+      # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
+      - name: Wait, then start the next collection
+        if: ${{ !cancelled() && github.ref_name == 'main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 480
+          gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main

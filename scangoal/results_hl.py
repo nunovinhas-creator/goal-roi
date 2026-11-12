@@ -91,7 +91,11 @@ def run(fetch=request_json, now=None, token=None):
         if ev['id'] not in seen:
             seen.add(ev['id'])
             unique.append(ev)
-    found, near = match_events(targets, unique, load_aliases())
+    unfinished = {}
+    found, near = match_events(targets, unique, load_aliases(), unfinished)
+    # Jogos decididos depois dos 90 minutos: ficam em aberto (o resultado aos 90 não vem na resposta) e são contados.
+    late = {m: s for m, s in unfinished.items() if re.search(r'extra time|penalt', s, re.I)}
+    state['not_regular_time'] = {m: s for m, s in {**state.get('not_regular_time', {}), **late}.items() if m not in state['results']}
     for mid, res in found.items():
         state['results'].setdefault(mid, dict(res, matched_at_utc=now.isoformat(timespec='seconds')))   # nunca reescreve
     state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
