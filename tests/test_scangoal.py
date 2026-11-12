@@ -433,6 +433,72 @@ Liverpool Women — Aston Villa Women
         self.assertIn('gh workflow run collect.yml', wf)
 
 
+class Brain(Hardening):
+    def sig(self, i, hour, win, odds=2.0, mult=1):
+        return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': ['A', 'B'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
+                'date_utc': '2026-11-%02dT%02d:00:00+00:00' % (10 + i % 5, hour), 'kickoff_utc': None, 'max_mult': mult, 'n_signals': 1, 'share': 90, 'share_last': 90,
+                'mkt_volume': 5000, 'lead_min': None, 'minute': None, 'market': '1X2', 'selection': '1', 'score_at_signal': None, 'x4_min': None,
+                'w': None if win is None else (1.0 if win else -1.0), 'no_source': False}
+
+    def test_generator_never_reads_results_and_registry_only_grows(self):
+        from scangoal import brain
+        wins = [self.sig(i, 20, True) for i in range(10)]
+        losses = [dict(b, w=-1.0) for b in wins]
+        a, b = {}, {}
+        brain.update_registry(wins, a, now=None)
+        brain.update_registry(losses, b, now=None)
+        self.assertEqual(sorted(a), sorted(b))                                    # mesmos sinais, resultados opostos: mesmas hipóteses
+        self.assertIn('Betfair | Hora (UTC) = noite', a)
+        self.assertFalse(any(' & ' in h for h in a))                              # pares que não restringem nada não entram
+        before = json.dumps(a, sort_keys=True)
+        self.assertEqual(brain.update_registry(wins, a), 0)                       # nada de novo: o registo não muda
+        self.assertEqual(json.dumps(a, sort_keys=True), before)
+        self.assertEqual(brain.update_registry(wins[:7], {}), 0)                  # menos de 8 sinais: não regista
+
+    def test_status_rules_correction_and_tradable_flag(self):
+        from scangoal import brain
+        self.assertEqual(brain.status_of(29, 0.999, 0.99, 300), 'em observação')
+        self.assertEqual(brain.status_of(40, 0.96, 0.99, 300), 'promissora')
+        self.assertEqual(brain.status_of(120, 0.96, 0.99, 300), 'promissora')    # não passa a fasquia corrigida
+        self.assertEqual(brain.status_of(120, 0.995, 0.99, 300), 'forte')
+        self.assertEqual(brain.status_of(300, 0.995, 0.99, 300), 'confirmada')
+        self.assertEqual(brain.status_of(40, 0.05, 0.99, 300), 'abandonada')
+        sigs = [self.sig(i, 20, True) for i in range(40)] + [self.sig(100 + i, 20, None) for i in range(2)]
+        reg = {}
+        brain.update_registry(sigs, reg)
+        reg['Betfair | Reforço = sem reforço'] = {'family': 'Betfair', 'conditions': [['Reforço', 'sem reforço']], 'born_utc': '2026-01-01T00:00:00+00:00', 'source': 'gerador'}
+        out = brain.build(sigs, reg, 300)
+        by = {h['id']: h for h in out['top']}
+        self.assertEqual(by['Betfair | Hora (UTC) = noite']['status'], 'promissora')
+        self.assertFalse(by['Betfair | Reforço = sem reforço']['tradable'])       # só se sabe depois do sinal
+        self.assertEqual(len(out['watch']), 2)                                    # os 2 sinais em aberto encaixam numa hipótese promissora
+        self.assertTrue(all('Reforço' not in r['id'] for w in out['watch'] for r in w['reasons']))
+        self.assertEqual(out['expected_by_chance'], round(0.05 * out['tested'], 1))
+
+    def test_manual_hypothesis_only_counts_signals_after_it_was_written(self):
+        from scangoal import brain
+        sigs = [self.sig(i, 20, True) for i in range(10)]
+        reg = {'x': {'family': 'Betfair', 'conditions': [['Hora (UTC)', 'noite']], 'born_utc': '2026-11-12T12:00:00+00:00', 'source': 'manual'}}
+        rows, _, _ = brain.evaluate(sigs, reg, 300)
+        self.assertEqual(rows[0]['n'], sum(1 for b in sigs if b['date_utc'] > '2026-11-12T12:00:00+00:00'))
+        self.assertLess(rows[0]['n'], 10)
+
+    def test_report_registers_hypotheses_only_when_asked(self):
+        from scangoal import report
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                r = report.build()
+                self.assertEqual((r['brain']['hypotheses'], (Path(d) / 'hypotheses.json').exists()), (0, False))
+                r = report.build(register=True)
+                self.assertGreater(r['brain']['hypotheses'], 0)
+                self.assertTrue((Path(d) / 'hypotheses.json').exists())
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence

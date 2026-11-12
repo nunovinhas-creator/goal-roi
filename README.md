@@ -66,6 +66,13 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - A lista de golos do bot só é usada quando bate certo com o marcador do sinal e com o resultado final.
 - Sinais Stake: a odd indicada pode já não existir quando o aviso chega; o controlo de qualidade conta os avisos tardios.
 
+## Cérebro (hipóteses)
+`scangoal/brain.py` combina as características de cada sinal em hipóteses de 1 ou 2 condições e regista-as em `data/hypotheses.json` (o registo só cresce).
+- O gerador só conta quantos sinais têm cada combinação; nunca lê resultados. Por isso estas hipóteses são avaliadas em todos os dados.
+- Para acrescentar uma hipótese à mão (ou proposta por um modelo de linguagem), junta uma entrada com `"source": "manual"` ou `"llm"`: só contam os sinais posteriores a `born_utc`.
+- Estados: em observação (<30), promissora (>=30 e 95 %, pode ser acaso), forte (>=100, fasquia corrigida pelo número de hipóteses testadas), confirmada (>=300), abandonada (>=30 e <=10 %).
+- Hipóteses com condições que só se conhecem depois do primeiro sinal (reforço, movimento da odd) são informativas e não entram na lista "a seguir agora".
+
 ## Recolha
 O agendamento do GitHub não dispara neste repositório. Cada execução espera 8 minutos e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
 
