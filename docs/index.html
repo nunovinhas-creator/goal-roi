@@ -27,6 +27,12 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .fresh.stale i{background:var(--bad)}.fresh.stale{color:var(--bad)}
 .answer{margin:24px 0 0;padding:20px 22px;background:var(--ink);color:var(--bg);border-radius:14px}
 .answer p{margin:0;font:600 21px/1.35 Archivo,sans-serif;max-width:60ch}
+section.board{margin-top:18px;padding:20px 22px;background:var(--card);border:2px solid var(--mark);border-radius:14px}
+section.board h2{margin:0 0 4px}section.board h3{margin:14px 0 6px;font:700 16.5px/1.25 Archivo,sans-serif}section.board h3.gap{margin-top:20px}
+.boardgrid{display:grid;grid-template-columns:3fr 2fr;gap:6px 32px}@media(max-width:860px){.boardgrid{grid-template-columns:1fr}}
+section.board ol,section.board ul{margin:0;padding-left:22px}section.board li{margin:0 0 12px}section.board li b{font-weight:700}
+section.board .why{display:block;color:var(--mut);font-size:14.5px}section.board .chip{margin-left:6px;vertical-align:1px}
+#boardopen p{margin:0 0 10px}
 .answer small{display:block;margin-top:8px;font-size:14.5px;font-weight:400;opacity:.8;max-width:75ch}
 .facts{display:flex;flex-wrap:wrap;gap:6px 28px;margin:16px 2px 0;color:var(--mut);font-size:15px}
 .facts b{color:var(--ink);font-weight:700}
@@ -109,6 +115,16 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 
 <section class="answer" aria-live="polite"><p id="answer">A carregar os dados…</p><small id="answer2"></small></section>
 <div class="facts" id="facts"></div>
+
+<section class="board" aria-labelledby="boardh">
+  <h2 id="boardh">O que parece funcionar agora</h2>
+  <p class="note" id="boardnote"></p>
+  <div class="boardgrid">
+    <div><h3>Melhores táticas até agora</h3><ol id="best"></ol></div>
+    <div><h3>Em aberto neste momento</h3><div id="boardopen"></div><h3 class="gap">A evitar</h3><ul id="avoid"></ul></div>
+  </div>
+  <p class="note" id="boardllm"></p>
+</section>
 
 <h2>O que os dados dizem hoje</h2>
 <ul class="says" id="says"></ul>
@@ -362,6 +378,24 @@ function insights(d){
   else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
 }
 
+function boardUI(d){
+  const B=d.brain&&d.brain.board; if(!B)return;
+  const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
+  const name=h=>h.conditions.length?`${h.family} · ${h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')}`:`${h.family} · todos os sinais deste tipo`;
+  const item=(h,bad)=>{const li=el('li');li.append(el('b',{},name(h)),chip(bad?'bad':LV[h.level],bad?'A evitar':h.level[0].toUpperCase()+h.level.slice(1)));
+    li.appendChild(el('span',{class:'why'},`${hitsOf(h.hits,h.n)}; a odd exige ${pct(h.break_even)}. ROI ${pct(h.roi,1)}.`+(h.missing?` Faltam ${h.missing} resultados para deixar de ser só um indício.`:'')+(h.source==='llm'?' Proposta pelo modelo de linguagem.':'')));return li};
+  $('boardnote').textContent=`As táticas com melhor evidência entre as ${d.brain.hypotheses} que o cérebro e o modelo de linguagem estão a testar, com pelo menos ${B.min_results} resultados. Com tantas em teste, algumas parecem boas só por acaso: abaixo de ${B.hint_at} resultados são indícios, não conclusões.`;
+  for(const h of B.best)$('best').appendChild(item(h,false));
+  if(!B.best.length){$('best').remove();$('boardh').after(el('p',{},'Ainda nenhuma tática tem evidência suficiente para aparecer aqui. As primeiras devem surgir com mais um ou dois dias de resultados.'))}
+  for(const h of B.avoid)$('avoid').appendChild(item(h,true));
+  if(!B.avoid.length){const li=el('li');li.textContent='Nada a assinalar por agora.';$('avoid').appendChild(li)}
+  const o=$('boardopen');
+  for(const x of B.open){const p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}`),el('span',{class:'why'},`Encaixa em: ${x.tactic.split(' | ')[1].replaceAll(' = ',': ').replaceAll(' & ',' e ')}. ${x.kickoff_utc&&new Date(x.kickoff_utc)>new Date()?'Jogo a '+new Date(x.kickoff_utc).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'. ':''}Sinal das ${new Date(x.date_utc).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}.`));o.appendChild(p)}
+  if(!B.open.length)o.appendChild(el('p',{class:'note'},'Nenhum sinal em aberto encaixa nas táticas acima neste momento.'));
+  const n=(d.brain.notes||[])[0];
+  $('boardllm').textContent=n?`Última nota do modelo de linguagem, sobre "${n.id.replace(' | ',': ')}": ${n.note}`:'';
+}
+
 function brainUI(d){
   const B=d.brain; if(!B)return;
   $('brainnote').textContent=`O cérebro combina as características de cada sinal (odd, volume, quota, minuto, liga, hora, reforços) e regista cada combinação como hipótese quando há pelo menos ${B.rules.min_support} sinais. Estão registadas ${B.hypotheses}; ${B.tested} já têm ${B.rules.hint_at} resultados. Com tantas em teste, cerca de ${num(B.expected_by_chance)} pareceriam promissoras só por acaso, por isso “forte” e “confirmada” exigem uma fasquia corrigida (${B.rules.strong_at} e ${B.rules.confirm_at} resultados).`;
@@ -486,7 +520,7 @@ function recent(d){
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 </script>
 </body></html>
