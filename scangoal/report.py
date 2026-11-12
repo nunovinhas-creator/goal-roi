@@ -7,7 +7,7 @@ Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunc
 import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
-from . import insights
+from . import brain, insights
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -101,12 +101,13 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
             b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
                                                  'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league',
                                                  'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals')}
-            b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k)
+            b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None)
         b['n_signals'] += 1
-        b['odds_last'] = m.get('odds')
+        b['odds_last'], b['share_last'] = m.get('odds'), m.get('share')
         b['max_mult'] = max(b['max_mult'], m.get('mult', 1))
         if m.get('mult', 1) >= 4 and b['odds_at_x4'] is None:
             b['odds_at_x4'] = m['odds']
+            b['x4_min'] = round((datetime.fromisoformat(m['date_utc']) - datetime.fromisoformat(b['date_utc'])).total_seconds() / 60)
     bets = sorted(out.values(), key=lambda b: (b['date_utc'], b['message_id']))
     now = datetime.now(timezone.utc)
     for b in bets:
@@ -317,7 +318,7 @@ def write_csv(signals, path):
                          '%d-%d' % tuple(b['ft']) if b['ft'] else '', res, units, b['settled_by'] or '', 'sim' if b['in_roi'] else 'não'])
 
 
-def build(csv_path=None):
+def build(csv_path=None, register=False):
     msgs, ft, marks, notes, audit = load()
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
     for name in ('hl', 'bsd'):
@@ -363,6 +364,11 @@ def build(csv_path=None):
     if csv_path:
         write_csv(signals, csv_path)
     ins = insights.build(signals, bets, acc, MIN_SETTLED)
+    reg_path = data_dir() / 'hypotheses.json'
+    registry = brain.load_registry(reg_path)
+    if register and brain.update_registry(signals, registry):
+        reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    brn = brain.build(signals, registry, MIN_SETTLED)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),
@@ -375,14 +381,14 @@ def build(csv_path=None):
         'unsettled_market': sum(1 for b in bets if b['ft'] and b['w'] is None),
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
-        'accuracy': acc, 'insights': ins,
+        'accuracy': acc, 'insights': ins, 'brain': brn,
         'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 
 def main():
     docs = pathlib.Path('docs')
-    report = build(docs / 'bets.csv' if docs.is_dir() else None)
+    report = build(docs / 'bets.csv' if docs.is_dir() else None, register=True)
     out = data_dir() / 'report.json'
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')

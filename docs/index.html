@@ -30,6 +30,8 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .answer small{display:block;margin-top:8px;font-size:14.5px;font-weight:400;opacity:.8;max-width:75ch}
 .facts{display:flex;flex-wrap:wrap;gap:6px 28px;margin:16px 2px 0;color:var(--mut);font-size:15px}
 .facts b{color:var(--ink);font-weight:700}
+h3.sub{margin:22px 2px 4px;font:700 16.5px/1.25 Archivo,sans-serif}
+#braincounts{margin:0 2px 12px}#watch p{margin:6px 0}
 .says{margin:12px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .says li{padding:13px 20px;border-top:1px solid var(--line);max-width:none}.says li:first-child{border-top:0}
 .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
@@ -122,6 +124,14 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <h2>O bot acerta mais nos favoritos ou nas surpresas?</h2>
 <p class="note">Todos os sinais com odd, agrupados por faixa. O traço é a taxa que a própria odd exige; o ponto é o que aconteceu.</p>
 <div class="sig" id="calib"></div>
+
+<h2>Cérebro: hipóteses em teste</h2>
+<p class="note" id="brainnote"></p>
+<div class="facts" id="braincounts"></div>
+<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table></div>
+<h3 class="sub">A seguir agora</h3>
+<p class="note">Sinais ainda em aberto que encaixam numa hipótese promissora, forte ou confirmada. São indícios para observar, não recomendações.</p>
+<div class="panel" id="watch"></div>
 
 <h2>A confiança que o bot indica bate certo?</h2>
 <p class="note">Nos sinais de jogo aberto o bot indica uma percentagem “Over”. Aqui compara-se essa percentagem com o que aconteceu. <span id="nextgoal"></span></p>
@@ -308,6 +318,21 @@ function insights(d){
   else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
 }
 
+function brainUI(d){
+  const B=d.brain; if(!B)return;
+  $('brainnote').textContent=`O cérebro combina as características de cada sinal (odd, volume, quota, minuto, liga, hora, reforços) e regista cada combinação como hipótese quando há pelo menos ${B.rules.min_support} sinais. Estão registadas ${B.hypotheses}; ${B.tested} já têm ${B.rules.hint_at} resultados. Com tantas em teste, cerca de ${num(B.expected_by_chance)} pareceriam promissoras só por acaso, por isso “forte” e “confirmada” exigem uma fasquia corrigida (${B.rules.strong_at} e ${B.rules.confirm_at} resultados).`;
+  const ST={'em observação':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
+  for(const k of ['em observação','promissora','forte','confirmada','abandonada']){const s=el('span');s.append(el('b',{},String(B.counts[k]||0)),document.createTextNode(' '+(k==='em observação'?'em observação':(B.counts[k]===1?k:k+'s'))));$('braincounts').appendChild(s)}
+  for(const h of B.top){const tr=el('tr');td(tr,h.family,'l');
+    const c=td(tr,h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.tradable?'':' (informativa: só se sabe depois do sinal)'),'l');
+    td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
+    td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('hyps').appendChild(tr)}
+  if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=8;$('hyps').appendChild(tr)}
+  const w=$('watch');
+  if(!B.watch.length)w.appendChild(el('p',{class:'note'},`Ainda nenhuma hipótese chegou a promissora (são precisos ${B.rules.hint_at} resultados). A lista aparece aqui quando isso acontecer.`));
+  for(const x of B.watch){const r=x.reasons[0], p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}. Encaixa em ${x.reasons.length} ${x.reasons.length===1?'hipótese':'hipóteses'}; a melhor: ${r.id.split(' | ')[1]} (${pct(r.hit_rate)} em ${r.n}, ${r.status}).`));w.appendChild(p)}
+}
+
 function td(tr,t,c){const e=el('td',c?{class:c}:{});if(t instanceof Node)e.appendChild(t);else e.textContent=t;tr.appendChild(e);return e}
 function roi(tr,g,full){const r=g.roi;
   if(!r){for(let i=0;i<(full?4:2);i++)td(tr,'—','mut');return}
@@ -352,7 +377,7 @@ function recent(d){
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);chart(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);brainUI(d);chart(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 </script>
 </body></html>
