@@ -12,6 +12,23 @@ MSK = timezone(timedelta(hours=3))  # o bot mostra horas de Moscovo (UTC+3, sem 
 MIN_ODDS = 1.10
 
 
+def clean_league(text):
+    """Nome da competição sem bandeiras/emoji."""
+    return re.sub(r'^[^A-Za-z0-9]+', '', text or '').strip() or None
+
+
+def competition_kind(league, teams=()):
+    """Categoria simples da competição, só por palavras do nome: feminino, jovens, taça ou liga."""
+    blob = ' '.join([league or ''] + list(teams or []))
+    if re.search(r'\bWomen\b|Femenil|Feminin|Frauen', blob, re.I):
+        return 'feminino'
+    if re.search(r'\bU-?(1[5-9]|2[0-3])\b|Youth|Juniors', blob, re.I):
+        return 'jovens'
+    if re.search(r'\bCup\b|Trophy|Copa\b|Coupe|Pokal|Taça|Shield', league or '', re.I):
+        return 'taça'
+    return 'liga'
+
+
 def money(s):
     return float(s.replace('K', '')) * (1000 if 'K' in s else 1)
 
@@ -59,6 +76,7 @@ def parse(text):
             m['mult'] = int(mult[1]) if mult else 1
             s = re.search(r'^([12X]) · (.+?) @([\d.]+) · \$([\d.]+K?)', lines[2])
             m['teams'] = [t.strip() for t in lines[1].split(' · ')[0].split('—', 1)]
+            m['league'] = clean_league(lines[1].split(' · ', 1)[1]) if ' · ' in lines[1] else None
             v = re.search(r'market share (\d+)% · whole 1X2 market \$([\d.]+K?)', text)
             m.update(market='1X2', selection=s[1], odds=float(s[3]), sel_volume=money(s[4]),
                      share=int(v[1]), mkt_volume=money(v[2]), bet=True)
@@ -70,7 +88,7 @@ def parse(text):
             else:
                 a, c = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]), re.match(r'(.+?)\s+(\d+)\s*$', lines[3])
                 teams, phase, score = [a[1].strip(), c[1].strip()], 'live', [int(a[2]), int(c[2])]
-            m.update(type='STAKE_LOAD', phase=phase, teams=teams, score_at_signal=score,
+            m.update(type='STAKE_LOAD', phase=phase, teams=teams, score_at_signal=score, league=clean_league(lines[1].split(' · ')[0]),
                      kickoff_utc=kickoff_utc(lines[1]), market=s[1],
                      selection=s[2], odds=float(s[3]), total=money(re.search(r'\$([\d.]+K?)', h)[1]),
                      n_bets=int(b[1]) if b else None, bet=True)
@@ -79,7 +97,7 @@ def parse(text):
             mn = re.search(r"· (\d+)'", lines[1])
             a, b = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]), re.match(r'(.+?)\s+(\d+)\s*$', lines[3])
             kind = 'OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM'
-            m.update(phase='live', minute=int(mn[1]), teams=[a[1].strip(), b[1].strip()], score_at_signal=[int(a[2]), int(b[2])])
+            m.update(phase='live', minute=int(mn[1]), league=clean_league(lines[1].rsplit(' · ', 1)[0]), teams=[a[1].strip(), b[1].strip()], score_at_signal=[int(a[2]), int(b[2])])
             if s is None:  # sinal sem linha de odd: mede-se a taxa de acerto, não é aposta
                 m['type'] = kind + '_NO_ODDS'
             else:

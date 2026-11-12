@@ -281,6 +281,48 @@ class Highlightly(BSD):
         self.assertEqual(calls, [])                                              # menos de 4 horas depois
 
 
+class Insights(unittest.TestCase):
+    def test_beta_and_evidence(self):
+        from scangoal.insights import beta_cdf, evidence
+        self.assertAlmostEqual(beta_cdf(0.5, 2, 2), 0.5, places=6)
+        self.assertAlmostEqual(beta_cdf(0.3, 2, 5), 0.579825, places=5)
+        self.assertAlmostEqual(beta_cdf(0.9, 10, 1), 0.9 ** 10, places=6)
+        self.assertEqual(evidence(0, 0, 0.5), {'prudent_rate': 0.5, 'prob_above': 0.5})          # sem dados: sem vantagem
+        strong, weak = evidence(60, 40, 0.5), evidence(6, 4, 0.5)
+        self.assertGreater(strong['prob_above'], 0.95)
+        self.assertLess(weak['prob_above'], strong['prob_above'])                                   # mesma taxa, menos dados, menos certeza
+        self.assertLess(weak['prudent_rate'], 0.6)                                                   # puxada para a taxa necessária
+        self.assertIsNone(evidence(2, 0, None)['prob_above'])
+
+    def test_competition_kind_and_league(self):
+        from scangoal.parser import competition_kind
+        self.assertEqual(parse(BETFAIR_PRE)['league'], 'England EFL Trophy')
+        self.assertEqual(parse(BETFAIR_LIVE)['league'], 'Turkish 3 Lig')
+        self.assertEqual(parse(STAKE)['league'], 'UEFA U19 Championship')
+        self.assertEqual(parse(OPEN)['league'], "UEFA Women's Europa Cup")
+        self.assertEqual([competition_kind(*x) for x in (('England EFL Trophy', ['Barnsley', 'Oldham']), ('UEFA U19 Championship', []),
+                         ('League', ['Brondby Women', 'X']), ('Turkish 3 Lig', ['A', 'B']))], ['taça', 'jovens', 'feminino', 'liga'])
+
+    def test_report_has_insights_and_safe_narrative(self):
+        from scangoal import report
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                empty = report.build()
+                self.assertEqual(empty['insights']['narrative'], ['Ainda não há resultados suficientes para interpretar.'])
+                x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
+                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': t}
+                store.append_versions([row(1, x4), row(2, BETFAIR_PRE), row(3, OPEN), row(3, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅')])
+                r = report.build()
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+        ins = r['insights']
+        self.assertEqual((ins['price_move']['pre']['n'], ins['price_move']['pre']['shortened']), (1, 1))       # 1,83 -> 1,60
+        self.assertEqual(r['accuracy']['OPEN_GAME']['prob_above'] > 0.5, True)
+        self.assertEqual(ins['luck']['n'], 1)
+        self.assertEqual(ins['segments'], [])                                                                   # abaixo de 10 resultados por segmento
+
+
 class Store(unittest.TestCase):
     def test_append_only_versions(self):
         with tempfile.TemporaryDirectory() as d:

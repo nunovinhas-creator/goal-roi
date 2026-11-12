@@ -21,6 +21,14 @@ Tabela à parte, com todos os sinais que têm resultado (inclui os lidos já com
 - Sinais sem odd ("Open game" sem linha): acerto = pelo menos mais um golo depois do sinal (regra fixada a 12/11/2026).
 - "Taxa necessária" = média de 1/odd, a taxa de acerto que dá lucro zero.
 
+## Análise e interpretação (`scangoal/insights.py`, sem LLM)
+- **Evidência por tipo:** estimativa prudente da taxa de acerto e probabilidade de estar acima da taxa necessária (prior centrado em "sem vantagem", com peso de 10 apostas).
+- **Movimento da odd:** nos sinais Betfair com reforço, odd do último sinal contra a do primeiro. Antes do jogo é um indicador de concordância do mercado.
+- **Calibração:** acerto observado contra o que a odd exige, por faixa de odd.
+- **Segmentos:** competição (liga, taça, jovens, feminino), faixa de odd, dia, vários sinais no mesmo jogo, reforço, quota e tamanho do mercado, antecedência, parte do jogo, golos em falta, mercado. Lista fixada a 12/11/2026; só aparecem com 10 ou mais resultados e são sempre exploratórios.
+- **Sorte e risco:** saldo contra a oscilação esperada a odds justas, maior queda e pior sequência.
+- **Leitura automática:** frases geradas por regras a partir destes números.
+
 ## Perguntas pré-definidas (exploratórias)
 Escritas a 11/11/2026, antes de haver dados; aparecem no relatório mas nunca contam como conclusão:
 Q1 entrar só ao ×4; Q2 sinal sem reforço; Q3 faixas de odd; Q4 quota de mercado ≥ 80 %; Q5 antecedência do sinal pré-jogo; Q6 minuto do sinal Open game; Q7 todas as apostas.

@@ -7,6 +7,7 @@ Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunc
 import collections, json, math
 from datetime import datetime, timezone
 
+from . import insights
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -84,7 +85,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None):
         b = out.get(k)
         if b is None:
             b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
-                                                 'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight')}
+                                                 'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league')}
             b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k)
         b['n_signals'] += 1
         b['odds_last'] = m.get('odds')
@@ -165,12 +166,7 @@ def block(rows, odds_key='odds'):
             'conclusive': n >= MIN_SETTLED, 'note': 'ok' if n >= MIN_SETTLED else 'sem conclusão (<%d liquidadas)' % MIN_SETTLED}
 
 
-def wilson(k, n):
-    if not n:
-        return None
-    z, p = 1.96, k / n
-    c, h = (p + z * z / (2 * n)) / (1 + z * z / n), z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return [round(max(0.0, c - h), 4), round(min(1.0, c + h), 4)]
+wilson = insights.wilson
 
 
 def accuracy(signals):
@@ -253,6 +249,8 @@ def build():
     unparsed = [m for m in msgs if m.get('type') is None or m.get('error')]
     recent = [{'date_utc': b['date_utc'], 'group': b['group'], 'match': ' — '.join(b['teams'] or []) or b['match_id'], 'selection': label(b), 'odds': b['odds'], 'ft': b['ft'], 'w': b['w'], 'settled_by': b['settled_by'],
                'n_signals': b['n_signals'], 'max_mult': b['max_mult']} for b in bets[-60:]][::-1]
+    acc = accuracy(signals)
+    ins = insights.build(signals, bets, acc, MIN_SETTLED)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),
@@ -263,7 +261,7 @@ def build():
         'unsettled_market': sum(1 for b in bets if b['ft'] and b['w'] is None),
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
-        'accuracy': accuracy(signals),
+        'accuracy': acc, 'insights': ins,
         'questions': questions(bets), 'recent_bets': recent, 'timeline': timeline(bets),
     }
 
