@@ -237,11 +237,12 @@ class BSD(unittest.TestCase):
 
     def test_pagination_follows_next_and_respects_cap(self):
         from scangoal import results_bsd
-        p1 = {'results': [self.ev(1, 'A', 'B', '2026-11-11T19:00:00Z')], 'next': results_bsd.ROOT + '?page=2'}
-        p2 = {'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z', 1, 1)], 'next': results_bsd.ROOT + '?page=3'}
-        p3 = {'results': [], 'next': None}
-        state, calls = self.run_bsd([p1, p2, p3])
-        self.assertEqual((len(calls), state['results']['barnsley-vs-oldham-20261111']['ft']), (3, [1, 1]))
+        p1 = {'count': 2, 'results': [self.ev(1, 'A', 'B', '2026-11-11T19:00:00Z')], 'next': results_bsd.ROOT + '?offset=1'}
+        p2 = {'count': 2, 'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z', 1, 1)], 'next': None}
+        state, calls = self.run_bsd([p1, p2])
+        self.assertEqual((len(calls), state['results']['barnsley-vs-oldham-20261111']['ft']), (2, [1, 1]))
+        self.assertIn('offset=1', calls[1])
+        self.assertEqual(state['stats']['per_day'], {'2026-11-11': {'count_reported': 2, 'events_read': 2}})
 
 
 class Store(unittest.TestCase):
