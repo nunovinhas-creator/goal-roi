@@ -2430,6 +2430,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Golos até ao sinal = nenhum & Minuto = 31 a 60": {
+  "born_utc": "2026-11-12T20:25:32+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Forma de golos",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogos sem gols no início tendem a ter mais chances de gol nos 30 minutos seguintes",
+  "source": "llm"
+ },
  "Forma de golos | Golos em falta para ganhar = até 1 golo": {
   "born_utc": "2026-11-12T17:30:52+00:00",
   "conditions": [
@@ -2609,6 +2628,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais": {
+  "born_utc": "2026-11-12T20:25:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogos em dia de semana com mais gols tendem a ter mais chances de vitória",
+  "source": "llm"
+ },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -2694,6 +2732,25 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-12T20:25:32+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogos com odd baixa e ritmo alto tendem a ter mais chances de vitória",
+  "source": "llm"
  },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-12T15:25:14+00:00",
