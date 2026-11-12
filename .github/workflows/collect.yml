@@ -46,7 +46,12 @@ jobs:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
           BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
-      - name: Report (fixed rules, no LLM)
+      - name: Hypotheses proposed by a language model (once a day; skipped without keys)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          MASTER_BRAIN_LLM_API_KEY: ${{ secrets.MASTER_BRAIN_LLM_API_KEY }}
+        run: python -u -m scangoal.llm
+      - name: Report (fixed rules)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
       - name: Commit data
         run: |

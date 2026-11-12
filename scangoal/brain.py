@@ -124,7 +124,7 @@ def evaluate(signals, registry, min_settled):
         conds = {tuple(c) for c in h['conditions']}
         match = [b for b, fam, at in have if fam == h['family'] and conds <= at and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
         s = insights.summarize(match)
-        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'],
+        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'),
                          tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')]))
     tested = sum(1 for r in rows if r['n'] >= HINT_AT)
     bar = 1 - 0.05 / max(1, tested)
@@ -151,6 +151,8 @@ def build(signals, registry, min_settled):
     return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts,
             'expected_by_chance': round(0.05 * tested, 1), 'top': [r for r in rows if r['n'] >= 5][:25],
             'abandoned': [r for r in rows if r['status'] == 'abandonada'][:10],
+            'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
+            'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
             'rules': {'min_support': MIN_SUPPORT, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
 

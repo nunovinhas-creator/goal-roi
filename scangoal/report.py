@@ -12,6 +12,7 @@ from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
 HAIRCUTS = (0.0, 0.02, 0.05)
+LAST = {}                     # sinais da última execução de build(), para o módulo llm
 MIN_SETTLED = 300
 NO_SOURCE_AFTER_DAYS = 3      # sem resultado ao fim deste prazo: as fontes já não são consultadas
 BURST = 5                     # sinais Betfair no mesmo segundo: lote (ex.: ao subscrever); a hora do 1.º sinal não está provada
@@ -392,7 +393,10 @@ def build(csv_path=None, register=False):
     registry = brain.load_registry(reg_path)
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    LAST['signals'] = signals
     brn = brain.build(signals, registry, MIN_SETTLED)
+    llm_state = brain.load_registry(data_dir() / 'llm_state.json')
+    brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['entry_points'] = brain.entry_points(signals)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
