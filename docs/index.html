@@ -77,6 +77,12 @@ td.l{text-align:left}td.name{white-space:normal;min-width:160px}
 .filters button:focus-visible,summary:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
 .bet{display:grid;grid-template-columns:86px 1fr auto;gap:2px 14px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
 .bet:first-child{border-top:0}
+button.sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+th[aria-sort=descending] button.sort::after{content:' ▼'}th[aria-sort=ascending] button.sort::after{content:' ▲'}
+.sim{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;margin-bottom:14px}.sim label{display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--mut)}
+.sim input[type=number],.sim select{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:130px}.sim select{width:210px}
+.simtypes{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 12px;font-size:14px}.simtypes label{display:flex;gap:6px;align-items:center}
+.simout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 24px;margin:0 0 10px}.simout div{border-top:1px solid var(--line);padding-top:8px}.simout dt{color:var(--mut);font-size:14px}.simout dd{margin:0;font-weight:700;font-size:19px}
 .bet{cursor:pointer}.bet:hover .what b{text-decoration:underline}.bet:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
 .story{padding:4px 0 14px 100px;font-size:14px}.story p{margin:3px 0}.story .when{color:var(--mut);font-variant-numeric:tabular-nums}
 @media(max-width:640px){.story{padding-left:0}}
@@ -116,6 +122,20 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Uma unidade em cada aposta, à odd do primeiro sinal de cada jogo. Só entram apostas cujo sinal foi lido na versão original, antes de haver resultado.</p>
 <div class="panel"><div id="chart"><div class="tip" id="tip"></div></div></div>
 
+<h2>Simulador de banca</h2>
+<p class="note">Aplica uma regra de aposta às apostas já liquidadas, pela ordem em que apareceram. Mostra o que teria acontecido; não prevê o que vai acontecer.</p>
+<div class="panel">
+  <div class="sim">
+    <label>Banca inicial (€)<input type="number" id="simbank" value="1000" min="10" step="10"></label>
+    <label>Regra<select id="simmode"><option value="flat">Valor fixo por aposta</option><option value="pct">Percentagem da banca</option></select></label>
+    <label><span id="simvallabel">Valor por aposta (€)</span><input type="number" id="simval" value="10" min="0.1" step="0.1"></label>
+    <label>Odd conseguida<select id="simcut"><option value="0">A anunciada</option><option value="0.02">2 % abaixo</option><option value="0.05">5 % abaixo</option></select></label>
+  </div>
+  <div class="simtypes" id="simtypes" role="group" aria-label="Tipos de sinal a incluir"></div>
+  <dl class="simout" id="simout"></dl>
+  <div id="simchart"></div>
+</div>
+
 <h2>Lucro por grupo</h2>
 <p class="note">Um grupo só conta como conclusivo com <span id="minset">300</span> apostas liquidadas. As colunas “odd −2 %” e “odd −5 %” mostram o que sobra se não conseguires a odd anunciada.</p>
 <div class="panel wrap"><table><thead><tr><th>Grupo</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Saldo</th><th>ROI</th><th>Entre</th><th>Odd −2 %</th><th>Odd −5 %</th></tr></thead><tbody id="groups"></tbody></table></div>
@@ -130,8 +150,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 
 <h2>Cérebro: hipóteses em teste</h2>
 <p class="note" id="brainnote"></p>
+<p class="note">Clica no título de uma coluna para ordenar; clica outra vez para inverter.</p>
 <div class="facts" id="braincounts"></div>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table></div>
+<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table><button type="button" class="more" id="hypsmore" hidden></button></div>
 <h3 class="sub">Notas do investigador</h3>
 <p class="note">Observações escritas pelo modelo de linguagem sobre uma hipótese concreta. O texto é opinião do modelo; os números ao lado vêm dos dados.</p>
 <div class="panel" id="notes"></div>
@@ -345,10 +366,22 @@ function brainUI(d){
   $('brainnote').textContent=`O cérebro combina as características de cada sinal (odd, volume, quota, minuto, liga, hora, reforços) e regista cada combinação como hipótese quando há pelo menos ${B.rules.min_support} sinais. Estão registadas ${B.hypotheses}; ${B.tested} já têm ${B.rules.hint_at} resultados. Com tantas em teste, cerca de ${num(B.expected_by_chance)} pareceriam promissoras só por acaso, por isso “forte” e “confirmada” exigem uma fasquia corrigida (${B.rules.strong_at} e ${B.rules.confirm_at} resultados).`;
   const ST={'em observação':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
   for(const k of ['em observação','promissora','forte','confirmada','abandonada']){const s=el('span');s.append(el('b',{},String(B.counts[k]||0)),document.createTextNode(' '+(k==='em observação'?'em observação':(B.counts[k]===1?k:k+'s'))));$('braincounts').appendChild(s)}
-  for(const h of B.top){const tr=el('tr');td(tr,h.family,'l');
-    const c=td(tr,h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.tradable?'':' (informativa: só se sabe depois do sinal)'),'l');
-    td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
-    td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('hyps').appendChild(tr)}
+  const RANK={'confirmada':5,'forte':4,'promissora':3,'em observação':2,'abandonada':1};
+  const COLS=[null,null,h=>h.n,h=>h.hit_rate,h=>h.break_even,h=>h.prob_above,h=>h.roi,h=>RANK[h.status]];
+  let sortCol=5, sortDir=-1, showAll=false;
+  const ths=[...$('hyps').parentElement.querySelectorAll('thead th')];
+  const drawH=()=>{const body=$('hyps');body.textContent='';
+    const rows=B.top.slice().sort((x,y)=>{const a=COLS[sortCol](x),b=COLS[sortCol](y);return ((a==null)-(b==null))||sortDir*((a>b)-(a<b))||(y.n-x.n)});
+    for(const h of rows.slice(0,showAll?1e9:25)){const tr=el('tr');td(tr,h.family,'l');
+      td(tr,h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')+(h.tradable?'':' (informativa: só se sabe depois do sinal)'),'l');
+      td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
+      td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));body.appendChild(tr)}
+    ths.forEach((th,i)=>{if(COLS[i])th.setAttribute('aria-sort',i===sortCol?(sortDir<0?'descending':'ascending'):'none')});
+    $('hypsmore').hidden=showAll||rows.length<=25;$('hypsmore').textContent=`Mostrar as ${rows.length} hipóteses`};
+  ths.forEach((th,i)=>{if(!COLS[i])return;const label=th.textContent,btn=el('button',{type:'button',class:'sort'},label);th.textContent='';th.appendChild(btn);
+    btn.addEventListener('click',()=>{if(sortCol===i)sortDir=-sortDir;else{sortCol=i;sortDir=-1}drawH()})});
+  $('hypsmore').addEventListener('click',()=>{showAll=true;drawH()});
+  if(B.top.length)drawH();else $('hypsmore').hidden=true;
   if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=8;$('hyps').appendChild(tr)}
 const T=B.llm_today||{};
   $('llmnote').textContent=B.llm_runs?`De hora a hora, um modelo de linguagem lê os números e alterna entre propor hipóteses novas, refinar as melhores, apontar situações a evitar e escrever notas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}. Hoje: ${T.calls_today||0} ${T.calls_today===1?'chamada':'chamadas'}, cerca de ${num(Math.round(T.neurons_today||0))} de 10 000 neurónios gratuitos.`:'De hora a hora, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
@@ -362,6 +395,31 @@ const T=B.llm_today||{};
   const w=$('watch');
   if(!B.watch.length)w.appendChild(el('p',{class:'note'},`Ainda nenhuma hipótese chegou a promissora (são precisos ${B.rules.hint_at} resultados). A lista aparece aqui quando isso acontecer.`));
   for(const x of B.watch){const r=x.reasons[0], p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}. Encaixa em ${x.reasons.length} ${x.reasons.length===1?'hipótese':'hipóteses'}; a melhor: ${r.id.split(' | ')[1]} (${pct(r.hit_rate)} em ${r.n}, ${r.status}).`));w.appendChild(p)}
+}
+
+function simulator(d){
+  const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  for(const t of types){const l=el('label'),c=el('input',{type:'checkbox'});c.checked=true;c.addEventListener('change',()=>{c.checked?on.add(t):on.delete(t);run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));$('simtypes').appendChild(l)}
+  const run=()=>{const start=Math.max(1,+$('simbank').value||0), mode=$('simmode').value, val=Math.max(0,+$('simval').value||0), cut=+$('simcut').value;
+    $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
+    let bank=start, peak=start, dd=0, low=start, staked=0, n=0, bust=false;const curve=[start];
+    for(const p of tl){if(!on.has(p.t)||p.w==null)continue;
+      let stake=mode==='flat'?val:bank*val/100;stake=Math.min(stake,bank);if(stake<=0){bust=true;break}
+      const gain=p.w>0?p.w*(p.o*(1-cut)-1):p.w;bank+=stake*gain;staked+=stake;n++;peak=Math.max(peak,bank);dd=Math.max(dd,peak-bank);low=Math.min(low,bank);curve.push(bank)}
+    const out=$('simout');out.textContent='';
+    [[n,'apostas simuladas'],[eur(bank),'banca final'],[(bank>=start?'+':'')+eur(bank-start),'lucro ou perda'],[staked?pct((bank-start)/staked,1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
+      .forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v)));out.appendChild(w)});
+    const box=$('simchart');box.textContent='';
+    if(curve.length<3){box.appendChild(el('p',{class:'note'},n?'São precisas pelo menos duas apostas para desenhar a curva.':'Nenhuma aposta liquidada nos tipos escolhidos.'));return}
+    const W=960,H=200,L=64,R=14,T=12,B=22, mn=Math.min(...curve), mx=Math.max(...curve), pad=(mx-mn||1)*.1, y=v=>T+(mx+pad-v)/((mx+pad)-(mn-pad))*(H-T-B), x=i=>L+i/(curve.length-1)*(W-L-R);
+    const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`Banca simulada ao longo de ${n} apostas: de ${eur(start)} para ${eur(bank)}`});
+    for(const g of [mn,start,mx].filter((v,i,a)=>a.indexOf(v)===i)){s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g===start?'var(--mut)':'var(--line)','stroke-width':1}));
+      const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':12,fill:'var(--mut)'});t.textContent=Math.round(g).toLocaleString('pt-PT');s.appendChild(t)}
+    s.appendChild(sv('polyline',{points:curve.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),fill:'none',stroke:'var(--mark)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    box.appendChild(s);if(bust)box.appendChild(el('p',{class:'note'},'A banca chegou a zero antes do fim.'))};
+  ['simbank','simmode','simval','simcut'].forEach(id=>$(id).addEventListener('input',run));
+  $('simmode').addEventListener('change',()=>{$('simval').value=$('simmode').value==='flat'?10:1;run()});
+  run();
 }
 
 function td(tr,t,c){const e=el('td',c?{class:c}:{});if(t instanceof Node)e.appendChild(t);else e.textContent=t;tr.appendChild(e);return e}
@@ -427,7 +485,7 @@ function recent(d){
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);brainUI(d);chart(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 </script>
 </body></html>

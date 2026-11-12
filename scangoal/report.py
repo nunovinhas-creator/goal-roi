@@ -300,7 +300,7 @@ def timeline(bets):
             continue
         gain = pl(b['w'], b['odds'])
         total += gain
-        out.append({'d': b['date_utc'], 'u': round(total, 2), 'g': round(gain, 2), 'm': ' — '.join(b['teams'] or []), 's': label(b), 'o': b['odds']})
+        out.append({'d': b['date_utc'], 'u': round(total, 2), 'g': round(gain, 2), 'w': b['w'], 't': b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase'], 'm': ' — '.join(b['teams'] or []), 's': label(b), 'o': b['odds']})
     return out[-600:]
 
 

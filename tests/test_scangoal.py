@@ -681,6 +681,55 @@ class RegimeAndStories(Hardening):
         self.assertEqual((story['events'][0]['mult'], story['events'][1]['bot_prob']), (8, 50))
 
 
+class Notify(unittest.TestCase):
+    def report(self, **over):
+        base = {'brain': {'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
+                                     'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
+                          'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4}},
+                'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
+                'daily': [{'day': '2026-11-12', 'bets': 4, 'settled': 3, 'wins': 2, 'units': 0.85}], 'timeline': [{'u': 1.5}], 'settled_bets': 20}
+        base.update(over)
+        return base
+
+    def test_each_notice_is_sent_once_and_summary_waits_for_the_evening(self):
+        from scangoal import notify
+        state, noon = {}, datetime.fromisoformat('2026-11-12T12:00:00+00:00')
+        first = notify.messages(self.report(), state, noon)
+        self.assertEqual(len(first), 2)                                                # boas-vindas + sinal a seguir; o 1.º estado não gera aviso
+        self.assertIn('não uma recomendação', first[1])
+        self.assertIn('Over 2.5 @ 1,9', first[1])
+        self.assertEqual(notify.messages(self.report(), state, noon), [])              # nada de novo: silêncio
+        rep = self.report()
+        rep['brain']['status_list'] = {'h1': 'forte', 'h2': 'abandonada'}
+        rep['insights']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
+        changed = notify.messages(rep, state, noon)
+        self.assertEqual(len(changed), 3)
+        self.assertTrue(any('passou a forte' in m for m in changed) and any('Jogo aberto piorou' in m for m in changed))
+        evening = notify.messages(rep, state, datetime.fromisoformat('2026-11-12T21:05:00+00:00'))
+        self.assertEqual(len(evening), 1)
+        self.assertIn('saldo do dia +0,85 un.', evening[0])
+        self.assertEqual(notify.messages(rep, state, datetime.fromisoformat('2026-11-12T22:00:00+00:00')), [])   # um resumo por dia
+
+    def test_run_needs_keys_never_prints_token_and_failure_is_hourly(self):
+        from scangoal import notify
+        sent = []
+        sender = lambda token, chat, text: sent.append((token, chat, text))
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                (Path(d) / 'report.json').write_text(json.dumps(self.report()), encoding='utf-8')
+                self.assertIsNone(notify.run(sender, env={}))
+                st = notify.run(sender, datetime.fromisoformat('2026-11-12T12:00:00+00:00'), {'TG_BOT_TOKEN': 'SECRET', 'TG_CHAT_ID': '42'})
+                self.assertEqual((len(sent), st['sent_total'], sent[0][1]), (2, 2, '42'))
+                self.assertNotIn('SECRET', (Path(d) / 'notify_state.json').read_text(encoding='utf-8'))
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+        env = {'TG_BOT_TOKEN': 't', 'TG_CHAT_ID': '1'}
+        self.assertTrue(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), env))
+        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:25:00+00:00'), env))
+        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
+
+
 class Insights(unittest.TestCase):
     def test_beta_and_evidence(self):
         from scangoal.insights import beta_cdf, evidence

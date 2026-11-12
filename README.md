@@ -88,6 +88,16 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - O modelo só recebe números agregados; nunca mensagens. O texto que devolve é limpo e nunca é executado.
 - As propostas entram com origem `llm`: só contam os sinais posteriores ao registo. As notas só entram se referirem uma hipótese existente; os números mostrados vêm dos dados.
 
+## Avisos pelo Telegram
+`scangoal/notify.py` envia avisos por um bot teu (segredos `TG_BOT_TOKEN` e `TG_CHAT_ID`; sem eles, o passo é ignorado). Não usa a conta que lê o ScanGoal.
+- Sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 por recolha).
+- Hipóteses que mudam de estado e tipos de sinal que mudam de comportamento.
+- Resumo diário depois das 21:00 UTC.
+- Aviso quando uma recolha falha (no máximo um por hora). Se a cadeia de recolha parar por completo, não há quem avise: a página mostra "Recolha parada".
+
+## Simulador de banca
+Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas liquidadas do saldo estrito, por ordem, com escolha de tipos de sinal e de corte na odd. Corre no navegador; não altera dados.
+
 ## Recolha
 O agendamento do GitHub não dispara neste repositório. Cada execução espera 8 minutos e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
 
