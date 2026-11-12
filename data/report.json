@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-12T17:47:41+00:00",
- "messages": 135,
+ "generated_at_utc": "2026-11-12T17:55:58+00:00",
+ "messages": 136,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 5,
-  "BETFAIR": 77,
+  "BETFAIR": 78,
   "STAKE_LOAD": 12,
   "OPEN_GAME": 18,
   "TOTALS_FORM": 8,
@@ -23,10 +23,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 139,
+  "versions": 140,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-12T17:47:38+00:00",
+  "last_collected_at_utc": "2026-11-12T17:55:56+00:00",
   "hl_results": 20,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 0,
@@ -37,7 +37,7 @@
   "bsd_last_run_utc": "2026-11-12T17:47:39+00:00",
   "goal_minutes_matches": 10,
   "goal_minutes_inconsistent": 0,
-  "collector_last_run_utc": "2026-11-12T17:47:38+00:00",
+  "collector_last_run_utc": "2026-11-12T17:55:56+00:00",
   "name_review": [],
   "deleted_by_bot": 0,
   "ended_after_90": 0,
@@ -318,7 +318,7 @@
    "roi_announced_odds": -0.1488,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 14.0,
+   "per_day": 13.9,
    "days_to_hint": 1,
    "days_to_conclusion": 21,
    "prudent_rate": 0.444,
@@ -396,7 +396,7 @@
    "roi_announced_odds": 0.8019,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 14.7,
+   "per_day": 14.6,
    "days_to_hint": 1,
    "days_to_conclusion": 20,
    "prudent_rate": 0.7915,
@@ -452,7 +452,7 @@
    "by_bot_mark": 1,
    "per_day": 7.5,
    "days_to_hint": 3,
-   "days_to_conclusion": 39,
+   "days_to_conclusion": 40,
    "prudent_rate": 0.4622,
    "prob_above": 0.1552
   },
@@ -477,7 +477,7 @@
    "roi_announced_odds": -0.121,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 5.0,
+   "per_day": 4.9,
    "days_to_hint": 6,
    "days_to_conclusion": 60,
    "prudent_rate": 0.5985,
@@ -735,7 +735,7 @@
    },
    {
     "n": 10,
-    "signals": 12,
+    "signals": 13,
     "hits": 6,
     "misses": 4,
     "hit_rate": 0.6,
@@ -864,14 +864,14 @@
     }
    },
    "live": {
-    "n": 14,
-    "shortened": 3,
+    "n": 15,
+    "shortened": 4,
     "drifted": 11,
     "unchanged": 0,
-    "median_move_pct": 18.7,
+    "median_move_pct": 15.8,
     "when_shortened": {
      "n": 1,
-     "signals": 3,
+     "signals": 4,
      "hits": 0,
      "misses": 1,
      "hit_rate": 0.0,
@@ -989,11 +989,11 @@
   }
  },
  "brain": {
-  "hypotheses": 218,
+  "hypotheses": 220,
   "tested": 0,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 218
+   "em observação": 220
   },
   "expected_by_chance": 0.0,
   "top": [
@@ -3688,6 +3688,29 @@
     "expect": null
    },
    {
+    "id": "Betfair | Reforço = reforço ×4 ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Reforço",
+      "reforço ×4 ou mais"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 10,
+    "hits": 6,
+    "hit_rate": 0.6,
+    "break_even": 0.5365,
+    "prob_above": 0.6189,
+    "roi": 0.063,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null
+   },
+   {
     "id": "Betfair | Liga = UEFA U19 Championship & Momento = durante o jogo",
     "family": "Betfair",
     "conditions": [
@@ -4275,29 +4298,6 @@
     "status": "em observação",
     "tradable": false,
     "expect": null
-   },
-   {
-    "id": "Betfair | Faixa de odd = odd 2,00 a 3,00 & Quota de mercado = menos de 80 %",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 2,00 a 3,00"
-     ],
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ]
-    ],
-    "n": 8,
-    "hits": 3,
-    "hit_rate": 0.375,
-    "break_even": 0.4344,
-    "prob_above": 0.4001,
-    "roi": -0.02,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null
    }
   ],
   "status_list": {},
@@ -4559,7 +4559,7 @@
    {
     "phase": "live",
     "level": 2,
-    "signals": 14,
+    "signals": 15,
     "n": 8,
     "hits": 4,
     "hit_rate": 0.5,
@@ -4570,7 +4570,7 @@
    {
     "phase": "live",
     "level": 4,
-    "signals": 7,
+    "signals": 8,
     "n": 5,
     "hits": 2,
     "hit_rate": 0.4,
@@ -4581,7 +4581,7 @@
    {
     "phase": "live",
     "level": 8,
-    "signals": 2,
+    "signals": 3,
     "n": 2,
     "hits": 2,
     "hit_rate": 1.0,
@@ -4592,7 +4592,7 @@
    {
     "phase": "live",
     "level": 16,
-    "signals": 1,
+    "signals": 2,
     "n": 1,
     "hits": 1,
     "hit_rate": 1.0,
@@ -4604,7 +4604,7 @@
  },
  "questions": {
   "Q1 Betfair: só apostas que chegaram a ×4, à odd do sinal ×4": {
-   "bets": 8,
+   "bets": 9,
    "settled": 6,
    "matches": 6,
    "wins": 3,
@@ -4638,7 +4638,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 15,
+   "bets": 14,
    "settled": 6,
    "matches": 6,
    "wins": 1,
@@ -4940,8 +4940,8 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
+   "n_signals": 2,
+   "max_mult": 64
   },
   {
    "date_utc": "2026-11-12T17:28:59+00:00",
@@ -6783,6 +6783,17 @@
      "mult": 1,
      "share": 60,
      "mkt_volume": 273000.0,
+     "market": "1X2"
+    },
+    {
+     "d": "2026-11-12T17:55:40+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "2",
+     "odds": 1.64,
+     "mult": 64,
+     "share": 63,
+     "mkt_volume": 305000.0,
      "market": "1X2"
     }
    ],
