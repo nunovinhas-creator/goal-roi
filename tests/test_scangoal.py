@@ -67,6 +67,15 @@ class Parser(unittest.TestCase):
         broken = parse('💷 🟨 Betfair · LIVE\nA — B\nsomething else')
         self.assertEqual((broken['bet'], broken['error']), (False, 'fields_missing'))
 
+    def test_formats_seen_in_first_real_collection(self):
+        no_odds = OPEN.replace('💰 O 5: 1.81\n', '') + '\n\n🏁 FT 1:8\n⚽  91\'   1 - 8'
+        p = parse(no_odds)
+        self.assertEqual((p['type'], p['bet'], p['ft'], p['bot_mark']), ('OPEN_GAME_NO_ODDS', False, [1, 8], None))
+        self.assertNotIn('error', p)
+        self.assertEqual(parse('🏁 Full time: Liverpool Women 4:1 Aston Villa Women\nWeakened Liverpool Women won.')['type'], 'FULL_TIME_NOTE')
+        for head in ('⭐ Pro is active until 11.12.2026.', '🎁 3 months of Pro for free', '✅ Pro is on.', 'Pro status — 250 ⭐ per 30 days'):
+            self.assertEqual((parse(head)['type'], parse(head)['bet']), ('SERVICE', False))
+
     def test_split(self):
         self.assertEqual(len(list(split('ScanGoal:\n' + BETFAIR_PRE + '\n\n' + STAKE_FT + '\n\n' + OPEN))), 3)
 

@@ -2,9 +2,10 @@
 import re
 from datetime import datetime, timedelta, timezone
 
-HEAD = re.compile(r'^(💷|💸|🔥|⏳|🎯|🟥)')
+HEAD = re.compile(r'^(💷|💸|🔥|⏳|🎯|🟥|🏁 Full time|⭐|🎁|✅ Pro|Pro status)')
 URL = re.compile(r'https://scangoal\.com/match/(\S+?)\?')
-FT = re.compile(r'🏁 FT (\d+):(\d+) · (.+?) (✅|❌)')
+FT = re.compile(r'🏁 FT (\d+):(\d+)(?: · .+? (✅|❌))?')
+SERVICE = re.compile(r'^(⭐|🎁|✅ Pro|Pro status)')
 KICKOFF = re.compile(r'(\d{1,2}) ([a-z]{3}) (\d{4}) (\d{2}):(\d{2})')
 MONTHS = {m: i + 1 for i, m in enumerate('jan feb mar apr may jun jul aug sep oct nov dec'.split())}
 MSK = timezone(timedelta(hours=3))  # o bot mostra horas de Moscovo (UTC+3, sem hora de verão)
@@ -50,7 +51,7 @@ def parse(text):
     ft = FT.search(text)
     if ft:
         m['ft'] = [int(ft[1]), int(ft[2])]
-        m['bot_mark'] = ft[4] == '✅'
+        m['bot_mark'] = None if ft[3] is None else ft[3] == '✅'
     try:
         if h.startswith('💷'):
             m.update(type='BETFAIR', phase='live' if 'LIVE' in h else 'pre', kickoff_utc=kickoff_utc(h))
@@ -76,11 +77,18 @@ def parse(text):
         elif h.startswith('🔥') or h.startswith('🎯'):
             s = re.search(r'💰 O ([\d.]+): ([\d.]+)', text)
             mn = re.search(r"· (\d+)'", lines[1])
+            if s is None and mn:  # sinal sem linha de odd: fica registado, mas não é aposta
+                m.update(type=('OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM') + '_NO_ODDS', minute=int(mn[1]))
+                return m
             a, b = re.search(r'(\d+)\s*$', lines[2]), re.search(r'(\d+)\s*$', lines[3])
             m['teams'] = [re.sub(r'\s+\d+\s*$', '', lines[2]).strip(), re.sub(r'\s+\d+\s*$', '', lines[3]).strip()]
             m.update(type='OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM', phase='live', market='Asian Total',
                      selection='Over %s' % s[1], odds=float(s[2]), minute=int(mn[1]),
                      score_at_signal=[int(a[1]), int(b[1])], bet=True)
+        elif h.startswith('🏁 Full time'):
+            m['type'] = 'FULL_TIME_NOTE'
+        elif SERVICE.match(h):
+            m['type'] = 'SERVICE'
         elif h.startswith('⏳'):
             m['type'] = 'GOAL_BREWING'
         elif h.startswith('🟥'):

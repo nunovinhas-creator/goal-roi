@@ -32,7 +32,7 @@ def load():
             ft[p['match_id']] = p['ft']
             if p.get('bet'):
                 own = settle(p['market'], p['selection'], p['ft'], p.get('teams'))
-                if own is not None and own != 0 and (own > 0) != p['bot_mark']:
+                if own is not None and own != 0 and p['bot_mark'] is not None and (own > 0) != p['bot_mark']:
                     audit['bot_mark_disagreements'] += 1
         mid = r['message_id']
         if mid in first:
