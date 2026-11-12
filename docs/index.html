@@ -31,7 +31,7 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .facts{display:flex;flex-wrap:wrap;gap:6px 28px;margin:16px 2px 0;color:var(--mut);font-size:15px}
 .facts b{color:var(--ink);font-weight:700}
 h3.sub{margin:22px 2px 4px;font:700 16.5px/1.25 Archivo,sans-serif}
-#braincounts{margin:0 2px 12px}#watch p{margin:6px 0}
+#braincounts{margin:0 2px 12px}#watch p,#notes p{margin:6px 0}
 .says{margin:12px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .says li{padding:13px 20px;border-top:1px solid var(--line);max-width:none}.says li:first-child{border-top:0}
 .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
@@ -129,6 +129,9 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note" id="brainnote"></p>
 <div class="facts" id="braincounts"></div>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table></div>
+<h3 class="sub">Notas do investigador</h3>
+<p class="note">Observações escritas pelo modelo de linguagem sobre uma hipótese concreta. O texto é opinião do modelo; os números ao lado vêm dos dados.</p>
+<div class="panel" id="notes"></div>
 <h3 class="sub">Hipóteses propostas pelo modelo de linguagem</h3>
 <p class="note" id="llmnote"></p>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese e motivo</th><th>Proposta em</th><th>Resultados desde então</th><th>Acerto</th><th>Estado</th></tr></thead><tbody id="llm"></tbody></table></div>
@@ -335,8 +338,11 @@ function brainUI(d){
     td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
     td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('hyps').appendChild(tr)}
   if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=8;$('hyps').appendChild(tr)}
-  $('llmnote').textContent=B.llm_runs?`Uma vez por dia, um modelo de linguagem lê os números e propõe até 5 hipóteses novas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}.`:'Uma vez por dia, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
-  for(const h of B.llm||[]){const tr=el('tr');td(tr,h.family,'l');const c=td(tr,'','l');c.append(el('b',{},h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')));if(h.reason)c.append(el('br'),document.createTextNode(h.reason));
+const T=B.llm_today||{};
+  $('llmnote').textContent=B.llm_runs?`De hora a hora, um modelo de linguagem lê os números e alterna entre propor hipóteses novas, refinar as melhores, apontar situações a evitar e escrever notas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}. Hoje: ${T.calls_today||0} ${T.calls_today===1?'chamada':'chamadas'}, cerca de ${num(Math.round(T.neurons_today||0))} de 10 000 neurónios gratuitos.`:'De hora a hora, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
+  for(const n of B.notes||[]){const p=el('p');p.append(el('b',{},n.id.replace(' | ',': ')),document.createTextNode(` (${hitsOf(n.hits,n.n)}, precisa de ${n.break_even!=null?pct(n.break_even):'—'}). ${n.note}`));$('notes').appendChild(p)}
+  if(!(B.notes||[]).length)$('notes').appendChild(el('p',{class:'note'},'Ainda sem notas. A primeira aparece na próxima ronda de notas do modelo.'));
+  for(const h of B.llm||[]){const tr=el('tr');td(tr,h.family,'l');const c=td(tr,'','l');c.append(el('b',{},h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')));if(h.reason)c.append(el('br'),document.createTextNode(h.reason));
     td(tr,new Date(h.born_utc).toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'}));td(tr,h.n);td(tr,h.hit_rate!=null?pct(h.hit_rate):'—');td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('llm').appendChild(tr)}
   if(!(B.llm||[]).length){const tr=el('tr');td(tr,'Ainda sem propostas.','mut').colSpan=6;$('llm').appendChild(tr)}
   for(const e of B.entry_points||[]){if(!e.signals)continue;const tr=el('tr');td(tr,e.phase==='pre'?'Antes do jogo':'Durante o jogo','l');td(tr,e.level===1?'Ao primeiro sinal':`Ao reforço ×${e.level}`,'l');td(tr,e.n);

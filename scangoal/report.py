@@ -397,6 +397,14 @@ def build(csv_path=None, register=False):
     brn = brain.build(signals, registry, MIN_SETTLED)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
+    brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}
+    try:
+        notes = json.loads((data_dir() / 'llm_notes.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        notes = []
+    by_id = {h['id']: h for h in brn['top']}
+    brn['notes'] = [dict(n, n=by_id[n['id']]['n'], hits=by_id[n['id']]['hits'], hit_rate=by_id[n['id']]['hit_rate'], break_even=by_id[n['id']]['break_even'],
+                         status=by_id[n['id']]['status']) for n in notes if n.get('id') in by_id][:12]
     brn['entry_points'] = brain.entry_points(signals)
     return {
         'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),

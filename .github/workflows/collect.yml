@@ -46,7 +46,7 @@ jobs:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
           BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
-      - name: Hypotheses proposed by a language model (once a day; skipped without keys)
+      - name: Language model investigation (hourly, within the free daily budget; skipped without keys)
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           MASTER_BRAIN_LLM_API_KEY: ${{ secrets.MASTER_BRAIN_LLM_API_KEY }}

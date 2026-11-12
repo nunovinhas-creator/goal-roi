@@ -124,7 +124,7 @@ def evaluate(signals, registry, min_settled):
         conds = {tuple(c) for c in h['conditions']}
         match = [b for b, fam, at in have if fam == h['family'] and conds <= at and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
         s = insights.summarize(match)
-        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'),
+        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'), expect=h.get('expect'),
                          tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')]))
     tested = sum(1 for r in rows if r['n'] >= HINT_AT)
     bar = 1 - 0.05 / max(1, tested)
