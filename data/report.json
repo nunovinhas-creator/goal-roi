@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-12T19:27:28+00:00",
- "messages": 137,
+ "generated_at_utc": "2026-11-12T19:35:49+00:00",
+ "messages": 139,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 5,
-  "BETFAIR": 79,
+  "BETFAIR": 81,
   "STAKE_LOAD": 12,
   "OPEN_GAME": 18,
   "TOTALS_FORM": 8,
@@ -23,10 +23,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 150,
+  "versions": 152,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-12T19:02:24+00:00",
+  "last_collected_at_utc": "2026-11-12T19:35:44+00:00",
   "hl_results": 25,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 2,
@@ -34,10 +34,10 @@
   "bsd_results": 1,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 0,
-  "bsd_last_run_utc": "2026-11-12T18:45:47+00:00",
-  "goal_minutes_matches": 10,
+  "bsd_last_run_utc": "2026-11-12T19:35:48+00:00",
+  "goal_minutes_matches": 15,
   "goal_minutes_inconsistent": 0,
-  "collector_last_run_utc": "2026-11-12T19:27:21+00:00",
+  "collector_last_run_utc": "2026-11-12T19:35:44+00:00",
   "name_review": [
    {
     "bot": [
@@ -75,14 +75,14 @@
   "goal_lists": 34,
   "goal_lists_consistent": 21
  },
- "unique_bets": 42,
+ "unique_bets": 44,
  "settled_bets": 31,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
-   "bets": 19,
+   "bets": 20,
    "settled": 10,
    "matches": 10,
    "wins": 3,
@@ -171,7 +171,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/pre/mkt<10K": {
-   "bets": 4,
+   "bets": 5,
    "settled": 2,
    "matches": 2,
    "wins": 2,
@@ -358,7 +358,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 31,
+   "signals": 32,
    "with_result": 21,
    "hits": 9,
    "misses": 12,
@@ -378,14 +378,14 @@
    "roi_announced_odds": -0.1576,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 16.4,
+   "per_day": 16.3,
    "days_to_hint": 1,
    "days_to_conclusion": 18,
    "prudent_rate": 0.4544,
    "prob_above": 0.2709
   },
   "BETFAIR/pre": {
-   "signals": 10,
+   "signals": 11,
    "with_result": 6,
    "hits": 5,
    "misses": 1,
@@ -407,33 +407,36 @@
    "by_bot_mark": 0,
    "per_day": 4.7,
    "days_to_hint": 6,
-   "days_to_conclusion": 63,
+   "days_to_conclusion": 64,
    "prudent_rate": 0.6697,
    "prob_above": 0.8028
   },
   "GOAL_BREWING": {
    "signals": 5,
-   "with_result": 0,
+   "with_result": 1,
    "hits": 0,
-   "misses": 0,
+   "misses": 1,
    "pushes": 0,
    "eff_hits": 0,
-   "eff_misses": 0,
+   "eff_misses": 1.0,
    "no_source": 0,
-   "unsettleable": 2,
-   "hit_rate": null,
-   "ci95": null,
+   "unsettleable": 1,
+   "hit_rate": 0.0,
+   "ci95": [
+    0.0,
+    0.7935
+   ],
    "avg_odds": null,
-   "break_even": null,
-   "baseline": false,
+   "break_even": 0.37,
+   "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 0.0,
-   "days_to_hint": null,
-   "days_to_conclusion": null,
-   "prudent_rate": null,
-   "prob_above": null
+   "per_day": 0.8,
+   "days_to_hint": 38,
+   "days_to_conclusion": 388,
+   "prudent_rate": 0.3364,
+   "prob_above": 0.383
   },
   "OPEN_GAME": {
    "signals": 18,
@@ -484,8 +487,8 @@
    "seen_late": 2,
    "by_bot_mark": 0,
    "per_day": 2.0,
-   "days_to_hint": 14,
-   "days_to_conclusion": 149,
+   "days_to_hint": 15,
+   "days_to_conclusion": 150,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857
   },
@@ -510,9 +513,9 @@
    "roi_announced_odds": -0.495,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 7.9,
+   "per_day": 7.8,
    "days_to_hint": 3,
-   "days_to_conclusion": 37,
+   "days_to_conclusion": 38,
    "prudent_rate": 0.4334,
    "prob_above": 0.1148
   },
@@ -566,7 +569,7 @@
    "by_bot_mark": 0,
    "per_day": 1.9,
    "days_to_hint": 15,
-   "days_to_conclusion": 158,
+   "days_to_conclusion": 159,
    "prudent_rate": 0.5254,
    "prob_above": 0.4902
   }
@@ -777,7 +780,7 @@
    },
    {
     "n": 10,
-    "signals": 18,
+    "signals": 19,
     "hits": 8,
     "misses": 2,
     "hit_rate": 0.8,
@@ -795,7 +798,7 @@
    },
    {
     "n": 14,
-    "signals": 21,
+    "signals": 23,
     "hits": 10,
     "misses": 4,
     "hit_rate": 0.7143,
@@ -813,7 +816,7 @@
    },
    {
     "n": 18,
-    "signals": 30,
+    "signals": 32,
     "hits": 11,
     "misses": 7,
     "hit_rate": 0.6111,
@@ -867,7 +870,7 @@
    },
    {
     "n": 18,
-    "signals": 32,
+    "signals": 34,
     "hits": 10,
     "misses": 8,
     "hit_rate": 0.5556,
@@ -903,7 +906,7 @@
    },
    {
     "n": 27,
-    "signals": 41,
+    "signals": 43,
     "hits": 14,
     "misses": 13,
     "hit_rate": 0.5185,
@@ -921,7 +924,7 @@
    },
    {
     "n": 10,
-    "signals": 19,
+    "signals": 21,
     "hits": 4,
     "misses": 6,
     "hit_rate": 0.4,
@@ -939,7 +942,7 @@
    },
    {
     "n": 21,
-    "signals": 31,
+    "signals": 32,
     "hits": 9,
     "misses": 12,
     "hit_rate": 0.4286,
@@ -975,7 +978,7 @@
    },
    {
     "n": 17,
-    "signals": 23,
+    "signals": 24,
     "hits": 6,
     "misses": 11,
     "hit_rate": 0.3529,
@@ -1106,7 +1109,7 @@
    },
    {
     "n": 44,
-    "signals": 51,
+    "signals": 53,
     "hits": 29,
     "misses": 15,
     "hit_rate": 0.6588,
@@ -1175,11 +1178,11 @@
   }
  },
  "brain": {
-  "hypotheses": 221,
+  "hypotheses": 226,
   "tested": 0,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 221
+   "em observação": 226
   },
   "expected_by_chance": 0.0,
   "top": [
@@ -4538,7 +4541,7 @@
    },
    {
     "n": 0,
-    "signals": 0,
+    "signals": 1,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -4568,7 +4571,7 @@
     "reason": "Jogos com quota alta e mercado pequeno",
     "expect": "acima",
     "tradable": true,
-    "open": 0,
+    "open": 1,
     "status": "em observação"
    },
    {
@@ -4752,7 +4755,7 @@
    {
     "phase": "pre",
     "level": 1,
-    "signals": 10,
+    "signals": 11,
     "n": 6,
     "hits": 5,
     "hit_rate": 0.8333,
@@ -4807,7 +4810,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 31,
+    "signals": 32,
     "n": 21,
     "hits": 9,
     "hit_rate": 0.4286,
@@ -4897,7 +4900,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 14,
+   "bets": 16,
    "settled": 7,
    "matches": 7,
    "wins": 2,
@@ -4943,7 +4946,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [1.50; 2.50)": {
-   "bets": 24,
+   "bets": 26,
    "settled": 16,
    "matches": 15,
    "wins": 7,
@@ -5011,7 +5014,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q4 Betfair: quota de mercado >= 80 %": {
-   "bets": 12,
+   "bets": 13,
    "settled": 7,
    "matches": 7,
    "wins": 5,
@@ -5045,7 +5048,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q5 Betfair pré-jogo: sinal a mais de 60 min do início": {
-   "bets": 3,
+   "bets": 4,
    "settled": 1,
    "matches": 1,
    "wins": 1,
@@ -5154,7 +5157,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 42,
+   "bets": 44,
    "settled": 31,
    "matches": 28,
    "wins": 15,
@@ -5189,6 +5192,32 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-12T19:27:25+00:00",
+   "match_id": "slovenia-vs-switzerland-20261113",
+   "group": "BETFAIR/pre/mkt<10K",
+   "match": "Slovenia — Switzerland",
+   "selection": "Switzerland",
+   "odds": 1.73,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-12T19:27:25+00:00",
+   "match_id": "benin-vs-central-african-rep-20261112",
+   "group": "BETFAIR/live/mkt<10K",
+   "match": "Benin — Central African Rep",
+   "selection": "Benin",
+   "odds": 1.79,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-12T17:40:48+00:00",
    "match_id": "armenia-vs-cyprus-20261112",
@@ -6742,8 +6771,21 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
+   "goals": [
+    [
+     74,
+     "0-1"
+    ],
+    [
+     85,
+     "1-1"
+    ],
+    [
+     89,
+     "2-1"
+    ]
+   ],
+   "goals_source": "Highlightly",
    "ft": [
     2,
     1
@@ -6789,8 +6831,13 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
+   "goals": [
+    [
+     70,
+     "0-1"
+    ]
+   ],
+   "goals_source": "Highlightly",
    "ft": [
     0,
     1
@@ -6858,8 +6905,21 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
+   "goals": [
+    [
+     44,
+     "1-0"
+    ],
+    [
+     46,
+     "1-1"
+    ],
+    [
+     90,
+     "2-1"
+    ]
+   ],
+   "goals_source": "Highlightly",
    "ft": [
     2,
     1
@@ -6966,11 +7026,19 @@
    ],
    "goals": [
     [
+     5,
+     "1-0"
+    ],
+    [
+     46,
+     "2-0"
+    ],
+    [
      70,
      "2-1"
     ],
     [
-     76,
+     75,
      "2-2"
     ],
     [
@@ -6978,7 +7046,7 @@
      "2-3"
     ]
    ],
-   "goals_source": "bot",
+   "goals_source": "Highlightly",
    "ft": [
     2,
     3
@@ -7310,6 +7378,50 @@
     0,
     0
    ]
+  },
+  "benin-vs-central-african-rep-20261112": {
+   "teams": [
+    "Benin",
+    "Central African Rep"
+   ],
+   "events": [
+    {
+     "d": "2026-11-12T19:27:25+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "1",
+     "odds": 1.79,
+     "mult": 1,
+     "share": 91,
+     "mkt_volume": 9400.0,
+     "market": "1X2"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "slovenia-vs-switzerland-20261113": {
+   "teams": [
+    "Slovenia",
+    "Switzerland"
+   ],
+   "events": [
+    {
+     "d": "2026-11-12T19:27:25+00:00",
+     "k": "BETFAIR",
+     "phase": "pre",
+     "selection": "2",
+     "odds": 1.73,
+     "mult": 1,
+     "share": 64,
+     "mkt_volume": 4800.0,
+     "market": "1X2"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
   }
  },
  "timeline": [
@@ -7633,7 +7745,7 @@
    "day": "2026-11-11"
   },
   {
-   "bets": 27,
+   "bets": 29,
    "settled": 18,
    "wins": 10,
    "units": 0.27,
