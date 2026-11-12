@@ -79,6 +79,11 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Para acrescentar uma hipótese à mão (ou proposta por um modelo de linguagem), junta uma entrada com `"source": "manual"` ou `"llm"`: só contam os sinais posteriores a `born_utc`.
 - Estados: em observação (<30), promissora (>=30 e 95 %, pode ser acaso), forte (>=100, fasquia corrigida pelo número de hipóteses testadas), confirmada (>=300), abandonada (>=30 e <=10 %).
 - Hipóteses com condições que só se conhecem depois do primeiro sinal (reforço, movimento da odd) são informativas e não entram na lista "a seguir agora".
+- Um voto por jogo (12/11/2026): na evidência, vários sinais no mesmo jogo repartem um voto. Dois acertos no mesmo jogo contam um; um acerto e uma falha contam meio de cada. O acerto e o ROI mostrados continuam a contar cada sinal.
+- Vantagem com intervalo: além da probabilidade de estar acima do necessário, cada hipótese mostra a vantagem estimada em pontos percentuais (acerto menos taxa necessária) com um intervalo de 90 %, e a probabilidade de continuar acima do necessário com 2 % de perda de odd.
+- "Rende mais do que o resto do tipo": probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo. Serve para distinguir uma condição que acrescenta algo de uma que só herda o desempenho do tipo. Só informa; não muda o estado.
+- "Seguir o cérebro teria compensado?": cada sinal com odd é decidido só com os resultados conhecidos nesse momento (150 minutos depois do início do jogo). Segue-se quando encaixa numa tática apostável com 8 resultados e 80 % de probabilidade nessa altura. Compara seguidos com não seguidos.
+- Balanço das propostas: das hipóteses com 10 ou mais resultados, quantas foram no sentido esperado, por origem. O modelo de linguagem recebe o balanço das suas propostas (as que se confirmaram e as que falharam) antes de propor mais.
 
 ## Investigador (modelo de linguagem)
 `scangoal/llm.py` chama, de hora a hora, um modelo no Cloudflare Workers AI (segredos `CLOUDFLARE_ACCOUNT_ID` e `MASTER_BRAIN_LLM_API_KEY`). Sem os segredos, o passo é ignorado.

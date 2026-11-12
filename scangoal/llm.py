@@ -1,6 +1,7 @@
 """Hipóteses propostas por um modelo de linguagem (Cloudflare Workers AI, o mesmo serviço do asianodds-h1-lab).
 
-O modelo só recebe números agregados (vocabulário de características e tabela das hipóteses atuais). Não recebe mensagens.
+O modelo só recebe números agregados (vocabulário de características, tabela das hipóteses atuais e o balanço das suas
+propostas anteriores, para aprender com o que se confirmou e com o que falhou). Não recebe mensagens.
 O que devolve é tratado como dados: cada proposta só entra se usar características que existem; nada do texto é executado.
 Como o modelo viu resultados, as propostas entram com origem 'llm' e só contam sinais POSTERIORES ao registo.
 Segredos: CLOUDFLARE_ACCOUNT_ID e MASTER_BRAIN_LLM_API_KEY (só no cabeçalho; nunca impressos). Sem eles, não faz nada.
@@ -58,7 +59,7 @@ def vocabulary(signals):
     return vocab
 
 
-def build_prompt(vocab, top, existing, mode='novas', weak=()):
+def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None):
     lines = ['Medimos sinais de apostas de futebol de um bot. Cada sinal tem características. Uma hipótese é uma família de sinal',
              'mais 1 a %d condições (característica = valor). Queremos hipóteses NOVAS que possam acertar acima do que a odd exige.' % MAX_CONDITIONS, '',
              'Características disponíveis por família (valor: número de sinais):']
@@ -73,6 +74,15 @@ def build_prompt(vocab, top, existing, mode='novas', weak=()):
     if weak:
         lines += ['', 'Hipóteses com pior desempenho até agora:']
         lines += ['- %s -> %d resultados, acerto %s, precisa %s' % (h['id'], h['n'], h['hit_rate'], h['break_even']) for h in weak[:12]]
+    if track and track.get('llm_judged'):   # o modelo recebe o balanço das suas propostas anteriores, medido só em dados posteriores a cada uma
+        row = lambda h: '- %s -> %d resultados, acerto %s, precisa %s' % (h['id'], h['n'], h['hit_rate'], h['break_even'])
+        lines += ['', 'Balanço das propostas anteriores do modelo (resultados posteriores à proposta; %d ou mais): %d de %d foram no sentido esperado.'
+                  % (track['min_results'], track['llm_as_expected'], track['llm_judged'])]
+        if track.get('worked'):
+            lines += ['Confirmaram-se até agora:'] + [row(h) for h in track['worked']]
+        if track.get('failed'):
+            lines += ['Falharam até agora:'] + [row(h) for h in track['failed']]
+        lines.append('Aprende com este balanço: aproxima-te do género de hipótese que se confirmou e não repitas o género que falhou.')
     if mode == 'notas':
         lines += ['', 'Escreve até 3 observações curtas e prudentes sobre o que estes números sugerem. Cada observação refere UMA hipótese da lista,',
                   'copiando o identificador exatamente como está escrito (o texto antes de "->"). Não inventes números; diz quando a amostra é pequena.',
@@ -179,7 +189,7 @@ def run(call=request, now=None, env=None):
     if not vocab:
         outcome = 'no_data'
     else:
-        prompt, raw = build_prompt(vocab, top, len(registry), mode, weak), None
+        prompt, raw = build_prompt(vocab, top, len(registry), mode, weak, rep['brain'].get('track')), None
         for model in MODELS:
             try:
                 res = call(account, key, model, prompt)

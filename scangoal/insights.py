@@ -9,6 +9,7 @@ from datetime import datetime
 from .parser import competition_kind
 
 PRIOR_WEIGHT = 10        # pseudo-observações centradas na taxa necessária ("sem vantagem")
+ODDS_LOSS = 0.02         # perda de odd usada na evidência "com perda de odd" (a mesma coluna −2 % do relatório)
 MIN_SEGMENT = 10         # resultados mínimos para um segmento aparecer
 HINT_AT = 30
 
@@ -68,13 +69,74 @@ def evidence(hits, misses, break_even):
     return {'prudent_rate': round(a / (a + b), 4), 'prob_above': round(1.0 - beta_cdf(break_even, a, b), 4)}
 
 
+def beta_ppf(q, a, b):
+    """Quantil da distribuição Beta, por bisseção."""
+    lo, hi = 0.0, 1.0
+    for _ in range(40):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if beta_cdf(mid, a, b) < q else (lo, mid)
+    return (lo + hi) / 2
+
+
+def posterior(hits, misses, break_even):
+    """Distribuição da vantagem (taxa de acerto menos taxa necessária), com o mesmo prior prudente de evidence().
+
+    edge: estimativa central; edge_ci: intervalo de 90 %; prob_above_cut: probabilidade de continuar acima do necessário
+    se a odd conseguida for 2 % pior do que a anunciada.
+    """
+    if break_even is None or not 0 < break_even < 1:
+        return {'edge': None, 'edge_ci': None, 'prob_above_cut': None}
+    a, b = break_even * PRIOR_WEIGHT + hits, (1 - break_even) * PRIOR_WEIGHT + misses
+    need = min(0.999, break_even / (1 - ODDS_LOSS))
+    return {'edge': round(a / (a + b) - break_even, 4),
+            'edge_ci': [round(beta_ppf(0.05, a, b) - break_even, 4), round(beta_ppf(0.95, a, b) - break_even, 4)],
+            'prob_above_cut': round(1.0 - beta_cdf(need, a, b), 4)}
+
+
+class Votes:
+    """Um voto por jogo (regra de 12/11/2026): vários sinais no mesmo jogo não são independentes, por isso repartem um voto.
+
+    Um jogo com dois sinais certos conta um acerto, não dois; com um certo e um errado conta meio acerto e meia falha.
+    É o lado prudente: a evidência nunca cresce por o bot repetir sinais no mesmo jogo.
+    """
+    def __init__(self):
+        self.m = {}
+
+    def add(self, r):
+        if r['w'] is None or r['w'] == 0:
+            return
+        g = self.m.setdefault(r.get('match_id') or ('sem jogo', id(r)), [0.0, 0.0, 0, 0.0, 0])
+        g[0] += max(r['w'], 0)
+        g[1] += max(-r['w'], 0)
+        g[2] += 1
+        if r['odds']:
+            g[3] += 1 / r['odds']
+            g[4] += 1
+
+    def totals(self):
+        """-> (acertos, falhas, taxa necessária, jogos)."""
+        priced = [g[3] / g[4] for g in self.m.values() if g[4]]
+        return (sum(g[0] / g[2] for g in self.m.values()), sum(g[1] / g[2] for g in self.m.values()),
+                sum(priced) / len(priced) if priced else None, len(self.m))
+
+
+def clustered(done):
+    v = Votes()
+    for r in done:
+        v.add(r)
+    return v.totals()
+
+
 def effective(done):
     """Acertos e falhas efetivos: meia vitória conta meio acerto, meia derrota meia falha, devolvida não conta."""
     return (round(sum(r['w'] for r in done if r['w'] > 0), 2), round(-sum(r['w'] for r in done if r['w'] < 0), 2))
 
 
 def summarize(rows):
-    """Resumo de um conjunto de sinais com resultado: acerto, taxa necessária, evidência e ROI à odd anunciada."""
+    """Resumo de um conjunto de sinais com resultado: acerto, taxa necessária, evidência e ROI à odd anunciada.
+
+    O acerto e a taxa necessária mostrados contam cada sinal; a evidência (prob_above, edge...) conta um voto por jogo.
+    """
     done = [r for r in rows if r['w'] is not None]
     hits, misses = sum(1 for r in done if r['w'] > 0), sum(1 for r in done if r['w'] < 0)
     priced = [r for r in done if r['odds'] and r['w'] != 0]
@@ -84,8 +146,24 @@ def summarize(rows):
     out = {'n': hits + misses, 'signals': len(rows), 'hits': hits, 'misses': misses,
            'hit_rate': round(eh / (eh + em), 4) if eh + em else None, 'ci95': wilson(eh, eh + em),
            'break_even': round(be, 4) if be else None, 'roi': round(sum(pls) / len(pls), 4) if pls else None}
-    out.update(evidence(eh, em, be))
+    ch, cm, cbe, games = clustered(done)
+    out['games'] = games
+    out.update(evidence(ch, cm, cbe))
+    out.update(posterior(ch, cm, cbe))
     return out
+
+
+def prob_better(a, b):
+    """Probabilidade (aprox. normal) de a vantagem do conjunto a ser maior do que a do conjunto b. Precisa de 5 jogos em cada."""
+    pa, pb = clustered([r for r in a if r['w'] is not None]), clustered([r for r in b if r['w'] is not None])
+    if pa[2] is None or pb[2] is None or pa[3] < 5 or pb[3] < 5:
+        return None
+    mean = var = 0.0
+    for sign, (h, m, be, _) in ((1, pa), (-1, pb)):
+        x, y = be * PRIOR_WEIGHT + h, (1 - be) * PRIOR_WEIGHT + m
+        mean += sign * (x / (x + y) - be)
+        var += x * y / ((x + y) ** 2 * (x + y + 1))
+    return round(0.5 * (1 + math.erf(mean / math.sqrt(2 * var))), 4)
 
 
 def family(b):
@@ -286,10 +364,13 @@ def narrative(acc, segs, tested, move, calib, luck, min_settled, regime=None):
 
 def build(signals, bets, accuracy, min_settled):
     for k, g in accuracy.items():
-        g.update(evidence(g.get('eff_hits', g['hits']), g.get('eff_misses', g['misses']), g['break_even']))
+        h, m = g.get('vote_hits', g.get('eff_hits', g['hits'])), g.get('vote_misses', g.get('eff_misses', g['misses']))
+        be = g.get('vote_break_even') or g['break_even']
+        g.update(evidence(h, m, be))
+        g.update(posterior(h, m, be))
     segs, tested = segments(signals)
     move, calib, luck = price_move(signals), calibration(signals), luck_and_risk(bets)
     reg = regime(signals)
     return {'regime': reg, 'bot_confidence': bot_confidence(signals), 'next_goal': next_goal(signals), 'segments': segs[:40], 'segments_tested': tested, 'price_move': move, 'calibration': calib, 'luck': luck,
             'narrative': narrative(accuracy, segs, tested, move, calib, luck, min_settled, reg),
-            'method': {'prior_weight': PRIOR_WEIGHT, 'min_segment': MIN_SEGMENT, 'hint_at': HINT_AT}}
+            'method': {'prior_weight': PRIOR_WEIGHT, 'odds_loss': ODDS_LOSS, 'one_vote_per_match': True, 'min_segment': MIN_SEGMENT, 'hint_at': HINT_AT}}

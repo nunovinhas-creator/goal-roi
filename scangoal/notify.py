@@ -43,6 +43,10 @@ def pct(v):
     return '—' if v is None else ('%.0f %%' % (v * 100))
 
 
+def pts(v):
+    return '—' if v is None else ('%+.0f' % (v * 100))
+
+
 def dec(v):
     return ('%+.2f' % v).replace('.', ',')
 
@@ -61,9 +65,12 @@ def messages(report, state, now):
             continue
         sent.add(key)
         r = w['reasons'][0]
-        fresh.append('A seguir: %s\n%s%s\nEncaixa em: %s (%s em %d resultados, %s)\nÉ um indício para observar, não uma recomendação.'
+        ci = r.get('edge_ci')
+        edge = ('\nVantagem estimada: %s pontos (entre %s e %s). Com 2 %% de perda de odd, probabilidade de continuar acima do necessário: %s.'
+                % (pts(r.get('edge')), pts(ci[0]), pts(ci[1]), pct(r.get('prob_above_cut')))) if ci else ''
+        fresh.append('A seguir: %s\n%s%s\nEncaixa em: %s (%s em %d resultados, %s)%s\nÉ um indício para observar, não uma recomendação.'
                      % (w.get('match') or 'Jogo', w.get('selection') or 'mais um golo', (' @ ' + str(w['odds']).replace('.', ',')) if w.get('odds') else '',
-                        r['id'], pct(r['hit_rate']), r['n'], r['status']))
+                        r['id'], pct(r['hit_rate']), r['n'], r['status'], edge))
     out += fresh
     state['watch_sent'] = sorted(sent)[-400:]
     old, new = state.get('statuses'), brain.get('status_list') or {}

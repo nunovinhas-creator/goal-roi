@@ -7,11 +7,15 @@ Disciplina (fixada a 12/11/2026):
 - O registo (data/hypotheses.json) só cresce; uma hipótese nunca é apagada nem reescrita.
 - Estados: em observação (<30 resultados); promissora (>=30 e prob. >= 95 %, sem correção: pode ser acaso);
   forte (>=100 e prob. corrigida pelo número de hipóteses testadas); confirmada (>=300, idem); abandonada (>=30 e prob. <= 10 %).
+- A evidência conta um voto por jogo (insights.Votes): sinais repetidos no mesmo jogo não a fazem crescer.
+- "Acrescenta ao tipo" (prob_adds): probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo.
+  Só informa; não muda o estado.
+- "Seguir o cérebro" (walk_forward): cada aposta é decidida só com os resultados que já se conheciam nesse momento.
 - Características que só se conhecem depois do primeiro sinal (reforço, movimento da odd...) tornam a hipótese
   "informativa": explica, mas não dá para apostar no momento do sinal, e não entra na lista "a seguir".
 """
 import itertools, json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from . import insights
 from .parser import competition_kind
@@ -20,6 +24,8 @@ MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser regist
 MAX_HYPOTHESES = 300
 HINT_AT, STRONG_AT = 30, 100
 BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de resultados e limiares de probabilidade
+KNOWN_AFTER_MIN = 150    # um resultado considera-se conhecido 150 minutos depois do início do jogo (ou do sinal, se for ao vivo)
+TRACK_MIN = 10           # resultados para uma hipótese entrar no balanço das propostas
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
 
 
@@ -123,9 +129,11 @@ def evaluate(signals, registry, min_settled):
     rows = []
     for hid, h in registry.items():
         conds = {tuple(c) for c in h['conditions']}
-        match = [b for b, fam, at in have if fam == h['family'] and conds <= at and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
+        pool = [(b, at) for b, fam, at in have if fam == h['family'] and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
+        match = [b for b, at in pool if conds <= at]
         s = insights.summarize(match)
-        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'), expect=h.get('expect'),
+        s['prob_adds'] = insights.prob_better(match, [b for b, at in pool if not conds <= at]) if conds else None
+        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
                          tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')]))
     tested = sum(1 for r in rows if r['n'] >= HINT_AT)
     bar = 1 - 0.05 / max(1, tested)
@@ -160,6 +168,7 @@ def board(rows, now=None, family_n=None):
     def card(r):
         return {'id': r['id'], 'family': r['family'], 'conditions': [] if r.get('whole') else r['conditions'], 'n': r['n'], 'hits': r['hits'], 'hit_rate': r['hit_rate'],
                 'break_even': r['break_even'], 'prob_above': r['prob_above'], 'roi': r['roi'], 'source': r['source'], 'reason': r.get('reason'),
+                'games': r.get('games'), 'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'), 'prob_adds': None if r.get('whole') else r.get('prob_adds'),
                 'level': r['status'] if r['status'] != 'em observação' else 'indício inicial', 'missing': max(0, HINT_AT - r['n'])}
 
     best = pick(sorted((r for r in cand if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada'), key=lambda r: (-r['prob_above'], -r['n'])), 5)
@@ -194,12 +203,15 @@ def build(signals, registry, min_settled):
         for b in r['open']:
             w = watch.setdefault(b['key'], {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'type': b['type'], 'market': b['market'],
                                             'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'reasons': []})
-            w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above']})
+            w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
+                                 'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut')})
     for r in rows:
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
     return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd,
-            'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect')}
+            'track': track_record(rows), 'walk_forward': walk_forward(signals, registry),
+            'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
+                                                                                                    'games', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds')}
                     for r in rows if r['n'] >= 5][:150],
             'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
             'abandoned': [r for r in rows if r['status'] == 'abandonada'][:10],
@@ -207,6 +219,93 @@ def build(signals, registry, min_settled):
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
             'rules': {'min_support': MIN_SUPPORT, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
+
+
+def track_record(rows):
+    """Balanço do processo de descoberta: das hipóteses com 10 ou mais resultados, quantas foram no sentido esperado, por origem.
+
+    As do modelo de linguagem só contam resultados posteriores à proposta; as do gerador servem de termo de comparação.
+    """
+    groups, worked, failed = {}, [], []
+    for r in rows:
+        if not r['conditions']:
+            continue
+        key = 'gerador' if r['source'] == 'gerador' else '%s/%s' % (r['source'], r.get('mode') or 'novas')
+        g = groups.setdefault(key, {'hypotheses': 0, 'judged': 0, 'as_expected': 0})
+        g['hypotheses'] += 1
+        if r['n'] < TRACK_MIN or r['prob_above'] is None:
+            continue
+        ok = (r['prob_above'] < 0.5) if r.get('expect') == 'abaixo' else (r['prob_above'] > 0.5)
+        g['judged'] += 1
+        g['as_expected'] += ok
+        if r['source'] == 'llm':
+            (worked if ok else failed).append({k: r.get(k) for k in ('id', 'n', 'hit_rate', 'break_even', 'prob_above', 'expect')})
+    llm = [g for k, g in groups.items() if k.startswith('llm')]
+    return {'by_source': groups, 'min_results': TRACK_MIN, 'llm_judged': sum(g['judged'] for g in llm), 'llm_as_expected': sum(g['as_expected'] for g in llm),
+            'worked': sorted(worked, key=lambda r: -r['n'])[:6], 'failed': sorted(failed, key=lambda r: -r['n'])[:6]}
+
+
+def known_at(b):
+    """Momento a partir do qual o resultado de um sinal se considera conhecido."""
+    ref = datetime.fromisoformat(b['date_utc'])
+    if b.get('kickoff_utc'):
+        ko = datetime.fromisoformat(b['kickoff_utc'])
+        ref = max(ref, ko if ko.tzinfo else ko.replace(tzinfo=timezone.utc))
+    return ref + timedelta(minutes=KNOWN_AFTER_MIN)
+
+
+def walk_forward(signals, registry):
+    """E se tivesse seguido o quadro em destaque desde o início? Sem olhar para o futuro.
+
+    Para cada sinal com odd e origem provada, por ordem: segue-se o sinal se, só com os resultados já conhecidos nesse momento,
+    alguma tática apostável tinha pelo menos BOARD_MIN resultados e probabilidade >= BOARD_GOOD (a regra do quadro).
+    Compara os sinais seguidos com os não seguidos: se o cérebro acrescenta alguma coisa, os seguidos têm de render mais.
+    """
+    multi, earlier = multi_matches(signals), earlier_index(signals)
+    hyps = [(hid, h['family'], {tuple(c) for c in h['conditions']}, None if h.get('source') == 'gerador' else h['born_utc'])
+            for hid, h in registry.items() if h['conditions'] and not any(c[0] in POST for c in h['conditions'])]
+    fits = {}
+    for b in signals:
+        fam, at = insights.family(b), set(atoms(b, multi, earlier))
+        fits[id(b)] = [i for i, (_, f, conds, born) in enumerate(hyps) if f == fam and conds <= at and (born is None or b['date_utc'] > born)]
+    results = sorted((b for b in signals if b['w'] is not None and b['w'] != 0), key=known_at)
+    votes, counts, pos = [insights.Votes() for _ in hyps], [0] * len(hyps), 0
+    sides = {True: [], False: []}
+    for b in sorted(signals, key=lambda b: b['date_utc']):
+        if not b.get('odds') or b.get('market') is None or not b.get('in_roi', True):
+            continue
+        when = datetime.fromisoformat(b['date_utc'])
+        while pos < len(results) and known_at(results[pos]) <= when:
+            for i in fits[id(results[pos])]:
+                votes[i].add(results[pos])
+                counts[i] += 1
+            pos += 1
+        follow = False
+        for i in fits[id(b)]:
+            if counts[i] >= BOARD_MIN:
+                h, m, be, _ = votes[i].totals()
+                if (insights.evidence(h, m, be)['prob_above'] or 0) >= BOARD_GOOD:
+                    follow = True
+                    break
+        sides[follow].append(b)
+
+    def side(rows):
+        done = [b for b in rows if b['w'] is not None]
+        pl = lambda b, cut: b['w'] * (b['odds'] * (1 - cut) - 1) if b['w'] > 0 else b['w']
+        units = sum(pl(b, 0.0) for b in done)
+        return {'bets': len(rows), 'settled': len(done), 'games': len({b['match_id'] for b in done}), 'wins': sum(1 for b in done if b['w'] > 0),
+                'units': round(units, 2), 'roi': round(units / len(done), 4) if done else None,
+                'roi_cut': round(sum(pl(b, insights.ODDS_LOSS) for b in done) / len(done), 4) if done else None}
+
+    curve, total = [], 0.0
+    for b in sides[True]:
+        if b['w'] is not None:
+            total += b['w'] * (b['odds'] - 1) if b['w'] > 0 else b['w']
+            curve.append(round(total, 2))
+    return {'followed': side(sides[True]), 'skipped': side(sides[False]), 'curve': curve[-400:],
+            'prob_followed_better': insights.prob_better(sides[True], sides[False]),
+            'first_followed_utc': sides[True][0]['date_utc'] if sides[True] else None,
+            'rule': {'min_results': BOARD_MIN, 'min_prob': BOARD_GOOD, 'known_after_min': KNOWN_AFTER_MIN}}
 
 
 def entry_points(signals):

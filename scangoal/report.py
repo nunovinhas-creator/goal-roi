@@ -250,11 +250,12 @@ def accuracy(signals):
         done = [r for r in rows if r['w'] is not None]
         hits, miss = sum(1 for r in done if r['w'] > 0), sum(1 for r in done if r['w'] < 0)
         eh, em = insights.effective(done)   # meia vitória = meio acerto; meia derrota = meia falha
+        vh, vm, vbe, games = insights.clustered(done)   # um voto por jogo, para a evidência
         priced = [r for r in done if r['odds'] and r['w'] != 0]
         no_odds = [r for r in done if not r['odds'] and r.get('minute') is not None]
         base = round(sum(r['usual_prob'] / 100 if r.get('usual_prob') else baseline_more_goals(r['minute']) for r in no_odds) / len(no_odds), 4) if no_odds and not priced else None
         out[name] = {'signals': len(rows), 'with_result': len(done), 'hits': hits, 'misses': miss, 'pushes': len(done) - hits - miss,
-                     'eff_hits': eh, 'eff_misses': em, 'no_source': sum(1 for r in rows if r['no_source']),
+                     'eff_hits': eh, 'eff_misses': em, 'vote_hits': round(vh, 2), 'vote_misses': round(vm, 2), 'vote_break_even': round(vbe, 4) if vbe else None, 'games': games, 'no_source': sum(1 for r in rows if r['no_source']),
                      'unsettleable': sum(1 for r in rows if r['ft'] and r['w'] is None),
                      'hit_rate': round(eh / (eh + em), 4) if eh + em else None, 'ci95': wilson(eh, eh + em),
                      'avg_odds': round(sum(r['odds'] for r in priced) / len(priced), 3) if priced else None,

@@ -858,6 +858,75 @@ class Insights(unittest.TestCase):
         self.assertEqual(ins['segments'], [])                                                                   # abaixo de 10 resultados por segmento
 
 
+class EvidencePerMatch(unittest.TestCase):
+    def row(self, match, w, odds=2.0, day=1, hour=10, typ='OPEN_GAME'):
+        d = '2026-11-%02dT%02d:00:00+00:00' % (day, hour)
+        return {'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5', 'date_utc': d,
+                'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True, 'key': (match, d),
+                'n_signals': 1, 'max_mult': 1, 'no_source': False}
+
+    def test_signals_in_the_same_match_share_one_vote(self):
+        from scangoal.insights import clustered, summarize
+        same = [self.row('m1', 1.0), self.row('m1', 1.0), self.row('m1', 1.0), self.row('m2', -1.0)]
+        self.assertEqual(clustered(same), (1.0, 1.0, 0.5, 2))                      # três acertos no mesmo jogo contam um
+        spread = [self.row('a', 1.0), self.row('b', 1.0), self.row('c', 1.0), self.row('d', -1.0)]
+        self.assertGreater(summarize(spread)['prob_above'], summarize(same)['prob_above'])
+        self.assertEqual(summarize(same)['hits'], 3)                                # o acerto mostrado continua a contar cada sinal
+        mixed = clustered([self.row('m', 1.0), self.row('m', -1.0)])
+        self.assertEqual(mixed[:2], (0.5, 0.5))
+
+    def test_posterior_gives_an_interval_and_the_odds_loss_makes_it_harder(self):
+        from scangoal.insights import evidence, posterior
+        p = posterior(30, 10, 0.5)
+        self.assertLess(p['edge_ci'][0], p['edge'])
+        self.assertGreater(p['edge_ci'][1], p['edge'])
+        self.assertLess(p['prob_above_cut'], evidence(30, 10, 0.5)['prob_above'])
+        self.assertEqual(posterior(0, 0, 0.5)['edge'], 0.0)                         # sem dados: sem vantagem
+        self.assertIsNone(posterior(3, 1, None)['edge_ci'])
+
+    def test_prob_better_needs_five_matches_on_each_side(self):
+        from scangoal.insights import prob_better
+        good = [self.row('g%d' % i, 1.0) for i in range(12)]
+        bad = [self.row('b%d' % i, -1.0) for i in range(12)]
+        self.assertGreater(prob_better(good, bad), 0.95)
+        self.assertLess(prob_better(bad, good), 0.05)
+        self.assertIsNone(prob_better(good, bad[:4]))
+
+    def test_walk_forward_never_uses_results_from_the_future(self):
+        from scangoal import brain
+        reg = {'h': {'family': 'Jogo aberto', 'conditions': [['Minuto', '31 a 60']], 'born_utc': '2026-01-01T00:00:00+00:00', 'source': 'gerador'}}
+        early = [self.row('m%d' % i, 1.0, day=1, hour=10) for i in range(10)]       # dez acertos, todos à mesma hora
+        wf = brain.walk_forward(early, reg)
+        self.assertEqual(wf['followed']['bets'], 0)                                 # nenhum resultado era conhecido quando os sinais saíram
+        self.assertEqual(wf['skipped']['bets'], 10)
+        late = [self.row('n%d' % i, -1.0, day=2, hour=10) for i in range(3)]        # no dia seguinte os dez acertos já se conhecem
+        wf = brain.walk_forward(early + late, reg)
+        self.assertEqual((wf['followed']['bets'], wf['followed']['wins'], wf['followed']['units']), (3, 0, -3.0))
+        self.assertEqual(wf['curve'], [-1.0, -2.0, -3.0])
+        soon = [self.row('s', 1.0, day=1, hour=12)]                                 # duas horas depois: ainda não passaram os 150 minutos
+        self.assertEqual(brain.walk_forward(early + soon, reg)['followed']['bets'], 0)
+        llm = {'h': dict(reg['h'], source='llm', born_utc='2026-11-01T12:00:00+00:00')}
+        self.assertEqual(brain.walk_forward(early + late, llm)['followed']['bets'], 0)   # proposta do modelo: os acertos anteriores não contam
+
+    def test_track_record_counts_proposals_in_the_expected_direction(self):
+        from scangoal import brain
+        row = lambda source, prob, expect=None, n=12, mode=None: {'conditions': [['Minuto', 'x']], 'source': source, 'mode': mode, 'n': n, 'prob_above': prob,
+                                                                    'expect': expect, 'id': 'h', 'hit_rate': 0.5, 'break_even': 0.5}
+        t = brain.track_record([row('llm', 0.9, 'acima', mode='novas'), row('llm', 0.9, 'abaixo', mode='evitar'), row('llm', 0.2, 'abaixo', mode='evitar'),
+                                row('llm', 0.99, 'acima', n=4), row('gerador', 0.7)])
+        self.assertEqual((t['llm_judged'], t['llm_as_expected']), (3, 2))           # a de 4 resultados ainda não é julgada
+        self.assertEqual((len(t['worked']), len(t['failed'])), (2, 1))
+        self.assertEqual(t['by_source']['gerador'], {'hypotheses': 1, 'judged': 1, 'as_expected': 1})
+
+    def test_prompt_carries_the_track_record_only_when_there_is_one(self):
+        from scangoal import llm
+        track = {'llm_judged': 3, 'llm_as_expected': 2, 'min_results': 10, 'worked': [{'id': 'Betfair | Seleção = empate', 'n': 12, 'hit_rate': 0.6, 'break_even': 0.4}], 'failed': []}
+        text = llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), track)
+        self.assertIn('2 de 3 foram no sentido esperado', text)
+        self.assertIn('Betfair | Seleção = empate -> 12 resultados', text)
+        self.assertNotIn('Balanço', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm_judged': 0}))
+
+
 class Store(unittest.TestCase):
     def test_append_only_versions(self):
         with tempfile.TemporaryDirectory() as d:

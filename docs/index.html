@@ -168,7 +168,10 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note" id="brainnote"></p>
 <p class="note">Clica no título de uma coluna para ordenar; clica outra vez para inverter.</p>
 <div class="facts" id="braincounts"></div>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table><button type="button" class="more" id="hypsmore" hidden></button></div>
+<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>Vantagem em pontos (intervalo de 90 %)</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table><button type="button" class="more" id="hypsmore" hidden></button></div>
+<h3 class="sub">Seguir o cérebro teria compensado?</h3>
+<p class="note" id="wfnote"></p>
+<div class="panel wrap"><table><thead><tr><th style="text-align:left">Sinais com odd</th><th>Apostas</th><th>Com resultado</th><th>Ganhas</th><th>Saldo</th><th>ROI</th><th>ROI com odd −2 %</th></tr></thead><tbody id="wf"></tbody></table></div>
 <h3 class="sub">Notas do investigador</h3>
 <p class="note">Observações escritas pelo modelo de linguagem sobre uma hipótese concreta. O texto é opinião do modelo; os números ao lado vêm dos dados.</p>
 <div class="panel" id="notes"></div>
@@ -225,6 +228,7 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs={},text)=>{const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e};
 const sv=(tag,attrs={})=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e};
+const pts=v=>(v>0?'+':v<0?'−':'')+Math.abs(v*100).toFixed(0), edgeText=h=>h.edge_ci?`${pts(h.edge)} pontos (entre ${pts(h.edge_ci[0])} e ${pts(h.edge_ci[1])})`:'—';
 const pct=(v,d=0)=>(v*100).toFixed(d).replace('.',',')+' %', num=v=>v==null?'—':String(v).replace('.',','), cls=v=>v>0?'pos':v<0?'neg':'';
 const sign=v=>(v>0?'+':'')+num(v), hitsOf=(h,n)=>`${h} ${h===1?'acerto':'acertos'} em ${n}`;
 const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resultado (1X2) que está a receber volume fora do normal'],
@@ -387,8 +391,8 @@ function boardUI(d){
   const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
   const name=h=>h.conditions.length?`${h.family} · ${h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')}`:`${h.family} · todos os sinais deste tipo`;
   const item=(h,bad)=>{const li=el('li');li.append(el('b',{},name(h)),chip(bad?'bad':LV[h.level],bad?'A evitar':h.level[0].toUpperCase()+h.level.slice(1)));
-    li.appendChild(el('span',{class:'why'},`${hitsOf(h.hits,h.n)}; a odd exige ${pct(h.break_even)}. ROI ${pct(h.roi,1)}.`+(h.missing?` Faltam ${h.missing} resultados para deixar de ser só um indício.`:'')+(h.source==='llm'?' Proposta pelo modelo de linguagem.':'')));return li};
-  $('boardnote').textContent=`As táticas com melhor evidência entre as ${d.brain.hypotheses} que o cérebro e o modelo de linguagem estão a testar, com pelo menos ${B.min_results} resultados. Com tantas em teste, algumas parecem boas só por acaso: abaixo de ${B.hint_at} resultados são indícios, não conclusões.`;
+    li.appendChild(el('span',{class:'why'},`${hitsOf(h.hits,h.n)}; a odd exige ${pct(h.break_even)}. ROI ${pct(h.roi,1)}.`+(h.edge_ci?` Vantagem estimada: ${edgeText(h)}; com 2 % de perda de odd, ${pct(h.prob_above_cut)} de probabilidade de continuar acima do necessário.`:'')+(h.prob_adds!=null?` Probabilidade de render mais do que os restantes sinais do mesmo tipo: ${pct(h.prob_adds)}.`:'')+(h.missing?` Faltam ${h.missing} resultados para deixar de ser só um indício.`:'')+(h.source==='llm'?' Proposta pelo modelo de linguagem.':'')));return li};
+  $('boardnote').textContent=`As táticas com melhor evidência entre as ${d.brain.hypotheses} que o cérebro e o modelo de linguagem estão a testar, com pelo menos ${B.min_results} resultados. Com tantas em teste, algumas parecem boas só por acaso: abaixo de ${B.hint_at} resultados são indícios, não conclusões. A evidência conta um voto por jogo: vários sinais no mesmo jogo não a fazem crescer.`;
   for(const h of B.best)$('best').appendChild(item(h,false));
   if(!B.best.length){$('best').remove();$('boardh').after(el('p',{},'Ainda nenhuma tática tem evidência suficiente para aparecer aqui. As primeiras devem surgir com mais um ou dois dias de resultados.'))}
   for(const h of B.avoid)$('avoid').appendChild(item(h,true));
@@ -406,14 +410,14 @@ function brainUI(d){
   const ST={'em observação':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
   for(const k of ['em observação','promissora','forte','confirmada','abandonada']){const s=el('span');s.append(el('b',{},String(B.counts[k]||0)),document.createTextNode(' '+(k==='em observação'?'em observação':(B.counts[k]===1?k:k+'s'))));$('braincounts').appendChild(s)}
   const RANK={'confirmada':5,'forte':4,'promissora':3,'em observação':2,'abandonada':1};
-  const COLS=[null,null,h=>h.n,h=>h.hit_rate,h=>h.break_even,h=>h.prob_above,h=>h.roi,h=>RANK[h.status]];
+  const COLS=[null,null,h=>h.n,h=>h.hit_rate,h=>h.break_even,h=>h.prob_above,h=>h.edge,h=>h.roi,h=>RANK[h.status]];
   let sortCol=5, sortDir=-1, showAll=false;
   const ths=[...$('hyps').parentElement.querySelectorAll('thead th')];
   const drawH=()=>{const body=$('hyps');body.textContent='';
     const rows=B.top.slice().sort((x,y)=>{const a=COLS[sortCol](x),b=COLS[sortCol](y);return ((a==null)-(b==null))||sortDir*((a>b)-(a<b))||(y.n-x.n)});
     for(const h of rows.slice(0,showAll?1e9:25)){const tr=el('tr');td(tr,h.family,'l');
       td(tr,h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')+(h.tradable?'':' (informativa: só se sabe depois do sinal)'),'l');
-      td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');
+      td(tr,h.n);td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');td(tr,edgeText(h),h.edge_ci?(h.edge_ci[0]>0?'pos':h.edge_ci[1]<0?'neg':''):'mut');
       td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));body.appendChild(tr)}
     ths.forEach((th,i)=>{if(COLS[i])th.setAttribute('aria-sort',i===sortCol?(sortDir<0?'descending':'ascending'):'none')});
     $('hypsmore').hidden=showAll||rows.length<=25;$('hypsmore').textContent=`Mostrar as ${rows.length} hipóteses`};
@@ -421,9 +425,12 @@ function brainUI(d){
     btn.addEventListener('click',()=>{if(sortCol===i)sortDir=-sortDir;else{sortCol=i;sortDir=-1}drawH()})});
   $('hypsmore').addEventListener('click',()=>{showAll=true;drawH()});
   if(B.top.length)drawH();else $('hypsmore').hidden=true;
-  if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=8;$('hyps').appendChild(tr)}
-const T=B.llm_today||{};
-  $('llmnote').textContent=B.llm_runs?`De hora a hora, um modelo de linguagem lê os números e alterna entre propor hipóteses novas, refinar as melhores, apontar situações a evitar e escrever notas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}. Hoje: ${T.calls_today||0} ${T.calls_today===1?'chamada':'chamadas'}, cerca de ${num(Math.round(T.neurons_today||0))} de 10 000 neurónios gratuitos.`:'De hora a hora, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
+  if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=9;$('hyps').appendChild(tr)}
+const WF=B.walk_forward;
+  if(WF){$('wfnote').textContent=`Cada sinal é decidido só com os resultados que já se conheciam nesse momento (um resultado conta ${WF.rule.known_after_min} minutos depois do início do jogo). Segue-se o sinal quando encaixa numa tática apostável que, nessa altura, já tinha ${WF.rule.min_results} resultados e ${pct(WF.rule.min_prob)} de probabilidade de estar acima do necessário. Se o cérebro acrescenta alguma coisa, os sinais seguidos têm de render mais do que os outros.`+(WF.prob_followed_better!=null?` Probabilidade de os seguidos terem mais vantagem do que os não seguidos: ${pct(WF.prob_followed_better)}.`:'')+(WF.followed.settled<30?` Com ${WF.followed.settled} resultados seguidos, ainda é só um indício.`:'');
+    for(const [name,g] of [['Seguidos pelo cérebro',WF.followed],['Não seguidos',WF.skipped]]){const tr=el('tr');td(tr,name,'l');td(tr,g.bets);td(tr,g.settled);td(tr,g.wins);td(tr,g.settled?num(g.units)+' un.':'—',g.settled?cls(g.units):'mut');td(tr,g.roi!=null?pct(g.roi,1):'—',g.roi==null?'mut':cls(g.roi));td(tr,g.roi_cut!=null?pct(g.roi_cut,1):'—',g.roi_cut==null?'mut':cls(g.roi_cut));$('wf').appendChild(tr)}}
+  const T=B.llm_today||{}, TR=B.track||{};
+  $('llmnote').textContent=B.llm_runs?`De hora a hora, um modelo de linguagem lê os números e alterna entre propor hipóteses novas, refinar as melhores, apontar situações a evitar e escrever notas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}. Hoje: ${T.calls_today||0} ${T.calls_today===1?'chamada':'chamadas'}, cerca de ${num(Math.round(T.neurons_today||0))} de 10 000 neurónios gratuitos.`+(TR.llm_judged?` Das propostas com ${TR.min_results} ou mais resultados novos, ${TR.llm_as_expected} de ${TR.llm_judged} foram no sentido esperado; o modelo recebe este balanço antes de propor mais.`:` Quando as propostas tiverem ${TR.min_results||10} resultados novos, o modelo passa a receber o balanço do que se confirmou e do que falhou.`):'De hora a hora, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
   for(const n of B.notes||[]){const p=el('p');p.append(el('b',{},n.id.replace(' | ',': ')),document.createTextNode(` (${hitsOf(n.hits,n.n)}, precisa de ${n.break_even!=null?pct(n.break_even):'—'}). ${n.note}`));$('notes').appendChild(p)}
   if(!(B.notes||[]).length)$('notes').appendChild(el('p',{class:'note'},'Ainda sem notas. A primeira aparece na próxima ronda de notas do modelo.'));
   for(const h of B.llm||[]){const tr=el('tr');td(tr,h.family,'l');const c=td(tr,'','l');c.append(el('b',{},h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')));if(h.reason)c.append(el('br'),document.createTextNode(h.reason));
