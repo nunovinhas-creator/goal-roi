@@ -1582,6 +1582,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Quota de mercado = 80 % ou mais & Tamanho do mercado = 10 mil $ ou mais": {
+  "born_utc": "2026-11-12T19:27:23+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ],
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercado confiante com volume alto",
+  "source": "llm"
+ },
  "Betfair | Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
