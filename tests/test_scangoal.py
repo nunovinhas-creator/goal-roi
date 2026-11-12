@@ -611,10 +611,49 @@ class LanguageModel(Hardening):
                 reg = json.loads((Path(d) / 'hypotheses.json').read_text(encoding='utf-8'))
                 h = reg['Betfair | Momento = durante o jogo & Seleção = empate']
                 self.assertEqual((h['source'], h['born_utc']), ('llm', '2026-11-12T12:00:00+00:00'))
-                llm.run(call, now + timedelta(hours=3), self.ENV)
-                self.assertEqual(len(calls), 2)                                                          # uma vez por dia
+                llm.run(call, now + timedelta(minutes=30), self.ENV)
+                self.assertEqual(len(calls), 2)                                                          # no máximo de hora a hora
                 r = report.build()
                 self.assertEqual((r['brain']['llm_total'], r['brain']['llm'][0]['n'], r['brain']['llm_runs']), (1, 0, 1))   # sinais anteriores não contam
+                self.assertEqual((st['last_mode'], st['calls_today'], st['neurons_today'] > 0), ('novas', 1, True))
+            finally:
+                del os.environ['SCANGOAL_DATA_DIR']
+
+    def test_modes_rotate_notes_are_anchored_and_budget_stops_the_day(self):
+        from scangoal import llm, report
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        prompts = []
+        def call(account, key, model, prompt):
+            prompts.append(prompt)
+            if '"notes"' in prompt:
+                return '{"notes":[{"id":"Betfair | Seleção = empate","note":"Amostra pequena <b>ainda</b>"},{"id":"inventada","note":"x"}]}', {'prompt_tokens': 1000, 'completion_tokens': 100}
+            return '{"hypotheses":[{"family":"Betfair","conditions":[["Seleção","equipa da casa"]],"reason":"sem sinais assim"}]}', {'prompt_tokens': 1000, 'completion_tokens': 100}
+        with tempfile.TemporaryDirectory() as d:
+            os.environ['SCANGOAL_DATA_DIR'] = d
+            try:
+                rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                rows += [self.row(i, live[i] + '\n\n🏁 FT 1:1', '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                store.append_versions(rows)
+                report.build(register=True)                                                             # o gerador regista "Seleção = empate"
+                t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
+                for k in range(4):
+                    st = llm.run(call, t0 + timedelta(hours=k), self.ENV)
+                    modes.append(st['last_mode'])
+                self.assertEqual(modes, ['novas', 'refinar', 'evitar', 'notas'])
+                self.assertEqual((st['accepted'], st['rejected']), (0, 3))                              # nenhum sinal na equipa da casa: rejeitadas
+                self.assertIn('ABAIXO', prompts[2])
+                notes = json.loads((Path(d) / 'llm_notes.json').read_text(encoding='utf-8'))
+                self.assertEqual([(n['id'], n['note']) for n in notes], [('Betfair | Seleção = empate', 'Amostra pequena bainda/b')])   # só a nota ancorada, texto limpo
+                r = report.build()
+                self.assertEqual((r['brain']['notes'][0]['n'], r['brain']['notes'][0]['hits']), (9, 9))  # números vêm dos dados
+                self.assertAlmostEqual(st['neurons_today'], 4 * (1000 * 26668 + 100 * 204805) / 1e6, places=0)
+                state = json.loads((Path(d) / 'llm_state.json').read_text())
+                state['neurons_today'] = 8000
+                (Path(d) / 'llm_state.json').write_text(json.dumps(state))
+                llm.run(call, t0 + timedelta(hours=5), self.ENV)
+                self.assertEqual(len(prompts), 4)                                                       # orçamento do dia esgotado: não chama
+                llm.run(call, t0 + timedelta(hours=24), self.ENV)
+                self.assertEqual(len(prompts), 5)                                                       # dia novo: volta a chamar
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
 
