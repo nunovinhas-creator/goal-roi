@@ -70,12 +70,34 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: python -u -m scangoal.notify --failure
-      # O agendamento do GitHub não dispara neste repositório. Cada execução espera e lança a seguinte (permitido ao GITHUB_TOKEN
+      # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
+      # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
+      - name: Fast reads every 2 minutes until the next collection (read-only)
+        id: fast
+        if: ${{ !cancelled() && github.ref_name == 'main' }}
+        continue-on-error: true
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION: ${{ secrets.TG_SESSION }}
+          TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
+      - name: Commit data from the fast reads
+        if: ${{ !cancelled() && github.ref_name == 'main' }}
+        continue-on-error: true
+        run: |
+          git add data docs/report.json docs/bets.csv
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
+          git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+      # O agendamento do GitHub não dispara neste repositório. Cada execução lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
-      - name: Wait, then start the next collection
+      - name: Start the next collection
         if: ${{ !cancelled() && github.ref_name == 'main' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          sleep 480
+          if [ "${{ steps.fast.outcome }}" = "skipped" ]; then sleep 480; fi
           gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main

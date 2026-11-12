@@ -952,6 +952,37 @@ class EvidencePerMatch(unittest.TestCase):
         self.assertNotIn('Balanço', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm_judged': 0}))
 
 
+class FastReads(unittest.TestCase):
+    def run_rounds(self, results, total=480, every=120):
+        import asyncio
+        from scangoal import watch
+        t, calls, fresh = [0.0], [], []
+
+        async def sleep(sec):
+            t[0] += sec
+
+        async def read():
+            calls.append(t[0])
+            r = results[len(calls) - 1] if len(calls) <= len(results) else 0
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+        done = asyncio.run(watch.rounds(read, lambda: fresh.append(t[0]), sleep, lambda: t[0], total, every))
+        return done, calls, fresh
+
+    def test_reads_every_two_minutes_and_reports_only_when_there_is_something_new(self):
+        done, calls, fresh = self.run_rounds([0, 3, 0, 1])
+        self.assertEqual((done, calls), (4, [120.0, 240.0, 360.0, 480.0]))
+        self.assertEqual(fresh, [240.0, 480.0])                                     # sem mensagens novas: nem relatório nem avisos
+
+    def test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop(self):
+        done, calls, _ = self.run_rounds([RuntimeError('x'), 2, 0, 0])
+        self.assertEqual((done, len(calls)), (3, 4))
+        done, calls, _ = self.run_rounds([0, RuntimeError('x'), RuntimeError('y'), 5])
+        self.assertEqual((done, len(calls)), (1, 3))                                # pára de ler; quem chama espera o resto do tempo
+
+
 class Store(unittest.TestCase):
     def test_append_only_versions(self):
         with tempfile.TemporaryDirectory() as d:

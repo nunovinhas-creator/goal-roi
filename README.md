@@ -116,7 +116,13 @@ Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas li
 - `data/manual_results.json` aceita resultados revistos à mão: `{"<id do jogo>": {"ft": [casa, fora], "source": "onde foi visto"}}`. Só entram quando nenhuma outra fonte tem o jogo; divergências são contadas.
 
 ## Recolha
-O agendamento do GitHub não dispara neste repositório. Cada execução espera 8 minutos e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
+O agendamento do GitHub não dispara neste repositório. Cada execução faz a recolha completa, depois passa 8 minutos em leitura rápida e lança a seguinte. Para parar, cancela a execução em curso; para retomar, usa "Run workflow". A opção "force_results" consulta já as fontes de resultados (gasta quota).
+
+### Leitura rápida (`scangoal/watch.py`)
+- Nos 8 minutos entre recolhas, relê as últimas 40 mensagens do bot de 2 em 2 minutos, com uma só ligação ao Telegram mantida aberta.
+- Quando há mensagens novas, refaz o relatório e envia os avisos; assim um alerta de um sinal ao vivo chega em cerca de 2 a 3 minutos em vez de 10.
+- Só leitura. Perante um erro ou um pedido do Telegram para esperar, pára de ler e aguarda o resto do tempo; duas leituras falhadas seguidas param o ciclo. Nunca falha a execução.
+- Ajustes por variável de ambiente: `WATCH_SECONDS` (480), `WATCH_INTERVAL` (120), `WATCH_RECENT` (40).
 
 ## Página
 GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `docs/report.json`, atualizado a cada recolha.

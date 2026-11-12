@@ -22,16 +22,32 @@ def iso(dt):
     return dt.astimezone(timezone.utc).isoformat(timespec='seconds') if dt else None
 
 
-async def collect():
+def make_client():
     from telethon import TelegramClient
     from telethon.sessions import StringSession
-    from .store import append_versions, data_dir, load_seen
     session = ''.join(os.environ['TG_SESSION'].split())
-    client = TelegramClient(StringSession(session), int(os.environ['TG_API_ID']), os.environ['TG_API_HASH'],
-                            receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1)
+    return TelegramClient(StringSession(session), int(os.environ['TG_API_ID']), os.environ['TG_API_HASH'],
+                          receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1)
+
+
+async def fetch(client, entity, limit, now):
+    """Lê as últimas `limit` mensagens. -> (linhas a guardar, id mais antigo lido, ids presentes)."""
+    rows, oldest, present = [], None, set()
+    async for msg in client.iter_messages(entity, limit=limit):
+        oldest = msg.id
+        present.add(msg.id)
+        if getattr(msg, 'out', False) or not (msg.raw_text or '').strip():
+            continue
+        rows.append({'message_id': msg.id, 'date_utc': iso(msg.date), 'edit_date_utc': iso(getattr(msg, 'edit_date', None)),
+                     'text': msg.raw_text, 'buttons': buttons(msg), 'collected_at_utc': now})
+    return rows, oldest, present
+
+
+async def collect():
+    from .store import append_versions, data_dir, load_seen
+    client = make_client()
     _, last_id = load_seen(data_dir() / 'messages.jsonl')
     now = iso(datetime.now(timezone.utc))
-    rows, oldest, present = [], None, set()
     await asyncio.wait_for(client.connect(), 30)
     try:
         if not await client.is_user_authorized():
@@ -39,13 +55,7 @@ async def collect():
             return 1
         entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         async with asyncio.timeout(150):
-            async for msg in client.iter_messages(entity, limit=RECENT):
-                oldest = msg.id
-                present.add(msg.id)
-                if getattr(msg, 'out', False) or not (msg.raw_text or '').strip():
-                    continue
-                rows.append({'message_id': msg.id, 'date_utc': iso(msg.date), 'edit_date_utc': iso(getattr(msg, 'edit_date', None)),
-                             'text': msg.raw_text, 'buttons': buttons(msg), 'collected_at_utc': now})
+            rows, oldest, present = await fetch(client, entity, RECENT, now)
     finally:
         await client.disconnect()
     # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
