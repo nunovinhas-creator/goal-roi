@@ -77,16 +77,18 @@ def parse(text):
         elif h.startswith('🔥') or h.startswith('🎯'):
             s = re.search(r'💰 O ([\d.]+): ([\d.]+)', text)
             mn = re.search(r"· (\d+)'", lines[1])
-            if s is None and mn:  # sinal sem linha de odd: fica registado, mas não é aposta
-                m.update(type=('OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM') + '_NO_ODDS', minute=int(mn[1]))
-                return m
-            a, b = re.search(r'(\d+)\s*$', lines[2]), re.search(r'(\d+)\s*$', lines[3])
-            m['teams'] = [re.sub(r'\s+\d+\s*$', '', lines[2]).strip(), re.sub(r'\s+\d+\s*$', '', lines[3]).strip()]
-            m.update(type='OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM', phase='live', market='Asian Total',
-                     selection='Over %s' % s[1], odds=float(s[2]), minute=int(mn[1]),
-                     score_at_signal=[int(a[1]), int(b[1])], bet=True)
+            a, b = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]), re.match(r'(.+?)\s+(\d+)\s*$', lines[3])
+            kind = 'OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM'
+            m.update(phase='live', minute=int(mn[1]), teams=[a[1].strip(), b[1].strip()], score_at_signal=[int(a[2]), int(b[2])])
+            if s is None:  # sinal sem linha de odd: mede-se a taxa de acerto, não é aposta
+                m['type'] = kind + '_NO_ODDS'
+            else:
+                m.update(type=kind, market='Asian Total', selection='Over %s' % s[1], odds=float(s[2]), bet=True)
         elif h.startswith('🏁 Full time'):
             m['type'] = 'FULL_TIME_NOTE'
+            n = re.match(r'🏁 Full time: (.+?) (\d+):(\d+) (.+)$', h)
+            if n:
+                m.update(teams=[n[1].strip(), n[4].strip()], ft=[int(n[2]), int(n[3])])
         elif SERVICE.match(h):
             m['type'] = 'SERVICE'
         elif h.startswith('⏳'):
@@ -107,21 +109,32 @@ def _side(token, teams):
     return hits[0] if len(hits) == 1 else None
 
 
+def _quarter(diff, line):
+    """Resultado de uma linha asiática (inteira, meia ou de quarto) para uma margem 'diff' a favor da seleção."""
+    parts = [line] if (line * 2) % 1 == 0 else [line - .25, line + .25]
+    return sum((1 if diff + p > 0 else -1 if diff + p < 0 else 0) for p in parts) / len(parts)
+
+
 def settle(market, selection, ft, teams=None):
-    """Lucro em unidades de (odd-1): 1 ganha, -1 perde, 0 devolve, ±0.5 meia. None = mercado não liquidável aqui."""
+    """Lucro em unidades de (odd-1): 1 ganha, -1 perde, 0 devolve, ±0.5 meia. None = mercado não liquidável pelo resultado final."""
     h, a = ft
-    if market == 'Double Chance':
+    mk = market.strip().lower()
+    if mk == 'asian total':
+        side, line = selection.split()[0], float(selection.split()[1])
+        return _quarter((h + a) if side == 'Over' else -(h + a), -line if side == 'Over' else line)
+    if mk == '1x2':
+        return 1.0 if selection == ('1' if h > a else '2' if a > h else 'X') else -1.0
+    if mk == 'both teams to score':
+        return 1.0 if (selection.strip().lower() == 'yes') == (h > 0 and a > 0) else -1.0
+    if mk == 'double chance':
         sides = [_side(tok, teams) for tok in selection.split(' or ')]
         if len(sides) != 2 or None in sides or sides[0] == sides[1]:
             return None
         return 1.0 if ('1' if h > a else '2' if a > h else 'X') in sides else -1.0
-    if market == 'Asian Total':
-        side, line = selection.split()[0], float(selection.split()[1])
-        parts = [line] if (line * 2) % 1 == 0 else [line - .25, line + .25]
-        sign = 1 if side == 'Over' else -1
-        return sum((1 if (h + a - p) * sign > 0 else -1 if (h + a - p) * sign < 0 else 0) for p in parts) / len(parts)
-    if market == '1X2':
-        return 1.0 if selection == ('1' if h > a else '2' if a > h else 'X') else -1.0
-    if market == 'Both Teams to Score':
-        return 1.0 if (selection == 'Yes') == (h > 0 and a > 0) else -1.0
+    if mk == 'asian handicap':
+        hc = re.match(r'^(.+?) \(([+-]?[\d.]+)\)$', selection.strip())
+        side = _side(hc[1], teams) if hc else None
+        if side not in ('1', '2'):
+            return None
+        return _quarter((h - a) if side == '1' else (a - h), float(hc[2]))
     return None

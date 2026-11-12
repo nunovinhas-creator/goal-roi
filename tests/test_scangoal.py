@@ -71,8 +71,10 @@ class Parser(unittest.TestCase):
         no_odds = OPEN.replace('💰 O 5: 1.81\n', '') + '\n\n🏁 FT 1:8\n⚽  91\'   1 - 8'
         p = parse(no_odds)
         self.assertEqual((p['type'], p['bet'], p['ft'], p['bot_mark']), ('OPEN_GAME_NO_ODDS', False, [1, 8], None))
+        self.assertEqual((p['minute'], p['score_at_signal'], p['teams']), (45, [0, 4], ['Czarni Sosnowiec Women', 'SK Brann Women']))
         self.assertNotIn('error', p)
-        self.assertEqual(parse('🏁 Full time: Liverpool Women 4:1 Aston Villa Women\nWeakened Liverpool Women won.')['type'], 'FULL_TIME_NOTE')
+        note = parse('🏁 Full time: Liverpool Women 4:1 Aston Villa Women\nWeakened Liverpool Women won.')
+        self.assertEqual((note['type'], note['teams'], note['ft']), ('FULL_TIME_NOTE', ['Liverpool Women', 'Aston Villa Women'], [4, 1]))
         for head in ('⭐ Pro is active until 11.12.2026.', '🎁 3 months of Pro for free', '✅ Pro is on.', 'Pro status — 250 ⭐ per 30 days'):
             self.assertEqual((parse(head)['type'], parse(head)['bet']), ('SERVICE', False))
 
@@ -91,6 +93,16 @@ class Settle(unittest.TestCase):
         self.assertEqual(settle('Asian Total', 'Under 3.25', [2, 1]), 0.5)
         self.assertEqual(settle('Asian Total', 'Over 0.75', [0, 0]), -1)
         self.assertEqual(settle('Asian Total', 'Over 1.25', [1, 0]), -0.5)
+
+    def test_asian_handicap_and_market_name_case(self):
+        teams = ['Eintracht Frankfurt Women', 'Psv Women']
+        self.assertEqual(settle('Asian Handicap', 'Eintracht Frankfurt (-1.5)', [2, 1], teams), -1)
+        self.assertEqual(settle('Asian Handicap', 'Eintracht Frankfurt (-1)', [2, 1], teams), 0)
+        self.assertEqual(settle('Asian Handicap', 'Psv (+0.25)', [1, 1], teams), 0.5)
+        self.assertEqual(settle('Asian Handicap', 'Psv (+0.75)', [2, 1], teams), -0.5)
+        self.assertIsNone(settle('Asian Handicap', 'Unknown (-1)', [2, 1], teams))
+        self.assertEqual(settle('Both Teams To Score', 'Yes', [2, 2]), 1)
+        self.assertIsNone(settle('2nd Team to Score', 'Sheffield Wednesday', [0, 4], ['Sheff Wed', 'Accrington']))
 
     def test_other_markets(self):
         self.assertEqual(settle('1X2', 'X', [1, 1]), 1)
@@ -141,6 +153,26 @@ class Report(unittest.TestCase):
         self.assertEqual(r['audit']['edits_changing_signal'], 1)     # a 2.ª versão do Open game mudou a odd
         self.assertEqual(r['groups']['STAKE_LOAD/live']['roi']['odd-0%']['roi'], -1.0)
         self.assertEqual((r['groups']['OPEN_GAME']['wins'], r['groups']['OPEN_GAME']['roi']['odd-0%']['roi']), (1, 0.81))  # odd original
+
+
+    def test_accuracy_counts_all_signals_and_no_odds_rule(self):
+        no_odds = OPEN.replace('💰 O 5: 1.81\n', '').replace('czarni-sosnowiec-women-vs-sk-brann-women', 'a-vs-b')
+        odd_market = STAKE.replace('Asian Total → Under 3.25 @ 1.70', '2nd Team to Score → Bosnia @ 2.10')
+        rows = [self.row(1, STAKE_FT),                                                    # vista já com resultado: fora do ROI, dentro do acerto
+                self.row(2, no_odds + '\n\n🏁 FT 0:4'),                                    # sem odd e sem mais golos -> falha
+                self.row(3, OPEN + '\n\n🏁 FT 1:4 · Over 5 ✅'),                            # devolvida
+                self.row(4, odd_market.replace('bosnia-u19-vs-san-marino-u19', 'c-vs-d')),
+                self.row(4, odd_market.replace('bosnia-u19-vs-san-marino-u19', 'c-vs-d') + '\n\n🏁 FT 2:1 · 2nd Team to Score → Bosnia ✅'),
+                self.row(5, BETFAIR_PRE), self.row(6, '🏁 Full time: Barnsley 0:0 Oldham\nNote.', '2026-11-11T21:00:00+00:00')]
+        r = self.run_report(rows)
+        acc = r['accuracy']
+        self.assertEqual((acc['OPEN_GAME_NO_ODDS']['hits'], acc['OPEN_GAME_NO_ODDS']['misses']), (0, 1))
+        self.assertEqual((acc['OPEN_GAME']['with_result'], acc['OPEN_GAME']['pushes'], acc['OPEN_GAME']['hit_rate']), (1, 1, None))
+        self.assertEqual((acc['STAKE_LOAD']['signals'], acc['STAKE_LOAD']['hits'], acc['STAKE_LOAD']['misses'], acc['STAKE_LOAD']['by_bot_mark']), (2, 1, 1, 1))
+        self.assertEqual(acc['STAKE_LOAD']['seen_late'], 1)
+        self.assertEqual((acc['BETFAIR/pre']['with_result'], acc['BETFAIR/pre']['misses']), (1, 1))   # FT pela nota de fim de jogo
+        self.assertEqual(r['groups']['BETFAIR/pre/mkt>=10K']['settled'], 1)
+        self.assertEqual(r['groups']['STAKE_LOAD/live']['bets'], 1)                                   # a vista já com resultado não entra no ROI
 
 
 class Store(unittest.TestCase):
