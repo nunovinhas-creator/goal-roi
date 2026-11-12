@@ -31,7 +31,7 @@ async def collect():
                             receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1)
     _, last_id = load_seen(data_dir() / 'messages.jsonl')
     now = iso(datetime.now(timezone.utc))
-    rows, oldest = [], None
+    rows, oldest, present = [], None, set()
     await asyncio.wait_for(client.connect(), 30)
     try:
         if not await client.is_user_authorized():
@@ -41,15 +41,19 @@ async def collect():
         async with asyncio.timeout(150):
             async for msg in client.iter_messages(entity, limit=RECENT):
                 oldest = msg.id
+                present.add(msg.id)
                 if getattr(msg, 'out', False) or not (msg.raw_text or '').strip():
                     continue
                 rows.append({'message_id': msg.id, 'date_utc': iso(msg.date), 'edit_date_utc': iso(getattr(msg, 'edit_date', None)),
                              'text': msg.raw_text, 'buttons': buttons(msg), 'collected_at_utc': now})
     finally:
         await client.disconnect()
+    # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
+    stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
+    missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
     added = append_versions(rows)
     # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
-    (data_dir() / 'state.json').write_text(json.dumps({'last_run_utc': now, 'read': len(rows), 'new_versions': added}) + '\n', encoding='utf-8')
+    (data_dir() / 'state.json').write_text(json.dumps({'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing}) + '\n', encoding='utf-8')
     if last_id and oldest and oldest > last_id + 1:
         print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)

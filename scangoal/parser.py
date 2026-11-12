@@ -10,6 +10,8 @@ KICKOFF = re.compile(r'(\d{1,2}) ([a-z]{3}) (\d{4}) (\d{2}):(\d{2})')
 MONTHS = {m: i + 1 for i, m in enumerate('jan feb mar apr may jun jul aug sep oct nov dec'.split())}
 MSK = timezone(timedelta(hours=3))  # o bot mostra horas de Moscovo (UTC+3, sem hora de verão)
 MIN_ODDS = 1.10
+GOAL = re.compile(r"⚽\s+(\d+)(?:\+\d+)?'\s+(\d+) - (\d+)")
+HCAP = re.compile(r'📊 Handicap: (.+?) ([+−-]?[\d.]+) · ([\d.]+)\s+\|\s+(.+?) ([+−-]?[\d.]+) · ([\d.]+)')
 
 
 def clean_league(text):
@@ -69,6 +71,7 @@ def parse(text):
     if ft:
         m['ft'] = [int(ft[1]), int(ft[2])]
         m['bot_mark'] = None if ft[3] is None else ft[3] == '✅'
+        m['goals'] = [[int(a), int(b), int(c)] for a, b, c in GOAL.findall(text)]   # lista do bot: nem sempre completa
     try:
         if h.startswith('💷'):
             m.update(type='BETFAIR', phase='live' if 'LIVE' in h else 'pre', kickoff_utc=kickoff_utc(h))
@@ -98,6 +101,9 @@ def parse(text):
             a, b = re.match(r'(.+?)\s+(\d+)\s*$', lines[2]), re.match(r'(.+?)\s+(\d+)\s*$', lines[3])
             kind = 'OPEN_GAME' if h.startswith('🔥') else 'TOTALS_FORM'
             m.update(phase='live', minute=int(mn[1]), league=clean_league(lines[1].rsplit(' · ', 1)[0]), teams=[a[1].strip(), b[1].strip()], score_at_signal=[int(a[2]), int(b[2])])
+            extra = re.search(r'Rhythm (\d+)/100 · Over (\d+)%', text)
+            if extra:
+                m.update(rhythm=int(extra[1]), bot_over_pct=int(extra[2]))
             if s is None:  # sinal sem linha de odd: mede-se a taxa de acerto, não é aposta
                 m['type'] = kind + '_NO_ODDS'
             else:
@@ -113,9 +119,28 @@ def parse(text):
             m['type'] = 'GOAL_BREWING'
         elif h.startswith('🟥'):
             m['type'] = 'WEAKENED_LINEUP'
+            weakened_lineup(m, lines, text)
     except (TypeError, IndexError, ValueError):
         m.update(error='fields_missing', bet=False)
     return m
+
+
+def weakened_lineup(m, lines, text):
+    """Alinhamento enfraquecido: aposta contra a equipa enfraquecida, ao handicap e odd da mensagem. Só se houver exatamente uma."""
+    teams = [t.strip() for t in lines[2].split('—', 1)] if len(lines) > 2 and '—' in lines[2] else None
+    weak = re.findall(r'^🔻 (.+?):', text, re.M)
+    hc = HCAP.search(text)
+    lead = re.search(r'\(in (\d+) min\)', lines[1]) if len(lines) > 1 else None
+    m.update(teams=teams, phase='pre', league=clean_league(lines[1].split(' · ')[0]) if len(lines) > 1 else None,
+             lead_from_text=int(lead[1]) if lead else None)
+    if not teams or len(teams) != 2 or len(weak) != 1 or weak[0] not in teams or not hc:
+        return
+    sides = {hc[1].strip(): (hc[2], hc[3]), hc[4].strip(): (hc[5], hc[6])}
+    other = teams[1 - teams.index(weak[0])]
+    if other not in sides:
+        return
+    line = float(sides[other][0].replace('−', '-'))
+    m.update(market='Asian Handicap', selection='%s (%+g)' % (other, line), odds=float(sides[other][1]), weakened=weak[0], bet=True)
 
 
 def _side(token, teams):
@@ -123,6 +148,9 @@ def _side(token, teams):
     t = token.strip().lower()
     if t == 'draw':
         return 'X'
+    exact = [k for k, name in zip('12', teams or []) if name and name.lower() == t]
+    if len(exact) == 1:
+        return exact[0]
     hits = [k for k, name in zip('12', teams or []) if name and (name.lower().startswith(t) or t in name.lower())]
     return hits[0] if len(hits) == 1 else None
 

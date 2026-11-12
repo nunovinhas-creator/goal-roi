@@ -82,7 +82,7 @@ def score_of(event):
     return [h, a] if all(type(n) is int and n >= 0 for n in (h, a)) and type(event.get('id')) is int else None
 
 
-def match_events(targets, events, aliases):
+def match_events(targets, events, aliases, unfinished=None):
     """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
     names = lambda name: {norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}
     found, near = {}, {}
@@ -98,6 +98,8 @@ def match_events(targets, events, aliases):
             ev = cands[0]
             found[mid] = {'ft': scored[0][1], 'bsd_id': ev['id'], 'home': name_of(ev, 'home_team'), 'away': name_of(ev, 'away_team'),
                           'event_date': kickoff_of(ev).isoformat(timespec='minutes')}
+        elif len(cands) == 1 and unfinished is not None:
+            unfinished[mid] = str(cands[0].get('status'))
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
             n = [[name_of(ev, 'home_team'), name_of(ev, 'away_team')] for (h, a), evs in index.items() if (h in homes) != (a in aways)
                  for ev in evs if time_ok(t, kickoff_of(ev))]
