@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T02:08:14+00:00",
+ "generated_at_utc": "2026-11-13T02:16:36+00:00",
  "messages": 159,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T02:08:12+00:00",
+  "collector_last_run_utc": "2026-11-13T02:16:29+00:00",
   "name_review": [
    {
     "bot": [
@@ -572,7 +572,7 @@
    "by_bot_mark": 0,
    "per_day": 5.1,
    "days_to_hint": 5,
-   "days_to_conclusion": 57,
+   "days_to_conclusion": 58,
    "prudent_rate": 0.7172,
    "prob_above": 0.8797,
    "edge": 0.1263,
@@ -609,7 +609,7 @@
    "by_bot_mark": 0,
    "per_day": 0.6,
    "days_to_hint": 46,
-   "days_to_conclusion": 469,
+   "days_to_conclusion": 471,
    "prudent_rate": 0.3364,
    "prob_above": 0.383,
    "edge": -0.0336,
@@ -646,7 +646,7 @@
    "by_bot_mark": 0,
    "per_day": 11.8,
    "days_to_hint": 2,
-   "days_to_conclusion": 24,
+   "days_to_conclusion": 25,
    "prudent_rate": 0.8037,
    "prob_above": 0.998,
    "edge": 0.2641,
@@ -755,9 +755,9 @@
    "roi_announced_odds": -0.495,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 6.5,
+   "per_day": 6.4,
    "days_to_hint": 4,
-   "days_to_conclusion": 45,
+   "days_to_conclusion": 46,
    "prudent_rate": 0.4531,
    "prob_above": 0.1688,
    "edge": -0.1125,
@@ -6997,17 +6997,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 11,
-  "llm_last_run_utc": "2026-11-13T01:17:59+00:00",
+  "llm_runs": 12,
+  "llm_last_run_utc": "2026-11-13T02:16:31+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 2,
-   "neurons_today": 341.1,
+   "calls_today": 3,
+   "neurons_today": 476.2,
    "accepted_today": 2,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+    "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
+    "at_utc": "2026-11-13T02:16:31+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 11,
+    "hit_rate": 1.0,
+    "break_even": 0.563,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Momento = durante o jogo & Tamanho do mercado = menos de 10 mil $",
+    "note": "tem um baixo acerto de 0.5625, sugerindo que essa combinação pode não ser eficaz.",
+    "at_utc": "2026-11-13T02:16:31+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 16,
+    "hits": 9,
+    "hit_rate": 0.5625,
+    "break_even": 0.4783,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
+    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados, requerendo mais dados para confirmação.",
+    "at_utc": "2026-11-13T02:16:31+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 8,
+    "hits": 8,
+    "hit_rate": 1.0,
+    "break_even": 0.508,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 11 resultados",
