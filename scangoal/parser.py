@@ -19,13 +19,24 @@ def clean_league(text):
     return re.sub(r'^[^A-Za-z0-9]+', '', text or '').strip() or None
 
 
+NATIONAL = re.compile(r'Nations League|International Match|Cup of Nations|Nations Cup|World Cup|Gold Cup|Asian Cup|Copa Am[eé]rica|European Championship|\bEURO\b', re.I)
+
+
 def competition_kind(league, teams=()):
-    """Categoria simples da competição, só por palavras do nome: feminino, jovens, taça ou liga."""
+    """Categoria simples da competição, só por palavras do nome: feminino, jovens, seleções, particular, taça ou liga.
+
+    Seleções: jogos entre seleções nacionais (Liga das Nações, qualificações, particulares entre seleções).
+    Particular: amigáveis entre clubes. As duas regras de cima (feminino, jovens) têm prioridade.
+    """
     blob = ' '.join([league or ''] + list(teams or []))
     if re.search(r'\bWomen\b|Femenil|Feminin|Frauen', blob, re.I):
         return 'feminino'
     if re.search(r'\bU-?(1[5-9]|2[0-3])\b|Youth|Juniors', blob, re.I):
         return 'jovens'
+    if NATIONAL.search(league or ''):
+        return 'seleções'
+    if re.search(r'Friendl', league or '', re.I):
+        return 'particular'
     if re.search(r'\bCup\b|Trophy|Copa\b|Coupe|Pokal|Taça|Shield', league or '', re.I):
         return 'taça'
     return 'liga'

@@ -893,6 +893,13 @@ class Insights(unittest.TestCase):
         self.assertEqual(parse(OPEN)['league'], "UEFA Women's Europa Cup")
         self.assertEqual([competition_kind(*x) for x in (('England EFL Trophy', ['Barnsley', 'Oldham']), ('UEFA U19 Championship', []),
                          ('League', ['Brondby Women', 'X']), ('Turkish 3 Lig', ['A', 'B']))], ['taça', 'jovens', 'feminino', 'liga'])
+        nations = [('International Friendlies International Match', ['Argentina', 'Uruguay']), ('UEFA Nations League', ['Moldova', 'Kazakhstan']),
+                   ('America CONCACAF Nations League', ['Guatemala', 'Canada']), ('Africa Cup Of Nations Qualifier', ['Benin', 'Central African Rep']),
+                   ('International Match', ['New Zealand', 'India'])]
+        self.assertEqual({competition_kind(*x) for x in nations}, {'seleções'})                    # antes: "liga" ou "taça"
+        self.assertEqual([competition_kind(*x) for x in (('International Friendlies Friendlies', ['Hannover', 'TSB Havelse']), ('Friendlies', ['Leipzig', 'Mlada Boleslav']),
+                          ('International Friendlies International Match', ['Singapore U23', 'Vietnam U23']), ('Africa U23 Africa Cup of Nations Qual', ['Rwanda U23', 'Cameroon U23']),
+                          ('Oman Professional League Cup', ['A', 'B']))], ['particular', 'particular', 'jovens', 'jovens', 'taça'])
 
     def test_report_has_insights_and_safe_narrative(self):
         from scangoal import report
