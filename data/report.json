@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T07:59:34+00:00",
+ "generated_at_utc": "2026-11-13T08:07:59+00:00",
  "messages": 163,
  "types": {
   "SERVICE": 7,
@@ -32,11 +32,11 @@
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 2,
   "bsd_last_run_utc": "2026-11-13T07:42:49+00:00",
-  "goal_minutes_matches": 31,
+  "goal_minutes_matches": 32,
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T07:59:33+00:00",
+  "collector_last_run_utc": "2026-11-13T08:07:50+00:00",
   "name_review": [
    {
     "bot": [
@@ -150,7 +150,7 @@
   "stake_no_score_after_kickoff": 1,
   "stake_sent_45_after_kickoff": 5,
   "goal_lists": 34,
-  "goal_lists_consistent": 22
+  "goal_lists_consistent": 23
  },
  "unique_bets": 58,
  "settled_bets": 40,
@@ -595,40 +595,40 @@
   },
   "GOAL_BREWING": {
    "signals": 7,
-   "with_result": 1,
+   "with_result": 2,
    "hits": 0,
-   "misses": 1,
+   "misses": 2,
    "pushes": 0,
    "eff_hits": 0,
-   "eff_misses": 1.0,
+   "eff_misses": 2.0,
    "vote_hits": 0.0,
-   "vote_misses": 1.0,
+   "vote_misses": 2.0,
    "vote_break_even": null,
-   "games": 1,
+   "games": 2,
    "no_source": 3,
-   "unsettleable": 2,
+   "unsettleable": 1,
    "hit_rate": 0.0,
    "ci95": [
     0.0,
-    0.7935
+    0.6576
    ],
    "avg_odds": null,
-   "break_even": 0.37,
+   "break_even": 0.365,
    "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 0.6,
-   "days_to_hint": 53,
-   "days_to_conclusion": 542,
-   "prudent_rate": 0.3364,
-   "prob_above": 0.383,
-   "edge": -0.0336,
+   "per_day": 1.1,
+   "days_to_hint": 26,
+   "days_to_conclusion": 271,
+   "prudent_rate": 0.3042,
+   "prob_above": 0.3027,
+   "edge": -0.0608,
    "edge_ci": [
-    -0.2399,
-    0.2078
+    -0.2506,
+    0.1674
    ],
-   "prob_above_cut": 0.364
+   "prob_above_cut": 0.2849
   },
   "OPEN_GAME": {
    "signals": 18,
@@ -694,7 +694,7 @@
    "by_bot_mark": 0,
    "per_day": 1.3,
    "days_to_hint": 22,
-   "days_to_conclusion": 227,
+   "days_to_conclusion": 228,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -1736,11 +1736,11 @@
   }
  },
  "brain": {
-  "hypotheses": 285,
+  "hypotheses": 287,
   "tested": 2,
   "corrected_bar": 0.975,
   "counts": {
-   "em observação": 285
+   "em observação": 287
   },
   "board": {
    "best": [
@@ -1986,7 +1986,7 @@
      "as_expected": 0
     },
     "llm/refinar": {
-     "hypotheses": 7,
+     "hypotheses": 9,
      "judged": 0,
      "as_expected": 0
     }
@@ -6590,6 +6590,88 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T08:07:52+00:00",
+    "reason": "Mercado com quota baixa e tamanho de mercado reduzido",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T08:07:52+00:00",
+    "reason": "Combinação de odd baixa, poucos golos e minuto específico",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Jogo aberto | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2",
     "family": "Jogo aberto",
     "conditions": [
@@ -7084,7 +7166,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 13,
+  "llm_total": 15,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -7092,15 +7174,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 17,
-  "llm_last_run_utc": "2026-11-13T07:09:18+00:00",
+  "llm_runs": 18,
+  "llm_last_run_utc": "2026-11-13T08:07:52+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 8,
-   "neurons_today": 1287.3,
-   "accepted_today": 3,
-   "last_mode": "novas"
+   "calls_today": 9,
+   "neurons_today": 1463.8,
+   "accepted_today": 5,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -8529,15 +8611,6 @@
   }
  ],
  "unsettled": [
-  {
-   "match_id": "ulaanbaatar-vs-hunters-fc-20261113",
-   "match": "Ulaanbaatar — Hunters FC",
-   "league": "Mongolian Premier League",
-   "date_utc": "2026-11-13T05:22:31+00:00",
-   "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
-   "signals": 1
-  },
   {
    "match_id": "sonio-takamatsu-vs-blancdieu-hirosaki-fc-20261113",
    "match": "SONIO Takamatsu — Blancdieu Hirosaki FC",

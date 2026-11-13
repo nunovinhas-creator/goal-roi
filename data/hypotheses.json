@@ -1261,6 +1261,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-13T08:07:52+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercado com quota baixa e tamanho de mercado reduzido",
+  "source": "llm"
+ },
  "Betfair | Hora (UTC) = tarde & Quota depois do sinal = desceu": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -3385,6 +3408,29 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60": {
+  "born_utc": "2026-11-13T08:07:52+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Combinação de odd baixa, poucos golos e minuto específico",
+  "source": "llm"
  },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-13T00:19:12+00:00",
