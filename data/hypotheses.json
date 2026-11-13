@@ -1965,6 +1965,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Volume na seleção = 10 mil $ ou mais": {
+  "born_utc": "2026-11-13T19:53:45+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Volume na seleção",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Combinação de faixa de odd e hora com volume alto",
+  "source": "llm"
+ },
  "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Volume na seleção = menos de 10 mil $": {
   "born_utc": "2026-11-13T10:46:54+00:00",
   "conditions": [
@@ -10354,6 +10377,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa da casa & Tamanho do mercado = 10 mil $ ou mais": {
+  "born_utc": "2026-11-13T19:53:45+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Seleção",
+    "equipa da casa"
+   ],
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercado com quota baixa e tamanho grande",
+  "source": "llm"
+ },
  "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-13T10:46:54+00:00",
   "conditions": [
@@ -12315,6 +12361,29 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-13T19:53:45+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Combinação de faixa de odd e minuto com sinal único",
+  "source": "llm"
+ },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -12864,6 +12933,29 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-13T19:53:45+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Golos em falta com minuto e parte do jogo",
+  "source": "llm"
  },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-13T10:46:54+00:00",

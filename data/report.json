@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T19:53:24+00:00",
+ "generated_at_utc": "2026-11-13T19:53:59+00:00",
  "messages": 217,
  "types": {
   "SERVICE": 10,
@@ -43,7 +43,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T19:53:23+00:00",
+  "collector_last_run_utc": "2026-11-13T19:53:43+00:00",
   "name_review": [
    {
     "bot": [
@@ -2016,11 +2016,11 @@
   }
  },
  "brain": {
-  "hypotheses": 824,
+  "hypotheses": 828,
   "tested": 4,
   "corrected_bar": 0.9875,
   "counts": {
-   "em observação": 824
+   "em observação": 828
   },
   "board": {
    "best": [
@@ -2581,7 +2581,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T19:53:24+00:00",
+   "generated_utc": "2026-11-13T19:53:59+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2604,7 +2604,7 @@
      "as_expected": 0
     },
     "llm/refinar": {
-     "hypotheses": 12,
+     "hypotheses": 16,
      "judged": 0,
      "as_expected": 0
     },
@@ -7550,6 +7550,170 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Volume na seleção = 10 mil $ ou mais",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Volume na seleção",
+      "10 mil $ ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T19:53:45+00:00",
+    "reason": "Combinação de faixa de odd e hora com volume alto",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa da casa & Tamanho do mercado = 10 mil $ ou mais",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ],
+     [
+      "Seleção",
+      "equipa da casa"
+     ],
+     [
+      "Tamanho do mercado",
+      "10 mil $ ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T19:53:45+00:00",
+    "reason": "Mercado com quota baixa e tamanho grande",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T19:53:45+00:00",
+    "reason": "Combinação de faixa de odd e minuto com sinal único",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T19:53:45+00:00",
+    "reason": "Golos em falta com minuto e parte do jogo",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Forma de golos | Golos até ao sinal = nenhum & Marcador no momento = empatado & Minuto = 31 a 60",
     "family": "Forma de golos",
     "conditions": [
@@ -8187,132 +8351,9 @@
     "tradable": true,
     "open": 1,
     "status": "em observação"
-   },
-   {
-    "n": 4,
-    "signals": 5,
-    "hits": 1,
-    "misses": 3,
-    "hit_rate": 0.25,
-    "ci95": [
-     0.0456,
-     0.6994
-    ],
-    "break_even": 0.5572,
-    "roi": -0.385,
-    "games": 4,
-    "prudent_rate": 0.4694,
-    "prob_above": 0.2553,
-    "edge": -0.0878,
-    "edge_ci": [
-     -0.2977,
-     0.1273
-    ],
-    "prob_above_cut": 0.2289,
-    "prob_adds": null,
-    "id": "Betfair | Tamanho do mercado = 10 mil $ ou mais & Volume na seleção = 10 mil $ ou mais",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Tamanho do mercado",
-      "10 mil $ ou mais"
-     ],
-     [
-      "Volume na seleção",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T15:33:31+00:00",
-    "reason": "Mercado com volume alto",
-    "expect": null,
-    "mode": null,
-    "tradable": true,
-    "open": 1,
-    "status": "em observação"
-   },
-   {
-    "n": 1,
-    "signals": 1,
-    "hits": 0,
-    "misses": 1,
-    "hit_rate": 0.0,
-    "ci95": [
-     0.0,
-     0.7935
-    ],
-    "break_even": 0.5814,
-    "roi": -1.0,
-    "games": 1,
-    "prudent_rate": 0.5285,
-    "prob_above": 0.3692,
-    "edge": -0.0529,
-    "edge_ci": [
-     -0.2936,
-     0.1817
-    ],
-    "prob_above_cut": 0.3399,
-    "prob_adds": null,
-    "id": "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Competição",
-      "liga"
-     ],
-     [
-      "Golos em falta para ganhar",
-      "até 1 golo"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T15:33:31+00:00",
-    "reason": "Jogos da liga com pouco espaço para ganhar",
-    "expect": null,
-    "mode": null,
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Stake | Mercado = golos (total asiático) & Número de apostas = várias",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Mercado",
-      "golos (total asiático)"
-     ],
-     [
-      "Número de apostas",
-      "várias"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T15:33:31+00:00",
-    "reason": "Apostas múltiplas em mercado de golos",
-    "expect": null,
-    "mode": null,
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
    }
   ],
-  "llm_total": 19,
+  "llm_total": 23,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -8321,15 +8362,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 29,
-  "llm_last_run_utc": "2026-11-13T18:54:43+00:00",
+  "llm_runs": 30,
+  "llm_last_run_utc": "2026-11-13T19:53:45+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 20,
-   "neurons_today": 3265.3,
-   "accepted_today": 9,
-   "last_mode": "novas"
+   "calls_today": 21,
+   "neurons_today": 3448.0,
+   "accepted_today": 13,
+   "last_mode": "refinar"
   },
   "notes": [
    {
