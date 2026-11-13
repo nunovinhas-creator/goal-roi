@@ -187,6 +187,82 @@ def board(rows, now=None, family_n=None):
             'min_results': BOARD_MIN, 'hint_at': HINT_AT}
 
 
+AGENDA_LIVE_MIN = 30     # sinal ao vivo (ou sem hora de início) só entra na agenda até 30 minutos depois, como os alertas
+VERDICT_ORDER = ('favorável', 'misto', 'sem evidência', 'contraditório', 'evitar')
+
+
+def agenda(rows, signals, now=None):
+    """Agenda: cada sinal com odd ainda apostável, com as táticas boas e más em que encaixa neste momento.
+
+    Usa as mesmas regras do quadro (táticas apostáveis com pelo menos BOARD_MIN resultados; boa >= BOARD_GOOD, má <= BOARD_BAD
+    ou abandonada) e é refeita a cada relatório, por isso muda à medida que chegam resultados.
+    Veredicto por sinal: favorável (só boas), misto (boas e más), evitar (só más), sem evidência (nenhuma),
+    contraditório (o mesmo jogo tem sinais em seleções diferentes do mesmo mercado).
+    odds_band_n: resultados do mesmo tipo de sinal na faixa de odd deste sinal; poucos = as táticas foram medidas noutras odds.
+    """
+    now = now or datetime.now(timezone.utc)
+    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['n'] >= BOARD_MIN]
+    good, bad = {}, {}
+    for r in sorted(cand, key=lambda r: (-r['prob_above'], -r['n'])):
+        bucket = good if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada' else bad if r['prob_above'] <= BOARD_BAD or r['status'] == 'abandonada' else None
+        if bucket is not None:
+            for b in r['open']:
+                bucket.setdefault(b['key'], []).append(r)
+    bad = {k: sorted(v, key=lambda r: (r['prob_above'], -r['n'])) for k, v in bad.items()}
+    band_n = {}
+    for b in signals:
+        if b['w'] is not None and b['w'] != 0 and b.get('odds'):
+            k = (insights.family(b), insights.odds_band(b['odds']))
+            band_n[k] = band_n.get(k, 0) + 1
+
+    def live(b):
+        ko = b.get('kickoff_utc') and datetime.fromisoformat(b['kickoff_utc'])
+        if ko and (ko if ko.tzinfo else ko.replace(tzinfo=timezone.utc)) > now:
+            return 'por começar'
+        if (now - datetime.fromisoformat(b['date_utc'])).total_seconds() <= AGENDA_LIVE_MIN * 60:
+            return 'a decorrer'
+        return None
+
+    def distinct(hs, limit):
+        out, seen = [], set()
+        for r in hs:
+            sample = (r['family'], r['n'], r['hits'])   # "mercado pequeno" e "volume pequeno" apanham muitas vezes os mesmos sinais
+            if sample not in seen:
+                seen.add(sample)
+                out.append(r)
+        return out[:limit], len(out)
+
+    def card(r):
+        return {'id': r['id'], 'conditions': r['conditions'], 'n': r['n'], 'hits': r['hits'], 'break_even': r['break_even'], 'prob_above': r['prob_above'],
+                'roi': r['roi'], 'edge': r.get('edge'), 'status': r['status'], 'source': r['source']}
+
+    open_ = [(b, live(b)) for b in signals if b['w'] is None and not b.get('no_source') and b.get('market') is not None and b.get('odds')]
+    open_ = [(b, when) for b, when in open_ if when]
+    picks = {}
+    for b, _ in open_:
+        picks.setdefault((b['match_id'], b['market']), set()).add(b['selection'])
+    out = []
+    for b, when in open_:
+        g, ng = distinct(good.get(b['key'], []), 3)
+        x, nx = distinct(bad.get(b['key'], []), 2)
+        conflict = len(picks[(b['match_id'], b['market'])]) > 1
+        verdict = 'contraditório' if conflict else 'favorável' if g and not x else 'misto' if g else 'evitar' if x else 'sem evidência'
+        teams = b.get('teams') or []
+        sel = {'1': teams[0], '2': teams[1], 'X': 'Empate'}.get(b['selection'], b['selection']) if b['market'] == '1X2' and len(teams) == 2 else b['selection']
+        band = insights.odds_band(b['odds'])
+        out.append({'match_id': b['match_id'], 'match': ' — '.join(teams) or b['match_id'], 'league': b.get('league'), 'family': insights.family(b), 'type': b['type'],
+                    'phase': b.get('phase'), 'when': when, 'kickoff_utc': b.get('kickoff_utc'), 'date_utc': b['date_utc'], 'minute': b.get('minute'),
+                    'score_at_signal': b.get('score_at_signal'), 'market': b['market'], 'selection': sel, 'odds': b['odds'], 'odds_last': b.get('odds_last'),
+                    'max_mult': b.get('max_mult'), 'share': b.get('share'), 'share_last': b.get('share_last'), 'verdict': verdict, 'conflict': conflict,
+                    'validated': any(r['status'] in ('forte', 'confirmada') for r in g) and verdict == 'favorável',
+                    'odds_band': band, 'odds_band_n': band_n.get((insights.family(b), band), 0), 'good': [card(r) for r in g], 'good_total': ng, 'bad': [card(r) for r in x], 'bad_total': nx})
+    rank = {v: i for i, v in enumerate(VERDICT_ORDER)}
+    out.sort(key=lambda a: (rank[a['verdict']], -(a['good'][0]['prob_above'] if a['good'] else 0), a['kickoff_utc'] or a['date_utc']))
+    counts = {v: sum(1 for a in out if a['verdict'] == v) for v in VERDICT_ORDER}
+    return {'items': out[:40], 'counts': counts, 'generated_utc': now.isoformat(timespec='seconds'),
+            'rules': {'min_results': BOARD_MIN, 'good': BOARD_GOOD, 'bad': BOARD_BAD, 'live_max_min': AGENDA_LIVE_MIN, 'hint_at': HINT_AT, 'strong_at': STRONG_AT}}
+
+
 def build(signals, registry, min_settled):
     rows, tested, bar = evaluate(signals, registry, min_settled)
     fams = {}
@@ -194,6 +270,7 @@ def build(signals, registry, min_settled):
         if b['w'] is not None and b['w'] != 0 and b['odds']:
             fams[insights.family(b)] = fams.get(insights.family(b), 0) + 1
     brd = board(rows, family_n=fams)
+    agd = agenda(rows, signals)
     counts = {}
     for r in rows:
         counts[r['status']] = counts.get(r['status'], 0) + 1
@@ -209,7 +286,7 @@ def build(signals, registry, min_settled):
     for r in rows:
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
-    return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd,
+    return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
             'track': track_record(rows), 'walk_forward': walk_forward(signals, registry),
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
                                                                                                     'games', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds')}
