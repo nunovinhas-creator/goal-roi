@@ -111,6 +111,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Competição = jovens & Faixa de odd = odd 2,00 a 3,00": {
+  "born_utc": "2026-11-13T01:17:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "jovens"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Betfair",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jovens com odd alta podem ser imprevisíveis",
+  "source": "llm"
+ },
  "Betfair | Competição = jovens & Hora (UTC) = tarde": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [

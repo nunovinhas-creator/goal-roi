@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T01:09:43+00:00",
+ "generated_at_utc": "2026-11-13T01:18:06+00:00",
  "messages": 159,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 0,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T01:09:41+00:00",
+  "collector_last_run_utc": "2026-11-13T01:17:58+00:00",
   "name_review": [
    {
     "bot": [
@@ -570,7 +570,7 @@
    "roi_announced_odds": 0.53,
    "seen_late": 6,
    "by_bot_mark": 0,
-   "per_day": 5.3,
+   "per_day": 5.2,
    "days_to_hint": 5,
    "days_to_conclusion": 56,
    "prudent_rate": 0.7172,
@@ -609,7 +609,7 @@
    "by_bot_mark": 0,
    "per_day": 0.7,
    "days_to_hint": 45,
-   "days_to_conclusion": 457,
+   "days_to_conclusion": 459,
    "prudent_rate": 0.3364,
    "prob_above": 0.383,
    "edge": -0.0336,
@@ -644,7 +644,7 @@
    "roi_announced_odds": 0.735,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 12.2,
+   "per_day": 12.1,
    "days_to_hint": 2,
    "days_to_conclusion": 24,
    "prudent_rate": 0.8037,
@@ -794,7 +794,7 @@
    "by_bot_mark": 0,
    "per_day": 6.1,
    "days_to_hint": 4,
-   "days_to_conclusion": 48,
+   "days_to_conclusion": 49,
    "prudent_rate": 0.5445,
    "prob_above": 0.3177,
    "edge": -0.0584,
@@ -1700,11 +1700,11 @@
   }
  },
  "brain": {
-  "hypotheses": 278,
+  "hypotheses": 279,
   "tested": 2,
   "corrected_bar": 0.975,
   "counts": {
-   "em observação": 278
+   "em observação": 279
   },
   "board": {
    "best": [
@@ -1932,6 +1932,11 @@
     },
     "llm/novas": {
      "hypotheses": 5,
+     "judged": 0,
+     "as_expected": 0
+    },
+    "llm/evitar": {
+     "hypotheses": 1,
      "judged": 0,
      "as_expected": 0
     },
@@ -6531,6 +6536,43 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Competição = jovens & Faixa de odd = odd 2,00 a 3,00",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Competição",
+      "jovens"
+     ],
+     [
+      "Faixa de odd",
+      "odd 2,00 a 3,00"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T01:17:59+00:00",
+    "reason": "jovens com odd alta podem ser imprevisíveis",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte",
     "family": "Jogo aberto",
     "conditions": [
@@ -6947,7 +6989,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 11,
+  "llm_total": 12,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -6955,15 +6997,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 10,
-  "llm_last_run_utc": "2026-11-13T00:19:12+00:00",
+  "llm_runs": 11,
+  "llm_last_run_utc": "2026-11-13T01:17:59+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 1,
-   "neurons_today": 182.1,
-   "accepted_today": 1,
-   "last_mode": "refinar"
+   "calls_today": 2,
+   "neurons_today": 341.1,
+   "accepted_today": 2,
+   "last_mode": "evitar"
   },
   "notes": [
    {
