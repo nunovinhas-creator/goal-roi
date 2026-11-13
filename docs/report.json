@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-13T12:19:17+00:00",
- "messages": 177,
+ "generated_at_utc": "2026-11-13T12:23:20+00:00",
+ "messages": 178,
  "types": {
   "SERVICE": 7,
   "GOAL_BREWING": 9,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 3,
   "OPEN_GAME_NO_ODDS": 2,
   "FULL_TIME_NOTE": 3,
-  "POLYMARKET": 6
+  "POLYMARKET": 7
  },
  "unparsed": 0,
  "unparsed_samples": [],
@@ -20,10 +20,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 191,
+  "versions": 192,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-13T12:18:55+00:00",
+  "last_collected_at_utc": "2026-11-13T12:23:19+00:00",
   "hl_results": 33,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T12:19:13+00:00",
+  "collector_last_run_utc": "2026-11-13T12:23:19+00:00",
   "name_review": [
    {
     "bot": [
@@ -165,7 +165,7 @@
   "goal_lists": 34,
   "goal_lists_consistent": 23
  },
- "unique_bets": 64,
+ "unique_bets": 65,
  "settled_bets": 40,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -386,7 +386,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 4,
+   "bets": 5,
    "settled": 1,
    "matches": 1,
    "wins": 1,
@@ -633,7 +633,7 @@
    "by_bot_mark": 0,
    "per_day": 1.0,
    "days_to_hint": 28,
-   "days_to_conclusion": 297,
+   "days_to_conclusion": 298,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -718,7 +718,7 @@
    "prob_above_cut": 0.6466
   },
   "POLYMARKET": {
-   "signals": 5,
+   "signals": 6,
    "with_result": 2,
    "hits": 2,
    "misses": 0,
@@ -1632,7 +1632,7 @@
    },
    {
     "n": 47,
-    "signals": 62,
+    "signals": 63,
     "hits": 31,
     "misses": 16,
     "hit_rate": 0.6593,
@@ -2524,35 +2524,6 @@
      "bad_total": 0
     },
     {
-     "match_id": "bermuda-vs-st-lucia-int-20261113",
-     "match": "Bermuda — St Lucia Int",
-     "league": "America CONCACAF Nations League",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-13T19:00+00:00",
-     "date_utc": "2026-11-13T12:17:53+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Total",
-     "selection": "Over 4.5",
-     "odds": 2.86,
-     "odds_last": 2.86,
-     "max_mult": 1,
-     "share": 100,
-     "share_last": 100,
-     "verdict": "sem evidência",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 0,
-     "good": [],
-     "good_total": 0,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "luxembourg-vs-estonia-20261113",
      "match": "Luxembourg — Estonia",
      "league": "UEFA Nations League",
@@ -2751,16 +2722,74 @@
      "good_total": 2,
      "bad": [],
      "bad_total": 0
+    },
+    {
+     "match_id": "bermuda-vs-st-lucia-int-20261113",
+     "match": "Bermuda — St Lucia Int",
+     "league": "America CONCACAF Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-13T19:00+00:00",
+     "date_utc": "2026-11-13T12:17:53+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Over 4.5",
+     "odds": 2.86,
+     "odds_last": 2.86,
+     "max_mult": 1,
+     "share": 100,
+     "share_last": 100,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 0,
+     "good": [],
+     "good_total": 0,
+     "bad": [],
+     "bad_total": 0
+    },
+    {
+     "match_id": "bermuda-vs-st-lucia-int-20261113",
+     "match": "Bermuda — St Lucia Int",
+     "league": "America CONCACAF Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-13T19:00+00:00",
+     "date_utc": "2026-11-13T12:22:59+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Over 3.5",
+     "odds": 1.85,
+     "odds_last": 1.85,
+     "max_mult": 1,
+     "share": 100,
+     "share_last": 100,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 2,
+     "good": [],
+     "good_total": 0,
+     "bad": [],
+     "bad_total": 0
     }
    ],
    "counts": {
     "favorável": 4,
     "misto": 1,
-    "sem evidência": 3,
-    "contraditório": 2,
+    "sem evidência": 2,
+    "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T12:19:17+00:00",
+   "generated_utc": "2026-11-13T12:23:20+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2810,7 +2839,7 @@
     "roi_cut": 0.203
    },
    "skipped": {
-    "bets": 30,
+    "bets": 31,
     "settled": 24,
     "games": 22,
     "wins": 10,
@@ -8893,7 +8922,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 64,
+   "bets": 65,
    "settled": 40,
    "matches": 34,
    "wins": 20,
@@ -8928,6 +8957,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-13T12:22:59+00:00",
+   "match_id": "bermuda-vs-st-lucia-int-20261113",
+   "group": "POLYMARKET/pre",
+   "match": "Bermuda — St Lucia Int",
+   "selection": "Over 3.5",
+   "odds": 1.85,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-13T12:17:53+00:00",
    "match_id": "bermuda-vs-st-lucia-int-20261113",
@@ -9805,22 +9847,6 @@
    "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-11T14:09:13+00:00",
-   "match_id": "republic-of-ireland-u19-vs-greece-u19-20261111",
-   "group": "BETFAIR/live/mkt<10K",
-   "match": "Republic of Ireland U19 — Greece U19",
-   "selection": "Republic of Ireland U19",
-   "odds": 2.72,
-   "ft": [
-    2,
-    0
-   ],
-   "w": 1.0,
-   "settled_by": "resultado HL",
-   "n_signals": 2,
-   "max_mult": 2
   }
  ],
  "unsettled": [
@@ -10015,51 +10041,6 @@
   }
  ],
  "matches": {
-  "republic-of-ireland-u19-vs-greece-u19-20261111": {
-   "teams": [
-    "Republic of Ireland U19",
-    "Greece U19"
-   ],
-   "events": [
-    {
-     "d": "2026-11-11T14:09:13+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "selection": "1",
-     "odds": 2.72,
-     "mult": 1,
-     "share": 63,
-     "mkt_volume": 7100.0,
-     "market": "1X2"
-    },
-    {
-     "d": "2026-11-11T14:14:16+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "selection": "1",
-     "odds": 3.15,
-     "mult": 2,
-     "share": 62,
-     "mkt_volume": 10000.0,
-     "market": "1X2"
-    }
-   ],
-   "goals": [
-    [
-     58,
-     "1-0"
-    ],
-    [
-     63,
-     "2-0"
-    ]
-   ],
-   "goals_source": "Highlightly",
-   "ft": [
-    2,
-    0
-   ]
-  },
   "spain-u19-vs-iceland-u19-20261111": {
    "teams": [
     "Spain U19",
@@ -12021,6 +12002,16 @@
      "share": 100,
      "market": "Asian Total",
      "total": 6800.0
+    },
+    {
+     "d": "2026-11-13T12:22:59+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "Over 3.5",
+     "odds": 1.85,
+     "share": 100,
+     "market": "Asian Total",
+     "total": 11000.0
     }
    ],
    "goals": null,
@@ -12446,7 +12437,7 @@
    "day": "2026-11-12"
   },
   {
-   "bets": 8,
+   "bets": 9,
    "settled": 1,
    "wins": 0,
    "units": -1.0,
