@@ -20,7 +20,7 @@ from .store import data_dir
 
 MODELS = [m for m in (os.environ.get('LLM_MODEL', ''), '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/meta/llama-3.1-8b-instruct-fast') if m]
 MIN_INTERVAL_MIN = int(os.environ.get('LLM_MIN_INTERVAL_MIN', '55'))
-MAX_PER_RUN, MAX_PER_DAY, MAX_TOTAL, MAX_CONDITIONS, MIN_SUPPORT = 5, 30, 300, 3, 5
+MAX_PER_RUN, MAX_CONDITIONS, MIN_SUPPORT = 5, 4, 5          # sem limite diário nem total de hipóteses: só o orçamento de neurónios limita
 DAILY_NEURONS = 8000                                        # margem sobre os 10 000 gratuitos
 PRICES = {'@cf/meta/llama-3.3-70b-instruct-fp8-fast': (26668, 204805), '@cf/meta/llama-3.1-8b-instruct-fast': (4119, 34868)}   # neurónios por milhão de tokens (entrada, saída)
 MODES = ('novas', 'refinar', 'evitar', 'notas')
@@ -175,11 +175,8 @@ def run(call=request, now=None, env=None):
     from . import report
     rep = report.build()
     signals, registry = report.LAST['signals'], brain.load_registry(rpath)
-    total_llm = sum(1 for h in registry.values() if h.get('source') == 'llm')
     vocab = vocabulary(signals)
     mode = MODES[state.get('runs', 0) % len(MODES)]
-    if mode != 'notas' and (total_llm >= MAX_TOTAL or state.get('accepted_today', 0) >= MAX_PER_DAY):
-        mode = 'notas'                                        # limite de hipóteses atingido: o modelo só comenta
     multi, earlier = brain.multi_matches(signals), brain.earlier_index(signals)
     have = [(insights.family(b), set(brain.atoms(b, multi, earlier))) for b in signals]
     support = lambda fam, conds: sum(1 for f, at in have if f == fam and conds <= at)
@@ -208,7 +205,6 @@ def run(call=request, now=None, env=None):
                     npath.write_text(json.dumps((stamped + old)[:40], indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
             else:
                 good, bad = accept(raw, vocab, registry, support, 'abaixo' if mode == 'evitar' else 'acima')
-                good = good[:max(0, min(MAX_TOTAL - total_llm, MAX_PER_DAY - state.get('accepted_today', 0)))]
                 for hid, entry in good:
                     registry[hid] = dict(entry, born_utc=now.isoformat(timespec='seconds'), model=used, mode=mode)
                 if good:
