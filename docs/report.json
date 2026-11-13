@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T20:34:10+00:00",
+ "generated_at_utc": "2026-11-13T20:36:41+00:00",
  "messages": 229,
  "types": {
   "SERVICE": 10,
@@ -43,7 +43,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T20:34:09+00:00",
+  "collector_last_run_utc": "2026-11-13T20:36:38+00:00",
   "name_review": [
    {
     "bot": [
@@ -2886,7 +2886,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T20:34:10+00:00",
+   "generated_utc": "2026-11-13T20:36:41+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6500,6 +6500,41 @@
     "prob_adds": 0.9671
    },
    {
+    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Confiança indicada pelo bot",
+      "menos de 95 %"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 6,
+    "hits": 6,
+    "hit_rate": 1.0,
+    "break_even": 0.5485,
+    "prob_above": 0.9263,
+    "roi": 0.8833,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 6,
+    "edge": 0.1693,
+    "edge_ci": [
+     -0.0254,
+     0.3322
+    ],
+    "prob_above_cut": 0.9134,
+    "prob_adds": 0.3443
+   },
+   {
     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
     "family": "Jogo aberto",
     "conditions": [
@@ -6562,6 +6597,41 @@
     "prob_adds": 0.3443
    },
    {
+    "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 6,
+    "hits": 6,
+    "hit_rate": 1.0,
+    "break_even": 0.5485,
+    "prob_above": 0.9263,
+    "roi": 0.8833,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 6,
+    "edge": 0.1693,
+    "edge_ci": [
+     -0.0254,
+     0.3322
+    ],
+    "prob_above_cut": 0.9134,
+    "prob_adds": 0.3443
+   },
+   {
     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
     "family": "Jogo aberto",
     "conditions": [
@@ -6599,76 +6669,6 @@
      [
       "Golos até ao sinal",
       "1 ou 2"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 6,
-    "hits": 6,
-    "hit_rate": 1.0,
-    "break_even": 0.5485,
-    "prob_above": 0.9263,
-    "roi": 0.8833,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 6,
-    "edge": 0.1693,
-    "edge_ci": [
-     -0.0254,
-     0.3322
-    ],
-    "prob_above_cut": 0.9134,
-    "prob_adds": 0.3443
-   },
-   {
-    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Confiança indicada pelo bot",
-      "menos de 95 %"
-     ],
-     [
-      "Minuto",
-      "31 a 60"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 6,
-    "hits": 6,
-    "hit_rate": 1.0,
-    "break_even": 0.5485,
-    "prob_above": 0.9263,
-    "roi": 0.8833,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 6,
-    "edge": 0.1693,
-    "edge_ci": [
-     -0.0254,
-     0.3322
-    ],
-    "prob_above_cut": 0.9134,
-    "prob_adds": 0.3443
-   },
-   {
-    "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "1 ou 2"
-     ],
-     [
-      "Minuto",
-      "31 a 60"
      ],
      [
       "Sinal anterior de outro tipo no mesmo jogo",
