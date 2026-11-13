@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T00:10:56+00:00",
+ "generated_at_utc": "2026-11-13T00:19:29+00:00",
  "messages": 155,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 0,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T00:10:52+00:00",
+  "collector_last_run_utc": "2026-11-13T00:19:10+00:00",
   "name_review": [
    {
     "bot": [
@@ -570,7 +570,7 @@
    "by_bot_mark": 0,
    "per_day": 4.7,
    "days_to_hint": 5,
-   "days_to_conclusion": 62,
+   "days_to_conclusion": 63,
    "prudent_rate": 0.6789,
    "prob_above": 0.8636,
    "edge": 0.1247,
@@ -607,7 +607,7 @@
    "by_bot_mark": 0,
    "per_day": 0.7,
    "days_to_hint": 44,
-   "days_to_conclusion": 445,
+   "days_to_conclusion": 447,
    "prudent_rate": 0.3364,
    "prob_above": 0.383,
    "edge": -0.0336,
@@ -681,7 +681,7 @@
    "by_bot_mark": 0,
    "per_day": 1.7,
    "days_to_hint": 17,
-   "days_to_conclusion": 178,
+   "days_to_conclusion": 179,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -829,7 +829,7 @@
    "by_bot_mark": 0,
    "per_day": 1.6,
    "days_to_hint": 18,
-   "days_to_conclusion": 187,
+   "days_to_conclusion": 188,
    "prudent_rate": 0.5254,
    "prob_above": 0.4902,
    "edge": -0.0051,
@@ -1648,11 +1648,11 @@
   }
  },
  "brain": {
-  "hypotheses": 268,
+  "hypotheses": 269,
   "tested": 1,
   "corrected_bar": 0.95,
   "counts": {
-   "em observação": 268
+   "em observação": 269
   },
   "board": {
    "best": [
@@ -1884,7 +1884,7 @@
      "as_expected": 0
     },
     "llm/refinar": {
-     "hypotheses": 5,
+     "hypotheses": 6,
      "judged": 0,
      "as_expected": 0
     }
@@ -6482,6 +6482,47 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T00:19:12+00:00",
+    "reason": "Jogos empatados ou com vantagem pequena tendem a ter mais gols na segunda parte",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Betfair | Competição = liga & Tamanho do mercado = 10 mil $ ou mais",
     "family": "Betfair",
     "conditions": [
@@ -6857,7 +6898,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 10,
+  "llm_total": 11,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -6865,15 +6906,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 9,
-  "llm_last_run_utc": "2026-11-12T23:20:32+00:00",
+  "llm_runs": 10,
+  "llm_last_run_utc": "2026-11-13T00:19:12+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
-   "day": "2026-11-12",
-   "calls_today": 8,
-   "neurons_today": 1224.8,
-   "accepted_today": 7,
-   "last_mode": "novas"
+   "day": "2026-11-13",
+   "calls_today": 1,
+   "neurons_today": 182.1,
+   "accepted_today": 1,
+   "last_mode": "refinar"
   },
   "notes": [
    {
