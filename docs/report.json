@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T16:48:31+00:00",
+ "generated_at_utc": "2026-11-13T16:57:08+00:00",
  "messages": 195,
  "types": {
   "SERVICE": 7,
@@ -24,19 +24,19 @@
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
   "last_collected_at_utc": "2026-11-13T16:10:47+00:00",
-  "hl_results": 34,
+  "hl_results": 35,
   "hl_vs_bot_disagreements": 0,
-  "hl_near_misses": 9,
-  "hl_last_run_utc": "2026-11-13T15:24:47+00:00",
+  "hl_near_misses": 10,
+  "hl_last_run_utc": "2026-11-13T16:56:53+00:00",
   "bsd_results": 6,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 4,
-  "bsd_last_run_utc": "2026-11-13T16:06:43+00:00",
+  "bsd_last_run_utc": "2026-11-13T16:56:54+00:00",
   "goal_minutes_matches": 34,
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T16:48:28+00:00",
+  "collector_last_run_utc": "2026-11-13T16:56:51+00:00",
   "name_review": [
    {
     "bot": [
@@ -131,6 +131,19 @@
    },
    {
     "bot": [
+     "UAE",
+     "Honduras"
+    ],
+    "bsd_candidates": [
+     [
+      "United Arab Emirates",
+      "Honduras"
+     ]
+    ],
+    "provider": "HL"
+   },
+   {
+    "bot": [
      "Vasteras SK",
      "Brommapojkarna"
     ],
@@ -218,39 +231,39 @@
   "goal_lists_consistent": 23
  },
  "unique_bets": 75,
- "settled_bets": 45,
+ "settled_bets": 46,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
    "bets": 33,
-   "settled": 15,
-   "matches": 15,
+   "settled": 16,
+   "matches": 16,
    "wins": 6,
    "pushes": 0,
-   "units": -2.38,
-   "avg_odds": 2.125,
+   "units": -3.38,
+   "avg_odds": 2.118,
    "roi": {
     "odd-0%": {
-     "roi": -0.1587,
+     "roi": -0.2113,
      "ci95": [
-      -0.7133,
-      0.3959
+      -0.7402,
+      0.3177
      ]
     },
     "odd-2%": {
-     "roi": -0.1755,
+     "roi": -0.227,
      "ci95": [
-      -0.719,
-      0.368
+      -0.7454,
+      0.2913
      ]
     },
     "odd-5%": {
-     "roi": -0.2007,
+     "roi": -0.2507,
      "ci95": [
-      -0.7276,
-      0.3261
+      -0.7532,
+      0.2518
      ]
     }
    },
@@ -269,7 +282,8 @@
     -1.42,
     -0.38,
     -1.38,
-    -2.38
+    -2.38,
+    -3.38
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -627,40 +641,40 @@
  "accuracy": {
   "BETFAIR/live": {
    "signals": 47,
-   "with_result": 27,
+   "with_result": 28,
    "hits": 12,
-   "misses": 15,
+   "misses": 16,
    "pushes": 0,
    "eff_hits": 12.0,
-   "eff_misses": 15.0,
+   "eff_misses": 16.0,
    "vote_hits": 12.0,
-   "vote_misses": 15.0,
-   "vote_break_even": 0.5066,
-   "games": 27,
+   "vote_misses": 16.0,
+   "vote_break_even": 0.5062,
+   "games": 28,
    "no_source": 9,
    "unsettleable": 0,
-   "hit_rate": 0.4444,
+   "hit_rate": 0.4286,
    "ci95": [
-    0.2759,
-    0.6269
+    0.2651,
+    0.6093
    ],
-   "avg_odds": 2.153,
-   "break_even": 0.5066,
+   "avg_odds": 2.148,
+   "break_even": 0.5062,
    "baseline": false,
-   "roi_announced_odds": -0.0996,
+   "roi_announced_odds": -0.1318,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 12.4,
+   "per_day": 12.9,
    "days_to_hint": 1,
    "days_to_conclusion": 22,
-   "prudent_rate": 0.4612,
-   "prob_above": 0.2888,
-   "edge": -0.0454,
+   "prudent_rate": 0.449,
+   "prob_above": 0.2382,
+   "edge": -0.0572,
    "edge_ci": [
-    -0.1774,
-    0.0891
+    -0.1869,
+    0.0755
    ],
-   "prob_above_cut": 0.2477
+   "prob_above_cut": 0.2008
   },
   "BETFAIR/pre": {
    "signals": 17,
@@ -726,7 +740,7 @@
    "by_bot_mark": 0,
    "per_day": 0.9,
    "days_to_hint": 31,
-   "days_to_conclusion": 325,
+   "days_to_conclusion": 326,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -800,7 +814,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 27,
-   "days_to_conclusion": 282,
+   "days_to_conclusion": 283,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -837,7 +851,7 @@
    "by_bot_mark": 0,
    "per_day": 1.9,
    "days_to_hint": 15,
-   "days_to_conclusion": 154,
+   "days_to_conclusion": 155,
    "prudent_rate": 0.6321,
    "prob_above": 0.6179,
    "edge": 0.0368,
@@ -948,7 +962,7 @@
    "by_bot_mark": 0,
    "per_day": 1.5,
    "days_to_hint": 18,
-   "days_to_conclusion": 193,
+   "days_to_conclusion": 194,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -963,7 +977,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 27,
+    "n": 28,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -1219,26 +1233,26 @@
     "value": "menos de 90"
    },
    {
-    "n": 13,
+    "n": 14,
     "signals": 31,
     "hits": 11,
-    "misses": 2,
-    "hit_rate": 0.8462,
+    "misses": 3,
+    "hit_rate": 0.7857,
     "ci95": [
-     0.5776,
-     0.9567
+     0.5241,
+     0.9243
     ],
-    "break_even": 0.5534,
-    "roi": 0.46,
-    "games": 13,
-    "prudent_rate": 0.7189,
-    "prob_above": 0.9536,
-    "edge": 0.1654,
+    "break_even": 0.5493,
+    "roi": 0.3557,
+    "games": 14,
+    "prudent_rate": 0.6872,
+    "prob_above": 0.9222,
+    "edge": 0.1379,
     "edge_ci": [
-     0.0039,
-     0.305
+     -0.0235,
+     0.2813
     ],
-    "prob_above_cut": 0.9424,
+    "prob_above_cut": 0.9053,
     "family": "Betfair",
     "dimension": "Quota de mercado",
     "value": "80 % ou mais"
@@ -1269,31 +1283,6 @@
     "value": "antes do jogo"
    },
    {
-    "n": 26,
-    "signals": 50,
-    "hits": 16,
-    "misses": 10,
-    "hit_rate": 0.6154,
-    "ci95": [
-     0.4253,
-     0.7757
-    ],
-    "break_even": 0.4991,
-    "roi": 0.24,
-    "games": 26,
-    "prudent_rate": 0.5831,
-    "prob_above": 0.8466,
-    "edge": 0.084,
-    "edge_ci": [
-     -0.0522,
-     0.2148
-    ],
-    "prob_above_cut": 0.8162,
-    "family": "Betfair",
-    "dimension": "Tamanho do mercado",
-    "value": "menos de 10 mil $"
-   },
-   {
     "n": 18,
     "signals": 26,
     "hits": 12,
@@ -1317,6 +1306,31 @@
     "family": "Betfair",
     "dimension": "Odd depois do sinal",
     "value": "subiu"
+   },
+   {
+    "n": 27,
+    "signals": 50,
+    "hits": 16,
+    "misses": 11,
+    "hit_rate": 0.5926,
+    "ci95": [
+     0.4073,
+     0.7549
+    ],
+    "break_even": 0.4989,
+    "roi": 0.1941,
+    "games": 27,
+    "prudent_rate": 0.5673,
+    "prob_above": 0.8001,
+    "edge": 0.0684,
+    "edge_ci": [
+     -0.0661,
+     0.1986
+    ],
+    "prob_above_cut": 0.764,
+    "family": "Betfair",
+    "dimension": "Tamanho do mercado",
+    "value": "menos de 10 mil $"
    },
    {
     "n": 11,
@@ -1369,54 +1383,29 @@
     "value": "odd 1,50 a 2,00"
    },
    {
-    "n": 26,
+    "n": 27,
     "signals": 50,
     "hits": 15,
-    "misses": 11,
-    "hit_rate": 0.5769,
+    "misses": 12,
+    "hit_rate": 0.5556,
     "ci95": [
-     0.3895,
-     0.7446
+     0.3731,
+     0.7241
     ],
-    "break_even": 0.5271,
-    "roi": 0.1369,
-    "games": 26,
-    "prudent_rate": 0.5631,
-    "prob_above": 0.6717,
-    "edge": 0.036,
+    "break_even": 0.5259,
+    "roi": 0.0948,
+    "games": 27,
+    "prudent_rate": 0.5475,
+    "prob_above": 0.6074,
+    "edge": 0.0216,
     "edge_ci": [
-     -0.1003,
-     0.1683
+     -0.1129,
+     0.1532
     ],
-    "prob_above_cut": 0.6241,
+    "prob_above_cut": 0.5568,
     "family": "Betfair",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com um só tipo de sinal"
-   },
-   {
-    "n": 37,
-    "signals": 64,
-    "hits": 20,
-    "misses": 17,
-    "hit_rate": 0.5405,
-    "ci95": [
-     0.3838,
-     0.6896
-    ],
-    "break_even": 0.5241,
-    "roi": 0.0408,
-    "games": 36,
-    "prudent_rate": 0.5376,
-    "prob_above": 0.5817,
-    "edge": 0.0147,
-    "edge_ci": [
-     -0.106,
-     0.1336
-    ],
-    "prob_above_cut": 0.5248,
-    "family": "Betfair",
-    "dimension": "Dia",
-    "value": "dia de semana"
    },
    {
     "n": 16,
@@ -1444,26 +1433,51 @@
     "value": "reforço ×4 ou mais"
    },
    {
-    "n": 16,
+    "n": 38,
+    "signals": 64,
+    "hits": 20,
+    "misses": 18,
+    "hit_rate": 0.5263,
+    "ci95": [
+     0.3726,
+     0.6752
+    ],
+    "break_even": 0.5234,
+    "roi": 0.0134,
+    "games": 37,
+    "prudent_rate": 0.526,
+    "prob_above": 0.5231,
+    "edge": 0.0039,
+    "edge_ci": [
+     -0.1155,
+     0.1219
+    ],
+    "prob_above_cut": 0.4651,
+    "family": "Betfair",
+    "dimension": "Dia",
+    "value": "dia de semana"
+   },
+   {
+    "n": 17,
     "signals": 24,
     "hits": 7,
-    "misses": 9,
-    "hit_rate": 0.4375,
+    "misses": 10,
+    "hit_rate": 0.4118,
     "ci95": [
-     0.231,
-     0.6682
+     0.2161,
+     0.6399
     ],
-    "break_even": 0.4424,
-    "roi": 0.0425,
-    "games": 16,
-    "prudent_rate": 0.4394,
-    "prob_above": 0.4815,
-    "edge": -0.003,
+    "break_even": 0.4455,
+    "roi": -0.0188,
+    "games": 17,
+    "prudent_rate": 0.4242,
+    "prob_above": 0.4052,
+    "edge": -0.0212,
     "edge_ci": [
-     -0.1577,
-     0.1571
+     -0.1719,
+     0.1359
     ],
-    "prob_above_cut": 0.4451,
+    "prob_above_cut": 0.3693,
     "family": "Betfair",
     "dimension": "Faixa de odd",
     "value": "odd 2,00 a 3,00"
@@ -1494,26 +1508,26 @@
     "value": "jogo com vários tipos de sinal"
    },
    {
-    "n": 27,
+    "n": 28,
     "signals": 47,
     "hits": 12,
-    "misses": 15,
-    "hit_rate": 0.4444,
+    "misses": 16,
+    "hit_rate": 0.4286,
     "ci95": [
-     0.2759,
-     0.6269
+     0.2651,
+     0.6093
     ],
-    "break_even": 0.5066,
-    "roi": -0.0996,
-    "games": 27,
-    "prudent_rate": 0.4613,
-    "prob_above": 0.2887,
-    "edge": -0.0454,
+    "break_even": 0.5062,
+    "roi": -0.1318,
+    "games": 28,
+    "prudent_rate": 0.449,
+    "prob_above": 0.2381,
+    "edge": -0.0572,
     "edge_ci": [
-     -0.1774,
-     0.089
+     -0.1869,
+     0.0755
     ],
-    "prob_above_cut": 0.2476,
+    "prob_above_cut": 0.2008,
     "family": "Betfair",
     "dimension": "Momento",
     "value": "durante o jogo"
@@ -1544,26 +1558,26 @@
     "value": "odd 1,50 a 2,00"
    },
    {
-    "n": 13,
+    "n": 14,
     "signals": 30,
     "hits": 5,
-    "misses": 8,
-    "hit_rate": 0.3846,
+    "misses": 9,
+    "hit_rate": 0.3571,
     "ci95": [
-     0.1771,
-     0.6448
+     0.1634,
+     0.6124
     ],
-    "break_even": 0.527,
-    "roi": -0.2631,
-    "games": 13,
-    "prudent_rate": 0.4465,
-    "prob_above": 0.2179,
-    "edge": -0.0805,
+    "break_even": 0.5248,
+    "roi": -0.3157,
+    "games": 14,
+    "prudent_rate": 0.427,
+    "prob_above": 0.1662,
+    "edge": -0.0978,
     "edge_ci": [
-     -0.2451,
-     0.0895
+     -0.2573,
+     0.0688
     ],
-    "prob_above_cut": 0.1889,
+    "prob_above_cut": 0.1415,
     "family": "Betfair",
     "dimension": "Reforço",
     "value": "sem reforço"
@@ -1822,26 +1836,26 @@
     "band": "odd 1,50 a 2,00"
    },
    {
-    "n": 23,
+    "n": 24,
     "signals": 34,
     "hits": 10,
-    "misses": 13,
-    "hit_rate": 0.4348,
+    "misses": 14,
+    "hit_rate": 0.4167,
     "ci95": [
-     0.2563,
-     0.6319
+     0.2447,
+     0.6117
     ],
-    "break_even": 0.447,
-    "roi": 0.0142,
-    "games": 21,
-    "prudent_rate": 0.4502,
-    "prob_above": 0.5159,
-    "edge": 0.0047,
+    "break_even": 0.449,
+    "roi": -0.0264,
+    "games": 22,
+    "prudent_rate": 0.4368,
+    "prob_above": 0.4449,
+    "edge": -0.0109,
     "edge_ci": [
-     -0.1384,
-     0.1514
+     -0.1509,
+     0.1336
     ],
-    "prob_above_cut": 0.4757,
+    "prob_above_cut": 0.4046,
     "band": "odd 2,00 a 3,00"
    },
    {
@@ -1869,17 +1883,17 @@
    }
   ],
   "luck": {
-   "n": 45,
-   "units": -3.33,
-   "luck_sd": 6.81,
-   "z": -0.49,
-   "max_drawdown": 7.14,
+   "n": 46,
+   "units": -4.33,
+   "luck_sd": 6.88,
+   "z": -0.63,
+   "max_drawdown": 7.28,
    "longest_losing_run": 6
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 16 em 17, precisa de 54 %, e a probabilidade de estar acima do mínimo é 100 % (amostra pequena, menos de 30 resultados).",
    "O mais fraco é aposta grande na Stake: 4 em 13, precisa de 54 %, probabilidade de estar acima do mínimo 14 %.",
-   "Saldo de -3,33 unidades em 45 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±13,6 unidades).",
+   "Saldo de -4,33 unidades em 46 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±13,8 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 12 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Foram comparados 25 segmentos; com tantos cortes, alguns parecem bons ou maus só por acaso. Um segmento só conta depois de se repetir em dados novos e de chegar a 300 resultados."
   ],
@@ -1952,38 +1966,6 @@
      "missing": 16
     },
     {
-     "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
-     "family": "Betfair",
-     "conditions": [
-      [
-       "Quota de mercado",
-       "80 % ou mais"
-      ],
-      [
-       "Sinal anterior de outro tipo no mesmo jogo",
-       "não"
-      ]
-     ],
-     "n": 12,
-     "hits": 11,
-     "hit_rate": 0.9167,
-     "break_even": 0.5861,
-     "prob_above": 0.9675,
-     "roi": 0.5817,
-     "source": "gerador",
-     "reason": null,
-     "games": 12,
-     "edge": 0.1803,
-     "edge_ci": [
-      0.022,
-      0.3105
-     ],
-     "prob_above_cut": 0.9588,
-     "prob_adds": 0.9892,
-     "level": "indício inicial",
-     "missing": 18
-    },
-    {
      "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais",
      "family": "Betfair",
      "conditions": [
@@ -2011,9 +1993,41 @@
       0.3322
      ],
      "prob_above_cut": 0.9515,
-     "prob_adds": 0.9817,
+     "prob_adds": 0.9857,
      "level": "indício inicial",
      "missing": 22
+    },
+    {
+     "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+     "family": "Betfair",
+     "conditions": [
+      [
+       "Quota de mercado",
+       "80 % ou mais"
+      ],
+      [
+       "Sinal anterior de outro tipo no mesmo jogo",
+       "não"
+      ]
+     ],
+     "n": 13,
+     "hits": 11,
+     "hit_rate": 0.8462,
+     "break_even": 0.5791,
+     "prob_above": 0.9405,
+     "roi": 0.46,
+     "source": "gerador",
+     "reason": null,
+     "games": 13,
+     "edge": 0.1509,
+     "edge_ci": [
+      -0.0092,
+      0.2879
+     ],
+     "prob_above_cut": 0.9262,
+     "prob_adds": 0.9786,
+     "level": "indício inicial",
+     "missing": 17
     }
    ],
    "avoid": [
@@ -2045,7 +2059,7 @@
       0.0302
      ],
      "prob_above_cut": 0.072,
-     "prob_adds": 0.0245,
+     "prob_adds": 0.0331,
      "level": "indício inicial",
      "missing": 18
     },
@@ -2081,7 +2095,7 @@
       0.0509
      ],
      "prob_above_cut": 0.1008,
-     "prob_adds": 0.0461,
+     "prob_adds": 0.0591,
      "level": "indício inicial",
      "missing": 19
     },
@@ -2131,7 +2145,7 @@
      "selection": "Saoura",
      "market": "1X2",
      "odds": 1.67,
-     "tactic": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não"
+     "tactic": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais"
     },
     {
      "date_utc": "2026-11-13T07:59:20+00:00",
@@ -2140,7 +2154,7 @@
      "selection": "Argentina",
      "market": "1X2",
      "odds": 1.6,
-     "tactic": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não"
+     "tactic": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais"
     },
     {
      "date_utc": "2026-11-12T15:08:59+00:00",
@@ -2157,6 +2171,184 @@
   },
   "agenda": {
    "items": [
+    {
+     "match_id": "saoura-vs-usm-khenchela-20261113",
+     "match": "Saoura — USM Khenchela",
+     "league": "Algerian Ligue 1",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-13T17:00+00:00",
+     "date_utc": "2026-11-13T15:05:53+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Saoura",
+     "odds": 1.67,
+     "odds_last": 1.67,
+     "max_mult": 1,
+     "share": 80,
+     "share_last": 80,
+     "verdict": "favorável",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 17,
+     "good": [
+      {
+       "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ]
+       ],
+       "n": 8,
+       "hits": 8,
+       "break_even": 0.573,
+       "prob_above": 0.9604,
+       "roi": 0.7625,
+       "edge": 0.1898,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 13,
+       "hits": 11,
+       "break_even": 0.5791,
+       "prob_above": 0.9405,
+       "roi": 0.46,
+       "edge": 0.1509,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = 80 % ou mais",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ]
+       ],
+       "n": 14,
+       "hits": 11,
+       "break_even": 0.5493,
+       "prob_above": 0.9222,
+       "roi": 0.3557,
+       "edge": 0.1379,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 15,
+     "bad": [],
+     "bad_total": 0
+    },
+    {
+     "match_id": "argentina-vs-uruguay-20261114",
+     "match": "Argentina — Uruguay",
+     "league": "International Friendlies International Match",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-13T23:00+00:00",
+     "date_utc": "2026-11-13T07:59:20+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Argentina",
+     "odds": 1.6,
+     "odds_last": 1.6,
+     "max_mult": 1,
+     "share": 95,
+     "share_last": 95,
+     "verdict": "favorável",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 17,
+     "good": [
+      {
+       "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ]
+       ],
+       "n": 8,
+       "hits": 8,
+       "break_even": 0.573,
+       "prob_above": 0.9604,
+       "roi": 0.7625,
+       "edge": 0.1898,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 13,
+       "hits": 11,
+       "break_even": 0.5791,
+       "prob_above": 0.9405,
+       "roi": 0.46,
+       "edge": 0.1509,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = 80 % ou mais",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ]
+       ],
+       "n": 14,
+       "hits": 11,
+       "break_even": 0.5493,
+       "prob_above": 0.9222,
+       "roi": 0.3557,
+       "edge": 0.1379,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 10,
+     "bad": [],
+     "bad_total": 0
+    },
     {
      "match_id": "moldova-vs-kazakhstan-20261113",
      "match": "Moldova — Kazakhstan",
@@ -2194,12 +2386,12 @@
          "não"
         ]
        ],
-       "n": 12,
+       "n": 13,
        "hits": 11,
-       "break_even": 0.5861,
-       "prob_above": 0.9675,
-       "roi": 0.5817,
-       "edge": 0.1803,
+       "break_even": 0.5791,
+       "prob_above": 0.9405,
+       "roi": 0.46,
+       "edge": 0.1509,
        "status": "em observação",
        "source": "gerador"
       },
@@ -2211,216 +2403,38 @@
          "80 % ou mais"
         ]
        ],
-       "n": 13,
+       "n": 14,
        "hits": 11,
-       "break_even": 0.5534,
-       "prob_above": 0.9536,
-       "roi": 0.46,
-       "edge": 0.1654,
+       "break_even": 0.5493,
+       "prob_above": 0.9222,
+       "roi": 0.3557,
+       "edge": 0.1379,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais",
+       "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo",
        "conditions": [
         [
          "Hora (UTC)",
          "tarde"
         ],
         [
-         "Quota de mercado",
-         "80 % ou mais"
+         "Momento",
+         "antes do jogo"
         ]
        ],
-       "n": 10,
-       "hits": 9,
-       "break_even": 0.5813,
-       "prob_above": 0.9391,
-       "roi": 0.57,
-       "edge": 0.1593,
+       "n": 9,
+       "hits": 8,
+       "break_even": 0.5819,
+       "prob_above": 0.9157,
+       "roi": 0.5778,
+       "edge": 0.1454,
        "status": "em observação",
        "source": "gerador"
       }
      ],
      "good_total": 9,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
-     "match_id": "saoura-vs-usm-khenchela-20261113",
-     "match": "Saoura — USM Khenchela",
-     "league": "Algerian Ligue 1",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-13T17:00+00:00",
-     "date_utc": "2026-11-13T15:05:53+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Saoura",
-     "odds": 1.67,
-     "odds_last": 1.67,
-     "max_mult": 1,
-     "share": 80,
-     "share_last": 80,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 17,
-     "good": [
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 12,
-       "hits": 11,
-       "break_even": 0.5861,
-       "prob_above": 0.9675,
-       "roi": 0.5817,
-       "edge": 0.1803,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ]
-       ],
-       "n": 8,
-       "hits": 8,
-       "break_even": 0.573,
-       "prob_above": 0.9604,
-       "roi": 0.7625,
-       "edge": 0.1898,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ]
-       ],
-       "n": 13,
-       "hits": 11,
-       "break_even": 0.5534,
-       "prob_above": 0.9536,
-       "roi": 0.46,
-       "edge": 0.1654,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 17,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
-     "match_id": "argentina-vs-uruguay-20261114",
-     "match": "Argentina — Uruguay",
-     "league": "International Friendlies International Match",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-13T23:00+00:00",
-     "date_utc": "2026-11-13T07:59:20+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Argentina",
-     "odds": 1.6,
-     "odds_last": 1.6,
-     "max_mult": 1,
-     "share": 95,
-     "share_last": 95,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 17,
-     "good": [
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 12,
-       "hits": 11,
-       "break_even": 0.5861,
-       "prob_above": 0.9675,
-       "roi": 0.5817,
-       "edge": 0.1803,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ]
-       ],
-       "n": 8,
-       "hits": 8,
-       "break_even": 0.573,
-       "prob_above": 0.9604,
-       "roi": 0.7625,
-       "edge": 0.1898,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ]
-       ],
-       "n": 13,
-       "hits": 11,
-       "break_even": 0.5534,
-       "prob_above": 0.9536,
-       "roi": 0.46,
-       "edge": 0.1654,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 11,
      "bad": [],
      "bad_total": 0
     },
@@ -2492,19 +2506,23 @@
        "source": "gerador"
       },
       {
-       "id": "Betfair | Tamanho do mercado = menos de 10 mil $",
+       "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
        "conditions": [
         [
-         "Tamanho do mercado",
-         "menos de 10 mil $"
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
         ]
        ],
-       "n": 26,
-       "hits": 16,
-       "break_even": 0.4991,
-       "prob_above": 0.8466,
-       "roi": 0.24,
-       "edge": 0.084,
+       "n": 15,
+       "hits": 11,
+       "break_even": 0.5769,
+       "prob_above": 0.8417,
+       "roi": 0.278,
+       "edge": 0.0939,
        "status": "em observação",
        "source": "gerador"
       }
@@ -2607,27 +2625,6 @@
        "source": "gerador"
       },
       {
-       "id": "Betfair | Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
-       "conditions": [
-        [
-         "Seleção",
-         "equipa da casa"
-        ],
-        [
-         "Tamanho do mercado",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 12,
-       "hits": 9,
-       "break_even": 0.5286,
-       "prob_above": 0.8804,
-       "roi": 0.4275,
-       "edge": 0.1208,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
        "id": "Betfair | Momento = antes do jogo",
        "conditions": [
         [
@@ -2643,9 +2640,30 @@
        "edge": 0.1143,
        "status": "em observação",
        "source": "gerador"
+      },
+      {
+       "id": "Betfair | Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
+       "conditions": [
+        [
+         "Seleção",
+         "equipa da casa"
+        ],
+        [
+         "Tamanho do mercado",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 13,
+       "hits": 9,
+       "break_even": 0.526,
+       "prob_above": 0.8246,
+       "roi": 0.3177,
+       "edge": 0.094,
+       "status": "em observação",
+       "source": "gerador"
       }
      ],
-     "good_total": 5,
+     "good_total": 4,
      "bad": [
       {
        "id": "Betfair | Quota de mercado = menos de 80 %",
@@ -2796,12 +2814,12 @@
          "menos de 10 mil $"
         ]
        ],
-       "n": 26,
+       "n": 27,
        "hits": 16,
-       "break_even": 0.4991,
-       "prob_above": 0.8466,
-       "roi": 0.24,
-       "edge": 0.084,
+       "break_even": 0.4989,
+       "prob_above": 0.8001,
+       "roi": 0.1941,
+       "edge": 0.0684,
        "status": "em observação",
        "source": "gerador"
       }
@@ -2851,7 +2869,7 @@
      "conflict": true,
      "validated": false,
      "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 16,
+     "odds_band_n": 17,
      "good": [
       {
        "id": "Betfair | Momento = antes do jogo & Volume na seleção = menos de 10 mil $",
@@ -2875,27 +2893,6 @@
        "source": "gerador"
       },
       {
-       "id": "Betfair | Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
-       "conditions": [
-        [
-         "Seleção",
-         "equipa da casa"
-        ],
-        [
-         "Volume na seleção",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 12,
-       "hits": 9,
-       "break_even": 0.5286,
-       "prob_above": 0.8804,
-       "roi": 0.4275,
-       "edge": 0.1208,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
        "id": "Betfair | Momento = antes do jogo",
        "conditions": [
         [
@@ -2911,9 +2908,30 @@
        "edge": 0.1143,
        "status": "em observação",
        "source": "gerador"
+      },
+      {
+       "id": "Betfair | Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
+       "conditions": [
+        [
+         "Seleção",
+         "equipa da casa"
+        ],
+        [
+         "Volume na seleção",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 13,
+       "hits": 9,
+       "break_even": 0.526,
+       "prob_above": 0.8246,
+       "roi": 0.3177,
+       "edge": 0.094,
+       "status": "em observação",
+       "source": "gerador"
       }
      ],
-     "good_total": 5,
+     "good_total": 4,
      "bad": [
       {
        "id": "Betfair | Quota de mercado = menos de 80 %",
@@ -3018,7 +3036,7 @@
     "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T16:48:31+00:00",
+   "generated_utc": "2026-11-13T16:57:08+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3032,8 +3050,8 @@
    "by_source": {
     "gerador": {
      "hypotheses": 672,
-     "judged": 175,
-     "as_expected": 127
+     "judged": 176,
+     "as_expected": 118
     },
     "llm/novas": {
      "hypotheses": 6,
@@ -3060,12 +3078,12 @@
   "walk_forward": {
    "followed": {
     "bets": 42,
-    "settled": 19,
-    "games": 17,
+    "settled": 20,
+    "games": 18,
     "wins": 11,
-    "units": 2.58,
-    "roi": 0.1358,
-    "roi_cut": 0.1141
+    "units": 1.58,
+    "roi": 0.079,
+    "roi_cut": 0.0584
    },
    "skipped": {
     "bets": 33,
@@ -3095,9 +3113,10 @@
     3.62,
     2.62,
     1.62,
-    2.58
+    2.58,
+    1.58
    ],
-   "prob_followed_better": 0.8161,
+   "prob_followed_better": 0.7729,
    "first_followed_utc": "2026-11-12T09:07:24+00:00",
    "rule": {
     "min_results": 8,
@@ -3437,7 +3456,7 @@
      0.3351
     ],
     "prob_above_cut": 0.9786,
-    "prob_adds": 0.9977
+    "prob_adds": 0.9984
    },
    {
     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
@@ -3553,7 +3572,7 @@
      0.3471
     ],
     "prob_above_cut": 0.9763,
-    "prob_adds": 0.996
+    "prob_adds": 0.9971
    },
    {
     "id": "Jogo aberto | Ritmo indicado pelo bot = 90 ou mais",
@@ -3673,7 +3692,7 @@
      0.3388
     ],
     "prob_above_cut": 0.9665,
-    "prob_adds": 0.9908
+    "prob_adds": 0.993
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
@@ -3708,7 +3727,7 @@
      0.3408
     ],
     "prob_above_cut": 0.9653,
-    "prob_adds": 0.9913
+    "prob_adds": 0.9935
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -3743,7 +3762,7 @@
      0.3408
     ],
     "prob_above_cut": 0.9653,
-    "prob_adds": 0.9913
+    "prob_adds": 0.9935
    },
    {
     "id": "Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
@@ -3901,37 +3920,6 @@
     "prob_adds": 0.531
    },
    {
-    "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 12,
-    "hits": 11,
-    "hit_rate": 0.9167,
-    "break_even": 0.5861,
-    "prob_above": 0.9675,
-    "roi": 0.5817,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 12,
-    "edge": 0.1803,
-    "edge_ci": [
-     0.022,
-     0.3105
-    ],
-    "prob_above_cut": 0.9588,
-    "prob_adds": 0.9892
-   },
-   {
     "id": "Betfair | Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
     "family": "Betfair",
     "conditions": [
@@ -3960,7 +3948,7 @@
      0.3268
     ],
     "prob_above_cut": 0.9592,
-    "prob_adds": 0.99
+    "prob_adds": 0.9926
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -3991,7 +3979,7 @@
      0.3268
     ],
     "prob_above_cut": 0.9592,
-    "prob_adds": 0.99
+    "prob_adds": 0.9926
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Quota depois do sinal = desceu & Seleção = equipa da casa",
@@ -4026,7 +4014,7 @@
      0.3486
     ],
     "prob_above_cut": 0.959,
-    "prob_adds": 0.9858
+    "prob_adds": 0.989
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais",
@@ -4061,7 +4049,7 @@
      0.3479
     ],
     "prob_above_cut": 0.9587,
-    "prob_adds": 0.986
+    "prob_adds": 0.9891
    },
    {
     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -4224,7 +4212,7 @@
      0.3227
     ],
     "prob_above_cut": 0.9564,
-    "prob_adds": 0.9888
+    "prob_adds": 0.9916
    },
    {
     "id": "Betfair | Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu",
@@ -4255,7 +4243,7 @@
      0.3394
     ],
     "prob_above_cut": 0.9549,
-    "prob_adds": 0.9838
+    "prob_adds": 0.9873
    },
    {
     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
@@ -4317,7 +4305,7 @@
      0.3371
     ],
     "prob_above_cut": 0.9538,
-    "prob_adds": 0.9831
+    "prob_adds": 0.9868
    },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -4484,7 +4472,7 @@
      0.3348
     ],
     "prob_above_cut": 0.9527,
-    "prob_adds": 0.9825
+    "prob_adds": 0.9863
    },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde",
@@ -4577,7 +4565,7 @@
      0.3322
     ],
     "prob_above_cut": 0.9515,
-    "prob_adds": 0.9817
+    "prob_adds": 0.9857
    },
    {
     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60",
@@ -4705,7 +4693,7 @@
      0.3291
     ],
     "prob_above_cut": 0.95,
-    "prob_adds": 0.9803
+    "prob_adds": 0.9846
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Quota depois do sinal = desceu",
@@ -4740,7 +4728,7 @@
      0.3342
     ],
     "prob_above_cut": 0.9501,
-    "prob_adds": 0.9827
+    "prob_adds": 0.9865
    },
    {
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60",
@@ -4860,7 +4848,7 @@
      0.3263
     ],
     "prob_above_cut": 0.9447,
-    "prob_adds": 0.9791
+    "prob_adds": 0.9837
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais",
@@ -4891,34 +4879,7 @@
      0.3257
     ],
     "prob_above_cut": 0.9443,
-    "prob_adds": 0.9793
-   },
-   {
-    "id": "Betfair | Quota de mercado = 80 % ou mais",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ]
-    ],
-    "n": 13,
-    "hits": 11,
-    "hit_rate": 0.8462,
-    "break_even": 0.5534,
-    "prob_above": 0.9536,
-    "roi": 0.46,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 13,
-    "edge": 0.1654,
-    "edge_ci": [
-     0.0039,
-     0.305
-    ],
-    "prob_above_cut": 0.9424,
-    "prob_adds": 0.9819
+    "prob_adds": 0.9838
    },
    {
     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Golos em falta para ganhar = até 1 golo",
@@ -5046,7 +5007,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo & Tamanho do mercado = menos de 10 mil $",
@@ -5081,7 +5042,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo & Volume na seleção = menos de 10 mil $",
@@ -5116,7 +5077,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Momento = antes do jogo & Quota depois do sinal = desceu",
@@ -5147,7 +5108,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Momento = antes do jogo & Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
@@ -5182,7 +5143,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Quota de mercado = 80 % ou mais & Reforço = reforço ×4 ou mais",
@@ -5213,7 +5174,7 @@
      0.3423
     ],
     "prob_above_cut": 0.9408,
-    "prob_adds": 0.9735
+    "prob_adds": 0.9786
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu",
@@ -5248,69 +5209,7 @@
      0.3378
     ],
     "prob_above_cut": 0.9383,
-    "prob_adds": 0.9717
-   },
-   {
-    "id": "Betfair | Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Tamanho do mercado",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5618,
-    "prob_above": 0.9459,
-    "roi": 0.8157,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 7,
-    "edge": 0.1804,
-    "edge_ci": [
-     -0.0048,
-     0.3324
-    ],
-    "prob_above_cut": 0.9352,
-    "prob_adds": 0.9695
-   },
-   {
-    "id": "Betfair | Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Volume na seleção",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5618,
-    "prob_above": 0.9459,
-    "roi": 0.8157,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 7,
-    "edge": 0.1804,
-    "edge_ci": [
-     -0.0048,
-     0.3324
-    ],
-    "prob_above_cut": 0.9352,
-    "prob_adds": 0.9695
+    "prob_adds": 0.9772
    },
    {
     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
@@ -5434,7 +5333,7 @@
      0.3329
     ],
     "prob_above_cut": 0.9343,
-    "prob_adds": 0.9706
+    "prob_adds": 0.9765
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota de mercado = 80 % ou mais",
@@ -5465,7 +5364,7 @@
      0.3285
     ],
     "prob_above_cut": 0.9329,
-    "prob_adds": 0.9678
+    "prob_adds": 0.9739
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu",
@@ -5500,7 +5399,7 @@
      0.3285
     ],
     "prob_above_cut": 0.9329,
-    "prob_adds": 0.9678
+    "prob_adds": 0.9739
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
@@ -5535,7 +5434,7 @@
      0.328
     ],
     "prob_above_cut": 0.9326,
-    "prob_adds": 0.9675
+    "prob_adds": 0.9737
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -5570,7 +5469,7 @@
      0.328
     ],
     "prob_above_cut": 0.9326,
-    "prob_adds": 0.9675
+    "prob_adds": 0.9737
    },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -5643,6 +5542,37 @@
     "prob_adds": 0.3491
    },
    {
+    "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 13,
+    "hits": 11,
+    "hit_rate": 0.8462,
+    "break_even": 0.5791,
+    "prob_above": 0.9405,
+    "roi": 0.46,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 13,
+    "edge": 0.1509,
+    "edge_ci": [
+     -0.0092,
+     0.2879
+    ],
+    "prob_above_cut": 0.9262,
+    "prob_adds": 0.9786
+   },
+   {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Odd depois do sinal = subiu & Quota depois do sinal = desceu",
     "family": "Betfair",
     "conditions": [
@@ -5675,38 +5605,7 @@
      0.3212
     ],
     "prob_above_cut": 0.9285,
-    "prob_adds": 0.9644
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ]
-    ],
-    "n": 10,
-    "hits": 9,
-    "hit_rate": 0.9,
-    "break_even": 0.5813,
-    "prob_above": 0.9391,
-    "roi": 0.57,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 10,
-    "edge": 0.1593,
-    "edge_ci": [
-     -0.0112,
-     0.3019
-    ],
-    "prob_above_cut": 0.9256,
-    "prob_adds": 0.9666
+    "prob_adds": 0.9711
    },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -5865,7 +5764,7 @@
      0.3121
     ],
     "prob_above_cut": 0.9201,
-    "prob_adds": 0.9643
+    "prob_adds": 0.9715
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -5900,7 +5799,7 @@
      0.3121
     ],
     "prob_above_cut": 0.9201,
-    "prob_adds": 0.9643
+    "prob_adds": 0.9715
    },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
@@ -5932,68 +5831,6 @@
     ],
     "prob_above_cut": 0.9199,
     "prob_adds": 0.3132
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Tamanho do mercado = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Tamanho do mercado",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 20,
-    "hits": 14,
-    "hit_rate": 0.7,
-    "break_even": 0.5012,
-    "prob_above": 0.9309,
-    "roi": 0.4265,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 20,
-    "edge": 0.1326,
-    "edge_ci": [
-     -0.015,
-     0.2698
-    ],
-    "prob_above_cut": 0.915,
-    "prob_adds": 0.9783
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Volume na seleção = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Volume na seleção",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 20,
-    "hits": 14,
-    "hit_rate": 0.7,
-    "break_even": 0.5012,
-    "prob_above": 0.9309,
-    "roi": 0.4265,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 20,
-    "edge": 0.1326,
-    "edge_ci": [
-     -0.015,
-     0.2698
-    ],
-    "prob_above_cut": 0.915,
-    "prob_adds": 0.9783
    },
    {
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos",
@@ -6059,7 +5896,7 @@
      0.3307
     ],
     "prob_above_cut": 0.9131,
-    "prob_adds": 0.9526
+    "prob_adds": 0.961
    },
    {
     "id": "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -6094,77 +5931,7 @@
      0.3307
     ],
     "prob_above_cut": 0.9131,
-    "prob_adds": 0.9526
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Tamanho do mercado",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 6,
-    "hits": 6,
-    "hit_rate": 1.0,
-    "break_even": 0.5557,
-    "prob_above": 0.924,
-    "roi": 0.84,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 6,
-    "edge": 0.1666,
-    "edge_ci": [
-     -0.0275,
-     0.3283
-    ],
-    "prob_above_cut": 0.9107,
-    "prob_adds": 0.9483
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Volume na seleção",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 6,
-    "hits": 6,
-    "hit_rate": 1.0,
-    "break_even": 0.5557,
-    "prob_above": 0.924,
-    "roi": 0.84,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 6,
-    "edge": 0.1666,
-    "edge_ci": [
-     -0.0275,
-     0.3283
-    ],
-    "prob_above_cut": 0.9107,
-    "prob_adds": 0.9483
+    "prob_adds": 0.961
    },
    {
     "id": "Betfair | Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu & Tamanho do mercado = menos de 10 mil $",
@@ -6199,7 +5966,7 @@
      0.3283
     ],
     "prob_above_cut": 0.9107,
-    "prob_adds": 0.9483
+    "prob_adds": 0.9569
    },
    {
     "id": "Betfair | Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu & Volume na seleção = menos de 10 mil $",
@@ -6234,7 +6001,7 @@
      0.3283
     ],
     "prob_above_cut": 0.9107,
-    "prob_adds": 0.9483
+    "prob_adds": 0.9569
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota depois do sinal = desceu",
@@ -6269,7 +6036,7 @@
      0.3267
     ],
     "prob_above_cut": 0.9093,
-    "prob_adds": 0.9495
+    "prob_adds": 0.9584
    },
    {
     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90",
@@ -6335,7 +6102,7 @@
      0.3256
     ],
     "prob_above_cut": 0.9088,
-    "prob_adds": 0.9466
+    "prob_adds": 0.9555
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Tamanho do mercado = menos de 10 mil $",
@@ -6370,7 +6137,7 @@
      0.3255
     ],
     "prob_above_cut": 0.9087,
-    "prob_adds": 0.9466
+    "prob_adds": 0.9554
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Volume na seleção = menos de 10 mil $",
@@ -6405,7 +6172,7 @@
      0.3255
     ],
     "prob_above_cut": 0.9087,
-    "prob_adds": 0.9466
+    "prob_adds": 0.9554
    },
    {
     "id": "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
@@ -6476,6 +6243,33 @@
     ],
     "prob_above_cut": 0.9078,
     "prob_adds": 0.258
+   },
+   {
+    "id": "Betfair | Quota de mercado = 80 % ou mais",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ]
+    ],
+    "n": 14,
+    "hits": 11,
+    "hit_rate": 0.7857,
+    "break_even": 0.5493,
+    "prob_above": 0.9222,
+    "roi": 0.3557,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 14,
+    "edge": 0.1379,
+    "edge_ci": [
+     -0.0235,
+     0.2813
+    ],
+    "prob_above_cut": 0.9053,
+    "prob_adds": 0.9687
    },
    {
     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
@@ -6572,7 +6366,7 @@
      0.3181
     ],
     "prob_above_cut": 0.9035,
-    "prob_adds": 0.9406
+    "prob_adds": 0.9505
    },
    {
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
@@ -6638,7 +6432,7 @@
      0.2947
     ],
     "prob_above_cut": 0.899,
-    "prob_adds": 0.9435
+    "prob_adds": 0.9538
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo & Quota de mercado = 80 % ou mais",
@@ -6673,7 +6467,7 @@
      0.3123
     ],
     "prob_above_cut": 0.8994,
-    "prob_adds": 0.938
+    "prob_adds": 0.9481
    },
    {
     "id": "Betfair | Momento = antes do jogo & Quota de mercado = 80 % ou mais",
@@ -6704,7 +6498,7 @@
      0.3123
     ],
     "prob_above_cut": 0.8994,
-    "prob_adds": 0.938
+    "prob_adds": 0.9481
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
@@ -6739,7 +6533,7 @@
      0.3146
     ],
     "prob_above_cut": 0.8968,
-    "prob_adds": 0.9388
+    "prob_adds": 0.9493
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
@@ -6774,7 +6568,7 @@
      0.3146
     ],
     "prob_above_cut": 0.8968,
-    "prob_adds": 0.9388
+    "prob_adds": 0.9493
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais & Tamanho do mercado = menos de 10 mil $",
@@ -6809,7 +6603,7 @@
      0.314
     ],
     "prob_above_cut": 0.8961,
-    "prob_adds": 0.9394
+    "prob_adds": 0.9496
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais & Volume na seleção = menos de 10 mil $",
@@ -6844,7 +6638,7 @@
      0.314
     ],
     "prob_above_cut": 0.8961,
-    "prob_adds": 0.9394
+    "prob_adds": 0.9496
    },
    {
     "id": "Betfair | Momento = antes do jogo & Tamanho do mercado = menos de 10 mil $",
@@ -6875,7 +6669,7 @@
      0.3131
     ],
     "prob_above_cut": 0.8952,
-    "prob_adds": 0.9386
+    "prob_adds": 0.9489
    },
    {
     "id": "Betfair | Momento = antes do jogo & Volume na seleção = menos de 10 mil $",
@@ -6906,7 +6700,7 @@
      0.3131
     ],
     "prob_above_cut": 0.8952,
-    "prob_adds": 0.9386
+    "prob_adds": 0.9489
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota depois do sinal = desceu & Seleção = equipa da casa",
@@ -6941,7 +6735,7 @@
      0.3089
     ],
     "prob_above_cut": 0.8906,
-    "prob_adds": 0.9332
+    "prob_adds": 0.9445
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais",
@@ -6976,7 +6770,7 @@
      0.3082
     ],
     "prob_above_cut": 0.8899,
-    "prob_adds": 0.9338
+    "prob_adds": 0.9449
    },
    {
     "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Parte do jogo = 2.ª parte",
@@ -7165,6 +6959,68 @@
     "prob_adds": 0.2462
    },
    {
+    "id": "Betfair | Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 8,
+    "hits": 7,
+    "hit_rate": 0.875,
+    "break_even": 0.5535,
+    "prob_above": 0.9016,
+    "roi": 0.5887,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 8,
+    "edge": 0.1429,
+    "edge_ci": [
+     -0.043,
+     0.3033
+    ],
+    "prob_above_cut": 0.8844,
+    "prob_adds": 0.9406
+   },
+   {
+    "id": "Betfair | Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ],
+     [
+      "Volume na seleção",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 8,
+    "hits": 7,
+    "hit_rate": 0.875,
+    "break_even": 0.5535,
+    "prob_above": 0.9016,
+    "roi": 0.5887,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 8,
+    "edge": 0.1429,
+    "edge_ci": [
+     -0.043,
+     0.3033
+    ],
+    "prob_above_cut": 0.8844,
+    "prob_adds": 0.9406
+   },
+   {
     "id": "Betfair | Momento = antes do jogo & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
     "family": "Betfair",
     "conditions": [
@@ -7197,7 +7053,7 @@
      0.3316
     ],
     "prob_above_cut": 0.8845,
-    "prob_adds": 0.9227
+    "prob_adds": 0.9339
    },
    {
     "id": "Betfair | Momento = antes do jogo & Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
@@ -7232,7 +7088,7 @@
      0.3316
     ],
     "prob_above_cut": 0.8845,
-    "prob_adds": 0.9227
+    "prob_adds": 0.9339
    },
    {
     "id": "Betfair | Quota depois do sinal = desceu & Reforço = reforço ×4 ou mais & Seleção = equipa da casa",
@@ -7267,7 +7123,69 @@
      0.3006
     ],
     "prob_above_cut": 0.8813,
-    "prob_adds": 0.9244
+    "prob_adds": 0.937
+   },
+   {
+    "id": "Betfair | Hora (UTC) = tarde & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 21,
+    "hits": 14,
+    "hit_rate": 0.6667,
+    "break_even": 0.5009,
+    "prob_above": 0.8986,
+    "roi": 0.3586,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 21,
+    "edge": 0.1123,
+    "edge_ci": [
+     -0.0337,
+     0.2499
+    ],
+    "prob_above_cut": 0.8773,
+    "prob_adds": 0.969
+   },
+   {
+    "id": "Betfair | Hora (UTC) = tarde & Volume na seleção = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Volume na seleção",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 21,
+    "hits": 14,
+    "hit_rate": 0.6667,
+    "break_even": 0.5009,
+    "prob_above": 0.8986,
+    "roi": 0.3586,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 21,
+    "edge": 0.1123,
+    "edge_ci": [
+     -0.0337,
+     0.2499
+    ],
+    "prob_above_cut": 0.8773,
+    "prob_adds": 0.969
    },
    {
     "id": "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota depois do sinal = desceu & Seleção = equipa da casa",
@@ -7302,10 +7220,10 @@
      0.3286
     ],
     "prob_above_cut": 0.8821,
-    "prob_adds": 0.9189
+    "prob_adds": 0.9308
    },
    {
-    "id": "Betfair | Hora (UTC) = tarde & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
+    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = 80 % ou mais",
     "family": "Betfair",
     "conditions": [
      [
@@ -7313,66 +7231,27 @@
       "tarde"
      ],
      [
-      "Seleção",
-      "equipa da casa"
-     ],
-     [
-      "Tamanho do mercado",
-      "menos de 10 mil $"
+      "Quota de mercado",
+      "80 % ou mais"
      ]
     ],
-    "n": 10,
-    "hits": 8,
-    "hit_rate": 0.8,
-    "break_even": 0.5309,
-    "prob_above": 0.8956,
-    "roi": 0.546,
+    "n": 11,
+    "hits": 9,
+    "hit_rate": 0.8182,
+    "break_even": 0.5735,
+    "prob_above": 0.8961,
+    "roi": 0.4273,
     "status": "em observação",
     "tradable": true,
     "expect": null,
-    "games": 10,
-    "edge": 0.1345,
+    "games": 11,
+    "edge": 0.1282,
     "edge_ci": [
-     -0.0444,
-     0.2942
+     -0.0431,
+     0.2771
     ],
-    "prob_above_cut": 0.8774,
-    "prob_adds": 0.9261
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Seleção",
-      "equipa da casa"
-     ],
-     [
-      "Volume na seleção",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 10,
-    "hits": 8,
-    "hit_rate": 0.8,
-    "break_even": 0.5309,
-    "prob_above": 0.8956,
-    "roi": 0.546,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 10,
-    "edge": 0.1345,
-    "edge_ci": [
-     -0.0444,
-     0.2942
-    ],
-    "prob_above_cut": 0.8774,
-    "prob_adds": 0.9261
+    "prob_above_cut": 0.8758,
+    "prob_adds": 0.9413
    },
    {
     "id": "Betfair | Momento = antes do jogo & Odd depois do sinal = subiu & Volume na seleção = menos de 10 mil $",
@@ -7407,7 +7286,7 @@
      0.3233
     ],
     "prob_above_cut": 0.8778,
-    "prob_adds": 0.9162
+    "prob_adds": 0.9282
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Seleção = equipa da casa & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -7442,7 +7321,7 @@
      0.2746
     ],
     "prob_above_cut": 0.8722,
-    "prob_adds": 0.9232
+    "prob_adds": 0.9374
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota depois do sinal = desceu",
@@ -7477,7 +7356,7 @@
      0.3183
     ],
     "prob_above_cut": 0.8745,
-    "prob_adds": 0.9161
+    "prob_adds": 0.9289
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
@@ -7512,7 +7391,7 @@
      0.3164
     ],
     "prob_above_cut": 0.8722,
-    "prob_adds": 0.9105
+    "prob_adds": 0.9233
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
@@ -7547,7 +7426,7 @@
      0.3164
     ],
     "prob_above_cut": 0.8722,
-    "prob_adds": 0.9105
+    "prob_adds": 0.9233
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Reforço = reforço ×4 ou mais & Seleção = equipa da casa",
@@ -7582,7 +7461,7 @@
      0.2904
     ],
     "prob_above_cut": 0.8693,
-    "prob_adds": 0.9126
+    "prob_adds": 0.9268
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Tamanho do mercado = menos de 10 mil $",
@@ -7617,7 +7496,7 @@
      0.2817
     ],
     "prob_above_cut": 0.8683,
-    "prob_adds": 0.9247
+    "prob_adds": 0.9383
    },
    {
     "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Volume na seleção = menos de 10 mil $",
@@ -7652,7 +7531,7 @@
      0.2817
     ],
     "prob_above_cut": 0.8683,
-    "prob_adds": 0.9247
+    "prob_adds": 0.9383
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
@@ -7687,7 +7566,7 @@
      0.3146
     ],
     "prob_above_cut": 0.8708,
-    "prob_adds": 0.909
+    "prob_adds": 0.9219
    },
    {
     "id": "Betfair | Odd depois do sinal = subiu & Quota de mercado = 80 % ou mais & Volume na seleção = menos de 10 mil $",
@@ -7722,7 +7601,7 @@
      0.3146
     ],
     "prob_above_cut": 0.8708,
-    "prob_adds": 0.909
+    "prob_adds": 0.9219
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
@@ -7757,7 +7636,7 @@
      0.2893
     ],
     "prob_above_cut": 0.868,
-    "prob_adds": 0.9112
+    "prob_adds": 0.9256
    },
    {
     "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
@@ -7792,7 +7671,7 @@
      0.2893
     ],
     "prob_above_cut": 0.868,
-    "prob_adds": 0.9112
+    "prob_adds": 0.9256
    },
    {
     "id": "Betfair | Momento = antes do jogo & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
@@ -7827,7 +7706,7 @@
      0.3123
     ],
     "prob_above_cut": 0.8689,
-    "prob_adds": 0.9052
+    "prob_adds": 0.9189
    },
    {
     "id": "Betfair | Momento = antes do jogo & Seleção = equipa da casa & Volume na seleção = menos de 10 mil $",
@@ -7862,7 +7741,7 @@
      0.3123
     ],
     "prob_above_cut": 0.8689,
-    "prob_adds": 0.9052
+    "prob_adds": 0.9189
    },
    {
     "id": "Betfair | Quota de mercado = 80 % ou mais & Quota depois do sinal = desceu & Seleção = equipa da casa",
@@ -7897,7 +7776,7 @@
      0.3124
     ],
     "prob_above_cut": 0.8689,
-    "prob_adds": 0.9053
+    "prob_adds": 0.9189
    },
    {
     "id": "Jogo aberto | Competição = liga",
@@ -7955,7 +7834,139 @@
      0.2706
     ],
     "prob_above_cut": 0.8616,
-    "prob_adds": 0.9246
+    "prob_adds": 0.9389
+   },
+   {
+    "id": "Betfair | Odd depois do sinal = subiu & Volume na seleção = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Odd depois do sinal",
+      "subiu"
+     ],
+     [
+      "Volume na seleção",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 14,
+    "hits": 10,
+    "hit_rate": 0.7143,
+    "break_even": 0.5121,
+    "prob_above": 0.8826,
+    "roi": 0.39,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 14,
+    "edge": 0.118,
+    "edge_ci": [
+     -0.0473,
+     0.2706
+    ],
+    "prob_above_cut": 0.8616,
+    "prob_adds": 0.9389
+   },
+   {
+    "id": "Betfair | Momento = antes do jogo & Reforço = reforço ×4 ou mais & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Momento",
+      "antes do jogo"
+     ],
+     [
+      "Reforço",
+      "reforço ×4 ou mais"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.8571,
+    "break_even": 0.5285,
+    "prob_above": 0.879,
+    "roi": 0.6186,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 7,
+    "edge": 0.1353,
+    "edge_ci": [
+     -0.059,
+     0.3071
+    ],
+    "prob_above_cut": 0.8606,
+    "prob_adds": 0.9183
+   },
+   {
+    "id": "Betfair | Momento = antes do jogo & Reforço = reforço ×4 ou mais & Volume na seleção = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Momento",
+      "antes do jogo"
+     ],
+     [
+      "Reforço",
+      "reforço ×4 ou mais"
+     ],
+     [
+      "Volume na seleção",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.8571,
+    "break_even": 0.5285,
+    "prob_above": 0.879,
+    "roi": 0.6186,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 7,
+    "edge": 0.1353,
+    "edge_ci": [
+     -0.059,
+     0.3071
+    ],
+    "prob_above_cut": 0.8606,
+    "prob_adds": 0.9183
+   },
+   {
+    "id": "Betfair | Quota depois do sinal = desceu & Velocidade do reforço = ×4 em mais de 30 min",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota depois do sinal",
+      "desceu"
+     ],
+     [
+      "Velocidade do reforço",
+      "×4 em mais de 30 min"
+     ]
+    ],
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.8571,
+    "break_even": 0.5373,
+    "prob_above": 0.8738,
+    "roi": 0.5729,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 7,
+    "edge": 0.1317,
+    "edge_ci": [
+     -0.0622,
+     0.3024
+    ],
+    "prob_above_cut": 0.8546,
+    "prob_adds": 0.9117
    }
   ],
   "status_list": {},
@@ -8510,26 +8521,26 @@
     "status": "em observação"
    },
    {
-    "n": 1,
+    "n": 2,
     "signals": 11,
     "hits": 1,
-    "misses": 0,
-    "hit_rate": 1.0,
+    "misses": 1,
+    "hit_rate": 0.5,
     "ci95": [
-     0.2065,
-     1.0
+     0.0945,
+     0.9055
     ],
-    "break_even": 0.5102,
-    "roi": 0.96,
-    "games": 1,
-    "prudent_rate": 0.5547,
-    "prob_above": 0.6223,
-    "edge": 0.0445,
+    "break_even": 0.5026,
+    "roi": -0.02,
+    "games": 2,
+    "prudent_rate": 0.5022,
+    "prob_above": 0.4992,
+    "edge": -0.0004,
     "edge_ci": [
-     -0.1979,
-     0.2751
+     -0.2294,
+     0.2281
     ],
-    "prob_above_cut": 0.5964,
+    "prob_above_cut": 0.4714,
     "prob_adds": null,
     "id": "Betfair | Quota de mercado = 80 % ou mais & Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
     "family": "Betfair",
@@ -8553,7 +8564,7 @@
     "expect": "acima",
     "mode": "refinar",
     "tradable": true,
-    "open": 9,
+    "open": 8,
     "status": "em observação"
    },
    {
@@ -8730,15 +8741,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 26,
-  "llm_last_run_utc": "2026-11-13T15:58:14+00:00",
+  "llm_runs": 27,
+  "llm_last_run_utc": "2026-11-13T16:56:55+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 17,
-   "neurons_today": 2786.6,
+   "calls_today": 18,
+   "neurons_today": 2956.3,
    "accepted_today": 9,
-   "last_mode": "refinar"
+   "last_mode": "evitar"
   },
   "notes": [
    {
@@ -8934,12 +8945,12 @@
     "phase": "live",
     "level": 1,
     "signals": 47,
-    "n": 27,
+    "n": 28,
     "hits": 12,
-    "hit_rate": 0.4444,
-    "break_even": 0.5066,
-    "roi": -0.0996,
-    "prob_above": 0.2887
+    "hit_rate": 0.4286,
+    "break_even": 0.5062,
+    "roi": -0.1318,
+    "prob_above": 0.2381
    },
    {
     "phase": "live",
@@ -9024,32 +9035,32 @@
   },
   "Q2 Betfair: sem reforço (sinal único)": {
    "bets": 25,
-   "settled": 9,
-   "matches": 9,
+   "settled": 10,
+   "matches": 10,
    "wins": 2,
    "pushes": 0,
-   "units": -5.72,
-   "avg_odds": 2.366,
+   "units": -6.72,
+   "avg_odds": 2.331,
    "roi": {
     "odd-0%": {
-     "roi": -0.6356,
+     "roi": -0.672,
      "ci95": [
-      -1.1081,
-      -0.163
+      -1.1007,
+      -0.2433
      ]
     },
     "odd-2%": {
-     "roi": -0.6428,
+     "roi": -0.6786,
      "ci95": [
-      -1.106,
-      -0.1797
+      -1.0987,
+      -0.2585
      ]
     },
     "odd-5%": {
-     "roi": -0.6538,
+     "roi": -0.6884,
      "ci95": [
-      -1.1027,
-      -0.2048
+      -1.0956,
+      -0.2812
      ]
     }
    },
@@ -9070,32 +9081,32 @@
   },
   "Q3 Betfair: odd [1.50; 2.50)": {
    "bets": 44,
-   "settled": 24,
-   "matches": 23,
+   "settled": 25,
+   "matches": 24,
    "wins": 11,
    "pushes": 0,
-   "units": -3.43,
-   "avg_odds": 1.924,
+   "units": -4.43,
+   "avg_odds": 1.928,
    "roi": {
     "odd-0%": {
-     "roi": -0.1429,
+     "roi": -0.1772,
      "ci95": [
-      -0.5132,
-      0.2274
+      -0.5388,
+      0.1844
      ]
     },
     "odd-2%": {
-     "roi": -0.1601,
+     "roi": -0.1937,
      "ci95": [
-      -0.523,
-      0.2028
+      -0.548,
+      0.1607
      ]
     },
     "odd-5%": {
-     "roi": -0.1858,
+     "roi": -0.2183,
      "ci95": [
-      -0.5376,
-      0.166
+      -0.5619,
+      0.1252
      ]
     }
    },
@@ -9138,32 +9149,32 @@
   },
   "Q4 Betfair: quota de mercado >= 80 %": {
    "bets": 25,
-   "settled": 8,
-   "matches": 8,
+   "settled": 9,
+   "matches": 9,
    "wins": 6,
    "pushes": 0,
-   "units": 2.65,
-   "avg_odds": 2.369,
+   "units": 1.65,
+   "avg_odds": 2.33,
    "roi": {
     "odd-0%": {
-     "roi": 0.3313,
+     "roi": 0.1833,
      "ci95": [
-      -0.2461,
-      0.9086
+      -0.4026,
+      0.7692
      ]
     },
     "odd-2%": {
-     "roi": 0.3046,
+     "roi": 0.1597,
      "ci95": [
-      -0.2612,
-      0.8704
+      -0.4145,
+      0.7339
      ]
     },
     "odd-5%": {
-     "roi": 0.2647,
+     "roi": 0.1242,
      "ci95": [
-      -0.2838,
-      0.8131
+      -0.4324,
+      0.6808
      ]
     }
    },
@@ -9299,32 +9310,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 75,
-   "settled": 45,
-   "matches": 38,
+   "settled": 46,
+   "matches": 39,
    "wins": 22,
    "pushes": 1,
-   "units": -3.33,
-   "avg_odds": 2.031,
+   "units": -4.33,
+   "avg_odds": 2.03,
    "roi": {
     "odd-0%": {
-     "roi": -0.074,
+     "roi": -0.0941,
      "ci95": [
-      -0.3341,
-      0.1861
+      -0.3515,
+      0.1632
      ]
     },
     "odd-2%": {
-     "roi": -0.0921,
+     "roi": -0.1118,
      "ci95": [
-      -0.347,
-      0.1629
+      -0.364,
+      0.1404
      ]
     },
     "odd-5%": {
-     "roi": -0.1192,
+     "roi": -0.1383,
      "ci95": [
-      -0.3664,
-      0.128
+      -0.3829,
+      0.1062
      ]
     }
    },
@@ -9379,9 +9390,12 @@
    "match": "Sohar — Al Musannah",
    "selection": "Sohar",
    "odds": 2.02,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -10211,15 +10225,6 @@
   }
  ],
  "unsettled": [
-  {
-   "match_id": "sohar-vs-al-musannah-20261113",
-   "match": "Sohar — Al Musannah",
-   "league": "Oman Professional League Cup",
-   "date_utc": "2026-11-13T14:47:09+00:00",
-   "kickoff_utc": null,
-   "why": "à espera da fonte de resultados",
-   "signals": 1
-  },
   {
    "match_id": "al-wasl-u19-vs-al-nasr-sc-u19-20261113",
    "match": "Al-Wasl U19 — Al Nasr SC U19",
@@ -12205,7 +12210,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    0,
+    0
+   ]
   },
   "saoura-vs-usm-khenchela-20261113": {
    "teams": [
@@ -12724,6 +12732,16 @@
    "m": "UAE — Honduras",
    "s": "Under 1.5",
    "o": 1.95
+  },
+  {
+   "d": "2026-11-13T14:47:09+00:00",
+   "u": -4.33,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "BETFAIR/live",
+   "m": "Sohar — Al Musannah",
+   "s": "Sohar",
+   "o": 2.02
   }
  ],
  "daily": [
@@ -12743,9 +12761,9 @@
   },
   {
    "bets": 19,
-   "settled": 6,
+   "settled": 7,
    "wins": 2,
-   "units": -2.14,
+   "units": -3.14,
    "day": "2026-11-13"
   }
  ]
