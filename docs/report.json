@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T11:54:01+00:00",
+ "generated_at_utc": "2026-11-13T12:02:34+00:00",
  "messages": 173,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T11:53:57+00:00",
+  "collector_last_run_utc": "2026-11-13T12:02:22+00:00",
   "name_review": [
    {
     "bot": [
@@ -633,7 +633,7 @@
    "by_bot_mark": 0,
    "per_day": 1.0,
    "days_to_hint": 28,
-   "days_to_conclusion": 295,
+   "days_to_conclusion": 296,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -707,7 +707,7 @@
    "by_bot_mark": 0,
    "per_day": 1.2,
    "days_to_hint": 24,
-   "days_to_conclusion": 251,
+   "days_to_conclusion": 252,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -855,7 +855,7 @@
    "by_bot_mark": 0,
    "per_day": 1.7,
    "days_to_hint": 16,
-   "days_to_conclusion": 173,
+   "days_to_conclusion": 174,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -1724,11 +1724,11 @@
   }
  },
  "brain": {
-  "hypotheses": 576,
+  "hypotheses": 578,
   "tested": 2,
   "corrected_bar": 0.975,
   "counts": {
-   "em observação": 576
+   "em observação": 578
   },
   "board": {
    "best": [
@@ -2075,95 +2075,6 @@
       }
      ],
      "good_total": 9,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
-     "match_id": "prykarpattya-ivano-frankivsk-vs-kolos-kovalivka-ii-20261113",
-     "match": "Prykarpattya Ivano Frankivsk — Kolos Kovalivka II",
-     "league": "Ukrainian Persha Liga",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-13T11:28:53+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Prykarpattya Ivano Frankivsk",
-     "odds": 3.25,
-     "odds_last": 3.3,
-     "max_mult": 2,
-     "share": 80,
-     "share_last": 73,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd acima de 3,00",
-     "odds_band_n": 1,
-     "good": [
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 11,
-       "hits": 10,
-       "break_even": 0.593,
-       "prob_above": 0.9519,
-       "roi": 0.5473,
-       "edge": 0.1656,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
-       "conditions": [
-        [
-         "Seleção",
-         "equipa da casa"
-        ],
-        [
-         "Tamanho do mercado",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 9,
-       "hits": 8,
-       "break_even": 0.5334,
-       "prob_above": 0.9387,
-       "roi": 0.6856,
-       "edge": 0.1684,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Quota de mercado = 80 % ou mais",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "80 % ou mais"
-        ]
-       ],
-       "n": 12,
-       "hits": 10,
-       "break_even": 0.557,
-       "prob_above": 0.9331,
-       "roi": 0.4183,
-       "edge": 0.1507,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 7,
      "bad": [],
      "bad_total": 0
     },
@@ -2772,13 +2683,13 @@
     }
    ],
    "counts": {
-    "favorável": 5,
+    "favorável": 4,
     "misto": 1,
     "sem evidência": 1,
     "contraditório": 2,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T11:54:01+00:00",
+   "generated_utc": "2026-11-13T12:02:34+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2806,7 +2717,7 @@
      "as_expected": 0
     },
     "llm/refinar": {
-     "hypotheses": 9,
+     "hypotheses": 11,
      "judged": 0,
      "as_expected": 0
     }
@@ -7674,6 +7585,80 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ],
+     [
+      "Tamanho do mercado",
+      "10 mil $ ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T12:02:24+00:00",
+    "reason": "Quota baixa com volume alto pode indicar valor",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "90 ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-13T12:02:24+00:00",
+    "reason": "Ritmo alto na segunda parte pode indicar jogo aberto",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Forma de golos | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
     "family": "Forma de golos",
     "conditions": [
@@ -8291,7 +8276,7 @@
     "status": "em observação"
    }
   ],
-  "llm_total": 16,
+  "llm_total": 18,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -8300,15 +8285,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 21,
-  "llm_last_run_utc": "2026-11-13T11:03:40+00:00",
+  "llm_runs": 22,
+  "llm_last_run_utc": "2026-11-13T12:02:24+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 12,
-   "neurons_today": 1940.0,
-   "accepted_today": 6,
-   "last_mode": "novas"
+   "calls_today": 13,
+   "neurons_today": 2112.4,
+   "accepted_today": 8,
+   "last_mode": "refinar"
   },
   "notes": [
    {
