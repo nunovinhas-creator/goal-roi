@@ -11761,6 +11761,29 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60": {
+  "born_utc": "2026-11-13T23:49:53+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Forma de golos",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Forma de golos com muitos golos e diferença grande",
+  "source": "llm"
+ },
  "Forma de golos | Golos até ao sinal = 3 ou mais & Parte do jogo = 1.ª parte": {
   "born_utc": "2026-11-13T20:42:44+00:00",
   "conditions": [
@@ -13887,6 +13910,29 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-13T23:49:53+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogo aberto com odd baixa e sem sinais anteriores",
+  "source": "llm"
  },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-12T16:32:35+00:00",
