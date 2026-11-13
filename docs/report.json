@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T13:59:47+00:00",
+ "generated_at_utc": "2026-11-13T14:00:20+00:00",
  "messages": 185,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T13:59:47+00:00",
+  "collector_last_run_utc": "2026-11-13T14:00:06+00:00",
   "name_review": [
    {
     "bot": [
@@ -2748,7 +2748,7 @@
     "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T13:59:47+00:00",
+   "generated_utc": "2026-11-13T14:00:20+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -8344,17 +8344,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 23,
-  "llm_last_run_utc": "2026-11-13T13:01:18+00:00",
+  "llm_runs": 24,
+  "llm_last_run_utc": "2026-11-13T14:00:08+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 14,
-   "neurons_today": 2291.8,
+   "calls_today": 15,
+   "neurons_today": 2434.4,
    "accepted_today": 8,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+    "note": "apresenta um acerto de 1.0, mas a amostra é pequena",
+    "at_utc": "2026-11-13T14:00:08+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 11,
+    "hit_rate": 1.0,
+    "break_even": 0.563,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde & Tamanho do mercado = menos de 10 mil $",
+    "note": "tem um desempenho ruim com um acerto de 0.6667",
+    "at_utc": "2026-11-13T14:00:08+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 9,
+    "hits": 6,
+    "hit_rate": 0.6667,
+    "break_even": 0.4191,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
+    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena",
+    "at_utc": "2026-11-13T14:00:08+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 8,
+    "hits": 8,
+    "hit_rate": 1.0,
+    "break_even": 0.508,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
@@ -8452,17 +8485,6 @@
     "hits": 11,
     "hit_rate": 1.0,
     "break_even": 0.563,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
-    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados",
-    "at_utc": "2026-11-12T18:29:05+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.508,
     "status": "em observação"
    }
   ],
