@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T20:44:44+00:00",
+ "generated_at_utc": "2026-11-13T20:45:08+00:00",
  "messages": 232,
  "types": {
   "SERVICE": 10,
@@ -39,11 +39,11 @@
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 4,
   "bsd_last_run_utc": "2026-11-13T20:19:38+00:00",
-  "goal_minutes_matches": 35,
+  "goal_minutes_matches": 36,
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T20:44:43+00:00",
+  "collector_last_run_utc": "2026-11-13T20:45:05+00:00",
   "name_review": [
    {
     "bot": [
@@ -2988,7 +2988,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-13T20:44:44+00:00",
+   "generated_utc": "2026-11-13T20:45:08+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6769,6 +6769,41 @@
     "prob_adds": 0.3443
    },
    {
+    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ]
+    ],
+    "n": 6,
+    "hits": 6,
+    "hit_rate": 1.0,
+    "break_even": 0.5486,
+    "prob_above": 0.9263,
+    "roi": 0.8267,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 6,
+    "edge": 0.1693,
+    "edge_ci": [
+     -0.0254,
+     0.3322
+    ],
+    "prob_above_cut": 0.9134,
+    "prob_adds": 0.3442
+   },
+   {
     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Jogo aberto",
     "conditions": [
@@ -6884,41 +6919,6 @@
     "break_even": 0.5486,
     "prob_above": 0.9263,
     "roi": 0.7086,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 6,
-    "edge": 0.1693,
-    "edge_ci": [
-     -0.0254,
-     0.3322
-    ],
-    "prob_above_cut": 0.9134,
-    "prob_adds": 0.3442
-   },
-   {
-    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Golos em falta para ganhar",
-      "até 1 golo"
-     ],
-     [
-      "Marcador no momento",
-      "diferença de 2 ou mais golos"
-     ]
-    ],
-    "n": 6,
-    "hits": 6,
-    "hit_rate": 1.0,
-    "break_even": 0.5486,
-    "prob_above": 0.9263,
-    "roi": 0.8267,
     "status": "em observação",
     "tradable": true,
     "expect": null,
@@ -10241,6 +10241,15 @@
  ],
  "unsettled": [
   {
+   "match_id": "shooting-stars-nigeria-vs-bendel-insurance-20261113",
+   "match": "Shooting Stars Nigeria — Bendel Insurance",
+   "league": "Nigeria Premier League",
+   "date_utc": "2026-11-13T18:44:56+00:00",
+   "kickoff_utc": null,
+   "why": "à espera da fonte de resultados",
+   "signals": 1
+  },
+  {
    "match_id": "etehad-al-reef-vs-umm-al-hassam-20261113",
    "match": "Etehad Al Reef — Umm Al Hassam",
    "league": "Bahrain Division 2",
@@ -10793,8 +10802,21 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
+   "goals": [
+    [
+     39,
+     "1-0"
+    ],
+    [
+     51,
+     "1-1"
+    ],
+    [
+     77,
+     "2-1"
+    ]
+   ],
+   "goals_source": "Highlightly",
    "ft": [
     2,
     1
