@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T06:02:17+00:00",
+ "generated_at_utc": "2026-11-13T06:10:44+00:00",
  "messages": 162,
  "types": {
   "SERVICE": 7,
@@ -27,7 +27,7 @@
   "hl_results": 31,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 6,
-  "hl_last_run_utc": "2026-11-13T04:38:29+00:00",
+  "hl_last_run_utc": "2026-11-13T06:10:34+00:00",
   "bsd_results": 6,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 2,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T06:02:15+00:00",
+  "collector_last_run_utc": "2026-11-13T06:10:33+00:00",
   "name_review": [
    {
     "bot": [
@@ -546,7 +546,7 @@
    "by_bot_mark": 0,
    "per_day": 14.5,
    "days_to_hint": 1,
-   "days_to_conclusion": 19,
+   "days_to_conclusion": 20,
    "prudent_rate": 0.4874,
    "prob_above": 0.4129,
    "edge": -0.0185,
@@ -620,7 +620,7 @@
    "by_bot_mark": 0,
    "per_day": 0.6,
    "days_to_hint": 51,
-   "days_to_conclusion": 518,
+   "days_to_conclusion": 520,
    "prudent_rate": 0.3364,
    "prob_above": 0.383,
    "edge": -0.0336,
@@ -694,7 +694,7 @@
    "by_bot_mark": 0,
    "per_day": 1.4,
    "days_to_hint": 21,
-   "days_to_conclusion": 215,
+   "days_to_conclusion": 216,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -768,7 +768,7 @@
    "by_bot_mark": 1,
    "per_day": 6.4,
    "days_to_hint": 3,
-   "days_to_conclusion": 45,
+   "days_to_conclusion": 46,
    "prudent_rate": 0.4183,
    "prob_above": 0.1324,
    "edge": -0.1264,
@@ -7083,17 +7083,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 15,
-  "llm_last_run_utc": "2026-11-13T05:12:17+00:00",
+  "llm_runs": 16,
+  "llm_last_run_utc": "2026-11-13T06:10:37+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 6,
-   "neurons_today": 982.0,
+   "calls_today": 7,
+   "neurons_today": 1117.9,
    "accepted_today": 3,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+    "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 11 resultados",
+    "at_utc": "2026-11-13T06:10:37+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 11,
+    "hit_rate": 1.0,
+    "break_even": 0.563,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Hora (UTC) = tarde",
+    "note": "tem um acerto de 1.0, mas também tem uma amostra pequena de 10 resultados",
+    "at_utc": "2026-11-13T06:10:37+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 10,
+    "hits": 10,
+    "hit_rate": 1.0,
+    "break_even": 0.546,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Tamanho do mercado = menos de 10 mil $ & Velocidade do reforço = ×4 em mais de 30 min",
+    "note": "apresenta um dos piores desempenhos com um acerto de 0.625, mas a amostra também é pequena com 8 resultados",
+    "at_utc": "2026-11-13T06:10:37+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 8,
+    "hits": 5,
+    "hit_rate": 0.625,
+    "break_even": 0.5271,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
