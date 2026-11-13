@@ -27,6 +27,15 @@ h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
 .fresh.stale i{background:var(--bad)}.fresh.stale{color:var(--bad)}
 .answer{margin:24px 0 0;padding:20px 22px;background:var(--ink);color:var(--bg);border-radius:14px}
 .answer p{margin:0;font:600 21px/1.35 Archivo,sans-serif;max-width:60ch}
+section.agenda{margin-top:18px;padding:20px 22px;background:var(--card);border:2px solid var(--ink);border-radius:14px}
+section.agenda h2{margin:0 0 4px}.agtop{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px}
+.agcounts{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.ag{display:grid;grid-template-columns:92px 1fr auto;gap:2px 16px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
+.ag:first-of-type{border-top:0}.ag .t{font-weight:700;font-size:15px;line-height:1.3}.ag .t small{display:block;font-weight:400;color:var(--mut);font-size:13px}
+.ag .m b{font-weight:700}.ag .m .lg{color:var(--mut);font-size:13.5px}.ag .why{margin:5px 0 0;font-size:14.5px;color:var(--mut)}.ag .why b{color:var(--ink);font-weight:650}
+.ag .warn{margin:4px 0 0;font-size:13.5px;color:var(--wait)}.ag.dim{opacity:.72}
+.chip.ok{background:var(--good);color:var(--card)}
+@media(max-width:640px){.ag{grid-template-columns:1fr auto;gap:4px 12px}.ag .t{display:flex;gap:8px;align-items:baseline}.ag .t small{display:inline}.ag .m{grid-column:1/-1;grid-row:2}}
 section.board{margin-top:18px;padding:20px 22px;background:var(--card);border:2px solid var(--mark);border-radius:14px}
 section.board h2{margin:0 0 4px}section.board h3{margin:14px 0 6px;font:700 16.5px/1.25 Archivo,sans-serif}section.board h3.gap{margin-top:20px}
 .boardgrid{display:grid;grid-template-columns:3fr 2fr;gap:6px 32px}@media(max-width:860px){.boardgrid{grid-template-columns:1fr}}
@@ -115,6 +124,13 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 
 <section class="answer" aria-live="polite"><p id="answer">A carregar os dados…</p><small id="answer2"></small></section>
 <div class="facts" id="facts"></div>
+
+<section class="agenda" id="agenda" aria-labelledby="agendah">
+  <div class="agtop"><h2 id="agendah">Jogos por começar: o que o cérebro diz</h2><span class="note" id="agendafresh"></span></div>
+  <p class="note" id="agendanote"></p>
+  <div class="agcounts" id="agendacounts"></div>
+  <div id="agendalist"></div>
+</section>
 
 <section class="board" aria-labelledby="boardh">
   <h2 id="boardh">O que parece funcionar agora</h2>
@@ -325,7 +341,7 @@ function fresh(d){
   const last=d.audit&&(d.audit.collector_last_run_utc||d.audit.last_collected_at_utc), f=$('fresh'), age=last?(Date.now()-Date.parse(last))/60000:null;
   const when=last?new Date(last).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
   f.lastElementChild.textContent=last?(age>45?`Recolha parada desde ${when}`:`Atualizado em ${when}`):'Sem recolhas ainda';
-  if(age==null||age>45)f.classList.add('stale');
+  f.classList.toggle('stale',age==null||age>45);
 }
 
 function chart(d){
@@ -386,6 +402,53 @@ function insights(d){
   else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
 }
 
+const LISBON={timeZone:'Europe/Lisbon'};
+function agendaWhen(a,now){
+  if(a.kickoff_utc&&new Date(a.kickoff_utc)>now){const k=new Date(a.kickoff_utc), day=x=>x.toLocaleDateString('pt-PT',LISBON);
+    const tom=new Date(now.getTime()+864e5), lbl=day(k)===day(now)?'hoje':day(k)===day(tom)?'amanhã':k.toLocaleDateString('pt-PT',Object.assign({weekday:'short',day:'2-digit',month:'2-digit'},LISBON));
+    return [k.toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON)),lbl]}
+  const sc=a.score_at_signal?` · ${a.score_at_signal[0]}-${a.score_at_signal[1]}`:'';
+  return ['Ao vivo',(a.minute!=null?`min. ${a.minute}`:'sinal às '+new Date(a.date_utc).toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON)))+sc]
+}
+function agendaStill(a,now){
+  if(a.when==='por começar')return a.kickoff_utc&&new Date(a.kickoff_utc)>now;
+  return now-new Date(a.date_utc)<=(a.live_max_min||30)*60000;
+}
+const AGV={'favorável':['good','Favorável'],'misto':['wait','Misto'],'sem evidência':['none','Sem evidência'],'contraditório':['bad','Sinais contraditórios'],'evitar':['bad','Evitar']};
+const tname=h=>h.conditions.map(x=>`${x[0][0].toLowerCase()+x[0].slice(1)}: ${x[1]}`).join(' e '), odd=v=>v==null?'—':v.toFixed(2).replace('.',',');
+const tline=h=>`${hitsOf(h.hits,h.n)}, ROI ${pct(h.roi,0)}, ${pct(h.prob_above)} de probabilidade de estar acima do necessário`;
+function agendaUI(d){
+  const A=d.brain&&d.brain.agenda, list=$('agendalist'), now=new Date(); if(!A)return;
+  list.textContent='';$('agendacounts').textContent='';
+  const items=A.items.map(a=>Object.assign({live_max_min:A.rules.live_max_min},a)).filter(a=>agendaStill(a,now));
+  const R=A.rules;
+  $('agendanote').textContent=`Cada sinal com odd ainda apostável, cruzado com as táticas que o cérebro mede (mínimo ${R.min_results} resultados). Favorável: só táticas boas; misto: boas e más. Refeito a cada recolha, cerca de 10 minutos; os jogos saem quando começam. Abaixo de ${R.hint_at} resultados é só indício; alerta no Telegram a partir de ${R.strong_at}.`;
+  $('agendafresh').textContent='Cérebro calculado às '+new Date(A.generated_utc).toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON));
+  for(const v of Object.keys(AGV)){const n=items.filter(a=>a.verdict===v).length;if(n)$('agendacounts').appendChild(chip(AGV[v][0],`${n} ${AGV[v][1].toLowerCase()}`))}
+  if(!items.length){list.appendChild(el('p',{},'Neste momento não há sinais com odd por apostar. Assim que o bot enviar um, aparece aqui com a leitura do cérebro.'));return}
+  const byMatch={};for(const a of items)(byMatch[a.match_id]=byMatch[a.match_id]||[]).push(a);
+  for(const a of items){
+    const r=el('div',{class:'ag'+(a.verdict==='evitar'||a.verdict==='contraditório'?' dim':'')}), [t1,t2]=agendaWhen(a,now);
+    const t=el('div',{class:'t'},t1);t.appendChild(el('small',{},t2));r.appendChild(t);
+    const m=el('div',{class:'m'});
+    m.append(el('b',{},a.match),document.createTextNode(` · ${a.selection}${a.market!=='1X2'?' ('+a.market+')':''} @ ${odd(a.odds)}`),el('div',{class:'lg'},`${a.family}${a.phase==='live'?' ao vivo':a.phase==='pre'?' antes do jogo':''}${a.league?' · '+a.league:''}`));
+    const why=el('p',{class:'why'});
+    if(a.verdict==='contraditório'){why.append(document.createTextNode('O bot deu sinais em seleções diferentes no mesmo jogo: '+byMatch[a.match_id].filter(x=>x.market===a.market).map(x=>`${x.selection} @ ${odd(x.odds)}`).join(' e ')+'. '))}
+    if(a.good.length){why.append(el('b',{},'A favor: '),document.createTextNode(`${tname(a.good[0])} (${tline(a.good[0])}).`+(a.good_total>1?` Encaixa em mais ${a.good_total-1} ${a.good_total===2?'tática boa':'táticas boas'}.`:'')+' '))}
+    if(a.bad.length){why.append(el('b',{},'Contra: '),document.createTextNode(`${tname(a.bad[0])} (${tline(a.bad[0])}).`))}
+    if(!a.good.length&&!a.bad.length)why.append(document.createTextNode('Não encaixa em nenhuma tática com evidência suficiente, nem boa nem má.'));
+    m.appendChild(why);
+    const warn=[];
+    if(a.odds_band_n<R.min_results)warn.push(`Só ${a.odds_band_n} ${a.odds_band_n===1?'resultado':'resultados'} deste tipo de sinal com ${a.odds_band}: as táticas foram medidas sobretudo noutras odds.`);
+    if(a.odds_last&&a.odds_last!==a.odds)warn.push(`A odd passou de ${odd(a.odds)} para ${odd(a.odds_last)}${a.max_mult>1?` no reforço ×${a.max_mult}`:''}.`);
+    else if(a.max_mult>1)warn.push(`Reforçado até ×${a.max_mult}.`);
+    if(a.share!=null&&a.share_last!=null&&a.share_last!==a.share)warn.push(`Quota de mercado de ${a.share} % para ${a.share_last} %.`);
+    if(warn.length)m.appendChild(el('p',{class:'warn'},warn.join(' ')));
+    r.appendChild(m);
+    const [k,txt]=AGV[a.verdict];r.appendChild(a.validated?chip('ok','Validada · alerta'):chip(k,txt));
+    list.appendChild(r)}
+}
+function agendaRefresh(){fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{agendaUI(d);fresh(d)}).catch(()=>{})}
 function boardUI(d){
   const B=d.brain&&d.brain.board; if(!B)return;
   const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
@@ -541,7 +604,8 @@ function recent(d){
   draw(F[0][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d)})
+fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);agendaUI(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d)})
  .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
+setInterval(agendaRefresh,3*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)agendaRefresh()});
 </script>
 </body></html>

@@ -511,6 +511,37 @@ class Brain(Hardening):
         whole = brain.board(rows, now, {'Stake': 42, 'Jogo aberto': 100})
         self.assertEqual([(c['id'], c['conditions']) for c in whole['best']][0], ('f', []))            # apanha quase todos os sinais Stake: é o tipo inteiro
 
+    def test_agenda_classifies_open_signals_and_drops_started_games(self):
+        from scangoal import brain
+        now = datetime.fromisoformat('2026-11-13T10:00:00+00:00')
+        s = lambda mid, sel, ko=None, date='2026-11-13T09:00:00+00:00', odds=1.8, **kw: dict({'match_id': mid, 'key': (mid, sel), 'type': 'BETFAIR', 'phase': 'pre', 'market': '1X2',
+            'selection': sel, 'odds': odds, 'odds_last': odds, 'teams': ['A', 'B'], 'league': 'Liga', 'date_utc': date, 'kickoff_utc': ko, 'w': None, 'no_source': False}, **kw)
+        good, both, avoid, none, conflict1, conflict2 = (s('g', '1', '2026-11-13T17:00+00:00'), s('m', '2', '2026-11-13T18:00+00:00'), s('a', '1', '2026-11-13T19:00+00:00'),
+                                                         s('n', '1', '2026-11-13T20:00+00:00'), s('c', '1', '2026-11-13T21:00+00:00'), s('c', 'X', '2026-11-13T21:00+00:00'))
+        started = s('old', '1', '2026-11-13T09:30+00:00')                       # já começou
+        stale_live = s('lv', '1', date='2026-11-13T09:00:00+00:00')             # ao vivo há 60 minutos
+        fresh_live = s('lv2', '1', date='2026-11-13T09:45:00+00:00')            # ao vivo há 15 minutos
+        settled = s('done', '1', '2026-11-13T22:00+00:00', w=1.0)
+        hist = [s('h%d' % i, '1', odds=1.8, w=1.0) for i in range(3)]          # resultados do tipo na faixa 1,50 a 2,00
+        row = lambda hid, n, hits, prob, open_, status='em observação', tradable=True: {'id': hid, 'family': 'Betfair', 'conditions': [['Seleção', hid]], 'n': n, 'hits': hits,
+            'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_}
+        rows = [row('boa', 12, 11, 0.95, [good, both, conflict1, fresh_live, started]), row('boa-igual', 12, 11, 0.94, [good]),   # mesma amostra: conta uma vez
+                row('ma', 12, 3, 0.05, [both, avoid]), row('neutra', 12, 7, 0.5, [none]), row('poucos', 5, 5, 0.99, [none]),
+                row('depois', 20, 18, 0.99, [none], tradable=False), row('forte', 120, 90, 0.999, [conflict2], status='forte')]
+        a = brain.agenda(rows, [good, both, avoid, none, conflict1, conflict2, started, stale_live, fresh_live, settled] + hist, now)
+        got = {(x['match_id'], x['selection']): x for x in a['items']}
+        self.assertNotIn(('old', 'A'), got); self.assertNotIn(('lv', 'A'), got); self.assertNotIn(('done', 'A'), got)
+        self.assertEqual(got[('lv2', 'A')]['when'], 'a decorrer')
+        self.assertEqual((got[('g', 'A')]['verdict'], got[('g', 'A')]['good_total']), ('favorável', 1))
+        self.assertEqual(got[('m', 'B')]['verdict'], 'misto')
+        self.assertEqual(got[('a', 'A')]['verdict'], 'evitar')
+        self.assertEqual(got[('n', 'A')]['verdict'], 'sem evidência')                  # neutra, poucos resultados e "depois do sinal" não contam
+        self.assertEqual({got[('c', 'A')]['verdict'], got[('c', 'Empate')]['verdict']}, {'contraditório'})
+        self.assertFalse(got[('c', 'Empate')]['validated'])                              # tática forte, mas o jogo tem sinais contraditórios
+        self.assertEqual((got[('g', 'A')]['odds_band'], got[('g', 'A')]['odds_band_n']), ('odd 1,50 a 2,00', 4))
+        self.assertEqual(a['items'][0]['verdict'], 'favorável')
+        self.assertEqual(a['counts']['contraditório'], 2)
+
     def test_manual_hypothesis_only_counts_signals_after_it_was_written(self):
         from scangoal import brain
         sigs = [self.sig(i, 20, True) for i in range(10)]
