@@ -3258,6 +3258,29 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2": {
+  "born_utc": "2026-11-13T04:13:24+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos em dia de semana com golos iniciais e odd favoráveis",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais": {
   "born_utc": "2026-11-12T20:25:32+00:00",
   "conditions": [
