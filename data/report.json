@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T15:07:42+00:00",
+ "generated_at_utc": "2026-11-13T15:08:01+00:00",
  "messages": 193,
  "types": {
   "SERVICE": 7,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T15:07:41+00:00",
+  "collector_last_run_utc": "2026-11-13T15:07:58+00:00",
   "name_review": [
    {
     "bot": [
@@ -3032,7 +3032,7 @@
     "contraditório": 4,
     "evitar": 1
    },
-   "generated_utc": "2026-11-13T15:07:42+00:00",
+   "generated_utc": "2026-11-13T15:08:01+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7445,9 +7445,13 @@
     "prob_adds": 0.9046
    },
    {
-    "id": "Betfair | Momento = antes do jogo & Quota de mercado = 80 % ou mais",
+    "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo & Quota de mercado = 80 % ou mais",
     "family": "Betfair",
     "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
      [
       "Momento",
       "antes do jogo"
@@ -7476,13 +7480,9 @@
     "prob_adds": 0.8939
    },
    {
-    "id": "Betfair | Hora (UTC) = tarde & Momento = antes do jogo & Quota de mercado = 80 % ou mais",
+    "id": "Betfair | Momento = antes do jogo & Quota de mercado = 80 % ou mais",
     "family": "Betfair",
     "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
      [
       "Momento",
       "antes do jogo"
