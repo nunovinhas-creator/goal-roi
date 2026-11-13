@@ -21,7 +21,7 @@ from . import insights
 from .parser import competition_kind
 
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
-MAX_HYPOTHESES = 300
+MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo não tem limite de tamanho
 HINT_AT, STRONG_AT = 30, 100
 BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de resultados e limiares de probabilidade
 KNOWN_AFTER_MIN = 150    # um resultado considera-se conhecido 150 minutos depois do início do jogo (ou do sinal, se for ao vivo)
@@ -86,13 +86,14 @@ def multi_matches(signals):
 
 
 def candidates(signals):
-    """Combinações de 1 e 2 características por família, com o número de sinais que as têm. Não lê resultados."""
+    """Combinações de 1 a MAX_CONDITIONS características por família, com o número de sinais que as têm. Não lê resultados."""
     multi, support, earlier = multi_matches(signals), {}, earlier_index(signals)
     for b in signals:
         fam, at = insights.family(b), sorted(set(atoms(b, multi, earlier)))
-        combos = [(a,) for a in at] + [c for c in itertools.combinations(at, 2) if c[0][0] != c[1][0]]
-        for c in combos:
-            support[(fam, c)] = support.get((fam, c), 0) + 1
+        for k in range(1, MAX_CONDITIONS + 1):
+            for c in itertools.combinations(at, k):
+                if len({x[0] for x in c}) == k:   # uma característica só entra uma vez
+                    support[(fam, c)] = support.get((fam, c), 0) + 1
     return support
 
 
@@ -104,10 +105,10 @@ def update_registry(signals, registry, now=None):
     support = dict(ranked)
     for (fam, conds), n in ranked:
         hid = hyp_id(fam, conds)
-        if n < MIN_SUPPORT or hid in registry or len(registry) >= MAX_HYPOTHESES:
+        if n < MIN_SUPPORT or hid in registry:
             continue
-        if len(conds) == 2 and any(support.get((fam, (c,))) == n for c in conds):
-            continue   # o par apanha exatamente os mesmos sinais que uma das suas metades: não acrescenta nada
+        if len(conds) > 1 and any(support.get((fam, sub)) == n for sub in itertools.combinations(conds, len(conds) - 1)):
+            continue   # apanha exatamente os mesmos sinais que uma combinação mais simples: não acrescenta nada
         registry[hid] = {'family': fam, 'conditions': [list(c) for c in sorted(conds)], 'born_utc': now, 'source': 'gerador'}
         added += 1
     return added
@@ -296,7 +297,7 @@ def build(signals, registry, min_settled):
             'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
-            'rules': {'min_support': MIN_SUPPORT, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
+            'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
 
 
 def track_record(rows):

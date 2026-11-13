@@ -1,3 +1,4 @@
+import itertools
 import json, os, tempfile, unittest
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -455,6 +456,21 @@ class Brain(Hardening):
         self.assertEqual(brain.update_registry(wins, a), 0)                       # nada de novo: o registo não muda
         self.assertEqual(json.dumps(a, sort_keys=True), before)
         self.assertEqual(brain.update_registry(wins[:7], {}), 0)                  # menos de 8 sinais: não regista
+
+    def test_generator_has_no_size_cap_and_skips_redundant_triples(self):
+        from scangoal import brain
+        sigs = [dict(self.sig(i, 20 if i & 1 else 9, None, odds=1.6 if i & 2 else 2.5), selection='1' if i & 4 else '2') for i in range(64)]   # 3 características independentes: 8 sinais por trio
+        reg = {'x%d' % i: {'family': 'Betfair', 'conditions': [['Liga', 'x%d' % i]], 'born_utc': '2026-11-01T00:00:00+00:00', 'source': 'gerador'} for i in range(400)}
+        added = brain.update_registry(sigs, reg)
+        self.assertGreater(added, 0)                                                           # 400 já registadas e continua a aceitar
+        new = [h for k, h in reg.items() if not k.startswith('x')]
+        self.assertTrue(any(len(h['conditions']) == 3 for h in new))                           # combina até 3 características
+        self.assertFalse(any(len(h['conditions']) > brain.MAX_CONDITIONS for h in new))
+        support = brain.candidates(sigs)
+        for h in new:                                                                          # nenhuma repete os sinais de uma combinação mais simples
+            conds = tuple(tuple(c) for c in h['conditions'])
+            n = support[('Betfair', conds)]
+            self.assertTrue(len(conds) == 1 or all(support[('Betfair', sub)] != n for sub in itertools.combinations(conds, len(conds) - 1)))
 
     def test_status_rules_correction_and_tradable_flag(self):
         from scangoal import brain
