@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T17:53:28+00:00",
+ "generated_at_utc": "2026-11-13T17:55:52+00:00",
  "messages": 204,
  "types": {
   "SERVICE": 10,
@@ -42,7 +42,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T17:53:27+00:00",
+  "collector_last_run_utc": "2026-11-13T17:55:44+00:00",
   "name_review": [
    {
     "bot": [
@@ -820,7 +820,7 @@
    "by_bot_mark": 0,
    "per_day": 1.0,
    "days_to_hint": 28,
-   "days_to_conclusion": 288,
+   "days_to_conclusion": 289,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -857,7 +857,7 @@
    "by_bot_mark": 0,
    "per_day": 1.9,
    "days_to_hint": 16,
-   "days_to_conclusion": 160,
+   "days_to_conclusion": 161,
    "prudent_rate": 0.6321,
    "prob_above": 0.6179,
    "edge": 0.0368,
@@ -2872,7 +2872,7 @@
     "contraditório": 4,
     "evitar": 1
    },
-   "generated_utc": "2026-11-13T17:53:28+00:00",
+   "generated_utc": "2026-11-13T17:55:52+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -8577,17 +8577,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 27,
-  "llm_last_run_utc": "2026-11-13T16:56:55+00:00",
+  "llm_runs": 28,
+  "llm_last_run_utc": "2026-11-13T17:55:47+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-13",
-   "calls_today": 18,
-   "neurons_today": 2956.3,
+   "calls_today": 19,
+   "neurons_today": 3091.8,
    "accepted_today": 9,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+    "note": "A amostra é pequena, mas o acerto é de 100%.",
+    "at_utc": "2026-11-13T17:55:47+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 11,
+    "hit_rate": 1.0,
+    "break_even": 0.563,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Quota depois do sinal = desceu & Velocidade do reforço = ×4 em mais de 30 min",
+    "note": "A amostra é pequena e o acerto é inferior a 90%.",
+    "at_utc": "2026-11-13T17:55:47+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 7,
+    "hits": 6,
+    "hit_rate": 0.8571,
+    "break_even": 0.5373,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
+    "note": "O acerto é alto, mas a amostra não é muito grande.",
+    "at_utc": "2026-11-13T17:55:47+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 10,
+    "hit_rate": 0.95,
+    "break_even": 0.5509,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "note": "apresenta um acerto de 1.0, mas a amostra é pequena",
@@ -8685,39 +8718,6 @@
     "hits": 11,
     "hit_rate": 1.0,
     "break_even": 0.563,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
-    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados",
-    "at_utc": "2026-11-12T22:21:56+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.508,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 11 resultados",
-    "at_utc": "2026-11-12T18:29:05+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 11,
-    "hits": 11,
-    "hit_rate": 1.0,
-    "break_even": 0.563,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
-    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados",
-    "at_utc": "2026-11-12T18:29:05+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.508,
     "status": "em observação"
    }
   ],
