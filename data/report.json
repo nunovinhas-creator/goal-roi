@@ -1,9 +1,9 @@
 {
- "generated_at_utc": "2026-11-13T13:51:44+00:00",
- "messages": 184,
+ "generated_at_utc": "2026-11-13T13:59:47+00:00",
+ "messages": 185,
  "types": {
   "SERVICE": 7,
-  "GOAL_BREWING": 11,
+  "GOAL_BREWING": 12,
   "BETFAIR": 111,
   "STAKE_LOAD": 14,
   "OPEN_GAME": 18,
@@ -20,10 +20,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 198,
+  "versions": 199,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-13T13:30:36+00:00",
+  "last_collected_at_utc": "2026-11-13T13:59:47+00:00",
   "hl_results": 33,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 9,
@@ -36,7 +36,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-13T13:51:41+00:00",
+  "collector_last_run_utc": "2026-11-13T13:59:47+00:00",
   "name_review": [
    {
     "bot": [
@@ -659,7 +659,7 @@
    "prob_above_cut": 0.7851
   },
   "GOAL_BREWING": {
-   "signals": 11,
+   "signals": 12,
    "with_result": 2,
    "hits": 0,
    "misses": 2,
@@ -685,7 +685,7 @@
    "by_bot_mark": 0,
    "per_day": 1.0,
    "days_to_hint": 29,
-   "days_to_conclusion": 307,
+   "days_to_conclusion": 308,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -759,7 +759,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 25,
-   "days_to_conclusion": 263,
+   "days_to_conclusion": 264,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -907,7 +907,7 @@
    "by_bot_mark": 0,
    "per_day": 1.6,
    "days_to_hint": 17,
-   "days_to_conclusion": 181,
+   "days_to_conclusion": 182,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -1776,11 +1776,11 @@
   }
  },
  "brain": {
-  "hypotheses": 617,
+  "hypotheses": 618,
   "tested": 2,
   "corrected_bar": 0.975,
   "counts": {
-   "em observação": 617
+   "em observação": 618
   },
   "board": {
    "best": [
@@ -2050,99 +2050,6 @@
   },
   "agenda": {
    "items": [
-    {
-     "match_id": "comoros-vs-congo-20261113",
-     "match": "Comoros — Congo",
-     "league": "Africa Cup Of Nations Qualifier",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-13T13:26:12+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Comoros",
-     "odds": 2.1,
-     "odds_last": 2.1,
-     "max_mult": 1,
-     "share": 66,
-     "share_last": 66,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 15,
-     "good": [
-      {
-       "id": "Betfair | Hora (UTC) = tarde & Tamanho do mercado = menos de 10 mil $",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Tamanho do mercado",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 17,
-       "hits": 13,
-       "break_even": 0.4989,
-       "prob_above": 0.9628,
-       "roi": 0.5629,
-       "edge": 0.1674,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Seleção = equipa da casa & Tamanho do mercado = menos de 10 mil $",
-       "conditions": [
-        [
-         "Seleção",
-         "equipa da casa"
-        ],
-        [
-         "Tamanho do mercado",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 9,
-       "hits": 8,
-       "break_even": 0.5334,
-       "prob_above": 0.9387,
-       "roi": 0.6856,
-       "edge": 0.1684,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 23,
-       "hits": 16,
-       "break_even": 0.5345,
-       "prob_above": 0.9085,
-       "roi": 0.3578,
-       "edge": 0.1123,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 12,
-     "bad": [],
-     "bad_total": 0
-    },
     {
      "match_id": "moldova-vs-kazakhstan-20261113",
      "match": "Moldova — Kazakhstan",
@@ -2832,83 +2739,16 @@
      "good_total": 0,
      "bad": [],
      "bad_total": 0
-    },
-    {
-     "match_id": "mozambique-vs-ethiopia-20261113",
-     "match": "Mozambique — Ethiopia",
-     "league": "Africa Cup Of Nations Qualifier",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-13T13:00+00:00",
-     "date_utc": "2026-11-13T13:27:54+00:00",
-     "minute": null,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Under 1.5",
-     "odds": 1.9,
-     "odds_last": 1.9,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 8,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Stake | Número de apostas = uma",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ]
-       ],
-       "n": 8,
-       "hits": 2,
-       "break_even": 0.5637,
-       "prob_above": 0.1162,
-       "roi": -0.5875,
-       "edge": -0.1394,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Dia = dia de semana",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ]
-       ],
-       "n": 11,
-       "hits": 3,
-       "break_even": 0.5495,
-       "prob_above": 0.1324,
-       "roi": -0.5409,
-       "edge": -0.1264,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 2
     }
    ],
    "counts": {
-    "favorável": 4,
+    "favorável": 3,
     "misto": 1,
     "sem evidência": 2,
     "contraditório": 4,
-    "evitar": 1
+    "evitar": 0
    },
-   "generated_utc": "2026-11-13T13:51:44+00:00",
+   "generated_utc": "2026-11-13T13:59:47+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2921,7 +2761,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 599,
+     "hypotheses": 600,
      "judged": 148,
      "as_expected": 122
     },
