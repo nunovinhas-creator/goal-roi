@@ -9379,6 +9379,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-14T18:26:37+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercados noturnos com odds mais altas tendem a ter mais incertezas",
+  "source": "llm"
+ },
  "Betfair | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
