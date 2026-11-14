@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T13:24:49+00:00",
+ "generated_at_utc": "2026-11-14T13:31:12+00:00",
  "messages": 330,
  "types": {
   "SERVICE": 10,
@@ -45,11 +45,11 @@
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 5,
   "bsd_last_run_utc": "2026-11-14T13:06:00+00:00",
-  "goal_minutes_matches": 42,
+  "goal_minutes_matches": 43,
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T13:24:48+00:00",
+  "collector_last_run_utc": "2026-11-14T13:31:02+00:00",
   "name_review": [
    {
     "bot": [
@@ -293,7 +293,7 @@
   "stake_no_score_after_kickoff": 1,
   "stake_sent_45_after_kickoff": 5,
   "goal_lists": 86,
-  "goal_lists_consistent": 64
+  "goal_lists_consistent": 65
  },
  "unique_bets": 158,
  "settled_bets": 105,
@@ -862,40 +862,40 @@
   },
   "GOAL_BREWING": {
    "signals": 19,
-   "with_result": 2,
-   "hits": 0,
+   "with_result": 3,
+   "hits": 1,
    "misses": 2,
    "pushes": 0,
-   "eff_hits": 0,
+   "eff_hits": 1.0,
    "eff_misses": 2.0,
-   "vote_hits": 0.0,
+   "vote_hits": 1.0,
    "vote_misses": 2.0,
    "vote_break_even": null,
-   "games": 2,
+   "games": 3,
    "no_source": 9,
-   "unsettleable": 2,
-   "hit_rate": 0.0,
+   "unsettleable": 1,
+   "hit_rate": 0.3333,
    "ci95": [
-    0.0,
-    0.6576
+    0.0615,
+    0.7923
    ],
    "avg_odds": null,
-   "break_even": 0.365,
+   "break_even": 0.3633,
    "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 0.7,
-   "days_to_hint": 43,
-   "days_to_conclusion": 453,
-   "prudent_rate": 0.3042,
-   "prob_above": 0.3027,
-   "edge": -0.0608,
+   "per_day": 1.0,
+   "days_to_hint": 28,
+   "days_to_conclusion": 302,
+   "prudent_rate": 0.3564,
+   "prob_above": 0.4574,
+   "edge": -0.0069,
    "edge_ci": [
-    -0.2506,
-    0.1674
+    -0.2044,
+    0.2166
    ],
-   "prob_above_cut": 0.2849
+   "prob_above_cut": 0.436
   },
   "OPEN_GAME": {
    "signals": 60,
@@ -922,7 +922,7 @@
    "roi_announced_odds": 0.3302,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 15.5,
+   "per_day": 15.4,
    "days_to_hint": 0,
    "days_to_conclusion": 17,
    "prudent_rate": 0.7083,
@@ -961,7 +961,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 25,
-   "days_to_conclusion": 272,
+   "days_to_conclusion": 273,
    "prudent_rate": 0.7546,
    "prob_above": 0.7521,
    "edge": 0.0736,
@@ -1146,7 +1146,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 26,
-   "days_to_conclusion": 278,
+   "days_to_conclusion": 279,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -3657,7 +3657,7 @@
     "contraditório": 7,
     "evitar": 3
    },
-   "generated_utc": "2026-11-14T13:24:49+00:00",
+   "generated_utc": "2026-11-14T13:31:11+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -10051,17 +10051,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 47,
-  "llm_last_run_utc": "2026-11-14T12:32:14+00:00",
+  "llm_runs": 48,
+  "llm_last_run_utc": "2026-11-14T13:31:04+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 13,
-   "neurons_today": 2311.0,
+   "calls_today": 14,
+   "neurons_today": 2469.4,
    "accepted_today": 9,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte",
+    "note": "apresenta um acerto de 0.8548, o que pode ser um bom sinal, mas é necessário mais dados para confirmar",
+    "at_utc": "2026-11-14T13:31:04+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 32,
+    "hits": 27,
+    "hit_rate": 0.8548,
+    "break_even": 0.5423,
+    "status": "promissora"
+   },
+   {
+    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Parte do jogo = 2.ª parte",
+    "note": "tem uma amostra pequena de 12 resultados, o que não permite tirar conclusões definitivas",
+    "at_utc": "2026-11-14T13:31:04+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 12,
+    "hits": 12,
+    "hit_rate": 1.0,
+    "break_even": 0.5427,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "apresenta um acerto de 0.96, mas com apenas 13 resultados, a amostra é pequena e mais dados são necessários para confirmar a tendência",
+    "at_utc": "2026-11-14T13:31:04+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 13,
+    "hits": 12,
+    "hit_rate": 0.96,
+    "break_even": 0.546,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
     "note": "apresenta um acerto de 0.96, mas a amostra é pequena, com apenas 13 resultados.",
@@ -10159,39 +10192,6 @@
     "hits": 20,
     "hit_rate": 0.907,
     "break_even": 0.5802,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
-    "at_utc": "2026-11-13T10:04:50+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 22,
-    "hits": 20,
-    "hit_rate": 0.907,
-    "break_even": 0.5802,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 11 resultados",
-    "at_utc": "2026-11-13T06:10:37+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 22,
-    "hits": 20,
-    "hit_rate": 0.907,
-    "break_even": 0.5802,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Hora (UTC) = tarde",
-    "note": "tem um acerto de 1.0, mas também tem uma amostra pequena de 10 resultados",
-    "at_utc": "2026-11-13T06:10:37+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 14,
-    "hits": 13,
-    "hit_rate": 0.9286,
-    "break_even": 0.5305,
     "status": "em observação"
    }
   ],
@@ -11555,15 +11555,6 @@
    "match": "AS Trencin Women — Dukla Banska Bystrica Women",
    "league": "Slovakian 1 Liga Women",
    "date_utc": "2026-11-14T10:25:39+00:00",
-   "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
-   "signals": 1
-  },
-  {
-   "match_id": "fc-tatran-presov-women-vs-slovan-bratislava-women-20261114",
-   "match": "FC Tatran Presov Women — Slovan Bratislava Women",
-   "league": "Slovakian 1 Liga Women",
-   "date_utc": "2026-11-14T10:23:22+00:00",
    "kickoff_utc": null,
    "why": "à espera dos minutos dos golos",
    "signals": 1
