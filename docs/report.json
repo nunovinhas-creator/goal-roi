@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T21:21:55+00:00",
+ "generated_at_utc": "2026-11-14T21:24:23+00:00",
  "messages": 619,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T21:21:51+00:00",
+  "collector_last_run_utc": "2026-11-14T21:24:08+00:00",
   "name_review": [
    {
     "bot": [
@@ -3875,70 +3875,6 @@
       }
      ],
      "bad_total": 17
-    },
-    {
-     "match_id": "cucuta-deportivo-vs-jaguares-de-cordoba-20261114",
-     "match": "Cucuta Deportivo — Jaguares De Cordoba",
-     "league": "Colombian Primera Division",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-14T20:30+00:00",
-     "date_utc": "2026-11-14T20:53:33+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Match Result",
-     "selection": "Cúcuta Deportivo",
-     "odds": 1.95,
-     "odds_last": 1.95,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 20,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Stake | Mercado = outros mercados",
-       "conditions": [
-        [
-         "Mercado",
-         "outros mercados"
-        ]
-       ],
-       "n": 16,
-       "hits": 2,
-       "break_even": 0.5167,
-       "prob_above": 0.012,
-       "roi": -0.785,
-       "edge": -0.2271,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Número de apostas = uma",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ]
-       ],
-       "n": 19,
-       "hits": 5,
-       "break_even": 0.538,
-       "prob_above": 0.0353,
-       "roi": -0.5421,
-       "edge": -0.1686,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 11
     }
    ],
    "counts": {
@@ -3946,9 +3882,9 @@
     "misto": 2,
     "sem evidência": 0,
     "contraditório": 0,
-    "evitar": 4
+    "evitar": 3
    },
-   "generated_utc": "2026-11-14T21:21:55+00:00",
+   "generated_utc": "2026-11-14T21:24:23+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -10867,17 +10803,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 55,
-  "llm_last_run_utc": "2026-11-14T20:24:49+00:00",
+  "llm_runs": 56,
+  "llm_last_run_utc": "2026-11-14T21:24:11+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 21,
-   "neurons_today": 3859.2,
+   "calls_today": 22,
+   "neurons_today": 4032.2,
    "accepted_today": 12,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
+    "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena com apenas 20 resultados",
+    "at_utc": "2026-11-14T21:24:11+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 20,
+    "hits": 18,
+    "hit_rate": 0.9211,
+    "break_even": 0.5471,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+    "note": "tem um acerto de 0.7391, o que pode ser considerado moderado, com uma amostra razoável de 48 resultados",
+    "at_utc": "2026-11-14T21:24:11+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 48,
+    "hits": 35,
+    "hit_rate": 0.7391,
+    "break_even": 0.5357,
+    "status": "promissora"
+   },
+   {
+    "id": "Jogo aberto | Competição = feminino & Hora (UTC) = tarde & Minuto = 31 a 60",
+    "note": "apresenta um acerto perfeito de 1.0, mas a amostra é muito pequena com apenas 10 resultados",
+    "at_utc": "2026-11-14T21:24:11+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 10,
+    "hits": 10,
+    "hit_rate": 1.0,
+    "break_even": 0.4869,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
     "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena",
@@ -10970,39 +10939,6 @@
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
     "note": "A amostra é pequena, mas o acerto é de 100%.",
     "at_utc": "2026-11-13T17:55:47+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 46,
-    "hits": 33,
-    "hit_rate": 0.7126,
-    "break_even": 0.5575,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
-    "note": "O acerto é alto, mas a amostra não é muito grande.",
-    "at_utc": "2026-11-13T17:55:47+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 46,
-    "hits": 33,
-    "hit_rate": 0.7209,
-    "break_even": 0.5389,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um acerto de 1.0, mas a amostra é pequena",
-    "at_utc": "2026-11-13T14:00:08+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 46,
-    "hits": 33,
-    "hit_rate": 0.7126,
-    "break_even": 0.5575,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
-    "at_utc": "2026-11-13T10:04:50+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "n": 46,
     "hits": 33,
