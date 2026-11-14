@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T03:44:06+00:00",
+ "generated_at_utc": "2026-11-14T03:44:34+00:00",
  "messages": 250,
  "types": {
   "SERVICE": 10,
@@ -37,7 +37,7 @@
   "hl_results": 39,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 11,
-  "hl_last_run_utc": "2026-11-14T02:12:21+00:00",
+  "hl_last_run_utc": "2026-11-14T03:44:23+00:00",
   "bsd_results": 11,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 5,
@@ -46,7 +46,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T03:44:05+00:00",
+  "collector_last_run_utc": "2026-11-14T03:44:21+00:00",
   "name_review": [
    {
     "bot": [
@@ -778,7 +778,7 @@
    "vote_misses": 6.0,
    "vote_break_even": 0.5431,
    "games": 14,
-   "no_source": 0,
+   "no_source": 1,
    "unsettleable": 0,
    "hit_rate": 0.5333,
    "ci95": [
@@ -904,7 +904,7 @@
    "by_bot_mark": 0,
    "per_day": 0.9,
    "days_to_hint": 33,
-   "days_to_conclusion": 349,
+   "days_to_conclusion": 350,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -2258,11 +2258,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1233,
+  "hypotheses": 1236,
   "tested": 6,
   "corrected_bar": 0.99167,
   "counts": {
-   "em observação": 1233
+   "em observação": 1236
   },
   "board": {
    "best": [
@@ -2605,7 +2605,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-14T03:44:06+00:00",
+   "generated_utc": "2026-11-14T03:44:34+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2623,7 +2623,7 @@
      "as_expected": 277
     },
     "llm/refinar": {
-     "hypotheses": 18,
+     "hypotheses": 21,
      "judged": 0,
      "as_expected": 0
     },
@@ -7637,6 +7637,141 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Dia",
+      "dia de semana"
+     ],
+     [
+      "Golos até ao sinal",
+      "3 ou mais"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "90 ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T03:44:25+00:00",
+    "reason": "jogo com ritmo alto e muitos golos, na primeira hora, em dia de semana",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Dia = dia de semana & Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Dia",
+      "dia de semana"
+     ],
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T03:44:25+00:00",
+    "reason": "jogo empatado ou com diferença de um golo, na segunda parte, sem sinais anteriores e com alta probabilidade de gol",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Marcador no momento",
+      "diferença de 2 ou mais golos"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T03:44:25+00:00",
+    "reason": "jogo com diferença grande, na segunda parte, sem sinais anteriores e à noite",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Stake | Mercado = golos (total asiático) & Momento do aviso = até 45 min depois do início",
     "family": "Stake",
     "conditions": [
@@ -8345,132 +8480,9 @@
     "tradable": true,
     "open": 1,
     "status": "em observação"
-   },
-   {
-    "n": 7,
-    "signals": 12,
-    "hits": 5,
-    "misses": 2,
-    "hit_rate": 0.7143,
-    "ci95": [
-     0.3589,
-     0.9178
-    ],
-    "break_even": 0.5333,
-    "roi": 0.2183,
-    "games": 7,
-    "prudent_rate": 0.6078,
-    "prob_above": 0.7408,
-    "edge": 0.0745,
-    "edge_ci": [
-     -0.1225,
-     0.2566
-    ],
-    "prob_above_cut": 0.7114,
-    "prob_adds": 0.7644,
-    "id": "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Dia",
-      "dia de semana"
-     ],
-     [
-      "Golos até ao sinal",
-      "3 ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T20:25:32+00:00",
-    "reason": "jogos em dia de semana com mais gols tendem a ter mais chances de vitória",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
-   },
-   {
-    "n": 3,
-    "signals": 7,
-    "hits": 2,
-    "misses": 1,
-    "hit_rate": 0.6667,
-    "ci95": [
-     0.2077,
-     0.9385
-    ],
-    "break_even": 0.5447,
-    "roi": 0.0829,
-    "games": 3,
-    "prudent_rate": 0.5728,
-    "prob_above": 0.5901,
-    "edge": 0.0282,
-    "edge_ci": [
-     -0.1964,
-     0.2395
-    ],
-    "prob_above_cut": 0.5592,
-    "prob_adds": null,
-    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Ritmo indicado pelo bot",
-      "90 ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T20:25:32+00:00",
-    "reason": "jogos com odd baixa e ritmo alto tendem a ter mais chances de vitória",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Forma de golos | Golos até ao sinal = nenhum & Minuto = 31 a 60",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "nenhum"
-     ],
-     [
-      "Minuto",
-      "31 a 60"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T20:25:32+00:00",
-    "reason": "jogos sem gols no início tendem a ter mais chances de gol nos 30 minutos seguintes",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
    }
   ],
-  "llm_total": 26,
+  "llm_total": 29,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -8479,15 +8491,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 37,
-  "llm_last_run_utc": "2026-11-14T02:45:36+00:00",
+  "llm_runs": 38,
+  "llm_last_run_utc": "2026-11-14T03:44:25+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 3,
-   "neurons_today": 494.4,
-   "accepted_today": 1,
-   "last_mode": "novas"
+   "calls_today": 4,
+   "neurons_today": 710.0,
+   "accepted_today": 4,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -10065,7 +10077,7 @@
    "league": "Algerian Ligue 1",
    "date_utc": "2026-11-13T15:05:53+00:00",
    "kickoff_utc": "2026-11-13T17:00+00:00",
-   "why": "à espera da fonte de resultados",
+   "why": "as fontes não cobrem este jogo",
    "signals": 1
   },
   {

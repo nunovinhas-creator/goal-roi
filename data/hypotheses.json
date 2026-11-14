@@ -15755,6 +15755,33 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T03:44:25+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogo com ritmo alto e muitos golos, na primeira hora, em dia de semana",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 3 ou mais & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T03:00:05+00:00",
   "conditions": [
@@ -15902,6 +15929,33 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Dia = dia de semana & Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T03:44:25+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogo empatado ou com diferença de um golo, na segunda parte, sem sinais anteriores e com alta probabilidade de gol",
+  "source": "llm"
  },
  "Jogo aberto | Dia = dia de semana & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T01:59:37+00:00",
@@ -19631,6 +19685,33 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T03:44:25+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogo com diferença grande, na segunda parte, sem sinais anteriores e à noite",
+  "source": "llm"
  },
  "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-13T20:57:40+00:00",
