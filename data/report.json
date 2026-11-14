@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T12:53:20+00:00",
+ "generated_at_utc": "2026-11-14T12:57:39+00:00",
  "messages": 320,
  "types": {
   "SERVICE": 10,
@@ -37,10 +37,10 @@
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
   "last_collected_at_utc": "2026-11-14T12:53:19+00:00",
-  "hl_results": 42,
+  "hl_results": 43,
   "hl_vs_bot_disagreements": 0,
-  "hl_near_misses": 11,
-  "hl_last_run_utc": "2026-11-14T11:25:04+00:00",
+  "hl_near_misses": 13,
+  "hl_last_run_utc": "2026-11-14T12:57:35+00:00",
   "bsd_results": 14,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 5,
@@ -49,8 +49,21 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T12:53:19+00:00",
+  "collector_last_run_utc": "2026-11-14T12:57:33+00:00",
   "name_review": [
+   {
+    "bot": [
+     "AS Trencin Women",
+     "Dukla Banska Bystrica Women"
+    ],
+    "bsd_candidates": [
+     [
+      "Trenčín Women",
+      "Dukla Banská Bystrica Women"
+     ]
+    ],
+    "provider": "HL"
+   },
    {
     "bot": [
      "Atenas",
@@ -86,6 +99,19 @@
      [
       "Benin",
       "Central African Republic"
+     ]
+    ],
+    "provider": "HL"
+   },
+   {
+    "bot": [
+     "Bosnia U19",
+     "Georgia U19"
+    ],
+    "bsd_candidates": [
+     [
+      "Bosnia-Herzegovina U19",
+      "Georgia U19"
      ]
     ],
     "provider": "HL"
@@ -841,7 +867,7 @@
    "vote_break_even": null,
    "games": 2,
    "no_source": 9,
-   "unsettleable": 1,
+   "unsettleable": 2,
    "hit_rate": 0.0,
    "ci95": [
     0.0,
@@ -2752,94 +2778,6 @@
   "agenda": {
    "items": [
     {
-     "match_id": "kawempe-muslim-fc-women-vs-lekie-filles-women-20261114",
-     "match": "Kawempe Muslim FC Women — Lekie Filles Women",
-     "league": "Asian CAF Champions League Women",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-14T12:27:22+00:00",
-     "minute": 26,
-     "score_at_signal": [
-      0,
-      2
-     ],
-     "market": "Asian Total",
-     "selection": "Over 4.5",
-     "odds": 1.8,
-     "odds_last": 1.8,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 28,
-     "good": [
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ]
-       ],
-       "n": 24,
-       "hits": 20,
-       "break_even": 0.5237,
-       "prob_above": 0.9982,
-       "roi": 0.4935,
-       "edge": 0.2411,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 16,
-       "hits": 14,
-       "break_even": 0.5225,
-       "prob_above": 0.993,
-       "roi": 0.57,
-       "edge": 0.2314,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 31,
-       "hits": 24,
-       "break_even": 0.5461,
-       "prob_above": 0.992,
-       "roi": 0.3478,
-       "edge": 0.1813,
-       "status": "promissora",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 21,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "fk-podgorica-vs-berane-20261114",
      "match": "FK Podgorica — Berane",
      "league": "Montenegro Druga Liga",
@@ -3762,13 +3700,13 @@
     }
    ],
    "counts": {
-    "favorável": 1,
+    "favorável": 0,
     "misto": 3,
     "sem evidência": 9,
     "contraditório": 4,
     "evitar": 3
    },
-   "generated_utc": "2026-11-14T12:53:20+00:00",
+   "generated_utc": "2026-11-14T12:57:39+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
