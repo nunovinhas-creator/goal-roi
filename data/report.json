@@ -1,13 +1,13 @@
 {
- "generated_at_utc": "2026-11-14T06:15:01+00:00",
- "messages": 258,
+ "generated_at_utc": "2026-11-14T06:21:04+00:00",
+ "messages": 259,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 16,
   "BETFAIR": 128,
   "STAKE_LOAD": 16,
   "OPEN_GAME": 42,
-  "TOTALS_FORM": 9,
+  "TOTALS_FORM": 10,
   "WEAKENED_LINEUP": 3,
   "OPEN_GAME_NO_ODDS": 2,
   "FULL_TIME_NOTE": 4,
@@ -30,10 +30,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 317,
+  "versions": 318,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-14T06:12:44+00:00",
+  "last_collected_at_utc": "2026-11-14T06:21:03+00:00",
   "hl_results": 40,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 11,
@@ -46,7 +46,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T06:14:59+00:00",
+  "collector_last_run_utc": "2026-11-14T06:21:03+00:00",
   "name_review": [
    {
     "bot": [
@@ -266,7 +266,7 @@
   "goal_lists": 66,
   "goal_lists_consistent": 49
  },
- "unique_bets": 105,
+ "unique_bets": 106,
  "settled_bets": 84,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -655,7 +655,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "TOTALS_FORM": {
-   "bets": 5,
+   "bets": 6,
    "settled": 5,
    "matches": 5,
    "wins": 3,
@@ -798,7 +798,7 @@
    "roi_announced_odds": -0.1125,
    "seen_late": 6,
    "by_bot_mark": 0,
-   "per_day": 5.9,
+   "per_day": 5.8,
    "days_to_hint": 3,
    "days_to_conclusion": 49,
    "prudent_rate": 0.5284,
@@ -911,7 +911,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 35,
-   "days_to_conclusion": 365,
+   "days_to_conclusion": 366,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -948,7 +948,7 @@
    "by_bot_mark": 1,
    "per_day": 3.8,
    "days_to_hint": 7,
-   "days_to_conclusion": 78,
+   "days_to_conclusion": 79,
    "prudent_rate": 0.5465,
    "prob_above": 0.4519,
    "edge": -0.0186,
@@ -996,7 +996,7 @@
    "prob_above_cut": 0.0792
   },
   "TOTALS_FORM": {
-   "signals": 9,
+   "signals": 10,
    "with_result": 9,
    "hits": 5,
    "misses": 4,
@@ -1668,7 +1668,7 @@
    },
    {
     "n": 14,
-    "signals": 16,
+    "signals": 17,
     "hits": 8,
     "misses": 6,
     "hit_rate": 0.5714,
@@ -1818,7 +1818,7 @@
    },
    {
     "n": 11,
-    "signals": 12,
+    "signals": 13,
     "hits": 6,
     "misses": 5,
     "hit_rate": 0.5238,
@@ -2222,7 +2222,7 @@
   "calibration": [
    {
     "n": 6,
-    "signals": 6,
+    "signals": 7,
     "hits": 5,
     "misses": 1,
     "hit_rate": 0.8333,
@@ -2337,11 +2337,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1360,
+  "hypotheses": 1367,
   "tested": 11,
   "corrected_bar": 0.99545,
   "counts": {
-   "em observação": 1359,
+   "em observação": 1366,
    "abandonada": 1
   },
   "board": {
@@ -2597,15 +2597,48 @@
    "hint_at": 30
   },
   "agenda": {
-   "items": [],
+   "items": [
+    {
+     "match_id": "gifu-vs-matsumoto-yamaga-20261114",
+     "match": "Gifu — Matsumoto Yamaga",
+     "league": "Japanese J-League 3",
+     "family": "Forma de golos",
+     "type": "TOTALS_FORM",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-14T06:19:09+00:00",
+     "minute": 57,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "Asian Total",
+     "selection": "Over 0.5",
+     "odds": 1.43,
+     "odds_last": 1.43,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "sem evidência",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd até 1,50",
+     "odds_band_n": 1,
+     "good": [],
+     "good_total": 0,
+     "bad": [],
+     "bad_total": 0
+    }
+   ],
    "counts": {
     "favorável": 0,
     "misto": 0,
-    "sem evidência": 0,
+    "sem evidência": 1,
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-14T06:15:01+00:00",
+   "generated_utc": "2026-11-14T06:21:04+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2618,7 +2651,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 1331,
+     "hypotheses": 1338,
      "judged": 500,
      "as_expected": 328
     },
@@ -2655,7 +2688,7 @@
     "roi_cut": -0.095
    },
    "skipped": {
-    "bets": 37,
+    "bets": 38,
     "settled": 34,
     "games": 29,
     "wins": 14,
@@ -8162,7 +8195,7 @@
    },
    {
     "n": 0,
-    "signals": 0,
+    "signals": 1,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -8198,7 +8231,7 @@
     "expect": "acima",
     "mode": "refinar",
     "tradable": true,
-    "open": 0,
+    "open": 1,
     "status": "em observação"
    },
    {
@@ -9177,7 +9210,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 105,
+   "bets": 106,
    "settled": 84,
    "matches": 69,
    "wins": 34,
@@ -9212,6 +9245,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T06:19:09+00:00",
+   "match_id": "gifu-vs-matsumoto-yamaga-20261114",
+   "group": "TOTALS_FORM",
+   "match": "Gifu — Matsumoto Yamaga",
+   "selection": "Over 0.5",
+   "odds": 1.43,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T05:19:45+00:00",
    "match_id": "fukushima-vs-sagamihara-20261114",
@@ -10116,22 +10162,6 @@
    "settled_by": null,
    "n_signals": 2,
    "max_mult": 2
-  },
-  {
-   "date_utc": "2026-11-12T19:27:25+00:00",
-   "match_id": "slovenia-vs-switzerland-20261113",
-   "group": "BETFAIR/pre/mkt<10K",
-   "match": "Slovenia — Switzerland",
-   "selection": "Switzerland",
-   "odds": 1.73,
-   "ft": [
-    0,
-    0
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 6,
-   "max_mult": 256
   }
  ],
  "unsettled": [
@@ -12455,6 +12485,30 @@
    "goals": null,
    "goals_source": null,
    "ft": null
+  },
+  "gifu-vs-matsumoto-yamaga-20261114": {
+   "teams": [
+    "Gifu",
+    "Matsumoto Yamaga"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T06:19:09+00:00",
+     "k": "TOTALS_FORM",
+     "phase": "live",
+     "selection": "Over 0.5",
+     "odds": 1.43,
+     "minute": 57,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "Asian Total"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
   }
  },
  "timeline": [
@@ -13322,7 +13376,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 10,
+   "bets": 11,
    "settled": 9,
    "wins": 4,
    "units": -0.42,
