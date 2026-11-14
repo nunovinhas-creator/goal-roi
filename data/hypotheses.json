@@ -22155,6 +22155,21 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 1 golo": {
+  "born_utc": "2026-11-14T16:28:25+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T08:28:54+00:00",
   "conditions": [
@@ -23247,6 +23262,44 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Hora (UTC) = tarde & Minuto = 61 em diante & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T16:28:25+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = tarde & Minuto = 61 em diante & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T16:28:25+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T13:08:06+00:00",
   "conditions": [
@@ -23385,6 +23438,21 @@
    [
     "Marcador no momento",
     "diferença de 1 golo"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Marcador no momento = diferença de 1 golo & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T16:28:25+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Forma de golos",
@@ -25553,6 +25621,25 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Competição = feminino & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-14T16:28:18+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Jogo aberto",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "jogo lento em competição feminina",
+  "source": "llm"
  },
  "Jogo aberto | Competição = feminino & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T11:27:15+00:00",
