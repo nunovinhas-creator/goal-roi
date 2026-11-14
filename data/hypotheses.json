@@ -12747,6 +12747,17 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Forma de golos | Competição = liga": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo": {
   "born_utc": "2026-11-12T15:33:31+00:00",
   "conditions": [
@@ -12798,12 +12809,163 @@
   "reason": "Jogos de semana com odd baixa e poucos golos em falta",
   "source": "llm"
  },
+ "Forma de golos | Dia = dia de semana & Golos até ao sinal = 3 ou mais": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Golos até ao sinal = 3 ou mais & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Golos até ao sinal = 3 ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos até ao sinal = 3 ou mais": {
   "born_utc": "2026-11-13T20:30:10+00:00",
   "conditions": [
    [
     "Golos até ao sinal",
     "3 ou mais"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Hora (UTC) = noite": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Hora (UTC) = noite & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Forma de golos",
@@ -12831,6 +12993,21 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Forma de golos com muitos golos e diferença grande",
   "source": "llm"
+ },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
  },
  "Forma de golos | Golos até ao sinal = 3 ou mais & Parte do jogo = 1.ª parte": {
   "born_utc": "2026-11-13T20:42:44+00:00",
@@ -12921,6 +13098,21 @@
    [
     "Hora (UTC)",
     "noite"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = noite & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T04:26:05+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Forma de golos",
