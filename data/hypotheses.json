@@ -1152,6 +1152,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T11:33:30+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Betfair",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Betfair em liga, odd entre 1,50 e 2,00 e à tarde",
+  "source": "llm"
+ },
  "Betfair | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo": {
   "born_utc": "2026-11-13T13:15:53+00:00",
   "conditions": [

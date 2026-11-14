@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T11:33:15+00:00",
+ "generated_at_utc": "2026-11-14T11:33:41+00:00",
  "messages": 288,
  "types": {
   "SERVICE": 10,
@@ -47,7 +47,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T11:33:14+00:00",
+  "collector_last_run_utc": "2026-11-14T11:33:28+00:00",
   "name_review": [
    {
     "bot": [
@@ -2425,11 +2425,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1618,
+  "hypotheses": 1619,
   "tested": 14,
   "corrected_bar": 0.99643,
   "counts": {
-   "em observação": 1616,
+   "em observação": 1617,
    "abandonada": 1,
    "promissora": 1
   },
@@ -3036,7 +3036,7 @@
     "contraditório": 0,
     "evitar": 1
    },
-   "generated_utc": "2026-11-14T11:33:15+00:00",
+   "generated_utc": "2026-11-14T11:33:41+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3054,7 +3054,7 @@
      "as_expected": 392
     },
     "llm/refinar": {
-     "hypotheses": 21,
+     "hypotheses": 22,
      "judged": 0,
      "as_expected": 0
     },
@@ -8165,6 +8165,47 @@
   "llm": [
    {
     "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Betfair | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Competição",
+      "liga"
+     ],
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Hora (UTC)",
+      "tarde"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T11:33:30+00:00",
+    "reason": "Betfair em liga, odd entre 1,50 e 2,00 e à tarde",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
     "signals": 1,
     "hits": 0,
     "misses": 0,
@@ -8980,56 +9021,9 @@
     "tradable": true,
     "open": 0,
     "status": "em observação"
-   },
-   {
-    "n": 2,
-    "signals": 3,
-    "hits": 0,
-    "misses": 2,
-    "hit_rate": 0.0,
-    "ci95": [
-     0.0,
-     0.6576
-    ],
-    "break_even": 0.5702,
-    "roi": -0.6667,
-    "games": 2,
-    "prudent_rate": 0.4752,
-    "prob_above": 0.2555,
-    "edge": -0.095,
-    "edge_ci": [
-     -0.321,
-     0.1359
-    ],
-    "prob_above_cut": 0.2304,
-    "prob_adds": null,
-    "id": "Jogo aberto | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Dia",
-      "dia de semana"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Golos até ao sinal",
-      "1 ou 2"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-13T04:13:24+00:00",
-    "reason": "Jogos em dia de semana com golos iniciais e odd favoráveis",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
    }
   ],
-  "llm_total": 32,
+  "llm_total": 33,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -9038,15 +9032,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 45,
-  "llm_last_run_utc": "2026-11-14T10:34:55+00:00",
+  "llm_runs": 46,
+  "llm_last_run_utc": "2026-11-14T11:33:30+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 11,
-   "neurons_today": 1933.3,
-   "accepted_today": 7,
-   "last_mode": "novas"
+   "calls_today": 12,
+   "neurons_today": 2133.8,
+   "accepted_today": 8,
+   "last_mode": "refinar"
   },
   "notes": [
    {
