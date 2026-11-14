@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T06:27:23+00:00",
+ "generated_at_utc": "2026-11-14T06:31:41+00:00",
  "messages": 261,
  "types": {
   "SERVICE": 10,
@@ -46,7 +46,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T06:27:22+00:00",
+  "collector_last_run_utc": "2026-11-14T06:31:37+00:00",
   "name_review": [
    {
     "bot": [
@@ -911,7 +911,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 35,
-   "days_to_conclusion": 366,
+   "days_to_conclusion": 367,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -946,7 +946,7 @@
    "roi_announced_odds": -0.1617,
    "seen_late": 0,
    "by_bot_mark": 1,
-   "per_day": 3.8,
+   "per_day": 3.7,
    "days_to_hint": 7,
    "days_to_conclusion": 79,
    "prudent_rate": 0.5465,
@@ -2496,12 +2496,16 @@
    ],
    "avoid": [
     {
-     "id": "Betfair | Competição = seleções & Quota de mercado = menos de 80 %",
+     "id": "Betfair | Competição = seleções & Dia = dia de semana & Quota de mercado = menos de 80 %",
      "family": "Betfair",
      "conditions": [
       [
        "Competição",
        "seleções"
+      ],
+      [
+       "Dia",
+       "dia de semana"
       ],
       [
        "Quota de mercado",
@@ -2812,7 +2816,7 @@
     "contraditório": 0,
     "evitar": 1
    },
-   "generated_utc": "2026-11-14T06:27:23+00:00",
+   "generated_utc": "2026-11-14T06:31:41+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7892,50 +7896,10 @@
    }
   ],
   "status_list": {
-   "Betfair | Quota de mercado = menos de 80 %": "abandonada",
-   "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 %": "abandonada"
+   "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 %": "abandonada",
+   "Betfair | Quota de mercado = menos de 80 %": "abandonada"
   },
   "abandoned": [
-   {
-    "n": 30,
-    "signals": 37,
-    "hits": 10,
-    "misses": 20,
-    "hit_rate": 0.3333,
-    "ci95": [
-     0.1923,
-     0.5122
-    ],
-    "break_even": 0.4897,
-    "roi": -0.267,
-    "games": 29,
-    "prudent_rate": 0.3831,
-    "prob_above": 0.0793,
-    "edge": -0.111,
-    "edge_ci": [
-     -0.2341,
-     0.019
-    ],
-    "prob_above_cut": 0.0625,
-    "prob_adds": 0.047,
-    "id": "Betfair | Quota de mercado = menos de 80 %",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ]
-    ],
-    "source": "gerador",
-    "born_utc": "2026-11-12T15:16:56+00:00",
-    "reason": null,
-    "expect": null,
-    "mode": null,
-    "tradable": true,
-    "open": 4,
-    "status": "abandonada",
-    "whole": false
-   },
    {
     "n": 30,
     "signals": 36,
@@ -7977,6 +7941,46 @@
     "mode": null,
     "tradable": true,
     "open": 3,
+    "status": "abandonada",
+    "whole": false
+   },
+   {
+    "n": 30,
+    "signals": 37,
+    "hits": 10,
+    "misses": 20,
+    "hit_rate": 0.3333,
+    "ci95": [
+     0.1923,
+     0.5122
+    ],
+    "break_even": 0.4897,
+    "roi": -0.267,
+    "games": 29,
+    "prudent_rate": 0.3831,
+    "prob_above": 0.0793,
+    "edge": -0.111,
+    "edge_ci": [
+     -0.2341,
+     0.019
+    ],
+    "prob_above_cut": 0.0625,
+    "prob_adds": 0.047,
+    "id": "Betfair | Quota de mercado = menos de 80 %",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ]
+    ],
+    "source": "gerador",
+    "born_utc": "2026-11-12T15:16:56+00:00",
+    "reason": null,
+    "expect": null,
+    "mode": null,
+    "tradable": true,
+    "open": 4,
     "status": "abandonada",
     "whole": false
    }
