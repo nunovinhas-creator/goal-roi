@@ -19720,6 +19720,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Competição = liga & Golos até ao sinal = nenhum & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Competição = liga & Golos até ao sinal = nenhum & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T15:22:40+00:00",
   "conditions": [
@@ -19793,6 +19812,25 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Jogos da liga com pouco espaço para ganhar",
   "source": "llm"
+ },
+ "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
  },
  "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T15:22:40+00:00",
@@ -20891,6 +20929,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T15:22:40+00:00",
   "conditions": [
@@ -21102,6 +21159,25 @@
    [
     "Marcador no momento",
     "empatado"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = fim de semana & Marcador no momento = empatado & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
    ]
   ],
   "family": "Forma de golos",
@@ -22256,6 +22332,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Golos até ao sinal = nenhum & Hora (UTC) = tarde & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos até ao sinal = nenhum & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T14:32:11+00:00",
   "conditions": [
@@ -22354,6 +22449,25 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "jogos sem gols no início tendem a ter mais chances de gol nos 30 minutos seguintes",
   "source": "llm"
+ },
+ "Forma de golos | Golos até ao sinal = nenhum & Minuto = 31 a 60 & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
  },
  "Forma de golos | Golos até ao sinal = nenhum & Minuto = 61 em diante": {
   "born_utc": "2026-11-14T15:03:27+00:00",
@@ -22565,6 +22679,21 @@
    [
     "Parte do jogo",
     "2.ª parte"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T16:13:25+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
    ]
   ],
   "family": "Forma de golos",
@@ -23457,6 +23586,17 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Minuto = até ao 30": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Minuto",
+    "até ao 30"
    ]
   ],
   "family": "Forma de golos",
@@ -26120,6 +26260,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 1 golo": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T12:34:40+00:00",
   "conditions": [
@@ -27531,6 +27690,25 @@
    [
     "Ritmo indicado pelo bot",
     "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Marcador no momento = diferença de 1 golo & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
    ]
   ],
   "family": "Jogo aberto",
@@ -34683,6 +34861,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 1 golo": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T13:45:38+00:00",
   "conditions": [
@@ -37789,6 +37986,25 @@
    [
     "Hora (UTC)",
     "tarde"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 1 golo": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
    ]
   ],
   "family": "Jogo aberto",
@@ -43252,6 +43468,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Marcador no momento = diferença de 1 golo": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T14:30:04+00:00",
   "conditions": [
@@ -45693,6 +45928,25 @@
    [
     "Ritmo indicado pelo bot",
     "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = diferença de 1 golo & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-14T16:19:24+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 1 golo"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
    ]
   ],
   "family": "Jogo aberto",
