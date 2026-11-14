@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-14T11:16:46+00:00",
- "messages": 281,
+ "generated_at_utc": "2026-11-14T11:24:49+00:00",
+ "messages": 282,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 19,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 3,
   "OPEN_GAME_NO_ODDS": 2,
   "FULL_TIME_NOTE": 4,
-  "POLYMARKET": 10,
+  "POLYMARKET": 11,
   "None": 8,
   "TOTALS_FORM_NO_ODDS": 15
  },
@@ -31,10 +31,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 349,
+  "versions": 350,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-14T11:08:07+00:00",
+  "last_collected_at_utc": "2026-11-14T11:24:48+00:00",
   "hl_results": 41,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 11,
@@ -47,7 +47,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T11:16:43+00:00",
+  "collector_last_run_utc": "2026-11-14T11:24:48+00:00",
   "name_review": [
    {
     "bot": [
@@ -267,7 +267,7 @@
   "goal_lists": 72,
   "goal_lists_consistent": 54
  },
- "unique_bets": 122,
+ "unique_bets": 123,
  "settled_bets": 92,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -545,7 +545,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 8,
+   "bets": 9,
    "settled": 5,
    "matches": 4,
    "wins": 2,
@@ -846,7 +846,7 @@
    "by_bot_mark": 0,
    "per_day": 0.7,
    "days_to_hint": 42,
-   "days_to_conclusion": 440,
+   "days_to_conclusion": 441,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -920,7 +920,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 38,
-   "days_to_conclusion": 396,
+   "days_to_conclusion": 397,
    "prudent_rate": 0.7598,
    "prob_above": 0.6857,
    "edge": 0.0481,
@@ -931,7 +931,7 @@
    "prob_above_cut": 0.6466
   },
   "POLYMARKET": {
-   "signals": 9,
+   "signals": 10,
    "with_result": 6,
    "hits": 3,
    "misses": 3,
@@ -1105,7 +1105,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 25,
-   "days_to_conclusion": 269,
+   "days_to_conclusion": 270,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -2355,7 +2355,7 @@
    },
    {
     "n": 34,
-    "signals": 45,
+    "signals": 46,
     "hits": 15,
     "misses": 19,
     "hit_rate": 0.4412,
@@ -2424,11 +2424,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1569,
+  "hypotheses": 1571,
   "tested": 14,
   "corrected_bar": 0.99643,
   "counts": {
-   "em observação": 1567,
+   "em observação": 1569,
    "abandonada": 1,
    "promissora": 1
   },
@@ -2699,6 +2699,35 @@
   "agenda": {
    "items": [
     {
+     "match_id": "georgia-vs-hungary-20261114",
+     "match": "Georgia — Hungary",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-14T17:00+00:00",
+     "date_utc": "2026-11-14T11:23:00+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(-0.5)",
+     "odds": 2.53,
+     "odds_last": 2.53,
+     "max_mult": 1,
+     "share": 84,
+     "share_last": 84,
+     "verdict": "sem evidência",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 1,
+     "good": [],
+     "good_total": 0,
+     "bad": [],
+     "bad_total": 0
+    },
+    {
      "match_id": "austria-vs-rep-of-ireland-20261114",
      "match": "Austria — Rep of Ireland",
      "league": "UEFA Nations League",
@@ -2784,63 +2813,16 @@
      "good_total": 0,
      "bad": [],
      "bad_total": 0
-    },
-    {
-     "match_id": "rcd-espanyol-women-vs-costa-adeje-tenerife-women-20261114",
-     "match": "Rcd Espanyol Women — Costa Adeje Tenerife Women",
-     "league": "Spanish Primera Women",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-14T11:00+00:00",
-     "date_utc": "2026-11-14T10:47:32+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Handicap",
-     "selection": "UDG Tenerife (0)",
-     "odds": 1.89,
-     "odds_last": 1.89,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 11,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ]
-       ],
-       "n": 11,
-       "hits": 4,
-       "break_even": 0.5756,
-       "prob_above": 0.1582,
-       "roi": -0.3682,
-       "edge": -0.1117,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 1
     }
    ],
    "counts": {
     "favorável": 0,
     "misto": 0,
-    "sem evidência": 3,
+    "sem evidência": 4,
     "contraditório": 0,
-    "evitar": 1
+    "evitar": 0
    },
-   "generated_utc": "2026-11-14T11:16:46+00:00",
+   "generated_utc": "2026-11-14T11:24:49+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2853,7 +2835,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 1537,
+     "hypotheses": 1539,
      "judged": 589,
      "as_expected": 386
     },
@@ -2890,7 +2872,7 @@
     "roi_cut": -0.0795
    },
    "skipped": {
-    "bets": 49,
+    "bets": 50,
     "settled": 37,
     "games": 32,
     "wins": 15,
@@ -9417,7 +9399,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 122,
+   "bets": 123,
    "settled": 92,
    "matches": 77,
    "wins": 38,
@@ -9452,6 +9434,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T11:23:00+00:00",
+   "match_id": "georgia-vs-hungary-20261114",
+   "group": "POLYMARKET/pre",
+   "match": "Georgia — Hungary",
+   "selection": "Polymarket: AH2(-0.5)",
+   "odds": 2.53,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T11:07:41+00:00",
    "match_id": "portugal-vs-denmark-20261114",
@@ -10347,22 +10342,6 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-13T12:14:35+00:00",
-   "match_id": "hartberg-vs-floridsdorfer-20261113",
-   "group": "BETFAIR/live/mkt<10K",
-   "match": "Hartberg — Floridsdorfer",
-   "selection": "Hartberg",
-   "odds": 1.8,
-   "ft": [
-    1,
-    1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -10970,31 +10949,6 @@
    "ft": [
     2,
     3
-   ]
-  },
-  "hartberg-vs-floridsdorfer-20261113": {
-   "teams": [
-    "Hartberg",
-    "Floridsdorfer"
-   ],
-   "events": [
-    {
-     "d": "2026-11-13T12:14:35+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "selection": "1",
-     "odds": 1.8,
-     "mult": 1,
-     "share": 68,
-     "mkt_volume": 5000.0,
-     "market": "1X2"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    1,
-    1
    ]
   },
   "bermuda-vs-st-lucia-int-20261113": {
@@ -12763,6 +12717,27 @@
    "goals": null,
    "goals_source": null,
    "ft": null
+  },
+  "georgia-vs-hungary-20261114": {
+   "teams": [
+    "Georgia",
+    "Hungary"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T11:23:00+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(-0.5)",
+     "odds": 2.53,
+     "share": 84,
+     "market": "Polymarket",
+     "total": 5400.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
   }
  },
  "timeline": [
@@ -13710,7 +13685,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 27,
+   "bets": 28,
    "settled": 17,
    "wins": 8,
    "units": 0.22,
