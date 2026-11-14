@@ -15111,6 +15111,25 @@
   "family": "Golo a caminho",
   "source": "gerador"
  },
+ "Golo a caminho | Minuto = 31 a 60 & Vantagem indicada pelo bot = menos de 15 pontos acima do habitual": {
+  "born_utc": "2026-11-14T06:40:02+00:00",
+  "conditions": [
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Vantagem indicada pelo bot",
+    "menos de 15 pontos acima do habitual"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Golo a caminho",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Golo esperado com vantagem moderada na 2.ª parte do jogo",
+  "source": "llm"
+ },
  "Golo a caminho | Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-13T09:50:17+00:00",
   "conditions": [
@@ -21974,6 +21993,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T06:40:02+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogo empatado ou com diferença de 1 golo na 1.ª parte",
+  "source": "llm"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-12T17:30:52+00:00",
   "conditions": [
@@ -24203,6 +24241,25 @@
   "family": "Stake",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Apostas múltiplas em mercado de golos",
+  "source": "llm"
+ },
+ "Stake | Mercado = golos (total asiático) & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-14T06:40:02+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "golos (total asiático)"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Aposta com valor alto em mercado de golos",
   "source": "llm"
  },
  "Stake | Momento do aviso = até 45 min depois do início": {
