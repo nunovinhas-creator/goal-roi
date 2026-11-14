@@ -84,7 +84,8 @@ def alert(w, r):
 
 def messages(report, state, now):
     """Relatório + estado anterior -> lista de textos a enviar. Atualiza o estado."""
-    out, brain, ins = [], report.get('brain') or {}, report.get('insights') or {}
+    out, brain = [], report.get('brain') or {}
+    operational = report.get('operational') or {}
     if not state.get('hello'):
         state['hello'] = True
         out.append('Avisos do goal-roi ligados. Vais receber: alertas de jogos que encaixam em táticas validadas, sinais que encaixam em hipóteses promissoras, mudanças de estado e um resumo diário.\n' + PAGE)
@@ -127,12 +128,15 @@ def messages(report, state, now):
             else:
                 out.append('Hipótese voltou a "em observação":\n%s' % hid)
     state['statuses'] = new
-    old_reg = state.get('regime') or {}
-    for r in ins.get('regime') or []:
-        if r['state'] in ('piorou', 'melhorou') and old_reg.get(r['type']) != r['state']:
-            out.append('Mudança de comportamento: %s %s. Acerto recente %s, antes %s.'
-                       % (KIND.get(r['type'], r['type']), r['state'], pct(r['recent']['hit_rate']), pct(r['before']['hit_rate'])))
-    state['regime'] = {r['type']: r['state'] for r in ins.get('regime') or []}
+    # Never compare the eligible population to the legacy exploratory state.
+    # Seed silently on migration; leave historical `regime` intact.
+    if operational.get('scope') == 'eligible_bets_only':
+        old_reg = state.get('operational_regime')
+        for r in operational.get('regime') or []:
+            if old_reg is not None and r['state'] in ('piorou', 'melhorou') and old_reg.get(r['type']) != r['state']:
+                out.append('Mudança de comportamento (evidência elegível): %s %s. Acerto recente %s, antes %s.'
+                           % (KIND.get(r['type'], r['type']), r['state'], pct(r['recent']['hit_rate']), pct(r['before']['hit_rate'])))
+        state['operational_regime'] = {r['type']: r['state'] for r in operational.get('regime') or []}
     day = now.date().isoformat()
     if now.hour >= SUMMARY_HOUR_UTC and state.get('summary_day') != day:
         state['summary_day'] = day

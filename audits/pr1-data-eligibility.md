@@ -73,3 +73,35 @@ Esta auditoria compara o código base e corrigido em execuções separadas, mas 
 O script lê a base com `git show`, sem checkout nem execução de coletores. Para reproduzir os mesmos números, usar os ficheiros `data/` do commit base (a recolha em main pode continuar). O JSON inclui hashes de todos os ficheiros de dados. Nenhum secret, workflow ou histórico é alterado. Commit com `[skip ci]` para evitar execução automática de Actions ao abrir a PR. Sem merge ou deploy.
 
 PRs 2–5 aguardam integração autorizada da anterior, conforme a condição final do pedido.
+
+## Correção P1 após revisão independente #5907550172
+
+Parecer lido integralmente: commit revisto `9b15dbc0cd9ff03aa62911a483d55aef4d5d9f48`, revisão de 14/11/2026. O revisor identificou fuga de evidência exploratória para o veredito principal/narrativa do dashboard e os avisos Telegram de mudança de comportamento.
+
+Antes desta correção: os 97 testes passaram novamente. Depois: **103 testes passaram**, com a rede Python bloqueada; o teste do dashboard executa as funções reais `verdict()` e `answer()` num contexto Node isolado, sem browser, fetch ou serviços. Node é necessário para esta regressão; nenhuma dependência paga foi adicionada.
+
+### Resposta às observações
+
+- `scangoal/report.py`: novo bloco `operational`, com `scope=eligible_bets_only`, `accuracy` e `regime`, calculado exclusivamente após `eligible()`. `accuracy` e `insights` legados são preservados integralmente como exploratórios.
+- `docs/index.html`: `answer()` usa apenas `operational.accuracy` quando a origem está identificada. Relatórios antigos ou com scope diferente mostram “Evidência elegível ainda indisponível”, sem recorrer a `accuracy`. A narrativa e as tabelas derivadas de `insights` são explicitamente exploratórias; as observações recebem o prefixo “Exploratório”.
+- `scangoal/notify.py`: mudanças de comportamento usam apenas `operational.regime`. Sem scope elegível, não há esse aviso nem atualização da referência operacional. A primeira amostra elegível estabelece a referência silenciosamente; o estado legado `regime` é preservado e a nova referência usa `operational_regime`. Isto evita comparar populações diferentes ao migrar. Os restantes alertas mantêm o comportamento anterior.
+- `tests/test_operational_evidence.py` e `tests/dashboard_operational.cjs`: seis regressões novas, incluindo separação no relatório real, contaminação por vitórias inelegíveis, ausência/scope inválido, migração silenciosa, preservação do estado legado e execução real do veredito JavaScript. As mesmas vitórias com proveniência válida continuam a poder gerar o aviso de melhoria; repetições não duplicam o aviso.
+- `tests/test_scangoal.py`: a fixture de avisos passa a fornecer explicitamente o regime elegível; os testes existentes de sinais, estados, resumo e deduplicação continuam a passar.
+
+### Comparação após P1
+
+Reexecutado `python scripts/audit_data_eligibility.py`, com o mesmo snapshot e relógio. O script compara também a versão revista: **brain completo, accuracy e insights exploratórios são exatamente iguais** antes/depois desta correção P1. Todos os hashes históricos permanecem iguais. As 8 hipóteses promissoras, 3 abandonadas, 4778 em observação e ROI walk-forward −0,23% permanecem iguais. Os números originais da tabela desta auditoria não foram reinterpretados como evidência prospectiva.
+
+| Tipo | Resultados no regime exploratório | Resultados no regime elegível |
+|---|---:|---:|
+| Betfair ao vivo | 41 | 37 |
+| Betfair pré-jogo | 16 | 10 |
+| Jogo aberto | 91 (estável) | 78 (poucos dados) |
+| Polymarket | 55 | 55 |
+| Stake | 47 | 38 |
+| Totals form | 29 | 25 |
+| Alinhamento enfraquecido | 4 | 4 |
+
+Na regressão sintética, 80 resultados elegíveis equilibrados mais 40 vitórias inelegíveis produzem “melhorou” na estatística exploratória, mas mantêm a evidência operacional e os avisos inalterados. A mesma adição elegível produz o aviso esperado. Isto testa isolamento da evidência; não demonstra capacidade preditiva.
+
+Validações adicionais: sintaxe de todos os scripts inline do dashboard com Node e `git diff --check`. Nenhum ficheiro em `data/`, relatório publicado, secret ou workflow foi alterado. Nenhuma mensagem real enviada. A PR continua Draft, sem merge/deploy, e a PR 2 aguarda nova revisão independente. As reservas científicas das PRs 2–5 continuam válidas.

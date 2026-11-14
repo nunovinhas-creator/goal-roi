@@ -157,3 +157,12 @@ multiplicidade, ativação cronológica ou validação prospectiva. Os nomes ant
 Ver [auditoria da PR 1](audits/pr1-data-eligibility.md). Testes sem rede:
 `python scripts/test_offline.py`. Comparação reproduzível com a base fixada:
 `python scripts/audit_data_eligibility.py`.
+
+Após a revisão P1, `operational.accuracy` alimenta o veredito principal e
+`operational.regime` alimenta os avisos de comportamento. Ambos exigem
+`scope=eligible_bets_only`; relatórios antigos não usam estatísticas exploratórias
+como alternativa. A narrativa e as tabelas legadas do dashboard estão identificadas
+como exploratórias. A primeira leitura do regime elegível estabelece uma referência
+silenciosa em `operational_regime`, preservando o campo histórico `regime`.
+Os testes offline incluem agora a execução de `answer()` em Node (necessário no
+ambiente de testes), sem chamadas externas.

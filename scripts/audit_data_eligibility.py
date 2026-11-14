@@ -20,6 +20,7 @@ from scangoal import brain, report
 
 BASE = '0a4423983bee954beb5ed247349e85c7df47eee4'
 NOW = '2026-11-14T22:00:00+00:00'
+REVIEWED = '9b15dbc0cd9ff03aa62911a483d55aef4d5d9f48'
 TARGETS = (
     'Stake | Número de apostas = uma',
     'Stake | Dia = fim de semana',
@@ -35,11 +36,11 @@ class Clock(datetime):
         return cls.fromisoformat(NOW).astimezone(tz)
 
 
-def old_module(name):
-    source = subprocess.check_output(['git', 'show', f'{BASE}:scangoal/{name}.py'], text=True)
+def old_module(name, ref=BASE):
+    source = subprocess.check_output(['git', 'show', f'{ref}:scangoal/{name}.py'], text=True)
     module = types.ModuleType(f'scangoal._baseline_{name}')
     module.__package__ = 'scangoal'
-    exec(compile(source, f'{BASE}:{name}.py', 'exec'), module.__dict__)
+    exec(compile(source, f'{ref}:{name}.py', 'exec'), module.__dict__)
     module.datetime = Clock
     return module
 
@@ -69,13 +70,24 @@ if __name__ == '__main__':
     with patch.object(socket.socket, 'connect', blocked), patch.object(socket, 'create_connection', blocked), patch.object(report, 'datetime', Clock), patch.object(brain, 'datetime', Clock):
         before = oldreport.build(register=False)
         oldrows, _, _ = oldbrain.evaluate(copy.deepcopy(oldreport.LAST['signals']), registry, report.MIN_SETTLED)
+        reviewed = old_module('report', REVIEWED).build(register=False)
         after = report.build(register=False)
         rows, _, _ = brain.evaluate(copy.deepcopy(report.LAST['signals']), registry, report.MIN_SETTLED)
+    assert reviewed['brain'] == after['brain'], 'P1 brain regression'
+    assert reviewed['accuracy'] == after['accuracy'], 'P1 exploratory regression'
+    assert reviewed['insights'] == after['insights'], 'P1 insights regression'
     assert hashes == digest(), 'Historical data changed'
     assert before['groups'] == after['groups'], 'Strict ROI regression'
     assert before['accuracy'] == after['accuracy'], 'Exploratory accuracy regression'
     print(json.dumps({'baseline_commit': BASE, 'clock_utc': NOW, 'data_sha256': hashes,
                       'before': summary(before, oldrows), 'after': summary(after, rows),
                       'eligibility': after['brain']['eligibility'],
+                      'review_p1': {'reviewed_commit': REVIEWED, 'brain_unchanged': True,
+                                    'exploratory_insights_unchanged': True,
+                                    'dashboard_before': 'accuracy (all signals)',
+                                    'dashboard_after': 'operational.accuracy (eligible only)',
+                                    'telegram_before': reviewed['insights']['regime'],
+                                    'telegram_after': after['operational']['regime'],
+                                    'eligible_accuracy': after['operational']['accuracy']},
                       'checks': {'historical_data_unchanged': True, 'strict_roi_unchanged': True, 'exploratory_accuracy_unchanged': True},
                       'interpretation': 'Historical sensitivity analysis only; no prospective validation or proof of predictive improvement.'}, indent=2, ensure_ascii=False))

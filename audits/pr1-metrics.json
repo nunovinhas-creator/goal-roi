@@ -178,6 +178,319 @@
       "edited_at_first_sight": 30
     }
   },
+  "review_p1": {
+    "reviewed_commit": "9b15dbc0cd9ff03aa62911a483d55aef4d5d9f48",
+    "brain_unchanged": true,
+    "exploratory_insights_unchanged": true,
+    "dashboard_before": "accuracy (all signals)",
+    "dashboard_after": "operational.accuracy (eligible only)",
+    "telegram_before": [
+      {
+        "type": "BETFAIR/live",
+        "n": 41,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "BETFAIR/pre",
+        "n": 16,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "OPEN_GAME",
+        "n": 91,
+        "needed": 80,
+        "state": "estável",
+        "before": {
+          "n": 51,
+          "hit_rate": 0.7374,
+          "break_even": 0.5359,
+          "roi": 0.3843
+        },
+        "recent": {
+          "n": 40,
+          "hit_rate": 0.5658,
+          "break_even": 0.5304,
+          "roi": 0.133
+        },
+        "z": -1.67
+      },
+      {
+        "type": "POLYMARKET",
+        "n": 55,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "STAKE_LOAD",
+        "n": 47,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "TOTALS_FORM",
+        "n": 29,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "WEAKENED_LINEUP",
+        "n": 4,
+        "needed": 80,
+        "state": "poucos dados"
+      }
+    ],
+    "telegram_after": [
+      {
+        "type": "BETFAIR/live",
+        "n": 37,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "BETFAIR/pre",
+        "n": 10,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "OPEN_GAME",
+        "n": 78,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "POLYMARKET",
+        "n": 55,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "STAKE_LOAD",
+        "n": 38,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "TOTALS_FORM",
+        "n": 25,
+        "needed": 80,
+        "state": "poucos dados"
+      },
+      {
+        "type": "WEAKENED_LINEUP",
+        "n": 4,
+        "needed": 80,
+        "state": "poucos dados"
+      }
+    ],
+    "eligible_accuracy": {
+      "BETFAIR/live": {
+        "signals": 66,
+        "with_result": 37,
+        "hits": 15,
+        "misses": 22,
+        "pushes": 0,
+        "eff_hits": 15.0,
+        "eff_misses": 22.0,
+        "vote_hits": 15.0,
+        "vote_misses": 22.0,
+        "vote_break_even": 0.4368,
+        "games": 37,
+        "no_source": 13,
+        "unsettleable": 0,
+        "hit_rate": 0.4054,
+        "ci95": [
+          0.2635,
+          0.5651
+        ],
+        "avg_odds": 2.768,
+        "break_even": 0.4368,
+        "baseline": false,
+        "roi_announced_odds": 0.0097,
+        "seen_late": 0,
+        "by_bot_mark": 0,
+        "per_day": 11.0,
+        "days_to_hint": 0,
+        "days_to_conclusion": 24
+      },
+      "BETFAIR/pre": {
+        "signals": 14,
+        "with_result": 10,
+        "hits": 3,
+        "misses": 7,
+        "pushes": 0,
+        "eff_hits": 3.0,
+        "eff_misses": 7.0,
+        "vote_hits": 3.0,
+        "vote_misses": 6.0,
+        "vote_break_even": 0.4666,
+        "games": 9,
+        "no_source": 1,
+        "unsettleable": 0,
+        "hit_rate": 0.3,
+        "ci95": [
+          0.1078,
+          0.6032
+        ],
+        "avg_odds": 2.441,
+        "break_even": 0.4564,
+        "baseline": false,
+        "roi_announced_odds": -0.442,
+        "seen_late": 0,
+        "by_bot_mark": 0,
+        "per_day": 3.0,
+        "days_to_hint": 7,
+        "days_to_conclusion": 97
+      },
+      "OPEN_GAME": {
+        "signals": 102,
+        "with_result": 99,
+        "hits": 48,
+        "misses": 30,
+        "pushes": 21,
+        "eff_hits": 46.5,
+        "eff_misses": 29.0,
+        "vote_hits": 46.5,
+        "vote_misses": 29.0,
+        "vote_break_even": 0.5352,
+        "games": 78,
+        "no_source": 0,
+        "unsettleable": 0,
+        "hit_rate": 0.6159,
+        "ci95": [
+          0.5031,
+          0.7175
+        ],
+        "avg_odds": 1.932,
+        "break_even": 0.5352,
+        "baseline": false,
+        "roi_announced_odds": 0.1469,
+        "seen_late": 0,
+        "by_bot_mark": 0,
+        "per_day": 33.9,
+        "days_to_hint": 0,
+        "days_to_conclusion": 7
+      },
+      "POLYMARKET": {
+        "signals": 62,
+        "with_result": 55,
+        "hits": 27,
+        "misses": 28,
+        "pushes": 0,
+        "eff_hits": 27.0,
+        "eff_misses": 28.0,
+        "vote_hits": 11.15,
+        "vote_misses": 10.85,
+        "vote_break_even": 0.517,
+        "games": 22,
+        "no_source": 0,
+        "unsettleable": 3,
+        "hit_rate": 0.4909,
+        "ci95": [
+          0.3638,
+          0.6192
+        ],
+        "avg_odds": 2.37,
+        "break_even": 0.4861,
+        "baseline": false,
+        "roi_announced_odds": -0.0353,
+        "seen_late": 0,
+        "by_bot_mark": 32,
+        "per_day": 24.5,
+        "days_to_hint": 0,
+        "days_to_conclusion": 11
+      },
+      "STAKE_LOAD": {
+        "signals": 63,
+        "with_result": 40,
+        "hits": 16,
+        "misses": 22,
+        "pushes": 2,
+        "eff_hits": 16.0,
+        "eff_misses": 22.0,
+        "vote_hits": 5.28,
+        "vote_misses": 13.72,
+        "vote_break_even": 0.5148,
+        "games": 19,
+        "no_source": 0,
+        "unsettleable": 19,
+        "hit_rate": 0.4211,
+        "ci95": [
+          0.2785,
+          0.5781
+        ],
+        "avg_odds": 2.006,
+        "break_even": 0.5327,
+        "baseline": false,
+        "roi_announced_odds": -0.231,
+        "seen_late": 0,
+        "by_bot_mark": 4,
+        "per_day": 16.7,
+        "days_to_hint": 0,
+        "days_to_conclusion": 16
+      },
+      "TOTALS_FORM": {
+        "signals": 26,
+        "with_result": 25,
+        "hits": 16,
+        "misses": 9,
+        "pushes": 0,
+        "eff_hits": 13.0,
+        "eff_misses": 9.0,
+        "vote_hits": 13.0,
+        "vote_misses": 9.0,
+        "vote_break_even": 0.5996,
+        "games": 25,
+        "no_source": 0,
+        "unsettleable": 0,
+        "hit_rate": 0.5909,
+        "ci95": [
+          0.3873,
+          0.7674
+        ],
+        "avg_odds": 1.681,
+        "break_even": 0.5996,
+        "baseline": false,
+        "roi_announced_odds": -0.0078,
+        "seen_late": 0,
+        "by_bot_mark": 0,
+        "per_day": 10.1,
+        "days_to_hint": 1,
+        "days_to_conclusion": 28
+      },
+      "WEAKENED_LINEUP": {
+        "signals": 5,
+        "with_result": 4,
+        "hits": 1,
+        "misses": 3,
+        "pushes": 0,
+        "eff_hits": 1.0,
+        "eff_misses": 3.0,
+        "vote_hits": 1.0,
+        "vote_misses": 3.0,
+        "vote_break_even": 0.5255,
+        "games": 4,
+        "no_source": 0,
+        "unsettleable": 0,
+        "hit_rate": 0.25,
+        "ci95": [
+          0.0456,
+          0.6994
+        ],
+        "avg_odds": 1.905,
+        "break_even": 0.5255,
+        "baseline": false,
+        "roi_announced_odds": -0.53,
+        "seen_late": 0,
+        "by_bot_mark": 0,
+        "per_day": 1.3,
+        "days_to_hint": 21,
+        "days_to_conclusion": 235
+      }
+    }
+  },
   "checks": {
     "historical_data_unchanged": true,
     "strict_roi_unchanged": true,

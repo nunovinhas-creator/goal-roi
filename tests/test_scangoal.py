@@ -756,6 +756,7 @@ class Notify(unittest.TestCase):
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
                           'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4}},
                 'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
+                'operational': {'scope': 'eligible_bets_only', 'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'daily': [{'day': '2026-11-12', 'bets': 4, 'settled': 3, 'wins': 2, 'units': 0.85}], 'timeline': [{'u': 1.5}], 'settled_bets': 20}
         base.update(over)
         return base
@@ -770,7 +771,7 @@ class Notify(unittest.TestCase):
         self.assertEqual(notify.messages(self.report(), state, noon), [])              # nada de novo: silêncio
         rep = self.report()
         rep['brain']['status_list'] = {'h1': 'forte', 'h2': 'abandonada'}
-        rep['insights']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
+        rep['operational']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
         changed = notify.messages(rep, state, noon)
         self.assertEqual(len(changed), 3)
         self.assertTrue(any('passou a forte' in m for m in changed) and any('Jogo aberto piorou' in m for m in changed))

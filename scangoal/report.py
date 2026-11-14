@@ -383,6 +383,13 @@ def write_csv(signals, path):
                          '%d-%d' % tuple(b['ft']) if b['ft'] else '', res, units, b['settled_by'] or '', 'sim' if b['in_roi'] else 'não'])
 
 
+def operational_evidence(signals):
+    """Decision-facing statistics, independent of the legacy exploratory tables."""
+    rows = [b for b in signals if eligible(b)]
+    return {'scope': 'eligible_bets_only', 'accuracy': accuracy(rows),
+            'regime': insights.regime(rows)}
+
+
 def build(csv_path=None, register=False):
     msgs, ft, marks, notes, audit = load()
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
@@ -475,6 +482,7 @@ def build(csv_path=None, register=False):
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
+        'operational': operational_evidence(signals),
         'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 

@@ -142,10 +142,12 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
   <p class="note" id="boardllm"></p>
 </section>
 
-<h2>O que os dados dizem hoje</h2>
+<h2>Leitura exploratória dos dados</h2>
+<p class="note">Inclui sinais inelegíveis. Estas observações não alimentam o veredito principal nem os avisos de comportamento.</p>
 <ul class="says" id="says"></ul>
 
-<h2>Cada tipo de sinal acerta o suficiente?</h2>
+<h2>Acerto por tipo — estatísticas exploratórias</h2>
+<p class="note">Inclui sinais inelegíveis e sinais sem odd. Não constitui conclusão operacional.</p>
 <p class="note">Para dar lucro, um sinal tem de acertar mais vezes do que a odd exige. O ponto mostra a taxa de acerto medida; a faixa mostra onde o valor real pode estar; o traço vertical é o mínimo necessário.</p>
 <div class="legend"><span><i class="k-dot"></i>taxa de acerto medida</span><span><i class="k-band"></i>margem de incerteza (95 %)</span><span><i class="k-tick"></i>mínimo para não perder dinheiro</span></div>
 <div class="sig" id="signals"></div>
@@ -172,11 +174,11 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Um grupo só conta como conclusivo com <span id="minset">300</span> apostas liquidadas. As colunas “odd −2 %” e “odd −5 %” mostram o que sobra se não conseguires a odd anunciada.</p>
 <div class="panel wrap"><table><thead><tr><th>Grupo</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Saldo</th><th>ROI</th><th>Entre</th><th>Odd −2 %</th><th>Odd −5 %</th></tr></thead><tbody id="groups"></tbody></table></div>
 
-<h2>A odd mexe a favor do sinal?</h2>
+<h2>Movimento da odd — exploratório</h2>
 <p class="note">Quando o bot reforça um sinal Betfair, traz a odd mais recente. Se a odd desce depois do primeiro sinal, o mercado concordou com ele. É um indicador mais rápido do que esperar pelos resultados.</p>
 <div class="duo" id="move"></div>
 
-<h2>O bot acerta mais nos favoritos ou nas surpresas?</h2>
+<h2>Acerto por faixa de odd — exploratório</h2>
 <p class="note">Todos os sinais com odd, agrupados por faixa. O traço é a taxa que a própria odd exige; o ponto é o que aconteceu.</p>
 <div class="sig" id="calib"></div>
 
@@ -201,15 +203,15 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
 <p class="note">Sinais ainda em aberto que encaixam numa hipótese promissora, forte ou confirmada. São indícios para observar, não recomendações.</p>
 <div class="panel" id="watch"></div>
 
-<h2>A confiança que o bot indica bate certo?</h2>
+<h2>Confiança indicada pelo bot — exploratório</h2>
 <p class="note">Nos sinais de jogo aberto o bot indica uma percentagem “Over”. Aqui compara-se essa percentagem com o que aconteceu. <span id="nextgoal"></span></p>
 <div class="panel wrap"><table><thead><tr><th>Confiança indicada</th><th>Resultados</th><th>Média indicada</th><th>Acerto real</th><th>A odd exige</th></tr></thead><tbody id="conf"></tbody></table></div>
 
-<h2>Algum sinal mudou de comportamento?</h2>
-<p class="note">Compara os últimos 40 resultados de cada tipo com os anteriores. Serve para dar conta cedo de um sinal que deixou de funcionar, ou que começou a funcionar.</p>
+<h2>Mudanças de comportamento — exploratório</h2>
+<p class="note">Compara os últimos 40 resultados de cada tipo com os anteriores. Inclui sinais inelegíveis; esta tabela não gera alertas operacionais.</p>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Resultados</th><th>Acerto antes</th><th>Acerto recente</th><th>ROI antes</th><th>ROI recente</th><th>Estado</th></tr></thead><tbody id="regime"></tbody></table></div>
 
-<h2>Onde os sinais funcionam melhor e pior</h2>
+<h2>Segmentos — exploração histórica</h2>
 <p class="note" id="segnote"></p>
 <div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Corte</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="segs"></tbody></table></div>
 
@@ -319,7 +321,8 @@ function signals(d){
 }
 
 function answer(d){
-  const acc=Object.entries(d.accuracy||{}).map(([k,g])=>({k,g,n:g.hits+g.misses,v:verdict(g,d.min_settled)}));
+  const operational=d.operational?.scope==='eligible_bets_only'?d.operational:null;
+  const acc=Object.entries(operational?.accuracy||{}).map(([k,g])=>({k,g,n:g.hits+g.misses,v:verdict(g,d.min_settled)}));
   const firm=acc.filter(x=>x.n>=d.min_settled&&x.v[0]!=='none'), hint=acc.filter(x=>x.n>=30&&x.n<d.min_settled&&(x.v[0]==='good'||x.v[0]==='bad'));
   const lead=acc.slice().sort((a,b)=>b.n-a.n)[0];
   let main,sub;
@@ -330,6 +333,8 @@ function answer(d){
     sub=`Um indício só passa a conclusão com ${d.min_settled} apostas liquidadas no mesmo tipo.`}
   else{main='Ainda é cedo para dizer se os sinais dão lucro.';
     sub=lead&&lead.n?`O tipo com mais resultados é “${NAMES[lead.k]?NAMES[lead.k][0]:lead.k}”, com ${lead.n}. São precisos pelo menos 30 para um primeiro indício e ${d.min_settled} para uma conclusão.`:'Os primeiros resultados aparecem assim que os jogos terminarem.'}
+  if(!operational){main='Evidência elegível ainda indisponível.';sub='Aguarda um relatório com evidência elegível; as estatísticas exploratórias não sustentam este veredito.'}
+  else{sub='Apenas evidência elegível. '+sub+' Resultados históricos não demonstram capacidade preditiva.'}
   $('answer').textContent=main;$('answer2').textContent=sub;
   const days=d.first_signal_utc?Math.max(1,Math.ceil((Date.now()-Date.parse(d.first_signal_utc))/864e5)):0;
   const tl=d.timeline||[], bal=tl.length?tl[tl.length-1].u:0;
@@ -372,7 +377,7 @@ function chart(d){
 
 function insights(d){
   const I=d.insights; if(!I)return;
-  for(const t of I.narrative)$('says').appendChild(el('li',{},t));
+  for(const t of I.narrative)$('says').appendChild(el('li',{},'Exploratório: '+t));
   const mv=(title,m,note)=>{const p=el('div',{class:'panel'});p.appendChild(el('h3',{},title));
     if(!m.n){p.appendChild(el('p',{},'Ainda sem apostas com reforço.'))}
     else{p.appendChild(el('div',{class:'big'},`${m.shortened} de ${m.n}`));p.appendChild(el('p',{},`apostas em que a odd desceu depois do sinal. Subiu em ${m.drifted}. Variação típica: ${m.median_move_pct>0?'+':''}${num(m.median_move_pct)} %.`));
