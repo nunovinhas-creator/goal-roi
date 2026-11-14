@@ -18951,6 +18951,25 @@
   "reason": "Golo esperado com vantagem moderada na 2.ª parte do jogo",
   "source": "llm"
  },
+ "Golo a caminho | Minuto = até ao 30 & Vantagem indicada pelo bot = menos de 15 pontos acima do habitual": {
+  "born_utc": "2026-11-14T14:29:56+00:00",
+  "conditions": [
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Vantagem indicada pelo bot",
+    "menos de 15 pontos acima do habitual"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Golo a caminho",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Vantagens pequenas no início do jogo tendem a ser confirmadas",
+  "source": "llm"
+ },
  "Golo a caminho | Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-13T09:50:17+00:00",
   "conditions": [
@@ -19857,6 +19876,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = entre 1 e 2 golos": {
   "born_utc": "2026-11-14T13:20:27+00:00",
   "conditions": [
@@ -19895,6 +19933,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Confiança indicada pelo bot = 95 % ou mais & Minuto = 31 a 60": {
   "born_utc": "2026-11-14T09:25:24+00:00",
   "conditions": [
@@ -19928,6 +19985,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Confiança indicada pelo bot = 95 % ou mais & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -20392,6 +20468,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 3 ou mais": {
   "born_utc": "2026-11-14T11:25:11+00:00",
   "conditions": [
@@ -20563,6 +20658,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T11:50:06+00:00",
   "conditions": [
@@ -20631,6 +20745,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T14:29:29+00:00",
   "conditions": [
@@ -20688,6 +20821,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T14:29:29+00:00",
   "conditions": [
@@ -20736,6 +20888,25 @@
    [
     "Golos até ao sinal",
     "3 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
    ]
   ],
   "family": "Jogo aberto",
@@ -21147,6 +21318,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Hora (UTC) = tarde & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T14:19:07+00:00",
   "conditions": [
@@ -21161,6 +21351,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Hora (UTC) = tarde & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -21305,6 +21514,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -21578,6 +21806,25 @@
    [
     "Parte do jogo",
     "1.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = liga & Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
    ]
   ],
   "family": "Jogo aberto",
@@ -22358,6 +22605,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Dia = fim de semana & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Dia = fim de semana & Golos em falta para ganhar = entre 1 e 2 golos": {
   "born_utc": "2026-11-14T12:19:38+00:00",
   "conditions": [
@@ -23006,6 +23272,25 @@
    [
     "Golos em falta para ganhar",
     "até 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
    ]
   ],
   "family": "Jogo aberto",
@@ -24171,6 +24456,21 @@
    [
     "Minuto",
     "61 em diante"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Minuto = até ao 30": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
    ]
   ],
   "family": "Jogo aberto",
@@ -28142,6 +28442,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 3 ou mais & Minuto = 31 a 60": {
   "born_utc": "2026-11-14T12:19:38+00:00",
   "conditions": [
@@ -29170,6 +29489,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Minuto = até ao 30 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T09:19:05+00:00",
   "conditions": [
@@ -29746,6 +30084,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 1 golo": {
   "born_utc": "2026-11-14T11:50:06+00:00",
   "conditions": [
@@ -29817,6 +30174,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 3 ou mais & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -32293,6 +32669,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T13:45:38+00:00",
   "conditions": [
@@ -32914,6 +33309,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T11:50:06+00:00",
   "conditions": [
@@ -33335,6 +33749,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde & Minuto = 31 a 60": {
   "born_utc": "2026-11-14T13:10:05+00:00",
   "conditions": [
@@ -33373,6 +33806,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-14T13:20:27+00:00",
   "conditions": [
@@ -33387,6 +33839,25 @@
    [
     "Parte do jogo",
     "2.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Hora (UTC) = tarde & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
    ]
   ],
   "family": "Jogo aberto",
@@ -34240,6 +34711,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Minuto = 31 a 60": {
   "born_utc": "2026-11-14T12:21:38+00:00",
   "conditions": [
@@ -34278,6 +34768,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-14T14:23:30+00:00",
   "conditions": [
@@ -34292,6 +34801,25 @@
    [
     "Parte do jogo",
     "2.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
    ]
   ],
   "family": "Jogo aberto",
@@ -34728,6 +35256,25 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Jogo empatado ou com diferença de 1 golo na 1.ª parte",
   "source": "llm"
+ },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
  },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-12T17:30:52+00:00",
@@ -36234,6 +36781,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T13:45:38+00:00",
   "conditions": [
@@ -36396,6 +36962,21 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Hora (UTC) = tarde & Minuto = até ao 30": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
    ]
   ],
   "family": "Jogo aberto",
@@ -38024,6 +38605,21 @@
    [
     "Minuto",
     "até ao 30"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Minuto = até ao 30 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T14:30:04+00:00",
+  "conditions": [
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
    ]
   ],
   "family": "Jogo aberto",
