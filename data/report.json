@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T01:38:49+00:00",
+ "generated_at_utc": "2026-11-14T01:47:16+00:00",
  "messages": 243,
  "types": {
   "SERVICE": 10,
@@ -44,7 +44,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T01:38:46+00:00",
+  "collector_last_run_utc": "2026-11-14T01:47:04+00:00",
   "name_review": [
    {
     "bot": [
@@ -825,7 +825,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 36,
-   "days_to_conclusion": 380,
+   "days_to_conclusion": 381,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -860,7 +860,7 @@
    "roi_announced_odds": 0.4368,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 11.2,
+   "per_day": 11.1,
    "days_to_hint": 1,
    "days_to_conclusion": 25,
    "prudent_rate": 0.7469,
@@ -2676,7 +2676,7 @@
     "contraditório": 0,
     "evitar": 1
    },
-   "generated_utc": "2026-11-14T01:38:49+00:00",
+   "generated_utc": "2026-11-14T01:47:16+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -8537,17 +8537,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 35,
-  "llm_last_run_utc": "2026-11-14T00:48:48+00:00",
+  "llm_runs": 36,
+  "llm_last_run_utc": "2026-11-14T01:47:06+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 1,
-   "neurons_today": 166.3,
+   "calls_today": 2,
+   "neurons_today": 320.7,
    "accepted_today": 0,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "apresenta um alto acerto de 0.96, mas a amostra é pequena com apenas 13 resultados",
+    "at_utc": "2026-11-14T01:47:06+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 13,
+    "hits": 12,
+    "hit_rate": 0.96,
+    "break_even": 0.546,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Hora (UTC) = tarde",
+    "note": "tem um acerto perfeito de 1.0, mas a amostra é muito pequena com apenas 10 resultados",
+    "at_utc": "2026-11-14T01:47:06+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 10,
+    "hits": 10,
+    "hit_rate": 1.0,
+    "break_even": 0.546,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00",
+    "note": "apresenta um acerto relativamente baixo de 0.8571, o que pode ser um sinal de que essa hipótese precisa de mais avaliação",
+    "at_utc": "2026-11-14T01:47:06+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 9,
+    "hit_rate": 0.8571,
+    "break_even": 0.547,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Hora (UTC) = tarde",
     "note": "apenas 10 resultados, mas com acerto de 1.0",
@@ -8645,39 +8678,6 @@
     "hits": 13,
     "hit_rate": 0.9259,
     "break_even": 0.5673,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Hora (UTC) = tarde",
-    "note": "tem um acerto de 1.0, mas também tem uma amostra pequena de 10 resultados",
-    "at_utc": "2026-11-13T06:10:37+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 10,
-    "hits": 10,
-    "hit_rate": 1.0,
-    "break_even": 0.546,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-    "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
-    "at_utc": "2026-11-13T02:16:31+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 14,
-    "hits": 13,
-    "hit_rate": 0.9259,
-    "break_even": 0.5673,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
-    "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados, requerendo mais dados para confirmação.",
-    "at_utc": "2026-11-13T02:16:31+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.512,
     "status": "em observação"
    }
   ],
