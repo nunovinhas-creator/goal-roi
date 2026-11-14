@@ -166,3 +166,14 @@ como exploratórias. A primeira leitura do regime elegível estabelece uma refer
 silenciosa em `operational_regime`, preservando o campo histórico `regime`.
 Os testes offline incluem agora a execução de `answer()` em Node (necessário no
 ambiente de testes), sem chamadas externas.
+
+### Migração silenciosa dos estados Telegram
+
+A primeira referência elegível é registada uma só vez em
+`migrations.eligible_statuses_v1`, preservando os estados antigos e o histórico de
+entrega. Transições futuras continuam a gerar avisos. O comando offline
+`python -m scangoal.notify --migrate-statuses` prepara exclusivamente essa referência,
+sem credenciais nem envios, e pode ser repetido sem efeitos adicionais.
+Consultar o [procedimento de integração e reversão](audits/pr1-safe-integration.md)
+antes de qualquer integração autorizada. Não restaurar um estado de notificações
+antigo sobre um estado que já recebeu novas entregas.

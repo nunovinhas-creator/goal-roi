@@ -105,3 +105,7 @@ Reexecutado `python scripts/audit_data_eligibility.py`, com o mesmo snapshot e r
 Na regressão sintética, 80 resultados elegíveis equilibrados mais 40 vitórias inelegíveis produzem “melhorou” na estatística exploratória, mas mantêm a evidência operacional e os avisos inalterados. A mesma adição elegível produz o aviso esperado. Isto testa isolamento da evidência; não demonstra capacidade preditiva.
 
 Validações adicionais: sintaxe de todos os scripts inline do dashboard com Node e `git diff --check`. Nenhum ficheiro em `data/`, relatório publicado, secret ou workflow foi alterado. Nenhuma mensagem real enviada. A PR continua Draft, sem merge/deploy, e a PR 2 aguarda nova revisão independente. As reservas científicas das PRs 2–5 continuam válidas.
+
+## Reserva operacional da revisão #5907607348
+
+Preparada migração silenciosa, idempotente e persistida das classificações Telegram, sem alterar cérebro/LLM/estatística. No cenário 33→8, o notificador aprovado emitia 25 transições retroativas; o corrigido emite zero. Quatro mudanças genuínas posteriores continuam a emitir quatro avisos, sem repetição no ciclo seguinte. **112 testes offline passaram** (103 anteriores + 9 regressões). Ver [procedimento de integração e reversão](pr1-safe-integration.md) e `pr1-notify-migration.json`. A PR permanece Draft e aguarda última revisão independente; não houve merge, deploy ou execução de produção.

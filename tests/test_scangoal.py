@@ -752,7 +752,7 @@ class RegimeAndStories(Hardening):
 
 class Notify(unittest.TestCase):
     def report(self, **over):
-        base = {'brain': {'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
+        base = {'brain': {'evidence_scope': 'eligible_bets_only', 'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
                           'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4}},
                 'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
@@ -789,7 +789,7 @@ class Notify(unittest.TestCase):
         rep = self.report()
         rep['brain']['watch'] = [game('2026-11-12T11:50:00+00:00'), game('2026-11-12T09:00:00+00:00'), game('2026-11-12T08:00:00+00:00', '2026-11-12T20:00')]
         rep['brain']['status_list'] = {'h1': 'forte'}
-        state = {'hello': True, 'statuses': {'h1': 'promissora'}}
+        state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {notify.STATUS_MIGRATION: {}}}
         out = notify.messages(rep, state, noon)
         alerts = [m for m in out if m.startswith('🟢 ALERTA')]
         self.assertEqual(len(alerts), 2)                                               # o sinal de há 3 horas, com o jogo já a decorrer, não gera alerta
