@@ -13742,6 +13742,21 @@
   "reason": "Jogos da liga com pouco espaço para ganhar",
   "source": "llm"
  },
+ "Forma de golos | Competição = liga & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Dia = dia de semana": {
   "born_utc": "2026-11-12T17:30:52+00:00",
   "conditions": [
@@ -13888,6 +13903,59 @@
    [
     "Marcador no momento",
     "empatado"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
    ],
    [
     "Sinal anterior de outro tipo no mesmo jogo",
@@ -14055,6 +14123,21 @@
   "reason": "Forma de golos com muitos golos e diferença grande",
   "source": "llm"
  },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Minuto = 31 a 60": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos até ao sinal = 3 ou mais & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T04:26:05+00:00",
   "conditions": [
@@ -14215,6 +14298,17 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Marcador no momento = diferença de 2 ou mais golos": {
+  "born_utc": "2026-11-14T05:43:50+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
    ]
   ],
   "family": "Forma de golos",
