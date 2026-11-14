@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T12:30:00+00:00",
+ "generated_at_utc": "2026-11-14T12:32:37+00:00",
  "messages": 313,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T12:29:59+00:00",
+  "collector_last_run_utc": "2026-11-14T12:32:12+00:00",
   "name_review": [
    {
     "bot": [
@@ -1037,7 +1037,7 @@
    "roi_announced_odds": -0.2795,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 4.0,
+   "per_day": 3.9,
    "days_to_hint": 5,
    "days_to_conclusion": 74,
    "prudent_rate": 0.5148,
@@ -1113,7 +1113,7 @@
    "by_bot_mark": 0,
    "per_day": 1.1,
    "days_to_hint": 25,
-   "days_to_conclusion": 274,
+   "days_to_conclusion": 275,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -2434,11 +2434,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1840,
+  "hypotheses": 1841,
   "tested": 17,
   "corrected_bar": 0.99706,
   "counts": {
-   "em observação": 1835,
+   "em observação": 1836,
    "abandonada": 1,
    "promissora": 4
   },
@@ -2835,94 +2835,6 @@
       }
      ],
      "good_total": 21,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
-     "match_id": "napoli-women-vs-ac-milan-women-20261114",
-     "match": "Napoli Women — AC Milan Women",
-     "league": "Italian Serie A Women",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-14T12:01:42+00:00",
-     "minute": 30,
-     "score_at_signal": [
-      1,
-      2
-     ],
-     "market": "Asian Total",
-     "selection": "Over 5",
-     "odds": 1.86,
-     "odds_last": 1.86,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 28,
-     "good": [
-      {
-       "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 31,
-       "hits": 24,
-       "break_even": 0.5461,
-       "prob_above": 0.992,
-       "roi": 0.3575,
-       "edge": 0.1813,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Hora (UTC) = tarde",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ]
-       ],
-       "n": 10,
-       "hits": 10,
-       "break_even": 0.546,
-       "prob_above": 0.9853,
-       "roi": 0.7242,
-       "edge": 0.227,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 8,
-       "hits": 8,
-       "break_even": 0.5501,
-       "prob_above": 0.9656,
-       "roi": 0.69,
-       "edge": 0.1999,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 14,
      "bad": [],
      "bad_total": 0
     },
@@ -3820,13 +3732,13 @@
     }
    ],
    "counts": {
-    "favorável": 2,
+    "favorável": 1,
     "misto": 3,
     "sem evidência": 10,
     "contraditório": 2,
     "evitar": 3
    },
-   "generated_utc": "2026-11-14T12:30:00+00:00",
+   "generated_utc": "2026-11-14T12:32:37+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3854,7 +3766,7 @@
      "as_expected": 0
     },
     "llm/evitar": {
-     "hypotheses": 1,
+     "hypotheses": 2,
      "judged": 0,
      "as_expected": 0
     }
@@ -8954,6 +8866,43 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Stake | Mercado = outros mercados & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Mercado",
+      "outros mercados"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T12:32:14+00:00",
+    "reason": "mercados com pouco volume tendem a ter menor confiabilidade",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Betfair | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde",
     "family": "Betfair",
     "conditions": [
@@ -9761,56 +9710,9 @@
     "tradable": true,
     "open": 0,
     "status": "em observação"
-   },
-   {
-    "n": 2,
-    "signals": 2,
-    "hits": 0,
-    "misses": 2,
-    "hit_rate": 0.0,
-    "ci95": [
-     0.0,
-     0.6576
-    ],
-    "break_even": 0.5159,
-    "roi": -1.0,
-    "games": 2,
-    "prudent_rate": 0.4299,
-    "prob_above": 0.2704,
-    "edge": -0.086,
-    "edge_ci": [
-     -0.3054,
-     0.1473
-    ],
-    "prob_above_cut": 0.2473,
-    "prob_adds": null,
-    "id": "Betfair | Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Tamanho do mercado = menos de 10 mil $",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ],
-     [
-      "Tamanho do mercado",
-      "menos de 10 mil $"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-13T08:07:52+00:00",
-    "reason": "Mercado com quota baixa e tamanho de mercado reduzido",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
    }
   ],
-  "llm_total": 33,
+  "llm_total": 34,
   "watch": [
    {
     "date_utc": "2026-11-14T12:27:22+00:00",
@@ -10066,15 +9968,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 46,
-  "llm_last_run_utc": "2026-11-14T11:33:30+00:00",
+  "llm_runs": 47,
+  "llm_last_run_utc": "2026-11-14T12:32:14+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 12,
-   "neurons_today": 2133.8,
-   "accepted_today": 8,
-   "last_mode": "refinar"
+   "calls_today": 13,
+   "neurons_today": 2311.0,
+   "accepted_today": 9,
+   "last_mode": "evitar"
   },
   "notes": [
    {
