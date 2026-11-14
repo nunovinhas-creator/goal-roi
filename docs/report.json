@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-14T13:45:39+00:00",
- "messages": 338,
+ "generated_at_utc": "2026-11-14T13:48:00+00:00",
+ "messages": 339,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 19,
   "BETFAIR": 134,
-  "STAKE_LOAD": 24,
+  "STAKE_LOAD": 25,
   "OPEN_GAME": 63,
   "TOTALS_FORM": 15,
   "WEAKENED_LINEUP": 5,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 424,
+  "versions": 425,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-14T13:45:38+00:00",
+  "last_collected_at_utc": "2026-11-14T13:47:58+00:00",
   "hl_results": 43,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 13,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T13:45:38+00:00",
+  "collector_last_run_utc": "2026-11-14T13:47:58+00:00",
   "name_review": [
    {
     "bot": [
@@ -289,13 +289,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 12,
-  "stake_no_score_after_kickoff": 1,
-  "stake_sent_45_after_kickoff": 5,
+  "stake_original_seen": 13,
+  "stake_no_score_after_kickoff": 2,
+  "stake_sent_45_after_kickoff": 6,
   "goal_lists": 87,
   "goal_lists_consistent": 66
  },
- "unique_bets": 163,
+ "unique_bets": 164,
  "settled_bets": 106,
  "unsettled_market": 2,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -662,7 +662,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 8,
+   "bets": 9,
    "settled": 3,
    "matches": 3,
    "wins": 0,
@@ -1010,7 +1010,7 @@
    "prob_above_cut": 0.4181
   },
   "STAKE_LOAD": {
-   "signals": 22,
+   "signals": 23,
    "with_result": 16,
    "hits": 5,
    "misses": 11,
@@ -2374,7 +2374,7 @@
    },
    {
     "n": 82,
-    "signals": 122,
+    "signals": 123,
     "hits": 48,
     "misses": 34,
     "hit_rate": 0.5813,
@@ -2469,11 +2469,11 @@
   }
  },
  "brain": {
-  "hypotheses": 2257,
+  "hypotheses": 2280,
   "tested": 22,
   "corrected_bar": 0.99773,
   "counts": {
-   "em observação": 2250,
+   "em observação": 2273,
    "abandonada": 1,
    "promissora": 6
   },
@@ -3555,6 +3555,70 @@
      "bad_total": 0
     },
     {
+     "match_id": "valladolid-vs-cd-castellon-20261114",
+     "match": "Valladolid — CD Castellon",
+     "league": "Spanish Segunda",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-14T13:00+00:00",
+     "date_utc": "2026-11-14T13:47:49+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Total Goals",
+     "selection": "Over 1.5",
+     "odds": 1.8,
+     "odds_last": 1.8,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 13,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ]
+       ],
+       "n": 13,
+       "hits": 5,
+       "break_even": 0.5702,
+       "prob_above": 0.1597,
+       "roi": -0.3269,
+       "edge": -0.1083,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = uma",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 11,
+       "hits": 4,
+       "break_even": 0.555,
+       "prob_above": 0.1781,
+       "roi": -0.3636,
+       "edge": -0.1002,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 3
+    },
+    {
      "match_id": "athletic-bilbao-b-vs-racing-ferrol-20261114",
      "match": "Athletic Bilbao B — Racing Ferrol",
      "league": "Spanish Spain Primera Division RFEF",
@@ -3840,9 +3904,9 @@
     "misto": 0,
     "sem evidência": 8,
     "contraditório": 7,
-    "evitar": 4
+    "evitar": 5
    },
-   "generated_utc": "2026-11-14T13:45:39+00:00",
+   "generated_utc": "2026-11-14T13:48:00+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3855,7 +3919,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 2223,
+     "hypotheses": 2246,
      "judged": 737,
      "as_expected": 479
     },
@@ -3892,7 +3956,7 @@
     "roi_cut": -0.0141
    },
    "skipped": {
-    "bets": 73,
+    "bets": 74,
     "settled": 44,
     "games": 38,
     "wins": 19,
@@ -8915,7 +8979,7 @@
   "llm": [
    {
     "n": 0,
-    "signals": 0,
+    "signals": 1,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -8947,7 +9011,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 0,
+    "open": 1,
     "status": "em observação"
    },
    {
@@ -11044,7 +11108,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 163,
+   "bets": 164,
    "settled": 106,
    "matches": 89,
    "wins": 47,
@@ -11079,6 +11143,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T13:47:49+00:00",
+   "match_id": "valladolid-vs-cd-castellon-20261114",
+   "group": "STAKE_LOAD/pre",
+   "match": "Valladolid — CD Castellon",
+   "selection": "Total Goals: Over 1.5",
+   "odds": 1.8,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T13:45:08+00:00",
    "match_id": "athletic-bilbao-b-vs-racing-ferrol-20261114",
@@ -11917,22 +11994,6 @@
    "settled_by": null,
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T05:19:39+00:00",
-   "match_id": "maruyasu-okazaki-vs-minebea-mitsumi-20261114",
-   "group": "TOTALS_FORM",
-   "match": "Maruyasu Okazaki — Minebea Mitsumi",
-   "selection": "Over 0.75",
-   "odds": 1.78,
-   "ft": [
-    0,
-    2
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -12307,42 +12368,6 @@
   }
  ],
  "matches": {
-  "maruyasu-okazaki-vs-minebea-mitsumi-20261114": {
-   "teams": [
-    "Maruyasu Okazaki",
-    "Minebea Mitsumi"
-   ],
-   "events": [
-    {
-     "d": "2026-11-14T05:19:39+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 0.75",
-     "odds": 1.78,
-     "minute": 62,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     65,
-     "0-1"
-    ],
-    [
-     71,
-     "0-2"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    0,
-    2
-   ]
-  },
   "fukushima-vs-sagamihara-20261114": {
    "teams": [
     "Fukushima",
@@ -13403,6 +13428,15 @@
      "share": 62,
      "market": "Polymarket",
      "total": 6100.0
+    },
+    {
+     "d": "2026-11-14T13:47:49+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Over 1.5",
+     "odds": 1.8,
+     "market": "Total Goals",
+     "total": 6000.0
     }
    ],
    "goals": null,
@@ -15025,7 +15059,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 68,
+   "bets": 69,
    "settled": 31,
    "wins": 17,
    "units": 7.49,
