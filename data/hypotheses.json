@@ -15901,6 +15901,25 @@
   "reason": "Forma de golos com muitos golos e diferença grande",
   "source": "llm"
  },
+ "Forma de golos | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos até ao sinal = 3 ou mais & Minuto = 31 a 60": {
   "born_utc": "2026-11-14T05:43:50+00:00",
   "conditions": [
@@ -16223,6 +16242,17 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
    ]
   ],
   "family": "Forma de golos",
@@ -17017,6 +17047,51 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = feminino & Confiança indicada pelo bot = 95 % ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = feminino & Faixa de odd = odd 1,50 a 2,00": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = feminino & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = feminino & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T11:27:15+00:00",
   "conditions": [
@@ -17027,6 +17102,44 @@
    [
     "Marcador no momento",
     "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = feminino & Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = feminino & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "feminino"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
@@ -19769,6 +19882,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -22719,6 +22851,21 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 3 ou mais": {
   "born_utc": "2026-11-14T11:25:11+00:00",
   "conditions": [
@@ -23139,6 +23286,40 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Dia = fim de semana & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Dia = fim de semana & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-14T10:09:20+00:00",
   "conditions": [
@@ -23183,6 +23364,25 @@
    [
     "Ritmo indicado pelo bot",
     "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = 90 ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
@@ -24443,6 +24643,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 1.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T12:02:51+00:00",
   "conditions": [
@@ -24953,6 +25172,21 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Hora (UTC) = tarde": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": {
   "born_utc": "2026-11-14T01:59:37+00:00",
   "conditions": [
@@ -24963,6 +25197,44 @@
    [
     "Marcador no momento",
     "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
@@ -25108,6 +25380,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T09:19:05+00:00",
   "conditions": [
@@ -25122,6 +25413,21 @@
    [
     "Ritmo indicado pelo bot",
     "menos de 90"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Jogo aberto",
@@ -25190,6 +25496,25 @@
    [
     "Ritmo indicado pelo bot",
     "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Ritmo indicado pelo bot = 90 ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
@@ -28115,6 +28440,21 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Hora (UTC) = tarde & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Hora (UTC) = tarde & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T12:06:51+00:00",
   "conditions": [
@@ -29250,6 +29590,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-12T16:15:53+00:00",
   "conditions": [
@@ -29395,6 +29754,25 @@
    [
     "Ritmo indicado pelo bot",
     "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:27:59+00:00",
+  "conditions": [
+   [
+    "Parte do jogo",
+    "1.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
