@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-14T21:32:49+00:00",
- "messages": 624,
+ "generated_at_utc": "2026-11-14T21:34:56+00:00",
+ "messages": 625,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 27,
   "BETFAIR": 152,
-  "STAKE_LOAD": 88,
+  "STAKE_LOAD": 89,
   "OPEN_GAME": 112,
   "TOTALS_FORM": 29,
   "WEAKENED_LINEUP": 6,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 884,
+  "versions": 885,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-14T21:30:26+00:00",
+  "last_collected_at_utc": "2026-11-14T21:34:53+00:00",
   "hl_results": 45,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 18,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T21:32:42+00:00",
+  "collector_last_run_utc": "2026-11-14T21:34:53+00:00",
   "name_review": [
    {
     "bot": [
@@ -393,13 +393,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 59,
-  "stake_no_score_after_kickoff": 13,
-  "stake_sent_45_after_kickoff": 23,
+  "stake_original_seen": 60,
+  "stake_no_score_after_kickoff": 14,
+  "stake_sent_45_after_kickoff": 24,
   "goal_lists": 181,
   "goal_lists_consistent": 128
  },
- "unique_bets": 330,
+ "unique_bets": 331,
  "settled_bets": 226,
  "unsettled_market": 15,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -871,7 +871,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 34,
+   "bets": 35,
    "settled": 11,
    "matches": 9,
    "wins": 1,
@@ -1243,7 +1243,7 @@
    "prob_above_cut": 0.5033
   },
   "STAKE_LOAD": {
-   "signals": 69,
+   "signals": 70,
    "with_result": 31,
    "hits": 7,
    "misses": 23,
@@ -2643,7 +2643,7 @@
    },
    {
     "n": 67,
-    "signals": 112,
+    "signals": 113,
     "hits": 34,
     "misses": 33,
     "hit_rate": 0.5075,
@@ -2715,11 +2715,11 @@
   }
  },
  "brain": {
-  "hypotheses": 4718,
+  "hypotheses": 4725,
   "tested": 135,
   "corrected_bar": 0.99963,
   "counts": {
-   "em observação": 4690,
+   "em observação": 4697,
    "abandonada": 1,
    "promissora": 27
   },
@@ -3499,6 +3499,70 @@
      "bad_total": 0
     },
     {
+     "match_id": "austria-vs-rep-of-ireland-20261114",
+     "match": "Austria — Rep of Ireland",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-14T19:45+00:00",
+     "date_utc": "2026-11-14T21:14:03+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Handicap",
+     "selection": "Austria (-0.25)",
+     "odds": 1.95,
+     "odds_last": 1.95,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 21,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Mercado = outros mercados",
+       "conditions": [
+        [
+         "Mercado",
+         "outros mercados"
+        ]
+       ],
+       "n": 17,
+       "hits": 2,
+       "break_even": 0.5199,
+       "prob_above": 0.0071,
+       "roi": -0.7976,
+       "edge": -0.2414,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 16,
+       "hits": 2,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 17
+    },
+    {
      "match_id": "portugal-vs-denmark-20261114",
      "match": "Portugal — Denmark",
      "league": "UEFA Nations League",
@@ -3563,29 +3627,29 @@
      "bad_total": 13
     },
     {
-     "match_id": "portugal-vs-denmark-20261114",
-     "match": "Portugal — Denmark",
+     "match_id": "austria-vs-rep-of-ireland-20261114",
+     "match": "Austria — Rep of Ireland",
      "league": "UEFA Nations League",
      "family": "Stake",
      "type": "STAKE_LOAD",
      "phase": "pre",
      "when": "a decorrer",
      "kickoff_utc": "2026-11-14T19:45+00:00",
-     "date_utc": "2026-11-14T21:07:29+00:00",
+     "date_utc": "2026-11-14T21:33:33+00:00",
      "minute": null,
      "score_at_signal": null,
-     "market": "4th Goal",
-     "selection": "Portugal",
-     "odds": 1.95,
-     "odds_last": 2.25,
+     "market": "Asian Handicap",
+     "selection": "Ireland (1)",
+     "odds": 2.1,
+     "odds_last": 2.1,
      "max_mult": 1,
      "share": null,
      "share_last": null,
-     "verdict": "evitar",
-     "conflict": false,
+     "verdict": "contraditório",
+     "conflict": true,
      "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 21,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 5,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -3624,24 +3688,24 @@
        "source": "gerador"
       }
      ],
-     "bad_total": 17
+     "bad_total": 14
     },
     {
-     "match_id": "austria-vs-rep-of-ireland-20261114",
-     "match": "Austria — Rep of Ireland",
+     "match_id": "portugal-vs-denmark-20261114",
+     "match": "Portugal — Denmark",
      "league": "UEFA Nations League",
      "family": "Stake",
      "type": "STAKE_LOAD",
      "phase": "pre",
      "when": "a decorrer",
      "kickoff_utc": "2026-11-14T19:45+00:00",
-     "date_utc": "2026-11-14T21:14:03+00:00",
+     "date_utc": "2026-11-14T21:07:29+00:00",
      "minute": null,
      "score_at_signal": null,
-     "market": "Asian Handicap",
-     "selection": "Austria (-0.25)",
+     "market": "4th Goal",
+     "selection": "Portugal",
      "odds": 1.95,
-     "odds_last": 1.95,
+     "odds_last": 2.25,
      "max_mult": 1,
      "share": null,
      "share_last": null,
@@ -3823,10 +3887,10 @@
     "favorável": 2,
     "misto": 1,
     "sem evidência": 0,
-    "contraditório": 3,
-    "evitar": 4
+    "contraditório": 5,
+    "evitar": 3
    },
-   "generated_utc": "2026-11-14T21:32:49+00:00",
+   "generated_utc": "2026-11-14T21:34:56+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3839,7 +3903,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 4681,
+     "hypotheses": 4688,
      "judged": 2155,
      "as_expected": 1479
     },
@@ -3950,7 +4014,7 @@
     "roi_cut": 0.0154
    },
    "skipped": {
-    "bets": 142,
+    "bets": 143,
     "settled": 86,
     "games": 55,
     "wins": 38,
@@ -9256,7 +9320,7 @@
    },
    {
     "n": 6,
-    "signals": 24,
+    "signals": 25,
     "hits": 0,
     "misses": 6,
     "hit_rate": 0.0,
@@ -9294,7 +9358,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 18,
+    "open": 19,
     "status": "em observação"
    },
    {
@@ -11363,7 +11427,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 330,
+   "bets": 331,
    "settled": 226,
    "matches": 169,
    "wins": 103,
@@ -11398,6 +11462,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T21:33:33+00:00",
+   "match_id": "austria-vs-rep-of-ireland-20261114",
+   "group": "STAKE_LOAD/pre",
+   "match": "Austria — Rep of Ireland",
+   "selection": "Asian Handicap: Ireland (1)",
+   "odds": 2.1,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T21:29:53+00:00",
    "match_id": "portugal-vs-denmark-20261114",
@@ -12212,22 +12289,6 @@
    "settled_by": "marca do bot",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T18:11:47+00:00",
-   "match_id": "georgia-vs-hungary-20261114",
-   "group": "STAKE_LOAD/live",
-   "match": "Georgia — Hungary",
-   "selection": "Draw No Bet: Hungary",
-   "odds": 1.7,
-   "ft": [
-    0,
-    2
-   ],
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -12885,6 +12946,15 @@
      "odds": 1.8,
      "market": "Asian Total",
      "total": 10000.0
+    },
+    {
+     "d": "2026-11-14T21:33:33+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Ireland (1)",
+     "odds": 2.1,
+     "market": "Asian Handicap",
+     "total": 7000.0
     }
    ],
    "goals": null,
@@ -13308,157 +13378,6 @@
    "goals": null,
    "goals_source": null,
    "ft": null
-  },
-  "georgia-vs-hungary-20261114": {
-   "teams": [
-    "Georgia",
-    "Hungary"
-   ],
-   "events": [
-    {
-     "d": "2026-11-14T11:23:00+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.53,
-     "share": 84,
-     "market": "Polymarket",
-     "total": 5400.0
-    },
-    {
-     "d": "2026-11-14T11:47:27+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.5,
-     "share": 91,
-     "market": "Polymarket",
-     "total": 10000.0
-    },
-    {
-     "d": "2026-11-14T12:18:27+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "Under 2.5",
-     "odds": 1.61,
-     "share": 100,
-     "market": "Asian Total",
-     "total": 15000.0
-    },
-    {
-     "d": "2026-11-14T13:44:54+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.44,
-     "share": 28,
-     "market": "Polymarket",
-     "total": 5000.0
-    },
-    {
-     "d": "2026-11-14T16:07:28+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.33,
-     "share": 19,
-     "market": "Polymarket",
-     "total": 6100.0
-    },
-    {
-     "d": "2026-11-14T16:07:28+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH1(+0.5)",
-     "odds": 1.72,
-     "share": 18,
-     "market": "Polymarket",
-     "total": 5900.0
-    },
-    {
-     "d": "2026-11-14T16:22:29+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.33,
-     "share": 42,
-     "market": "Polymarket",
-     "total": 19000.0
-    },
-    {
-     "d": "2026-11-14T16:36:19+00:00",
-     "k": "POLYMARKET",
-     "phase": "pre",
-     "selection": "AH2(-0.5)",
-     "odds": 2.27,
-     "share": 53,
-     "market": "Polymarket",
-     "total": 50000.0
-    },
-    {
-     "d": "2026-11-14T16:48:30+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "pre",
-     "selection": "Under 2",
-     "odds": 2.11,
-     "market": "Asian Total",
-     "total": 24000.0
-    },
-    {
-     "d": "2026-11-14T17:19:05+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "live",
-     "selection": "Georgia",
-     "odds": 3.2,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "1x2",
-     "total": 7000.0
-    },
-    {
-     "d": "2026-11-14T18:03:51+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "live",
-     "selection": "Over 1",
-     "odds": 1.7,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total",
-     "total": 290000.0
-    },
-    {
-     "d": "2026-11-14T18:11:47+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "live",
-     "selection": "Hungary",
-     "odds": 1.7,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Draw No Bet",
-     "total": 6000.0
-    }
-   ],
-   "goals": [
-    [
-     73,
-     "0-1"
-    ],
-    [
-     85,
-     "0-2"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    0,
-    2
-   ]
   },
   "norway-vs-wales-20261114": {
    "teams": [
@@ -17176,7 +17095,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 235,
+   "bets": 236,
    "settled": 151,
    "wins": 73,
    "units": 5.68,
