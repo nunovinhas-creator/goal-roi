@@ -1,17 +1,17 @@
 {
- "generated_at_utc": "2026-11-14T14:04:46+00:00",
- "messages": 345,
+ "generated_at_utc": "2026-11-14T14:08:50+00:00",
+ "messages": 347,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 19,
   "BETFAIR": 134,
-  "STAKE_LOAD": 25,
+  "STAKE_LOAD": 26,
   "OPEN_GAME": 65,
   "TOTALS_FORM": 15,
   "WEAKENED_LINEUP": 5,
   "OPEN_GAME_NO_ODDS": 5,
   "FULL_TIME_NOTE": 4,
-  "POLYMARKET": 34,
+  "POLYMARKET": 35,
   "None": 10,
   "TOTALS_FORM_NO_ODDS": 19
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 442,
+  "versions": 444,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-14T14:04:41+00:00",
+  "last_collected_at_utc": "2026-11-14T14:08:48+00:00",
   "hl_results": 43,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 13,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T14:04:41+00:00",
+  "collector_last_run_utc": "2026-11-14T14:08:48+00:00",
   "name_review": [
    {
     "bot": [
@@ -289,13 +289,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 13,
+  "stake_original_seen": 14,
   "stake_no_score_after_kickoff": 2,
-  "stake_sent_45_after_kickoff": 6,
+  "stake_sent_45_after_kickoff": 7,
   "goal_lists": 96,
   "goal_lists_consistent": 75
  },
- "unique_bets": 169,
+ "unique_bets": 170,
  "settled_bets": 114,
  "unsettled_market": 2,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -629,7 +629,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/live": {
-   "bets": 4,
+   "bets": 5,
    "settled": 4,
    "matches": 3,
    "wins": 2,
@@ -1018,7 +1018,7 @@
    "prob_above_cut": 0.4991
   },
   "STAKE_LOAD": {
-   "signals": 23,
+   "signals": 24,
    "with_result": 16,
    "hits": 5,
    "misses": 11,
@@ -1042,7 +1042,7 @@
    "roi_announced_odds": -0.4531,
    "seen_late": 9,
    "by_bot_mark": 1,
-   "per_day": 5.3,
+   "per_day": 5.2,
    "days_to_hint": 3,
    "days_to_conclusion": 55,
    "prudent_rate": 0.4104,
@@ -2382,7 +2382,7 @@
    },
    {
     "n": 87,
-    "signals": 126,
+    "signals": 127,
     "hits": 52,
     "misses": 35,
     "hit_rate": 0.5917,
@@ -2477,11 +2477,11 @@
   }
  },
  "brain": {
-  "hypotheses": 2350,
+  "hypotheses": 2354,
   "tested": 24,
   "corrected_bar": 0.99792,
   "counts": {
-   "em observação": 2343,
+   "em observação": 2347,
    "abandonada": 1,
    "promissora": 6
   },
@@ -3721,6 +3721,73 @@
      "bad_total": 0
     },
     {
+     "match_id": "spain-u19-vs-wales-u19-20261114",
+     "match": "Spain U19 — Wales U19",
+     "league": "UEFA U19 Championship",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-14T12:30+00:00",
+     "date_utc": "2026-11-14T14:04:50+00:00",
+     "minute": null,
+     "score_at_signal": [
+      1,
+      0
+     ],
+     "market": "2nd Goal",
+     "selection": "Spain",
+     "odds": 1.6,
+     "odds_last": 1.6,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 13,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ]
+       ],
+       "n": 13,
+       "hits": 5,
+       "break_even": 0.5702,
+       "prob_above": 0.1597,
+       "roi": -0.3269,
+       "edge": -0.1083,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = uma",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 11,
+       "hits": 4,
+       "break_even": 0.555,
+       "prob_above": 0.1781,
+       "roi": -0.3636,
+       "edge": -0.1002,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 3
+    },
+    {
      "match_id": "valladolid-vs-cd-castellon-20261114",
      "match": "Valladolid — CD Castellon",
      "league": "Spanish Segunda",
@@ -4002,9 +4069,9 @@
     "misto": 3,
     "sem evidência": 11,
     "contraditório": 2,
-    "evitar": 4
+    "evitar": 5
    },
-   "generated_utc": "2026-11-14T14:04:46+00:00",
+   "generated_utc": "2026-11-14T14:08:50+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4017,7 +4084,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 2316,
+     "hypotheses": 2320,
      "judged": 819,
      "as_expected": 547
     },
@@ -4071,7 +4138,7 @@
     "roi_cut": 0.0096
    },
    "skipped": {
-    "bets": 77,
+    "bets": 78,
     "settled": 46,
     "games": 40,
     "wins": 21,
@@ -9132,7 +9199,7 @@
   "llm": [
    {
     "n": 0,
-    "signals": 1,
+    "signals": 2,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -9164,7 +9231,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 1,
+    "open": 2,
     "status": "em observação"
    },
    {
@@ -10962,7 +11029,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 169,
+   "bets": 170,
    "settled": 114,
    "matches": 97,
    "wins": 52,
@@ -10997,6 +11064,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T14:04:50+00:00",
+   "match_id": "spain-u19-vs-wales-u19-20261114",
+   "group": "STAKE_LOAD/live",
+   "match": "Spain U19 — Wales U19",
+   "selection": "2nd Goal: Spain",
+   "odds": 1.6,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T13:59:37+00:00",
    "match_id": "northern-ireland-vs-ukraine-20261114",
@@ -11327,7 +11407,7 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 2,
+   "n_signals": 3,
    "max_mult": 1
   },
   {
@@ -11844,22 +11924,6 @@
    "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T08:31:34+00:00",
-   "match_id": "polokwane-city-reserves-vs-chippa-united-reserves-20261114",
-   "group": "OPEN_GAME",
-   "match": "Polokwane City Reserves — Chippa United Reserves",
-   "selection": "Over 3.5",
-   "odds": 2.11,
-   "ft": [
-    4,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -12234,52 +12298,6 @@
   }
  ],
  "matches": {
-  "polokwane-city-reserves-vs-chippa-united-reserves-20261114": {
-   "teams": [
-    "Polokwane City Reserves",
-    "Chippa United Reserves"
-   ],
-   "events": [
-    {
-     "d": "2026-11-14T08:31:34+00:00",
-     "k": "OPEN_GAME",
-     "phase": "live",
-     "selection": "Over 3.5",
-     "odds": 2.11,
-     "minute": 27,
-     "score_at_signal": [
-      2,
-      0
-     ],
-     "rhythm": 82,
-     "bot_over_pct": 95,
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     28,
-     "2-0"
-    ],
-    [
-     59,
-     "3-0"
-    ],
-    [
-     74,
-     "4-0"
-    ],
-    [
-     89,
-     "4-1"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    4,
-    1
-   ]
-  },
   "north-district-vs-hong-kong-fc-20261114": {
    "teams": [
     "North District",
@@ -12976,6 +12994,21 @@
      "share": 54,
      "market": "Polymarket",
      "total": 31000.0
+    },
+    {
+     "d": "2026-11-14T14:08:44+00:00",
+     "k": "POLYMARKET",
+     "phase": "live",
+     "selection": "AH1(-0.5)",
+     "odds": 1.82,
+     "minute": 2,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "share": 8,
+     "market": "Polymarket",
+     "total": 5500.0
     }
    ],
    "goals": null,
@@ -13822,6 +13855,30 @@
      "share": 41,
      "market": "Polymarket",
      "total": 5900.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "spain-u19-vs-wales-u19-20261114": {
+   "teams": [
+    "Spain U19",
+    "Wales U19"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T14:04:50+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "live",
+     "selection": "Spain",
+     "odds": 1.6,
+     "score_at_signal": [
+      1,
+      0
+     ],
+     "market": "2nd Goal",
+     "total": 5000.0
     }
    ],
    "goals": null,
@@ -14994,7 +15051,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 74,
+   "bets": 75,
    "settled": 39,
    "wins": 22,
    "units": 10.12,
