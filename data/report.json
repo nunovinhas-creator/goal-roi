@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-14T06:40:10+00:00",
- "messages": 261,
+ "generated_at_utc": "2026-11-14T06:46:13+00:00",
+ "messages": 262,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 16,
-  "BETFAIR": 129,
+  "BETFAIR": 130,
   "STAKE_LOAD": 16,
   "OPEN_GAME": 43,
   "TOTALS_FORM": 10,
@@ -30,10 +30,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 320,
+  "versions": 321,
   "edits_changing_signal": 0,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-14T06:27:22+00:00",
+  "last_collected_at_utc": "2026-11-14T06:46:12+00:00",
   "hl_results": 40,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 11,
@@ -46,7 +46,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T06:40:00+00:00",
+  "collector_last_run_utc": "2026-11-14T06:46:12+00:00",
   "name_review": [
    {
     "bot": [
@@ -266,7 +266,7 @@
   "goal_lists": 66,
   "goal_lists_consistent": 49
  },
- "unique_bets": 108,
+ "unique_bets": 109,
  "settled_bets": 84,
  "unsettled_market": 0,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -325,7 +325,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
-   "bets": 11,
+   "bets": 12,
    "settled": 10,
    "matches": 10,
    "wins": 4,
@@ -737,7 +737,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 52,
+   "signals": 53,
    "with_result": 30,
    "hits": 13,
    "misses": 17,
@@ -837,7 +837,7 @@
    "by_bot_mark": 0,
    "per_day": 0.7,
    "days_to_hint": 39,
-   "days_to_conclusion": 411,
+   "days_to_conclusion": 412,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -985,7 +985,7 @@
    "by_bot_mark": 1,
    "per_day": 5.1,
    "days_to_hint": 4,
-   "days_to_conclusion": 56,
+   "days_to_conclusion": 57,
    "prudent_rate": 0.4064,
    "prob_above": 0.0956,
    "edge": -0.1377,
@@ -1096,7 +1096,7 @@
    "by_bot_mark": 0,
    "per_day": 1.2,
    "days_to_hint": 23,
-   "days_to_conclusion": 250,
+   "days_to_conclusion": 251,
    "prudent_rate": 0.4765,
    "prob_above": 0.3772,
    "edge": -0.043,
@@ -1668,7 +1668,7 @@
    },
    {
     "n": 14,
-    "signals": 16,
+    "signals": 15,
     "hits": 8,
     "misses": 6,
     "hit_rate": 0.5714,
@@ -1868,7 +1868,7 @@
    },
    {
     "n": 30,
-    "signals": 52,
+    "signals": 53,
     "hits": 13,
     "misses": 17,
     "hit_rate": 0.4333,
@@ -1893,7 +1893,7 @@
    },
    {
     "n": 17,
-    "signals": 17,
+    "signals": 18,
     "hits": 6,
     "misses": 11,
     "hit_rate": 0.3529,
@@ -1943,7 +1943,7 @@
    },
    {
     "n": 14,
-    "signals": 16,
+    "signals": 17,
     "hits": 5,
     "misses": 9,
     "hit_rate": 0.3571,
@@ -1968,7 +1968,7 @@
    },
    {
     "n": 16,
-    "signals": 31,
+    "signals": 32,
     "hits": 5,
     "misses": 11,
     "hit_rate": 0.3125,
@@ -2018,7 +2018,7 @@
    },
    {
     "n": 30,
-    "signals": 37,
+    "signals": 38,
     "hits": 10,
     "misses": 20,
     "hit_rate": 0.3333,
@@ -2291,7 +2291,7 @@
    },
    {
     "n": 5,
-    "signals": 9,
+    "signals": 10,
     "hits": 0,
     "misses": 5,
     "hit_rate": 0.0,
@@ -2337,11 +2337,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1414,
+  "hypotheses": 1431,
   "tested": 12,
   "corrected_bar": 0.99583,
   "counts": {
-   "em observação": 1412,
+   "em observação": 1429,
    "abandonada": 2
   },
   "board": {
@@ -2532,38 +2532,38 @@
      "missing": 19
     },
     {
-     "id": "Betfair | Competição = seleções & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais",
      "family": "Betfair",
      "conditions": [
       [
-       "Competição",
-       "seleções"
+       "Dia",
+       "dia de semana"
       ],
       [
        "Quota de mercado",
        "menos de 80 %"
       ],
       [
-       "Sinal anterior de outro tipo no mesmo jogo",
-       "não"
+       "Tamanho do mercado",
+       "10 mil $ ou mais"
       ]
      ],
      "n": 8,
-     "hits": 0,
-     "hit_rate": 0.0,
-     "break_even": 0.4554,
-     "prob_above": 0.0461,
-     "roi": -1.0,
+     "hits": 1,
+     "hit_rate": 0.125,
+     "break_even": 0.5682,
+     "prob_above": 0.0448,
+     "roi": -0.6925,
      "source": "gerador",
      "reason": null,
-     "games": 7,
-     "edge": -0.1928,
+     "games": 8,
+     "edge": -0.197,
      "edge_ci": [
-      -0.3499,
-      -0.005
+      -0.3711,
+      -0.0062
      ],
-     "prob_above_cut": 0.0392,
-     "prob_adds": 0.0427,
+     "prob_above_cut": 0.0362,
+     "prob_adds": 0.0458,
      "level": "indício inicial",
      "missing": 22
     },
@@ -2807,6 +2807,70 @@
       }
      ],
      "bad_total": 10
+    },
+    {
+     "match_id": "giravanz-vs-kusatsu-20261114",
+     "match": "Giravanz — Kusatsu",
+     "league": "Japanese J-League 3",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-14T06:46:11+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Empate",
+     "odds": 9.2,
+     "odds_last": 9.2,
+     "max_mult": 1,
+     "share": 61,
+     "share_last": 61,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 4,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 30,
+       "hits": 10,
+       "break_even": 0.4897,
+       "prob_above": 0.0793,
+       "roi": -0.267,
+       "edge": -0.111,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Tamanho do mercado = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Tamanho do mercado",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 14,
+       "hits": 5,
+       "break_even": 0.5577,
+       "prob_above": 0.1244,
+       "roi": -0.3764,
+       "edge": -0.117,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 4
     }
    ],
    "counts": {
@@ -2814,9 +2878,9 @@
     "misto": 0,
     "sem evidência": 1,
     "contraditório": 0,
-    "evitar": 1
+    "evitar": 2
    },
-   "generated_utc": "2026-11-14T06:40:10+00:00",
+   "generated_utc": "2026-11-14T06:46:13+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2829,8 +2893,8 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 1382,
-     "judged": 515,
+     "hypotheses": 1399,
+     "judged": 521,
      "as_expected": 330
     },
     "llm/refinar": {
@@ -2866,7 +2930,7 @@
     "roi_cut": -0.095
    },
    "skipped": {
-    "bets": 39,
+    "bets": 40,
     "settled": 34,
     "games": 29,
     "wins": 14,
@@ -7946,7 +8010,7 @@
    },
    {
     "n": 30,
-    "signals": 37,
+    "signals": 38,
     "hits": 10,
     "misses": 20,
     "hit_rate": 0.3333,
@@ -7980,7 +8044,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 4,
+    "open": 5,
     "status": "abandonada",
     "whole": false
    }
@@ -8613,7 +8677,7 @@
    },
    {
     "n": 2,
-    "signals": 3,
+    "signals": 4,
     "hits": 1,
     "misses": 1,
     "hit_rate": 0.5,
@@ -8651,7 +8715,7 @@
     "expect": "acima",
     "mode": "refinar",
     "tradable": true,
-    "open": 1,
+    "open": 2,
     "status": "em observação"
    },
    {
@@ -9049,7 +9113,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 52,
+    "signals": 53,
     "n": 30,
     "hits": 13,
     "hit_rate": 0.4333,
@@ -9139,7 +9203,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 26,
+   "bets": 27,
    "settled": 12,
    "matches": 12,
    "wins": 2,
@@ -9219,7 +9283,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 13,
+   "bets": 14,
    "settled": 6,
    "matches": 6,
    "wins": 1,
@@ -9423,7 +9487,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 108,
+   "bets": 109,
    "settled": 84,
    "matches": 69,
    "wins": 34,
@@ -9458,6 +9522,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T06:46:11+00:00",
+   "match_id": "giravanz-vs-kusatsu-20261114",
+   "group": "BETFAIR/live/mkt>=10K",
+   "match": "Giravanz — Kusatsu",
+   "selection": "Empate",
+   "odds": 9.2,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T06:26:18+00:00",
    "match_id": "bahrain-vs-yemen-20261114",
@@ -10356,22 +10433,6 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-12T20:46:57+00:00",
-   "match_id": "luxembourg-vs-estonia-20261113",
-   "group": "BETFAIR/pre/mkt>=10K",
-   "match": "Luxembourg — Estonia",
-   "selection": "Luxembourg",
-   "odds": 2.4,
-   "ft": [
-    0,
-    1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 3,
-   "max_mult": 8
   }
  ],
  "unsettled": [
@@ -12658,6 +12719,38 @@
    "goals_source": null,
    "ft": null
   },
+  "giravanz-vs-kusatsu-20261114": {
+   "teams": [
+    "Giravanz",
+    "Kusatsu"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T06:12:21+00:00",
+     "k": "TOTALS_FORM_NO_ODDS",
+     "phase": "live",
+     "minute": 53,
+     "score_at_signal": [
+      1,
+      2
+     ]
+    },
+    {
+     "d": "2026-11-14T06:46:11+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "X",
+     "odds": 9.2,
+     "mult": 1,
+     "share": 61,
+     "mkt_volume": 23000.0,
+     "market": "1X2"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
   "gifu-vs-matsumoto-yamaga-20261114": {
    "teams": [
     "Gifu",
@@ -13570,7 +13663,7 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 13,
+   "bets": 14,
    "settled": 9,
    "wins": 4,
    "units": -0.42,
