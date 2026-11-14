@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-14T19:08:35+00:00",
- "messages": 542,
+ "generated_at_utc": "2026-11-14T19:08:59+00:00",
+ "messages": 544,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 24,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 5,
   "OPEN_GAME_NO_ODDS": 9,
   "FULL_TIME_NOTE": 6,
-  "POLYMARKET": 99,
+  "POLYMARKET": 101,
   "None": 16,
   "TOTALS_FORM_NO_ODDS": 35
  },
@@ -33,14 +33,14 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 773,
+  "versions": 780,
   "edits_changing_signal": 0,
-  "bot_mark_disagreements": 1,
-  "last_collected_at_utc": "2026-11-14T19:08:32+00:00",
+  "bot_mark_disagreements": 2,
+  "last_collected_at_utc": "2026-11-14T19:08:54+00:00",
   "hl_results": 45,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 18,
-  "hl_last_run_utc": "2026-11-14T17:36:10+00:00",
+  "hl_last_run_utc": "2026-11-14T19:08:55+00:00",
   "bsd_results": 15,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 7,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T19:08:32+00:00",
+  "collector_last_run_utc": "2026-11-14T19:08:54+00:00",
   "name_review": [
    {
     "bot": [
@@ -383,12 +383,12 @@
   "stake_original_seen": 37,
   "stake_no_score_after_kickoff": 6,
   "stake_sent_45_after_kickoff": 15,
-  "goal_lists": 162,
+  "goal_lists": 166,
   "goal_lists_consistent": 117
  },
- "unique_bets": 287,
- "settled_bets": 207,
- "unsettled_market": 14,
+ "unique_bets": 288,
+ "settled_bets": 208,
+ "unsettled_market": 13,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
@@ -736,7 +736,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 48,
+   "bets": 49,
    "settled": 24,
    "matches": 12,
    "wins": 14,
@@ -797,32 +797,32 @@
   },
   "STAKE_LOAD/live": {
    "bets": 14,
-   "settled": 9,
+   "settled": 10,
    "matches": 7,
    "wins": 3,
    "pushes": 0,
-   "units": -3.6,
-   "avg_odds": 2.0,
+   "units": -4.6,
+   "avg_odds": 1.96,
    "roi": {
     "odd-0%": {
-     "roi": -0.4,
+     "roi": -0.46,
      "ci95": [
-      -0.8549,
-      0.0549
+      -0.9235,
+      0.0035
      ]
     },
     "odd-2%": {
-     "roi": -0.412,
+     "roi": -0.4708,
      "ci95": [
-      -0.8578,
-      0.0338
+      -0.925,
+      -0.0166
      ]
     },
     "odd-5%": {
-     "roi": -0.43,
+     "roi": -0.487,
      "ci95": [
-      -0.8622,
-      0.0022
+      -0.9273,
+      -0.0467
      ]
     }
    },
@@ -835,7 +835,8 @@
     -2.3,
     -3.3,
     -4.3,
-    -3.6
+    -5.3,
+    -4.6
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1174,7 +1175,7 @@
    "prob_above_cut": 0.4295
   },
   "POLYMARKET": {
-   "signals": 53,
+   "signals": 54,
    "with_result": 28,
    "hits": 15,
    "misses": 13,
@@ -1212,40 +1213,40 @@
   },
   "STAKE_LOAD": {
    "signals": 47,
-   "with_result": 28,
+   "with_result": 29,
    "hits": 7,
-   "misses": 20,
+   "misses": 21,
    "pushes": 1,
    "eff_hits": 7.0,
-   "eff_misses": 20.0,
-   "vote_hits": 4.83,
-   "vote_misses": 14.17,
-   "vote_break_even": 0.5292,
+   "eff_misses": 21.0,
+   "vote_hits": 4.75,
+   "vote_misses": 14.25,
+   "vote_break_even": 0.5294,
    "games": 19,
    "no_source": 0,
-   "unsettleable": 12,
-   "hit_rate": 0.2593,
+   "unsettleable": 11,
+   "hit_rate": 0.25,
    "ci95": [
-    0.1317,
-    0.4468
+    0.1268,
+    0.4336
    ],
-   "avg_odds": 1.956,
-   "break_even": 0.5358,
+   "avg_odds": 1.943,
+   "break_even": 0.539,
    "baseline": false,
-   "roi_announced_odds": -0.5289,
+   "roi_announced_odds": -0.5452,
    "seen_late": 9,
-   "by_bot_mark": 2,
-   "per_day": 8.3,
+   "by_bot_mark": 3,
+   "per_day": 8.6,
    "days_to_hint": 1,
-   "days_to_conclusion": 33,
-   "prudent_rate": 0.349,
-   "prob_above": 0.0242,
-   "edge": -0.1802,
+   "days_to_conclusion": 32,
+   "prudent_rate": 0.3463,
+   "prob_above": 0.0225,
+   "edge": -0.1831,
    "edge_ci": [
-    -0.3173,
-    -0.031
+    -0.3199,
+    -0.034
    ],
-   "prob_above_cut": 0.0184
+   "prob_above_cut": 0.017
   },
   "TOTALS_FORM": {
    "signals": 28,
@@ -1400,7 +1401,7 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 27,
+    "n": 28,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -2033,7 +2034,7 @@
    },
    {
     "n": 13,
-    "signals": 32,
+    "signals": 33,
     "hits": 7,
     "misses": 6,
     "hit_rate": 0.5385,
@@ -2133,7 +2134,7 @@
    },
    {
     "n": 24,
-    "signals": 48,
+    "signals": 49,
     "hits": 14,
     "misses": 10,
     "hit_rate": 0.5833,
@@ -2233,7 +2234,7 @@
    },
    {
     "n": 22,
-    "signals": 47,
+    "signals": 48,
     "hits": 12,
     "misses": 10,
     "hit_rate": 0.5455,
@@ -2283,7 +2284,7 @@
    },
    {
     "n": 19,
-    "signals": 34,
+    "signals": 35,
     "hits": 9,
     "misses": 10,
     "hit_rate": 0.4737,
@@ -2358,7 +2359,7 @@
    },
    {
     "n": 21,
-    "signals": 36,
+    "signals": 37,
     "hits": 10,
     "misses": 11,
     "hit_rate": 0.4762,
@@ -2587,31 +2588,31 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 129,
+    "n": 130,
     "signals": 181,
     "hits": 75,
-    "misses": 54,
-    "hit_rate": 0.5709,
+    "misses": 55,
+    "hit_rate": 0.5663,
     "ci95": [
-     0.4827,
-     0.6547
+     0.4785,
+     0.65
     ],
-    "break_even": 0.5703,
-    "roi": 0.01,
+    "break_even": 0.5707,
+    "roi": 0.0029,
     "games": 104,
-    "prudent_rate": 0.5842,
-    "prob_above": 0.6197,
-    "edge": 0.0139,
+    "prudent_rate": 0.5833,
+    "prob_above": 0.6112,
+    "edge": 0.0129,
     "edge_ci": [
-     -0.0642,
-     0.0903
+     -0.0652,
+     0.0892
     ],
-    "prob_above_cut": 0.5236,
+    "prob_above_cut": 0.5147,
     "band": "odd 1,50 a 2,00"
    },
    {
     "n": 64,
-    "signals": 97,
+    "signals": 98,
     "hits": 31,
     "misses": 33,
     "hit_rate": 0.4844,
@@ -2657,17 +2658,17 @@
    }
   ],
   "luck": {
-   "n": 207,
-   "units": -8.0,
-   "luck_sd": 15.35,
-   "z": -0.52,
+   "n": 208,
+   "units": -9.0,
+   "luck_sd": 15.37,
+   "z": -0.59,
    "max_drawdown": 16.07,
    "longest_losing_run": 7
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 52 em 81, precisa de 53 %, e a probabilidade de estar acima do mínimo é 98 %.",
-   "O mais fraco é aposta grande na Stake: 7 em 27, precisa de 54 %, probabilidade de estar acima do mínimo 2 %.",
-   "Saldo de -8,00 unidades em 207 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±30,7 unidades).",
+   "O mais fraco é aposta grande na Stake: 7 em 28, precisa de 54 %, probabilidade de estar acima do mínimo 2 %.",
+   "Saldo de -9,00 unidades em 208 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±30,7 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 15 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Jogo aberto, parte do jogo = 2.ª parte: 39 em 54 (73 % contra 55 % necessários). Indício positivo.",
    "Jogo aberto, ritmo indicado pelo bot = menos de 90: 32 em 45 (72 % contra 54 % necessários). Indício positivo.",
@@ -2682,11 +2683,11 @@
   }
  },
  "brain": {
-  "hypotheses": 4157,
+  "hypotheses": 4172,
   "tested": 113,
   "corrected_bar": 0.99956,
   "counts": {
-   "em observação": 4135,
+   "em observação": 4150,
    "abandonada": 1,
    "promissora": 21
   },
@@ -2855,24 +2856,24 @@
        "sim"
       ]
      ],
-     "n": 15,
+     "n": 16,
      "hits": 2,
-     "hit_rate": 0.1333,
-     "break_even": 0.5309,
-     "prob_above": 0.0154,
-     "roi": -0.7225,
+     "hit_rate": 0.125,
+     "break_even": 0.5368,
+     "prob_above": 0.0127,
+     "roi": -0.7388,
      "source": "gerador",
      "reason": null,
      "games": 11,
-     "edge": -0.2291,
+     "edge": -0.2367,
      "edge_ci": [
-      -0.3783,
-      -0.0577
+      -0.3841,
+      -0.0663
      ],
-     "prob_above_cut": 0.012,
-     "prob_adds": 0.1055,
+     "prob_above_cut": 0.0098,
+     "prob_adds": 0.0955,
      "level": "indício inicial",
-     "missing": 15
+     "missing": 14
     },
     {
      "id": "Stake | Mercado = outros mercados",
@@ -2883,24 +2884,24 @@
        "outros mercados"
       ]
      ],
-     "n": 14,
+     "n": 15,
      "hits": 2,
-     "hit_rate": 0.1429,
-     "break_even": 0.5098,
-     "prob_above": 0.0223,
-     "roi": -0.7543,
+     "hit_rate": 0.1333,
+     "break_even": 0.5175,
+     "prob_above": 0.0186,
+     "roi": -0.7707,
      "source": "gerador",
      "reason": null,
      "games": 12,
-     "edge": -0.2072,
+     "edge": -0.2144,
      "edge_ci": [
-      -0.353,
-      -0.0399
+      -0.3586,
+      -0.0481
      ],
-     "prob_above_cut": 0.0177,
-     "prob_adds": 0.2239,
+     "prob_above_cut": 0.0147,
+     "prob_adds": 0.2078,
      "level": "indício inicial",
-     "missing": 16
+     "missing": 15
     },
     {
      "id": "Betfair | Competição = seleções & Dia = dia de semana & Quota de mercado = menos de 80 %",
@@ -3382,35 +3383,6 @@
      "bad_total": 3
     },
     {
-     "match_id": "austria-vs-rep-of-ireland-20261114",
-     "match": "Austria — Rep of Ireland",
-     "league": "UEFA Nations League",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-14T19:45+00:00",
-     "date_utc": "2026-11-14T10:42:25+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Polymarket",
-     "selection": "AH1(-0.5)",
-     "odds": 1.72,
-     "odds_last": 1.72,
-     "max_mult": 1,
-     "share": 86,
-     "share_last": 86,
-     "verdict": "sem evidência",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 17,
-     "good": [],
-     "good_total": 0,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "portugal-vs-denmark-20261114",
      "match": "Portugal — Denmark",
      "league": "UEFA Nations League",
@@ -3522,7 +3494,7 @@
      "odds_last": 2.22,
      "max_mult": 1,
      "share": 34,
-     "share_last": 67,
+     "share_last": 74,
      "verdict": "contraditório",
      "conflict": true,
      "validated": false,
@@ -3548,6 +3520,78 @@
       }
      ],
      "good_total": 1,
+     "bad": [],
+     "bad_total": 0
+    },
+    {
+     "match_id": "austria-vs-rep-of-ireland-20261114",
+     "match": "Austria — Rep of Ireland",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-14T19:45+00:00",
+     "date_utc": "2026-11-14T19:08:44+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(+0.5)",
+     "odds": 2.44,
+     "odds_last": 2.44,
+     "max_mult": 1,
+     "share": 19,
+     "share_last": 19,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 8,
+     "good": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 2,00 a 3,00"
+        ]
+       ],
+       "n": 8,
+       "hits": 6,
+       "break_even": 0.4394,
+       "prob_above": 0.8357,
+       "roi": 0.6725,
+       "edge": 0.1215,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Dia",
+         "fim de semana"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 10,
+       "hits": 8,
+       "break_even": 0.5213,
+       "prob_above": 0.8167,
+       "roi": 0.627,
+       "edge": 0.1044,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 2,
      "bad": [],
      "bad_total": 0
     },
@@ -4001,6 +4045,35 @@
      "bad_total": 0
     },
     {
+     "match_id": "austria-vs-rep-of-ireland-20261114",
+     "match": "Austria — Rep of Ireland",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-14T19:45+00:00",
+     "date_utc": "2026-11-14T10:42:25+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH1(-0.5)",
+     "odds": 1.72,
+     "odds_last": 1.72,
+     "max_mult": 1,
+     "share": 86,
+     "share_last": 86,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 17,
+     "good": [],
+     "good_total": 0,
+     "bad": [],
+     "bad_total": 0
+    },
+    {
      "match_id": "portugal-vs-denmark-20261114",
      "match": "Portugal — Denmark",
      "league": "UEFA Nations League",
@@ -4052,7 +4125,7 @@
      "conflict": true,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 18,
+     "odds_band_n": 19,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -4064,12 +4137,12 @@
          "sim"
         ]
        ],
-       "n": 15,
+       "n": 16,
        "hits": 2,
-       "break_even": 0.5309,
-       "prob_above": 0.0154,
-       "roi": -0.7225,
-       "edge": -0.2291,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4085,12 +4158,12 @@
          "sim"
         ]
        ],
-       "n": 12,
+       "n": 13,
        "hits": 1,
-       "break_even": 0.5311,
-       "prob_above": 0.024,
-       "roi": -0.7892,
-       "edge": -0.2195,
+       "break_even": 0.5383,
+       "prob_above": 0.0199,
+       "roi": -0.8043,
+       "edge": -0.228,
        "status": "em observação",
        "source": "gerador"
       }
@@ -4254,7 +4327,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 18,
+     "odds_band_n": 19,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -4266,12 +4339,12 @@
          "sim"
         ]
        ],
-       "n": 15,
+       "n": 16,
        "hits": 2,
-       "break_even": 0.5309,
-       "prob_above": 0.0154,
-       "roi": -0.7225,
-       "edge": -0.2291,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4283,17 +4356,17 @@
          "outros mercados"
         ]
        ],
-       "n": 14,
+       "n": 15,
        "hits": 2,
-       "break_even": 0.5098,
-       "prob_above": 0.0223,
-       "roi": -0.7543,
-       "edge": -0.2072,
+       "break_even": 0.5175,
+       "prob_above": 0.0186,
+       "roi": -0.7707,
+       "edge": -0.2144,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 16
+     "bad_total": 20
     },
     {
      "match_id": "northern-ireland-vs-ukraine-20261114",
@@ -4330,12 +4403,12 @@
          "sim"
         ]
        ],
-       "n": 15,
+       "n": 16,
        "hits": 2,
-       "break_even": 0.5309,
-       "prob_above": 0.0154,
-       "roi": -0.7225,
-       "edge": -0.2291,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4347,17 +4420,17 @@
          "outros mercados"
         ]
        ],
-       "n": 14,
+       "n": 15,
        "hits": 2,
-       "break_even": 0.5098,
-       "prob_above": 0.0223,
-       "roi": -0.7543,
-       "edge": -0.2072,
+       "break_even": 0.5175,
+       "prob_above": 0.0186,
+       "roi": -0.7707,
+       "edge": -0.2144,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 7
+     "bad_total": 8
     },
     {
      "match_id": "portugal-vs-denmark-20261114",
@@ -4382,7 +4455,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 18,
+     "odds_band_n": 19,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -4394,12 +4467,12 @@
          "sim"
         ]
        ],
-       "n": 15,
+       "n": 16,
        "hits": 2,
-       "break_even": 0.5309,
-       "prob_above": 0.0154,
-       "roi": -0.7225,
-       "edge": -0.2291,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4411,17 +4484,17 @@
          "outros mercados"
         ]
        ],
-       "n": 14,
+       "n": 15,
        "hits": 2,
-       "break_even": 0.5098,
-       "prob_above": 0.0223,
-       "roi": -0.7543,
-       "edge": -0.2072,
+       "break_even": 0.5175,
+       "prob_above": 0.0186,
+       "roi": -0.7707,
+       "edge": -0.2144,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 12
+     "bad_total": 13
     },
     {
      "match_id": "northern-ireland-vs-ukraine-20261114",
@@ -4446,7 +4519,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 18,
+     "odds_band_n": 19,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -4458,12 +4531,12 @@
          "sim"
         ]
        ],
-       "n": 15,
+       "n": 16,
        "hits": 2,
-       "break_even": 0.5309,
-       "prob_above": 0.0154,
-       "roi": -0.7225,
-       "edge": -0.2291,
+       "break_even": 0.5368,
+       "prob_above": 0.0127,
+       "roi": -0.7388,
+       "edge": -0.2367,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4475,12 +4548,12 @@
          "outros mercados"
         ]
        ],
-       "n": 14,
+       "n": 15,
        "hits": 2,
-       "break_even": 0.5098,
-       "prob_above": 0.0223,
-       "roi": -0.7543,
-       "edge": -0.2072,
+       "break_even": 0.5175,
+       "prob_above": 0.0186,
+       "roi": -0.7707,
+       "edge": -0.2144,
        "status": "em observação",
        "source": "gerador"
       }
@@ -4491,11 +4564,11 @@
    "counts": {
     "favorável": 3,
     "misto": 2,
-    "sem evidência": 1,
-    "contraditório": 15,
+    "sem evidência": 0,
+    "contraditório": 17,
     "evitar": 4
    },
-   "generated_utc": "2026-11-14T19:08:35+00:00",
+   "generated_utc": "2026-11-14T19:08:59+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4508,8 +4581,8 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 4120,
-     "judged": 1982,
+     "hypotheses": 4135,
+     "judged": 1996,
      "as_expected": 1336
     },
     "llm/refinar": {
@@ -4610,7 +4683,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 170,
+    "bets": 171,
     "settled": 127,
     "games": 116,
     "wins": 57,
@@ -4620,12 +4693,12 @@
    },
    "skipped": {
     "bets": 117,
-    "settled": 80,
+    "settled": 81,
     "games": 51,
     "wins": 36,
-    "units": -8.33,
-    "roi": -0.1041,
-    "roi_cut": -0.1213
+    "units": -9.33,
+    "roi": -0.1152,
+    "roi_cut": -0.1321
    },
    "curve": [
     0.61,
@@ -4756,7 +4829,7 @@
     1.32,
     0.32
    ],
-   "prob_followed_better": 0.7905,
+   "prob_followed_better": 0.7938,
    "first_followed_utc": "2026-11-12T09:07:24+00:00",
    "rule": {
     "min_results": 8,
@@ -11711,33 +11784,33 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 287,
-   "settled": 207,
+   "bets": 288,
+   "settled": 208,
    "matches": 155,
    "wins": 93,
    "pushes": 18,
-   "units": -8.0,
-   "avg_odds": 2.139,
+   "units": -9.0,
+   "avg_odds": 2.136,
    "roi": {
     "odd-0%": {
-     "roi": -0.0387,
+     "roi": -0.0433,
      "ci95": [
-      -0.1728,
-      0.0955
+      -0.1795,
+      0.0929
      ]
     },
     "odd-2%": {
-     "roi": -0.0557,
+     "roi": -0.0602,
      "ci95": [
-      -0.1873,
-      0.0759
+      -0.1939,
+      0.0734
      ]
     },
     "odd-5%": {
-     "roi": -0.0812,
+     "roi": -0.0856,
      "ci95": [
-      -0.209,
-      0.0466
+      -0.2154,
+      0.0442
      ]
     }
    },
@@ -11746,6 +11819,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-14T19:08:44+00:00",
+   "match_id": "austria-vs-rep-of-ireland-20261114",
+   "group": "POLYMARKET/pre",
+   "match": "Austria — Rep of Ireland",
+   "selection": "Polymarket: AH2(+0.5)",
+   "odds": 2.44,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-14T18:59:05+00:00",
    "match_id": "northern-ireland-vs-ukraine-20261114",
@@ -11782,7 +11868,7 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 4,
+   "n_signals": 5,
    "max_mult": 1
   },
   {
@@ -12071,8 +12157,8 @@
     3,
     1
    ],
-   "w": null,
-   "settled_by": null,
+   "w": -1.0,
+   "settled_by": "marca do bot",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -12599,22 +12685,6 @@
    "settled_by": null,
    "n_signals": 2,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T16:22:24+00:00",
-   "match_id": "norway-vs-wales-20261114",
-   "group": "STAKE_LOAD/pre",
-   "match": "Norway — Wales",
-   "selection": "1st Half - Corner Handicap: Norway (-0.5)",
-   "odds": 1.58,
-   "ft": [
-    3,
-    1
-   ],
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -12661,7 +12731,7 @@
    "date_utc": "2026-11-14T16:22:24+00:00",
    "kickoff_utc": "2026-11-14T17:00+00:00",
    "why": "mercado que o resultado final não decide",
-   "signals": 5
+   "signals": 4
   },
   {
    "match_id": "ruzomberok-women-vs-fc-vion-zlate-moravce-women-20261114",
@@ -13133,6 +13203,37 @@
   }
  ],
  "matches": {
+  "austria-vs-rep-of-ireland-20261114": {
+   "teams": [
+    "Austria",
+    "Rep of Ireland"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T10:42:25+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH1(-0.5)",
+     "odds": 1.72,
+     "share": 86,
+     "market": "Polymarket",
+     "total": 12000.0
+    },
+    {
+     "d": "2026-11-14T19:08:44+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(+0.5)",
+     "odds": 2.44,
+     "share": 19,
+     "market": "Polymarket",
+     "total": 8900.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
   "sweden-vs-bosnia-20261114": {
    "teams": [
     "Sweden",
@@ -14090,6 +14191,16 @@
      "share": 11,
      "market": "Polymarket",
      "total": 11000.0
+    },
+    {
+     "d": "2026-11-14T19:08:43+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH1(+0.5)",
+     "odds": 2.22,
+     "share": 74,
+     "market": "Polymarket",
+     "total": 92000.0
     }
    ],
    "goals": null,
@@ -17132,8 +17243,18 @@
    "o": 1.4
   },
   {
+   "d": "2026-11-14T17:55:12+00:00",
+   "u": -6.7,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "STAKE_LOAD",
+   "m": "Norway — Wales",
+   "s": "Asian Handicap: Wales (1.25)",
+   "o": 1.6
+  },
+  {
    "d": "2026-11-14T18:03:51+00:00",
-   "u": -5.0,
+   "u": -6.0,
    "g": 0.7,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -17143,7 +17264,7 @@
   },
   {
    "d": "2026-11-14T18:11:55+00:00",
-   "u": -6.0,
+   "u": -7.0,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -17153,7 +17274,7 @@
   },
   {
    "d": "2026-11-14T18:27:29+00:00",
-   "u": -7.0,
+   "u": -8.0,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -17163,7 +17284,7 @@
   },
   {
    "d": "2026-11-14T18:28:12+00:00",
-   "u": -8.0,
+   "u": -9.0,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -17195,10 +17316,10 @@
    "day": "2026-11-13"
   },
   {
-   "bets": 192,
-   "settled": 132,
+   "bets": 193,
+   "settled": 133,
    "wins": 63,
-   "units": 3.57,
+   "units": 2.57,
    "day": "2026-11-14"
   }
  ]
