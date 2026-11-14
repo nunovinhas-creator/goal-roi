@@ -15175,6 +15175,21 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Competição = liga & Dia = fim de semana": {
+  "born_utc": "2026-11-14T12:15:15+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Competição = liga & Golos até ao sinal = 3 ou mais": {
   "born_utc": "2026-11-14T06:12:44+00:00",
   "conditions": [
@@ -15954,6 +15969,36 @@
    [
     "Marcador no momento",
     "diferença de 2 ou mais golos"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-14T12:15:15+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 1.ª parte": {
+  "born_utc": "2026-11-14T12:15:15+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "1.ª parte"
    ]
   ],
   "family": "Forma de golos",
@@ -28556,6 +28601,126 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Competição = seleções & Dia = fim de semana": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Mercado = outro mercado": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Momento = antes do jogo": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana & Mercado = outro mercado": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Faixa de odd = odd 1,50 a 2,00": {
   "born_utc": "2026-11-14T11:33:14+00:00",
   "conditions": [
@@ -28653,6 +28818,17 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Mercado = outro mercado": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "outro mercado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Momento = antes do jogo": {
   "born_utc": "2026-11-14T11:08:07+00:00",
   "conditions": [
@@ -28679,12 +28855,53 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Momento = antes do jogo & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-14T12:09:16+00:00",
+  "conditions": [
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Número de apostas = várias": {
   "born_utc": "2026-11-14T11:33:14+00:00",
   "conditions": [
    [
     "Número de apostas",
     "várias"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Número de apostas = várias & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Número de apostas",
+    "várias"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-14T12:13:15+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
    ]
   ],
   "family": "Polymarket",
