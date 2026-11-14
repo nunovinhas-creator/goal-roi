@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T02:39:23+00:00",
+ "generated_at_utc": "2026-11-14T02:45:44+00:00",
  "messages": 247,
  "types": {
   "SERVICE": 10,
@@ -46,7 +46,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-14T02:39:22+00:00",
+  "collector_last_run_utc": "2026-11-14T02:45:34+00:00",
   "name_review": [
    {
     "bot": [
@@ -829,7 +829,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 37,
-   "days_to_conclusion": 386,
+   "days_to_conclusion": 387,
    "prudent_rate": 0.3042,
    "prob_above": 0.3027,
    "edge": -0.0608,
@@ -2257,11 +2257,11 @@
   }
  },
  "brain": {
-  "hypotheses": 1133,
+  "hypotheses": 1134,
   "tested": 6,
   "corrected_bar": 0.99167,
   "counts": {
-   "em observação": 1133
+   "em observação": 1134
   },
   "board": {
    "best": [
@@ -2515,7 +2515,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-14T02:39:23+00:00",
+   "generated_utc": "2026-11-14T02:45:44+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -2538,7 +2538,7 @@
      "as_expected": 0
     },
     "llm/novas": {
-     "hypotheses": 6,
+     "hypotheses": 7,
      "judged": 0,
      "as_expected": 0
     },
@@ -7534,6 +7534,43 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Stake | Mercado = golos (total asiático) & Momento do aviso = até 45 min depois do início",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Mercado",
+      "golos (total asiático)"
+     ],
+     [
+      "Momento do aviso",
+      "até 45 min depois do início"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-14T02:45:36+00:00",
+    "reason": "Apostas em golos com aviso rápido",
+    "expect": "acima",
+    "mode": "novas",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Forma de golos | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60",
     "family": "Forma de golos",
     "conditions": [
@@ -8328,46 +8365,9 @@
     "tradable": true,
     "open": 0,
     "status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Betfair | Quota de mercado = 80 % ou mais & Tamanho do mercado = 10 mil $ ou mais",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Quota de mercado",
-      "80 % ou mais"
-     ],
-     [
-      "Tamanho do mercado",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-12T19:27:23+00:00",
-    "reason": "Mercado confiante com volume alto",
-    "expect": "acima",
-    "mode": "novas",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
    }
   ],
-  "llm_total": 25,
+  "llm_total": 26,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -8376,15 +8376,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 36,
-  "llm_last_run_utc": "2026-11-14T01:47:06+00:00",
+  "llm_runs": 37,
+  "llm_last_run_utc": "2026-11-14T02:45:36+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-14",
-   "calls_today": 2,
-   "neurons_today": 320.7,
-   "accepted_today": 0,
-   "last_mode": "notas"
+   "calls_today": 3,
+   "neurons_today": 494.4,
+   "accepted_today": 1,
+   "last_mode": "novas"
   },
   "notes": [
    {

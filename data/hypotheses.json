@@ -19298,6 +19298,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Mercado = golos (total asiático) & Momento do aviso = até 45 min depois do início": {
+  "born_utc": "2026-11-14T02:45:36+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "golos (total asiático)"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Apostas em golos com aviso rápido",
+  "source": "llm"
+ },
  "Stake | Mercado = golos (total asiático) & Número de apostas = várias": {
   "born_utc": "2026-11-12T15:33:31+00:00",
   "conditions": [
