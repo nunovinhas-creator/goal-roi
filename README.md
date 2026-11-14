@@ -134,3 +134,26 @@ GitHub Pages a partir da pasta `docs/` da `main` (Settings → Pages). Mostra `d
 - Sinais Betfair não trazem resultado; dependem de outra mensagem do mesmo jogo ou da BSD com nomes exatamente iguais.
 - A odd anunciada pode não ser obtível, sobretudo ao vivo e em mercados pequenos.
 - Camadas seguintes (perguntas pré-definidas; resumo por LLM a partir dos números) só depois de haver dados.
+
+## Elegibilidade da evidência do cérebro (PR 1, 14/11/2026)
+
+O cérebro usa apenas sinais com `in_roi == true`, sem marcas de origem inválida,
+com mercado e odd finita >= 1,10. O mesmo filtro aplica-se ao apoio de novas
+hipóteses, às classificações, comparações com o resto do tipo, agenda, watch,
+pontos de entrada e ao treino e avaliação do walk-forward. A LLM recebe esse
+universo filtrado através de `report.LAST['signals']`.
+
+`accuracy` e `insights` continuam exploratórios. `brain.exploratory` conserva as
+contagens de estados no universo completo e uma amostra das 150 hipóteses com
+mais resultados; não alimenta recomendações. `brain.eligibility` apresenta os
+motivos de exclusão (podem sobrepor-se). `in_roi` mantém o significado legado
+para compatibilidade; `evidence_eligible` inclui também os critérios de mercado
+ e odd. Os dados e o registo de hipóteses existentes não são apagados.
+
+Esta separação não resolve ainda independência dos jogos, estabilidade,
+multiplicidade, ativação cronológica ou validação prospectiva. Os nomes antigos
+"forte"/"confirmada" não constituem certificação científica.
+
+Ver [auditoria da PR 1](audits/pr1-data-eligibility.md). Testes sem rede:
+`python scripts/test_offline.py`. Comparação reproduzível com a base fixada:
+`python scripts/audit_data_eligibility.py`.

@@ -8,6 +8,7 @@ import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
 from . import brain, insights
+from .eligibility import eligible, exclusion_reasons
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -120,6 +121,8 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             if b['edited_at_first_sight']:   # só vimos a versão editada, em que o bot reescreve as linhas das equipas: a hora decide a fase
                 b['phase'] = 'pre' if b['after_kickoff_min'] < 0 else 'live'
         b['in_roi'] = provenance_ok(b)
+        b['evidence_eligible'] = eligible(b)
+        b['evidence_exclusions'] = exclusion_reasons(b)
         b['group'] = group(b)
         f = ft.get(b['match_id']) or note_ft(b, notes)
         from_bsd = False
@@ -446,7 +449,7 @@ def build(csv_path=None, register=False):
     registry = brain.load_registry(reg_path)
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    LAST['signals'] = signals
+    LAST['signals'] = [b for b in signals if eligible(b)]
     brn = brain.build(signals, registry, MIN_SETTLED)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')

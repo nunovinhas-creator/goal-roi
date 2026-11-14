@@ -19,6 +19,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import insights
 from .parser import competition_kind
+from .eligibility import eligible, exclusion_reasons
 
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
 MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo não tem limite de tamanho
@@ -87,6 +88,7 @@ def multi_matches(signals):
 
 def candidates(signals):
     """Combinações de 1 a MAX_CONDITIONS características por família, com o número de sinais que as têm. Não lê resultados."""
+    signals = [b for b in signals if eligible(b)]
     multi, support, earlier = multi_matches(signals), {}, earlier_index(signals)
     for b in signals:
         fam, at = insights.family(b), sorted(set(atoms(b, multi, earlier)))
@@ -124,7 +126,9 @@ def status_of(n, prob, corrected_bar, min_settled):
     return 'promissora' if prob >= 0.95 else 'em observação'
 
 
-def evaluate(signals, registry, min_settled):
+def evaluate(signals, registry, min_settled, *, exploratory=False):
+    if not exploratory:
+        signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
     have = [(b, insights.family(b), set(atoms(b, multi, earlier))) for b in signals]
     rows = []
@@ -177,6 +181,8 @@ def board(rows, now=None, family_n=None):
     live = {}
     for r in best:
         for b in r['open']:
+            if not eligible(b):
+                continue
             ko = datetime.fromisoformat(b['kickoff_utc']) if b.get('kickoff_utc') else None
             fresh = (ko is not None and ko > now) or (now - datetime.fromisoformat(b['date_utc'])).total_seconds() <= 3600
             if fresh and b['key'] not in live:
@@ -203,6 +209,7 @@ def agenda(rows, signals, now=None):
     """
     now = now or datetime.now(timezone.utc)
     cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['n'] >= BOARD_MIN]
+    signals = [b for b in signals if eligible(b)]
     good, bad = {}, {}
     for r in sorted(cand, key=lambda r: (-r['prob_above'], -r['n'])):
         bucket = good if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada' else bad if r['prob_above'] <= BOARD_BAD or r['status'] == 'abandonada' else None
@@ -265,6 +272,16 @@ def agenda(rows, signals, now=None):
 
 
 def build(signals, registry, min_settled):
+    all_signals = signals
+    signals = [b for b in all_signals if eligible(b)]
+    excluded = {}
+    for b in all_signals:
+        for reason in exclusion_reasons(b):
+            excluded[reason] = excluded.get(reason, 0) + 1
+    exploratory_rows, _, _ = evaluate(all_signals, registry, min_settled, exploratory=True)
+    exploratory_counts = {}
+    for r in exploratory_rows:
+        exploratory_counts[r['status']] = exploratory_counts.get(r['status'], 0) + 1
     rows, tested, bar = evaluate(signals, registry, min_settled)
     fams = {}
     for b in signals:
@@ -287,7 +304,11 @@ def build(signals, registry, min_settled):
     for r in rows:
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
-    return {'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
+    return {'evidence_scope': 'eligible_bets_only',
+            'eligibility': {'total': len(all_signals), 'eligible': len(signals), 'excluded': len(all_signals) - len(signals), 'reasons': excluded},
+            'exploratory': {'scope': 'all_signals_not_for_recommendations', 'counts': exploratory_counts,
+                            'hypotheses': [{k: r[k] for k in ('id', 'n', 'games', 'roi', 'status')} for r in sorted(exploratory_rows, key=lambda r: (-r['n'], r['id']))[:150]]},
+            'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
             'track': track_record(rows), 'walk_forward': walk_forward(signals, registry),
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
                                                                                                     'games', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds')}
@@ -340,6 +361,7 @@ def walk_forward(signals, registry):
     alguma tática apostável tinha pelo menos BOARD_MIN resultados e probabilidade >= BOARD_GOOD (a regra do quadro).
     Compara os sinais seguidos com os não seguidos: se o cérebro acrescenta alguma coisa, os seguidos têm de render mais.
     """
+    signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
     hyps = [(hid, h['family'], {tuple(c) for c in h['conditions']}, None if h.get('source') == 'gerador' else h['born_utc'])
             for hid, h in registry.items() if h['conditions'] and not any(c[0] in POST for c in h['conditions'])]
@@ -351,7 +373,7 @@ def walk_forward(signals, registry):
     votes, counts, pos = [insights.Votes() for _ in hyps], [0] * len(hyps), 0
     sides = {True: [], False: []}
     for b in sorted(signals, key=lambda b: b['date_utc']):
-        if not b.get('odds') or b.get('market') is None or not b.get('in_roi', True):
+        if not b.get('odds') or b.get('market') is None or not eligible(b):
             continue
         when = datetime.fromisoformat(b['date_utc'])
         while pos < len(results) and known_at(results[pos]) <= when:
@@ -389,6 +411,7 @@ def walk_forward(signals, registry):
 
 def entry_points(signals):
     """Betfair: entrar ao primeiro sinal ou esperar pelo reforço? Cada linha usa a odd do primeiro sinal que chegou a esse reforço."""
+    signals = [b for b in signals if eligible(b)]
     out = []
     for phase in ('pre', 'live'):
         rows = [b for b in signals if b['type'] == 'BETFAIR' and b['phase'] == phase and b.get('steps')]
