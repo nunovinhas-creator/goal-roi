@@ -1,17 +1,17 @@
 {
- "generated_at_utc": "2026-11-15T19:12:40+00:00",
- "messages": 906,
+ "generated_at_utc": "2026-11-15T19:16:53+00:00",
+ "messages": 908,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 36,
   "BETFAIR": 183,
-  "STAKE_LOAD": 150,
+  "STAKE_LOAD": 151,
   "OPEN_GAME": 152,
   "TOTALS_FORM": 49,
   "WEAKENED_LINEUP": 10,
   "OPEN_GAME_NO_ODDS": 12,
   "FULL_TIME_NOTE": 12,
-  "POLYMARKET": 211,
+  "POLYMARKET": 212,
   "None": 28,
   "TOTALS_FORM_NO_ODDS": 53
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1423,
+  "versions": 1426,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 7,
-  "last_collected_at_utc": "2026-11-15T19:12:27+00:00",
+  "last_collected_at_utc": "2026-11-15T19:16:42+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 32,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T19:12:27+00:00",
+  "collector_last_run_utc": "2026-11-15T19:16:42+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 111,
+  "stake_original_seen": 112,
   "stake_no_score_after_kickoff": 19,
   "stake_sent_45_after_kickoff": 33,
   "goal_lists": 295,
   "goal_lists_consistent": 182
  },
- "unique_bets": 511,
+ "unique_bets": 512,
  "settled_bets": 380,
  "unsettled_market": 38,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1033,7 +1033,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 67,
+   "bets": 68,
    "settled": 34,
    "matches": 22,
    "wins": 11,
@@ -1449,7 +1449,7 @@
    "prob_above_cut": 0.1473
   },
   "STAKE_LOAD": {
-   "signals": 121,
+   "signals": 122,
    "with_result": 72,
    "hits": 29,
    "misses": 40,
@@ -1547,7 +1547,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 25.1,
+   "per_day": 25.0,
    "days_to_hint": 0,
    "days_to_conclusion": 10,
    "prudent_rate": 0.8263,
@@ -2929,7 +2929,7 @@
    },
    {
     "n": 233,
-    "signals": 312,
+    "signals": 313,
     "hits": 133,
     "misses": 100,
     "hit_rate": 0.5561,
@@ -3033,8 +3033,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "independent_games_hysteresis_v1",
   "eligibility": {
-   "total": 660,
-   "eligible": 511,
+   "total": 661,
+   "eligible": 512,
    "excluded": 149,
    "reasons": {
     "no_valid_odds": 101,
@@ -3049,7 +3049,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5838,
+    "em observação": 5842,
     "promissora": 44,
     "abandonada": 3
    },
@@ -4106,11 +4106,11 @@
     }
    ]
   },
-  "hypotheses": 5885,
+  "hypotheses": 5889,
   "tested": 288,
   "corrected_bar": 0.99983,
   "counts": {
-   "em observação": 5881,
+   "em observação": 5885,
    "promissora": 4
   },
   "board": {
@@ -6398,6 +6398,103 @@
      "bad_total": 45
     },
     {
+     "match_id": "spain-vs-england-20261115",
+     "match": "Spain — England",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-15T19:45+00:00",
+     "date_utc": "2026-11-15T19:16:01+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Over 2.5",
+     "odds": 1.56,
+     "odds_last": 1.56,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 37,
+     "good": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático) & Número de apostas = uma",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "golos (total asiático)"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 12,
+       "games": 10,
+       "hits": 9,
+       "break_even": 0.583,
+       "prob_above": 0.8131,
+       "roi": 0.2958,
+       "edge": 0.0918,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 1,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 20,
+       "games": 13,
+       "hits": 5,
+       "break_even": 0.5284,
+       "prob_above": 0.0224,
+       "roi": -0.5209,
+       "edge": -0.204,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 16,
+       "games": 11,
+       "hits": 5,
+       "break_even": 0.5753,
+       "prob_above": 0.0414,
+       "roi": -0.4388,
+       "edge": -0.1867,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 28
+    },
+    {
      "match_id": "france-vs-turkey-20261115",
      "match": "France — Turkey",
      "league": "UEFA Nations League",
@@ -6808,10 +6905,10 @@
      "market": "Polymarket",
      "selection": "AH2(+0.5)",
      "odds": 5.56,
-     "odds_last": 5.56,
+     "odds_last": 5.73,
      "max_mult": 1,
      "share": 3,
-     "share_last": 3,
+     "share_last": 2,
      "verdict": "contraditório",
      "conflict": true,
      "validated": false,
@@ -8141,90 +8238,16 @@
       }
      ],
      "bad_total": 47
-    },
-    {
-     "match_id": "nacional-potosi-vs-real-potosi-20261116",
-     "match": "Nacional Potosi — Real Potosi",
-     "league": "Bolivian Bolivia Copa Division Profesional",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-15T21:30+00:00",
-     "date_utc": "2026-11-15T18:49:31+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Nacional Potosi",
-     "odds": 2.68,
-     "odds_last": 2.68,
-     "max_mult": 1,
-     "share": 66,
-     "share_last": 66,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 25,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Betfair | Hora (UTC) = noite & Quota de mercado = menos de 80 %",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ]
-       ],
-       "n": 9,
-       "games": 9,
-       "hits": 1,
-       "break_even": 0.4626,
-       "prob_above": 0.0629,
-       "roi": -0.7733,
-       "edge": -0.1665,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 2,00 a 3,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 17,
-       "games": 17,
-       "hits": 4,
-       "break_even": 0.4413,
-       "prob_above": 0.078,
-       "roi": -0.4506,
-       "edge": -0.1297,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 17
     }
    ],
    "counts": {
     "favorável": 1,
     "misto": 1,
     "sem evidência": 0,
-    "contraditório": 28,
+    "contraditório": 29,
     "evitar": 12
    },
-   "generated_utc": "2026-11-15T19:12:39+00:00",
+   "generated_utc": "2026-11-15T19:16:52+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -8237,7 +8260,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5837,
+     "hypotheses": 5841,
      "judged": 2489,
      "as_expected": 1094
     },
@@ -8375,7 +8398,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 166,
+    "bets": 167,
     "settled": 145,
     "games": 139,
     "wins": 68,
@@ -15803,7 +15826,7 @@
     "days_to_conclusion": 9
    },
    "STAKE_LOAD": {
-    "signals": 111,
+    "signals": 112,
     "with_result": 63,
     "hits": 26,
     "misses": 34,
@@ -15827,7 +15850,7 @@
     "roi_announced_odds": -0.207,
     "seen_late": 0,
     "by_bot_mark": 11,
-    "per_day": 19.0,
+    "per_day": 18.9,
     "days_to_hint": 0,
     "days_to_conclusion": 13
    },
@@ -16281,7 +16304,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 511,
+   "bets": 512,
    "settled": 380,
    "matches": 251,
    "wins": 176,
@@ -16316,6 +16339,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T19:16:01+00:00",
+   "match_id": "spain-vs-england-20261115",
+   "group": "STAKE_LOAD/pre",
+   "match": "Spain — England",
+   "selection": "Over 2.5",
+   "odds": 1.56,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T19:12:20+00:00",
    "match_id": "spain-vs-england-20261115",
@@ -17171,22 +17207,6 @@
    "w": 1.0,
    "settled_by": "resultado",
    "n_signals": 2,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T15:56:33+00:00",
-   "match_id": "finland-vs-san-marino-20261115",
-   "group": "POLYMARKET/pre",
-   "match": "Finland — San Marino",
-   "selection": "Polymarket: AH2(+3.5)",
-   "odds": 2.33,
-   "ft": [
-    7,
-    2
-   ],
-   "w": -1.0,
-   "settled_by": "marca do bot",
-   "n_signals": 1,
    "max_mult": 1
   }
  ],
@@ -18129,6 +18149,16 @@
      "share": 57,
      "market": "Polymarket",
      "total": 35000.0
+    },
+    {
+     "d": "2026-11-15T19:16:07+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(+0.5)",
+     "odds": 5.73,
+     "share": 2,
+     "market": "Polymarket",
+     "total": 6300.0
     }
    ],
    "goals": null,
@@ -23337,7 +23367,7 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 163,
+   "bets": 164,
    "settled": 93,
    "wins": 43,
    "units": -12.21,
