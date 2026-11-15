@@ -6,6 +6,50 @@
 - **Relógio fixo:** `2026-11-15T14:34:34Z` (hora do commit base). **Python:** 3.11.
 - **Rede bloqueada** na auditoria e nos testes; sementes fixas (`20261115`).
 
+> **Revisão #5911487915 (commit `ef4606a`): correções feitas nesta versão.** Ver a secção 0. Em resumo:
+> - **P1-A e P1-B:** existe agora uma definição única de jogo prospetivo. Um jogo só conta se todas as suas apostas foram emitidas e lidas depois do registo, eram decidíveis e têm hora de resultado provada. Essa definição é usada pelo relatório, pela máquina de estados, pelo `entry_status` e pelo teste de confirmação.
+> - **P1 científico:** escolhida a **via 1**. "Forte" e "confirmada" deixam de usar caudas posteriores com Bonferroni e passam a exigir um **certificado** de um e-processo com nível garantido. Acrescenta-se uma proteção fail-closed no cérebro e no Telegram.
+
+## 0. Correções após a revisão #5911487915
+
+**P1-A — sinais históricos recuperados tarde.**
+- A condição antiga era `decision_time > born`, sinal a sinal. Um sinal emitido antes do registo, mas lido depois, contava como prospetivo.
+- Agora `brain.operational_bet(b, t)` exige, sem exceções:
+  - sinal emitido depois de t (`date_utc > t`);
+  - carimbo de leitura depois de t;
+  - sinal decidível quando foi lido (`chronology.decidable`, a mesma política do walk-forward);
+  - hora do resultado verificada (não desconhecida nem contraditória).
+- Cada jogo é classificado numa de quatro categorias: `prospective`, `mixed`, `before_registration` (incluindo os recuperados tarde) e `after_registration_not_operational` (sinal lido tarde demais ou hora do resultado não provada).
+- **Regressão:** 40 vitórias pré-registo, recuperadas depois do registo, dão 0 jogos prospetivos no relatório e no replay, ficam em `before_registration` e não permitem certificação.
+
+**P1-B — definição única.**
+- `operational_game(rows, t)` = todas as apostas decididas do jogo são operacionais; um jogo misto não conta em lado nenhum.
+- `prospective_summary` recebe os mesmos `ordered_games` da máquina de estados e usa a mesma função que `game_steps`, `entry_status` e o teste de confirmação.
+- **Testes:**
+  - 35 jogos mistos dão 0 no relatório e 0 no replay; o controlo com 35 jogos completos dá 35 nos dois;
+  - em dados aleatórios (lados do registo, atrasos, horas desconhecidas e contraditórias), relatório = replay = contagem direta, e as categorias somam todos os jogos.
+- **Impacto no snapshot** (143 hipóteses testadas):
+
+| | Definição de `ef4606a` | Definição única |
+|---|---:|---:|
+| Pares hipótese–jogo prospetivos (relatório) | 4 671 | **4 600** |
+| Idem, no replay | 4 662 | **4 600** |
+| Hipóteses com relatório ≠ replay | **6** | 0 |
+| Jogos mistos / não operacionais depois do registo | contados | 9 / 62, **excluídos** |
+| Jogos anteriores ao registo (incl. recuperados tarde) | — | 813 |
+| Hipóteses testadas com ≥ 30 jogos prospetivos | 80 | **74** (6 mudam de nível) |
+
+**P1 científico — via 1.** Construí um teste com nível garantido em vez de afirmar o que a aproximação não demonstrava (secção 3, ponto 4). Em síntese:
+- **Seleção:** primeira promoção confirmada a promissora, com hora provada. É exploratória.
+- **Confirmação:** e-processo de apostas, só com jogos operacionais posteriores à seleção.
+- **Orçamento:** α_j = 0,05/(j(j+1)) pela ordem de seleção.
+- **Garantia:** desigualdade de Ville + união, ou seja, P(alguma tática sem vantagem ser certificada, **em toda a vida do projeto**) ≤ 0,05, sob qualquer dependência entre hipóteses e com observação contínua, sob o nulo enunciado.
+- **Proteção fail-closed:**
+  - (i) o cérebro rebaixa a promissora qualquer validada sem certificado (`validation_blocked`);
+  - (ii) o Telegram só anuncia "tática validada" ou um ALERTA se o relatório declarar `validation.method = eprocess_online_alpha_v1` **e** essa tática estiver em `validation.certified`, com `certified: true` na razão. Caso contrário trata-a como promissora, também no texto.
+- Parâmetros fixados por princípio e nunca pelo ROI: α = 0,05, odd −2 % (constante `ODDS_LOSS` existente), grelha geométrica de λ, mínimo de 30 jogos (`HINT_AT`).
+- No snapshot: **11 selecionadas, 0 certificadas**. Os e-valores atuais vão de 0,78 a 1,87 (máximo histórico 2,44), contra limiares de 40 a 2 640.
+
 ## 1. Problemas medidos
 
 **A. Fasquia corrigida retroativa.** Na PR 2, `evaluate()` calculava a fasquia com o número **atual** de hipóteses testadas e aplicava-a a toda a reconstituição. Demonstrado em `CorrectedBarIsRetroactive`: os mesmos 102 jogos davam forte com 1 hipótese e promissora com 401.
@@ -68,25 +112,31 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
    - A evidência anterior ao registo junta-se num único passo "no registo". Como a PR 2 exige 2 passos para mudar de estado, uma hipótese nova precisa de pelo menos um jogo posterior para ganhar estado.
    - Sem `born_utc` válido não há estados nem uso no walk-forward.
    - O registo existente **não é alterado** e nenhuma data é reescrita.
-4. **Testes múltiplos sob dependência** (forte/confirmada).
-   - Uma decisão tomada com n jogos no instante t só é validada se a cauda posterior **não arredondada** (`insights.tail_below`) for ≤ α · 100 / (n(n+1)) / m(t), com:
-     - α = 0,05;
-     - m(t) = hipóteses **registadas** que tinham ≥ 30 jogos **provadamente conhecidos** em t;
-     - 100/(n(n+1)) = parte de α gasta no olhar com n jogos. É uma série telescópica: soma exatamente 1 sobre n ≥ 100.
-   - É uma desigualdade da união (Bonferroni) sobre hipóteses **e** sobre olhares. **Não assume independência:** vale para qualquer dependência e, com hipóteses sobrepostas, é conservadora.
-   - A fasquia e m(t) ficam registados em cada mudança (`bar`, `tested`). Hipóteses que chegam depois **não reescrevem** decisões fixadas.
-   - Manter: o dobro do erro, como na PR 2.
-   - 1 − cauda é tratado como valor-p unilateral. É uma aproximação: o prior Beta centrado na taxa necessária encolhe para "sem vantagem", o que a torna ligeiramente conservadora.
-5. **Porta prospetiva.** Forte/confirmada exigem ainda ≥ 30 jogos **prospetivos** (sinais lidos pelo sistema depois do registo) com prob ≥ 0,95 (manter: ≥ 0,90).
-   - É um requisito de replicação em dados que não existiam quando a hipótese nasceu.
-   - Usa constantes já existentes (`HINT_AT`, `PROMOTE_AT`, `KEEP_PROMISING`).
+4. **Validação certificada** (forte/confirmada; revisão #5911487915).
+   - **Seleção:** τ = primeira mudança confirmada para promissora, com hora provada. É exploratória e pode usar todos os dados anteriores.
+   - **Evidência de confirmação:** só jogos com `operational_game(rows, τ)`: todas as apostas emitidas e lidas depois de τ, decidíveis, com resultado de hora provada. São processados pela ordem provada de observação.
+   - **Estatística:** lucro por jogo, y = média das apostas distintas do jogo de w·(odd·0,98 − 1) se ganha, w se perde. Inclui meias apostas, y ≥ −1, e as apostas repetidas contam uma vez.
+   - **E-processo:** E_n = média sobre λ ∈ {1/2, 1/4, 1/8, 1/16, 1/32} de ∏(1 + λ·y_i).
+     - **Nulo** H₀(h): em cada jogo usado, E[y_i | passado] ≤ 0, isto é, sem lucro esperado à odd −2 %.
+     - Sob H₀, cada produto é uma supermartingala não negativa com início em 1, e a média também.
+     - **Ville:** P(sup_n E_n ≥ 1/a) ≤ a. Vale para qualquer olhar, odds heterogéneas e resultados fracionários.
+   - **Orçamento:** a j-ésima tática selecionada (por τ, empates pela identidade) recebe α_j = 0,05/(j(j+1)), e Σ_j α_j = 0,05.
+     - Certifica-se no primeiro jogo com E_n ≥ 1/α_j e n ≥ 30. O certificado é registado (`confirmation.certified_utc`).
+     - α_j depende do passado, mas o teste de h usa só jogos posteriores a τ_h. Condicionando em F_τ, P(falsa certificação de h) ≤ α_{J_h}, e somando sobre índices distintos o total fica ≤ α.
+   - **Estado:** forte/confirmada = certificado + ≥ 100/300 jogos + prob ≥ 0,95 (manter: 0,90), com a confirmação em 2 passos da PR 2.
+   - **Sobreposição:** hipóteses sobre os mesmos jogos não partilham orçamento. Cada uma paga o seu α_j, o que é conservador.
+   - **O que deixou de existir:** a fasquia Bonferroni com caudas posteriores, a repartição por olhares e a porta "30 jogos prospetivos com 95 %". `corrected_bar` passa a `null` no relatório. `evaluate()` devolve 1 − α/testadas só por compatibilidade, e esse valor não decide nada.
+5. **Evidência prospetiva** (relatório, `evidence_level`): jogos com `operational_game(rows, born)`, a mesma definição aplicada ao registo. É descritiva; a decisão está no ponto 4.
 6. **Promissora e abandonada:** os limiares ficam iguais (0,95/0,90 e 0,10/0,20, sem correção). Continuam explicitamente **exploratórias**.
 7. **Walk-forward cronológico.**
    - Cada decisão é tomada na hora da leitura do sinal, só com resultados observados antes e só com hipóteses registadas antes. As propostas da LLM e manuais só usam sinais posteriores ao seu registo.
    - Sinais lidos tarde demais contam como **não reconstituíveis**, nunca como decisões.
 8. **Relatório.**
    - Por hipótese: `born_verified`, `at_birth` (evidência disponível no registo), `prospective`, `evidence_level` (exploratória / prospetiva / não verificável), `result_time_unknown` e `game_set`.
-   - No cérebro: `multiplicity` (método, família, fasquia atual, conjuntos distintos, união e soma dos jogos das promissoras) e `corrected_bar_tail`.
+   - Por hipótese: `prospective.categories` e `confirmation` (rank, α, limiar, jogos, e-valor atual e máximo, seleção, certificado).
+   - No cérebro:
+     - `multiplicity`: só descritivo, com conjuntos distintos, união e soma dos jogos das promissoras e categorias;
+     - `validation`: método, α, nulo, pressupostos, afirmação exata, selecionadas, certificadas e as mais próximas.
    - `prob_above`, `edge` e as restantes probabilidades **não mudam** de fórmula nem de valor.
 
 **Quatro avaliações, distintas no relatório:**
@@ -100,16 +150,26 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
 **Demonstrado (testes determinísticos e verificação git):**
 - nenhuma decisão usa um resultado observado depois dela, nem um resultado sem hora provada;
 - nenhuma hipótese decide antes de existir;
-- hipóteses acrescentadas depois não reescrevem decisões fixadas;
-- a fasquia é a do instante;
+- hipóteses acrescentadas ou selecionadas depois não alteram certificados nem decisões anteriores;
+- a evidência prospetiva tem uma definição, partilhada pelo relatório e pelo replay;
 - a ordem física dos dados não conta;
-- as entradas inválidas falham fechadas.
+- as entradas inválidas falham fechadas;
+- nenhuma validada sem certificado chega ao relatório ou ao Telegram.
+
+**Demonstrado matematicamente, sob pressupostos explícitos:** P(alguma certificação falsa em toda a vida do projeto) ≤ 0,05.
+- **Pressupostos:**
+  - (A1) o nulo vale condicionalmente ao passado em cada jogo usado;
+  - (A2) a pertença de um jogo a uma hipótese nunca depende do seu resultado (condições fixas, atributos conhecidos no fim do jogo);
+  - (A3) as horas guardadas são verdadeiras (verificadas contra o git).
+- **Verificação empírica:**
+  - nulo no limite, com odds 1,4–3,5 e meias vitórias: 1,7 % das 300 séries cruzam 1/0,05, e 0 % cruzam 1/0,025;
+  - nos sintéticos de odd 2,0 (sem vantagem), há 0 falsas validações até 1000 jogos.
 
 **Não demonstrável retrospetivamente:**
 - **Decisões anteriores a 12/11 09:34**, antes de haver recolha: 29 sinais com odd foram lidos na recolha inicial e são **não reconstituíveis**. Os 6 sinais de 15/11 e os outros casos lidos tarde estão contados na mesma categoria.
 - **A hora real do fim do jogo e do resultado no mundo:** não é observada. Usa-se só a observação pelo sistema, que é um limite superior conservador.
-- **A FWER global no tempo:** com uma família que cresce, a correção cronológica controla o erro da família **em cada instante**, não a soma ao longo de famílias sucessivas. Uma correção *online* estrita (α_j por ordem de entrada) é possível, mas tornaria quase impossível validar as hipóteses registadas mais tarde. Fica para decisão do auditor.
-- **Capacidade preditiva:** não pode ser demonstrada com esta amostra (secção 6).
+- **A robustez do nulo:** a garantia é sobre lucro **à odd anunciada −2 %**. Se as odds realmente obtidas forem piores, uma certificação pode não se traduzir em lucro. A garantia também não cobre erros de liquidação.
+- **Capacidade preditiva:** não pode ser demonstrada com esta amostra (secções 6 e 7).
 
 ## 5. Antes/depois (mesmo snapshot, mesmo relógio)
 
@@ -118,22 +178,23 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
 | Promissoras / abandonadas / validadas (elegível) | 13 / 0 / 0 | 11 / 0 / 0 |
 | Promissoras (exploratório) | 58 | 57 |
 | Hipóteses testadas | 143 | 143 |
-| Fasquia da primeira validação (n = 100) | 0,99965 | 0,9999965 (cauda 3,5·10⁻⁶) |
+| Regra das validadas | Bonferroni (1 − 0,05/m) com `prob_above` arredondado | certificado de e-processo, α_j = 0,05/(j(j+1)) |
+| Selecionadas / certificadas | — | 11 / 0 (e-valores 0,78–1,87; limiares 40–2 640) |
 | `prob_above` e `games` iguais (150 hipóteses comparadas) | — | sim |
-| Hipóteses testadas com evidência prospetiva ≥ 30 jogos | — | 80 de 143 |
+| Hipóteses testadas com evidência prospetiva ≥ 30 jogos | — | 74 de 143 (eram 80 com a definição de `ef4606a`) |
 | Walk-forward seguidas: apostas, ROI, ROI odd −2 % | 135, +0,77 %, −0,91 % | 131, +3,12 %, +1,41 % |
 | Walk-forward não seguidas: apostas, ROI | 290, −2,66 % | 259, −4,97 % |
 | Não reconstituíveis | — | 35 (24 com resultado) |
 | P(seguidas renderem mais) | 0,43 | 0,60 |
 | IC 90 % *bootstrap* por jogo, ROI das seguidas | — | [−11,2 %; +17,5 %] |
 | Primeiro relatório PR 3 sobre o estado Telegram de produção | — | **0 avisos de estado** (sem migração seriam 2) |
-| `report.build` (2 medições) | 8,6–9,7 s | 9,7–10,3 s |
+| `report.build` (2 medições) | 8,7–10,3 s | 10,3–10,6 s |
 
 **As 2 hipóteses que mudam** (promissora → em observação) são as que a PR 2 descrevia como "mantidas pela histerese":
 - **"Jogo aberto | Golos até ao sinal = 1 ou 2"** (43 jogos, 0,9496). Na PR 2, a promoção foi confirmada a "15/11 00:17", uma hora **fictícia** dada pela aproximação de 150 min. Na ordem provada, a sequência dos passos 30–43 é 0,92, 0,94, 0,91, 0,87, 0,91, 0,93, 0,944, 0,946, **0,955**, 0,93, 0,94, **0,956**, 0,93, 0,95: nunca houve dois jogos seguidos ≥ 0,95.
 - **"Jogo aberto | Minuto = 31 a 60 & Ritmo < 90"** (36 jogos, 0,9429): mesmo mecanismo.
 
-As outras 11 promissoras mantêm-se. Cada uma tem a mudança datada depois do registo e a fasquia/família desse instante (m entre 27 e 119) registada.
+As outras 11 promissoras mantêm-se, todas com a mudança datada depois do registo. As 11 são as táticas selecionadas para confirmação.
 
 ## 6. Walk-forward, sensibilidade e ablações
 
@@ -163,82 +224,75 @@ Um resultado que muda tanto com escolhas de implementação **não é evidência
   - 48,5 % das simulações dão 0;
   - **11 %** das simulações dão ≥ 12.
 - Os "acasos" vêm em cachos, porque são os mesmos jogos e os mesmos sorteios. O número observado de promissoras **é compatível com acaso**.
-- **Westfall–Young (máximo, FWER 5 %, um olhar):** cauda 3,8·10⁻³, contra 3,5·10⁻⁴ de Bonferroni.
-  - Com esta sobreposição, Bonferroni é cerca de 11× mais exigente do que o necessário.
-  - Mantém-se Bonferroni porque é válido sem modelo. O WY depende do modelo nulo (sorteios independentes entre mercados do mesmo jogo, e 1/odd sem margem) e custa minutos por relatório.
+- **Westfall–Young (máximo, FWER 5 %, um olhar):** a cauda limite é 3,8·10⁻³, contra 3,5·10⁻⁴ de Bonferroni.
+  - É descritivo: com esta sobreposição, uma correção de um só olhar que ignore a dependência seria cerca de 11× mais exigente do que o necessário.
+  - Já não decide nada: as promissoras são exploratórias e as validadas usam o e-processo.
 
-**Taxas de validação sintéticas** (uma hipótese, 200 sementes, parâmetros fixados antes):
+**Taxas de validação sintéticas** (uma hipótese, odd 2,0, parâmetros fixados antes; "sem vantagem" = p 0,50, abaixo do equilíbrio à odd −2 %):
 
-| Caso | PR 2 | PR 3 sem repartição por olhares | PR 3 |
-|---|---:|---:|---:|
-| sem vantagem, 160 jogos | 12 % | 12 % | **0 %** |
-| sem vantagem, 300 jogos | 18 % | 18 % | **0 %** |
-| p = 0,60 à odd 2,0 (ROI +20 %), 300 jogos | 97,5 % | 97,5 % | 46 % |
-| p = 0,75, 160 jogos | 100 % | 100 % | 100 % |
+| Caso | Sementes | PR 2 | PR 3 `ef4606a` (Bonferroni + caudas) | PR 3 (e-processo) |
+|---|---:|---:|---:|---:|
+| sem vantagem, 160 jogos | 200 | 12 % | 0 % | **0 %** |
+| sem vantagem, 300 jogos | 200 | 18 % | 0 % | **0 %** |
+| sem vantagem, 1000 jogos | 60 | 25 % | 0 % | **0 %** |
+| p = 0,60 (ROI +20 %), 300 jogos | 200 | 97,5 % | 46 % | 46,5 % |
+| p = 0,60, 1000 jogos | 60 | 100 % | 98,3 % | 100 % |
+| p = 0,75, 160 jogos | 200 | 100 % | 100 % | 99,5 % |
 
-**Custo explícito:** vantagens realistas (2–5 % de ROI) **nunca** serão validadas com centenas de jogos, por esta regra ou pela da PR 2 (que as validaria por acaso). É a consequência honesta do tamanho da amostra.
+**Leitura:**
+- A versão `ef4606a` também não validou falsamente nestes casos. A diferença está na garantia: a sua taxa nula de 0 % era empírica e sem prova, enquanto a do e-processo é limitada por construção, para toda a vida do projeto e qualquer número de táticas selecionadas.
+- **Custo:** vantagens realistas (2–5 % de ROI) não serão certificadas com centenas nem com poucos milhares de jogos. Uma tática selecionada em 11.º lugar precisa de E ≥ 2 640. É a consequência honesta do tamanho da amostra, aceite conforme pedido ("rigor antes de facilidade").
 
 ## 8. Testes
 
-**Total:** 207 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada).
+**Total:** 211 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada). Destes, 178 são anteriores à PR 3 e 33 estão em `tests/test_chronological_validity.py`.
 
-**29 novos** em `tests/test_chronological_validity.py`:
-- **Hora dos resultados:**
-  - resultado observado depois da decisão não a influencia (com controlo positivo);
-  - reconstituição pela ordem provada;
-  - jogo conhecido só com todas as apostas.
-- **Hora desconhecida, contraditória ou malformada:**
-  - nunca presumida;
-  - conta "agora", depois das provadas;
-  - sem fuso, texto, número ou vazio → desconhecida.
-- **Registo:**
-  - hipótese registada depois do sinal não o decide;
-  - evidência anterior ao registo é um passo e precisa de confirmação;
-  - hipóteses acrescentadas depois não reescrevem mudanças nem o walk-forward;
-  - `born_utc` ausente ou malformado não decide.
-- **Fasquia cronológica:**
-  - registada em cada mudança;
-  - uma família que já existia aplica-se;
-  - os olhares são pagos (série telescópica);
-  - linha temporal da família.
-- **Porta prospetiva:**
-  - só a história nunca valida;
-  - a confirmação prospetiva valida;
-  - prospetivo fraco bloqueia;
-  - o arredondamento não passa uma fasquia mais exigente.
-- **Mesmo jogo, uma unidade:** passo e walk-forward, com controlo positivo.
-- **Sobreposição:** 4 hipóteses sobre os mesmos jogos dão 1 conjunto e contam 4 testes (nunca relaxa a fasquia).
-- **Reordenação física** dos sinais e do registo: resultado idêntico.
-- **Decidibilidade:** recolha tardia e sinal não lido → não reconstituíveis; janela igual à dos alertas.
-- **Cenários com 10 sementes:** vantagem verdadeira validada e lucrativa no walk-forward; sem vantagem nunca validada; deterioração retira a validação.
-- **Telegram:** migração das regras novas silenciosa e única, marcadores das PRs 1 e 2 intactos, mudança genuína posterior anunciada.
-- **Relatório:** hora = primeira recolha do resultado (não a última versão); Highlightly com `matched_at_utc`; resultado manual sem `observed_utc` → desconhecido.
+**Novos ou reescritos após a revisão #5911487915:**
+- **`ProspectiveEligibility`** (P1-A/P1-B):
+  - pré-registo recuperado tarde nunca é prospetivo (nem no relatório, nem no replay, nem no certificado);
+  - emitidos depois do registo mas lidos tarde, ou sem hora de resultado → não operacionais;
+  - jogos mistos contam 0 em todo o lado, com controlo de jogos completos;
+  - relatório = replay = contagem direta em dados aleatórios.
+- **`OnlineConfirmation`:**
+  - certificado, rank, α e limiar, e jogos contados só depois da seleção;
+  - orçamento por ordem de seleção (1.ª 40, 2.ª 120), sem que uma seleção posterior altere a anterior;
+  - nível sob o nulo no limite (≤ 5 %, com E[E_n] ≈ 1);
+  - história forte sem evidência posterior à seleção não certifica;
+  - a guarda rebaixa uma validada sem certificado.
+- **`OverlappingHypotheses`:** 4 hipóteses sobre os mesmos jogos dão 1 conjunto, 4 ranks e 4 limiares (40/120/240/400).
+- **`TelegramNeverClaimsUncertifiedValidation`:**
+  - sem bloco `validation`, com outro método, com a lista vazia ou malformada → nunca "validada", "forte" ou ALERTA;
+  - certificado na tática mas não na razão → sem ALERTA;
+  - certificada → ALERTA e aviso.
+- **`CorrectedBarIsChronological`:** forte/forte, mesmas mudanças e mesmo certificado com 1 ou 401 hipóteses (rank 1).
+- **Mantidos:**
+  - hora dos resultados, horas desconhecidas e contraditórias, registo, unidade de jogo, reordenação física, decidibilidade e proveniência no relatório;
+  - cenários com 10 sementes: vantagem verdadeira certificada e lucrativa no walk-forward, sem vantagem nunca validada, deterioração retira a validação.
 
-**Contra o código da PR 2**, 25 dos 29 falham:
-- 7 em asserções de comportamento: resultado tardio usado, hora desconhecida usada, hipótese futura usada, estado antes do registo, só história valida, família anterior ignorada, migração;
-- 18 por API/campos que não existiam.
-
-Os 4 que passam:
-- 2 testam só o módulo novo de cronologia;
-- 1 é a reordenação física;
-- 1 é a hipótese acrescentada depois, que passa na PR 2 só por o arredondamento a 4 casas esconder a diferença de fasquia.
-
-**Testes existentes preservados.** As asserções ficam todas iguais, exceto:
-- **`CorrectedBarIsRetroactive` → `CorrectedBarIsChronological`:** era a limitação documentada da PR 2 e agora afirma o comportamento corrigido (forte/forte e o mesmo histórico, contra forte/promissora). A série passa a ser determinística, 7 em cada 10.
-- **Fixtures:** as do walk-forward (`sig` em `test_independence_stability.py` e `EvidencePerMatch.row` em `test_scangoal.py`) **declaram a proveniência** com o mesmo tempo que sempre assumiram: lido ao envio, resultado disponível 150 min depois. Não muda nenhuma asserção, como a PR 1 fez com `in_roi` e a PR 2 com `games`/`match_id`.
-- **`scripts/pr2_cutover.py`** (e o ensaio e o teste): fica fixo na sua própria regra (`independent_games_hysteresis_v1`), para nunca aceitar relatórios de regras posteriores.
+**Testes existentes preservados.** As asserções ficam iguais. As únicas alterações são de fixtures ou de regras próprias da PR 3:
+- **`CorrectedBarIsRetroactive` → `CorrectedBarIsChronological`:** era a limitação da PR 2, agora corrigida.
+- **Fixtures do walk-forward:** declaram a proveniência com o tempo de sempre.
+- **Fixtures do Telegram** (`test_notify_migration.eligible_report` e `test_scangoal.Notify`): declaram `validation` com o certificado das táticas "forte" que já usavam. Sem isso, a proteção nova trata-as, corretamente, como promissoras.
+- **`scripts/pr2_cutover.py`:** fica fixo na regra da PR 2.
 
 ## 9. Telegram: marcador e corte
 
-- **Regra nova:** `brain.status_rules = chronological_prospective_v1`. O mecanismo existente (`notify.migration_key`) dá-lhe a chave `status_rules:chronological_prospective_v1`, por isso o primeiro relatório PR 3 faz **uma** reposição silenciosa da referência. `eligible_statuses_v1`, `status_rules:independent_games_hysteresis_v1` e o histórico de entregas ficam intactos (teste e ensaio).
+- **Regra nova:** `brain.status_rules = chronological_eprocess_v1`. O mecanismo existente (`notify.migration_key`) dá-lhe a chave `status_rules:chronological_eprocess_v1`, por isso o primeiro relatório PR 3 faz **uma** reposição silenciosa da referência. `eligible_statuses_v1`, `status_rules:independent_games_hysteresis_v1` e o histórico de entregas ficam intactos (teste e ensaio).
 - **Ensaio** sobre o `notify_state.json` real, só com `messages()` em memória: 0 avisos de estado com a migração, contra 2 sem ela ("voltou a em observação").
+- **Proteção fail-closed nova:** `notify.eligible_statuses` e os alertas só reconhecem validadas com o certificado do método aceite (secção 0).
 - **Não executado.** Como na PR 2, a integração exige corte controlado: pausa, corte e merge. Uma execução com código da PR 2 que corra depois do primeiro relatório PR 3 gravaria estados da PR 2 sob uma referência já migrada, e a seguinte anunciaria essas diferenças. O script de corte da PR 3 (variante de `scripts/pr2_cutover.py` com a chave nova) **não foi criado**: fica para depois da aprovação da metodologia.
 
 ## 10. Limitações e riscos residuais
 
 1. **Pré-recolha:** decisões anteriores a 12/11 09:34 são irreconstituíveis. As margens de 5/15 min são limites dos timeouts, não medições por mensagem.
-2. **Família crescente:** controlo por instante, não global (secção 4).
-3. **Aproximação de valor-p:** 1 − cauda posterior com prior Beta(10) não é um valor-p exato. A repartição por olhares é conservadora; um e-processo (*testing by betting*) seria uma alternativa sequencial exata.
+2. **Pressupostos da garantia** (secção 4):
+   - o nulo é condicional ao passado;
+   - a pertença é independente do resultado;
+   - as horas são verdadeiras;
+   - a odd −2 % é atingível.
+   
+   O e-processo não protege contra dados errados nem contra odds piores do que −2 %.
+3. **Ordem de seleção:** a seleção é exploratória e sem correção. Táticas selecionadas mais tarde recebem α muito menor, por isso as primeiras a ser promovidas são favorecidas. É uma escolha de desenho, documentada e não ajustada ao ROI.
 4. **Potência:** a validação fica, na prática, fora de alcance para vantagens realistas. É o comportamento pretendido, mas deve ser comunicado (PR 5).
 5. **Promissora continua sem correção.** O relatório e o dashboard dizem-no, e `multiplicity` mostra a sobreposição. A consolidação dos avisos redundantes fica para a PR 5.
 6. **Fora do âmbito:** o regime (avisos de mudança de comportamento), o quadro e a agenda continuam a usar a evidência atual, que é exploratória. Não decidem estados.
@@ -251,17 +305,21 @@ Os 4 que passam:
 ```bash
 git fetch --unshallow origin    # a verificação git precisa do histórico completo
 git switch --detach <SHA da PR 3>
-python3.11 scripts/test_offline.py                                    # 207 testes
+python3.11 scripts/test_offline.py                                    # 211 testes
 python3.11 -m unittest tests.test_chronological_validity -v
-python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~5 min; data/ tem de ser igual à base
+python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min; data/ tem de ser igual à base
 ```
 
 ## 12. Parecer do autor (não substitui a revisão independente)
 
-- **Técnico: aprovado pelo autor.** Os quatro defeitos A–D estão corrigidos ou expostos. A cronologia é provada e verificada contra o git, e os testes adversariais cobrem cada garantia, com controlo positivo. Não há alterações em produção.
+- **Técnico: aprovado pelo autor**, sujeito a revisão.
+  - P1-A e P1-B estão corrigidos com uma definição única e testes adversariais.
+  - A validação passou a ter nível demonstrado (via 1), com proteção fail-closed no cérebro e no Telegram.
+  - Sem alterações em produção.
 - **Científico: INCONCLUSIVO** quanto a capacidade preditiva:
   - o walk-forward cronológico dá +3,1 % (IC 90 % −11 % a +18 %), instável a escolhas de minutos;
-  - o número de promissoras é compatível com acaso sob a dependência real (11 % das simulações nulas dão tantas ou mais).
+  - o número de promissoras é compatível com acaso sob a dependência real (11 % das simulações nulas dão tantas ou mais);
+  - nenhuma tática certificada.
 - **Cientificamente bloqueado:**
   - a reconstituição de decisões anteriores a 12/11 09:34;
-  - qualquer validação (forte/confirmada) antes de haver ≥ 100 jogos, dos quais ≥ 30 prospetivos, por tática. Hoje: nenhuma validada e nenhuma com 100 jogos (máximo 78); 80 das 143 testadas já têm ≥ 30 jogos prospetivos.
+  - qualquer validação sem certificado. Hoje há 11 táticas selecionadas, nenhuma com 100 jogos (máximo 78) e todas com e-valores entre 0,78 e 1,87, muito abaixo dos limiares (40 a 2 640).
