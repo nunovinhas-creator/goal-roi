@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T16:37:59+00:00",
+ "generated_at_utc": "2026-11-15T16:44:12+00:00",
  "messages": 834,
  "types": {
   "SERVICE": 10,
@@ -39,8 +39,8 @@
   "last_collected_at_utc": "2026-11-15T16:37:49+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
-  "hl_near_misses": 30,
-  "hl_last_run_utc": "2026-11-15T15:09:20+00:00",
+  "hl_near_misses": 31,
+  "hl_last_run_utc": "2026-11-15T16:44:02+00:00",
   "bsd_results": 19,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 11,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T16:37:49+00:00",
+  "collector_last_run_utc": "2026-11-15T16:44:00+00:00",
   "name_review": [
    {
     "bot": [
@@ -125,6 +125,19 @@
      [
       "Bosnia-Herzegovina U19",
       "Georgia U19"
+     ]
+    ],
+    "provider": "HL"
+   },
+   {
+    "bot": [
+     "Burnley Women",
+     "Southampton WFC Women"
+    ],
+    "bsd_candidates": [
+     [
+      "Burnley Women",
+      "Southampton Women"
      ]
     ],
     "provider": "HL"
@@ -424,19 +437,6 @@
      [
       "Ponte Preta",
       "Operário-PR"
-     ]
-    ],
-    "provider": "HL"
-   },
-   {
-    "bot": [
-     "Worksop",
-     "South Shields"
-    ],
-    "bsd_candidates": [
-     [
-      "Worksop Town",
-      "South Shields"
      ]
     ],
     "provider": "HL"
@@ -1203,7 +1203,7 @@
    "vote_misses": 28.0,
    "vote_break_even": 0.4263,
    "games": 47,
-   "no_source": 16,
+   "no_source": 18,
    "unsettleable": 0,
    "hit_rate": 0.4043,
    "ci95": [
@@ -1255,7 +1255,7 @@
    "by_bot_mark": 0,
    "per_day": 3.8,
    "days_to_hint": 4,
-   "days_to_conclusion": 74,
+   "days_to_conclusion": 75,
    "prudent_rate": 0.5284,
    "prob_above": 0.532,
    "edge": 0.0073,
@@ -1277,7 +1277,7 @@
    "vote_misses": 2.0,
    "vote_break_even": null,
    "games": 3,
-   "no_source": 14,
+   "no_source": 15,
    "unsettleable": 2,
    "hit_rate": 0.3333,
    "ci95": [
@@ -1401,7 +1401,7 @@
    "roi_announced_odds": -0.1447,
    "seen_late": 0,
    "by_bot_mark": 42,
-   "per_day": 23.2,
+   "per_day": 23.1,
    "days_to_hint": 0,
    "days_to_conclusion": 10,
    "prudent_rate": 0.4407,
@@ -1512,7 +1512,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 23.9,
+   "per_day": 23.8,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.8101,
@@ -1551,7 +1551,7 @@
    "by_bot_mark": 0,
    "per_day": 1.8,
    "days_to_hint": 13,
-   "days_to_conclusion": 165,
+   "days_to_conclusion": 166,
    "prudent_rate": 0.4727,
    "prob_above": 0.3201,
    "edge": -0.0572,
@@ -5059,162 +5059,6 @@
      "bad_total": 1
     },
     {
-     "match_id": "ud-logrones-vs-arenas-club-de-getxo-20261115",
-     "match": "UD Logrones — Arenas Club de Getxo",
-     "league": "Spanish Spain Primera Division RFEF",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-15T16:12:36+00:00",
-     "minute": 40,
-     "score_at_signal": [
-      0,
-      1
-     ],
-     "market": "Asian Total",
-     "selection": "Over 2",
-     "odds": 1.68,
-     "odds_last": 1.68,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 61,
-     "good": [
-      {
-       "id": "Jogo aberto | Competição = liga & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 1 golo",
-       "conditions": [
-        [
-         "Competição",
-         "liga"
-        ],
-        [
-         "Golos em falta para ganhar",
-         "até 1 golo"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 1 golo"
-        ]
-       ],
-       "n": 10,
-       "games": 10,
-       "hits": 8,
-       "break_even": 0.5736,
-       "prob_above": 0.8409,
-       "roi": 0.2625,
-       "edge": 0.1051,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-       "conditions": [
-        [
-         "Golos em falta para ganhar",
-         "até 1 golo"
-        ]
-       ],
-       "n": 59,
-       "games": 59,
-       "hits": 38,
-       "break_even": 0.5713,
-       "prob_above": 0.8407,
-       "roi": 0.1112,
-       "edge": 0.0588,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Parte do jogo = 1.ª parte",
-       "conditions": [
-        [
-         "Competição",
-         "liga"
-        ],
-        [
-         "Golos até ao sinal",
-         "1 ou 2"
-        ],
-        [
-         "Parte do jogo",
-         "1.ª parte"
-        ]
-       ],
-       "n": 12,
-       "games": 12,
-       "hits": 8,
-       "break_even": 0.4825,
-       "prob_above": 0.8308,
-       "roi": 0.4236,
-       "edge": 0.1005,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 7,
-     "bad": [
-      {
-       "id": "Jogo aberto | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais",
-       "conditions": [
-        [
-         "Competição",
-         "liga"
-        ],
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "90 ou mais"
-        ]
-       ],
-       "n": 11,
-       "games": 11,
-       "hits": 4,
-       "break_even": 0.5668,
-       "prob_above": 0.1639,
-       "roi": -0.2329,
-       "edge": -0.1064,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 1.ª parte & Ritmo indicado pelo bot = 90 ou mais",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Parte do jogo",
-         "1.ª parte"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "90 ou mais"
-        ]
-       ],
-       "n": 9,
-       "games": 9,
-       "hits": 3,
-       "break_even": 0.568,
-       "prob_above": 0.1653,
-       "roi": -0.2407,
-       "edge": -0.1112,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 4
-    },
-    {
      "match_id": "finland-vs-san-marino-20261115",
      "match": "Finland — San Marino",
      "league": "UEFA Nations League",
@@ -7748,16 +7592,82 @@
       }
      ],
      "bad_total": 5
+    },
+    {
+     "match_id": "germany-vs-netherlands-20261116",
+     "match": "Germany — Netherlands",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-16T19:45+00:00",
+     "date_utc": "2026-11-14T22:49:12+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1x2",
+     "selection": "Germany",
+     "odds": 1.85,
+     "odds_last": 1.85,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 30,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Mercado = outros mercados",
+       "conditions": [
+        [
+         "Mercado",
+         "outros mercados"
+        ]
+       ],
+       "n": 32,
+       "games": 22,
+       "hits": 11,
+       "break_even": 0.5219,
+       "prob_above": 0.0321,
+       "roi": -0.3491,
+       "edge": -0.1604,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 15,
+       "games": 9,
+       "hits": 4,
+       "break_even": 0.5427,
+       "prob_above": 0.0415,
+       "roi": -0.4935,
+       "edge": -0.1942,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 27
     }
    ],
    "counts": {
     "favorável": 2,
-    "misto": 4,
+    "misto": 3,
     "sem evidência": 0,
     "contraditório": 22,
     "evitar": 13
    },
-   "generated_utc": "2026-11-15T16:37:58+00:00",
+   "generated_utc": "2026-11-15T16:44:12+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -15426,7 +15336,7 @@
     "vote_misses": 27.0,
     "vote_break_even": 0.4144,
     "games": 43,
-    "no_source": 15,
+    "no_source": 17,
     "unsettleable": 0,
     "hit_rate": 0.3721,
     "ci95": [
@@ -15497,7 +15407,7 @@
     "roi_announced_odds": 0.1133,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 31.2,
+    "per_day": 31.1,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -15526,7 +15436,7 @@
     "roi_announced_odds": -0.1447,
     "seen_late": 0,
     "by_bot_mark": 42,
-    "per_day": 23.2,
+    "per_day": 23.1,
     "days_to_hint": 0,
     "days_to_conclusion": 10
    },
@@ -15615,7 +15525,7 @@
     "by_bot_mark": 0,
     "per_day": 1.8,
     "days_to_hint": 13,
-    "days_to_conclusion": 165
+    "days_to_conclusion": 166
    }
   },
   "regime": [
@@ -17041,7 +16951,7 @@
    "league": "Japanese J-League 3",
    "date_utc": "2026-11-15T06:41:10+00:00",
    "kickoff_utc": null,
-   "why": "à espera da fonte de resultados",
+   "why": "as fontes não cobrem este jogo",
    "signals": 1
   },
   {
@@ -17050,7 +16960,7 @@
    "league": "Japanese J-League 3",
    "date_utc": "2026-11-15T06:32:36+00:00",
    "kickoff_utc": null,
-   "why": "à espera da fonte de resultados",
+   "why": "as fontes não cobrem este jogo",
    "signals": 1
   },
   {
@@ -17059,7 +16969,7 @@
    "league": "Hong Kong Division 2",
    "date_utc": "2026-11-15T05:52:36+00:00",
    "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
+   "why": "as fontes não cobrem este jogo",
    "signals": 1
   },
   {
