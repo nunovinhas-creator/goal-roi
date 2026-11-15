@@ -42,7 +42,7 @@ def pr1_report():
 
 def pr2_report(statuses=None, **brain_extra):
     rep = {'generated_at_utc': NOW.isoformat(),
-           'brain': dict({'evidence_scope': 'eligible_bets_only', 'status_rules': brain.STATUS_RULES, 'hypotheses': 30, 'tested': 20,
+           'brain': dict({'evidence_scope': 'eligible_bets_only', 'status_rules': cut.PR2_RULES, 'hypotheses': 30, 'tested': 20,
                           'status_list': dict(PR2_STATUSES if statuses is None else statuses), 'counts': {'promissora': 13},
                           'exploratory': {'counts': {'promissora': 48}}, 'eligibility': {'eligible': 10, 'total': 12},
                           'walk_forward': {'followed': {}, 'skipped': {}}, 'watch': []}, **brain_extra),

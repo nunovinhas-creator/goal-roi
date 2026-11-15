@@ -70,6 +70,17 @@ def evidence(hits, misses, break_even):
     return {'prudent_rate': round(a / (a + b), 4), 'prob_above': round(1.0 - beta_cdf(break_even, a, b), 4)}
 
 
+def tail_below(hits, misses, break_even):
+    """Probabilidade posterior, NÃO arredondada, de a taxa estar abaixo da necessária (o complemento de prob_above).
+
+    Para comparar com fasquias muito exigentes (PR 3): prob_above vem arredondado a 4 casas e 0,99995 já aparece como 1.
+    """
+    if break_even is None or not 0 < break_even < 1:
+        return None
+    a, b = break_even * PRIOR_WEIGHT + hits, (1 - break_even) * PRIOR_WEIGHT + misses
+    return beta_cdf(break_even, a, b)
+
+
 def beta_ppf(q, a, b):
     """Quantil da distribuição Beta, por bisseção."""
     lo, hi = 0.0, 1.0

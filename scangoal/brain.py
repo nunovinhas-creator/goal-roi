@@ -17,13 +17,23 @@ Disciplina (fixada a 12/11/2026):
 - "Acrescenta ao tipo" (prob_adds): probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo.
   Só informa; não muda o estado.
 - "Seguir o cérebro" (walk_forward): cada aposta é decidida só com os resultados que já se conheciam nesse momento.
+- Validade cronológica (15/11/2026, PR 3, regras chronological_prospective_v1; ver audits/pr3-chronological-validity.md):
+  * um resultado só é conhecido a partir da primeira observação PROVADA pelo sistema (chronology.result_known), nunca por uma
+    aproximação; sem prova, só conta "agora", depois de todos os provados;
+  * uma hipótese não toma decisões antes de existir: a evidência anterior ao registo (born_utc) junta-se num único passo
+    "no registo"; sem born_utc válido não há estados;
+  * fasquia corrigida cronológica: em cada passo usa-se 1 − α/m(t), com m(t) = hipóteses registadas que já tinham 30 jogos
+    conhecidos nesse instante. Hipóteses acrescentadas depois não reescrevem decisões anteriores. Bonferroni não assume
+    independência entre hipóteses (é válido sob qualquer dependência; com hipóteses sobrepostas é conservador);
+  * forte/confirmada exigem ainda evidência PROSPETIVA: >= 30 jogos cujo sinal o sistema leu depois do registo, com
+    prob. >= 95 % (manter: >= 90 %). Evidência histórica, mesmo corrigida, é exploratória: não demonstra capacidade preditiva.
 - Características que só se conhecem depois do primeiro sinal (reforço, movimento da odd...) tornam a hipótese
   "informativa": explica, mas não dá para apostar no momento do sinal, e não entra na lista "a seguir".
 """
-import itertools, json
-from datetime import datetime, timedelta, timezone
+import hashlib, itertools, json
+from datetime import datetime, timezone
 
-from . import insights
+from . import chronology, insights
 from .parser import competition_kind
 from .eligibility import eligible, exclusion_reasons, game_identity
 
@@ -31,9 +41,11 @@ MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser regist
 MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo não tem limite de tamanho
 HINT_AT, STRONG_AT = 30, 100                       # jogos independentes
 BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de jogos e limiares de probabilidade
-KNOWN_AFTER_MIN = 150    # um resultado considera-se conhecido 150 minutos depois do início do jogo (ou do sinal, se for ao vivo)
 TRACK_MIN = 10           # jogos para uma hipótese entrar no balanço das propostas
-STATUS_RULES = 'independent_games_hysteresis_v1'   # muda quando as regras de estado mudam (migração silenciosa no Telegram)
+STATUS_RULES = 'chronological_prospective_v1'     # muda quando as regras de estado mudam (migração silenciosa no Telegram)
+FWER_ALPHA = 0.05        # erro de família (Bonferroni cronológico) para forte/confirmada
+VALIDATED = ('forte', 'confirmada')
+PROSPECTIVE_MIN = HINT_AT   # jogos prospetivos (sinal lido depois do registo) exigidos a uma tática validada
 PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / manter-se (histerese: o dobro do erro admitido)
 ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
 CONFIRM_STEPS = 2        # jogos seguidos em que a nova condição se tem de manter para o estado mudar
@@ -126,18 +138,52 @@ def update_registry(signals, registry, now=None):
     return added
 
 
-def status_of(n, prob, corrected_bar, min_settled):
-    """Estado pelos limiares de entrada, sem memória (n = jogos independentes). É o alvo a partir de "em observação"."""
+def look_share(games):
+    """Parte de α gasta no olhar com `games` jogos: STRONG_AT/(n(n+1)). Soma 1 sobre n >= STRONG_AT (série telescópica).
+
+    O estado é reavaliado a cada jogo novo (olhares repetidos). Sem esta repartição, uma hipótese sem vantagem atravessa a
+    fasquia de um só olhar muito mais vezes do que α (demonstrado em tests/test_chronological_validity.py, Scenarios).
+    """
+    n = max(games, STRONG_AT)
+    return STRONG_AT / (n * (n + 1))
+
+
+def corrected_bar(tested, games=STRONG_AT):
+    """Fasquia das validadas: Bonferroni sobre `tested` hipóteses E sobre os olhares (union bound, qualquer dependência)."""
+    return 1 - FWER_ALPHA * look_share(games) / max(1, tested)
+
+
+def prospective_ok(state, prospective):
+    """Condição prospetiva de uma tática validada. prospective=None: sem porta (só chamadas diretas à máquina de estados)."""
+    if prospective is None:
+        return True
+    games, prob = prospective
+    keep = state in VALIDATED
+    return games >= PROSPECTIVE_MIN and prob is not None and prob >= (KEEP_PROMISING if keep else PROMOTE_AT)
+
+
+def passes_bar(prob, tail, bar, keep=False):
+    """prob/tail contra a fasquia (keep: o dobro do erro admitido). Com a cauda não arredondada quando existe."""
+    allowed = (1 - bar) * (2 if keep else 1)
+    return tail <= allowed if tail is not None else prob >= 1 - allowed
+
+
+def status_of(n, prob, corrected_bar, min_settled, prospective=None, tail=None):
+    """Estado pelos limiares de entrada, sem memória (n = jogos independentes). É o alvo a partir de "em observação".
+
+    prospective = (jogos prospetivos, prob. prospetiva): forte/confirmada exigem-na (ver prospective_ok).
+    tail = cauda posterior não arredondada (insights.tail_below), usada contra a fasquia das validadas.
+    """
     if prob is None or n < HINT_AT:
         return 'em observação'
     if prob <= ABANDON_AT:
         return 'abandonada'
-    if n >= STRONG_AT and prob >= corrected_bar:
+    if n >= STRONG_AT and passes_bar(prob, tail, corrected_bar) and prospective_ok('em observação', prospective):
         return 'confirmada' if n >= min_settled else 'forte'
     return 'promissora' if prob >= PROMOTE_AT else 'em observação'
 
 
-def next_status(state, games, prob, corrected_bar, min_settled):
+def next_status(state, games, prob, corrected_bar, min_settled, prospective=None, tail=None):
     """Estado-alvo dado o estado atual (histerese): entrar exige o limiar de entrada; manter-se, só o limiar de saída."""
     if prob is None or games < HINT_AT:
         return 'em observação'
@@ -145,49 +191,161 @@ def next_status(state, games, prob, corrected_bar, min_settled):
         return 'abandonada'
     if prob <= ABANDON_AT:
         return 'abandonada'
-    keep_bar = 1 - 2 * (1 - corrected_bar)
-    if games >= STRONG_AT and prob >= (keep_bar if state in ('forte', 'confirmada') else corrected_bar):
+    if games >= STRONG_AT and passes_bar(prob, tail, corrected_bar, keep=state in VALIDATED) and prospective_ok(state, prospective):
         return 'confirmada' if games >= min_settled else 'forte'
     if prob >= (KEEP_PROMISING if state in ('promissora', 'forte', 'confirmada') else PROMOTE_AT):
         return 'promissora'
     return 'em observação'
 
 
-def game_steps(match):
-    """Evidência acumulada jogo a jogo, pela ordem em que os resultados ficaram conhecidos (known_at): [(jogos, prob_above, hora)].
+_LAST = datetime.max.replace(tzinfo=timezone.utc)
 
-    Só devolve os passos a partir de HINT_AT jogos: antes disso o estado é sempre "em observação".
+
+def ordered_games(match):
+    """Jogos com resultado decidido, pela ordem em que o sistema PROVADAMENTE os conheceu: [(conhecido, jogo, sinais)].
+
+    Um jogo fica conhecido quando todas as suas apostas o estão (o último resultado). Sem hora provada (desconhecida ou
+    contraditória) o jogo vai para o fim, com conhecido = None ("agora"). Empates na mesma hora: pela hora do jogo (o primeiro
+    sinal) e depois pela identidade. A ordem física dos dados nunca conta. Fail-closed: sem jogo comprovável não há observação.
     """
     games = {}
     for b in match:
         key = game_identity(b)
-        if b['w'] is not None and b['w'] != 0 and key is not None:   # fail-closed: no proven game, no observation
+        if b['w'] is not None and b['w'] != 0 and key is not None:
             games.setdefault(key, []).append(b)
-    order = sorted(games.items(), key=lambda kv: (max(known_at(b) for b in kv[1]), kv[0]))
-    votes, out = insights.Votes(), []
-    for k, (_, rows) in enumerate(order, 1):
+    out = []
+    for key, rows in games.items():
+        times = [chronology.result_known(b) for b in rows]
+        known = None if any(t is None for t in times) else max(times)
+        first = min((chronology.signal_time(b) or _LAST) for b in rows)
+        out.append((known, first, key, rows))
+    out.sort(key=lambda g: (g[0] or _LAST, g[0] is None, g[1], g[2]))
+    return [(known, key, rows) for known, _, key, rows in out]
+
+
+def game_ids(match):
+    return {game_identity(b) for b in match if b['w'] is not None and b['w'] != 0 and game_identity(b) is not None}
+
+
+def game_set(match):
+    """Impressão digital do conjunto de jogos com resultado decidido (hipóteses com o mesmo conjunto são a mesma evidência)."""
+    ids = sorted(game_ids(match))
+    return hashlib.sha256('\n'.join(ids).encode('utf-8')).hexdigest()[:16] if ids else None
+
+
+def prospective_game(rows, born):
+    """Jogo prospetivo para uma hipótese: todos os seus sinais foram lidos pelo sistema DEPOIS do registo."""
+    if born is None:
+        return False
+    for b in rows:
+        t = chronology.decision_time(b)
+        if t is None or t <= born:
+            return False
+    return True
+
+
+def prospective_summary(match, born):
+    """Evidência PROSPETIVA de uma hipótese: só sinais que o sistema leu depois do registo (None sem registo válido).
+
+    Jogos, acertos e a mesma evidência (um voto por jogo); a prob. só a partir de BOARD_MIN jogos, para poupar tempo.
+    """
+    if born is None:
+        return None
+    rows = [b for b in match if prospective_game([b], born)]
+    v = insights.Votes()
+    for b in rows:
+        v.add(b)
+    h, m, be, n = v.totals()
+    done = [b for b in rows if b['w'] is not None]
+    pls = [(b['w'] * (b['odds'] - 1) if b['w'] > 0 else b['w']) for b in done if b['odds']]
+    return {'signals': len(rows), 'games': n, 'hits': round(h, 2), 'misses': round(m, 2),
+            'prob_above': insights.evidence(h, m, be)['prob_above'] if n >= BOARD_MIN else None,
+            'roi': round(sum(pls) / len(pls), 4) if pls else None}
+
+
+def game_steps(match, born=None, *, prospective_from=None):
+    """Evidência acumulada jogo a jogo, pela ordem provada em que os resultados ficaram conhecidos.
+
+    -> [(jogos, prob_above, hora ISO ou None, extra)], só a partir de HINT_AT jogos (antes disso: "em observação").
+    born: registo da hipótese. Os passos anteriores juntam-se num só passo "no registo" (a hipótese não decidia antes de
+    existir). extra = {'at': datetime ou None, 'prospective': (jogos, prob) dos jogos lidos depois de prospective_from}.
+    """
+    votes, pro, raw = insights.Votes(), insights.Votes(), []
+    for k, (known, _, rows) in enumerate(ordered_games(match), 1):
         for b in rows:
             votes.add(b)
+            if prospective_from is not None and prospective_game(rows, prospective_from):
+                pro.add(b)
         if k >= HINT_AT:
             h, m, be, n = votes.totals()
-            out.append((n, insights.evidence(h, m, be)['prob_above'], max(known_at(b) for b in rows).isoformat()))
-    return out
+            pn, pp = len(pro.m), None
+            if n >= STRONG_AT and pn >= PROSPECTIVE_MIN:   # a porta prospetiva só interessa às validadas
+                ph, pm, pbe, pn = pro.totals()
+                pp = insights.evidence(ph, pm, pbe)['prob_above']
+            tail = insights.tail_below(h, m, be) if n >= STRONG_AT else None
+            raw.append([n, insights.evidence(h, m, be)['prob_above'], known, (pn, pp), tail])
+    if born is not None:
+        early = [s for s in raw if s[2] is not None and s[2] < born]
+        if early:
+            rest = [s for s in raw if s[2] is None or s[2] >= born]
+            early[-1][2] = born          # a evidência disponível no registo, como um só passo
+            raw = early[-1:] + rest
+    return [(n, p, chronology.iso(at), {'at': at, 'prospective': pro_, 'tail': tail}) for n, p, at, pro_, tail in raw]
 
 
 def stable_status(steps, corrected_bar, min_settled):
-    """Máquina de estados com histerese e confirmação. -> (estado, estado pendente ou None, mudanças)."""
+    """Máquina de estados com histerese e confirmação. -> (estado, estado pendente ou None, mudanças).
+
+    corrected_bar: número (fasquia fixa) ou função hora -> (fasquia, hipóteses testadas), avaliada em cada passo: a fasquia
+    de uma decisão é a que existia nesse instante e fica registada na mudança. Passos com extra['prospective'] aplicam a
+    porta prospetiva às validadas.
+    """
     state, pending, run, changes = 'em observação', None, 0, []
-    for games, prob, when in steps:
-        target = next_status(state, games, prob, corrected_bar, min_settled)
+    for step in steps:
+        games, prob, when = step[:3]
+        extra = step[3] if len(step) > 3 else {}
+        if callable(corrected_bar):
+            tested = corrected_bar(extra.get('at'))[1]
+            bar = globals()['corrected_bar'](tested, games)
+        else:
+            bar, tested = corrected_bar, None
+        pro = extra.get('prospective')
+        target = next_status(state, games, prob, bar, min_settled, pro, extra.get('tail'))
         if target == state:
             pending, run = None, 0
             continue
         run = run + 1 if target == pending else 1
         pending = target
         if run >= CONFIRM_STEPS:
-            changes.append({'games': games, 'from': state, 'to': target, 'prob_above': prob, 'known_utc': when})
+            change = {'games': games, 'from': state, 'to': target, 'prob_above': prob, 'known_utc': when}
+            if callable(corrected_bar):
+                change.update(bar=round(bar, 6), tested=tested)
+            if pro is not None:
+                change.update(prospective_games=pro[0], prospective_prob=pro[1])
+            changes.append(change)
             state, pending, run = target, None, 0
     return state, pending, changes
+
+
+def family_timeline(entries):
+    """entries: hora em que cada hipótese entrou na família testada (None = só "agora"). -> função hora -> (fasquia, m)."""
+    known = sorted(t for t in entries if t is not None)
+    total = len(entries)
+
+    def at(t):
+        if t is None:
+            m = total
+        else:
+            lo, hi = 0, len(known)
+            while lo < hi:
+                mid = (lo + hi) // 2
+                if known[mid] <= t:
+                    lo = mid + 1
+                else:
+                    hi = mid
+            m = lo
+        return corrected_bar(m), m
+    return at
 
 
 def evaluate(signals, registry, min_settled, *, exploratory=False):
@@ -195,26 +353,57 @@ def evaluate(signals, registry, min_settled, *, exploratory=False):
         signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
     have = [(b, insights.family(b), set(atoms(b, multi, earlier))) for b in signals]
-    rows, matched = [], {}
-    for hid, h in registry.items():
+    rows, matched, born_of = [], {}, {}
+    for hid in sorted(registry):
+        h = registry[hid]
         conds = {tuple(c) for c in h['conditions']}
-        pool = [(b, at) for b, fam, at in have if fam == h['family'] and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
+        born = chronology.born(h)
+        born_of[hid] = born
+        gen = h.get('source') == 'gerador'
+        # Propostas de quem já viu resultados (llm/manual) só contam sinais posteriores ao registo; sem registo válido, nenhum.
+        pool = [(b, at) for b, fam, at in have if fam == h['family'] and (gen or (born is not None and (chronology.signal_time(b) or born) > born))]
         match = [b for b, at in pool if conds <= at]
         s = insights.summarize(match)
         s['prob_adds'] = insights.prob_better(match, [b for b, at in pool if not conds <= at]) if conds else None
         if s['games'] >= HINT_AT:
             matched[hid] = match
-        rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
-                         tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')]))
-    tested = len(matched)
-    bar = 1 - 0.05 / max(1, tested)
+        row = dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h.get('born_utc'), reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
+                   tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')], born_verified=born is not None,
+                   game_set=None if exploratory else game_set(match), _games=None if exploratory else game_ids(match))
+        if not exploratory:
+            row['prospective'] = prospective_summary(match, born)
+            row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if row['prospective']['games'] >= PROSPECTIVE_MIN else 'exploratória')
+        rows.append(row)
+    # Família testada, no tempo: cada hipótese entra quando está registada E tem HINT_AT jogos provadamente conhecidos.
+    ordered = {hid: ordered_games(m) for hid, m in matched.items()}
+    entries = []
+    for hid, games in ordered.items():
+        t30, born = games[HINT_AT - 1][0], born_of[hid]
+        entries.append(None if t30 is None or born is None else max(t30, born))
+    timeline = family_timeline(entries)
+    bar, tested = timeline(None)
     for r in rows:
         r['status'], r['pending_status'], r['status_changes'] = 'em observação', None, []
-        if r['id'] in matched:
-            r['status'], r['pending_status'], r['status_changes'] = stable_status(game_steps(matched[r['id']]), bar, min_settled)
+        born = born_of[r['id']]
+        tail = None
+        if r['id'] in matched and born is not None:   # sem registo válido: nunca toma decisões (fail-closed)
+            steps = game_steps(matched[r['id']], born, prospective_from=born)
+            r['status'], r['pending_status'], r['status_changes'] = stable_status(steps, timeline, min_settled)
+            tail = steps[-1][3]['tail'] if steps else None
+        if not exploratory and r['id'] in matched:
+            before = [g for g in ordered[r['id']] if g[0] is not None and born is not None and g[0] < born]
+            v = insights.Votes()
+            for _, _, gr in before:
+                for b in gr:
+                    v.add(b)
+            h, m, be, n = v.totals()
+            r['at_birth'] = {'games': n, 'prob_above': insights.evidence(h, m, be)['prob_above'] if n else None}
+            r['result_time_unknown'] = sum(1 for g in ordered[r['id']] if g[0] is None)
         # Transparency: the status the entry thresholds alone would give now. Different from `status` when the status is held
         # by hysteresis (inside the keep band) or a change is still waiting for confirmation (`pending_status`).
-        r['entry_status'] = status_of(r['games'], r['prob_above'], bar, min_settled)
+        pro = r.get('prospective')
+        r['entry_status'] = status_of(r['games'], r['prob_above'], corrected_bar(tested, r['games']), min_settled,
+                                      (pro['games'], pro['prob_above']) if pro else (0, None), tail) if born is not None else 'em observação'
     return rows, tested, bar
 
 
@@ -343,6 +532,30 @@ def agenda(rows, signals, now=None):
             'rules': {'min_results': BOARD_MIN, 'good': BOARD_GOOD, 'bad': BOARD_BAD, 'live_max_min': AGENDA_LIVE_MIN, 'hint_at': HINT_AT, 'strong_at': STRONG_AT}}
 
 
+def multiplicity(rows, tested, bar):
+    """Testes múltiplos sob dependência: o que a fasquia controla e quanta evidência distinta existe por trás dos estados.
+
+    Bonferroni (1 − α/m) controla o erro de família para QUALQUER dependência entre hipóteses (desigualdade da união): não
+    assume independência e, com hipóteses sobrepostas, é conservador. O inverso não vale para as promissoras (sem correção):
+    hipóteses sobre os mesmos jogos sobem e descem juntas, por isso N promissoras não são N descobertas. distinct_game_sets
+    conta conjuntos de jogos diferentes; as hipóteses com o mesmo conjunto são a mesma evidência.
+    """
+    tested_rows = [r for r in rows if r['games'] >= HINT_AT]
+    sets = lambda rs: len({r['game_set'] for r in rs})
+    good = [r for r in tested_rows if r['status'] in ('promissora', 'forte', 'confirmada')]
+    return {'method': 'bonferroni_chronological', 'alpha': FWER_ALPHA, 'valid_under_dependence': True,
+            'family': 'registered hypotheses with >= %d independent games known at each instant' % HINT_AT,
+            'tested_now': tested, 'bar_now': round(bar, 6),
+            'distinct_game_sets_tested': sets(tested_rows), 'distinct_game_sets_promising_or_better': sets(good),
+            'promising_or_better': len(good),
+            'promising_sum_games': sum(r['games'] for r in good),
+            'promising_union_games': len(set().union(*(r.get('_games') or set() for r in good))) if good else 0,
+            'validated_requires': {'games': STRONG_AT, 'bar': 'corrected at the decision instant', 'prospective_games': PROSPECTIVE_MIN,
+                                   'prospective_prob': PROMOTE_AT, 'prospective_keep': KEEP_PROMISING},
+            'evidence_levels': {lvl: sum(1 for r in tested_rows if r.get('evidence_level') == lvl) for lvl in ('exploratória', 'prospetiva', 'não verificável')},
+            'note': 'promissora is uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)'}
+
+
 def build(signals, registry, min_settled):
     all_signals = signals
     signals = [b for b in all_signals if eligible(b)]
@@ -373,17 +586,20 @@ def build(signals, registry, min_settled):
             w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'games': r['games'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even')})
+    mult = multiplicity(rows, tested, bar)
     for r in rows:
         r['open'] = len(r['open'])
+        r.pop('_games', None)
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
     return {'evidence_scope': 'eligible_bets_only', 'status_rules': STATUS_RULES,
             'eligibility': {'total': len(all_signals), 'eligible': len(signals), 'excluded': len(all_signals) - len(signals), 'reasons': excluded},
             'exploratory': {'scope': 'all_signals_not_for_recommendations', 'counts': exploratory_counts,
                             'hypotheses': [{k: r[k] for k in ('id', 'n', 'games', 'roi', 'status')} for r in sorted(exploratory_rows, key=lambda r: (-r['n'], r['id']))[:150]]},
             'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
-            'track': track_record(rows), 'walk_forward': walk_forward(signals, registry),
+            'track': track_record(rows), 'walk_forward': walk_forward(signals, registry), 'multiplicity': mult,
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
-                                                                                                    'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status')}
+                                                                                                    'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status',
+                                                                                                    'born_utc', 'born_verified', 'evidence_level', 'prospective', 'at_birth', 'result_time_unknown', 'game_set')}
                     | {'status_changes': len(r['status_changes']), 'last_change': r['status_changes'][-1] if r['status_changes'] else None}
                     for r in rows if r['n'] >= 5][:150],
             'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
@@ -393,7 +609,10 @@ def build(signals, registry, min_settled):
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
             'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled,
                       'unit': 'independent_games', 'status_rules': STATUS_RULES, 'promote_at': PROMOTE_AT, 'keep_promising': KEEP_PROMISING,
-                      'abandon_at': ABANDON_AT, 'keep_abandoned': KEEP_ABANDONED, 'confirm_steps': CONFIRM_STEPS}}
+                      'abandon_at': ABANDON_AT, 'keep_abandoned': KEEP_ABANDONED, 'confirm_steps': CONFIRM_STEPS,
+                      'fwer_alpha': FWER_ALPHA, 'corrected_bar': 'chronological', 'prospective_min': PROSPECTIVE_MIN,
+                      'result_time': 'first_observation_by_the_system', 'observation_margin_min': chronology.OBSERVATION_MARGIN_MIN,
+                      'decisions_from': 'born_utc'}}
 
 
 def track_record(rows):
@@ -421,44 +640,62 @@ def track_record(rows):
 
 
 def known_at(b):
-    """Momento a partir do qual o resultado de um sinal se considera conhecido."""
-    ref = datetime.fromisoformat(b['date_utc'])
-    if b.get('kickoff_utc'):
-        ko = datetime.fromisoformat(b['kickoff_utc'])
-        ref = max(ref, ko if ko.tzinfo else ko.replace(tzinfo=timezone.utc))
-    return ref + timedelta(minutes=KNOWN_AFTER_MIN)
+    """Momento PROVADO a partir do qual o resultado de um sinal estava disponível ao sistema, ou None (desconhecido).
+
+    PR 3: substitui a aproximação de 150 minutos depois do início, que usou resultados antes de o sistema os ter.
+    """
+    return chronology.result_known(b)
 
 
 def walk_forward(signals, registry):
-    """E se tivesse seguido o quadro em destaque desde o início? Sem olhar para o futuro.
+    """E se tivesse seguido o quadro em destaque? Só decisões que o sistema podia ter tomado, só com o que sabia nesse momento.
 
-    Para cada sinal com odd e origem provada, por ordem: segue-se o sinal se, só com os resultados já conhecidos nesse momento,
-    alguma tática apostável tinha pelo menos BOARD_MIN resultados e probabilidade >= BOARD_GOOD (a regra do quadro).
+    Para cada sinal com odd e origem provada, pela hora da decisão (quando o sistema leu o sinal):
+    - decisão reconstituível só se o sinal foi lido enquanto ainda dava para apostar (chronology.decidable); os restantes
+      (por exemplo, a recolha inicial de 12/11, que leu mensagens de dias anteriores) contam como "não reconstituíveis";
+    - só resultados com hora de observação provada e anterior à decisão; sem hora provada, nunca;
+    - só hipóteses já registadas nessa altura (born_utc <= decisão); sem born_utc válido, nunca. As do modelo de linguagem
+      ou manuais só usam resultados de sinais posteriores ao seu registo;
+    - segue-se o sinal se alguma tática apostável tinha pelo menos BOARD_MIN jogos e probabilidade >= BOARD_GOOD.
     Compara os sinais seguidos com os não seguidos: se o cérebro acrescenta alguma coisa, os seguidos têm de render mais.
     """
     signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
-    hyps = [(hid, h['family'], {tuple(c) for c in h['conditions']}, None if h.get('source') == 'gerador' else h['born_utc'])
-            for hid, h in registry.items() if h['conditions'] and not any(c[0] in POST for c in h['conditions'])]
+    hyps, invalid_birth = [], 0
+    for hid in sorted(registry):
+        h = registry[hid]
+        if not h.get('conditions') or any(c[0] in POST for c in h['conditions']):
+            continue
+        born = chronology.born(h)
+        if born is None:
+            invalid_birth += 1
+            continue
+        hyps.append((hid, h['family'], {tuple(c) for c in h['conditions']}, born, h.get('source') == 'gerador'))
     fits = {}
     for b in signals:
         fam, at = insights.family(b), set(atoms(b, multi, earlier))
-        fits[id(b)] = [i for i, (_, f, conds, born) in enumerate(hyps) if f == fam and conds <= at and (born is None or b['date_utc'] > born)]
-    results = sorted((b for b in signals if b['w'] is not None and b['w'] != 0), key=known_at)
-    votes, counts, pos = [insights.Votes() for _ in hyps], [0] * len(hyps), 0
-    sides = {True: [], False: []}
-    for b in sorted(signals, key=lambda b: b['date_utc']):
-        if not b.get('odds') or b.get('market') is None or not eligible(b):
+        fits[id(b)] = [i for i, (_, f, conds, _, _) in enumerate(hyps) if f == fam and conds <= at]
+    settled = [b for b in signals if b['w'] is not None and b['w'] != 0]
+    timed = sorted(((known_at(b), b) for b in settled if known_at(b) is not None),
+                   key=lambda kb: (kb[0], chronology.signal_time(kb[1]), str(kb[1].get('key'))))
+    votes, pos = [insights.Votes() for _ in hyps], 0
+    sides, unknown = {True: [], False: []}, []
+    order = sorted((b for b in signals if b.get('odds') and b.get('market') is not None),
+                   key=lambda b: (chronology.decision_time(b) or chronology.signal_time(b), chronology.signal_time(b), str(b.get('key'))))
+    for b in order:
+        if not chronology.decidable(b):
+            unknown.append(b)
             continue
-        when = datetime.fromisoformat(b['date_utc'])
-        while pos < len(results) and known_at(results[pos]) <= when:
-            for i in fits[id(results[pos])]:
-                votes[i].add(results[pos])
-                counts[i] += 1
+        when = chronology.decision_time(b)
+        while pos < len(timed) and timed[pos][0] <= when:
+            r = timed[pos][1]
+            for i in fits[id(r)]:
+                if hyps[i][4] or chronology.signal_time(r) > hyps[i][3]:
+                    votes[i].add(r)
             pos += 1
         follow = False
         for i in fits[id(b)]:
-            if counts[i] >= BOARD_MIN:                       # filtro barato: menos sinais do que BOARD_MIN implica menos jogos
+            if hyps[i][3] <= when and len(votes[i].m) >= BOARD_MIN:
                 h, m, be, games = votes[i].totals()
                 if games >= BOARD_MIN and (insights.evidence(h, m, be)['prob_above'] or 0) >= BOARD_GOOD:
                     follow = True
@@ -478,10 +715,18 @@ def walk_forward(signals, registry):
         if b['w'] is not None:
             total += b['w'] * (b['odds'] - 1) if b['w'] > 0 else b['w']
             curve.append(round(total, 2))
-    return {'followed': side(sides[True]), 'skipped': side(sides[False]), 'curve': curve[-400:],
+    decided = sides[True] + sides[False]
+    checks = [chronology.result_check(b)[1] for b in settled]
+    return {'followed': side(sides[True]), 'skipped': side(sides[False]), 'not_reconstructible': side(unknown), 'curve': curve[-400:],
             'prob_followed_better': insights.prob_better(sides[True], sides[False]),
             'first_followed_utc': sides[True][0]['date_utc'] if sides[True] else None,
-            'rule': {'min_results': BOARD_MIN, 'unit': 'independent_games', 'min_prob': BOARD_GOOD, 'known_after_min': KNOWN_AFTER_MIN}}
+            'first_decision_utc': chronology.iso(min(chronology.decision_time(b) for b in decided)) if decided else None,
+            'chronology': {'results_verified': checks.count('verified'), 'results_unknown_time': checks.count('unknown'),
+                           'results_contradictory_time': checks.count('contradictory'), 'hypotheses_without_valid_birth': invalid_birth},
+            'rule': {'min_results': BOARD_MIN, 'unit': 'independent_games', 'min_prob': BOARD_GOOD, 'method': 'chronological_v1',
+                     'result_time': 'first_observation_by_the_system', 'observation_margin_min': chronology.OBSERVATION_MARGIN_MIN,
+                     'decision_time': 'signal_read_by_the_system', 'decision_delay_max_min': chronology.DECISION_DELAY_MAX_MIN,
+                     'max_lag_min': chronology.DECISION_MAX_LAG_MIN, 'hypotheses': 'registered_before_the_decision'}}
 
 
 def entry_points(signals):

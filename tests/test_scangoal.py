@@ -948,9 +948,11 @@ class Insights(unittest.TestCase):
 class EvidencePerMatch(unittest.TestCase):
     def row(self, match, w, odds=2.0, day=1, hour=10, typ='OPEN_GAME'):
         d = '2026-11-%02dT%02d:00:00+00:00' % (day, hour)
+        # PR 3 provenance: signal read when sent; result first observed 145 min later (available after 150 min, as before).
+        seen = (datetime.fromisoformat(d) + timedelta(minutes=145)).isoformat() if w is not None else None
         return {'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5', 'date_utc': d,
                 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True, 'key': (match, d),
-                'n_signals': 1, 'max_mult': 1, 'no_source': False}
+                'n_signals': 1, 'max_mult': 1, 'no_source': False, 'signal_seen_utc': d, 'result_known_utc': seen}
 
     def test_signals_in_the_same_match_share_one_vote(self):
         from scangoal.insights import clustered, summarize
