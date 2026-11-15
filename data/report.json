@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T09:06:55+00:00",
+ "generated_at_utc": "2026-11-15T09:15:33+00:00",
  "messages": 676,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T09:06:47+00:00",
+  "collector_last_run_utc": "2026-11-15T09:15:16+00:00",
   "name_review": [
    {
     "bot": [
@@ -1203,7 +1203,7 @@
    "roi_announced_odds": -0.1125,
    "seen_late": 6,
    "by_bot_mark": 0,
-   "per_day": 4.2,
+   "per_day": 4.1,
    "days_to_hint": 4,
    "days_to_conclusion": 69,
    "prudent_rate": 0.5284,
@@ -1351,7 +1351,7 @@
    "roi_announced_odds": -0.1157,
    "seen_late": 0,
    "by_bot_mark": 36,
-   "per_day": 22.2,
+   "per_day": 22.1,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.4523,
@@ -1425,7 +1425,7 @@
    "roi_announced_odds": -0.0267,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 9.1,
+   "per_day": 9.0,
    "days_to_hint": 0,
    "days_to_conclusion": 30,
    "prudent_rate": 0.5967,
@@ -1462,7 +1462,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 24.8,
+   "per_day": 24.7,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.7874,
@@ -1501,7 +1501,7 @@
    "by_bot_mark": 0,
    "per_day": 1.4,
    "days_to_hint": 19,
-   "days_to_conclusion": 214,
+   "days_to_conclusion": 215,
    "prudent_rate": 0.4663,
    "prob_above": 0.3227,
    "edge": -0.0599,
@@ -4092,7 +4092,7 @@
     "contraditório": 2,
     "evitar": 3
    },
-   "generated_utc": "2026-11-15T09:06:55+00:00",
+   "generated_utc": "2026-11-15T09:15:33+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -10725,17 +10725,50 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 67,
-  "llm_last_run_utc": "2026-11-15T08:16:20+00:00",
+  "llm_runs": 68,
+  "llm_last_run_utc": "2026-11-15T09:15:18+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-15",
-   "calls_today": 9,
-   "neurons_today": 1765.4,
+   "calls_today": 10,
+   "neurons_today": 1948.7,
    "accepted_today": 3,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
+    "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena com apenas 20 resultados",
+    "at_utc": "2026-11-15T09:15:18+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 20,
+    "hits": 18,
+    "hit_rate": 0.9211,
+    "break_even": 0.5471,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "tem um acerto de 0.8718, o que é promissor, mas também tem uma amostra pequena de 20 resultados",
+    "at_utc": "2026-11-15T09:15:18+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 20,
+    "hits": 17,
+    "hit_rate": 0.8718,
+    "break_even": 0.5486,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Competição = feminino & Hora (UTC) = tarde & Minuto = 31 a 60",
+    "note": "apresenta um acerto perfeito de 1.0, mas a amostra é muito pequena com apenas 10 resultados",
+    "at_utc": "2026-11-15T09:15:18+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 10,
+    "hits": 10,
+    "hit_rate": 1.0,
+    "break_even": 0.4869,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Dia = dia de semana",
     "note": "apresenta um desempenho acima do necessário em várias combinações, sugerindo um potencial interessante para apostas nesse contexto, mas com amostras de tamanhos variados.",
@@ -10833,39 +10866,6 @@
     "hits": 24,
     "hit_rate": 0.8868,
     "break_even": 0.5728,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Parte do jogo = 2.ª parte",
-    "note": "apresenta um acerto de 0.8548, o que pode ser um bom sinal, mas é necessário mais dados para confirmar",
-    "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 67,
-    "hits": 49,
-    "hit_rate": 0.7344,
-    "break_even": 0.5565,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Parte do jogo = 2.ª parte",
-    "note": "tem uma amostra pequena de 12 resultados, o que não permite tirar conclusões definitivas",
-    "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 28,
-    "hits": 22,
-    "hit_rate": 0.7885,
-    "break_even": 0.5638,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "apresenta um acerto de 0.96, mas com apenas 13 resultados, a amostra é pequena e mais dados são necessários para confirmar a tendência",
-    "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 13,
-    "hits": 12,
-    "hit_rate": 0.96,
-    "break_even": 0.546,
     "status": "em observação"
    }
   ],
@@ -12243,6 +12243,15 @@
  ],
  "unsettled": [
   {
+   "match_id": "kashima-vs-yokohama-fm-20261115",
+   "match": "Kashima — Yokohama FM",
+   "league": "Japanese League Cup",
+   "date_utc": "2026-11-15T07:15:24+00:00",
+   "kickoff_utc": null,
+   "why": "à espera da fonte de resultados",
+   "signals": 1
+  },
+  {
    "match_id": "kamatamare-sanuki-vs-renofa-yamaguchi-20261115",
    "match": "Kamatamare Sanuki — Renofa Yamaguchi",
    "league": "Japanese J-League 3",
@@ -12771,15 +12780,6 @@
    "date_utc": "2026-11-13T09:49:33+00:00",
    "kickoff_utc": null,
    "why": "as fontes não cobrem este jogo",
-   "signals": 1
-  },
-  {
-   "match_id": "deren-vs-central-stallions-20261113",
-   "match": "Deren — Central Stallions",
-   "league": "Mongolian Premier League",
-   "date_utc": "2026-11-13T08:20:51+00:00",
-   "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
    "signals": 1
   }
  ],
