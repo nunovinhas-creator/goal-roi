@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T18:10:47+00:00",
+ "generated_at_utc": "2026-11-15T18:11:19+00:00",
  "messages": 866,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1345,
+  "versions": 1346,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 4,
-  "last_collected_at_utc": "2026-11-15T18:10:36+00:00",
+  "last_collected_at_utc": "2026-11-15T18:11:06+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 31,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T18:10:36+00:00",
+  "collector_last_run_utc": "2026-11-15T18:11:06+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,8 +448,8 @@
   "stake_original_seen": 108,
   "stake_no_score_after_kickoff": 19,
   "stake_sent_45_after_kickoff": 31,
-  "goal_lists": 279,
-  "goal_lists_consistent": 177
+  "goal_lists": 280,
+  "goal_lists_consistent": 178
  },
  "unique_bets": 490,
  "settled_bets": 360,
@@ -1356,40 +1356,40 @@
   },
   "OPEN_GAME_NO_ODDS": {
    "signals": 12,
-   "with_result": 11,
-   "hits": 7,
+   "with_result": 12,
+   "hits": 8,
    "misses": 4,
    "pushes": 0,
-   "eff_hits": 7.0,
+   "eff_hits": 8.0,
    "eff_misses": 4.0,
-   "vote_hits": 7.0,
+   "vote_hits": 8.0,
    "vote_misses": 4.0,
    "vote_break_even": null,
-   "games": 11,
+   "games": 12,
    "no_source": 0,
    "unsettleable": 0,
-   "hit_rate": 0.6364,
+   "hit_rate": 0.6667,
    "ci95": [
-    0.3538,
-    0.8483
+    0.3906,
+    0.8619
    ],
    "avg_odds": null,
-   "break_even": 0.7028,
+   "break_even": 0.7115,
    "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 2,
    "by_bot_mark": 0,
-   "per_day": 2.8,
-   "days_to_hint": 7,
-   "days_to_conclusion": 104,
-   "prudent_rate": 0.668,
-   "prob_above": 0.3864,
-   "edge": -0.0348,
+   "per_day": 3.0,
+   "days_to_hint": 6,
+   "days_to_conclusion": 95,
+   "prudent_rate": 0.687,
+   "prob_above": 0.4245,
+   "edge": -0.0245,
    "edge_ci": [
-    -0.2092,
-    0.121
+    -0.1932,
+    0.1245
    ],
-   "prob_above_cut": 0.3323
+   "prob_above_cut": 0.3663
   },
   "POLYMARKET": {
    "signals": 98,
@@ -1670,7 +1670,7 @@
    }
   ],
   "next_goal": {
-   "n": 105,
+   "n": 106,
    "median_min": 13
   },
   "segments": [
@@ -1810,28 +1810,28 @@
     "value": "liga"
    },
    {
-    "n": 66,
+    "n": 67,
     "signals": 80,
-    "hits": 44,
+    "hits": 45,
     "misses": 22,
-    "hit_rate": 0.6719,
+    "hit_rate": 0.6769,
     "ci95": [
-     0.55,
-     0.7743
+     0.5561,
+     0.778
     ],
     "break_even": 0.5583,
     "roi": 0.2203,
-    "games": 66,
-    "bets": 66,
+    "games": 67,
+    "bets": 67,
     "unidentified": 0,
-    "prudent_rate": 0.6565,
-    "prob_above": 0.9591,
-    "edge": 0.0982,
+    "prudent_rate": 0.6611,
+    "prob_above": 0.9667,
+    "edge": 0.1028,
     "edge_ci": [
-     0.0056,
-     0.186
+     0.011,
+     0.1897
     ],
-    "prob_above_cut": 0.9389,
+    "prob_above_cut": 0.9493,
     "family": "Jogo aberto",
     "dimension": "Ritmo indicado pelo bot",
     "value": "menos de 90"
@@ -2080,6 +2080,33 @@
     "value": "reforço ×2"
    },
    {
+    "n": 98,
+    "signals": 121,
+    "hits": 59,
+    "misses": 39,
+    "hit_rate": 0.6062,
+    "ci95": [
+     0.5065,
+     0.6978
+    ],
+    "break_even": 0.5513,
+    "roi": 0.1032,
+    "games": 98,
+    "bets": 98,
+    "unidentified": 0,
+    "prudent_rate": 0.6011,
+    "prob_above": 0.8529,
+    "edge": 0.0498,
+    "edge_ci": [
+     -0.029,
+     0.1264
+    ],
+    "prob_above_cut": 0.7929,
+    "family": "Jogo aberto",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com um só tipo de sinal"
+   },
+   {
     "n": 12,
     "signals": 18,
     "hits": 8,
@@ -2105,33 +2132,6 @@
     "family": "Jogo aberto",
     "dimension": "Competição",
     "value": "seleções"
-   },
-   {
-    "n": 97,
-    "signals": 121,
-    "hits": 58,
-    "misses": 39,
-    "hit_rate": 0.6021,
-    "ci95": [
-     0.5018,
-     0.6945
-    ],
-    "break_even": 0.5513,
-    "roi": 0.1032,
-    "games": 97,
-    "bets": 97,
-    "unidentified": 0,
-    "prudent_rate": 0.5973,
-    "prob_above": 0.8327,
-    "edge": 0.046,
-    "edge_ci": [
-     -0.0332,
-     0.1232
-    ],
-    "prob_above_cut": 0.7684,
-    "family": "Jogo aberto",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 38,
@@ -2161,6 +2161,33 @@
     "value": "odd 1,50 a 2,00"
    },
    {
+    "n": 56,
+    "signals": 66,
+    "hits": 35,
+    "misses": 21,
+    "hit_rate": 0.6204,
+    "ci95": [
+     0.4871,
+     0.7377
+    ],
+    "break_even": 0.5555,
+    "roi": 0.1584,
+    "games": 56,
+    "bets": 56,
+    "unidentified": 0,
+    "prudent_rate": 0.6102,
+    "prob_above": 0.8163,
+    "edge": 0.0547,
+    "edge_ci": [
+     -0.0468,
+     0.1523
+    ],
+    "prob_above_cut": 0.7643,
+    "family": "Jogo aberto",
+    "dimension": "Confiança indicada pelo bot",
+    "value": "menos de 95 %"
+   },
+   {
     "n": 60,
     "signals": 63,
     "hits": 42,
@@ -2188,31 +2215,31 @@
     "value": "2.ª parte"
    },
    {
-    "n": 55,
-    "signals": 66,
-    "hits": 34,
-    "misses": 21,
-    "hit_rate": 0.6132,
+    "n": 45,
+    "signals": 53,
+    "hits": 26,
+    "misses": 19,
+    "hit_rate": 0.5843,
     "ci95": [
-     0.4787,
-     0.7324
+     0.4385,
+     0.7167
     ],
-    "break_even": 0.5555,
-    "roi": 0.1584,
-    "games": 55,
-    "bets": 55,
+    "break_even": 0.5116,
+    "roi": 0.1233,
+    "games": 45,
+    "bets": 45,
     "unidentified": 0,
-    "prudent_rate": 0.604,
-    "prob_above": 0.7864,
-    "edge": 0.0486,
+    "prudent_rate": 0.5709,
+    "prob_above": 0.8125,
+    "edge": 0.0593,
     "edge_ci": [
-     -0.054,
-     0.1473
+     -0.0515,
+     0.1672
     ],
-    "prob_above_cut": 0.7304,
+    "prob_above_cut": 0.7685,
     "family": "Jogo aberto",
-    "dimension": "Confiança indicada pelo bot",
-    "value": "menos de 95 %"
+    "dimension": "Parte do jogo",
+    "value": "1.ª parte"
    },
    {
     "n": 80,
@@ -2240,33 +2267,6 @@
     "family": "Jogo aberto",
     "dimension": "Faixa de odd",
     "value": "odd 1,50 a 2,00"
-   },
-   {
-    "n": 44,
-    "signals": 53,
-    "hits": 25,
-    "misses": 19,
-    "hit_rate": 0.5747,
-    "ci95": [
-     0.4277,
-     0.7096
-    ],
-    "break_even": 0.5116,
-    "roi": 0.1233,
-    "games": 44,
-    "bets": 44,
-    "unidentified": 0,
-    "prudent_rate": 0.5629,
-    "prob_above": 0.7765,
-    "edge": 0.0513,
-    "edge_ci": [
-     -0.0607,
-     0.1606
-    ],
-    "prob_above_cut": 0.7286,
-    "family": "Jogo aberto",
-    "dimension": "Parte do jogo",
-    "value": "1.ª parte"
    },
    {
     "n": 10,
@@ -2404,6 +2404,33 @@
     "value": "dia de semana"
    },
    {
+    "n": 69,
+    "signals": 85,
+    "hits": 41,
+    "misses": 28,
+    "hit_rate": 0.5896,
+    "ci95": [
+     0.47,
+     0.6994
+    ],
+    "break_even": 0.5555,
+    "roi": 0.0899,
+    "games": 69,
+    "bets": 69,
+    "unidentified": 0,
+    "prudent_rate": 0.5851,
+    "prob_above": 0.7041,
+    "edge": 0.0296,
+    "edge_ci": [
+     -0.0634,
+     0.1202
+    ],
+    "prob_above_cut": 0.6319,
+    "family": "Jogo aberto",
+    "dimension": "Competição",
+    "value": "liga"
+   },
+   {
     "n": 11,
     "signals": 14,
     "hits": 7,
@@ -2485,33 +2512,6 @@
     "value": "até 1 golo"
    },
    {
-    "n": 68,
-    "signals": 85,
-    "hits": 40,
-    "misses": 28,
-    "hit_rate": 0.5833,
-    "ci95": [
-     0.463,
-     0.6945
-    ],
-    "break_even": 0.5555,
-    "roi": 0.0899,
-    "games": 68,
-    "bets": 68,
-    "unidentified": 0,
-    "prudent_rate": 0.5797,
-    "prob_above": 0.6686,
-    "edge": 0.0242,
-    "edge_ci": [
-     -0.0696,
-     0.1156
-    ],
-    "prob_above_cut": 0.5941,
-    "family": "Jogo aberto",
-    "dimension": "Competição",
-    "value": "liga"
-   },
-   {
     "n": 41,
     "signals": 79,
     "hits": 20,
@@ -2537,6 +2537,33 @@
     "family": "Betfair",
     "dimension": "Tamanho do mercado",
     "value": "menos de 10 mil $"
+   },
+   {
+    "n": 102,
+    "signals": 126,
+    "hits": 58,
+    "misses": 44,
+    "hit_rate": 0.5678,
+    "ci95": [
+     0.4698,
+     0.6609
+    ],
+    "break_even": 0.551,
+    "roi": 0.0529,
+    "games": 102,
+    "bets": 102,
+    "unidentified": 0,
+    "prudent_rate": 0.5663,
+    "prob_above": 0.629,
+    "edge": 0.0153,
+    "edge_ci": [
+     -0.063,
+     0.0922
+    ],
+    "prob_above_cut": 0.5371,
+    "family": "Jogo aberto",
+    "dimension": "Dia",
+    "value": "fim de semana"
    },
    {
     "n": 18,
@@ -2591,33 +2618,6 @@
     "family": "Stake",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com um só tipo de sinal"
-   },
-   {
-    "n": 101,
-    "signals": 126,
-    "hits": 57,
-    "misses": 44,
-    "hit_rate": 0.5635,
-    "ci95": [
-     0.465,
-     0.6572
-    ],
-    "break_even": 0.551,
-    "roi": 0.0529,
-    "games": 101,
-    "bets": 101,
-    "unidentified": 0,
-    "prudent_rate": 0.5623,
-    "prob_above": 0.5962,
-    "edge": 0.0113,
-    "edge_ci": [
-     -0.0674,
-     0.0886
-    ],
-    "prob_above_cut": 0.5034,
-    "family": "Jogo aberto",
-    "dimension": "Dia",
-    "value": "fim de semana"
    },
    {
     "n": 23,
@@ -3016,37 +3016,44 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5736,
-    "promissora": 41
+    "em observação": 5735,
+    "promissora": 42
    },
    "hypotheses": [
     {
      "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 105,
-     "games": 105,
+     "n": 106,
+     "games": 106,
      "roi": 0.1176,
      "status": "em observação"
     },
     {
      "id": "Jogo aberto | Dia = fim de semana",
-     "n": 101,
-     "games": 101,
+     "n": 102,
+     "games": 102,
      "roi": 0.0529,
      "status": "em observação"
     },
     {
      "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 97,
-     "games": 97,
+     "n": 98,
+     "games": 98,
      "roi": 0.1032,
      "status": "em observação"
     },
     {
      "id": "Jogo aberto | Minuto = 31 a 60",
-     "n": 90,
-     "games": 90,
+     "n": 91,
+     "games": 91,
      "roi": 0.1692,
      "status": "promissora"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 86,
+     "games": 86,
+     "roi": 0.0236,
+     "status": "em observação"
     },
     {
      "id": "Jogo aberto | Parte do jogo = 2.ª parte",
@@ -3063,17 +3070,17 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 85,
-     "games": 85,
-     "roi": 0.0236,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00",
      "n": 80,
      "games": 80,
      "roi": 0.0807,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 79,
+     "games": 79,
+     "roi": 0.0045,
      "status": "em observação"
     },
     {
@@ -3084,17 +3091,17 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 78,
-     "games": 78,
-     "roi": 0.0045,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
      "n": 76,
      "games": 76,
      "roi": 0.1101,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Hora (UTC) = tarde",
+     "n": 76,
+     "games": 76,
+     "roi": 0.0964,
      "status": "em observação"
     },
     {
@@ -3105,16 +3112,9 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde",
-     "n": 75,
-     "games": 75,
-     "roi": 0.0964,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 73,
-     "games": 73,
+     "n": 74,
+     "games": 74,
      "roi": 0.1506,
      "status": "em observação"
     },
@@ -3141,8 +3141,8 @@
     },
     {
      "id": "Jogo aberto | Competição = liga",
-     "n": 68,
-     "games": 68,
+     "n": 69,
+     "games": 69,
      "roi": 0.0899,
      "status": "em observação"
     },
@@ -3155,9 +3155,30 @@
     },
     {
      "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60",
+     "n": 67,
+     "games": 67,
+     "roi": 0.0529,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 67,
+     "games": 67,
+     "roi": 0.1385,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+     "n": 67,
+     "games": 67,
+     "roi": 0.2203,
+     "status": "promissora"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde",
      "n": 66,
      "games": 66,
-     "roi": 0.0529,
+     "roi": -0.0097,
      "status": "em observação"
     },
     {
@@ -3168,10 +3189,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 66,
      "games": 66,
-     "roi": 0.1385,
+     "roi": 0.0791,
      "status": "em observação"
     },
     {
@@ -3182,31 +3203,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
-     "n": 66,
-     "games": 66,
-     "roi": 0.2203,
-     "status": "promissora"
-    },
-    {
      "id": "Polymarket | Dia = fim de semana",
      "n": 66,
      "games": 26,
      "roi": -0.1382,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde",
-     "n": 65,
-     "games": 65,
-     "roi": -0.0097,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 65,
-     "games": 65,
-     "roi": 0.0791,
      "status": "em observação"
     },
     {
@@ -3252,17 +3252,31 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
+     "n": 61,
+     "games": 61,
+     "roi": 0.064,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
+     "n": 61,
+     "games": 61,
+     "roi": 0.1917,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 61,
+     "games": 61,
+     "roi": 0.0567,
+     "status": "em observação"
+    },
+    {
      "id": "Forma de golos | Parte do jogo = 2.ª parte",
      "n": 60,
      "games": 60,
      "roi": 0.0412,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
-     "n": 60,
-     "games": 60,
-     "roi": 0.064,
      "status": "em observação"
     },
     {
@@ -3280,13 +3294,6 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
-     "n": 60,
-     "games": 60,
-     "roi": 0.1917,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
      "n": 60,
      "games": 60,
@@ -3301,11 +3308,11 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
      "n": 60,
      "games": 60,
-     "roi": 0.0567,
-     "status": "em observação"
+     "roi": 0.2798,
+     "status": "promissora"
     },
     {
      "id": "Polymarket | Momento = antes do jogo",
@@ -3329,11 +3336,18 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
-     "n": 59,
-     "games": 59,
-     "roi": 0.2798,
-     "status": "promissora"
+     "id": "Jogo aberto | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 58,
+     "games": 58,
+     "roi": 0.0893,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 58,
+     "games": 58,
+     "roi": -0.0164,
+     "status": "em observação"
     },
     {
      "id": "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -3343,13 +3357,6 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 57,
-     "games": 57,
-     "roi": 0.0893,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 57,
      "games": 57,
@@ -3357,10 +3364,10 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 57,
      "games": 57,
-     "roi": -0.0164,
+     "roi": 0.0103,
      "status": "em observação"
     },
     {
@@ -3371,6 +3378,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 57,
+     "games": 57,
+     "roi": 0.1663,
+     "status": "promissora"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 57,
      "games": 19,
@@ -3378,10 +3392,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
      "n": 56,
      "games": 56,
-     "roi": 0.0103,
+     "roi": 0.1584,
      "status": "em observação"
     },
     {
@@ -3399,24 +3413,17 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 56,
-     "games": 56,
-     "roi": 0.1663,
-     "status": "promissora"
-    },
-    {
-     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
-     "n": 55,
-     "games": 55,
-     "roi": 0.1584,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 55,
      "games": 55,
      "roi": 0.1027,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60",
+     "n": 55,
+     "games": 55,
+     "roi": 0.2045,
      "status": "em observação"
     },
     {
@@ -3448,10 +3455,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60",
+     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90",
      "n": 54,
      "games": 54,
-     "roi": 0.2045,
+     "roi": 0.173,
      "status": "em observação"
     },
     {
@@ -3469,10 +3476,24 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60",
+     "n": 53,
+     "games": 53,
+     "roi": 0.0868,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 53,
      "games": 53,
      "roi": -0.0488,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 53,
+     "games": 53,
+     "roi": -0.0564,
      "status": "em observação"
     },
     {
@@ -3490,11 +3511,11 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90",
+     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
      "n": 53,
      "games": 53,
-     "roi": 0.173,
-     "status": "em observação"
+     "roi": 0.162,
+     "status": "promissora"
     },
     {
      "id": "Polymarket | Número de apostas = várias",
@@ -3504,17 +3525,17 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60",
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 52,
      "games": 52,
-     "roi": 0.0868,
+     "roi": 0.0576,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Jogo aberto | Competição = liga & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 52,
      "games": 52,
-     "roi": -0.0564,
+     "roi": 0.0829,
      "status": "em observação"
     },
     {
@@ -3522,13 +3543,6 @@
      "n": 52,
      "games": 52,
      "roi": 0.0967,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
-     "n": 52,
-     "games": 52,
-     "roi": 0.162,
      "status": "em observação"
     },
     {
@@ -3546,24 +3560,24 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 51,
-     "games": 51,
-     "roi": 0.0576,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 51,
-     "games": 51,
-     "roi": 0.0829,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 51,
      "games": 51,
      "roi": -0.0316,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 51,
+     "games": 51,
+     "roi": -0.0085,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 51,
+     "games": 51,
+     "roi": 0.1338,
      "status": "em observação"
     },
     {
@@ -3595,24 +3609,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 50,
-     "games": 50,
-     "roi": -0.0085,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
      "n": 50,
      "games": 50,
      "roi": -0.0679,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 50,
-     "games": 50,
-     "roi": 0.1338,
      "status": "em observação"
     },
     {
@@ -3662,6 +3662,13 @@
      "n": 49,
      "games": 49,
      "roi": 0.0316,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+     "n": 49,
+     "games": 49,
+     "roi": 0.1535,
      "status": "em observação"
     },
     {
@@ -3721,10 +3728,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+     "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2",
      "n": 48,
      "games": 48,
-     "roi": 0.1535,
+     "roi": 0.1053,
      "status": "em observação"
     },
     {
@@ -3746,6 +3753,13 @@
      "n": 48,
      "games": 48,
      "roi": 0.1623,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 48,
+     "games": 48,
+     "roi": 0.1586,
      "status": "em observação"
     },
     {
@@ -3798,13 +3812,6 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2",
-     "n": 47,
-     "games": 47,
-     "roi": 0.1053,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 47,
      "games": 47,
@@ -3826,11 +3833,11 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 47,
      "games": 47,
-     "roi": 0.1586,
-     "status": "em observação"
+     "roi": 0.2462,
+     "status": "promissora"
     },
     {
      "id": "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
@@ -3889,6 +3896,13 @@
      "status": "promissora"
     },
     {
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 46,
+     "games": 46,
+     "roi": 0.0456,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Competição = liga & Parte do jogo = 2.ª parte",
      "n": 46,
      "games": 46,
@@ -3910,6 +3924,27 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 46,
+     "games": 46,
+     "roi": 0.0867,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Minuto = 31 a 60",
+     "n": 46,
+     "games": 46,
+     "roi": 0.0772,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 46,
+     "games": 46,
+     "roi": 0.1102,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Minuto = 31 a 60",
      "n": 46,
      "games": 46,
@@ -3924,11 +3959,11 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 46,
      "games": 46,
-     "roi": 0.2462,
-     "status": "promissora"
+     "roi": 0.1169,
+     "status": "em observação"
     },
     {
      "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
@@ -3938,10 +3973,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Minuto = 31 a 60",
      "n": 45,
      "games": 45,
-     "roi": 0.0456,
+     "roi": 0.0498,
      "status": "em observação"
     },
     {
@@ -3952,10 +3987,17 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 45,
      "games": 45,
-     "roi": 0.0867,
+     "roi": 0.0517,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60",
+     "n": 45,
+     "games": 45,
+     "roi": 0.2065,
      "status": "em observação"
     },
     {
@@ -3963,13 +4005,6 @@
      "n": 45,
      "games": 45,
      "roi": -0.0307,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Minuto = 31 a 60",
-     "n": 45,
-     "games": 45,
-     "roi": 0.0772,
      "status": "em observação"
     },
     {
@@ -3987,10 +4022,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60",
      "n": 45,
      "games": 45,
-     "roi": 0.1102,
+     "roi": 0.2065,
      "status": "em observação"
     },
     {
@@ -4001,17 +4036,17 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 45,
-     "games": 45,
-     "roi": 0.1169,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = 90 ou mais",
      "n": 45,
      "games": 45,
      "roi": 0.0422,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Parte do jogo = 1.ª parte",
+     "n": 45,
+     "games": 45,
+     "roi": 0.1233,
      "status": "em observação"
     },
     {
@@ -4033,41 +4068,6 @@
      "n": 44,
      "games": 42,
      "roi": 0.0066,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 44,
-     "games": 44,
-     "roi": 0.2377,
-     "status": "promissora"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Marcador no momento = empatado",
-     "n": 44,
-     "games": 44,
-     "roi": 0.0962,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Minuto = 31 a 60",
-     "n": 44,
-     "games": 44,
-     "roi": 0.0498,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 44,
-     "games": 44,
-     "roi": 0.0517,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60",
-     "n": 44,
-     "games": 44,
-     "roi": 0.2065,
      "status": "em observação"
     }
    ]
@@ -6929,7 +6929,7 @@
     "contraditório": 18,
     "evitar": 10
    },
-   "generated_utc": "2026-11-15T18:10:46+00:00",
+   "generated_utc": "2026-11-15T18:11:18+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
