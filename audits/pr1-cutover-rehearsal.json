@@ -1,11 +1,22 @@
 {
- "main_sha": "2f7a4578bcdec2a127db3ec4b60b4960dd24d8e4",
- "pr_head_sha": "8a6610bd2e60fee0986fbbdfe0826d5e84c4d5fd",
- "at_utc": "2026-11-15T08:54:01+00:00",
+ "main_sha": "f12c06b4c5aa7386db312923928be645c99b0cc2",
+ "pr_head_sha": "25ef19c9a40561a97912b1f9138bf8ff7c0cbc37",
+ "at_utc": "2026-11-15T09:07:17+00:00",
  "python": "3.11.18",
  "merge_conflicts": 0,
  "integration_diff_vs_main": [
   "README.md",
+  "audits/pr1-cutover-evidence/README.md",
+  "audits/pr1-cutover-evidence/dry-run-main-f94b193.json",
+  "audits/pr1-cutover-evidence/dry_run_cutover.v0.py",
+  "audits/pr1-cutover-evidence/pr1_cutover.v0.py",
+  "audits/pr1-cutover-evidence/rehearsal-v0-main-bba39f6.json",
+  "audits/pr1-cutover-evidence/repro-pr1-metrics-python3.11.json",
+  "audits/pr1-cutover-evidence/reproduction-python-versions.json",
+  "audits/pr1-cutover-evidence/tests-112-merged-main-f94b193.log",
+  "audits/pr1-cutover-evidence/tests-112-pr-head-dad9279.log",
+  "audits/pr1-cutover-rehearsal.json",
+  "audits/pr1-cutover-runbook.md",
   "audits/pr1-data-eligibility.md",
   "audits/pr1-metrics.json",
   "audits/pr1-notify-migration.json",
@@ -31,31 +42,32 @@
  "cutover": {
   "ok": true,
   "restored": false,
-  "frozen_main_sha": "2f7a4578bcdec2a127db3ec4b60b4960dd24d8e4",
-  "head_sha": "08f14df90552c509b393133b8005338a67bf5099",
-  "at_utc": "2026-11-15T08:54:01+00:00",
+  "frozen_main_sha": "f12c06b4c5aa7386db312923928be645c99b0cc2",
+  "head_sha": "234c97e8bfe8ce69149d8fb39b823f5b4b689141",
+  "at_utc": "2026-11-15T09:07:17+00:00",
   "python": "3.11.18",
-  "report_generated_at_utc": "2026-11-15T08:54:06+00:00",
+  "report_generated_at_utc": "2026-11-15T09:07:22+00:00",
   "brain": {
    "evidence_scope": "eligible_bets_only",
-   "hypotheses": 5163,
+   "operational_scope": "eligible_bets_only",
+   "hypotheses": 5164,
    "counts": {
-    "em observação": 5147,
+    "em observação": 5148,
     "abandonada": 5,
     "promissora": 11
    },
    "exploratory_counts": {
-    "em observação": 5111,
+    "em observação": 5108,
     "abandonada": 7,
-    "promissora": 45
+    "promissora": 49
    },
    "eligibility": {
-    "total": 488,
+    "total": 489,
     "eligible": 370,
-    "excluded": 118,
+    "excluded": 119,
     "reasons": {
-     "no_valid_odds": 80,
-     "no_market": 80,
+     "no_valid_odds": 81,
+     "no_market": 81,
      "burst": 10,
      "provenance_not_verified": 40,
      "had_ft_at_first_sight": 29,
@@ -65,12 +77,12 @@
    "walk_forward": {
     "followed": {
      "bets": 133,
-     "settled": 118,
-     "games": 104,
-     "wins": 53,
-     "units": -2.15,
-     "roi": -0.0182,
-     "roi_cut": -0.0351
+     "settled": 119,
+     "games": 105,
+     "wins": 54,
+     "units": -1.75,
+     "roi": -0.0147,
+     "roi_cut": -0.0316
     },
     "skipped": {
      "bets": 237,
@@ -84,14 +96,15 @@
    }
   },
   "reference": {
-   "previous": 52,
+   "previous": 56,
    "baseline": 16,
-   "silenced_transitions": 38
+   "silenced_transitions": 42
   },
   "checks": {
    "first_call": "NOTIFY_STATUS_MIGRATED",
    "second_call": "NOTIFY_STATUS_UNCHANGED",
    "second_call_byte_identical": true,
+   "operational_scope_eligible": true,
    "statuses_equal_report_status_list": true,
    "previous_statuses_equal_original": true,
    "baseline_statuses_equal_report_status_list": true,
@@ -111,34 +124,34 @@
   "sha256_before": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "data/details_hl.json": "c8300a0833c4410e93adf6c08e092ac34952e45092bc920ad19226ee9c584980",
-   "data/hypotheses.json": "23be24ad8e357ff943c234029f9347eb61dd862714c1befad0ec3de0c73969c4",
+   "data/hypotheses.json": "f870947223572d42e40f7f45494e8648ea96ffb79cb2ab50b1997cba5943c1fb",
    "data/llm_notes.json": "feecb973cb424bb3b3304c920d42bdcdcf59a2280267aa573ade847f056e8a90",
    "data/llm_state.json": "81795eac182f63233946a7baee85e0a429f3c4f82fba43a5469500adeff36749",
-   "data/messages.jsonl": "a13fce23e96ded8b2f486ae1c56d0f61dab1008f8ae02de26e11d170ab47670b",
-   "data/notify_state.json": "a41727cab7899096994ae2e6e235e7ca944152f53300ef38812bdb2b6ee6c039",
-   "data/report.json": "7cb3d36f3139f42e07d9c7d17078794fea2a8bca5b11b95f27cd16de9146246a",
+   "data/messages.jsonl": "145e9743fd643ac1477cd9ea08636058fe730a91440fbd6b95a4f11d5ea3b5d9",
+   "data/notify_state.json": "efdc958a8b16dda58fe5f369c979548d5be1b18a228289a627089d6c5cd3703d",
+   "data/report.json": "e9e924266d5c013886e843dd44844958c6f12d319776465964305a1aa6b0399a",
    "data/results_bsd.json": "957539fcb279ba874c54f33a8f13c63f941cf07a17538314e4a2f2c25421581b",
-   "data/results_hl.json": "513980f2059008c352e6447bc6266a8566f4b39b7db267c12250370d089e6a8e",
-   "data/state.json": "9350f43a3b45a07701238119579d98508a0d522178ef1eb8f4d8329882d84310",
+   "data/results_hl.json": "4a92212e74a0da58405f5cfa2db5c0fdeff7ebaa604c8d05aa0d97f682369361",
+   "data/state.json": "ffed091e7aaebe7523bd1dc30c0ddadecbef03d6dfa08ae8168600b7133396e2",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "ce0254734938f710c7f9e002b05c7f516a0809ed8450ecee91f2272222b5e4c2",
-   "docs/report.json": "7cb3d36f3139f42e07d9c7d17078794fea2a8bca5b11b95f27cd16de9146246a"
+   "docs/bets.csv": "e071cbed0f750c7bc50e7dc8abad483783279b2f74e45f2f10543899d44ca844",
+   "docs/report.json": "e9e924266d5c013886e843dd44844958c6f12d319776465964305a1aa6b0399a"
   },
   "sha256_after": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "data/details_hl.json": "c8300a0833c4410e93adf6c08e092ac34952e45092bc920ad19226ee9c584980",
-   "data/hypotheses.json": "23be24ad8e357ff943c234029f9347eb61dd862714c1befad0ec3de0c73969c4",
+   "data/hypotheses.json": "f870947223572d42e40f7f45494e8648ea96ffb79cb2ab50b1997cba5943c1fb",
    "data/llm_notes.json": "feecb973cb424bb3b3304c920d42bdcdcf59a2280267aa573ade847f056e8a90",
    "data/llm_state.json": "81795eac182f63233946a7baee85e0a429f3c4f82fba43a5469500adeff36749",
-   "data/messages.jsonl": "a13fce23e96ded8b2f486ae1c56d0f61dab1008f8ae02de26e11d170ab47670b",
-   "data/notify_state.json": "6c1f286cd4167da97e7a959c0155d0a4f5bb0a0d1861f0a102794e5cba9e724a",
-   "data/report.json": "91f1ea3b7fa881a6be5d0b30ab68352f63931b45e52d7d055ccc3b0992c8f0f6",
+   "data/messages.jsonl": "145e9743fd643ac1477cd9ea08636058fe730a91440fbd6b95a4f11d5ea3b5d9",
+   "data/notify_state.json": "b3268ae5cc9fbe47b3becce96f199dc10f94fc01b7602651d2bdb0fd2d4fb606",
+   "data/report.json": "e76f66ac5f19354f796057d8019a119341f6b2be8a982d12237573fa90b0d1be",
    "data/results_bsd.json": "957539fcb279ba874c54f33a8f13c63f941cf07a17538314e4a2f2c25421581b",
-   "data/results_hl.json": "513980f2059008c352e6447bc6266a8566f4b39b7db267c12250370d089e6a8e",
-   "data/state.json": "9350f43a3b45a07701238119579d98508a0d522178ef1eb8f4d8329882d84310",
+   "data/results_hl.json": "4a92212e74a0da58405f5cfa2db5c0fdeff7ebaa604c8d05aa0d97f682369361",
+   "data/state.json": "ffed091e7aaebe7523bd1dc30c0ddadecbef03d6dfa08ae8168600b7133396e2",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "ce0254734938f710c7f9e002b05c7f516a0809ed8450ecee91f2272222b5e4c2",
-   "docs/report.json": "91f1ea3b7fa881a6be5d0b30ab68352f63931b45e52d7d055ccc3b0992c8f0f6"
+   "docs/bets.csv": "e071cbed0f750c7bc50e7dc8abad483783279b2f74e45f2f10543899d44ca844",
+   "docs/report.json": "e76f66ac5f19354f796057d8019a119341f6b2be8a982d12237573fa90b0d1be"
   }
  },
  "reclassification": {
@@ -147,6 +160,8 @@
    "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
    "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
    "Jogo aberto | Competição = liga & Golos em falta para ganhar = até 1 golo",
+   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais",
+   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Parte do jogo = 2.ª parte",
    "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
    "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
    "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60",
@@ -156,6 +171,7 @@
    "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
    "Jogo aberto | Golos até ao sinal = 1 ou 2",
    "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60",
+   "Jogo aberto | Golos até ao sinal = 3 ou mais & Parte do jogo = 2.ª parte",
    "Jogo aberto | Golos em falta para ganhar = até 1 golo",
    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60",
    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
@@ -165,6 +181,7 @@
    "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
    "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
    "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
    "Jogo aberto | Minuto = 31 a 60",
    "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
    "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
@@ -193,23 +210,33 @@
  "first_cycle_same_report": {},
  "first_cycle_register_true": {
   "messages": {},
-  "registry_before": 5163,
-  "registry_after": 5185,
-  "status_list_identical_to_cutover": true
+  "registry_before": 5164,
+  "registry_after": 5186,
+  "status_list_identical_to_cutover": true,
+  "operational_scope": "eligible_bets_only",
+  "status_list_differences": null
  },
  "counterfactual_without_migration": {
-  "status_transition": 38
+  "status_transition": 42
  },
  "main_notifier_already_has_migration": false,
  "old_code_risk": {
   "old_code_run_after_cutover": {
-   "status_transition": 38
+   "status_transition": 42
   },
   "baseline_overwritten_by_old_run": true,
   "next_new_code_run": {
-   "status_transition": 38
+   "status_transition": 42
   },
   "marker_still_present_so_no_remigration": true
+ },
+ "criteria": {
+  "cutover_ok": true,
+  "first_cycle_same_report_no_transitions": true,
+  "first_cycle_register_true_no_transitions": true,
+  "status_list_identical_register_true_vs_cutover": true,
+  "register_true_operational_scope_eligible": true,
+  "this_checkout_unchanged": true
  },
  "ok": true,
  "this_checkout_unchanged": true

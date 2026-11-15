@@ -12,5 +12,7 @@ Ficheiros preservados da área temporária do autor (Claude Code), tal como fora
 | `dry-run-main-f94b193.json` | Resultado desse ensaio (inclui hashes SHA-256 dos dados de produção lidos) |
 | `pr1_cutover.v0.py` | Primeira versão do script de corte (sem restauro automático nem testes); substituída |
 | `rehearsal-v0-main-bba39f6.json` | Ensaio geral com essa primeira versão sobre `main` `bba39f6` |
+| `p1-rollback-demo.py` | Demonstração do defeito P1 da revisão #5909958197: injeta uma exceção nas pós-verificações e no cálculo dos hashes e lista os ficheiros que ficam alterados (repositórios sintéticos) |
+| `p1-rollback-demo-output.jsonl` | Resultado: script `426489e` deixa 3 ficheiros alterados (`OSError`); script corrigido deixa 0 (`CutoverAborted`) |
 
 Todos os ensaios correram com a rede bloqueada, sem credenciais e sem emissor Telegram, em cópias ou worktrees temporárias. Os ficheiros de dados do checkout lido tinham os mesmos hashes antes e depois (`production_data_unchanged: true`); nada foi escrito em `main` nem no GitHub. Os números variam entre ensaios apenas porque `main` recebe dados novos de 8 em 8 minutos; nenhum deles é validação prospectiva.
