@@ -1,0 +1,110 @@
+{
+ "hashes": {
+  "data/report.json": {
+   "M": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "after": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c",
+   "script_before": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "script_after": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c"
+  },
+  "docs/report.json": {
+   "M": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "after": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c",
+   "script_before": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "script_after": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c"
+  },
+  "data/notify_state.json": {
+   "M": "4b8489bede424c70dc8716cec1b4902e4ea27116cabe18b2bf9fed8c3c732796",
+   "after": "8d47acba949e49a4936284802ce2653e5c8a36e17b901b43fbf0c070a1cf2460",
+   "script_before": "4b8489bede424c70dc8716cec1b4902e4ea27116cabe18b2bf9fed8c3c732796",
+   "script_after": "8d47acba949e49a4936284802ce2653e5c8a36e17b901b43fbf0c070a1cf2460"
+  }
+ },
+ "hashes_match_script": true,
+ "changed_vs_M": [
+  "data/notify_state.json",
+  "data/report.json",
+  "docs/index.html",
+  "docs/report.json"
+ ],
+ "migration_keys_M": [
+  "eligible_statuses_v1",
+  "status_rules:independent_games_hysteresis_v1"
+ ],
+ "migration_keys_after": [
+  "eligible_statuses_v1",
+  "status_rules:chronological_eprocess_v3",
+  "status_rules:independent_games_hysteresis_v1"
+ ],
+ "pr1_pr2_markers_identical": true,
+ "pr3_marker": {
+  "at_utc": "2026-11-15T20:58:42+00:00",
+  "baseline_statuses": {
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora"
+  },
+  "previous_statuses": {
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora"
+  },
+  "report_generated_at_utc": "2026-11-15T20:58:42+00:00"
+ },
+ "delivery": {
+  "sent_total": [
+   304,
+   304
+  ],
+  "watch_sent": [
+   113,
+   113
+  ],
+  "hello": [
+   true,
+   true
+  ],
+  "summary_day": [
+   "2026-11-14",
+   "2026-11-14"
+  ],
+  "last_run_utc": [
+   "2026-11-15T20:48:58+00:00",
+   "2026-11-15T20:48:58+00:00"
+  ]
+ },
+ "delivery_unchanged": true,
+ "status_rules": [
+  "independent_games_hysteresis_v1",
+  "chronological_eprocess_v3"
+ ],
+ "status_list_M": {
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora"
+ },
+ "status_list_after": {
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora"
+ },
+ "statuses_follow_report": true,
+ "certification": {
+  "state": "not_activated",
+  "certified": [],
+  "ledger_valid": false,
+  "ledger_file_exists": false
+ },
+ "no_validated_statuses": true,
+ "docs_equals_data_report": true,
+ "ok": true,
+ "changed_vs_M_production_paths": [
+  "data/notify_state.json",
+  "data/report.json",
+  "docs/report.json"
+ ],
+ "scope_note": "first run used data/ + docs/ and flagged docs/index.html; that file is PR dashboard code, byte-identical to the approved d4cbb0b and untouched by the merge and the cutover. Production paths are data/, docs/report.json, docs/bets.csv."
+}

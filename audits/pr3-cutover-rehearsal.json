@@ -1,7 +1,7 @@
 {
- "main_sha": "f71b34f6a99b9d2688e4bcd304b718a0644336ac",
- "pr_head_sha": "bc813aa19e0583cbf02c05ccdf666897a146fd4b",
- "at_utc": "2026-11-15T19:49:04+00:00",
+ "main_sha": "f6a9097cb55ba681c770684d09ee7b5d56167cbf",
+ "pr_head_sha": "5ea90e4515b43d4133a1f550c5a9e5133a7a76ad",
+ "at_utc": "2026-11-15T20:56:51+00:00",
  "python": "3.11.18",
  "status_rules": "chronological_eprocess_v3",
  "migration_key": "status_rules:chronological_eprocess_v3",
@@ -15,6 +15,7 @@
   "audits/pr3-cutover-evidence/mutation_check.txt",
   "audits/pr3-cutover-rehearsal.json",
   "audits/pr3-cutover-runbook.md",
+  "audits/pr3-cutover-window-plan.md",
   "audits/pr3-metrics.json",
   "docs/index.html",
   "scangoal/brain.py",
@@ -24,6 +25,7 @@
   "scangoal/notify.py",
   "scangoal/report.py",
   "scripts/audit_pr3_chronology.py",
+  "scripts/post_cutover_check.py",
   "scripts/pr2_cutover.py",
   "scripts/pr3_cutover.py",
   "scripts/rehearse_pr2_cutover.py",
@@ -31,6 +33,7 @@
   "tests/test_chronological_validity.py",
   "tests/test_independence_stability.py",
   "tests/test_notify_migration.py",
+  "tests/test_post_cutover_check.py",
   "tests/test_pr2_cutover.py",
   "tests/test_pr3_cutover.py",
   "tests/test_scangoal.py"
@@ -40,36 +43,36 @@
   "ok": true,
   "restored": false,
   "already_applied": false,
-  "frozen_main_sha": "f71b34f6a99b9d2688e4bcd304b718a0644336ac",
-  "head_sha": "ef1d8bbc506b3601d05aaa395728966bd1a397e7",
-  "at_utc": "2026-11-15T19:49:05+00:00",
+  "frozen_main_sha": "f6a9097cb55ba681c770684d09ee7b5d56167cbf",
+  "head_sha": "5ea90e4515b43d4133a1f550c5a9e5133a7a76ad",
+  "at_utc": "2026-11-15T20:56:51+00:00",
   "python": "3.11.18",
-  "report_generated_at_utc": "2026-11-15T19:49:05+00:00",
+  "report_generated_at_utc": "2026-11-15T20:56:51+00:00",
   "migration_key": "status_rules:chronological_eprocess_v3",
   "status_rules": "chronological_eprocess_v3",
   "brain": {
    "evidence_scope": "eligible_bets_only",
    "operational_scope": "eligible_bets_only",
    "status_rules": "chronological_eprocess_v3",
-   "hypotheses": 5912,
-   "tested": 288,
+   "hypotheses": 6019,
+   "tested": 324,
    "counts": {
-    "em observação": 5908,
+    "em observação": 6015,
     "promissora": 4
    },
    "exploratory_counts": {
-    "em observação": 5865,
-    "promissora": 44,
+    "em observação": 5970,
+    "promissora": 46,
     "abandonada": 3
    },
    "eligibility": {
-    "total": 672,
-    "eligible": 522,
-    "excluded": 150,
+    "total": 693,
+    "eligible": 539,
+    "excluded": 154,
     "reasons": {
-     "no_valid_odds": 102,
-     "no_market": 102,
-     "no_selection": 102,
+     "no_valid_odds": 106,
+     "no_market": 106,
+     "no_selection": 106,
      "burst": 10,
      "provenance_not_verified": 50,
      "had_ft_at_first_sight": 39,
@@ -79,22 +82,22 @@
    "validation_state": "not_activated",
    "walk_forward": {
     "followed": {
-     "bets": 170,
-     "settled": 145,
-     "games": 138,
-     "wins": 68,
-     "units": 0.86,
-     "roi": 0.006,
-     "roi_cut": -0.0107
+     "bets": 175,
+     "settled": 151,
+     "games": 144,
+     "wins": 71,
+     "units": 0.31,
+     "roi": 0.0021,
+     "roi_cut": -0.0144
     },
     "skipped": {
-     "bets": 317,
-     "settled": 210,
-     "games": 116,
-     "wins": 95,
-     "units": -20.19,
-     "roi": -0.0961,
-     "roi_cut": -0.1128
+     "bets": 329,
+     "settled": 212,
+     "games": 117,
+     "wins": 96,
+     "units": -18.24,
+     "roi": -0.086,
+     "roi_cut": -0.1029
     },
     "not_reconstructible": {
      "bets": 35,
@@ -108,7 +111,7 @@
    }
   },
   "register_true": {
-   "registry_size_after_on_copy": 5912,
+   "registry_size_after_on_copy": 6019,
    "status_list_identical": true
   },
   "reference": {
@@ -152,34 +155,34 @@
   "sha256_before": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
-   "data/hypotheses.json": "c1f1aba3505337b434ee854e53e067b3620d73a8cd8f758fd091e91b012e6111",
+   "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
    "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
-   "data/llm_state.json": "a9613ac2dbc59e829a69f404063b01e50c836232ce8e3519e50c0192409467c9",
-   "data/messages.jsonl": "82aa47f7e7654a09161d17958f1d8a97ceb46809279e9421ecb8e9e4b15d287d",
-   "data/notify_state.json": "8cfeb4876be80745bd10f67239c552b17d8330f4bb2cd86cf7c4a9743e9c22ff",
-   "data/report.json": "c8ea8ddf9a6bd5590d5bb81783189913aeadf8ab6f87b23a2df7e6f5cebb37da",
-   "data/results_bsd.json": "08097410e86cc471cd5105bafc37160d19bc886dee1e613bdd5548b5eeff8d84",
-   "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
-   "data/state.json": "e34099a6b487676895ff32f4236fa9fee74ca545c674577d6bec237d92376be5",
+   "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+   "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+   "data/notify_state.json": "4b8489bede424c70dc8716cec1b4902e4ea27116cabe18b2bf9fed8c3c732796",
+   "data/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+   "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+   "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "50cc924a5f17dbb95d5068e6b6f94a82935dfd86978246e6553fdeb147a2d7a8",
-   "docs/report.json": "c8ea8ddf9a6bd5590d5bb81783189913aeadf8ab6f87b23a2df7e6f5cebb37da"
+   "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+   "docs/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d"
   },
   "sha256_after": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
-   "data/hypotheses.json": "c1f1aba3505337b434ee854e53e067b3620d73a8cd8f758fd091e91b012e6111",
+   "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
    "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
-   "data/llm_state.json": "a9613ac2dbc59e829a69f404063b01e50c836232ce8e3519e50c0192409467c9",
-   "data/messages.jsonl": "82aa47f7e7654a09161d17958f1d8a97ceb46809279e9421ecb8e9e4b15d287d",
-   "data/notify_state.json": "fdcc4e33e9e70be9a8ad225b3176763824ec2103f1ee6aa4e1d866bf2c7cc4c7",
-   "data/report.json": "8db25b0310e422030765e3093d4df5638506436e4603c8db722e958940872224",
-   "data/results_bsd.json": "08097410e86cc471cd5105bafc37160d19bc886dee1e613bdd5548b5eeff8d84",
-   "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
-   "data/state.json": "e34099a6b487676895ff32f4236fa9fee74ca545c674577d6bec237d92376be5",
+   "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+   "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+   "data/notify_state.json": "5f7f336eb4e8e736c9d4da4d1cab7802e062483289ffae953c8bf98602842003",
+   "data/report.json": "e94271d04b3cd6e736bebf63e0939078c1832967f0e70fcec6f648851bb6dc8a",
+   "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+   "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+   "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "50cc924a5f17dbb95d5068e6b6f94a82935dfd86978246e6553fdeb147a2d7a8",
-   "docs/report.json": "8db25b0310e422030765e3093d4df5638506436e4603c8db722e958940872224"
+   "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+   "docs/report.json": "e94271d04b3cd6e736bebf63e0939078c1832967f0e70fcec6f648851bb6dc8a"
   }
  },
  "telegram": {
@@ -193,8 +196,8 @@
   "pr2_marker_byte_identical": true,
   "delivery_history_preserved": true,
   "delivery_counters": {
-   "sent_total": 303,
-   "watch_sent": 112
+   "sent_total": 304,
+   "watch_sent": 113
   },
   "cycle1": {},
   "cycle2": {},
@@ -254,6 +257,7 @@
     "audits/pr3-cutover-evidence/mutation_check.txt",
     "audits/pr3-cutover-rehearsal.json",
     "audits/pr3-cutover-runbook.md",
+    "audits/pr3-cutover-window-plan.md",
     "audits/pr3-metrics.json",
     "docs/index.html",
     "scangoal/brain.py",
@@ -263,6 +267,7 @@
     "scangoal/notify.py",
     "scangoal/report.py",
     "scripts/audit_pr3_chronology.py",
+    "scripts/post_cutover_check.py",
     "scripts/pr2_cutover.py",
     "scripts/pr3_cutover.py",
     "scripts/rehearse_pr2_cutover.py",
@@ -270,6 +275,7 @@
     "tests/test_chronological_validity.py",
     "tests/test_independence_stability.py",
     "tests/test_notify_migration.py",
+    "tests/test_post_cutover_check.py",
     "tests/test_pr2_cutover.py",
     "tests/test_pr3_cutover.py",
     "tests/test_scangoal.py"
@@ -277,7 +283,7 @@
   },
   "push_preflight_frozen": [],
   "push_preflight_after_concurrent_commit": [
-   "remote main moved from the frozen commit f71b34f6a99b to cec976d50a71: NO-GO (a writer ran)",
+   "remote main moved from the frozen commit f6a9097cb55b to 8efa65763cee: NO-GO (a writer ran)",
    "HEAD is not a fast-forward of the remote main: a push would need force (forbidden)"
   ],
   "stale_writer_rebase": {
@@ -308,8 +314,8 @@
  "checkout": {
   "shallow_depth_1": {
    "source": "github",
-   "seconds": 0.96,
-   "git_dir_mib": 0.56,
+   "seconds": 0.88,
+   "git_dir_mib": 0.57,
    "shallow": "true",
    "commits_visible": 1,
    "history_proof_without_ledger": [
@@ -318,10 +324,10 @@
   },
   "full_fetch_depth_0": {
    "source": "github",
-   "seconds": 1.87,
-   "git_dir_mib": 4.32,
+   "seconds": 2.34,
+   "git_dir_mib": 4.39,
    "shallow": "false",
-   "commits_visible": 1078,
+   "commits_visible": 1091,
    "history_proof_without_ledger": [
     "ledger never published"
    ]

@@ -1,0 +1,146 @@
+{
+ "ok": true,
+ "restored": false,
+ "already_applied": false,
+ "frozen_main_sha": "f6a9097cb55ba681c770684d09ee7b5d56167cbf",
+ "head_sha": "5ea90e4515b43d4133a1f550c5a9e5133a7a76ad",
+ "at_utc": "2026-11-15T20:58:42+00:00",
+ "python": "3.11.18",
+ "report_generated_at_utc": "2026-11-15T20:58:42+00:00",
+ "migration_key": "status_rules:chronological_eprocess_v3",
+ "status_rules": "chronological_eprocess_v3",
+ "brain": {
+  "evidence_scope": "eligible_bets_only",
+  "operational_scope": "eligible_bets_only",
+  "status_rules": "chronological_eprocess_v3",
+  "hypotheses": 6019,
+  "tested": 324,
+  "counts": {
+   "em observação": 6015,
+   "promissora": 4
+  },
+  "exploratory_counts": {
+   "em observação": 5970,
+   "promissora": 46,
+   "abandonada": 3
+  },
+  "eligibility": {
+   "total": 693,
+   "eligible": 539,
+   "excluded": 154,
+   "reasons": {
+    "no_valid_odds": 106,
+    "no_market": 106,
+    "no_selection": 106,
+    "burst": 10,
+    "provenance_not_verified": 50,
+    "had_ft_at_first_sight": 39,
+    "edited_at_first_sight": 40
+   }
+  },
+  "validation_state": "not_activated",
+  "walk_forward": {
+   "followed": {
+    "bets": 175,
+    "settled": 151,
+    "games": 144,
+    "wins": 71,
+    "units": 0.31,
+    "roi": 0.0021,
+    "roi_cut": -0.0144
+   },
+   "skipped": {
+    "bets": 329,
+    "settled": 212,
+    "games": 117,
+    "wins": 96,
+    "units": -18.24,
+    "roi": -0.086,
+    "roi_cut": -0.1029
+   },
+   "not_reconstructible": {
+    "bets": 35,
+    "settled": 26,
+    "games": 26,
+    "wins": 13,
+    "units": -1.18,
+    "roi": -0.0454,
+    "roi_cut": -0.0645
+   }
+  }
+ },
+ "register_true": {
+  "registry_size_after_on_copy": 6019,
+  "status_list_identical": true
+ },
+ "reference": {
+  "previous": 4,
+  "baseline": 4,
+  "silenced_transitions": 0
+ },
+ "checks": {
+  "first_call": "NOTIFY_STATUS_MIGRATED",
+  "second_call": "NOTIFY_STATUS_UNCHANGED",
+  "second_call_byte_identical": true,
+  "pr1_marker_preserved": true,
+  "pr2_marker_preserved": true,
+  "migration_keys_previous_plus_pr3": true,
+  "register_true_status_list_identical": true,
+  "statuses_equal_report_status_list": true,
+  "previous_statuses_equal_original": true,
+  "baseline_statuses_equal_report_status_list": true,
+  "delivery_fields_preserved": true,
+  "other_fields_preserved": true,
+  "no_unexpected_fields": true,
+  "registry_unchanged": true,
+  "no_certification_ledger": true,
+  "certification_not_activated": true,
+  "docs_report_equals_data_report": true,
+  "only_allowed_files_changed": true,
+  "cycle1_status_transitions": 0,
+  "cycle2_status_transitions": 0,
+  "cycle1_validated_messages": 0,
+  "cycle2_validated_messages": 0
+ },
+ "simulated_cycles": {
+  "cycle1": {},
+  "cycle2": {}
+ },
+ "changed_files": [
+  "data/notify_state.json",
+  "data/report.json",
+  "docs/report.json"
+ ],
+ "sha256_before": {
+  "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+  "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
+  "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+  "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+  "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+  "data/notify_state.json": "4b8489bede424c70dc8716cec1b4902e4ea27116cabe18b2bf9fed8c3c732796",
+  "data/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+  "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+  "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+  "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
+  "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+  "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+  "docs/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d"
+ },
+ "sha256_after": {
+  "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+  "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
+  "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+  "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+  "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+  "data/notify_state.json": "8d47acba949e49a4936284802ce2653e5c8a36e17b901b43fbf0c070a1cf2460",
+  "data/report.json": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c",
+  "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+  "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+  "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
+  "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+  "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+  "docs/report.json": "4b9dac050945524ae93671b77abe5816a937ac461865ff5f103ba9e903c73a3c"
+ }
+}
