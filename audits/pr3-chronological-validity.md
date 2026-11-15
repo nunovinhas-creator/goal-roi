@@ -6,7 +6,11 @@
 - **Relógio fixo:** `2026-11-15T14:34:34Z` (hora do commit base). **Python:** 3.11.
 - **Rede bloqueada** na auditoria e nos testes; sementes fixas (`20261115`).
 
-> **Revisão #5911747123 (commit `345e008`): correções feitas nesta versão.** Ver a secção 0-C. Em resumo:
+> **Revisão #5911845265 (commit `9da69d8`): correções feitas nesta versão.** Ver a secção 0-D. P1-F e P1-G foram aprovados e não mudaram. Em resumo:
+> - **P1-H:** a prova de integridade histórica (`certification.history_proof`, contra o histórico git publicado) passa a fazer parte do percurso real que autoriza a certificação. Sem prova: `history_unverified`, sem certificados, sem alertas validados e sem novas entradas.
+> - **P2-I:** o prazo de 3 dias fecha como perda pelo relógio explícito do relatório (`as_of`), mesmo sem outra aposta.
+>
+> **Revisão #5911747123 (commit `345e008`): correções da ronda anterior.** Ver a secção 0-C. Em resumo:
 > - **P1-F:** a certificação usa uma **cadeia sem sobreposição**. Um jogo só entra se, na hora da decisão, o jogo anterior da cadeia já tiver resultado observado. Um jogo sem resultado em 3 dias fecha como perda.
 > - **P1-G:** conta **uma aposta comprometida por jogo**, a primeira decidida. Deixa de haver média por jogo.
 > - **P2:**
@@ -25,6 +29,57 @@
 > **Revisão #5911487915 (commit `ef4606a`): correções da ronda anterior.** Ver a secção 0. Em resumo:
 > - **P1-A e P1-B:** existe agora uma definição única de jogo prospetivo. Um jogo só conta se todas as suas apostas foram emitidas e lidas depois do registo, eram decidíveis e têm hora de resultado provada. Essa definição é usada pelo relatório, pela máquina de estados, pelo `entry_status` e pelo teste de confirmação.
 > - **P1 científico:** escolhida a **via 1**. "Forte" e "confirmada" deixam de usar caudas posteriores com Bonferroni e passam a exigir um **certificado** de um e-processo com nível garantido. Acrescenta-se uma proteção fail-closed no cérebro e no Telegram.
+
+## 0-D. Correções após a revisão #5911845265
+
+**P1-H — integridade histórica no percurso efetivo.** `report.build` chama `certification.history_proof(registo, cópia atual, as_of=now)` antes de `brain.build`. A prova exige tudo o que se segue, e qualquer falha é fail-closed:
+1. git disponível e repositório **não shallow** (histórico completo);
+2. o registo publicado **pelo menos uma vez**. `verify_history([])` deixou de ser prova;
+3. todas as versões publicadas são válidas e cada uma prolonga a anterior sem tocar no génesis, nas legadas nem nas entradas;
+4. a cópia atual prolonga a última publicada;
+5. um ficheiro apagado ou ilegível numa versão é um problema;
+6. **coerência temporal:** o génesis e cada entrada foram publicados no commit que os introduziu entre o seu carimbo e +30 min (`PUBLISH_TOLERANCE_MIN`), nunca antes. 30 min cobre o job de recolha: o relatório escreve, o commit do mesmo job publica, e o job tem timeout de 15 min;
+7. entradas ainda não publicadas não podem ser anteriores à última publicação nem posteriores ao relógio do relatório.
+
+`brain.build(..., history_problems=...)` só ativa a certificação com a prova feita **e** vazia. Com `None` (prova não feita) ou com problemas, o estado é `history_unverified`: sem certificados, sem candidatas (nada é acrescentado ao registo) e sem "tática validada" no Telegram, porque `ledger_valid = false`.
+
+**Limites desta âncora, declarados:**
+- as horas de commit são as do runner do GitHub Actions; o histórico de pushes do GitHub seria uma âncora mais forte, mas exigiria rede e API no relatório;
+- **o workflow atual faz checkout shallow** (`actions/checkout` com profundidade 1), por isso em produção esta prova falha sempre e a certificação fica fechada. É o comportamento correto até um corte autorizado acrescentar `fetch-depth: 0` (ou equivalente) ao workflow. Isso não foi feito: workflows proibidos nesta PR.
+
+**P2-I — fecho aos 3 dias.**
+- `confirmation(..., as_of)`: um jogo admitido sem resultado provado fecha como **perda** no seu prazo logo que `as_of ≥ decisão + 3 dias`, mesmo que não apareça mais nenhuma aposta.
+- Sem `as_of` (avaliações históricas sem relógio) nada é antecipado.
+- `report.build(now=...)` usa um só instante para avaliar, registar seleções e `generated_at_utc`, por isso `register=False` e `register=True` no mesmo instante dão a mesma validação.
+
+**Demonstração contra `9da69d8` e agora** (`counterexamples_review_5911845265`):
+
+| | `9da69d8` | agora |
+|---|---|---|
+| Registo reescrito com hashes recalculados (verificação interna OK) | **`active`, `x` certificada** | `history_unverified`, nada certificado. Prova git: "version 1 is not an append-only extension" |
+| Jogo pendente sozinho, sem mais apostas | pendente para sempre | aos 2d23h pendente; **aos 3d1h perda** (1 jogo, 1 anulado) |
+
+**Testes** (245 no total, 10 novos):
+- **`LedgerHistoryEndToEnd`** usa repositórios git temporários reais, com `report.build` como em produção:
+  - histórico genuíno: ativa e acrescenta, publicado dentro da tolerância;
+  - reescrita com hashes recalculados, antes e depois de ser commitada: `history_unverified`, o ficheiro nunca é estendido e não há "validada" nem ALERTA no Telegram;
+  - nunca publicado, clone shallow, sem git, apagado e recriado;
+  - génesis publicado antes da ativação;
+  - entrada publicada 2 h depois;
+  - entradas não publicadas fora do tempo;
+  - `brain.build` sem prova fechado e com prova `[]` ativo.
+- **`ThreeDayDeadline`:** 2d23h / 3d exatos / 3d1h; sem relógio não antecipa; resultado depois do prazo continua perda; o mesmo instante dá a mesma resposta.
+
+Contra `9da69d8`, 9 dos 10 falham. O que passa, "sem relógio não antecipa", protege um comportamento que já existia.
+
+**Sem regressões** (mesmo snapshot, mesmo relógio): os estados (11 promissoras), o walk-forward, a simulação nula, a sensibilidade, as definições prospetivas, as taxas sintéticas, o ensaio Telegram e **todos** os contraexemplos das revisões anteriores (P1-C a P1-G e P2) dão **exatamente** os mesmos valores da ronda anterior. As 235 regressões anteriores passam.
+
+**Pré-requisitos do corte futuro.** Ficam documentados, mas nada foi preparado nem executado:
+- o workflow tem de passar a fazer checkout com histórico completo (sem isso, a certificação fica fechada);
+- verificação externa (GitHub Actions) de zero execuções antigas ativas ou pendentes, `main` congelada e proibição de re-run; `--confirm-collection-paused` é só uma declaração;
+- hashes dos inputs (`data/`) iguais entre a avaliação fresca, a migração Telegram e a gravação do registo;
+- primeiro commit do registo dentro de 30 min da ativação;
+- todas as marcas Telegram anteriores preservadas; a regra nova é `status_rules:chronological_eprocess_v3`.
 
 ## 0-C. Correções após a revisão #5911747123
 
@@ -318,7 +373,7 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
   - (A1) **nulo condicional:** para cada aposta admitida, sem lucro esperado à odd −2 %, dado tudo o que o sistema sabia na decisão. Pela cadeia, isso inclui os resultados de todos os jogos anteriores admitidos;
   - (A2) **amostra previsível:** condições só em `AS_OF_DIMENSIONS`, uma aposta comprometida por jogo, e admissão e fecho decididos só com horas conhecidas na decisão;
   - (A3) **horas verdadeiras**, verificadas contra o git: leitura dos sinais, primeira observação do resultado do jogo, registo de seleções;
-  - (A4) **registo append-only:** a cadeia interna prova a consistência; o crescimento verifica-se contra as versões publicadas (`verify_history`).
+  - (A4) **registo append-only:** a cadeia interna prova a consistência; o crescimento e as horas verificam-se em cada relatório contra o histórico git publicado (`history_proof`), e sem prova fica fechado.
 - **Não exige** independência entre jogos nem entre hipóteses, nem nenhum pressuposto sobre resultados em falta (fecham como perda).
 - **Sem registo ativo, nenhuma garantia é declarada** e nenhuma tática é validada. É o estado atual e o desta PR.
 - **Verificação empírica:**
@@ -350,7 +405,7 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
 | P(seguidas renderem mais) | 0,43 | 0,60 |
 | IC 90 % *bootstrap* por jogo, ROI das seguidas | — | [−11,2 %; +17,5 %] |
 | Primeiro relatório PR 3 sobre o estado Telegram de produção | — | **0 avisos de estado** (sem migração seriam 2) |
-| `report.build` (2 medições, ruidosas neste contentor) | 8,9–9,1 s | 11,0–12,4 s |
+| `report.build` (2 medições, ruidosas neste contentor) | 8,4–8,8 s | 9,7–9,9 s |
 
 **As 2 hipóteses que mudam** (promissora → em observação) são as que a PR 2 descrevia como "mantidas pela histerese":
 - **"Jogo aberto | Golos até ao sinal = 1 ou 2"** (43 jogos, 0,9496). Na PR 2, a promoção foi confirmada a "15/11 00:17", uma hora **fictícia** dada pela aproximação de 150 min. Na ordem provada, a sequência dos passos 30–43 é 0,92, 0,94, 0,91, 0,87, 0,91, 0,93, 0,944, 0,946, **0,955**, 0,93, 0,94, **0,956**, 0,93, 0,95: nunca houve dois jogos seguidos ≥ 0,95.
@@ -409,7 +464,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 
 ## 8. Testes
 
-**Total:** 235 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada). Destes, 178 são anteriores à PR 3 e 57 estão em `tests/test_chronological_validity.py`. Os novos da revisão #5911747123 estão na secção 0-C.
+**Total:** 245 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada; os testes de histórico usam git local). Destes, 178 são anteriores à PR 3 e 67 estão em `tests/test_chronological_validity.py`. Os novos das revisões #5911747123 e #5911845265 estão nas secções 0-C e 0-D.
 
 **Novos após a revisão #5911603577:**
 - **`AsOfMembership`** (P1-C):
@@ -497,7 +552,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 ```bash
 git fetch --unshallow origin    # a verificação git precisa do histórico completo
 git switch --detach <SHA da PR 3>
-python3.11 scripts/test_offline.py                                    # 235 testes
+python3.11 scripts/test_offline.py                                    # 245 testes
 python3.11 -m unittest tests.test_chronological_validity -v
 python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min; data/ tem de ser igual à base
 ```
@@ -505,7 +560,9 @@ python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min;
 ## 12. Parecer do autor (não substitui a revisão independente)
 
 - **Técnico: aprovado pelo autor**, sujeito a revisão.
-  - P1-F, P1-G e os P2 estão corrigidos. Os contraexemplos da revisão reproduzem-se em `345e008` e falham no código atual, com controlos positivos.
+  - P1-H e P2-I estão corrigidos no percurso real, com testes end-to-end em repositórios git.
+  - P1-F e P1-G, aprovados, ficam inalterados.
+  - Sem regressões no mesmo snapshot.
   - Certificação desligada; sem alterações em produção.
 - **Científico: INCONCLUSIVO** quanto a capacidade preditiva:
   - o walk-forward cronológico dá +3,1 % (IC 90 % −11 % a +18 %), instável a escolhas de minutos;
