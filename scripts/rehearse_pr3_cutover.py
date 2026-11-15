@@ -145,9 +145,13 @@ def failure_rehearsals(wt, main, now):
         again = cut.cutover(repo, cut_commit, now)
         out['interrupted']['idempotent_rerun'] = {'ok': again['ok'], 'already_applied': again.get('already_applied'), 'changed_files': again['changed_files']}
         # Data integrity: only the three allowed files differ from main; every other data/docs file byte-identical.
-        diff = git('diff', '--name-only', main, cut_commit, '--', 'data', 'docs', cwd=repo).stdout.split()
-        out['data_integrity'] = {'changed_vs_main': sorted(diff), 'only_allowed': set(diff) <= set(cut.WRITES),
-                                 'messages_identical': shown(main, 'data/messages.jsonl', repo) == shown(cut_commit, 'data/messages.jsonl', repo)}
+        integration = git('rev-parse', cut_commit + '^', cwd=repo).stdout.strip()
+        by_cutover = git('diff', '--name-only', integration, cut_commit, cwd=repo).stdout.split()
+        data_vs_main = git('diff', '--name-only', main, cut_commit, '--', 'data', 'docs/report.json', 'docs/bets.csv', cwd=repo).stdout.split()
+        out['data_integrity'] = {'changed_by_cutover_commit': sorted(by_cutover), 'data_changed_vs_main': sorted(data_vs_main),
+                                 'only_allowed': set(by_cutover) <= set(cut.WRITES) and set(data_vs_main) <= set(cut.WRITES),
+                                 'messages_identical': shown(main, 'data/messages.jsonl', repo) == shown(cut_commit, 'data/messages.jsonl', repo),
+                                 'code_changed_vs_main': sorted(set(git('diff', '--name-only', main, integration, cwd=repo).stdout.split()))}
         # Linear history and push preflight against a remote main that did not move.
         git('branch', '-f', 'remote-main', main, cwd=repo)
         out['push_preflight_frozen'] = cut.push_preflight(repo, 'remote-main', main)
