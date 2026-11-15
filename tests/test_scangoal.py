@@ -1,4 +1,5 @@
 import itertools
+from unittest.mock import patch
 import json, os, tempfile, unittest
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -440,7 +441,7 @@ class Brain(Hardening):
         return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': ['A', 'B'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
                 'date_utc': '2026-11-%02dT%02d:00:00+00:00' % (10 + i % 5, hour), 'kickoff_utc': None, 'max_mult': mult, 'n_signals': 1, 'share': 90, 'share_last': 90,
                 'mkt_volume': 5000, 'lead_min': None, 'minute': None, 'market': '1X2', 'selection': '1', 'score_at_signal': None, 'x4_min': None,
-                'w': None if win is None else (1.0 if win else -1.0), 'no_source': False}
+                'in_roi': True, 'w': None if win is None else (1.0 if win else -1.0), 'no_source': False}
 
     def test_generator_never_reads_results_and_registry_only_grows(self):
         from scangoal import brain
@@ -512,7 +513,7 @@ class Brain(Hardening):
             'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
             'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
         now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
-        sig = lambda key, date, ko=None: {'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
+        sig = lambda key, date, ko=None: {'in_roi': True, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
         rows = [row('a', 'Jogo aberto', 12, 11, 0.97, [sig('k1', '2026-11-12T19:40:00+00:00'), sig('k2', '2026-11-12T10:00:00+00:00'), sig('k3', '2026-11-12T12:00:00+00:00', '2026-11-12T22:00:00+00:00')]),
                 row('a2', 'Jogo aberto', 12, 11, 0.96),                 # mesma amostra que "a": repetida
                 row('b', 'Jogo aberto', 10, 8, 0.90), row('c', 'Jogo aberto', 9, 7, 0.85),        # a família já tem duas
@@ -530,7 +531,7 @@ class Brain(Hardening):
     def test_agenda_classifies_open_signals_and_drops_started_games(self):
         from scangoal import brain
         now = datetime.fromisoformat('2026-11-13T10:00:00+00:00')
-        s = lambda mid, sel, ko=None, date='2026-11-13T09:00:00+00:00', odds=1.8, **kw: dict({'match_id': mid, 'key': (mid, sel), 'type': 'BETFAIR', 'phase': 'pre', 'market': '1X2',
+        s = lambda mid, sel, ko=None, date='2026-11-13T09:00:00+00:00', odds=1.8, **kw: dict({'in_roi': True, 'match_id': mid, 'key': (mid, sel), 'type': 'BETFAIR', 'phase': 'pre', 'market': '1X2',
             'selection': sel, 'odds': odds, 'odds_last': odds, 'teams': ['A', 'B'], 'league': 'Liga', 'date_utc': date, 'kickoff_utc': ko, 'w': None, 'no_source': False}, **kw)
         good, both, avoid, none, conflict1, conflict2 = (s('g', '1', '2026-11-13T17:00+00:00'), s('m', '2', '2026-11-13T18:00+00:00'), s('a', '1', '2026-11-13T19:00+00:00'),
                                                          s('n', '1', '2026-11-13T20:00+00:00'), s('c', '1', '2026-11-13T21:00+00:00'), s('c', 'X', '2026-11-13T21:00+00:00'))
@@ -751,10 +752,11 @@ class RegimeAndStories(Hardening):
 
 class Notify(unittest.TestCase):
     def report(self, **over):
-        base = {'brain': {'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
+        base = {'brain': {'evidence_scope': 'eligible_bets_only', 'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
                           'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4}},
                 'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
+                'operational': {'scope': 'eligible_bets_only', 'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'daily': [{'day': '2026-11-12', 'bets': 4, 'settled': 3, 'wins': 2, 'units': 0.85}], 'timeline': [{'u': 1.5}], 'settled_bets': 20}
         base.update(over)
         return base
@@ -769,7 +771,7 @@ class Notify(unittest.TestCase):
         self.assertEqual(notify.messages(self.report(), state, noon), [])              # nada de novo: silêncio
         rep = self.report()
         rep['brain']['status_list'] = {'h1': 'forte', 'h2': 'abandonada'}
-        rep['insights']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
+        rep['operational']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
         changed = notify.messages(rep, state, noon)
         self.assertEqual(len(changed), 3)
         self.assertTrue(any('passou a forte' in m for m in changed) and any('Jogo aberto piorou' in m for m in changed))
@@ -787,7 +789,7 @@ class Notify(unittest.TestCase):
         rep = self.report()
         rep['brain']['watch'] = [game('2026-11-12T11:50:00+00:00'), game('2026-11-12T09:00:00+00:00'), game('2026-11-12T08:00:00+00:00', '2026-11-12T20:00')]
         rep['brain']['status_list'] = {'h1': 'forte'}
-        state = {'hello': True, 'statuses': {'h1': 'promissora'}}
+        state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {notify.STATUS_MIGRATION: {}}}
         out = notify.messages(rep, state, noon)
         alerts = [m for m in out if m.startswith('🟢 ALERTA')]
         self.assertEqual(len(alerts), 2)                                               # o sinal de há 3 horas, com o jogo já a decorrer, não gera alerta
@@ -850,17 +852,23 @@ https://scangoal.com/match/armenia-vs-cyprus-20261112?lang=en"""
 
 class Settlement(Hardening):
     def test_manual_result_settles_and_missing_matches_are_listed_with_a_reason(self):
-        live = BETFAIR_LIVE
-        mid = 'kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111'
-        other = BETFAIR_LIVE.replace(mid, 'x-vs-y-20261111')
-        rows = [self.row(1, live, '2026-11-11T12:10:00+00:00'), self.row(2, other, '2026-11-11T12:20:00+00:00')]
-        r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
-        self.assertEqual(sorted((u['match_id'], u['why']) for u in r['unsettled']),
-                         [(mid, 'à espera da fonte de resultados'), ('x-vs-y-20261111', 'as fontes não cobrem este jogo')])
-        self.assertEqual(r['accuracy']['BETFAIR/live']['no_source'], 1)
-        r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação'}}})
-        bet = [b for b in r['recent_bets'] if b['match_id'] == mid][0]
-        self.assertEqual((bet['ft'], bet['settled_by'], r['audit']['manual_results'], len(r['unsettled'])), ([1, 1], 'resultado manual', 1, 1))
+        class FixedDateTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return cls.fromisoformat('2026-11-12T12:00:00+00:00').astimezone(tz)
+
+        with patch('scangoal.report.datetime', FixedDateTime):
+            live = BETFAIR_LIVE
+            mid = 'kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111'
+            other = BETFAIR_LIVE.replace(mid, 'x-vs-y-20261111')
+            rows = [self.row(1, live, '2026-11-11T12:10:00+00:00'), self.row(2, other, '2026-11-11T12:20:00+00:00')]
+            r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
+            self.assertEqual(sorted((u['match_id'], u['why']) for u in r['unsettled']),
+                             [(mid, 'à espera da fonte de resultados'), ('x-vs-y-20261111', 'as fontes não cobrem este jogo')])
+            self.assertEqual(r['accuracy']['BETFAIR/live']['no_source'], 1)
+            r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação'}}})
+            bet = [b for b in r['recent_bets'] if b['match_id'] == mid][0]
+            self.assertEqual((bet['ft'], bet['settled_by'], r['audit']['manual_results'], len(r['unsettled'])), ([1, 1], 'resultado manual', 1, 1))
 
     def test_highlightly_gives_up_only_after_two_complete_late_checks(self):
         from scangoal import results_hl

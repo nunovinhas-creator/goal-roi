@@ -6,7 +6,7 @@ sinais em aberto que encaixam numa hipótese promissora (indício); hipóteses q
 mudanças de comportamento de um tipo de sinal; e um resumo diário depois das 21:00 UTC.
 Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nunca é impresso). Sem eles, não faz nada.
 """
-import json, os, sys
+import copy, json, os, sys, tempfile
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from urllib.error import HTTPError, URLError
@@ -16,6 +16,8 @@ from urllib.request import Request, urlopen
 from .results_bsd import load_json
 from .store import data_dir
 
+STATUS_MIGRATION = 'eligible_statuses_v1'
+EVIDENCE_SCOPE = 'eligible_bets_only'
 SUMMARY_HOUR_UTC = 21
 MAX_WATCH_PER_RUN = 5
 VALID = ('forte', 'confirmada')   # tática validada: 100 ou mais resultados e fasquia corrigida pelo número de hipóteses testadas
@@ -82,9 +84,70 @@ def alert(w, r):
     return '\n'.join(x for x in lines if x)
 
 
+def eligible_statuses(report):
+    brain = report.get('brain') or {}
+    statuses = brain.get('status_list')
+    if brain.get('evidence_scope') != EVIDENCE_SCOPE or not isinstance(statuses, dict):
+        return None
+    allowed = {'em observação', 'promissora', 'forte', 'confirmada', 'abandonada'}
+    if any(not isinstance(k, str) or v not in allowed for k, v in statuses.items()):
+        return None
+    return statuses
+
+
+def migrate_status_reference(report, state, now):
+    """One-time silent baseline change. Does not touch delivery history or send."""
+    new = eligible_statuses(report)
+    if new is None:
+        return False
+    migrations = state.get('migrations') or {}
+    if STATUS_MIGRATION in migrations:
+        return False
+    record = {'at_utc': now.isoformat(timespec='seconds'),
+              'report_generated_at_utc': report.get('generated_at_utc'),
+              'previous_statuses': copy.deepcopy(state.get('statuses')),
+              'baseline_statuses': copy.deepcopy(new)}
+    state.setdefault('migrations', {})[STATUS_MIGRATION] = record
+    state['statuses'] = copy.deepcopy(new)
+    return True
+
+
+def save_state(path, state):
+    """Atomic local replacement; caller must keep the existing single-writer policy."""
+    temp = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=path.parent,
+                                         prefix='.notify-state-', delete=False) as f:
+            temp = f.name
+            json.dump(state, f, indent=1, ensure_ascii=False, sort_keys=True)
+            f.write('\n')
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp, path)
+    finally:
+        if temp and os.path.exists(temp):
+            os.unlink(temp)
+
+
+def migrate_file(now=None):
+    """Offline CLI: migrate only; no credentials, sender, report generation or counters."""
+    report = load_json(data_dir() / 'report.json', None)
+    if not report or eligible_statuses(report) is None:
+        raise NotifyError('eligible report required')
+    path = data_dir() / 'notify_state.json'
+    # Fail closed: a missing/corrupt existing state must not erase delivery history.
+    state = json.loads(path.read_text(encoding='utf-8'))
+    changed = migrate_status_reference(report, state, now or datetime.now(UTC))
+    if changed:
+        save_state(path, state)
+    print('NOTIFY_STATUS_MIGRATED' if changed else 'NOTIFY_STATUS_UNCHANGED')
+    return changed
+
+
 def messages(report, state, now):
     """Relatório + estado anterior -> lista de textos a enviar. Atualiza o estado."""
-    out, brain, ins = [], report.get('brain') or {}, report.get('insights') or {}
+    out, brain = [], report.get('brain') or {}
+    operational = report.get('operational') or {}
     if not state.get('hello'):
         state['hello'] = True
         out.append('Avisos do goal-roi ligados. Vais receber: alertas de jogos que encaixam em táticas validadas, sinais que encaixam em hipóteses promissoras, mudanças de estado e um resumo diário.\n' + PAGE)
@@ -110,8 +173,9 @@ def messages(report, state, now):
                         r['id'], pct(r['hit_rate']), r['n'], r['status'], edge))
     out += fresh
     state['watch_sent'] = sorted(sent)[-400:]
-    old, new = state.get('statuses'), brain.get('status_list') or {}
-    if old is not None:
+    migrate_status_reference(report, state, now)
+    old, new = state.get('statuses'), eligible_statuses(report)
+    if old is not None and new is not None:
         for hid, st in sorted(new.items()):
             if old.get(hid) == st:
                 continue
@@ -126,13 +190,17 @@ def messages(report, state, now):
                 out.append('⛔ Tática deixou de estar validada, voltou a "em observação":\n%s\nDeixa de gerar alertas.' % hid)
             else:
                 out.append('Hipótese voltou a "em observação":\n%s' % hid)
-    state['statuses'] = new
-    old_reg = state.get('regime') or {}
-    for r in ins.get('regime') or []:
-        if r['state'] in ('piorou', 'melhorou') and old_reg.get(r['type']) != r['state']:
-            out.append('Mudança de comportamento: %s %s. Acerto recente %s, antes %s.'
-                       % (KIND.get(r['type'], r['type']), r['state'], pct(r['recent']['hit_rate']), pct(r['before']['hit_rate'])))
-    state['regime'] = {r['type']: r['state'] for r in ins.get('regime') or []}
+    if new is not None:
+        state['statuses'] = copy.deepcopy(new)
+    # Never compare the eligible population to the legacy exploratory state.
+    # Seed silently on migration; leave historical `regime` intact.
+    if operational.get('scope') == 'eligible_bets_only':
+        old_reg = state.get('operational_regime')
+        for r in operational.get('regime') or []:
+            if old_reg is not None and r['state'] in ('piorou', 'melhorou') and old_reg.get(r['type']) != r['state']:
+                out.append('Mudança de comportamento (evidência elegível): %s %s. Acerto recente %s, antes %s.'
+                           % (KIND.get(r['type'], r['type']), r['state'], pct(r['recent']['hit_rate']), pct(r['before']['hit_rate'])))
+        state['operational_regime'] = {r['type']: r['state'] for r in operational.get('regime') or []}
     day = now.date().isoformat()
     if now.hour >= SUMMARY_HOUR_UTC and state.get('summary_day') != day:
         state['summary_day'] = day
@@ -163,13 +231,15 @@ def run(sender=send, now=None, env=None):
         print('NOTIFY_NO_REPORT')
         return None
     path = data_dir() / 'notify_state.json'
-    state = load_json(path, {})
+    state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+    if migrate_status_reference(report, state, now):
+        save_state(path, state)  # Persist the boundary before any fallible send.
     todo, done = messages(report, state, now), 0
     for text in todo:
         sender(token, chat, text)
         done += 1
     state['last_run_utc'], state['sent_total'] = now.isoformat(timespec='seconds'), state.get('sent_total', 0) + done
-    path.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    save_state(path, state)
     print('NOTIFY_OK sent', done)
     return state
 
@@ -185,6 +255,13 @@ def failure(sender=send, now=None, env=None):
 
 
 def main():
+    if '--migrate-statuses' in sys.argv:
+        try:
+            migrate_file()
+        except Exception as exc:
+            print('NOTIFY_MIGRATION_FAILED', type(exc).__name__)
+            sys.exit(1)
+        return
     try:
         failure() if '--failure' in sys.argv else run()
     except Exception as exc:      # só o tipo do erro; nunca o token

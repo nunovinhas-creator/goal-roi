@@ -1,0 +1,115 @@
+{
+ "ok": true,
+ "restored": false,
+ "frozen_main_sha": "affc168f54bd060372eb29bd961a9adf67edd937",
+ "head_sha": "eb03ec9fdb93238206b350d8a178ae6e5412473d",
+ "at_utc": "2026-11-15T09:27:59+00:00",
+ "python": "3.11.18",
+ "report_generated_at_utc": "2026-11-15T09:28:04+00:00",
+ "brain": {
+  "evidence_scope": "eligible_bets_only",
+  "operational_scope": "eligible_bets_only",
+  "hypotheses": 5164,
+  "counts": {
+   "em observação": 5148,
+   "abandonada": 5,
+   "promissora": 11
+  },
+  "exploratory_counts": {
+   "em observação": 5108,
+   "abandonada": 7,
+   "promissora": 49
+  },
+  "eligibility": {
+   "total": 489,
+   "eligible": 370,
+   "excluded": 119,
+   "reasons": {
+    "no_valid_odds": 81,
+    "no_market": 81,
+    "burst": 10,
+    "provenance_not_verified": 40,
+    "had_ft_at_first_sight": 29,
+    "edited_at_first_sight": 30
+   }
+  },
+  "walk_forward": {
+   "followed": {
+    "bets": 133,
+    "settled": 119,
+    "games": 105,
+    "wins": 54,
+    "units": -1.75,
+    "roi": -0.0147,
+    "roi_cut": -0.0316
+   },
+   "skipped": {
+    "bets": 237,
+    "settled": 176,
+    "games": 115,
+    "wins": 84,
+    "units": -5.38,
+    "roi": -0.0306,
+    "roi_cut": -0.0484
+   }
+  }
+ },
+ "reference": {
+  "previous": 56,
+  "baseline": 16,
+  "silenced_transitions": 42
+ },
+ "checks": {
+  "first_call": "NOTIFY_STATUS_MIGRATED",
+  "second_call": "NOTIFY_STATUS_UNCHANGED",
+  "second_call_byte_identical": true,
+  "operational_scope_eligible": true,
+  "statuses_equal_report_status_list": true,
+  "previous_statuses_equal_original": true,
+  "baseline_statuses_equal_report_status_list": true,
+  "delivery_fields_preserved": true,
+  "other_fields_preserved": true,
+  "registry_unchanged": true,
+  "docs_report_equals_data_report": true,
+  "only_allowed_files_changed": true,
+  "next_cycle_status_transitions": 0
+ },
+ "next_cycle_simulated_messages": {},
+ "changed_files": [
+  "data/notify_state.json",
+  "data/report.json",
+  "docs/report.json"
+ ],
+ "sha256_before": {
+  "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/details_hl.json": "c8300a0833c4410e93adf6c08e092ac34952e45092bc920ad19226ee9c584980",
+  "data/hypotheses.json": "f870947223572d42e40f7f45494e8648ea96ffb79cb2ab50b1997cba5943c1fb",
+  "data/llm_notes.json": "a3058163564d484f0c35f9e39faf1d48e11898fe28944ae57c8e02eeb8d9ff22",
+  "data/llm_state.json": "d6e482d2855c54342d0caeffcc2e655dd3089474a280069da099ec14c9dd62e8",
+  "data/messages.jsonl": "145e9743fd643ac1477cd9ea08636058fe730a91440fbd6b95a4f11d5ea3b5d9",
+  "data/notify_state.json": "957a97ea6071462a4f5cf5898d01c8c2d83651f40be36c8eb8f38f3d2617cdf0",
+  "data/report.json": "8378669676d434ced15ad5be88ac40aaf576539467c2af9f46c190953612590f",
+  "data/results_bsd.json": "957539fcb279ba874c54f33a8f13c63f941cf07a17538314e4a2f2c25421581b",
+  "data/results_hl.json": "4a92212e74a0da58405f5cfa2db5c0fdeff7ebaa604c8d05aa0d97f682369361",
+  "data/state.json": "52fba672ae2abf0d7dc8fda1a097604da5f7fcc320b151a807ae75c5b2528fc3",
+  "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+  "docs/bets.csv": "e071cbed0f750c7bc50e7dc8abad483783279b2f74e45f2f10543899d44ca844",
+  "docs/report.json": "8378669676d434ced15ad5be88ac40aaf576539467c2af9f46c190953612590f"
+ },
+ "sha256_after": {
+  "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/details_hl.json": "c8300a0833c4410e93adf6c08e092ac34952e45092bc920ad19226ee9c584980",
+  "data/hypotheses.json": "f870947223572d42e40f7f45494e8648ea96ffb79cb2ab50b1997cba5943c1fb",
+  "data/llm_notes.json": "a3058163564d484f0c35f9e39faf1d48e11898fe28944ae57c8e02eeb8d9ff22",
+  "data/llm_state.json": "d6e482d2855c54342d0caeffcc2e655dd3089474a280069da099ec14c9dd62e8",
+  "data/messages.jsonl": "145e9743fd643ac1477cd9ea08636058fe730a91440fbd6b95a4f11d5ea3b5d9",
+  "data/notify_state.json": "70717baa922b903843d079b5bcfe9a863ae1b4361edba5312e3117a3dc094d0c",
+  "data/report.json": "b04415b437af9252335ac5d9cc5c12fe92f4f98a97747c1e3a9358b4d1c5b469",
+  "data/results_bsd.json": "957539fcb279ba874c54f33a8f13c63f941cf07a17538314e4a2f2c25421581b",
+  "data/results_hl.json": "4a92212e74a0da58405f5cfa2db5c0fdeff7ebaa604c8d05aa0d97f682369361",
+  "data/state.json": "52fba672ae2abf0d7dc8fda1a097604da5f7fcc320b151a807ae75c5b2528fc3",
+  "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+  "docs/bets.csv": "e071cbed0f750c7bc50e7dc8abad483783279b2f74e45f2f10543899d44ca844",
+  "docs/report.json": "b04415b437af9252335ac5d9cc5c12fe92f4f98a97747c1e3a9358b4d1c5b469"
+ }
+}

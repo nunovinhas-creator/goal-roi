@@ -1,0 +1,158 @@
+test_excluded_open_bets_cannot_enter_agenda_or_watch (test_eligibility.Eligibility.test_excluded_open_bets_cannot_enter_agenda_or_watch) ... ok
+test_excluded_results_cannot_train_walk_forward (test_eligibility.Eligibility.test_excluded_results_cannot_train_walk_forward) ... ok
+test_excluded_winners_cannot_promote_or_support_registration (test_eligibility.Eligibility.test_excluded_winners_cannot_promote_or_support_registration) ... ok
+test_fail_closed_and_conflicting_flags (test_eligibility.Eligibility.test_fail_closed_and_conflicting_flags) ... ok
+test_first_invalid_signal_cannot_be_rescued_by_reinforcement (test_eligibility.Eligibility.test_first_invalid_signal_cannot_be_rescued_by_reinforcement) ... ok
+test_33_to_8_silent_and_idempotent_with_history (test_notify_migration.NotifyMigration.test_33_to_8_silent_and_idempotent_with_history) ... ok
+test_corrupt_state_is_not_replaced_with_empty_history (test_notify_migration.NotifyMigration.test_corrupt_state_is_not_replaced_with_empty_history) ... ok
+test_explicit_observation_and_abandonment_are_silent_at_boundary (test_notify_migration.NotifyMigration.test_explicit_observation_and_abandonment_are_silent_at_boundary) ... ok
+test_failed_atomic_save_leaves_state_and_sends_nothing (test_notify_migration.NotifyMigration.test_failed_atomic_save_leaves_state_and_sends_nothing) ... ok
+test_genuine_subsequent_changes_are_not_silenced (test_notify_migration.NotifyMigration.test_genuine_subsequent_changes_are_not_silenced) ... ok
+test_missing_scope_does_not_migrate_or_overwrite_reference (test_notify_migration.NotifyMigration.test_missing_scope_does_not_migrate_or_overwrite_reference) ... ok
+test_offline_migration_persists_once_without_sender_or_counters (test_notify_migration.NotifyMigration.test_offline_migration_persists_once_without_sender_or_counters) ... NOTIFY_STATUS_MIGRATED
+NOTIFY_STATUS_UNCHANGED
+NOTIFY_STATUS_UNCHANGED
+ok
+test_send_failure_cannot_undo_migration_or_consume_delivery (test_notify_migration.NotifyMigration.test_send_failure_cannot_undo_migration_or_consume_delivery) ... NOTIFY_OK sent 1
+NOTIFY_OK sent 0
+ok
+test_watch_and_daily_summary_keep_working (test_notify_migration.NotifyMigration.test_watch_and_daily_summary_keep_working) ... ok
+test_ineligible_wins_change_only_exploratory_statistics (test_operational_evidence.OperationalEvidence.test_ineligible_wins_change_only_exploratory_statistics) ... ok
+test_ineligible_wins_do_not_create_behavior_alerts (test_operational_evidence.OperationalEvidence.test_ineligible_wins_do_not_create_behavior_alerts) ... ok
+test_migration_seeds_silently_and_preserves_legacy_history (test_operational_evidence.OperationalEvidence.test_migration_seeds_silently_and_preserves_legacy_history) ... ok
+test_missing_or_wrong_scope_never_falls_back_or_changes_state (test_operational_evidence.OperationalEvidence.test_missing_or_wrong_scope_never_falls_back_or_changes_state) ... ok
+test_real_dashboard_answer_ignores_exploratory_statistics (test_operational_evidence.OperationalEvidence.test_real_dashboard_answer_ignores_exploratory_statistics) ... ok
+test_report_build_exposes_independent_eligible_population (test_operational_evidence.OperationalEvidence.test_report_build_exposes_independent_eligible_population) ... ok
+test_bot_fields_goal_list_and_confidence_table (test_scangoal.AuditFixes.test_bot_fields_goal_list_and_confidence_table) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.AuditFixes.test_collector_state_daily_csv_and_name_review) ... ok
+test_half_results_count_as_half_and_no_odds_gets_a_baseline (test_scangoal.AuditFixes.test_half_results_count_as_half_and_no_odds_gets_a_baseline) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.AuditFixes.test_interval_groups_bets_of_the_same_match) ... ok
+test_live_asian_handicap_needs_the_bot_mark (test_scangoal.AuditFixes.test_live_asian_handicap_needs_the_bot_mark) ... ok
+test_no_source_extra_time_deleted_and_quota_inputs (test_scangoal.AuditFixes.test_no_source_extra_time_deleted_and_quota_inputs) ... ok
+test_provenance_edited_and_burst_stay_out_of_roi (test_scangoal.AuditFixes.test_provenance_edited_and_burst_stay_out_of_roi) ... ok
+test_result_edit_is_not_counted_as_a_changed_signal (test_scangoal.AuditFixes.test_result_edit_is_not_counted_as_a_changed_signal) ... ok
+test_stake_original_layout_is_trusted_and_late_arrival_is_counted (test_scangoal.AuditFixes.test_stake_original_layout_is_trusted_and_late_arrival_is_counted) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.AuditFixes.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_weakened_lineup_bets_against_the_weakened_side (test_scangoal.AuditFixes.test_weakened_lineup_bets_against_the_weakened_side) ... ok
+test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.BSD.test_alias_file_is_the_only_way_to_bridge_names) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_exact_identity_time_window_and_no_fuzzy (test_scangoal.BSD.test_exact_identity_time_window_and_no_fuzzy) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_pagination_follows_next_and_respects_cap (test_scangoal.BSD.test_pagination_follows_next_and_respects_cap) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
+ok
+test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.BSD.test_unfinished_ambiguous_throttle_and_missing_key) ... BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
+BSD_SKIPPED_TOO_SOON
+BSD_NOT_CONFIGURED
+ok
+test_agenda_classifies_open_signals_and_drops_started_games (test_scangoal.Brain.test_agenda_classifies_open_signals_and_drops_started_games) ... ok
+test_board_shows_best_and_worst_tactics_and_fresh_open_signals (test_scangoal.Brain.test_board_shows_best_and_worst_tactics_and_fresh_open_signals) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.Brain.test_collector_state_daily_csv_and_name_review) ... ok
+test_generator_has_no_size_cap_and_skips_redundant_triples (test_scangoal.Brain.test_generator_has_no_size_cap_and_skips_redundant_triples) ... ok
+test_generator_never_reads_results_and_registry_only_grows (test_scangoal.Brain.test_generator_never_reads_results_and_registry_only_grows) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.Brain.test_interval_groups_bets_of_the_same_match) ... ok
+test_manual_hypothesis_only_counts_signals_after_it_was_written (test_scangoal.Brain.test_manual_hypothesis_only_counts_signals_after_it_was_written) ... ok
+test_new_features_and_entry_points (test_scangoal.Brain.test_new_features_and_entry_points) ... ok
+test_report_registers_hypotheses_only_when_asked (test_scangoal.Brain.test_report_registers_hypotheses_only_when_asked) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Brain.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_status_rules_correction_and_tradable_flag (test_scangoal.Brain.test_status_rules_correction_and_tradable_flag) ... ok
+test_posterior_gives_an_interval_and_the_odds_loss_makes_it_harder (test_scangoal.EvidencePerMatch.test_posterior_gives_an_interval_and_the_odds_loss_makes_it_harder) ... ok
+test_prob_better_needs_five_matches_on_each_side (test_scangoal.EvidencePerMatch.test_prob_better_needs_five_matches_on_each_side) ... ok
+test_prompt_carries_the_track_record_only_when_there_is_one (test_scangoal.EvidencePerMatch.test_prompt_carries_the_track_record_only_when_there_is_one) ... ok
+test_signals_in_the_same_match_share_one_vote (test_scangoal.EvidencePerMatch.test_signals_in_the_same_match_share_one_vote) ... ok
+test_track_record_counts_proposals_in_the_expected_direction (test_scangoal.EvidencePerMatch.test_track_record_counts_proposals_in_the_expected_direction) ... ok
+test_walk_forward_never_uses_results_from_the_future (test_scangoal.EvidencePerMatch.test_walk_forward_never_uses_results_from_the_future) ... ok
+test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop (test_scangoal.FastReads.test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop) ... WATCH_READ_FAILED RuntimeError
+WATCH_READ_FAILED RuntimeError
+WATCH_READ_FAILED RuntimeError
+ok
+test_reads_every_two_minutes_and_reports_only_when_there_is_something_new (test_scangoal.FastReads.test_reads_every_two_minutes_and_reports_only_when_there_is_something_new) ... ok
+test_budget_priority_and_unfinished_are_respected (test_scangoal.GoalMinutes.test_budget_priority_and_unfinished_are_respected) ... HL_DETAILS_OK {"pending": 8, "requests": 4, "stopped": "daily_quota_low", "quota_remaining": 14, "fields_seen": ["awayTeam", "events", "homeTeam", "id", "state"], "stored": 3, "consistent": 3}
+HL_DETAILS_SKIPPED_TOO_SOON
+HL_DETAILS_NOT_CONFIGURED
+ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.GoalMinutes.test_collector_state_daily_csv_and_name_review) ... ok
+test_goal_brewing_is_measured_with_goal_minutes_and_extra_time_uses_90_minutes (test_scangoal.GoalMinutes.test_goal_brewing_is_measured_with_goal_minutes_and_extra_time_uses_90_minutes) ... ok
+test_goals_must_add_up_to_the_final_score (test_scangoal.GoalMinutes.test_goals_must_add_up_to_the_final_score) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.GoalMinutes.test_interval_groups_bets_of_the_same_match) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.GoalMinutes.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.Hardening.test_collector_state_daily_csv_and_name_review) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.Hardening.test_interval_groups_bets_of_the_same_match) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Hardening.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.Highlightly.test_alias_file_is_the_only_way_to_bridge_names) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_exact_identity_time_window_and_no_fuzzy (test_scangoal.Highlightly.test_exact_identity_time_window_and_no_fuzzy) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_finished_only_and_report_priority (test_scangoal.Highlightly.test_finished_only_and_report_priority) ... HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 2, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}}
+ok
+test_pagination_follows_next_and_respects_cap (test_scangoal.Highlightly.test_pagination_follows_next_and_respects_cap) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
+ok
+test_quota_guard_pagination_and_throttle (test_scangoal.Highlightly.test_quota_guard_pagination_and_throttle) ... HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 1, "stopped": "daily_quota_low", "quota_remaining": 10, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 1}}}
+HL_SKIPPED_TOO_SOON
+ok
+test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.Highlightly.test_unfinished_ambiguous_throttle_and_missing_key) ... BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
+BSD_SKIPPED_TOO_SOON
+BSD_NOT_CONFIGURED
+ok
+test_beta_and_evidence (test_scangoal.Insights.test_beta_and_evidence) ... ok
+test_competition_kind_and_league (test_scangoal.Insights.test_competition_kind_and_league) ... ok
+test_report_has_insights_and_safe_narrative (test_scangoal.Insights.test_report_has_insights_and_safe_narrative) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.LanguageModel.test_collector_state_daily_csv_and_name_review) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.LanguageModel.test_interval_groups_bets_of_the_same_match) ... ok
+test_modes_rotate_notes_are_anchored_and_budget_stops_the_day (test_scangoal.LanguageModel.test_modes_rotate_notes_are_anchored_and_budget_stops_the_day) ... LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
+LLM_OK {"last_mode": "refinar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 94.2}
+LLM_OK {"last_mode": "evitar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 141.3}
+LLM_OK {"last_mode": "notas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 0, "last_notes": 1, "neurons_today": 188.4}
+LLM_SKIPPED_DAILY_BUDGET
+LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
+ok
+test_only_proposals_made_of_known_features_are_accepted (test_scangoal.LanguageModel.test_only_proposals_made_of_known_features_are_accepted) ... ok
+test_run_registers_with_birth_date_and_respects_daily_limit (test_scangoal.LanguageModel.test_run_registers_with_birth_date_and_respects_daily_limit) ... LLM_NOT_CONFIGURED
+LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.1-8b-instruct-fast", "last_accepted": 1, "last_rejected": 0, "last_notes": 0, "neurons_today": 3.1}
+LLM_SKIPPED_TOO_SOON
+ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.LanguageModel.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_each_notice_is_sent_once_and_summary_waits_for_the_evening (test_scangoal.Notify.test_each_notice_is_sent_once_and_summary_waits_for_the_evening) ... ok
+test_run_needs_keys_never_prints_token_and_failure_is_hourly (test_scangoal.Notify.test_run_needs_keys_never_prints_token_and_failure_is_hourly) ... NOTIFY_NOT_CONFIGURED
+NOTIFY_OK sent 2
+ok
+test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation (test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation) ... ok
+test_page_does_not_name_the_bot (test_scangoal.PageName.test_page_does_not_name_the_bot) ... ok
+test_betfair_live_draw (test_scangoal.Parser.test_betfair_live_draw) ... ok
+test_betfair_pre (test_scangoal.Parser.test_betfair_pre) ... ok
+test_formats_seen_in_first_real_collection (test_scangoal.Parser.test_formats_seen_in_first_real_collection) ... ok
+test_kickoff_month_unknown (test_scangoal.Parser.test_kickoff_month_unknown) ... ok
+test_non_bets_and_unknown (test_scangoal.Parser.test_non_bets_and_unknown) ... ok
+test_open_game (test_scangoal.Parser.test_open_game) ... ok
+test_split (test_scangoal.Parser.test_split) ... ok
+test_stake_before_and_after_edit (test_scangoal.Parser.test_stake_before_and_after_edit) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.Polymarket.test_collector_state_daily_csv_and_name_review) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.Polymarket.test_interval_groups_bets_of_the_same_match) ... ok
+test_parsed_as_bets_with_lowest_odds_of_a_range (test_scangoal.Polymarket.test_parsed_as_bets_with_lowest_odds_of_a_range) ... ok
+test_settled_and_grouped_by_phase (test_scangoal.Polymarket.test_settled_and_grouped_by_phase) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Polymarket.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.RegimeAndStories.test_collector_state_daily_csv_and_name_review) ... ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.RegimeAndStories.test_interval_groups_bets_of_the_same_match) ... ok
+test_match_story_lists_every_signal_goals_and_result (test_scangoal.RegimeAndStories.test_match_story_lists_every_signal_goals_and_result) ... ok
+test_regime_needs_80_results_and_flags_a_real_change (test_scangoal.RegimeAndStories.test_regime_needs_80_results_and_flags_a_real_change) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.RegimeAndStories.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_accuracy_counts_all_signals_and_no_odds_rule (test_scangoal.Report.test_accuracy_counts_all_signals_and_no_odds_rule) ... ok
+test_edit_adds_result_and_audit (test_scangoal.Report.test_edit_adds_result_and_audit) ... ok
+test_first_signal_rule_reinforcement_and_exclusions (test_scangoal.Report.test_first_signal_rule_reinforcement_and_exclusions) ... ok
+test_asian_handicap_and_market_name_case (test_scangoal.Settle.test_asian_handicap_and_market_name_case) ... ok
+test_asian_totals (test_scangoal.Settle.test_asian_totals) ... ok
+test_other_markets (test_scangoal.Settle.test_other_markets) ... ok
+test_collector_state_daily_csv_and_name_review (test_scangoal.Settlement.test_collector_state_daily_csv_and_name_review) ... ok
+test_highlightly_gives_up_only_after_two_complete_late_checks (test_scangoal.Settlement.test_highlightly_gives_up_only_after_two_complete_late_checks) ... HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 1, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 1, "targets": 0, "matched_this_run": 0, "requests": 0, "events_seen": 0, "stopped": null, "quota_remaining": null, "per_day": {}}
+ok
+test_interval_groups_bets_of_the_same_match (test_scangoal.Settlement.test_interval_groups_bets_of_the_same_match) ... ok
+test_manual_result_settles_and_missing_matches_are_listed_with_a_reason (test_scangoal.Settlement.test_manual_result_settles_and_missing_matches_are_listed_with_a_reason) ... ok
+test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Settlement.test_stake_phase_comes_from_time_not_from_layout) ... ok
+test_append_only_versions (test_scangoal.Store.test_append_only_versions) ... ok
+
+----------------------------------------------------------------------
+Ran 112 tests in 0.461s
+
+OK

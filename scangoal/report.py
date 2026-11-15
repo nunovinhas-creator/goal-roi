@@ -8,6 +8,7 @@ import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
 from . import brain, insights
+from .eligibility import eligible, exclusion_reasons
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -120,6 +121,8 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             if b['edited_at_first_sight']:   # só vimos a versão editada, em que o bot reescreve as linhas das equipas: a hora decide a fase
                 b['phase'] = 'pre' if b['after_kickoff_min'] < 0 else 'live'
         b['in_roi'] = provenance_ok(b)
+        b['evidence_eligible'] = eligible(b)
+        b['evidence_exclusions'] = exclusion_reasons(b)
         b['group'] = group(b)
         f = ft.get(b['match_id']) or note_ft(b, notes)
         from_bsd = False
@@ -380,6 +383,13 @@ def write_csv(signals, path):
                          '%d-%d' % tuple(b['ft']) if b['ft'] else '', res, units, b['settled_by'] or '', 'sim' if b['in_roi'] else 'não'])
 
 
+def operational_evidence(signals):
+    """Decision-facing statistics, independent of the legacy exploratory tables."""
+    rows = [b for b in signals if eligible(b)]
+    return {'scope': 'eligible_bets_only', 'accuracy': accuracy(rows),
+            'regime': insights.regime(rows)}
+
+
 def build(csv_path=None, register=False):
     msgs, ft, marks, notes, audit = load()
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
@@ -446,7 +456,7 @@ def build(csv_path=None, register=False):
     registry = brain.load_registry(reg_path)
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    LAST['signals'] = signals
+    LAST['signals'] = [b for b in signals if eligible(b)]
     brn = brain.build(signals, registry, MIN_SETTLED)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
@@ -472,6 +482,7 @@ def build(csv_path=None, register=False):
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
+        'operational': operational_evidence(signals),
         'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 

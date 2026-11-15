@@ -1,0 +1,12 @@
+{
+ "field": "after.walk_forward.skipped.units",
+ "published": -2.77,
+ "python3.11": -2.78,
+ "python3.12": -2.77,
+ "python3.13": -2.77,
+ "audit_notify_migration_equal_to_published": {
+  "python3.11": true,
+  "python3.12": true
+ },
+ "note": "Python 3.12+ sums floats with Neumaier compensation; -2.775 rounds differently. Only differing field in the whole pr1-metrics.json reproduction."
+}
