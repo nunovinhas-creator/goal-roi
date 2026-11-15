@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-15T15:35:37+00:00",
- "messages": 794,
+ "generated_at_utc": "2026-11-15T15:41:51+00:00",
+ "messages": 796,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 36,
-  "BETFAIR": 172,
-  "STAKE_LOAD": 127,
+  "BETFAIR": 173,
+  "STAKE_LOAD": 128,
   "OPEN_GAME": 141,
   "TOTALS_FORM": 47,
   "WEAKENED_LINEUP": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1226,
+  "versions": 1229,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-15T15:32:42+00:00",
+  "last_collected_at_utc": "2026-11-15T15:41:39+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 30,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T15:34:57+00:00",
+  "collector_last_run_utc": "2026-11-15T15:41:39+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,14 +445,14 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 96,
+  "stake_original_seen": 97,
   "stake_no_score_after_kickoff": 18,
   "stake_sent_45_after_kickoff": 29,
-  "goal_lists": 259,
-  "goal_lists_consistent": 167
+  "goal_lists": 260,
+  "goal_lists_consistent": 168
  },
- "unique_bets": 446,
- "settled_bets": 326,
+ "unique_bets": 448,
+ "settled_bets": 327,
  "unsettled_market": 28,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
@@ -518,7 +518,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
-   "bets": 28,
+   "bets": 29,
    "settled": 19,
    "matches": 19,
    "wins": 6,
@@ -992,7 +992,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 60,
+   "bets": 61,
    "settled": 27,
    "matches": 16,
    "wins": 10,
@@ -1056,32 +1056,32 @@
   },
   "TOTALS_FORM": {
    "bets": 40,
-   "settled": 37,
-   "matches": 37,
-   "wins": 25,
+   "settled": 38,
+   "matches": 38,
+   "wins": 26,
    "pushes": 0,
-   "units": 1.63,
-   "avg_odds": 1.662,
+   "units": 1.97,
+   "avg_odds": 1.663,
    "roi": {
     "odd-0%": {
-     "roi": 0.0441,
+     "roi": 0.0518,
      "ci95": [
-      -0.1967,
-      0.2848
+      -0.183,
+      0.2866
      ]
     },
     "odd-2%": {
-     "roi": 0.0253,
+     "roi": 0.0332,
      "ci95": [
-      -0.2109,
-      0.2616
+      -0.1973,
+      0.2636
      ]
     },
     "odd-5%": {
-     "roi": -0.0027,
+     "roi": 0.0052,
      "ci95": [
-      -0.2322,
-      0.2267
+      -0.2187,
+      0.2291
      ]
     }
    },
@@ -1122,7 +1122,8 @@
     1.51,
     0.51,
     1.23,
-    1.63
+    1.63,
+    1.97
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1173,7 +1174,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 89,
+   "signals": 90,
    "with_result": 47,
    "hits": 19,
    "misses": 28,
@@ -1273,7 +1274,7 @@
    "by_bot_mark": 0,
    "per_day": 0.7,
    "days_to_hint": 38,
-   "days_to_conclusion": 409,
+   "days_to_conclusion": 410,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1308,7 +1309,7 @@
    "roi_announced_odds": 0.1569,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 28.3,
+   "per_day": 28.2,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
    "prudent_rate": 0.623,
@@ -1395,7 +1396,7 @@
    "prob_above_cut": 0.1539
   },
   "STAKE_LOAD": {
-   "signals": 106,
+   "signals": 107,
    "with_result": 57,
    "hits": 24,
    "misses": 31,
@@ -1433,40 +1434,40 @@
   },
   "TOTALS_FORM": {
    "signals": 47,
-   "with_result": 44,
-   "hits": 30,
+   "with_result": 45,
+   "hits": 31,
    "misses": 14,
    "pushes": 0,
-   "eff_hits": 24.5,
+   "eff_hits": 25.0,
    "eff_misses": 14.0,
-   "vote_hits": 24.5,
+   "vote_hits": 25.0,
    "vote_misses": 14.0,
-   "vote_break_even": 0.6079,
-   "games": 44,
+   "vote_break_even": 0.6076,
+   "games": 45,
    "no_source": 0,
    "unsettleable": 0,
-   "hit_rate": 0.6364,
+   "hit_rate": 0.641,
    "ci95": [
-    0.4786,
-    0.7694
+    0.4842,
+    0.7726
    ],
-   "avg_odds": 1.658,
-   "break_even": 0.6079,
+   "avg_odds": 1.659,
+   "break_even": 0.6076,
    "baseline": false,
-   "roi_announced_odds": 0.0356,
+   "roi_announced_odds": 0.0423,
    "seen_late": 7,
    "by_bot_mark": 0,
-   "per_day": 11.2,
+   "per_day": 11.5,
    "days_to_hint": 0,
    "days_to_conclusion": 23,
-   "prudent_rate": 0.6305,
-   "prob_above": 0.636,
-   "edge": 0.0226,
+   "prudent_rate": 0.6342,
+   "prob_above": 0.6582,
+   "edge": 0.0266,
    "edge_ci": [
-    -0.0934,
-    0.1324
+    -0.0886,
+    0.1356
    ],
-   "prob_above_cut": 0.5681
+   "prob_above_cut": 0.5913
   },
   "TOTALS_FORM_NO_ODDS": {
    "signals": 49,
@@ -1590,7 +1591,7 @@
    },
    {
     "type": "TOTALS_FORM",
-    "n": 44,
+    "n": 45,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -1695,58 +1696,85 @@
     "value": "dia de semana"
    },
    {
-    "n": 71,
+    "n": 72,
     "signals": 77,
-    "hits": 55,
+    "hits": 56,
     "misses": 16,
-    "hit_rate": 0.7576,
+    "hit_rate": 0.7594,
     "ci95": [
-     0.6419,
-     0.8449
+     0.6443,
+     0.8461
     ],
-    "break_even": 0.609,
-    "roi": 0.095,
-    "games": 71,
-    "bets": 71,
+    "break_even": 0.6086,
+    "roi": 0.1016,
+    "games": 72,
+    "bets": 72,
     "unidentified": 0,
-    "prudent_rate": 0.738,
-    "prob_above": 0.9918,
-    "edge": 0.1291,
+    "prudent_rate": 0.7397,
+    "prob_above": 0.9928,
+    "edge": 0.1311,
     "edge_ci": [
-     0.0431,
-     0.2078
+     0.0456,
+     0.2094
     ],
-    "prob_above_cut": 0.9856,
+    "prob_above_cut": 0.9872,
     "family": "Forma de golos",
     "dimension": "Dia",
     "value": "fim de semana"
    },
    {
-    "n": 63,
+    "n": 64,
     "signals": 69,
-    "hits": 47,
+    "hits": 48,
     "misses": 16,
-    "hit_rate": 0.7288,
+    "hit_rate": 0.7311,
     "ci95": [
-     0.604,
-     0.8256
+     0.607,
+     0.8272
     ],
-    "break_even": 0.6105,
-    "roi": 0.0653,
-    "games": 63,
-    "bets": 63,
+    "break_even": 0.6101,
+    "roi": 0.0727,
+    "games": 64,
+    "bets": 64,
     "unidentified": 0,
-    "prudent_rate": 0.7117,
-    "prob_above": 0.9632,
-    "edge": 0.1012,
+    "prudent_rate": 0.7137,
+    "prob_above": 0.967,
+    "edge": 0.1036,
     "edge_ci": [
-     0.0086,
-     0.1866
+     0.0116,
+     0.1886
     ],
-    "prob_above_cut": 0.943,
+    "prob_above_cut": 0.9484,
     "family": "Forma de golos",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com um só tipo de sinal"
+   },
+   {
+    "n": 51,
+    "signals": 53,
+    "hits": 39,
+    "misses": 12,
+    "hit_rate": 0.75,
+    "ci95": [
+     0.6122,
+     0.8508
+    ],
+    "break_even": 0.6146,
+    "roi": -0.0335,
+    "games": 51,
+    "bets": 51,
+    "unidentified": 0,
+    "prudent_rate": 0.7267,
+    "prob_above": 0.9665,
+    "edge": 0.1121,
+    "edge_ci": [
+     0.0122,
+     0.2029
+    ],
+    "prob_above_cut": 0.9495,
+    "family": "Forma de golos",
+    "dimension": "Competição",
+    "value": "liga"
    },
    {
     "n": 81,
@@ -1774,33 +1802,6 @@
     "family": "Jogo aberto",
     "dimension": "Parte do jogo",
     "value": "2.ª parte"
-   },
-   {
-    "n": 50,
-    "signals": 53,
-    "hits": 38,
-    "misses": 12,
-    "hit_rate": 0.7474,
-    "ci95": [
-     0.6086,
-     0.8492
-    ],
-    "break_even": 0.6155,
-    "roi": -0.0505,
-    "games": 50,
-    "bets": 50,
-    "unidentified": 0,
-    "prudent_rate": 0.7244,
-    "prob_above": 0.962,
-    "edge": 0.109,
-    "edge_ci": [
-     0.0085,
-     0.2005
-    ],
-    "prob_above_cut": 0.9433,
-    "family": "Forma de golos",
-    "dimension": "Competição",
-    "value": "liga"
    },
    {
     "n": 70,
@@ -2262,58 +2263,58 @@
     "value": "1.ª parte"
    },
    {
-    "n": 56,
-    "signals": 61,
-    "hits": 38,
-    "misses": 18,
-    "hit_rate": 0.6538,
-    "ci95": [
-     0.518,
-     0.7685
-    ],
-    "break_even": 0.6113,
-    "roi": -0.0029,
-    "games": 56,
-    "bets": 56,
-    "unidentified": 0,
-    "prudent_rate": 0.647,
-    "prob_above": 0.7269,
-    "edge": 0.0357,
-    "edge_ci": [
-     -0.0661,
-     0.132
-    ],
-    "prob_above_cut": 0.6566,
-    "family": "Forma de golos",
-    "dimension": "Parte do jogo",
-    "value": "2.ª parte"
-   },
-   {
-    "n": 34,
+    "n": 35,
     "signals": 37,
-    "hits": 24,
+    "hits": 25,
     "misses": 10,
-    "hit_rate": 0.6491,
+    "hit_rate": 0.6552,
     "ci95": [
-     0.466,
-     0.7968
+     0.4734,
+     0.8006
     ],
-    "break_even": 0.5882,
-    "roi": 0.0884,
-    "games": 34,
-    "bets": 34,
+    "break_even": 0.5884,
+    "roi": 0.0956,
+    "games": 35,
+    "bets": 35,
     "unidentified": 0,
-    "prudent_rate": 0.6333,
-    "prob_above": 0.7251,
-    "edge": 0.0451,
+    "prudent_rate": 0.6381,
+    "prob_above": 0.7457,
+    "edge": 0.0496,
     "edge_ci": [
-     -0.0851,
-     0.1673
+     -0.0795,
+     0.1706
     ],
-    "prob_above_cut": 0.673,
+    "prob_above_cut": 0.695,
     "family": "Forma de golos",
     "dimension": "Faixa de odd",
     "value": "odd 1,50 a 2,00"
+   },
+   {
+    "n": 57,
+    "signals": 61,
+    "hits": 39,
+    "misses": 18,
+    "hit_rate": 0.6571,
+    "ci95": [
+     0.522,
+     0.7708
+    ],
+    "break_even": 0.6109,
+    "roi": 0.0059,
+    "games": 57,
+    "bets": 57,
+    "unidentified": 0,
+    "prudent_rate": 0.6497,
+    "prob_above": 0.7447,
+    "edge": 0.0388,
+    "edge_ci": [
+     -0.0624,
+     0.1346
+    ],
+    "prob_above_cut": 0.6763,
+    "family": "Forma de golos",
+    "dimension": "Parte do jogo",
+    "value": "2.ª parte"
    },
    {
     "n": 64,
@@ -2479,7 +2480,7 @@
    },
    {
     "n": 17,
-    "signals": 42,
+    "signals": 43,
     "hits": 6,
     "misses": 11,
     "hit_rate": 0.3529,
@@ -2560,7 +2561,7 @@
    },
    {
     "n": 13,
-    "signals": 42,
+    "signals": 43,
     "hits": 6,
     "misses": 7,
     "hit_rate": 0.4615,
@@ -2584,6 +2585,33 @@
     "family": "Betfair",
     "dimension": "Competição",
     "value": "liga"
+   },
+   {
+    "n": 40,
+    "signals": 42,
+    "hits": 27,
+    "misses": 13,
+    "hit_rate": 0.6286,
+    "ci95": [
+     0.4634,
+     0.7683
+    ],
+    "break_even": 0.61,
+    "roi": 0.015,
+    "games": 40,
+    "bets": 40,
+    "unidentified": 0,
+    "prudent_rate": 0.6244,
+    "prob_above": 0.5885,
+    "edge": 0.0145,
+    "edge_ci": [
+     -0.1063,
+     0.1288
+    ],
+    "prob_above_cut": 0.5212,
+    "family": "Forma de golos",
+    "dimension": "Golos em falta para ganhar",
+    "value": "até 1 golo"
    },
    {
     "n": 12,
@@ -2640,33 +2668,6 @@
     "value": "até 45 min depois do início"
    },
    {
-    "n": 39,
-    "signals": 42,
-    "hits": 26,
-    "misses": 13,
-    "hit_rate": 0.6232,
-    "ci95": [
-     0.457,
-     0.7647
-    ],
-    "break_even": 0.6104,
-    "roi": 0.0067,
-    "games": 39,
-    "bets": 39,
-    "unidentified": 0,
-    "prudent_rate": 0.6203,
-    "prob_above": 0.5637,
-    "edge": 0.0099,
-    "edge_ci": [
-     -0.1116,
-     0.1253
-    ],
-    "prob_above_cut": 0.4962,
-    "family": "Forma de golos",
-    "dimension": "Golos em falta para ganhar",
-    "value": "até 1 golo"
-   },
-   {
     "n": 16,
     "signals": 20,
     "hits": 8,
@@ -2695,7 +2696,7 @@
    },
    {
     "n": 34,
-    "signals": 80,
+    "signals": 81,
     "hits": 17,
     "misses": 17,
     "hit_rate": 0.5,
@@ -2861,28 +2862,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 202,
-    "signals": 281,
-    "hits": 116,
+    "n": 203,
+    "signals": 282,
+    "hits": 117,
     "misses": 86,
-    "hit_rate": 0.5619,
+    "hit_rate": 0.563,
     "ci95": [
-     0.4915,
-     0.6298
+     0.4927,
+     0.6308
     ],
-    "break_even": 0.5761,
-    "roi": -0.0149,
-    "games": 159,
-    "bets": 200,
+    "break_even": 0.5762,
+    "roi": -0.0133,
+    "games": 160,
+    "bets": 201,
     "unidentified": 0,
-    "prudent_rate": 0.5674,
-    "prob_above": 0.436,
-    "edge": -0.0066,
+    "prudent_rate": 0.5688,
+    "prob_above": 0.4482,
+    "edge": -0.0053,
     "edge_ci": [
-     -0.0709,
-     0.0569
+     -0.0696,
+     0.0579
     ],
-    "prob_above_cut": 0.3217,
+    "prob_above_cut": 0.3327,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -2912,7 +2913,7 @@
    },
    {
     "n": 30,
-    "signals": 52,
+    "signals": 53,
     "hits": 6,
     "misses": 24,
     "hit_rate": 0.2034,
@@ -2937,21 +2938,21 @@
    }
   ],
   "luck": {
-   "n": 326,
-   "units": -10.88,
-   "luck_sd": 20.93,
-   "z": -0.52,
+   "n": 327,
+   "units": -10.54,
+   "luck_sd": 20.94,
+   "z": -0.5,
    "max_drawdown": 24.36,
    "longest_losing_run": 7
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 71 em 113, precisa de 54 %, e a probabilidade de estar acima do mínimo é 96 %.",
    "O mais fraco é aposta grande na Stake: 24 em 55, precisa de 55 %, probabilidade de estar acima do mínimo 6 %.",
-   "Saldo de -10,88 unidades em 326 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±41,9 unidades).",
+   "Saldo de -10,54 unidades em 327 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±41,9 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 15 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 30 em 34 (88 % contra 59 % necessários). Indício positivo.",
-   "Forma de golos, dia = fim de semana: 55 em 71 (76 % contra 61 % necessários). Indício positivo.",
-   "Forma de golos, outros sinais no mesmo jogo = jogo com um só tipo de sinal: 47 em 63 (73 % contra 61 % necessários). Indício positivo.",
+   "Forma de golos, dia = fim de semana: 56 em 72 (76 % contra 61 % necessários). Indício positivo.",
+   "Forma de golos, outros sinais no mesmo jogo = jogo com um só tipo de sinal: 48 em 64 (73 % contra 61 % necessários). Indício positivo.",
    "Foram comparados 74 segmentos; com tantos cortes, alguns parecem bons ou maus só por acaso. Um segmento só conta depois de se repetir em dados novos e de chegar a 300 resultados."
   ],
   "method": {
@@ -2966,8 +2967,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "independent_games_hysteresis_v1",
   "eligibility": {
-   "total": 588,
-   "eligible": 446,
+   "total": 590,
+   "eligible": 448,
    "excluded": 142,
    "reasons": {
     "no_valid_odds": 94,
@@ -2982,8 +2983,8 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5546,
-    "promissora": 42
+    "em observação": 5553,
+    "promissora": 43
    },
    "hypotheses": [
     {
@@ -3023,9 +3024,9 @@
     },
     {
      "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 78,
-     "games": 78,
-     "roi": 0.0626,
+     "n": 79,
+     "games": 79,
+     "roi": 0.0695,
      "status": "promissora"
     },
     {
@@ -3044,9 +3045,9 @@
     },
     {
      "id": "Forma de golos | Dia = fim de semana",
-     "n": 71,
-     "games": 71,
-     "roi": 0.095,
+     "n": 72,
+     "games": 72,
+     "roi": 0.1016,
      "status": "promissora"
     },
     {
@@ -3092,6 +3093,13 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 64,
+     "games": 64,
+     "roi": 0.0727,
+     "status": "promissora"
+    },
+    {
      "id": "Jogo aberto | Competição = liga",
      "n": 64,
      "games": 64,
@@ -3099,10 +3107,10 @@
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 63,
      "games": 63,
-     "roi": 0.0653,
+     "roi": 0.1585,
      "status": "promissora"
     },
     {
@@ -3117,13 +3125,6 @@
      "n": 63,
      "games": 63,
      "roi": 0.2406,
-     "status": "promissora"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 62,
-     "games": 62,
-     "roi": 0.153,
      "status": "promissora"
     },
     {
@@ -3176,6 +3177,13 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Parte do jogo = 2.ª parte",
+     "n": 57,
+     "games": 57,
+     "roi": 0.0059,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde",
      "n": 57,
      "games": 57,
@@ -3201,13 +3209,6 @@
      "n": 57,
      "games": 57,
      "roi": 0.0864,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Parte do jogo = 2.ª parte",
-     "n": 56,
-     "games": 56,
-     "roi": -0.0029,
      "status": "em observação"
     },
     {
@@ -3344,6 +3345,20 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Competição = liga",
+     "n": 51,
+     "games": 51,
+     "roi": -0.0335,
+     "status": "promissora"
+    },
+    {
+     "id": "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 51,
+     "games": 51,
+     "roi": 0.171,
+     "status": "promissora"
+    },
+    {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 51,
      "games": 51,
@@ -3356,20 +3371,6 @@
      "games": 51,
      "roi": 0.2017,
      "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Competição = liga",
-     "n": 50,
-     "games": 50,
-     "roi": -0.0505,
-     "status": "promissora"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 50,
-     "games": 50,
-     "roi": 0.1653,
-     "status": "promissora"
     },
     {
      "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60",
@@ -3407,6 +3408,13 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Marcador no momento = empatado",
+     "n": 49,
+     "games": 49,
+     "roi": 0.0138,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 3 ou mais",
      "n": 49,
      "games": 49,
@@ -3435,10 +3443,10 @@
      "status": "promissora"
     },
     {
-     "id": "Forma de golos | Marcador no momento = empatado",
+     "id": "Forma de golos | Hora (UTC) = tarde",
      "n": 48,
      "games": 48,
-     "roi": 0.0059,
+     "roi": 0.0491,
      "status": "em observação"
     },
     {
@@ -3477,10 +3485,17 @@
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Hora (UTC) = tarde",
+     "id": "Forma de golos | Dia = fim de semana & Parte do jogo = 2.ª parte",
      "n": 47,
      "games": 47,
-     "roi": 0.0379,
+     "roi": 0.0673,
+     "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 47,
+     "games": 47,
+     "roi": 0.0421,
      "status": "em observação"
     },
     {
@@ -3544,20 +3559,6 @@
      "n": 46,
      "games": 45,
      "roi": 0.0207,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Parte do jogo = 2.ª parte",
-     "n": 46,
-     "games": 46,
-     "roi": 0.0582,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 46,
-     "games": 46,
-     "roi": 0.0334,
      "status": "em observação"
     },
     {
@@ -3645,6 +3646,27 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Competição = liga & Dia = fim de semana",
+     "n": 44,
+     "games": 44,
+     "roi": 0.0586,
+     "status": "promissora"
+    },
+    {
+     "id": "Forma de golos | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 44,
+     "games": 44,
+     "roi": 0.043,
+     "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Dia = fim de semana & Hora (UTC) = tarde",
+     "n": 44,
+     "games": 44,
+     "roi": 0.1554,
+     "status": "promissora"
+    },
+    {
      "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 44,
      "games": 44,
@@ -3708,25 +3730,18 @@
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Competição = liga & Dia = fim de semana",
+     "id": "Forma de golos | Golos até ao sinal = nenhum",
      "n": 43,
      "games": 43,
-     "roi": 0.0445,
-     "status": "promissora"
-    },
-    {
-     "id": "Forma de golos | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 43,
-     "games": 43,
-     "roi": 0.0274,
+     "roi": 0.0138,
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Dia = fim de semana & Hora (UTC) = tarde",
+     "id": "Forma de golos | Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 43,
      "games": 43,
-     "roi": 0.147,
-     "status": "promissora"
+     "roi": 0.0476,
+     "status": "em observação"
     },
     {
      "id": "Forma de golos | Minuto = 31 a 60",
@@ -3813,17 +3828,17 @@
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Golos até ao sinal = nenhum",
+     "id": "Forma de golos | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 42,
      "games": 42,
-     "roi": 0.0059,
+     "roi": 0.0782,
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
      "n": 42,
      "games": 42,
-     "roi": 0.0397,
+     "roi": 0.0433,
      "status": "em observação"
     },
     {
@@ -3873,20 +3888,6 @@
      "n": 42,
      "games": 13,
      "roi": -0.1021,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 41,
-     "games": 41,
-     "roi": 0.0673,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
-     "n": 41,
-     "games": 41,
-     "roi": 0.0337,
      "status": "em observação"
     },
     {
@@ -3974,10 +3975,31 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Dia = fim de semana & Marcador no momento = empatado",
+     "n": 40,
+     "games": 40,
+     "roi": 0.0797,
+     "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Dia = fim de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 40,
+     "games": 40,
+     "roi": 0.1409,
+     "status": "em observação"
+    },
+    {
      "id": "Forma de golos | Golos até ao sinal = 3 ou mais",
      "n": 40,
      "games": 40,
      "roi": null,
+     "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Golos em falta para ganhar = até 1 golo",
+     "n": 40,
+     "games": 40,
+     "roi": 0.015,
      "status": "em observação"
     },
     {
@@ -4014,35 +4036,14 @@
      "games": 19,
      "roi": -0.2342,
      "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Quota de mercado = menos de 80 %",
-     "n": 40,
-     "games": 21,
-     "roi": -0.1417,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 40,
-     "games": 21,
-     "roi": -0.1908,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Marcador no momento = empatado",
-     "n": 39,
-     "games": 39,
-     "roi": 0.0721,
-     "status": "em observação"
     }
    ]
   },
-  "hypotheses": 5588,
-  "tested": 205,
+  "hypotheses": 5596,
+  "tested": 210,
   "corrected_bar": 0.99976,
   "counts": {
-   "em observação": 5579,
+   "em observação": 5587,
    "promissora": 9
   },
   "board": {
@@ -4153,7 +4154,7 @@
       0.3173
      ],
      "prob_above_cut": 0.9153,
-     "prob_adds": 0.9465,
+     "prob_adds": 0.9417,
      "bets": 8,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4177,27 +4178,27 @@
        "não"
       ]
      ],
-     "n": 23,
-     "hits": 18,
-     "hit_rate": 0.7436,
-     "break_even": 0.5916,
-     "prob_above": 0.879,
-     "roi": 0.2222,
+     "n": 24,
+     "hits": 19,
+     "hit_rate": 0.75,
+     "break_even": 0.5918,
+     "prob_above": 0.8922,
+     "roi": 0.2271,
      "source": "gerador",
      "reason": null,
-     "games": 23,
-     "edge": 0.1004,
+     "games": 24,
+     "edge": 0.1055,
      "edge_ci": [
-      -0.0445,
-      0.2303
+      -0.0377,
+      0.2335
      ],
-     "prob_above_cut": 0.8507,
-     "prob_adds": 0.9223,
-     "bets": 23,
+     "prob_above_cut": 0.8659,
+     "prob_adds": 0.9288,
+     "bets": 24,
      "pending_status": null,
      "entry_status": "em observação",
      "level": "indício inicial",
-     "missing": 7
+     "missing": 6
     },
     {
      "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $",
@@ -4375,15 +4376,6 @@
      "tactic": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não"
     },
     {
-     "date_utc": "2026-11-15T14:59:20+00:00",
-     "kickoff_utc": null,
-     "match": "Club Milano — ASD Caldiero Terme",
-     "selection": "Over 0.75",
-     "market": "Asian Total",
-     "odds": 1.68,
-     "tactic": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
      "date_utc": "2026-11-15T12:22:14+00:00",
      "kickoff_utc": "2026-11-15T19:45+00:00",
      "match": "Spain — England",
@@ -4424,7 +4416,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 29,
+     "odds_band_n": 30,
      "good": [
       {
        "id": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -4442,13 +4434,13 @@
          "não"
         ]
        ],
-       "n": 23,
-       "games": 23,
-       "hits": 18,
-       "break_even": 0.5916,
-       "prob_above": 0.879,
-       "roi": 0.2222,
-       "edge": 0.1004,
+       "n": 24,
+       "games": 24,
+       "hits": 19,
+       "break_even": 0.5918,
+       "prob_above": 0.8922,
+       "roi": 0.2271,
+       "edge": 0.1055,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4468,13 +4460,13 @@
          "tarde"
         ]
        ],
-       "n": 13,
-       "games": 13,
-       "hits": 11,
-       "break_even": 0.5846,
-       "prob_above": 0.8517,
-       "roi": 0.2865,
-       "edge": 0.1077,
+       "n": 14,
+       "games": 14,
+       "hits": 12,
+       "break_even": 0.5854,
+       "prob_above": 0.8699,
+       "roi": 0.2904,
+       "edge": 0.1148,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4490,18 +4482,18 @@
          "odd 1,50 a 2,00"
         ]
        ],
-       "n": 25,
-       "games": 25,
-       "hits": 19,
-       "break_even": 0.5907,
-       "prob_above": 0.8407,
-       "roi": 0.1792,
-       "edge": 0.0837,
+       "n": 26,
+       "games": 26,
+       "hits": 20,
+       "break_even": 0.5909,
+       "prob_above": 0.8566,
+       "roi": 0.1854,
+       "edge": 0.0888,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "good_total": 6,
+     "good_total": 10,
      "bad": [],
      "bad_total": 0
     },
@@ -5904,6 +5896,84 @@
      "bad_total": 17
     },
     {
+     "match_id": "fc-spaeri-vs-fc-iberia-1999-20261115",
+     "match": "FC Spaeri — FC Iberia 1999",
+     "league": "Georgian Erovnuli Liga",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-15T15:40:44+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "FC Spaeri",
+     "odds": 4.2,
+     "odds_last": 4.2,
+     "max_mult": 1,
+     "share": 71,
+     "share_last": 71,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 13,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Volume na seleção",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 24,
+       "games": 23,
+       "hits": 7,
+       "break_even": 0.4489,
+       "prob_above": 0.109,
+       "roi": -0.3421,
+       "edge": -0.1033,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 27,
+       "games": 26,
+       "hits": 8,
+       "break_even": 0.4322,
+       "prob_above": 0.1245,
+       "roi": -0.2152,
+       "edge": -0.0918,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 9
+    },
+    {
      "match_id": "finland-vs-san-marino-20261115",
      "match": "Finland — San Marino",
      "league": "UEFA Nations League",
@@ -6498,6 +6568,72 @@
      "bad_total": 22
     },
     {
+     "match_id": "belgium-vs-italy-20261115",
+     "match": "Belgium — Italy",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-15T19:45+00:00",
+     "date_utc": "2026-11-15T15:37:03+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Over 3",
+     "odds": 1.91,
+     "odds_last": 1.91,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 29,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 15,
+       "games": 9,
+       "hits": 4,
+       "break_even": 0.5427,
+       "prob_above": 0.0415,
+       "roi": -0.5244,
+       "edge": -0.1942,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = tarde",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "tarde"
+        ]
+       ],
+       "n": 18,
+       "games": 13,
+       "hits": 4,
+       "break_even": 0.5394,
+       "prob_above": 0.0485,
+       "roi": -0.59,
+       "edge": -0.1692,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 15
+    },
+    {
      "match_id": "utc-cajamarca-vs-cd-los-chankas-20261116",
      "match": "UTC Cajamarca — CD Los Chankas",
      "league": "Peru Primera Division",
@@ -6639,9 +6775,9 @@
     "misto": 1,
     "sem evidência": 0,
     "contraditório": 8,
-    "evitar": 18
+    "evitar": 20
    },
-   "generated_utc": "2026-11-15T15:35:36+00:00",
+   "generated_utc": "2026-11-15T15:41:50+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6654,9 +6790,9 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5544,
-     "judged": 1996,
-     "as_expected": 990
+     "hypotheses": 5552,
+     "judged": 1998,
+     "as_expected": 1001
     },
     "llm/refinar": {
      "hypotheses": 26,
@@ -6781,11 +6917,11 @@
     },
     {
      "id": "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo",
-     "n": 16,
-     "games": 16,
-     "hit_rate": 0.5862,
-     "break_even": 0.613,
-     "prob_above": 0.4474,
+     "n": 17,
+     "games": 17,
+     "hit_rate": 0.6,
+     "break_even": 0.612,
+     "prob_above": 0.4824,
      "expect": null
     }
    ]
@@ -6793,15 +6929,15 @@
   "walk_forward": {
    "followed": {
     "bets": 143,
-    "settled": 121,
-    "games": 119,
-    "wins": 54,
-    "units": -3.62,
-    "roi": -0.0299,
-    "roi_cut": -0.0459
+    "settled": 122,
+    "games": 120,
+    "wins": 55,
+    "units": -3.28,
+    "roi": -0.0268,
+    "roi_cut": -0.0429
    },
    "skipped": {
-    "bets": 303,
+    "bets": 305,
     "settled": 205,
     "games": 128,
     "wins": 98,
@@ -6930,9 +7066,10 @@
     -0.61,
     -1.61,
     -2.62,
-    -3.62
+    -3.62,
+    -3.28
    ],
-   "prob_followed_better": 0.3121,
+   "prob_followed_better": 0.3215,
    "first_followed_utc": "2026-11-12T16:38:51+00:00",
    "rule": {
     "min_results": 8,
@@ -6941,7 +7078,7 @@
     "known_after_min": 150
    }
   },
-  "expected_by_chance": 10.2,
+  "expected_by_chance": 10.5,
   "top": [
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
@@ -8275,7 +8412,7 @@
      0.3173
     ],
     "prob_above_cut": 0.9153,
-    "prob_adds": 0.9465,
+    "prob_adds": 0.9417,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10560,6 +10697,46 @@
     "last_change": null
    },
    {
+    "id": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Forma de golos",
+    "conditions": [
+     [
+      "Dia",
+      "fim de semana"
+     ],
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 24,
+    "hits": 19,
+    "hit_rate": 0.75,
+    "break_even": 0.5918,
+    "prob_above": 0.8922,
+    "roi": 0.2271,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 24,
+    "bets": 24,
+    "edge": 0.1055,
+    "edge_ci": [
+     -0.0377,
+     0.2335
+    ],
+    "prob_above_cut": 0.8659,
+    "prob_adds": 0.9288,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Dia = dia de semana & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos",
     "family": "Jogo aberto",
     "conditions": [
@@ -11852,46 +12029,6 @@
     ],
     "prob_above_cut": 0.8539,
     "prob_adds": 0.7854,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Dia",
-      "fim de semana"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 23,
-    "hits": 18,
-    "hit_rate": 0.7436,
-    "break_even": 0.5916,
-    "prob_above": 0.879,
-    "roi": 0.2222,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 23,
-    "bets": 23,
-    "edge": 0.1004,
-    "edge_ci": [
-     -0.0445,
-     0.2303
-    ],
-    "prob_above_cut": 0.8507,
-    "prob_adds": 0.9223,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -14067,7 +14204,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 84,
+    "signals": 85,
     "n": 43,
     "hits": 16,
     "hit_rate": 0.3721,
@@ -14125,7 +14262,7 @@
   "scope": "eligible_bets_only",
   "accuracy": {
    "BETFAIR/live": {
-    "signals": 84,
+    "signals": 85,
     "with_result": 43,
     "hits": 16,
     "misses": 27,
@@ -14180,7 +14317,7 @@
     "by_bot_mark": 0,
     "per_day": 2.5,
     "days_to_hint": 9,
-    "days_to_conclusion": 118
+    "days_to_conclusion": 119
    },
    "OPEN_GAME": {
     "signals": 121,
@@ -14207,7 +14344,7 @@
     "roi_announced_odds": 0.1091,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 31.3,
+    "per_day": 31.2,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -14241,7 +14378,7 @@
     "days_to_conclusion": 12
    },
    "STAKE_LOAD": {
-    "signals": 96,
+    "signals": 97,
     "with_result": 48,
     "hits": 21,
     "misses": 25,
@@ -14265,36 +14402,36 @@
     "roi_announced_odds": -0.1817,
     "seen_late": 0,
     "by_bot_mark": 8,
-    "per_day": 15.3,
+    "per_day": 15.2,
     "days_to_hint": 0,
     "days_to_conclusion": 17
    },
    "TOTALS_FORM": {
     "signals": 40,
-    "with_result": 37,
-    "hits": 25,
+    "with_result": 38,
+    "hits": 26,
     "misses": 12,
     "pushes": 0,
-    "eff_hits": 21.0,
+    "eff_hits": 21.5,
     "eff_misses": 12.0,
-    "vote_hits": 21.0,
+    "vote_hits": 21.5,
     "vote_misses": 12.0,
-    "vote_break_even": 0.6062,
-    "games": 37,
+    "vote_break_even": 0.6059,
+    "games": 38,
     "no_source": 0,
     "unsettleable": 0,
-    "hit_rate": 0.6364,
+    "hit_rate": 0.6418,
     "ci95": [
-     0.4662,
-     0.7781
+     0.4727,
+     0.7817
     ],
-    "avg_odds": 1.662,
-    "break_even": 0.6062,
+    "avg_odds": 1.663,
+    "break_even": 0.6059,
     "baseline": false,
-    "roi_announced_odds": 0.0441,
+    "roi_announced_odds": 0.0518,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 11.5,
+    "per_day": 11.8,
     "days_to_hint": 0,
     "days_to_conclusion": 23
    },
@@ -14374,7 +14511,7 @@
    },
    {
     "type": "TOTALS_FORM",
-    "n": 37,
+    "n": 38,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -14422,7 +14559,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 63,
+   "bets": 64,
    "settled": 28,
    "matches": 28,
    "wins": 7,
@@ -14502,7 +14639,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 53,
+   "bets": 54,
    "settled": 23,
    "matches": 23,
    "wins": 7,
@@ -14706,33 +14843,33 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 446,
-   "settled": 326,
-   "matches": 226,
-   "wins": 152,
+   "bets": 448,
+   "settled": 327,
+   "matches": 227,
+   "wins": 153,
    "pushes": 27,
-   "units": -10.88,
-   "avg_odds": 2.343,
+   "units": -10.54,
+   "avg_odds": 2.341,
    "roi": {
     "odd-0%": {
-     "roi": -0.0334,
+     "roi": -0.0322,
      "ci95": [
-      -0.1472,
-      0.0805
+      -0.1457,
+      0.0813
      ]
     },
     "odd-2%": {
-     "roi": -0.0506,
+     "roi": -0.0495,
      "ci95": [
-      -0.1622,
-      0.061
+      -0.1607,
+      0.0618
      ]
     },
     "odd-5%": {
-     "roi": -0.0765,
+     "roi": -0.0753,
      "ci95": [
-      -0.1846,
-      0.0317
+      -0.1832,
+      0.0325
      ]
     }
    },
@@ -14741,6 +14878,32 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T15:40:44+00:00",
+   "match_id": "fc-spaeri-vs-fc-iberia-1999-20261115",
+   "group": "BETFAIR/live/mkt>=10K",
+   "match": "FC Spaeri — FC Iberia 1999",
+   "selection": "FC Spaeri",
+   "odds": 4.2,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-15T15:37:03+00:00",
+   "match_id": "belgium-vs-italy-20261115",
+   "group": "STAKE_LOAD/pre",
+   "match": "Belgium — Italy",
+   "selection": "Over 3",
+   "odds": 1.91,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T15:29:31+00:00",
    "match_id": "fc-guidonia-montecelio-1937-vs-as-ostia-mare-20261115",
@@ -14891,9 +15054,12 @@
    "match": "Club Milano — ASD Caldiero Terme",
    "selection": "Over 0.75",
    "odds": 1.68,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    1
+   ],
+   "w": 0.5,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -15534,32 +15700,6 @@
    "match": "Croatia — Czech Republic",
    "selection": "1x2 & Total: Croatia & Over 1.5",
    "odds": 1.71,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T11:59:55+00:00",
-   "match_id": "belgium-vs-italy-20261115",
-   "group": "POLYMARKET/pre",
-   "match": "Belgium — Italy",
-   "selection": "Polymarket: AH2(+0.5)",
-   "odds": 1.78,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 2,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T11:59:52+00:00",
-   "match_id": "spain-vs-england-20261115",
-   "group": "STAKE_LOAD/pre",
-   "match": "Spain — England",
-   "selection": "Under 3.5",
-   "odds": 1.57,
    "ft": null,
    "w": null,
    "settled_by": null,
@@ -16279,6 +16419,15 @@
      "share": 39,
      "market": "Polymarket",
      "total": 11000.0
+    },
+    {
+     "d": "2026-11-15T15:37:03+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Over 3",
+     "odds": 1.91,
+     "market": "Asian Total",
+     "total": 7000.0
     }
    ],
    "goals": null,
@@ -17357,9 +17506,17 @@
      "market": "Asian Total"
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     71,
+     "0-1"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    0,
+    1
+   ]
   },
   "troyes-u19-vs-paris-fc-u19-20261115": {
    "teams": [
@@ -17560,6 +17717,28 @@
      "mult": 1,
      "share": 64,
      "mkt_volume": 24000.0,
+     "market": "1X2"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "fc-spaeri-vs-fc-iberia-1999-20261115": {
+   "teams": [
+    "FC Spaeri",
+    "FC Iberia 1999"
+   ],
+   "events": [
+    {
+     "d": "2026-11-15T15:40:44+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "1",
+     "odds": 4.2,
+     "mult": 1,
+     "share": 71,
+     "mkt_volume": 10000.0,
      "market": "1X2"
     }
    ],
@@ -20828,6 +21007,16 @@
    "m": "Spezia — Vado FC",
    "s": "Spezia Total: Over 1.5",
    "o": 1.65
+  },
+  {
+   "d": "2026-11-15T14:59:20+00:00",
+   "u": -10.54,
+   "g": 0.34,
+   "w": 0.5,
+   "t": "TOTALS_FORM",
+   "m": "Club Milano — ASD Caldiero Terme",
+   "s": "Over 0.75",
+   "o": 1.68
   }
  ],
  "daily": [
@@ -20860,10 +21049,10 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 98,
-   "settled": 39,
-   "wins": 19,
-   "units": -3.59,
+   "bets": 100,
+   "settled": 40,
+   "wins": 20,
+   "units": -3.25,
    "day": "2026-11-15"
   }
  ]

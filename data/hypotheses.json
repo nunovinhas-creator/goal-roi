@@ -1956,6 +1956,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Competição = liga & Faixa de odd = odd acima de 3,00 & Tamanho do mercado = 10 mil $ ou mais": {
+  "born_utc": "2026-11-15T15:41:39+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Competição = liga & Faixa de odd = odd acima de 3,00 & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-15T07:40:02+00:00",
   "conditions": [
@@ -25777,6 +25796,21 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Mercado com volume alto",
   "source": "llm"
+ },
+ "Betfair | Tamanho do mercado = 10 mil $ ou mais & Volume na seleção = menos de 10 mil $": {
+  "born_utc": "2026-11-15T15:41:39+00:00",
+  "conditions": [
+   [
+    "Tamanho do mercado",
+    "10 mil $ ou mais"
+   ],
+   [
+    "Volume na seleção",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
  },
  "Betfair | Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-12T15:16:56+00:00",
@@ -71992,6 +72026,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Dia = fim de semana & Hora (UTC) = manhã & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Dia = fim de semana & Hora (UTC) = tarde": {
   "born_utc": "2026-11-14T13:16:28+00:00",
   "conditions": [
@@ -76669,6 +76722,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Hora (UTC) = manhã & Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Hora (UTC) = manhã & Número de apostas = várias": {
   "born_utc": "2026-11-15T07:58:56+00:00",
   "conditions": [
@@ -76679,6 +76751,25 @@
    [
     "Número de apostas",
     "várias"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Hora (UTC) = manhã & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
    ]
   ],
   "family": "Polymarket",
@@ -88313,6 +88404,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Dia = fim de semana & Mercado = golos (total asiático) & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Mercado",
+    "golos (total asiático)"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Dia = fim de semana & Mercado = outros mercados": {
   "born_utc": "2026-11-14T15:16:13+00:00",
   "conditions": [
@@ -90561,6 +90671,25 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Mercado",
+    "golos (total asiático)"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
    ]
   ],
   "family": "Stake",
@@ -94419,6 +94548,25 @@
    [
     "Marcador no momento",
     "empatado"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = tarde & Liga = UEFA Nations League & Mercado = golos (total asiático)": {
+  "born_utc": "2026-11-15T15:37:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Liga",
+    "UEFA Nations League"
+   ],
+   [
+    "Mercado",
+    "golos (total asiático)"
    ]
   ],
   "family": "Stake",
