@@ -11,8 +11,13 @@ Regras:
   não feita em tempo real) e não gastam α.
 - Depois, cada relatório com register=True acrescenta, com a hora real, as hipóteses certificáveis que estão promissoras e
   ainda não constam: rank = posição na lista, α = FWER_ALPHA/(rank(rank+1)). Nada é reescrito nem apagado.
-- Cada entrada guarda o hash das condições da hipótese e o hash da entrada anterior (cadeia verificável); o histórico git do
-  ficheiro é o relógio externo.
+- Cada entrada guarda o hash das condições da hipótese e o hash da entrada anterior.
+
+Alcance da verificação (revisão #5911747123, P2): a cadeia de hashes DENTRO do ficheiro só prova consistência interna — um
+ficheiro inteiramente reescrito, com hashes recalculados, também a satisfaz. A prova de que o registo só cresceu é externa:
+verify_history() confirma que cada versão publicada (histórico git do ficheiro, com as horas dos commits do GitHub) prolonga a
+anterior sem alterar nada. O relatório expõe a cabeça da cadeia (ledger_head_sha256), que fica também no histórico git do
+relatório. verify() nunca levanta exceções: qualquer entrada malformada é só um problema, que desliga a certificação.
 """
 import hashlib, json, os, sys, tempfile
 from datetime import datetime, timezone
@@ -47,12 +52,23 @@ def load(path):
         return {'invalid': 'unreadable'}
 
 
+def _str(x):
+    return isinstance(x, str) and bool(x)
+
+
 def verify(ledger, registry=None):
-    """-> lista de problemas (vazia = válido). Qualquer problema desliga TODA a certificação."""
+    """-> lista de problemas (vazia = válido). Nunca levanta exceções. Qualquer problema desliga TODA a certificação."""
+    try:
+        return _verify(ledger, registry)
+    except Exception as exc:          # defesa em profundidade: um registo adulterado nunca derruba o relatório
+        return ['malformed: %s' % type(exc).__name__]
+
+
+def _verify(ledger, registry):
     if not isinstance(ledger, dict):
         return ['not a ledger']
     problems = []
-    if ledger.get('method') != METHOD or ledger.get('alpha') != ALPHA:
+    if ledger.get('method') != METHOD or ledger.get('alpha') != ALPHA or isinstance(ledger.get('alpha'), bool):
         problems.append('method or alpha')
     start = chronology.parse_utc(ledger.get('activated_utc'))
     if start is None:
@@ -60,27 +76,56 @@ def verify(ledger, registry=None):
     legacy, entries = ledger.get('legacy'), ledger.get('entries')
     if not isinstance(legacy, list) or not isinstance(entries, list):
         return problems + ['structure']
-    legacy_ids = {x.get('id') for x in legacy if isinstance(x, dict)}
-    seen, prev_time, prev_hash = set(), start, ledger.get('genesis_sha256')
-    if prev_hash != entry_hash({k: ledger.get(k) for k in ('method', 'alpha', 'activated_utc', 'legacy')}):
+    if any(not isinstance(x, dict) or not _str(x.get('id')) for x in legacy):
+        return problems + ['legacy entries']
+    legacy_ids = [x['id'] for x in legacy]
+    if len(set(legacy_ids)) != len(legacy_ids) or legacy_ids != sorted(legacy_ids):
+        problems.append('legacy ids')
+    if ledger.get('genesis_sha256') != entry_hash({k: ledger.get(k) for k in ('method', 'alpha', 'activated_utc', 'legacy')}):
         problems.append('genesis hash')
+    seen, prev_time, prev_hash = set(), start, ledger.get('genesis_sha256')
+    fields = {'rank', 'id', 'alpha', 'selected_utc', 'conditions_sha256', 'prev_sha256'}
     for j, e in enumerate(entries, 1):
-        if not isinstance(e, dict):
+        if not isinstance(e, dict) or set(e) != fields or not all(_str(e.get(k)) for k in ('id', 'selected_utc', 'conditions_sha256', 'prev_sha256')):
             problems.append('entry %d' % j)
-            continue
-        t = chronology.parse_utc(e.get('selected_utc'))
-        if e.get('rank') != j or e.get('alpha') != alpha_for_rank(j):
+            break
+        t = chronology.parse_utc(e['selected_utc'])
+        if type(e['rank']) is not int or e['rank'] != j or type(e['alpha']) is not float or e['alpha'] != alpha_for_rank(j):
             problems.append('rank/alpha %d' % j)
         if t is None or prev_time is None or t < prev_time:
             problems.append('time %d' % j)
-        if e.get('id') in seen or e.get('id') in legacy_ids or not isinstance(e.get('id'), str):
+        if e['id'] in seen or e['id'] in legacy_ids:
             problems.append('id %d' % j)
-        if e.get('prev_sha256') != prev_hash:
+        if e['prev_sha256'] != prev_hash:
             problems.append('chain %d' % j)
-        if registry is not None and (e.get('id') not in registry or conditions_hash(registry[e['id']]) != e.get('conditions_sha256')):
+        if registry is not None and (e['id'] not in registry or conditions_hash(registry[e['id']]) != e['conditions_sha256']):
             problems.append('conditions %d' % j)
-        seen.add(e.get('id'))
+        seen.add(e['id'])
         prev_time, prev_hash = t or prev_time, entry_hash(e)
+    return problems
+
+
+def head(ledger):
+    """Cabeça da cadeia (hash da última entrada, ou do génesis): publicada no relatório como âncora."""
+    entries = ledger.get('entries') or []
+    return entry_hash(entries[-1]) if entries else ledger.get('genesis_sha256')
+
+
+def verify_history(versions):
+    """Âncora externa: versões publicadas do registo, por ordem (por exemplo, o histórico git do ficheiro). Cada uma tem de ser
+    válida e prolongar a anterior sem alterar o génesis, as legadas nem nenhuma entrada já publicada. -> lista de problemas."""
+    problems, prev = [], None
+    for i, led in enumerate(versions):
+        p = verify(led)
+        if p:
+            problems.append('version %d invalid: %s' % (i, ', '.join(p)))
+            continue
+        if prev is not None:
+            if any(led.get(k) != prev.get(k) for k in ('method', 'alpha', 'activated_utc', 'legacy', 'genesis_sha256')):
+                problems.append('version %d rewrote the genesis' % i)
+            elif led['entries'][:len(prev['entries'])] != prev['entries']:
+                problems.append('version %d is not an append-only extension' % i)
+        prev = led
     return problems
 
 
@@ -92,6 +137,51 @@ def selections(ledger, registry):
     if problems:
         return {}, problems
     return {e['id']: (e['rank'], e['alpha'], chronology.parse_utc(e['selected_utc'])) for e in ledger['entries']}, []
+
+
+PROMISING = ('promissora', 'forte', 'confirmada')
+REPORT_MAX_AGE_MIN = 20
+
+
+def activation_plan(report, notify_state, fresh_rows, status_rules, now, *, collection_paused=False, ledger_exists=False):
+    """Pré-condições da ativação (revisão #5911747123, P2) e o registo a criar. -> (registo ou None, problemas).
+
+    Exige: confirmação explícita de que a recolha está parada (sem escritores concorrentes); nenhum registo existente; o
+    report.json publicado gerado sob as regras atuais, há no máximo REPORT_MAX_AGE_MIN minutos, com o mesmo status_list do
+    cálculo fresco; a migração Telegram das regras atuais já feita. Legadas = TODAS as hipóteses que estão, estiveram ou estão
+    a caminho de ser promissoras (estado, estado pendente e qualquer mudança passada), no cálculo fresco e no relatório.
+    """
+    problems = []
+    if not collection_paused:
+        problems.append('collection not confirmed paused')
+    if ledger_exists:
+        problems.append('ledger already exists')
+    brain_ = (report or {}).get('brain') or {}
+    if brain_.get('status_rules') != status_rules:
+        problems.append('report not produced under %s' % status_rules)
+    made = chronology.parse_utc((report or {}).get('generated_at_utc'))
+    if made is None or not 0 <= (now - made).total_seconds() <= REPORT_MAX_AGE_MIN * 60:
+        problems.append('report is not fresh')
+    fresh = {r['id']: r['status'] for r in fresh_rows if r.get('status') != 'em observação'}
+    if brain_.get('status_list') != fresh:
+        problems.append('report statuses differ from a fresh evaluation')
+    if 'status_rules:%s' % status_rules not in ((notify_state or {}).get('migrations') or {}):
+        problems.append('telegram migration for %s not done' % status_rules)
+    if (brain_.get('validation') or {}).get('state') != 'not_activated':
+        problems.append('validation is not in the not_activated state')
+    if problems:
+        return None, problems
+    legacy = {}
+    for r in fresh_rows:
+        ever = r.get('status') in PROMISING or r.get('pending_status') in PROMISING or any(c.get('to') in PROMISING for c in r.get('status_changes') or [])
+        if ever:
+            legacy[r['id']] = r['status']
+    for hid, st in (brain_.get('status_list') or {}).items():
+        if st in PROMISING:
+            legacy.setdefault(hid, st)
+    ledger = activate({h: 'promissora' if st not in PROMISING else st for h, st in legacy.items()}, now)
+    missing = [h for h, st in fresh.items() if st in PROMISING and h not in {x['id'] for x in ledger['legacy']}]
+    return (None, ['legacy incomplete: %s' % missing]) if missing else (ledger, [])
 
 
 def activate(registry_statuses, now):
@@ -131,19 +221,32 @@ def save(path, ledger):
 
 
 def main():
-    """Ativação manual e única; nunca chamada pela recolha. Exige autorização do proprietário (corte controlado)."""
+    """Ativação manual e única; nunca chamada pela recolha. Só no corte autorizado, com a recolha parada:
+    python -m scangoal.certification --activate --confirm-collection-paused
+    """
+    from . import brain, report as report_mod
     from .store import data_dir
     if '--activate' not in sys.argv:
-        print('usage: python -m scangoal.certification --activate')
+        print('usage: python -m scangoal.certification --activate --confirm-collection-paused')
         sys.exit(2)
     path = data_dir() / FILE
-    if path.exists():
-        print('CERTIFICATION_ALREADY_ACTIVE')
+    now = datetime.now(timezone.utc)
+    published = json.loads((data_dir() / 'report.json').read_text(encoding='utf-8'))
+    notify_state = json.loads((data_dir() / 'notify_state.json').read_text(encoding='utf-8'))
+    report_mod.build(None, register=False)
+    registry = brain.load_registry(data_dir() / 'hypotheses.json')
+    rows = brain.evaluate(report_mod.LAST['signals'], registry, report_mod.MIN_SETTLED)[0]
+    ledger, problems = activation_plan(published, notify_state, rows, brain.STATUS_RULES, now,
+                                       collection_paused='--confirm-collection-paused' in sys.argv, ledger_exists=path.exists())
+    if problems:
+        print('CERTIFICATION_NOT_ACTIVATED', '; '.join(problems))
         sys.exit(1)
-    report = json.loads((data_dir() / 'report.json').read_text(encoding='utf-8'))
-    statuses = (report.get('brain') or {}).get('status_list') or {}
-    save(path, activate(statuses, datetime.now(timezone.utc)))
-    print('CERTIFICATION_ACTIVATED legacy', sum(1 for v in statuses.values() if v in ('promissora', 'forte', 'confirmada')))
+    save(path, ledger)
+    check = verify(load(path), registry)
+    if check:
+        print('CERTIFICATION_ACTIVATION_FAILED_VERIFY', check)
+        sys.exit(1)
+    print('CERTIFICATION_ACTIVATED legacy', len(ledger['legacy']), 'head', head(ledger))
 
 
 if __name__ == '__main__':

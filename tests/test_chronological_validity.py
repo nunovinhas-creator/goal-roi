@@ -4,6 +4,7 @@ Every fixture states its own provenance: when the system read each signal (signa
 result (result_known_utc). Nothing here touches data/, the network or Telegram.
 """
 import json
+import math
 import os
 import random
 import tempfile
@@ -67,6 +68,8 @@ def rows_by_id(signals, registry, ledger=None):
 
 
 THREE_IN_FOUR = ([1.0, 1.0, 1.0, -1.0] * 26)[:102]   # 102 games at 3/4 and odds 2.0: a large, certifiable edge
+CHAIN = 180   # minutes between games: each result (+145 min) is seen before the next decision, so the certification chain
+              # admits every game (review #5911747123: a game decided while the previous one is open never enters it)
 
 
 def follows(wf):
@@ -161,13 +164,13 @@ class HypothesisBirth(unittest.TestCase):
         self.assertGreaterEqual(r['status_changes'][0]['known_utc'], born)                 # dated after registration
 
     def test_hypothesis_added_later_never_rewrites_fixed_decisions(self):
-        own = series(THREE_IN_FOUR)                                                    # 102 games, certified with rank 1
+        own = series(THREE_IN_FOUR, every=CHAIN)                                       # 102 games, certified with rank 1
         base = {'a': hyp()}
         led = make_ledger(base, [(['a'], -30)])
         rows1, _, _ = rows_by_id(own, base, led)
         self.assertEqual(rows1['a']['status'], 'forte')
         # 400 hypotheses registered long after a's last game (one of them selected later), on games played afterwards.
-        later = [sig('s%d' % i, 1.0 if i % 4 else -1.0, 10000 + i * 60, typ='STAKE_LOAD') for i in range(40)]
+        later = [sig('s%d' % i, 1.0 if i % 4 else -1.0, 20000 + i * 60, typ='STAKE_LOAD') for i in range(40)]
         crowd = dict(base, **{'s%d' % k: hyp(born=at(9000), family='Stake', conditions=()) for k in range(400)})
         rows2, tested2, _ = rows_by_id(own + later, crowd, led)
         self.assertEqual(tested2, 401)
@@ -210,7 +213,7 @@ class OnlineConfirmation(unittest.TestCase):
 
     def test_certified_tactic_and_its_certificate(self):
         reg = {'a': hyp()}
-        sigs = series(THREE_IN_FOUR)
+        sigs = series(THREE_IN_FOUR, every=CHAIN)
         r = rows_by_id(sigs, reg, make_ledger(reg, [(['a'], -30)]))[0]['a']
         c = r['confirmation']
         self.assertEqual((r['status'], c['rank'], c['alpha'], c['threshold'], c['certifiable']), ('forte', 1, 0.025, 40.0, True))
@@ -221,10 +224,10 @@ class OnlineConfirmation(unittest.TestCase):
 
     def test_alpha_budget_follows_the_ledger(self):
         self.assertAlmostEqual(sum(brain.alpha_for_rank(j) for j in range(1, 100000)), brain.FWER_ALPHA * (1 - 1 / 100000), places=12)
-        early = series(THREE_IN_FOUR)
-        late = series(THREE_IN_FOUR, start=200, prefix='p', typ='POLYMARKET', market='1X2', selection='1')
+        early = series(THREE_IN_FOUR, every=CHAIN)
+        late = series(THREE_IN_FOUR, start=200, every=CHAIN, prefix='p', typ='POLYMARKET', market='1X2', selection='1')
         reg = {'a': hyp(), 'b': hyp(family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
-        led = make_ledger(reg, [(['a'], -30), (['b'], 150 * 60)])
+        led = make_ledger(reg, [(['a'], -30), (['b'], 150 * CHAIN)])
         rows = rows_by_id(early + late, reg, led)[0]
         self.assertEqual((rows['a']['confirmation']['rank'], rows['b']['confirmation']['rank']), (1, 2))
         self.assertEqual((rows['a']['confirmation']['threshold'], rows['b']['confirmation']['threshold']), (40.0, 120.0))
@@ -235,27 +238,26 @@ class OnlineConfirmation(unittest.TestCase):
         # Boundary null: win probability makes the expected profit at odds -2 % exactly zero; odds 1.4-3.5, some half wins.
         rng, crossed, means = random.Random(77), 0, []
         for run in range(300):
-            games, t = [], T0
+            games = []
             for i in range(400):
                 o = round(rng.uniform(1.4, 3.5), 2)
                 p = 1 / (o * (1 - insights.ODDS_LOSS))
                 w = 1.0 if rng.random() < p else -1.0
                 if w > 0 and rng.random() < 0.1:   # some wins are half wins: lower expected profit, still inside the null
                     w = 0.5 if rng.random() < 0.5 else 1.0
-                t += timedelta(hours=1)
-                b = sig('n%d-%d' % (run, i), w, i * 60, odds=o)
-                games.append((t, b['match_id'], [b]))
+                games.append(sig('n%d-%d' % (run, i), w, i * CHAIN, odds=o))
             c = brain.confirmation(games, T0 - timedelta(days=1), 0.05)
+            self.assertEqual(c['games'], 400)
             crossed += c['log10_e_max'] >= 1.30103
             means.append(c['e_value'])
         self.assertLessEqual(crossed / 300, 0.05)                                      # Ville: P(sup E >= 1/alpha) <= alpha
         self.assertLess(sum(means) / len(means), 1.25)                                 # supermartingale: E[E_n] <= 1 (noisy)
 
     def test_strong_history_without_post_selection_evidence_is_not_certified(self):
-        history = series([1.0] * 90 + [-1.0] * 30)
-        weak_after = series([1.0, -1.0] * 20, start=200)                               # break-even after the selection
-        reg = {'h': hyp(born=at(150 * 60))}
-        r = rows_by_id(history + weak_after, reg, make_ledger(reg, [(['h'], 180 * 60)]))[0]['h']
+        history = series([1.0] * 90 + [-1.0] * 30, every=CHAIN)
+        weak_after = series([1.0, -1.0] * 20, start=200, every=CHAIN)                  # break-even after the selection
+        reg = {'h': hyp(born=at(150 * CHAIN))}
+        r = rows_by_id(history + weak_after, reg, make_ledger(reg, [(['h'], 180 * CHAIN)]))[0]['h']
         self.assertGreaterEqual(r['prob_above'], 0.9999)
         self.assertIsNone(r['confirmation']['certified_utc'])
         self.assertNotIn(r['status'], brain.VALIDATED)
@@ -341,7 +343,7 @@ class ProspectiveEligibility(unittest.TestCase):
 
 class OverlappingHypotheses(unittest.TestCase):
     def test_overlap_is_reported_and_every_hypothesis_pays_its_own_alpha(self):
-        g = series(THREE_IN_FOUR)
+        g = series(THREE_IN_FOUR, every=CHAIN)
         idx = brain.earlier_index(g)
         common = sorted(set.intersection(*(set(brain.atoms(dict(b), set(), idx)) for b in g)) - {('Dia', 'fim de semana'), ('Dia', 'dia de semana')})
         picks = [[], [common[0]], [common[1]], [common[0], common[1]]]
@@ -431,7 +433,7 @@ class Scenarios(unittest.TestCase):
     def run_case(self, rates, seed):
         rng = random.Random(seed)
         outcomes = [1.0 if rng.random() < p else -1.0 for p in rates]
-        sigs = series(outcomes)
+        sigs = series(outcomes, every=CHAIN)
         reg = {'h': hyp(born=at(-60))}
         rows, _, _ = rows_by_id(sigs, reg, make_ledger(reg, [(['h'], -30)]))
         return rows['h'], sigs
@@ -440,7 +442,7 @@ class Scenarios(unittest.TestCase):
         for seed in self.SEEDS:
             r, sigs = self.run_case([0.75] * 160, seed)
             self.assertIn(r['status'], brain.VALIDATED, seed)
-            wf = brain.walk_forward(sigs + [sig('d', None, 200 * 60)], {'h': hyp(born=at(-60))})
+            wf = brain.walk_forward(sigs + [sig('d', None, 200 * CHAIN)], {'h': hyp(born=at(-60))})
             self.assertGreater(wf['followed']['roi'], 0, seed)
 
     def test_no_edge_is_never_validated(self):
@@ -468,12 +470,12 @@ class TelegramRulesMigration(unittest.TestCase):
         return {'generated_at_utc': at(0), 'brain': {'evidence_scope': 'eligible_bets_only', 'status_rules': brain.STATUS_RULES, 'status_list': statuses}}
 
     def test_pr3_rules_rebaseline_silently_once(self):
-        self.assertEqual(brain.STATUS_RULES, 'chronological_eprocess_v2')
+        self.assertEqual(brain.STATUS_RULES, 'chronological_eprocess_v3')
         state = self.production_like_state()
         before = json.loads(json.dumps(state))
         out = notify.messages(self.report({'a': 'promissora'}), state, T0)        # b and c lose their status under PR 3 rules
         self.assertEqual([m for m in out if 'Hipótese' in m or 'Tática' in m], [])
-        key = 'status_rules:chronological_eprocess_v2'
+        key = 'status_rules:chronological_eprocess_v3'
         self.assertEqual(sorted(state['migrations']), sorted(list(before['migrations']) + [key]))
         for k, v in before['migrations'].items():
             self.assertEqual(state['migrations'][k], v)
@@ -502,11 +504,11 @@ class AsOfMembership(unittest.TestCase):
         self.assertFalse(brain.certifiable({'family': 'Jogo aberto', 'conditions': 'x', 'born_utc': EARLY}))
 
     def test_a_later_signal_of_another_family_changes_nothing(self):
-        own = series(THREE_IN_FOUR)
+        own = series(THREE_IN_FOUR, every=CHAIN)
         reg = {'a': hyp(), 'post': hyp(conditions=(('Outros sinais no mesmo jogo', 'jogo com um só tipo de sinal'),))}
         led = make_ledger(reg, [(['a', 'post'], -30)])
         before = rows_by_id(own, reg, led)[0]
-        later = [sig('g%d' % i, 1.0, i * 60 + 90, typ='POLYMARKET', market='1X2', selection='1') for i in range(102)]   # other family, later
+        later = [sig('g%d' % i, 1.0, i * CHAIN + 90, typ='POLYMARKET', market='1X2', selection='1') for i in range(102)]   # other family, later
         after = rows_by_id(own + later, reg, led)[0]
         self.assertEqual(before['a']['confirmation'], after['a']['confirmation'])
         self.assertEqual(before['a']['status'], after['a']['status'])
@@ -516,7 +518,7 @@ class AsOfMembership(unittest.TestCase):
             self.assertNotIn(rows['post']['status'], brain.VALIDATED)
 
     def test_later_reinforcement_or_odds_move_changes_nothing(self):
-        games = [self.betfair('b%d' % i, w, i * 60) for i, w in enumerate(THREE_IN_FOUR)]
+        games = [self.betfair('b%d' % i, w, i * CHAIN) for i, w in enumerate(THREE_IN_FOUR)]
         moved = [dict(b, max_mult=4, n_signals=3, odds_last=1.7) for b in games]          # what later messages add to the same bet
         reg = {'safe': hyp(family='Betfair', conditions=(('Momento', 'durante o jogo'),)),
                'post': hyp(family='Betfair', conditions=(('Reforço', 'sem reforço'),))}
@@ -527,23 +529,24 @@ class AsOfMembership(unittest.TestCase):
         self.assertFalse(a['post']['confirmation']['certifiable'])
         self.assertNotIn(a['post']['status'], brain.VALIDATED)
 
-    def test_bet_decided_after_the_first_result_is_ignored_not_retroactive(self):
-        own = series(THREE_IN_FOUR)
+    def test_other_bets_of_a_game_never_change_the_committed_one(self):
+        own = series(THREE_IN_FOUR, every=CHAIN)
         reg = {'a': hyp()}
         led = make_ledger(reg, [(['a'], -30)])
         base = rows_by_id(own, reg, led)[0]['a']['confirmation']
-        late_bet = [sig('g%d' % i, -1.0, i * 60 + 200, market='Asian Total', selection='Over 3.5') for i in range(102)]   # after +145
-        self.assertEqual(rows_by_id(own + late_bet, reg, led)[0]['a']['confirmation'], base)
-        # Positive control: the same extra bets decided BEFORE the first result do enter the games (and change the e-process).
-        early_bet = [sig('g%d' % i, -1.0, i * 60 + 20, market='Asian Total', selection='Over 3.5', first=125) for i in range(102)]
-        self.assertNotEqual(rows_by_id(own + early_bet, reg, led)[0]['a']['confirmation']['log10_e'], base['log10_e'])
+        for offset, first in ((200, 'result'), (20, 125)):                                # after / before the first result
+            extra = [sig('g%d' % i, -1.0, i * CHAIN + offset, selection='Over 3.5', first=first) for i in range(102)]
+            self.assertEqual(rows_by_id(own + extra, reg, led)[0]['a']['confirmation'], base, offset)
+        # Positive control: changing the committed (first) bet's outcome does change the e-process.
+        flipped = [dict(b, w=-b['w']) if i % 4 == 0 else b for i, b in enumerate(own)]
+        self.assertNotEqual(rows_by_id(flipped, reg, led)[0]['a']['confirmation']['log10_e'], base['log10_e'])
 
 
 class ResultKnownBeforeDecision(unittest.TestCase):
     """Review #5911603577, P1-D: a result the system already had when the bet could still be decided never counts."""
 
     def run_case(self, **kw):
-        sigs = series(THREE_IN_FOUR[:40], **kw)
+        sigs = series(THREE_IN_FOUR[:40], every=CHAIN, **kw)
         reg = {'a': hyp()}
         return rows_by_id(sigs, reg, make_ledger(reg, [(['a'], -30)]))[0]['a'], sigs
 
@@ -570,14 +573,14 @@ class SelectionLedger(unittest.TestCase):
 
     def setUp(self):
         self.reg = {'a': hyp(), 'b': hyp(family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
-        self.data = series(THREE_IN_FOUR) + series(THREE_IN_FOUR, start=200, prefix='p', typ='POLYMARKET', market='1X2', selection='1')
+        self.data = series(THREE_IN_FOUR, every=CHAIN) + series(THREE_IN_FOUR, start=200, every=CHAIN, prefix='p', typ='POLYMARKET', market='1X2', selection='1')
         self.led = make_ledger(self.reg, [(['b'], -30), (['a'], -20)])
 
     def test_late_data_never_reorders_or_rewrites_the_ledger(self):
         first = rows_by_id(self.data, self.reg, self.led)[0]
         # Late facts: results of old games seen again by another source, extra late bets, late signals of other families.
-        late = [sig('g%d' % i, 1.0, i * 60 + 300, selection='Over 1.5') for i in range(50)]
-        late += [sig('p%d' % (200 + i), 1.0, (200 + i) * 60 + 300, typ='STAKE_LOAD') for i in range(50)]
+        late = [sig('g%d' % i, 1.0, i * CHAIN + 300, selection='Over 1.5') for i in range(50)]
+        late += [sig('p%d' % (200 + i), 1.0, (200 + i) * CHAIN + 300, typ='STAKE_LOAD') for i in range(50)]
         second = rows_by_id(self.data + late, self.reg, self.led)[0]
         for hid in ('a', 'b'):
             self.assertEqual(first[hid]['confirmation'], second[hid]['confirmation'], hid)
@@ -635,21 +638,165 @@ class SelectionLedger(unittest.TestCase):
 
 class NumericalRobustness(unittest.TestCase):
     def test_thousands_of_winning_games_never_overflow(self):
-        games = []
-        for i in range(5000):
-            b = sig('w%d' % i, 1.0, i * 60, odds=3.0)
-            games.append((T0 + timedelta(minutes=i * 60 + 150), b['match_id'], [b]))
+        games = [sig('w%d' % i, 1.0, i * CHAIN, odds=3.0) for i in range(5000)]
         c = brain.confirmation(games, T0 - timedelta(days=1), brain.alpha_for_rank(50))
         self.assertEqual(c['games'], 5000)
         self.assertIsNone(c['e_value'])                                                 # beyond e^700: only its log is shown
         self.assertGreater(c['log10_e'], 1000)
         self.assertIsNotNone(c['certified_at'])
         json.dumps(c, default=str)
-        losses = [(t, k, [dict(r[0], w=-1.0)]) for t, k, r in games]
+        losses = [dict(b, w=-1.0) for b in games]
         c = brain.confirmation(losses, T0 - timedelta(days=1), 0.05)
         self.assertLess(c['log10_e'], -60)                                              # 5000 * log10(1 - 1/32) dominates the mixture
         self.assertEqual(c['e_value'], 0.0)
         self.assertIsNone(c['certified_at'])
+
+
+class SimultaneouslyOpenGames(unittest.TestCase):
+    """Review #5911747123, P1-F: 120 games decided before any result, all driven by the SAME fair coin X."""
+    SINCE = T0 - timedelta(days=1)
+
+    def correlated(self, x, spacing=1, known=1000, edge_p=None, seed=0):
+        rng = random.Random(seed)
+        out = []
+        for i in range(120):
+            w = x if edge_p is None else (1.0 if rng.random() < edge_p else -1.0)
+            out.append(sig('c%d' % i, w, i * spacing, known=known - i * spacing))   # every result revealed after all decisions
+        return out
+
+    def test_120_correlated_open_games_never_certify(self):
+        for x in (1.0, -1.0):                                       # each branch has probability 1/2 under the stated null
+            games = self.correlated(x)
+            c = brain.confirmation(games, self.SINCE, brain.alpha_for_rank(1))
+            self.assertEqual((c['admitted'], c['skipped']['overlap']), (1, 119), x)
+            self.assertIsNone(c['certified_at'], x)
+            self.assertLess(c['log10_e_max'], 1)
+        # What the audited rule did: the 120 factors multiplied in reveal order (all wins) certify with a huge margin.
+        log_e = max(120 * math.log1p(lam * (2.0 * 0.98 - 1)) for lam in brain.EPROCESS_LAMBDAS) - math.log(len(brain.EPROCESS_LAMBDAS))
+        self.assertGreater(log_e, math.log(40))
+
+    def test_whole_hypothesis_never_validated_from_correlated_open_games(self):
+        reg = {'a': hyp()}
+        rows = rows_by_id(self.correlated(1.0), reg, make_ledger(reg, [(['a'], -30)]))[0]['a']
+        self.assertIsNone(rows['confirmation']['certified_utc'])
+        self.assertNotIn(rows['status'], brain.VALIDATED)
+
+    def test_controls_sequential_games_with_and_without_edge(self):
+        edge = [sig('e%d' % i, w, i * CHAIN) for i, w in enumerate(THREE_IN_FOUR)]
+        self.assertIsNotNone(brain.confirmation(edge, self.SINCE, brain.alpha_for_rank(1))['certified_at'])     # real edge
+        rng, crossed = random.Random(5), 0
+        for run in range(100):                                       # sequential, no edge (fair coin per game at the boundary)
+            p = 1 / (2.0 * (1 - insights.ODDS_LOSS))
+            games = [sig('z%d-%d' % (run, i), 1.0 if rng.random() < p else -1.0, i * CHAIN) for i in range(200)]
+            crossed += brain.confirmation(games, self.SINCE, brain.alpha_for_rank(1))['certified_at'] is not None
+        self.assertLessEqual(crossed / 100, brain.alpha_for_rank(1))
+
+    def test_real_edge_but_overlapping_games_is_the_price(self):
+        # Honest cost: a true edge on games that are all open together cannot be certified (one admitted game).
+        games = self.correlated(None, edge_p=0.75, seed=3)
+        c = brain.confirmation(games, self.SINCE, brain.alpha_for_rank(1))
+        self.assertEqual((c['admitted'], c['certified_at']), (1, None))
+
+
+class AdaptiveBetsPerGame(unittest.TestCase):
+    """Review #5911747123, P1-G: a second bet only when a later signal points to X = -1 (no result seen yet)."""
+    WIN, LOSS = 2.0 * (1 - insights.ODDS_LOSS) - 1, -1.0
+
+    def game(self, i, x, y, minute):
+        rows = [sig('a%s' % i, x, minute, market='Asian Total', selection='Over 2.5', first=145)]
+        if x < 0:                                                    # the adaptive extra bet, decided after the first one
+            rows.append(sig('a%s' % i, y, minute + 30, market='Asian Total', selection='Over 1.5', first=115))
+        return rows
+
+    def test_exact_expectation_of_the_committed_bet_and_of_the_old_average(self):
+        committed, averaged = [], []
+        for x in (1.0, -1.0):
+            for y in (1.0, -1.0):
+                rows = self.game(0, x, y, 0)
+                committed.append(brain.bet_profit(brain.committed_bet(rows)))
+                profits = [brain.bet_profit(b) for b in rows]
+                averaged.append(sum(profits) / len(profits))         # the per-game mean used before this review
+        self.assertAlmostEqual(sum(committed) / 4, (self.WIN + self.LOSS) / 2)   # = -0.02 <= 0 (null preserved)
+        self.assertGreater(sum(averaged) / 4, 0.2)                                # +0.225: the selective average had an edge
+
+    def test_sequential_adaptive_games_never_certify_under_the_null(self):
+        rng, crossed, old_mean = random.Random(9), 0, []
+        p = 1 / (2.0 * (1 - insights.ODDS_LOSS))                     # boundary: each single bet has zero expected profit
+        for run in range(200):
+            games = []
+            for i in range(200):
+                x = 1.0 if rng.random() < p else -1.0
+                y = 1.0 if rng.random() < p else -1.0
+                rows = self.game('%d-%d' % (run, i), x, y, i * CHAIN)
+                games += rows
+                prof = [brain.bet_profit(b) for b in rows]
+                old_mean.append(sum(prof) / len(prof))
+            crossed += brain.confirmation(games, T0 - timedelta(days=1), 0.05)['certified_at'] is not None
+        self.assertLessEqual(crossed / 200, 0.05)
+        self.assertGreater(sum(old_mean) / len(old_mean), 0.2)       # the old per-game average drifted upwards
+
+
+class LedgerHardening(unittest.TestCase):
+    """Review #5911747123, P2: malformed entries never raise; append-only proven against history; activation guarded."""
+
+    def setUp(self):
+        self.reg = {'a': hyp(), 'b': hyp(family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
+        self.led = make_ledger(self.reg, [(['a'], -30), (['b'], -20)])
+
+    def test_malformed_ledgers_are_problems_not_crashes(self):
+        bad = [None, [], 'x', {}, dict(self.led, entries=None), dict(self.led, legacy=[[]]), dict(self.led, legacy=[{'id': []}]),
+               dict(self.led, entries=[{}]), dict(self.led, entries=[dict(self.led['entries'][0], id=[])]),
+               dict(self.led, entries=[dict(self.led['entries'][0], rank='1')]), dict(self.led, entries=[dict(self.led['entries'][0], alpha=True)]),
+               dict(self.led, entries=[dict(self.led['entries'][0], prev_sha256=123)]), dict(self.led, entries=[dict(self.led['entries'][0], extra=1)]),
+               dict(self.led, alpha=True), dict(self.led, activated_utc=7), {'invalid': 'unreadable'}]
+        for led in bad:
+            problems = certification.verify(led, self.reg)
+            self.assertTrue(problems, led)
+            out = brain.build(series([1.0] * 10), self.reg, 300, led)
+            self.assertIn(out['validation']['state'], ('ledger_invalid', 'not_activated'))
+            self.assertEqual(out['validation']['certified'], [])
+        self.assertEqual(certification.verify(self.led, self.reg), [])
+
+    def test_history_detects_rewrites_that_the_internal_chain_cannot(self):
+        rewritten = certification.activate({}, T0 - timedelta(days=1))   # same activation, entries in another order, rehashed
+        certification.append(rewritten, ['b'], self.reg, T0 - timedelta(minutes=30))
+        certification.append(rewritten, ['a'], self.reg, T0 - timedelta(minutes=20))
+        self.assertEqual(certification.verify(rewritten, self.reg), [])                  # internally consistent
+        self.assertTrue(certification.verify_history([self.led, rewritten]))             # but not an extension of what was published
+        first = make_ledger(self.reg, [(['a'], -30)])
+        self.assertEqual(certification.verify_history([first, self.led]), [])            # a genuine append
+        diverged = json.loads(json.dumps(first))
+        certification.append(diverged, ['b'], self.reg, T0 - timedelta(minutes=10))
+        self.assertTrue(certification.verify_history([self.led, diverged]))              # divergent prefix
+        self.assertTrue(certification.verify_history([self.led, first]))                 # truncation
+        self.assertNotEqual(certification.head(self.led), certification.head(first))
+
+    def rows(self):
+        return [{'id': 'p', 'status': 'promissora', 'pending_status': None, 'status_changes': [{'to': 'promissora'}]},
+                {'id': 'q', 'status': 'em observação', 'pending_status': 'promissora', 'status_changes': []},
+                {'id': 'r', 'status': 'em observação', 'pending_status': None, 'status_changes': [{'to': 'promissora'}, {'to': 'em observação'}]},
+                {'id': 's', 'status': 'em observação', 'pending_status': None, 'status_changes': []}]
+
+    def test_activation_preconditions_and_complete_legacy(self):
+        now = T0
+        report = {'generated_at_utc': at(-5), 'brain': {'status_rules': brain.STATUS_RULES, 'status_list': {'p': 'promissora'},
+                                                        'validation': {'state': 'not_activated'}}}
+        state = {'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
+        ok = dict(collection_paused=True, ledger_exists=False)
+        led, problems = certification.activation_plan(report, state, self.rows(), brain.STATUS_RULES, now, **ok)
+        self.assertEqual(problems, [])
+        self.assertEqual([x['id'] for x in led['legacy']], ['p', 'q', 'r'])            # current, pending and past promising
+        self.assertEqual(certification.verify(led), [])
+        cases = {'paused': dict(ok, collection_paused=False), 'exists': dict(ok, ledger_exists=True)}
+        for name, kw in cases.items():
+            self.assertTrue(certification.activation_plan(report, state, self.rows(), brain.STATUS_RULES, now, **kw)[1], name)
+        variants = {'old_rules': dict(report, brain=dict(report['brain'], status_rules='independent_games_hysteresis_v1')),
+                    'stale': dict(report, generated_at_utc=at(-60)), 'future': dict(report, generated_at_utc=at(5)),
+                    'differs': dict(report, brain=dict(report['brain'], status_list={})),
+                    'active': dict(report, brain=dict(report['brain'], validation={'state': 'active'}))}
+        for name, rep in variants.items():
+            self.assertTrue(certification.activation_plan(rep, state, self.rows(), brain.STATUS_RULES, now, **ok)[1], name)
+        self.assertTrue(certification.activation_plan(report, {'migrations': {}}, self.rows(), brain.STATUS_RULES, now, **ok)[1])
 
 
 class ReportProvenance(unittest.TestCase):

@@ -42,11 +42,12 @@ MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo 
 HINT_AT, STRONG_AT = 30, 100                       # jogos independentes
 BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de jogos e limiares de probabilidade
 TRACK_MIN = 10           # jogos para uma hipótese entrar no balanço das propostas
-STATUS_RULES = 'chronological_eprocess_v2'        # muda quando as regras de estado mudam (migração silenciosa no Telegram)
+STATUS_RULES = 'chronological_eprocess_v3'        # muda quando as regras de estado mudam (migração silenciosa no Telegram)
 VALIDATION_METHOD = 'eprocess_online_alpha_v1'     # o Telegram só anuncia validadas certificadas por este método
 FWER_ALPHA = 0.05        # erro de família, para toda a vida do projeto, das táticas certificadas (forte/confirmada)
 EPROCESS_LAMBDAS = (0.5, 0.25, 0.125, 0.0625, 0.03125)   # fixados a priori (grelha geométrica); nunca escolhidos pelos dados
 VALIDATED = ('forte', 'confirmada')
+OPEN_TIMEOUT_DAYS = 3       # = report.NO_SOURCE_AFTER_DAYS: jogo da cadeia sem resultado até lá fecha como perda
 PROSPECTIVE_MIN = HINT_AT   # jogos operacionais posteriores (ao registo / à seleção) exigidos à evidência prospetiva e à certificação
 PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / manter-se (histerese: o dobro do erro admitido)
 ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
@@ -324,17 +325,24 @@ def prospective_summary(ordered, born):
             'roi': round(sum(pls) / len(pls), 4) if pls else None, 'categories': cats}
 
 
-def game_profit(rows):
-    """Lucro por unidade do jogo à odd anunciada com perda ODDS_LOSS (mais exigente do que a odd anunciada); apostas
-    repetidas contam uma vez, apostas diferentes do mesmo jogo fazem média. Sempre em [-1, ∞). None se algo for inválido."""
-    bets = {}
-    for b in rows:
-        o, w = b.get('odds'), b.get('w')
-        if isinstance(o, bool) or not isinstance(o, (int, float)) or not math.isfinite(o) or o <= 1 or w is None or not -1 <= w <= 1:
-            return None
-        bets.setdefault(bet_identity(b), []).append(w * (o * (1 - insights.ODDS_LOSS) - 1) if w > 0 else w)
-    vals = [sum(v) / len(v) for _, v in sorted(bets.items(), key=lambda kv: str(kv[0]))]
-    return sum(vals) / len(vals) if vals else None
+def bet_profit(b):
+    """Lucro por unidade de UMA aposta à odd anunciada com perda ODDS_LOSS; em [-1, ∞). None se a odd ou o resultado forem inválidos."""
+    o, w = b.get('odds'), b.get('w')
+    if isinstance(o, bool) or not isinstance(o, (int, float)) or not math.isfinite(o) or o <= 1:
+        return None
+    if isinstance(w, bool) or not isinstance(w, (int, float)) or not -1 <= w <= 1:
+        return None
+    return w * (o * (1 - insights.ODDS_LOSS) - 1) if w > 0 else float(w)
+
+
+def committed_bet(rows):
+    """A aposta COMPROMETIDA de um jogo (revisão #5911747123, P1-G): a primeira aposta da hipótese a ser decidida nesse jogo
+    (hora da decisão, depois hora de envio e identidade). Fica fixada nesse instante; apostas posteriores do mesmo jogo, noutros
+    mercados ou seleções, nunca a substituem nem entram numa média. Considera também apostas ainda abertas ou devolvidas."""
+    timed = [b for b in rows if chronology.decision_time(b) is not None]
+    if not timed:
+        return None
+    return min(timed, key=lambda b: (chronology.decision_time(b), chronology.signal_time(b) or _LAST, str(b.get('key'))))
 
 
 def _log_mean_exp(logs):
@@ -342,38 +350,82 @@ def _log_mean_exp(logs):
     return top + math.log(sum(math.exp(x - top) for x in logs) / len(logs))
 
 
-def confirmation(ordered, since, alpha):
-    """Teste de confirmação com nível garantido: e-processo de apostas (testing by betting) sobre o lucro por jogo.
+def confirmation(match, since, alpha):
+    """Teste de confirmação com nível garantido: e-processo de apostas (testing by betting), em cadeia sem sobreposição.
 
-    Nulo (por hipótese): em cada jogo usado, o lucro esperado à odd anunciada −2 %, dado tudo o que se sabia quando as suas
-    apostas foram decididas, é <= 0 ("sem vantagem"). E_n = média sobre EPROCESS_LAMBDAS de prod(1 + λ·y_i); y_i >= −1 e
-    λ <= 1/2, por isso cada fator é > 0 e, sob o nulo, E_n é uma supermartingala não negativa (E_0 = 1). Desigualdade de
-    Ville: P(algum n com E_n >= 1/α) <= α (observação contínua, odds diferentes, resultados fracionários).
-    Amostra previsível (revisão #5911603577): só jogos operacionais com sinais posteriores a `since` (a seleção REGISTADA),
-    só as apostas decididas antes de qualquer resultado do jogo ser conhecido, pela ordem em que esses jogos ficaram completos.
-    Tudo em domínio logarítmico: séries longas nunca transbordam. Certifica quando log E_n >= log(1/α) e n >= PROSPECTIVE_MIN.
+    Amostra (revisões #5911603577 e #5911747123), toda decidida com informação disponível na hora de cada decisão:
+    1. em cada jogo, só a aposta comprometida (committed_bet): uma aposta por jogo, fixada na primeira decisão (P1-G);
+    2. o jogo é candidato se essa aposta foi emitida e lida depois de `since` (a seleção registada), era decidível, e nenhum
+       resultado do jogo tinha sido observado até à decisão mais tardia possível (latest_decision); um resultado já
+       existente sem hora provada exclui o jogo (fail-closed);
+    3. CADEIA SEM SOBREPOSIÇÃO (P1-F): um candidato só é admitido se, na hora da sua decisão, o último jogo admitido já
+       estiver fechado; os outros são ignorados. Cada fator é assim decidido depois de revelados todos os anteriores;
+    4. um jogo admitido fecha quando o seu resultado é observado (hora provada); se não for observado até OPEN_TIMEOUT_DAYS
+       depois da decisão, fecha nesse instante como PERDA (y = −1), definitivamente.
+
+    Nulo H₀ (por hipótese): para cada aposta admitida, E[y | tudo o que o sistema sabia na hora da decisão] <= 0, com y o
+    lucro à odd anunciada −2 % (y = 0 se devolvida/anulada). Como (1 − λ) <= 1 + λ·y para todo y >= −1, o fator efetivo nunca
+    excede 1 + λ·y verdadeiro: sob H₀, E[fator | F_decisão] <= 1, e F_decisão contém os fatores anteriores (cadeia). Logo
+    E_n = média sobre λ de prod(fatores) é uma supermartingala não negativa e, pela desigualdade de Ville,
+    P(algum n com E_n >= 1/α) <= α, sob qualquer dependência entre jogos. Tudo em domínio logarítmico.
     """
-    games = []
-    for _, key, rows in ordered:
-        if not operational_game(rows, since):
+    games = {}
+    for b in match:
+        key = game_identity(b)
+        if key is not None:
+            games.setdefault(key, []).append(b)
+    cands, skipped = [], {'not_operational': 0, 'result_seen_before_decision': 0, 'overlap': 0}
+    for key, rows in games.items():
+        b = committed_bet(rows)
+        if b is None:
             continue
-        core = game_core(rows)
-        y = game_profit(core)
-        if y is None:
+        t, sent, stamp = chronology.decision_time(b), chronology.signal_time(b), chronology.parse_utc(b.get('signal_seen_utc'))
+        if since is None or sent is None or stamp is None or sent <= since or stamp <= since or not chronology.decidable(b):
+            skipped['not_operational'] += 1
             continue
-        games.append((max(chronology.result_known(b) for b in core), min(chronology.signal_time(b) for b in core), key, y))
-    games.sort()
+        first = chronology.parse_utc(b.get('match_result_first_seen_utc'))
+        settled = b.get('w') is not None
+        if (first is not None and latest_decision(b) >= first) or (settled and first is None):
+            skipped['result_seen_before_decision'] += 1      # resultado já visto, ou existente sem hora provada: nunca entra
+            continue
+        cands.append((t, sent, str(b.get('key')), b))
+    cands.sort(key=lambda c: c[:3])
     logs, n, log_e, log_max, cert, bar = [0.0] * len(EPROCESS_LAMBDAS), 0, 0.0, 0.0, None, math.log(1 / alpha)
-    for done, _, _, y in games:
+    open_until, pending, admitted, voided = None, False, 0, 0
+    timeout = timedelta(days=OPEN_TIMEOUT_DAYS)
+
+    def close(y, closed):
+        nonlocal n, log_e, log_max, cert
         n += 1
         for k, lam in enumerate(EPROCESS_LAMBDAS):
             logs[k] += math.log1p(lam * y)
         log_e = _log_mean_exp(logs)
         log_max = max(log_max, log_e)
         if cert is None and n >= PROSPECTIVE_MIN and log_e >= bar:
-            cert = done
+            cert = closed
+
+    for t, _, _, b in cands:
+        if open_until is not None and t < open_until:
+            skipped['overlap'] += 1                           # o último jogo admitido ainda estava aberto nesta decisão
+            continue
+        if pending:                                           # o anterior não teve resultado até ao prazo: perda, nesse prazo
+            close(-1.0, open_until)
+            voided, pending = voided + 1, False
+        admitted += 1
+        deadline = t + timeout
+        if b.get('w') is None:                                # ainda aberto: bloqueia a cadeia até ao resultado ou ao prazo
+            open_until, pending = deadline, True
+            continue
+        known, verdict = chronology.result_check(b)
+        y = bet_profit(b) if verdict == 'verified' and known <= deadline else None
+        if y is None:                                         # tardio, sem hora provada ou inválido: perda no prazo
+            y, known = -1.0, deadline
+            voided += 1
+        open_until = known
+        close(y, known)
     shown = lambda x: round(math.exp(x), 4) if x < 700 else None   # e-valor legível; acima de e^700 só o log10
-    return {'games': n, 'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
+    return {'games': n, 'admitted': admitted, 'voided_as_loss': voided, 'pending': admitted - n, 'skipped': skipped,
+            'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
             'log10_e_max': round(log_max / math.log(10), 4), 'threshold': round(1 / alpha, 2), 'alpha': alpha, 'certified_at': cert}
 
 
@@ -443,7 +495,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
     have = [(b, insights.family(b), set(atoms(b, multi, earlier))) for b in signals]
-    rows, matched, born_of, ordered = [], {}, {}, {}
+    rows, matched, born_of, ordered, matches = [], {}, {}, {}, {}
     for hid in sorted(registry):
         h = registry[hid]
         conds = {tuple(c) for c in h['conditions']}
@@ -463,6 +515,8 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if not exploratory or hid in matched:
             ordered[hid] = ordered_games(match)
         if not exploratory:
+            matches[hid] = match
+        if not exploratory:
             row['prospective'] = prospective_summary(ordered[hid], born)
             row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if row['prospective']['games'] >= PROSPECTIVE_MIN else 'exploratória')
         rows.append(row)
@@ -474,7 +528,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if hid not in by_id:
             continue
         ok = certifiable(registry[hid])
-        c = confirmation(ordered[hid], t, alpha) if ok else {'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
+        c = confirmation(matches[hid], t, alpha) if ok else {'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
         by_id[hid]['confirmation'] = dict(c, rank=rank, selected_utc=chronology.iso(t), certifiable=ok, certified_utc=chronology.iso(c['certified_at']))
         del by_id[hid]['confirmation']['certified_at']
         if c['certified_at'] is not None:
@@ -667,19 +721,24 @@ def validation(rows, ledger, problems, registry):
             'state': 'active' if active else 'not_activated' if ledger is None else 'ledger_invalid',
             'ledger_valid': active, 'ledger_problems': problems if ledger is not None else [],
             'activated_utc': ledger.get('activated_utc') if active else None, 'legacy': len(ledger.get('legacy') or []) if active else 0,
+            'ledger_head_sha256': certification.head(ledger) if active else None, 'ledger_entries': len(ledger.get('entries') or []) if active else 0,
             'test': 'test-by-betting e-process on per-game profit at announced odds minus %d %%' % round(insights.ODDS_LOSS * 100),
             'lambdas': list(EPROCESS_LAMBDAS), 'allocation': 'alpha/(j(j+1)) by order of REGISTERED real-time selection (append-only ledger)',
-            'evidence': 'games whose bets were sent and read after the registered selection, decidable, decided before any result of '
-                        'the game was observed, with proven result time; only hypotheses whose conditions are all known at the first signal',
+            'evidence': 'one committed bet per game (the first decided), sent and read after the registered selection, decidable, decided '
+                        'before any result of the game was observed; games enter a non-overlapping chain (a game is admitted only if the '
+                        'previous admitted one was already closed at its decision); a chain game without proven result within %d days '
+                        'closes as a loss; only hypotheses whose conditions are all known at the first signal' % OPEN_TIMEOUT_DAYS,
             'as_of_dimensions': sorted(AS_OF_DIMENSIONS),
             'min_games': PROSPECTIVE_MIN, 'also_requires': {'games': STRONG_AT, 'prob_above': PROMOTE_AT, 'keep_prob_above': KEEP_PROMISING},
             'claim': ('P(any tactic ever certified while its expected profit at odds -2 %% is <= 0 on its games) <= %.2f, over the whole '
                       'life of the project from activation, any dependence between hypotheses, continuous monitoring, under the assumptions'
                       % FWER_ALPHA) if active else 'no claim: certification is not active, no tactic can be validated',
-            'assumptions': ['null holds conditionally on everything known when each bet was decided (no edge whatever happened before)',
+            'null': 'for every admitted bet, E[profit at odds -2 % | everything the system knew at its decision] <= 0',
+            'assumptions': ['the null above (no edge given all information available at each decision, including earlier chain results)',
                             'membership of a bet uses only dimensions known at its first signal (as_of_dimensions)',
                             'stored observation times are true (verified against git history in the PR 3 audit)',
-                            'the ledger is append-only (verified hash chain; git history as external clock)'],
+                            'the ledger is append-only: the in-file hash chain proves only internal consistency; append-only history is '
+                            'proven against git history (certification.verify_history), not inside the report'],
             'selected': len(sel), 'certified': [r['id'] for r in sel if r['confirmation']['certified_utc']], 'candidates': candidates,
             'closest': [dict(r['confirmation'], id=r['id']) for r in sorted(sel, key=closeness, reverse=True)[:5]]}
 

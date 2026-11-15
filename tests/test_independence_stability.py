@@ -363,8 +363,9 @@ class CorrectedBarIsChronological(unittest.TestCase):
 
     def test_validated_status_no_longer_depends_on_hypotheses_tested_later(self):
         base = ([1.0, 1.0, 1.0, -1.0] * 26)[:102]
-        own = games(base)                                               # 102 games of "Jogo aberto" (days 1-6)
-        others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 200 + i, typ='STAKE_LOAD') for i in range(30)]   # days 11-12
+        # 102 games of "Jogo aberto", one every 3 hours: each result is known before the next decision (certification chain).
+        own = [sig('g%d' % i, w, 3 * i) for i, w in enumerate(base)]
+        others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 400 + i, typ='STAKE_LOAD') for i in range(30)]   # days 21-22
         alone = {'a': family_only()['h']}
         crowded = dict(alone, **{'s%d' % k: dict(family_only('Stake')['h']) for k in range(400)})
         # Selection registered in real time before a's games (ledger), rank 1; the 400 others are never selected.
