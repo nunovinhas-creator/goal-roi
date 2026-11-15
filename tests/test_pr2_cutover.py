@@ -235,6 +235,54 @@ class PR2Cutover(unittest.TestCase):
                 self.assertEqual(self.files(), before)
                 self.assertEqual(result['checks']['next_cycle_status_transitions'] + result['checks']['next_cycle_status_transitions_register_true'], 1)
 
+    def test_second_migration_must_report_unchanged(self):
+        real, calls = cut.notify.migrate_file, {'n': 0}
+
+        def lying(now=None):
+            calls['n'] += 1
+            if calls['n'] == 2:                   # file untouched and False returned, but the operator would read MIGRATED
+                print('NOTIFY_STATUS_MIGRATED')
+                return False
+            return real(now)
+        before = self.files()
+        with patch.object(cut.notify, 'migrate_file', lying):
+            result = cut.cutover(self.root, self.main, NOW, build_ok)
+        self.assertEqual((result['ok'], result['restored'], result['checks']['second_call']), (False, True, 'NOTIFY_STATUS_MIGRATED'))
+        self.assertEqual(self.files(), before)
+
+    def test_builds_must_not_write_into_the_checkout(self):
+        def writes_state(csv_path=None, register=False):
+            if not register:
+                write(self.root, 'data/state.json', {'unexpected': True})
+            return pr2_report()
+        exc = self.refused('register=False build wrote into the checkout', build=writes_state)
+        self.assertEqual(exc.stage, 'build_report')
+        self.assertFalse((self.root / 'data/state.json').exists())
+
+    def test_migration_writing_other_files_or_growing_the_registry_is_rolled_back(self):
+        real = cut.notify.migrate_file
+
+        def other_file(state_path_root):
+            write(state_path_root, 'data/state.json', {'unexpected': True})
+
+        def registry(state_path_root):
+            write(state_path_root, 'data/hypotheses.json', {'k0': {}, 'grown-during-migration': {}})
+        for label, fault, failing in (('other file', other_file, {'only_allowed_files_changed'}),
+                                      ('registry', registry, {'only_allowed_files_changed', 'registry_unchanged'})):
+            with self.subTest(label):
+                def faulty(now=None, fault=fault):
+                    changed = real(now)
+                    if changed:
+                        fault(self.root)
+                    return changed
+                before = self.files()
+                with patch.object(cut.notify, 'migrate_file', faulty):
+                    result = cut.cutover(self.root, self.main, NOW, build_ok)
+                self.assertEqual((result['ok'], result['restored']), (False, True))
+                self.assertEqual({k for k, v in result['checks'].items() if v is False}, failing)
+                self.assertEqual(self.files(), before)
+                self.assertFalse((self.root / 'data/state.json').exists())
+
     def test_register_true_divergence_refused_before_any_write(self):
         def build_diverging(csv_path=None, register=False):
             build_ok(csv_path, register)
@@ -280,7 +328,7 @@ class PR2Cutover(unittest.TestCase):
 
                     def flaky(root, real=real, calls=calls):
                         calls['n'] += 1
-                        if calls['n'] == 3:   # 1: snapshot; 2: register=True check; 3: post-checks
+                        if calls['n'] == 4:   # 1: snapshot; 2: after register=False; 3: after register=True; 4: post-checks
                             raise OSError('injected failure in post-checks')
                         return real(root)
                     inject = patch.object(cut, 'contents', flaky)

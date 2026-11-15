@@ -16,7 +16,7 @@ Guards (before anything is written):
   this code's STATUS_RULES and a valid status_list;
 - a second report built with register=True ON A TEMPORARY COPY of data/ (the production report step registers) passes the
   same checks and has an IDENTICAL status_list; otherwise the first production cycle would announce statuses that are not
-  new evidence. The checkout must be byte-identical after that build.
+  new evidence. The checkout must be byte-identical after EACH build (neither build may write into it).
 
 Work: write data/report.json + docs/report.json, offline migration twice (MIGRATED, then UNCHANGED, file byte-identical),
 and simulate the next notify cycle with BOTH reports, without any sender: zero status transitions required.
@@ -121,6 +121,8 @@ def execute(root, frozen, head, original, before_state, now, build, progress):
     """Everything that writes or inspects written files. Runs entirely under cutover()'s rollback."""
     progress['stage'] = 'build_report'
     rep = build(None, register=False)
+    if contents(root) != original:
+        raise CutoverError('register=False build wrote into the checkout')
     progress['stage'] = 'validate_report'
     statuses = check_report(rep, 'register=False report')
 
