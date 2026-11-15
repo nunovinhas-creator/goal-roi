@@ -5,6 +5,7 @@ Extrai o código de cada commit e duas cópias de `data/` (git archive) para pas
 produção, `report.build(register=True)` e depois `notify.messages` sobre uma cópia do estado Telegram (só calcula os textos;
 nada é enviado, não há credenciais nem rede). Compara o relatório inteiro, os ficheiros de dados resultantes e as mensagens.
 Diferenças permitidas: só as chaves acrescentadas pela PR 4 (`brain.track`, reescrito, e `brain.llm_evaluation`, nova).
+O relógio (`datetime.now`) é fixado no instante dos dados nas duas execuções: há campos que o usam.
 Código de saída: 0 = só diferenças permitidas; 1 = outra diferença.
 """
 import hashlib
@@ -20,11 +21,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ALLOWED = {('brain', 'track'), ('brain', 'llm_evaluation')}
 CHILD = r'''
-import copy, json, sys
-from datetime import datetime
+import copy, json, sys, datetime as dt
 from scangoal import report, notify
 from scangoal.store import data_dir
-now = datetime.fromisoformat(sys.argv[1])
+import scangoal
+now = dt.datetime.fromisoformat(sys.argv[1])
+class Frozen(dt.datetime):   # o relógio da máquina fica igual ao instante dos dados nas duas versões (há código que usa datetime.now)
+    @classmethod
+    def now(cls, tz=None):
+        return now if tz is None else now.astimezone(tz)
+for name, mod in list(sys.modules.items()):
+    if name.startswith('scangoal') and getattr(mod, 'datetime', None) is dt.datetime:
+        mod.datetime = Frozen
 rep = report.build(now=now, register=True)
 state = json.loads((data_dir() / 'notify_state.json').read_text(encoding='utf-8'))
 msgs = notify.messages(copy.deepcopy(rep), state, now)
@@ -78,7 +86,7 @@ def main(argv):
     rep_diff = diff(a['report'], b['report'])
     out = {'main': main_ref, 'pr': pr_ref, 'data': data_ref, 'now': now,
            'report_differences_outside_allowed': rep_diff,
-           'allowed_differences': sorted('/'.join(p) for p in ALLOWED),
+           'allowed_differences': sorted('/'.join(p) for p in ALLOWED), 'wall_clock': 'frozen at now in both runs (datetime.now patched in every scangoal module)',
            'status_list_main': a['report']['brain']['status_list'], 'status_list_pr': b['report']['brain']['status_list'],
            'counts_main': a['report']['brain']['counts'], 'counts_pr': b['report']['brain']['counts'],
            'validation_state': [a['report']['brain']['validation']['state'], b['report']['brain']['validation']['state']],

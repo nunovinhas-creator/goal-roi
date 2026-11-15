@@ -1,0 +1,33 @@
+baseline: pass
+birth: max(born_utc, publication)             CAUGHT
+birth: unpublished has no birth               CAUGHT
+history: shallow refused                      CAUGHT
+history: rewritten entry                      CAUGHT
+history: removed entry                        CAUGHT
+history: deleted registry                     CAUGHT
+history: monotonic commit time                CAUGHT
+protocol: content hash                        CAUGHT
+protocol: introducing commit                  CAUGHT
+evidence: only prospective games              CAUGHT
+evidence: as_of view                          CAUGHT
+evidence: start = max(birth, protocol)        CAUGHT
+verdict: proof problems first                 CAUGHT
+minimum: groups                               CAUGHT
+minimum: days                                 CAUGHT
+minimum: day share                            CAUGHT
+minimum: llm games                            CAUGHT
+test: one-sided p                             CAUGHT
+holm: multiply by remaining tests             CAUGHT
+primary: groups count once                    CAUGHT
+primary: evitar excluded                      CAUGHT
+controls: born before the proposal            CAUGHT
+controls: comparable support                  CAUGHT
+groups: complete linkage                      CAUGHT
+groups: same expectation                      CAUGHT
+groups: no contradictory condition            CAUGHT
+redundancy: sub-combinations                  CAUGHT
+redundancy: same signals as existing          CAUGHT
+redundancy: same reply learns accepted        CAUGHT
+llm: rejects redundant proposals              CAUGHT
+track: prospective games only                 CAUGHT
+ALL CAUGHT
