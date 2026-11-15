@@ -1,0 +1,714 @@
+{
+ "base": "82ab9d86593055fbc98420265a469728d914288f",
+ "clock": "2026-11-15T14:34:34+00:00",
+ "python": "3.11.18",
+ "data_matches_base": true,
+ "data_sha256": {
+  ".gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "details_hl.json": "4130750c1e55b1cbfd8671bc23992e5a4ff1e54df3abb8b9423c20e31ae06830",
+  "hypotheses.json": "b3cbf881db1fe62bb41e491a3fc22bb17a523fb817030bd4b1b9ac35d9ae1301",
+  "llm_notes.json": "7f7f740b1a32ea64a23fe64daeb7d21c2fff27894a90e33b9946f8a2a69d5e56",
+  "llm_state.json": "b06874bf4d22b434c320c7850e3f07a1f5959e222414a0eb2977c4ef09648e74",
+  "messages.jsonl": "745f599f07ead894f5788b5a8e6b12fddce2e08e1725407987d8b195d7ecaf31",
+  "notify_state.json": "03feb664fc703b236e77031b1a7f94135bc83c798388281eb535cbcd75f5ad52",
+  "report.json": "8c82a18d5a62cefb9d2a1d21bb587c9020a4e18dd5570d361effba0b1ad5082b",
+  "results_bsd.json": "bcfd52c423111119ff697e6c36357c110dac9d212edcd2923b23af874e6767b7",
+  "results_hl.json": "5c397758fc77421c572349378db79580bdff1f6866059ef35c35742d559a5d74",
+  "state.json": "ac430bf9f220a722ddb16561f0a328f50ebe53c91594fcd84292f56409dc76a9",
+  "team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5"
+ },
+ "build_seconds": {
+  "pr2": [
+   8.62,
+   9.7
+  ],
+  "pr3": [
+   10.33,
+   9.67
+  ]
+ },
+ "pr2": {
+  "hypotheses": 5483,
+  "tested": 143,
+  "corrected_bar": 0.99965,
+  "counts": {
+   "em observação": 5470,
+   "promissora": 13
+  },
+  "status_list": {
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+   "Jogo aberto | Golos até ao sinal = 1 ou 2": "promissora",
+   "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90": "promissora"
+  },
+  "exploratory_counts": {
+   "em observação": 5425,
+   "promissora": 58
+  },
+  "walk_forward": {
+   "followed": {
+    "bets": 135,
+    "settled": 111,
+    "games": 109,
+    "wins": 52,
+    "units": 0.85,
+    "roi": 0.0077,
+    "roi_cut": -0.0091
+   },
+   "skipped": {
+    "bets": 290,
+    "settled": 200,
+    "games": 124,
+    "wins": 96,
+    "units": -5.31,
+    "roi": -0.0266,
+    "roi_cut": -0.0447
+   },
+   "not_reconstructible": null,
+   "prob_followed_better": 0.4317,
+   "first_followed_utc": "2026-11-12T16:38:51+00:00",
+   "chronology": null
+  }
+ },
+ "pr3": {
+  "hypotheses": 5483,
+  "tested": 143,
+  "corrected_bar": 0.99999654,
+  "counts": {
+   "em observação": 5472,
+   "promissora": 11
+  },
+  "status_list": {
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora"
+  },
+  "exploratory_counts": {
+   "em observação": 5426,
+   "promissora": 57
+  },
+  "walk_forward": {
+   "followed": {
+    "bets": 131,
+    "settled": 111,
+    "games": 108,
+    "wins": 52,
+    "units": 3.46,
+    "roi": 0.0312,
+    "roi_cut": 0.0141
+   },
+   "skipped": {
+    "bets": 259,
+    "settled": 176,
+    "games": 101,
+    "wins": 83,
+    "units": -8.74,
+    "roi": -0.0497,
+    "roi_cut": -0.0672
+   },
+   "not_reconstructible": {
+    "bets": 35,
+    "settled": 24,
+    "games": 24,
+    "wins": 13,
+    "units": 0.82,
+    "roi": 0.0342,
+    "roi_cut": 0.0135
+   },
+   "prob_followed_better": 0.6021,
+   "first_followed_utc": "2026-11-12T19:27:25+00:00",
+   "chronology": {
+    "results_verified": 286,
+    "results_unknown_time": 0,
+    "results_contradictory_time": 0,
+    "hypotheses_without_valid_birth": 0
+   }
+  }
+ },
+ "prob_above_identical": true,
+ "games_identical": true,
+ "compared_hypotheses": 150,
+ "status_changes_pr2_to_pr3": [
+  {
+   "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
+   "pr2": "promissora",
+   "pr3": "em observação",
+   "games": 43,
+   "prob_above": 0.9496,
+   "pr3_pending": null,
+   "pr2_last_change": {
+    "games": 39,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.964,
+    "known_utc": "2026-11-15T00:17:49+00:00"
+   },
+   "born_utc": "2026-11-12T16:15:53+00:00",
+   "at_birth": {
+    "games": 1,
+    "prob_above": 0.6225
+   },
+   "prospective_games": 41
+  },
+  {
+   "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90",
+   "pr2": "promissora",
+   "pr3": "em observação",
+   "games": 36,
+   "prob_above": 0.9429,
+   "pr3_pending": null,
+   "pr2_last_change": {
+    "games": 32,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9606,
+    "known_utc": "2026-11-15T00:17:49+00:00"
+   },
+   "born_utc": "2026-11-12T17:30:52+00:00",
+   "at_birth": {
+    "games": 1,
+    "prob_above": 0.618
+   },
+   "prospective_games": 34
+  }
+ ],
+ "pr3_status_change_records": {
+  "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90": [
+   {
+    "games": 31,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9535,
+    "known_utc": "2026-11-15T05:12:49+00:00",
+    "bar": 0.999995,
+    "tested": 110,
+    "prospective_games": 25,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte": [
+   {
+    "games": 33,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9651,
+    "known_utc": "2026-11-15T00:10:03+00:00",
+    "bar": 0.999995,
+    "tested": 97,
+    "prospective_games": 30,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": [
+   {
+    "games": 31,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.977,
+    "known_utc": "2026-11-14T18:23:15+00:00",
+    "bar": 0.999988,
+    "tested": 43,
+    "prospective_games": 30,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": [
+   {
+    "games": 34,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9667,
+    "known_utc": "2026-11-15T09:09:31+00:00",
+    "bar": 0.999996,
+    "tested": 119,
+    "prospective_games": 32,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": [
+   {
+    "games": 33,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9623,
+    "known_utc": "2026-11-14T23:44:37+00:00",
+    "bar": 0.999995,
+    "tested": 92,
+    "prospective_games": 31,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": [
+   {
+    "games": 38,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9684,
+    "known_utc": "2026-11-15T03:16:34+00:00",
+    "bar": 0.999995,
+    "tested": 106,
+    "prospective_games": 37,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": [
+   {
+    "games": 31,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9615,
+    "known_utc": "2026-11-14T21:03:24+00:00",
+    "bar": 0.999993,
+    "tested": 75,
+    "prospective_games": 29,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Parte do jogo = 2.ª parte": [
+   {
+    "games": 31,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9734,
+    "known_utc": "2026-11-14T17:02:49+00:00",
+    "bar": 0.999982,
+    "tested": 27,
+    "prospective_games": 31,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": [
+   {
+    "games": 31,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9696,
+    "known_utc": "2026-11-15T05:12:49+00:00",
+    "bar": 0.999995,
+    "tested": 110,
+    "prospective_games": 29,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Ritmo indicado pelo bot = menos de 90": [
+   {
+    "games": 32,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9624,
+    "known_utc": "2026-11-14T17:21:44+00:00",
+    "bar": 0.999986,
+    "tested": 36,
+    "prospective_games": 31,
+    "prospective_prob": null
+   }
+  ],
+  "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": [
+   {
+    "games": 32,
+    "from": "em observação",
+    "to": "promissora",
+    "prob_above": 0.9668,
+    "known_utc": "2026-11-14T20:13:05+00:00",
+    "bar": 0.999993,
+    "tested": 69,
+    "prospective_games": 30,
+    "prospective_prob": null
+   }
+  ]
+ },
+ "pr3_evidence_levels_tested": {
+  "exploratória": 63,
+  "prospetiva": 80,
+  "não verificável": 0
+ },
+ "pr3_multiplicity": {
+  "method": "bonferroni_chronological_over_hypotheses_and_looks",
+  "alpha": 0.05,
+  "valid_under_dependence": true,
+  "look_share": "alpha * 100 / (n (n + 1)) at n games (sums to alpha over n >= 100)",
+  "family": "registered hypotheses with >= 30 independent games known at each instant",
+  "tested_now": 143,
+  "bar_now_at_first_look": 0.99999654,
+  "distinct_game_sets_tested": 132,
+  "distinct_game_sets_promising_or_better": 11,
+  "promising_or_better": 11,
+  "promising_sum_games": 449,
+  "promising_union_games": 76,
+  "validated_requires": {
+   "games": 100,
+   "bar": "corrected at the decision instant",
+   "prospective_games": 30,
+   "prospective_prob": 0.95,
+   "prospective_keep": 0.9
+  },
+  "evidence_levels": {
+   "exploratória": 63,
+   "prospetiva": 80,
+   "não verificável": 0
+  },
+  "note": "promissora is uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)"
+ },
+ "chronology": {
+  "eligible_signals": 425,
+  "eligible_with_decided_result": 286,
+  "result_time_check": {
+   "verified": 286
+  },
+  "result_source": {
+   "HL": 23,
+   "bot_message": 211,
+   "bot_full_time_note": 8,
+   "bot_mark": 43,
+   "BSD": 1
+  },
+  "observed_minus_pr2_approximation_min": {
+   "p0": -135,
+   "p10": -104,
+   "p50": -58,
+   "p90": 20,
+   "max": 1118
+  },
+  "results_known_later_than_pr2_assumed": 35,
+  "late_examples": [
+   {
+    "date_utc": "2026-11-11T13:36:42+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T16:06:42+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 1118
+   },
+   {
+    "date_utc": "2026-11-11T14:09:13+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T16:39:13+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 1085
+   },
+   {
+    "date_utc": "2026-11-11T16:40:11+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T19:10:11+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 935
+   },
+   {
+    "date_utc": "2026-11-11T16:53:08+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T19:23:08+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 922
+   },
+   {
+    "date_utc": "2026-11-11T17:08:12+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T19:38:12+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 906
+   },
+   {
+    "date_utc": "2026-11-11T16:51:21+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T19:21:21+00:00",
+    "observed": "2026-11-12T09:39:15+00:00",
+    "source": "bot_message",
+    "late_min": 858
+   },
+   {
+    "date_utc": "2026-11-11T14:00:29+00:00",
+    "kickoff_utc": "2026-11-11T17:00+00:00",
+    "pr2_known": "2026-11-11T19:30:00+00:00",
+    "observed": "2026-11-12T09:39:15+00:00",
+    "source": "bot_message",
+    "late_min": 849
+   },
+   {
+    "date_utc": "2026-11-11T18:30:29+00:00",
+    "kickoff_utc": null,
+    "pr2_known": "2026-11-11T21:00:29+00:00",
+    "observed": "2026-11-12T10:44:42+00:00",
+    "source": "HL",
+    "late_min": 824
+   }
+  ],
+  "signal_read_lag_min": {
+   "p50": 1.25,
+   "p90": 27.38,
+   "max": 1207.8
+  },
+  "signals_read_before_sent_by_seconds": 2,
+  "priced_signals": 425,
+  "not_decidable": 35,
+  "not_decidable_by_read_day": {
+   "2026-11-12": 29,
+   "2026-11-15": 6
+  }
+ },
+ "git_timestamp_verification": {
+  "message_versions": {
+   "checked": 1184,
+   "collected_after_commit": 0,
+   "commit_minus_collected_min": {
+    "p50": 0.7,
+    "p90": 6.0,
+    "max": 6.2
+   },
+   "edit_after_collected": 0
+  },
+  "hypotheses": {
+   "checked": 5483,
+   "invalid_born": 0,
+   "born_after_first_commit": 0,
+   "commit_minus_born_min": {
+    "p50": 2.0,
+    "p90": 6.0,
+    "max": 6.1
+   },
+   "born_changed_later": 0,
+   "removed_later": 0
+  },
+  "results_hl": {
+   "checked": 49,
+   "missing_stamp": 0,
+   "stamp_after_first_commit": 0,
+   "commit_minus_stamp_min": {
+    "p50": 0.0,
+    "p90": 0.2,
+    "max": 0.3
+   }
+  },
+  "results_bsd": {
+   "checked": 19,
+   "missing_stamp": 0,
+   "stamp_after_first_commit": 0,
+   "commit_minus_stamp_min": {
+    "p50": 0.1,
+    "p90": 0.1,
+    "max": 0.2
+   }
+  },
+  "details_hl": {
+   "checked": 49,
+   "missing_stamp": 0,
+   "stamp_after_first_commit": 0,
+   "commit_minus_stamp_min": {
+    "p50": 0.0,
+    "p90": 0.1,
+    "max": 0.2
+   }
+  }
+ },
+ "pr2_walk_forward_leakage": {
+  "followed": 135,
+  "followed_with_results_not_yet_observed": 5,
+  "unobserved_results_used_max": 2,
+  "followed_not_reconstructible": 2
+ },
+ "overlap": {
+  "tested": 143,
+  "tested_by_family": {
+   "Betfair": 15,
+   "Forma de golos": 9,
+   "Jogo aberto": 119
+  },
+  "all_games_in_tested": 165,
+  "pairwise_jaccard_tested": {
+   "p50": 0.266,
+   "p90": 0.515,
+   "share_ge_0_5": 0.116
+  },
+  "clusters_tested_by_threshold": {
+   "0.5": 5,
+   "0.8": 38,
+   "0.9": 84,
+   "1.0": 132
+  },
+  "promising": 11,
+  "promising_pairwise_jaccard_p50": 0.41,
+  "promising_clusters_by_threshold": {
+   "0.5": 2,
+   "0.8": 7,
+   "0.9": 8,
+   "1.0": 11
+  },
+  "promising_union_games": 76,
+  "promising_sum_games": 449
+ },
+ "null_simulation": {
+  "simulations": 400,
+  "seed": 20261115,
+  "tested": 143,
+  "observed_tested_with_prob_ge_0_95": 12,
+  "null_count_ge_0_95": {
+   "mean": 4.42,
+   "p50": 1,
+   "p95": 20,
+   "p99": 44,
+   "share_ge_observed": 0.11,
+   "share_zero": 0.485
+  },
+  "bonferroni_expected_independent": 7.2,
+  "westfall_young_tail_threshold_fwer_5pct": 0.0038329636315721383,
+  "bonferroni_tail_threshold_single_look": 0.00034965034965034965,
+  "note": "promising-by-chance counts come in clumps: same games, same draws"
+ },
+ "walk_forward_bootstrap_roi_90": {
+  "followed": [
+   -0.1119,
+   0.1752
+  ],
+  "skipped": [
+   -0.1918,
+   0.0858
+  ]
+ },
+ "sensitivity": {
+  "pr3": {
+   "followed": 131,
+   "followed_settled": 111,
+   "roi_followed": 0.0312,
+   "roi_cut_followed": 0.0141,
+   "roi_skipped": -0.0497,
+   "not_reconstructible": 35,
+   "prob_followed_better": 0.6021
+  },
+  "observation_margin_0": {
+   "followed": 132,
+   "followed_settled": 111,
+   "roi_followed": 0.0321,
+   "roi_cut_followed": 0.0153,
+   "roi_skipped": -0.049,
+   "not_reconstructible": 37,
+   "prob_followed_better": 0.594
+  },
+  "observation_margin_15": {
+   "followed": 133,
+   "followed_settled": 113,
+   "roi_followed": 0.04,
+   "roi_cut_followed": 0.0226,
+   "roi_skipped": -0.0563,
+   "not_reconstructible": 35,
+   "prob_followed_better": 0.6232
+  },
+  "observation_margin_60": {
+   "followed": 130,
+   "followed_settled": 109,
+   "roi_followed": 0.0501,
+   "roi_cut_followed": 0.0327,
+   "roi_skipped": -0.0603,
+   "not_reconstructible": 35,
+   "prob_followed_better": 0.5813
+  },
+  "decision_delay_0": {
+   "followed": 131,
+   "followed_settled": 111,
+   "roi_followed": 0.0312,
+   "roi_cut_followed": 0.0141,
+   "roi_skipped": -0.0439,
+   "not_reconstructible": 32,
+   "prob_followed_better": 0.5752
+  },
+  "decision_delay_5": {
+   "followed": 131,
+   "followed_settled": 111,
+   "roi_followed": 0.0312,
+   "roi_cut_followed": 0.0141,
+   "roi_skipped": -0.0439,
+   "not_reconstructible": 33,
+   "prob_followed_better": 0.5752
+  },
+  "ablation_without_registration_gate": {
+   "followed": 131,
+   "followed_settled": 111,
+   "roi_followed": 0.0312,
+   "roi_cut_followed": 0.0141,
+   "roi_skipped": -0.0497,
+   "not_reconstructible": 35,
+   "prob_followed_better": 0.6021
+  },
+  "ablation_pr2_result_times": {
+   "followed": 133,
+   "followed_settled": 110,
+   "roi_followed": 0.0016,
+   "roi_cut_followed": -0.0151,
+   "roi_skipped": -0.0308,
+   "not_reconstructible": 35,
+   "prob_followed_better": 0.42
+  },
+  "ablation_decide_every_signal_at_send_time": {
+   "followed": 133,
+   "followed_settled": 112,
+   "roi_followed": 0.037,
+   "roi_cut_followed": 0.0198,
+   "roi_skipped": -0.0432,
+   "not_reconstructible": 0,
+   "prob_followed_better": 0.5982
+  }
+ },
+ "notify_rehearsal": {
+  "migration_key": "status_rules:chronological_prospective_v1",
+  "markers_before": [
+   "eligible_statuses_v1",
+   "status_rules:independent_games_hysteresis_v1"
+  ],
+  "markers_after": [
+   "eligible_statuses_v1",
+   "status_rules:chronological_prospective_v1",
+   "status_rules:independent_games_hysteresis_v1"
+  ],
+  "status_messages_with_migration": 0,
+  "status_changes_without_migration": 2,
+  "previous_markers_intact": true,
+  "note": "messages() only; nothing sent, nothing written"
+ },
+ "synthetic_validation_rates": {
+  "seeds": 200,
+  "tested_family": 1,
+  "rates_ever_validated": {
+   "no_edge_p0.50_160_games": {
+    "pr2": 0.12,
+    "pr3_without_look_spending": 0.12,
+    "pr3": 0.0
+   },
+   "no_edge_p0.50_300_games": {
+    "pr2": 0.18,
+    "pr3_without_look_spending": 0.18,
+    "pr3": 0.0
+   },
+   "edge_p0.60_300_games": {
+    "pr2": 0.975,
+    "pr3_without_look_spending": 0.975,
+    "pr3": 0.46
+   },
+   "edge_p0.75_160_games": {
+    "pr2": 1.0,
+    "pr3_without_look_spending": 1.0,
+    "pr3": 1.0
+   }
+  },
+  "note": "one hypothesis, so Bonferroni over hypotheses is inactive: this isolates repeated looks; pr2 uses its own bar 1 - 0.05/m with rounded prob_above"
+ },
+ "data_unchanged_by_audit": true
+}

@@ -543,9 +543,10 @@ def multiplicity(rows, tested, bar):
     tested_rows = [r for r in rows if r['games'] >= HINT_AT]
     sets = lambda rs: len({r['game_set'] for r in rs})
     good = [r for r in tested_rows if r['status'] in ('promissora', 'forte', 'confirmada')]
-    return {'method': 'bonferroni_chronological', 'alpha': FWER_ALPHA, 'valid_under_dependence': True,
+    return {'method': 'bonferroni_chronological_over_hypotheses_and_looks', 'alpha': FWER_ALPHA, 'valid_under_dependence': True,
+            'look_share': 'alpha * %d / (n (n + 1)) at n games (sums to alpha over n >= %d)' % (STRONG_AT, STRONG_AT),
             'family': 'registered hypotheses with >= %d independent games known at each instant' % HINT_AT,
-            'tested_now': tested, 'bar_now': round(bar, 6),
+            'tested_now': tested, 'bar_now_at_first_look': round(bar, 8),
             'distinct_game_sets_tested': sets(tested_rows), 'distinct_game_sets_promising_or_better': sets(good),
             'promising_or_better': len(good),
             'promising_sum_games': sum(r['games'] for r in good),
@@ -595,7 +596,7 @@ def build(signals, registry, min_settled):
             'eligibility': {'total': len(all_signals), 'eligible': len(signals), 'excluded': len(all_signals) - len(signals), 'reasons': excluded},
             'exploratory': {'scope': 'all_signals_not_for_recommendations', 'counts': exploratory_counts,
                             'hypotheses': [{k: r[k] for k in ('id', 'n', 'games', 'roi', 'status')} for r in sorted(exploratory_rows, key=lambda r: (-r['n'], r['id']))[:150]]},
-            'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
+            'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 8), 'corrected_bar_tail': float('%.3g' % (1 - bar)), 'counts': counts, 'board': brd, 'agenda': agd,
             'track': track_record(rows), 'walk_forward': walk_forward(signals, registry), 'multiplicity': mult,
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
                                                                                                     'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status',
