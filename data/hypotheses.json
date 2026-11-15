@@ -53243,6 +53243,33 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-15T20:39:51+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos em fim de semana, com diferença de 2 ou mais golos, na 2ª parte e ritmo baixo tendem a ter um desfecho previsível",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = fim de semana & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T14:29:29+00:00",
   "conditions": [
@@ -63038,6 +63065,33 @@
   "mode": "refinar",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "jogo com diferença significativa e ritmo baixo",
+  "source": "llm"
+ },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-15T20:39:51+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogos com diferença de 2 ou mais golos, na 2ª parte, com poucos golos em falta para ganhar e sem sinais anteriores tendem a ter um desfecho previsível",
   "source": "llm"
  },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
