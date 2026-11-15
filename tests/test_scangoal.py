@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 from unittest.mock import patch
 import json, os, tempfile, unittest
@@ -661,13 +662,15 @@ class LanguageModel(Hardening):
 
     def test_run_registers_with_birth_date_and_respects_daily_limit(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i).replace('@1.94', '@1.94' if i < 6 else '@2.50') for i in range(9)]
         calls = []
         def call(account, key, model, prompt):
             calls.append((model, prompt))
             if len(calls) == 1:
                 raise llm.LLMError('HTTP 400')                                                           # primeiro modelo falha: tenta o seguinte
-            return '{"hypotheses":[{"family":"Betfair","conditions":[["Seleção","empate"],["Momento","durante o jogo"]],"reason":"teste"}]}'
+            # PR 4: "Seleção = empate" apanharia os mesmos sinais que a família inteira (todos são empate): redundante, rejeitada
+            return ('{"hypotheses":[{"family":"Betfair","conditions":[["Faixa de odd","odd 1,50 a 2,00"]],"reason":"teste"},'
+                    '{"family":"Betfair","conditions":[["Seleção","empate"]],"reason":"redundante"}]}')
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
@@ -678,8 +681,12 @@ class LanguageModel(Hardening):
                 self.assertEqual((st['last_outcome'], st['last_accepted'], len(calls)), ('ok', 1, 2))
                 self.assertNotIn('scangoal.com', calls[-1][1])                                           # o modelo só recebe agregados
                 reg = json.loads((Path(d) / 'hypotheses.json').read_text(encoding='utf-8'))
-                h = reg['Betfair | Momento = durante o jogo & Seleção = empate']
+                self.assertNotIn('Betfair | Seleção = empate', reg)
+                self.assertEqual((st['last_rejected'], st['rejected_equivalent'], st['last_rejected_equivalent']), (1, 1, 1))
+                h = reg['Betfair | Faixa de odd = odd 1,50 a 2,00']
                 self.assertEqual((h['source'], h['born_utc']), ('llm', '2026-11-12T12:00:00+00:00'))
+                self.assertEqual(sorted(h['provenance']), ['prompt_sha256', 'registry_size', 'report_generated_at_utc', 'response_sha256'])
+                self.assertEqual(h['provenance']['prompt_sha256'], hashlib.sha256(calls[-1][1].encode('utf-8')).hexdigest())
                 llm.run(call, now + timedelta(minutes=30), self.ENV)
                 self.assertEqual(len(calls), 2)                                                          # no máximo de hora a hora
                 r = report.build()
@@ -1001,23 +1008,31 @@ class EvidencePerMatch(unittest.TestCase):
         llm = {'h': dict(reg['h'], source='llm', born_utc='2026-11-01T12:00:00+00:00')}
         self.assertEqual(brain.walk_forward(early + late, llm)['followed']['bets'], 0)   # proposta do modelo: os acertos anteriores não contam
 
-    def test_track_record_counts_proposals_in_the_expected_direction(self):
+    def test_track_record_is_descriptive_and_never_confirms(self):
+        # PR 4 (decisão de 15/11/2026): prob_above > 0.5 nunca é êxito; só evidência prospetiva, em jogos e lucro por jogo.
         from scangoal import brain
-        row = lambda source, prob, expect=None, n=12, mode=None: {'conditions': [['Minuto', 'x']], 'source': source, 'mode': mode, 'n': n, 'games': n, 'prob_above': prob,
-                                                                    'expect': expect, 'id': 'h', 'hit_rate': 0.5, 'break_even': 0.5}
-        t = brain.track_record([row('llm', 0.9, 'acima', mode='novas'), row('llm', 0.9, 'abaixo', mode='evitar'), row('llm', 0.2, 'abaixo', mode='evitar'),
-                                row('llm', 0.99, 'acima', n=4), row('gerador', 0.7)])
-        self.assertEqual((t['llm_judged'], t['llm_as_expected']), (3, 2))           # a de 4 resultados ainda não é julgada
-        self.assertEqual((len(t['worked']), len(t['failed'])), (2, 1))
-        self.assertEqual(t['by_source']['gerador'], {'hypotheses': 1, 'judged': 1, 'as_expected': 1})
+        row = lambda source, prob, games, expect=None, mode=None, hid='h': {'conditions': [['Minuto', 'x']], 'source': source, 'mode': mode, 'n': 99, 'games': 99,
+                                                                           'prob_above': prob, 'expect': expect, 'id': hid,
+                                                                           'prospective': {'games': games, 'roi': 0.1}}
+        t = brain.track_record([row('llm', 0.99, 12, 'acima', 'novas', 'a'), row('llm', 0.01, 30, 'abaixo', 'evitar', 'b'), row('llm', 0.99, 4, 'acima', 'novas', 'c'),
+                                row('gerador', 0.7, 50)])
+        self.assertEqual(t['llm_with_prospective_evidence'], 2)                    # a de 4 jogos prospetivos fica de fora, mesmo com 99 sinais
+        self.assertEqual([h['id'] for h in t['llm']], ['b', 'a'])
+        self.assertEqual(t['by_source']['gerador'], {'hypotheses': 1, 'with_prospective_evidence': 1, 'prospective_games': 50})
+        self.assertIsNone(t['criterion'])
+        text = json.dumps(t, ensure_ascii=False).replace('no hypothesis is confirmed or refuted', '')
+        for word in ('as_expected', 'worked', 'failed', 'judged', 'prob_above', 'confirm'):
+            self.assertNotIn(word, text)
 
-    def test_prompt_carries_the_track_record_only_when_there_is_one(self):
+    def test_prompt_carries_the_track_record_only_as_description(self):
         from scangoal import llm
-        track = {'llm_judged': 3, 'llm_as_expected': 2, 'min_results': 10, 'worked': [{'id': 'Betfair | Seleção = empate', 'n': 12, 'hit_rate': 0.6, 'break_even': 0.4}], 'failed': []}
+        track = {'min_results': 10, 'llm': [{'id': 'Betfair | Seleção = empate', 'games': 12, 'roi': 0.25, 'expect': 'acima'}]}
         text = llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), track)
-        self.assertIn('2 de 3 foram no sentido esperado', text)
-        self.assertIn('Betfair | Seleção = empate -> 12 resultados', text)
-        self.assertNotIn('Balanço', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm_judged': 0}))
+        self.assertIn('Betfair | Seleção = empate -> 12 jogos, lucro médio por jogo +0.25', text)
+        self.assertIn('nenhuma está', text)
+        for word in ('Confirmaram-se', 'Falharam', 'sentido esperado', 'Aprende com este balanço'):
+            self.assertNotIn(word, text)
+        self.assertNotIn('Propostas anteriores', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm': []}))
 
 
 class FastReads(unittest.TestCase):

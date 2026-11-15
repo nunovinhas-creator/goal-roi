@@ -88,13 +88,25 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Vantagem com intervalo: além da probabilidade de estar acima do necessário, cada hipótese mostra a vantagem estimada em pontos percentuais (acerto menos taxa necessária) com um intervalo de 90 %, e a probabilidade de continuar acima do necessário com 2 % de perda de odd.
 - "Rende mais do que o resto do tipo": probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo. Serve para distinguir uma condição que acrescenta algo de uma que só herda o desempenho do tipo. Só informa; não muda o estado.
 - "Seguir o cérebro teria compensado?": cada sinal com odd é decidido quando o sistema o leu, só com os resultados que já tinha observado e só com as táticas já registadas (PR 3; antes, 150 minutos depois do início do jogo). Segue-se quando encaixa numa tática apostável com 8 jogos e 80 % de probabilidade nessa altura. Sinais lidos tarde demais para apostar são "não reconstituíveis". Compara seguidos com não seguidos.
-- Balanço das propostas: das hipóteses com 10 ou mais jogos, quantas foram no sentido esperado, por origem. O modelo de linguagem recebe o balanço das suas propostas (as que se confirmaram e as que falharam) antes de propor mais.
+- Balanço das propostas (PR 4): só descritivo, por origem, com evidência prospetiva (jogos independentes depois do registo) e lucro por jogo. Nenhuma hipótese é dada como confirmada ou falhada por acertar mais ou menos de metade; o modelo de linguagem recebe só estes números descritivos.
+
+## Avaliação científica da LLM (PR 4)
+`scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol.md` (`llm_incremental_v1`; o código recusa outra versão do ficheiro).
+- Pergunta: as hipóteses do modelo escolhem jogos com mais lucro por jogo (odd −2 %), depois do registo, do que hipóteses comparáveis do gerador (20 controlos pré-selecionados sem ler resultados), no mesmo intervalo?
+- Nascimento efetivo provado pelo histórico git completo (registo só a crescer); sem prova, a avaliação é "não verificada" e não tem conclusão.
+- Só jogos prospetivos (definição da PR 3) posteriores ao commit do protocolo sustentam conclusões; os anteriores são descritivos.
+- Grupos de hipóteses equivalentes (Jaccard 0,85 por ligação completa, sensibilidade 0,80 e 0,90) contam uma vez. Bootstrap por blocos de dia, uma comparação primária com α = 0,05 e Holm nas 7 análises adicionais; mínimos de grupos, jogos e dias.
+- Nunca altera estados, certificação, Telegram ou o registo.
+- Relatório reprodutível: `python3.11 scripts/audit_pr4_llm.py --ref <commit> --protocol-commit <sha>` (só leitura, sem rede; exige clone completo). Resultado em `audits/pr4-llm-evaluation.md` e `.json`.
+- A página mostra só um resumo sem conclusão (o workflow usa um checkout raso).
 
 ## Investigador (modelo de linguagem)
 `scangoal/llm.py` chama, de hora a hora, um modelo no Cloudflare Workers AI (segredos `CLOUDFLARE_ACCOUNT_ID` e `MASTER_BRAIN_LLM_API_KEY`). Sem os segredos, o passo é ignorado.
 - Quatro modos que rodam: hipóteses novas, refinar as melhores, situações a evitar, e notas sobre uma hipótese concreta.
 - Orçamento: o plano gratuito dá 10 000 neurónios por dia; o código estima o custo de cada chamada e pára aos 8 000.
-- Limites: 5 propostas por chamada, 30 por dia, 300 no total; cada proposta precisa de pelo menos 5 sinais já existentes com essas características.
+- Limites: 5 propostas por chamada; não há limite diário nem total de hipóteses (só o orçamento gratuito de neurónios limita). Cada proposta precisa de pelo menos 5 sinais já existentes com essas características.
+- Duplicados (PR 4): são rejeitadas as propostas iguais a uma hipótese existente e as redundantes no instante da proposta (apanham exatamente os mesmos sinais que uma hipótese existente ou que uma sub-combinação das suas condições). Nunca se rejeita por semelhança. `llm_state.json` conta estas rejeições em `rejected_equivalent`.
+- Proveniência (PR 4): cada proposta aceite guarda o `sha256` do pedido e da resposta, a hora do relatório usado e o tamanho do registo nesse momento.
 - O modelo só recebe números agregados; nunca mensagens. O texto que devolve é limpo e nunca é executado.
 - As propostas entram com origem `llm`: só contam os sinais posteriores ao registo. As notas só entram se referirem uma hipótese existente; os números mostrados vêm dos dados.
 
