@@ -86293,6 +86293,29 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Mercado = outros mercados & Momento do aviso = até 45 min depois do início & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-15T02:21:10+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Apostas grandes em mercados secundários podem influenciar o resultado",
+  "source": "llm"
+ },
  "Stake | Mercado = outros mercados & Momento do aviso = até 45 min depois do início & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-14T20:54:24+00:00",
   "conditions": [
