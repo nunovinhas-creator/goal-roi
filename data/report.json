@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-15T22:03:14+00:00",
- "messages": 1006,
+ "generated_at_utc": "2026-11-15T22:09:34+00:00",
+ "messages": 1007,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 36,
   "BETFAIR": 184,
-  "STAKE_LOAD": 199,
+  "STAKE_LOAD": 200,
   "OPEN_GAME": 157,
   "TOTALS_FORM": 52,
   "WEAKENED_LINEUP": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1662,
+  "versions": 1667,
   "edits_changing_signal": 2,
-  "bot_mark_disagreements": 12,
-  "last_collected_at_utc": "2026-11-15T22:03:11+00:00",
+  "bot_mark_disagreements": 13,
+  "last_collected_at_utc": "2026-11-15T22:09:34+00:00",
   "hl_results": 50,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 33,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T22:03:11+00:00",
+  "collector_last_run_utc": "2026-11-15T22:09:34+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,7 +448,7 @@
   "stake_original_seen": 136,
   "stake_no_score_after_kickoff": 28,
   "stake_sent_45_after_kickoff": 46,
-  "goal_lists": 336,
+  "goal_lists": 337,
   "goal_lists_consistent": 191
  },
  "unique_bets": 556,
@@ -1355,7 +1355,7 @@
    "by_bot_mark": 0,
    "per_day": 3.6,
    "days_to_hint": 4,
-   "days_to_conclusion": 78,
+   "days_to_conclusion": 79,
    "prudent_rate": 0.5284,
    "prob_above": 0.532,
    "edge": 0.0073,
@@ -1612,7 +1612,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 25.1,
+   "per_day": 25.0,
    "days_to_hint": 0,
    "days_to_conclusion": 10,
    "prudent_rate": 0.819,
@@ -3127,8 +3127,8 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6042,
-    "promissora": 48,
+    "em observação": 6041,
+    "promissora": 49,
     "abandonada": 5
    },
    "hypotheses": [
@@ -3148,9 +3148,16 @@
     },
     {
      "id": "Polymarket | Dia = fim de semana",
-     "n": 106,
+     "n": 107,
      "games": 33,
-     "roi": -0.0812,
+     "roi": -0.0898,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 104,
+     "games": 30,
+     "roi": -0.0817,
      "status": "em observação"
     },
     {
@@ -3161,17 +3168,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 103,
-     "games": 30,
-     "roi": -0.0728,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 97,
+     "n": 98,
      "games": 26,
-     "roi": -0.0673,
+     "roi": -0.0768,
      "status": "em observação"
     },
     {
@@ -3182,6 +3182,13 @@
      "status": "promissora"
     },
     {
+     "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 92,
+     "games": 92,
+     "roi": 0.0702,
+     "status": "promissora"
+    },
+    {
      "id": "Polymarket | Momento = antes do jogo",
      "n": 92,
      "games": 35,
@@ -3189,17 +3196,17 @@
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 91,
-     "games": 91,
-     "roi": 0.0702,
-     "status": "promissora"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 91,
      "games": 91,
      "roi": 0.0352,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Competição = seleções",
+     "n": 91,
+     "games": 21,
+     "roi": -0.0656,
      "status": "em observação"
     },
     {
@@ -3210,18 +3217,32 @@
      "status": "promissora"
     },
     {
-     "id": "Polymarket | Competição = seleções",
+     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 90,
-     "games": 21,
-     "roi": -0.0552,
+     "games": 20,
+     "roi": -0.073,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 89,
-     "games": 20,
-     "roi": -0.0626,
+     "id": "Polymarket | Liga = UEFA Nations League",
+     "n": 88,
+     "games": 19,
+     "roi": -0.0519,
      "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 88,
+     "games": 19,
+     "roi": -0.0519,
+     "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Dia = fim de semana",
+     "n": 87,
+     "games": 87,
+     "roi": 0.0973,
+     "status": "promissora"
     },
     {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo",
@@ -3231,38 +3252,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Liga = UEFA Nations League",
-     "n": 87,
-     "games": 19,
-     "roi": -0.041,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 87,
-     "games": 19,
-     "roi": -0.041,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana",
-     "n": 86,
-     "games": 86,
-     "roi": 0.0973,
-     "status": "promissora"
-    },
-    {
      "id": "Polymarket | Número de apostas = várias",
-     "n": 85,
+     "n": 86,
      "games": 31,
-     "roi": -0.1436,
+     "roi": -0.1536,
      "status": "em observação"
     },
     {
      "id": "Polymarket | Valor da aposta = menos de 10 mil $",
-     "n": 85,
+     "n": 86,
      "games": 35,
-     "roi": 0.0352,
+     "roi": 0.0231,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Competição = seleções & Dia = fim de semana",
+     "n": 85,
+     "games": 17,
+     "roi": -0.0588,
      "status": "em observação"
     },
     {
@@ -3280,10 +3287,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana",
+     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 84,
-     "games": 17,
-     "roi": -0.0476,
+     "games": 16,
+     "roi": -0.0667,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League",
+     "n": 84,
+     "games": 16,
+     "roi": -0.0667,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 84,
+     "games": 16,
+     "roi": -0.0667,
      "status": "em observação"
     },
     {
@@ -3294,31 +3315,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 83,
-     "games": 16,
-     "roi": -0.0554,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League",
-     "n": 83,
-     "games": 16,
-     "roi": -0.0554,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 83,
-     "games": 16,
-     "roi": -0.0554,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
      "n": 82,
      "games": 82,
      "roi": 0.1199,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Número de apostas = várias",
+     "n": 82,
+     "games": 28,
+     "roi": -0.1737,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Valor da aposta = menos de 10 mil $",
+     "n": 82,
+     "games": 31,
+     "roi": 0.0323,
      "status": "em observação"
     },
     {
@@ -3329,17 +3343,10 @@
      "status": "abandonada"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Número de apostas = várias",
-     "n": 81,
-     "games": 28,
-     "roi": -0.1635,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Valor da aposta = menos de 10 mil $",
-     "n": 81,
-     "games": 31,
-     "roi": 0.0451,
+     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 80,
+     "games": 27,
+     "roi": -0.1766,
      "status": "em observação"
     },
     {
@@ -3350,17 +3357,17 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 79,
-     "games": 27,
-     "roi": -0.1662,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Hora (UTC) = tarde",
      "n": 78,
      "games": 78,
      "roi": 0.0874,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Quota de mercado = menos de 80 %",
+     "n": 78,
+     "games": 31,
+     "roi": -0.1637,
      "status": "em observação"
     },
     {
@@ -3371,17 +3378,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Quota de mercado = menos de 80 %",
+     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 77,
-     "games": 31,
-     "roi": -0.1529,
+     "games": 77,
+     "roi": 0.073,
+     "status": "promissora"
+    },
+    {
+     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "n": 77,
+     "games": 28,
+     "roi": 0.0529,
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "id": "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 76,
      "games": 76,
-     "roi": 0.073,
+     "roi": 0.1441,
      "status": "promissora"
     },
     {
@@ -3399,31 +3413,17 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
-     "n": 76,
-     "games": 28,
-     "roi": 0.0667,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 75,
-     "games": 75,
-     "roi": 0.1441,
-     "status": "promissora"
-    },
-    {
      "id": "Polymarket | Dia = fim de semana & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 75,
+     "n": 76,
      "games": 24,
-     "roi": -0.1888,
+     "roi": -0.1995,
      "status": "em observação"
     },
     {
      "id": "Polymarket | Dia = fim de semana & Quota de mercado = menos de 80 %",
-     "n": 75,
+     "n": 76,
      "games": 29,
-     "roi": -0.1751,
+     "roi": -0.1859,
      "status": "em observação"
     },
     {
@@ -3434,6 +3434,13 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "n": 73,
+     "games": 24,
+     "roi": 0.0648,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Competição = seleções & Momento = antes do jogo",
      "n": 72,
      "games": 21,
@@ -3441,17 +3448,17 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Competição = seleções & Número de apostas = várias",
+     "n": 72,
+     "games": 20,
+     "roi": -0.1429,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo & Número de apostas = várias",
      "n": 72,
      "games": 27,
      "roi": -0.1079,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
-     "n": 72,
-     "games": 24,
-     "roi": 0.0796,
      "status": "em observação"
     },
     {
@@ -3490,10 +3497,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Número de apostas = várias",
+     "id": "Polymarket | Competição = seleções & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 71,
-     "games": 20,
-     "roi": -0.1308,
+     "games": 19,
+     "roi": -0.1534,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Liga = UEFA Nations League & Número de apostas = várias",
+     "n": 71,
+     "games": 19,
+     "roi": -0.1534,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Liga = UEFA Nations League & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 71,
+     "games": 19,
+     "roi": -0.1534,
      "status": "em observação"
     },
     {
@@ -3511,24 +3532,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
      "n": 70,
-     "games": 19,
-     "roi": -0.1413,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Número de apostas = várias",
-     "n": 70,
-     "games": 19,
-     "roi": -0.1413,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 70,
-     "games": 19,
-     "roi": -0.1413,
+     "games": 24,
+     "roi": -0.1409,
      "status": "em observação"
     },
     {
@@ -3574,13 +3581,6 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
-     "n": 69,
-     "games": 24,
-     "roi": -0.1284,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo",
      "n": 68,
      "games": 68,
@@ -3602,6 +3602,27 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Número de apostas = várias",
+     "n": 68,
+     "games": 17,
+     "roi": -0.1665,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Competição = seleções & Valor da aposta = menos de 10 mil $",
+     "n": 68,
+     "games": 21,
+     "roi": 0.0635,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "n": 68,
+     "games": 22,
+     "roi": -0.165,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Competição = seleções & Dia = fim de semana & Momento = antes do jogo",
      "n": 67,
      "games": 17,
@@ -3609,24 +3630,17 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Número de apostas = várias",
+     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 67,
-     "games": 17,
-     "roi": -0.154,
+     "games": 20,
+     "roi": 0.0555,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Número de apostas = várias",
      "n": 67,
-     "games": 21,
-     "roi": 0.0794,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
-     "n": 67,
-     "games": 22,
-     "roi": -0.1525,
+     "games": 16,
+     "roi": -0.1779,
      "status": "em observação"
     },
     {
@@ -3658,13 +3672,6 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
-     "n": 66,
-     "games": 20,
-     "roi": 0.0715,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Momento = antes do jogo",
      "n": 66,
      "games": 16,
@@ -3672,10 +3679,24 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Número de apostas = várias",
+     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 66,
-     "games": 16,
-     "roi": -0.1655,
+     "games": 19,
+     "roi": 0.0715,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Liga = UEFA Nations League & Valor da aposta = menos de 10 mil $",
+     "n": 66,
+     "games": 19,
+     "roi": 0.0715,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Mercado = outro mercado",
+     "n": 66,
+     "games": 30,
+     "roi": -0.1914,
      "status": "em observação"
     },
     {
@@ -3700,25 +3721,25 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Competição = seleções & Quota de mercado = menos de 80 %",
      "n": 65,
      "games": 19,
-     "roi": 0.088,
+     "roi": -0.1157,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Liga = UEFA Nations League & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado",
      "n": 65,
-     "games": 19,
-     "roi": 0.088,
+     "games": 29,
+     "roi": -0.2046,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Mercado = outro mercado",
-     "n": 65,
-     "games": 30,
-     "roi": -0.1789,
-     "status": "em observação"
+     "id": "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 64,
+     "games": 64,
+     "roi": 0.1532,
+     "status": "promissora"
     },
     {
      "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00",
@@ -3735,25 +3756,39 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Quota de mercado = menos de 80 %",
+     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Valor da aposta = menos de 10 mil $",
      "n": 64,
-     "games": 19,
-     "roi": -0.1019,
+     "games": 17,
+     "roi": 0.0778,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado",
+     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
      "n": 64,
-     "games": 29,
-     "roi": -0.1922,
+     "games": 18,
+     "roi": -0.1269,
      "status": "em observação"
     },
     {
-     "id": "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 63,
-     "games": 63,
-     "roi": 0.1532,
-     "status": "promissora"
+     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "n": 64,
+     "games": 18,
+     "roi": -0.1269,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Liga = UEFA Nations League & Quota de mercado = menos de 80 %",
+     "n": 64,
+     "games": 18,
+     "roi": -0.1269,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = sim",
+     "n": 64,
+     "games": 17,
+     "roi": -0.0244,
+     "status": "em observação"
     },
     {
      "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
@@ -3784,17 +3819,17 @@
      "status": "promissora"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Quota de mercado = menos de 80 %",
      "n": 63,
      "games": 17,
-     "roi": 0.0949,
+     "roi": -0.141,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Valor da aposta = menos de 10 mil $",
      "n": 63,
-     "games": 18,
-     "roi": -0.113,
+     "games": 16,
+     "roi": 0.0695,
      "status": "em observação"
     },
     {
@@ -3805,24 +3840,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "id": "Polymarket | Número de apostas = várias & Valor da aposta = menos de 10 mil $",
      "n": 63,
-     "games": 18,
-     "roi": -0.113,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Quota de mercado = menos de 80 %",
-     "n": 63,
-     "games": 18,
-     "roi": -0.113,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 63,
-     "games": 17,
-     "roi": -0.0089,
+     "games": 28,
+     "roi": -0.0463,
      "status": "em observação"
     },
     {
@@ -3854,13 +3875,6 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Quota de mercado = menos de 80 %",
-     "n": 62,
-     "games": 17,
-     "roi": -0.1271,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Competição = seleções & Momento = antes do jogo & Número de apostas = várias",
      "n": 62,
      "games": 20,
@@ -3868,17 +3882,17 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Quota de mercado = menos de 80 %",
      "n": 62,
      "games": 16,
-     "roi": 0.0868,
+     "roi": -0.1529,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Número de apostas = várias & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
      "n": 62,
-     "games": 28,
-     "roi": -0.031,
+     "games": 29,
+     "roi": -0.0992,
      "status": "em observação"
     },
     {
@@ -3896,10 +3910,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Quota de mercado = menos de 80 %",
+     "id": "Polymarket | Dia = fim de semana & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
      "n": 61,
-     "games": 16,
-     "roi": -0.139,
+     "games": 28,
+     "roi": -0.1118,
      "status": "em observação"
     },
     {
@@ -3910,18 +3924,18 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-     "n": 61,
-     "games": 29,
-     "roi": -0.0844,
-     "status": "em observação"
-    },
-    {
      "id": "Stake | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 61,
      "games": 18,
      "roi": -0.1659,
      "status": "em observação"
+    },
+    {
+     "id": "Forma de golos | Competição = liga",
+     "n": 60,
+     "games": 60,
+     "roi": -0.0643,
+     "status": "promissora"
     },
     {
      "id": "Jogo aberto | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -3966,10 +3980,24 @@
      "status": "promissora"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Competição = seleções & Sinal anterior de outro tipo no mesmo jogo = sim",
      "n": 60,
-     "games": 28,
-     "roi": -0.097,
+     "games": 14,
+     "roi": 0.0067,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Número de apostas = várias & Valor da aposta = menos de 10 mil $",
+     "n": 60,
+     "games": 25,
+     "roi": -0.0543,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim",
+     "n": 60,
+     "games": 14,
+     "roi": -0.0432,
      "status": "em observação"
     },
     {
@@ -3980,18 +4008,18 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Liga = UEFA Nations League & Sinal anterior de outro tipo no mesmo jogo = sim",
+     "n": 60,
+     "games": 14,
+     "roi": 0.0067,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Momento = antes do jogo & Quota de mercado = menos de 80 %",
      "n": 60,
      "games": 29,
      "roi": -0.1695,
      "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Competição = liga",
-     "n": 59,
-     "games": 59,
-     "roi": -0.0643,
-     "status": "promissora"
     },
     {
      "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -4001,31 +4029,17 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Sinal anterior de outro tipo no mesmo jogo = sim",
+     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 59,
-     "games": 14,
-     "roi": 0.0237,
+     "games": 24,
+     "roi": -0.1536,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Número de apostas = várias & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Número de apostas = várias & Quota de mercado = menos de 80 %",
      "n": 59,
      "games": 25,
-     "roi": -0.0383,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 59,
-     "games": 14,
-     "roi": -0.0269,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 59,
-     "games": 14,
-     "roi": 0.0237,
+     "roi": -0.2215,
      "status": "em observação"
     },
     {
@@ -4064,6 +4078,13 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 58,
+     "games": 23,
+     "roi": -0.1678,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo & Quota de mercado = menos de 80 %",
      "n": 58,
      "games": 27,
@@ -4071,24 +4092,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 58,
-     "games": 24,
-     "roi": -0.139,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 58,
      "games": 26,
      "roi": 0.031,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Número de apostas = várias & Quota de mercado = menos de 80 %",
-     "n": 58,
-     "games": 25,
-     "roi": -0.2081,
      "status": "em observação"
     },
     {
@@ -4106,10 +4113,17 @@
      "status": "promissora"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "id": "Polymarket | Dia = fim de semana & Número de apostas = várias & Quota de mercado = menos de 80 %",
      "n": 57,
      "games": 23,
-     "roi": -0.1532,
+     "roi": -0.2532,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "n": 57,
+     "games": 24,
+     "roi": -0.0674,
      "status": "em observação"
     },
     {
@@ -4166,20 +4180,6 @@
      "n": 56,
      "games": 56,
      "roi": -0.0403,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 56,
-     "games": 56,
-     "roi": -0.0106,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 56,
-     "games": 56,
-     "roi": -0.0562,
      "status": "em observação"
     }
    ]
@@ -4378,7 +4378,7 @@
       0.3025
      ],
      "prob_above_cut": 0.885,
-     "prob_adds": 0.9718,
+     "prob_adds": 0.9721,
      "bets": 16,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4419,7 +4419,7 @@
       -0.0417
      ],
      "prob_above_cut": 0.0134,
-     "prob_adds": 0.045,
+     "prob_adds": 0.0455,
      "bets": 18,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4454,7 +4454,7 @@
       -0.038
      ],
      "prob_above_cut": 0.0134,
-     "prob_adds": 0.0498,
+     "prob_adds": 0.0504,
      "bets": 28,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4929,7 +4929,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-15T22:03:31+00:00",
+   "generated_utc": "2026-11-15T22:09:51+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4944,7 +4944,7 @@
     "gerador": {
      "hypotheses": 6044,
      "judged": 2933,
-     "as_expected": 1306
+     "as_expected": 1305
     },
     "llm/refinar": {
      "hypotheses": 32,
@@ -5090,12 +5090,12 @@
    },
    "skipped": {
     "bets": 337,
-    "settled": 246,
+    "settled": 247,
     "games": 121,
     "wins": 116,
-    "units": -14.7,
-    "roi": -0.0597,
-    "roi_cut": -0.0773
+    "units": -15.7,
+    "roi": -0.0635,
+    "roi_cut": -0.081
    },
    "not_reconstructible": {
     "bets": 36,
@@ -5279,11 +5279,11 @@
     -0.31,
     0.99
    ],
-   "prob_followed_better": 0.5198,
+   "prob_followed_better": 0.5206,
    "first_followed_utc": "2026-11-12T19:27:25+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 412,
+    "results_verified": 413,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -11998,7 +11998,7 @@
      0.3025
     ],
     "prob_above_cut": 0.885,
-    "prob_adds": 0.9718,
+    "prob_adds": 0.9721,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T14:10:34+00:00",
@@ -13010,7 +13010,7 @@
      0.314
     ],
     "prob_above_cut": 0.8799,
-    "prob_adds": 0.9672,
+    "prob_adds": 0.9675,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T13:33:53+00:00",
@@ -13650,7 +13650,7 @@
      0.2609
     ],
     "prob_above_cut": 0.872,
-    "prob_adds": 0.9831,
+    "prob_adds": 0.9834,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T16:49:20+00:00",
@@ -14214,7 +14214,7 @@
      0.287
     ],
     "prob_above_cut": 0.8701,
-    "prob_adds": 0.9648,
+    "prob_adds": 0.9652,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T18:43:46+00:00",
@@ -14345,7 +14345,7 @@
      0.2598
     ],
     "prob_above_cut": 0.8695,
-    "prob_adds": 0.979,
+    "prob_adds": 0.9794,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T15:56:32+00:00",
@@ -14542,7 +14542,7 @@
      0.3508
     ],
     "prob_above_cut": 0.8747,
-    "prob_adds": 0.96,
+    "prob_adds": 0.9605,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T21:36:00+00:00",
@@ -14606,7 +14606,7 @@
      0.3242
     ],
     "prob_above_cut": 0.8728,
-    "prob_adds": 0.9661,
+    "prob_adds": 0.9664,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T18:43:46+00:00",
@@ -14670,7 +14670,7 @@
      0.3084
     ],
     "prob_above_cut": 0.8703,
-    "prob_adds": 0.972,
+    "prob_adds": 0.9724,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:54:00+00:00",
@@ -14734,7 +14734,7 @@
      0.3222
     ],
     "prob_above_cut": 0.8697,
-    "prob_adds": 0.9596,
+    "prob_adds": 0.96,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T18:13:22+00:00",
@@ -14925,7 +14925,7 @@
      -0.007
     ],
     "prob_above_cut": 0.0293,
-    "prob_adds": 0.063,
+    "prob_adds": 0.0642,
     "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00",
     "family": "Polymarket",
     "conditions": [
@@ -16664,7 +16664,7 @@
     "roi_announced_odds": -0.0385,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 10.6,
+    "per_day": 10.5,
     "days_to_hint": 0,
     "days_to_conclusion": 25
    },
@@ -16722,7 +16722,7 @@
     "roi_announced_odds": 0.1024,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 32.4,
+    "per_day": 32.3,
     "days_to_hint": 0,
     "days_to_conclusion": 6
    },
@@ -16751,7 +16751,7 @@
     "roi_announced_odds": -0.0936,
     "seen_late": 0,
     "by_bot_mark": 66,
-    "per_day": 34.8,
+    "per_day": 34.7,
     "days_to_hint": 0,
     "days_to_conclusion": 6
    },
@@ -16780,7 +16780,7 @@
     "roi_announced_odds": -0.1699,
     "seen_late": 0,
     "by_bot_mark": 17,
-    "per_day": 25.3,
+    "per_day": 25.2,
     "days_to_hint": 0,
     "days_to_conclusion": 9
    },
