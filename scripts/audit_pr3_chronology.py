@@ -15,6 +15,7 @@ import os
 import random
 import socket
 import subprocess
+import tempfile
 import sys
 import time
 import types
@@ -32,6 +33,7 @@ BASE = '82ab9d86593055fbc98420265a469728d914288f'       # main with PR 2 at the 
 FIRST_PR3 = 'ef4606a93d7c576f64a66afc186f9a3d6a2558bf'  # PR 3 as audited in review #5911487915 (Bonferroni/posterior tails)
 SECOND_PR3 = 'd946ffdf33198610277ffcf25e42d818ca0bef79' # PR 3 as audited in review #5911603577 (replayed selection order)
 THIRD_PR3 = '345e0081ea6910cfbd5f7f9963879a1fac04b656'  # PR 3 as audited in review #5911747123 (overlap, adaptive per-game mean)
+FOURTH_PR3 = '9da69d88c20e511e4fea21664def4100c79de6fb' # PR 3 as audited in review #5911845265 (history gate, 3-day close)
 SPACING_H = 3                                            # synthetic games every 3 h: each result is seen before the next decision
 NOW = '2026-11-15T14:34:34+00:00'                       # BASE commit time: the report clock for both versions
 UTC = timezone.utc
@@ -562,6 +564,44 @@ def counterexamples_third(third_brain, third_cert):
     return out
 
 
+def counterexamples_fourth(fourth_brain):
+    """Review #5911845265: P1-H on the real gate (rewritten ledger, recomputed hashes) and P2-I (lonely pending game)."""
+    out, act = {}, datetime(2026, 11, 1, tzinfo=UTC)
+    reg = {'x': {'family': 'Jogo aberto', 'conditions': [['Minuto', '31 a 60']], 'born_utc': '2026-10-01T00:00:00+00:00', 'source': 'gerador'}}
+    games = [_sig('g%d' % i, w, 3 * i) for i, w in enumerate(([1.0, 1.0, 1.0, -1.0] * 26)[:102])]
+    published = certification.activate({}, act)
+    certification.append(published, ['x'], reg, act + timedelta(hours=1))
+    rewritten = certification.activate({}, act)                       # internally valid, different history (rehashed)
+    certification.append(rewritten, ['x'], reg, datetime(2026, 11, 19, 12, tzinfo=UTC))
+    with tempfile.TemporaryDirectory() as root:
+        data = Path(root) / 'data'
+        data.mkdir()
+        run = lambda *a, when=act: subprocess.run(['git', '-C', root, '-c', 'user.name=a', '-c', 'user.email=a@invalid', '-c', 'commit.gpgsign=false', *a],
+                                                  check=True, capture_output=True, env=dict(os.environ, GIT_AUTHOR_DATE=when.isoformat(), GIT_COMMITTER_DATE=when.isoformat()))
+        run('init', '-q')
+        certification.save(data / certification.FILE, published)
+        run('add', '-A')
+        run('commit', '-q', '-m', 'ledger', when=act + timedelta(hours=1, minutes=5))
+        certification.save(data / certification.FILE, rewritten)
+        proof = certification.history_proof(data / certification.FILE, rewritten)
+    old = fourth_brain.build(games, reg, 300, rewritten)['validation']
+    new_unproven = brain.build(games, reg, 300, rewritten)['validation']
+    new = brain.build(games, reg, 300, rewritten, history_problems=proof)['validation']
+    out['P1-H_rewritten_ledger'] = {'internal_verify': certification.verify(rewritten, reg), 'git_history_proof': proof,
+                                    '9da69d8_state_and_certified': [old['state'], old['certified']],
+                                    'current_without_proof': [new_unproven['state'], new_unproven['certified']],
+                                    'current_with_proof': [new['state'], new['certified']]}
+    lonely = [_sig('o', None, 0)]
+    since, t0 = datetime(2026, 11, 19, tzinfo=UTC), datetime(2026, 11, 20, tzinfo=UTC)
+    after = t0 + timedelta(days=3, hours=1)
+    old_c = fourth_brain.confirmation(lonely, since, 0.025)
+    out['P2-I_lonely_pending_game'] = {
+        '9da69d8_any_time': {k: old_c[k] for k in ('games', 'pending', 'voided_as_loss')},
+        'current_2d23h': {k: v for k, v in brain.confirmation(lonely, since, 0.025, as_of=t0 + timedelta(days=2, hours=23)).items() if k in ('games', 'pending', 'voided_as_loss')},
+        'current_3d1h': {k: v for k, v in brain.confirmation(lonely, since, 0.025, as_of=after).items() if k in ('games', 'pending', 'voided_as_loss')}}
+    return out
+
+
 def review_5911603577(signals, registry, rows_by_id, second_brain):
     """P1-C/D/E on the snapshot: certifiable hypotheses, bets decided after a result was seen, the d946ffd replayed selection
     order versus the current (not activated) ledger, and a RETROSPECTIVE e-process simulation that is NOT a certificate."""
@@ -696,6 +736,7 @@ def main():
             'synthetic_validation_rates': validation_rates(old_brain, old_module('brain', base=FIRST_PR3)),
             'review_5911603577': review_5911603577(signals, registry, by_id, old_module('brain', base=SECOND_PR3)),
             'counterexamples_review_5911603577': counterexamples(old_module('brain', base=SECOND_PR3)),
+            'counterexamples_review_5911845265': counterexamples_fourth(old_module('brain', base=FOURTH_PR3)),
             'counterexamples_review_5911747123': counterexamples_third(old_module('brain', base=THIRD_PR3), old_module('certification', base=THIRD_PR3)),
         }
     out['data_unchanged_by_audit'] = digest() == data_before
