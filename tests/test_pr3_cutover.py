@@ -264,6 +264,91 @@ class PR3Cutover(unittest.TestCase):
         git(self.root, 'checkout', '--', 'data', 'docs')
         self.assertEqual(cut.main([]), 2)
 
+    # --- faulty migrations and builds (mutation-checked) ----------------------------------------------------------
+    def faulty_run(self, fault):
+        real = cut.notify.migrate_file
+
+        def faulty(now=None):
+            changed = real(now)
+            if changed:
+                fault()
+            return changed
+        before = self.files()
+        with patch.object(cut.notify, 'migrate_file', faulty), redirect_stdout(io.StringIO()):
+            result = cut.cutover(self.root, self.main, NOW, build_ok)
+        self.assertEqual((result['ok'], result['restored']), (False, True))
+        self.assertEqual(self.files(), before)
+        return {k for k, v in result['checks'].items() if v is False}
+
+    def edit_state(self, change):
+        path = self.root / 'data/notify_state.json'
+        st = json.loads(path.read_text(encoding='utf-8'))
+        change(st)
+        path.write_text(json.dumps(st, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+
+    def test_faulty_migration_touching_markers_counters_or_fields_is_rolled_back(self):
+        faults = {'pr1_marker_preserved': lambda st: st['migrations'][notify.STATUS_MIGRATION].update(baseline_statuses={}),
+                  'pr2_marker_preserved': lambda st: st['migrations'][cut.PR2_KEY].update(baseline_statuses={}),
+                  'delivery_fields_preserved': lambda st: st.update(sent_total=st['sent_total'] + 1),
+                  'no_unexpected_fields': lambda st: st.update(unexpected_field=True)}
+        for check, fault in faults.items():
+            with self.subTest(check):
+                failing = self.faulty_run(lambda fault=fault: self.edit_state(fault))
+                self.assertIn(check, failing)
+
+    def test_migration_writing_other_files_growing_the_registry_or_a_ledger_is_rolled_back(self):
+        cases = {'other file': (lambda: write(self.root, 'data/state.json', {'x': 1}), {'only_allowed_files_changed'}),
+                 'registry': (lambda: write(self.root, 'data/hypotheses.json', {'k0': {}, 'grown': {}}), {'only_allowed_files_changed', 'registry_unchanged'}),
+                 'ledger': (lambda: write(self.root, cut.LEDGER, {'method': 'x'}), {'only_allowed_files_changed', 'no_certification_ledger'})}
+        for label, (fault, expected) in cases.items():
+            with self.subTest(label):
+                self.assertEqual(self.faulty_run(fault), expected)
+                self.assertFalse((self.root / 'data/state.json').exists() or (self.root / cut.LEDGER).exists())
+
+    def test_second_migration_must_report_unchanged(self):
+        real, calls = cut.notify.migrate_file, {'n': 0}
+
+        def lying(now=None):
+            calls['n'] += 1
+            if calls['n'] == 2:
+                print('NOTIFY_STATUS_MIGRATED')
+                return False
+            return real(now)
+        before = self.files()
+        with patch.object(cut.notify, 'migrate_file', lying):
+            result = cut.cutover(self.root, self.main, NOW, build_ok)
+        self.assertEqual((result['ok'], result['restored'], result['checks']['second_call']), (False, True, 'NOTIFY_STATUS_MIGRATED'))
+        self.assertEqual(self.files(), before)
+
+    def test_builds_must_not_write_into_the_checkout_and_must_agree(self):
+        def writes(csv_path=None, register=False):
+            if not register:
+                write(self.root, 'data/state.json', {'unexpected': True})
+            return pr3_report()
+        self.assertEqual(self.refused('register=False build wrote into the checkout', build=writes).stage, 'build_report')
+
+        def leaks(csv_path=None, register=False):
+            if register:
+                write(self.root, 'data/hypotheses.json', {'leaked': True})
+            return pr3_report()
+        self.assertIsInstance(self.refused('wrote into the checkout', build=leaks), cut.CutoverAborted)
+
+        def diverges(csv_path=None, register=False):
+            build_ok(csv_path, register)
+            return pr3_report(dict(PR3_STATUSES, newly='promissora')) if register else pr3_report()
+        self.refused('register=True status_list differs', build=diverges)
+        self.assertNotIn('grown-by-register-true', (self.root / 'data/hypotheses.json').read_text(encoding='utf-8'))
+
+    def test_notify_and_brain_must_agree_on_the_migration_key(self):
+        with patch.object(cut.notify, 'migration_key', lambda report: 'status_rules:something_else'):
+            self.refused('maps to migration key status_rules:something_else')
+
+    def test_operational_scope_and_valid_statuses_are_required(self):
+        for label, rep, reason in (('no operational', dict(pr3_report(), operational={}), 'no eligible operational block'),
+                                   ('bad status', pr3_report({'k0': 'excelente'}), 'no valid eligible status_list')):
+            with self.subTest(label):
+                self.refused(reason, build=lambda csv_path=None, register=False, rep=rep: rep)
+
     # --- push preflight: concurrent commits, linear history --------------------------------------------------------
     def test_push_preflight_detects_a_moved_main_and_non_fast_forward(self):
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
