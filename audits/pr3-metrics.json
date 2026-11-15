@@ -19,12 +19,12 @@
  },
  "build_seconds": {
   "pr2": [
-   8.72,
-   10.32
+   11.53,
+   9.63
   ],
   "pr3": [
-   10.31,
-   10.56
+   11.61,
+   10.04
   ]
  },
  "pr2": {
@@ -308,16 +308,23 @@
    "não verificável": 0
   },
   "prospective_categories_tested": {
-   "prospective": 4600,
+   "prospective": 4593,
    "mixed": 9,
-   "before_registration": 813,
-   "after_registration_not_operational": 62
+   "before_registration": 771,
+   "after_registration_not_operational": 0,
+   "result_known_before_decision": 111,
+   "result_time_unproven": 0
   },
   "note": "promissora/abandonada are uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)"
  },
  "pr3_validation": {
   "method": "eprocess_online_alpha_v1",
   "alpha": 0.05,
+  "state": "not_activated",
+  "ledger_valid": false,
+  "ledger_problems": [],
+  "activated_utc": null,
+  "legacy": 0,
   "test": "test-by-betting e-process on per-game profit at announced odds minus 2 %",
   "lambdas": [
    0.5,
@@ -326,90 +333,63 @@
    0.0625,
    0.03125
   ],
-  "allocation": "alpha/(j(j+1)) by order of selection (first confirmed promissora)",
-  "evidence": "operational games whose signals were sent and read after the selection, decidable, with proven result time",
+  "allocation": "alpha/(j(j+1)) by order of REGISTERED real-time selection (append-only ledger)",
+  "evidence": "games whose bets were sent and read after the registered selection, decidable, decided before any result of the game was observed, with proven result time; only hypotheses whose conditions are all known at the first signal",
+  "as_of_dimensions": [
+   "Antecedência",
+   "Competição",
+   "Confiança indicada pelo bot",
+   "Dia",
+   "Faixa de odd",
+   "Golos até ao sinal",
+   "Golos em falta para ganhar",
+   "Hora (UTC)",
+   "Liga",
+   "Marcador no momento",
+   "Mercado",
+   "Minuto",
+   "Momento",
+   "Momento do aviso",
+   "Número de apostas",
+   "Parte do jogo",
+   "Quota de mercado",
+   "Ritmo indicado pelo bot",
+   "Seleção",
+   "Tamanho do mercado",
+   "Valor da aposta",
+   "Vantagem indicada pelo bot",
+   "Volume na seleção"
+  ],
   "min_games": 30,
   "also_requires": {
    "games": 100,
    "prob_above": 0.95,
    "keep_prob_above": 0.9
   },
-  "claim": "P(any tactic ever certified while its expected profit at odds -2 % is <= 0 on its games) <= 0.05, over the whole life of the project, any dependence between hypotheses, continuous monitoring",
+  "claim": "no claim: certification is not active, no tactic can be validated",
   "assumptions": [
-   "null holds conditionally on the past for every game used (no edge whatever happened before)",
-   "which games a hypothesis contains never depends on their results (fixed conditions)",
-   "stored observation times are true (verified against git history in the PR 3 audit)"
+   "null holds conditionally on everything known when each bet was decided (no edge whatever happened before)",
+   "membership of a bet uses only dimensions known at its first signal (as_of_dimensions)",
+   "stored observation times are true (verified against git history in the PR 3 audit)",
+   "the ledger is append-only (verified hash chain; git history as external clock)"
   ],
-  "selected": 11,
+  "selected": 0,
   "certified": [],
-  "closest": [
-   {
-    "games": 17,
-    "e_value": 0.9376,
-    "e_max": 1.1936,
-    "threshold": 40.0,
-    "alpha": 0.025,
-    "rank": 1,
-    "selected_utc": "2026-11-14T17:02:49+00:00",
-    "certified_utc": null,
-    "id": "Jogo aberto | Parte do jogo = 2.ª parte"
-   },
-   {
-    "games": 12,
-    "e_value": 1.8678,
-    "e_max": 2.4368,
-    "threshold": 120.0,
-    "alpha": 0.008333333333333333,
-    "rank": 2,
-    "selected_utc": "2026-11-14T17:21:44+00:00",
-    "certified_utc": null,
-    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90"
-   },
-   {
-    "games": 9,
-    "e_value": 1.1208,
-    "e_max": 1.4495,
-    "threshold": 240.0,
-    "alpha": 0.004166666666666667,
-    "rank": 3,
-    "selected_utc": "2026-11-14T18:23:15+00:00",
-    "certified_utc": null,
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos"
-   },
-   {
-    "games": 10,
-    "e_value": 1.0559,
-    "e_max": 1.2325,
-    "threshold": 400.0,
-    "alpha": 0.0025,
-    "rank": 4,
-    "selected_utc": "2026-11-14T20:13:05+00:00",
-    "certified_utc": null,
-    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não"
-   },
-   {
-    "games": 8,
-    "e_value": 1.2161,
-    "e_max": 1.4489,
-    "threshold": 600.0,
-    "alpha": 0.0016666666666666668,
-    "rank": 5,
-    "selected_utc": "2026-11-14T21:03:24+00:00",
-    "certified_utc": null,
-    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90"
-   }
-  ]
+  "candidates": [],
+  "closest": []
  },
  "prospective_definitions_review_5911487915": {
   "hypotheses": 143,
   "old_report_games": 4671,
   "old_replay_games": 4662,
-  "new_games": 4600,
+  "new_games": 4593,
   "old_report_vs_replay_disagree": 6,
-  "new_prospective": 4600,
+  "new_prospective": 4593,
   "new_mixed": 9,
-  "new_before_registration": 813,
-  "new_after_registration_not_operational": 62,
+  "new_before_registration": 771,
+  "new_after_registration_not_operational": 0,
+  "new_result_known_before_decision": 111,
+  "new_result_time_unproven": 0,
   "evidence_level_changed": 6,
   "examples": [
    {
@@ -421,7 +401,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 0,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    },
    {
@@ -433,7 +415,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 8,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    },
    {
@@ -445,7 +429,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 6,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    },
    {
@@ -457,7 +443,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 2,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    },
    {
@@ -469,7 +457,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 3,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    },
    {
@@ -481,7 +471,9 @@
      "prospective": 29,
      "mixed": 0,
      "before_registration": 0,
-     "after_registration_not_operational": 1
+     "after_registration_not_operational": 0,
+     "result_known_before_decision": 1,
+     "result_time_unproven": 0
     }
    }
   ]
@@ -788,14 +780,14 @@
   }
  },
  "notify_rehearsal": {
-  "migration_key": "status_rules:chronological_eprocess_v1",
+  "migration_key": "status_rules:chronological_eprocess_v2",
   "markers_before": [
    "eligible_statuses_v1",
    "status_rules:independent_games_hysteresis_v1"
   ],
   "markers_after": [
    "eligible_statuses_v1",
-   "status_rules:chronological_eprocess_v1",
+   "status_rules:chronological_eprocess_v2",
    "status_rules:independent_games_hysteresis_v1"
   ],
   "status_messages_with_migration": 0,
@@ -810,40 +802,257 @@
     "seeds": 200,
     "pr2": 0.12,
     "pr3_ef4606a_bonferroni": 0.0,
-    "pr3_eprocess": 0.0
+    "pr3_eprocess_with_ledger": 0.0
    },
    "no_edge_p0.50_300_games": {
     "seeds": 200,
     "pr2": 0.18,
     "pr3_ef4606a_bonferroni": 0.0,
-    "pr3_eprocess": 0.0
+    "pr3_eprocess_with_ledger": 0.005
    },
    "no_edge_p0.50_1000_games": {
     "seeds": 60,
     "pr2": 0.25,
     "pr3_ef4606a_bonferroni": 0.0,
-    "pr3_eprocess": 0.0
+    "pr3_eprocess_with_ledger": 0.0
    },
    "edge_p0.60_300_games": {
     "seeds": 200,
     "pr2": 0.975,
     "pr3_ef4606a_bonferroni": 0.46,
-    "pr3_eprocess": 0.465
+    "pr3_eprocess_with_ledger": 0.62
    },
    "edge_p0.60_1000_games": {
     "seeds": 60,
     "pr2": 1.0,
     "pr3_ef4606a_bonferroni": 0.983,
-    "pr3_eprocess": 1.0
+    "pr3_eprocess_with_ledger": 1.0
    },
    "edge_p0.75_160_games": {
     "seeds": 200,
     "pr2": 1.0,
     "pr3_ef4606a_bonferroni": 1.0,
-    "pr3_eprocess": 0.995
+    "pr3_eprocess_with_ledger": 1.0
    }
   },
-  "note": "one hypothesis (rank 1, alpha 0.025 for the e-process): isolates repeated looks; pr2 uses 1 - 0.05/m with rounded prob_above"
+  "note": "one hypothesis (ledger rank 1, alpha 0.025 for the e-process): isolates repeated looks; pr2 uses 1 - 0.05/m with rounded prob_above"
+ },
+ "review_5911603577": {
+  "tested": 143,
+  "tested_certifiable": 69,
+  "promising": 11,
+  "promising_certifiable": 6,
+  "promising_not_certifiable": [
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não"
+  ],
+  "settled_bets": 286,
+  "bets_first_result_unproven": 0,
+  "bets_decided_after_first_result": 10,
+  "bets_decided_after_first_result_but_d946ffd_operational": 2,
+  "d946ffd_prospective_games_tested": 4600,
+  "current_prospective_games_tested": 4593,
+  "d946ffd_selection_order": [
+   {
+    "rank": 1,
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte",
+    "selected_utc": "2026-11-14T17:02:49+00:00"
+   },
+   {
+    "rank": 2,
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+    "selected_utc": "2026-11-14T17:21:44+00:00"
+   },
+   {
+    "rank": 3,
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
+    "selected_utc": "2026-11-14T18:23:15+00:00"
+   },
+   {
+    "rank": 4,
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "selected_utc": "2026-11-14T20:13:05+00:00"
+   },
+   {
+    "rank": 5,
+    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
+    "selected_utc": "2026-11-14T21:03:24+00:00"
+   },
+   {
+    "rank": 6,
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+    "selected_utc": "2026-11-14T23:44:37+00:00"
+   },
+   {
+    "rank": 7,
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
+    "selected_utc": "2026-11-15T00:10:03+00:00"
+   },
+   {
+    "rank": 8,
+    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+    "selected_utc": "2026-11-15T03:16:34+00:00"
+   },
+   {
+    "rank": 9,
+    "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+    "selected_utc": "2026-11-15T05:12:49+00:00"
+   },
+   {
+    "rank": 10,
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "selected_utc": "2026-11-15T05:12:49+00:00"
+   },
+   {
+    "rank": 11,
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "selected_utc": "2026-11-15T09:09:31+00:00"
+   }
+  ],
+  "legacy_at_activation_if_activated_now": [
+   "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+   "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
+   "Jogo aberto | Parte do jogo = 2.ª parte",
+   "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não"
+  ],
+  "retrospective_simulation_not_a_certificate": [
+   {
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte",
+    "certifiable": true,
+    "games": 17,
+    "log10_e": -0.028,
+    "threshold": 40.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+    "certifiable": true,
+    "games": 12,
+    "log10_e": 0.2713,
+    "threshold": 120.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
+    "certifiable": true,
+    "games": 9,
+    "log10_e": 0.0495,
+    "threshold": 240.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "certifiable": false,
+    "games": 10,
+    "log10_e": 0.0236,
+    "threshold": 400.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
+    "certifiable": false,
+    "games": 8,
+    "log10_e": 0.085,
+    "threshold": 600.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
+    "certifiable": false,
+    "games": 3,
+    "log10_e": -0.0183,
+    "threshold": 840.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
+    "certifiable": true,
+    "games": 5,
+    "log10_e": -0.0641,
+    "threshold": 1120.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+    "certifiable": false,
+    "games": 4,
+    "log10_e": -0.1094,
+    "threshold": 1440.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+    "certifiable": true,
+    "games": 3,
+    "log10_e": -0.0234,
+    "threshold": 1800.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "certifiable": true,
+    "games": 3,
+    "log10_e": -0.0234,
+    "threshold": 2200.0,
+    "would_certify": false
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "certifiable": false,
+    "games": 1,
+    "log10_e": -0.0935,
+    "threshold": 2640.0,
+    "would_certify": false
+   }
+  ]
+ },
+ "counterexamples_review_5911603577": {
+  "P1-D_games_counted": {
+   "d946ffd": 40,
+   "current": 0
+  },
+  "P1-C_post_condition": {
+   "d946ffd_games_before_after": [
+    69,
+    null
+   ],
+   "current_certifiable": false
+  },
+  "P1-E_ranks": {
+   "d946ffd_before": {
+    "A": 1,
+    "B": 2
+   },
+   "d946ffd_after_late_bets": {
+    "A": 2,
+    "B": 1
+   },
+   "current_before": {
+    "A": 2,
+    "B": 1
+   },
+   "current_after_late_bets": {
+    "A": 2,
+    "B": 1
+   }
+  },
+  "P2_d946ffd": "OverflowError: math range error",
+  "P2_current": {
+   "games": 5000,
+   "log10_e": 1471.6322,
+   "e_value": null,
+   "certified": true
+  }
  },
  "data_unchanged_by_audit": true
 }
