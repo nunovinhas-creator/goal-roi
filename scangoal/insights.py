@@ -6,6 +6,7 @@ Dimensões fixadas a 12/11/2026, antes de haver dados suficientes para as escolh
 import math
 from datetime import datetime
 
+from .eligibility import bet_identity, game_identity
 from .parser import competition_kind
 
 PRIOR_WEIGHT = 10        # pseudo-observações centradas na taxa necessária ("sem vantagem")
@@ -94,30 +95,53 @@ def posterior(hits, misses, break_even):
 
 
 class Votes:
-    """Um voto por jogo (regra de 12/11/2026): vários sinais no mesmo jogo não são independentes, por isso repartem um voto.
+    """Um voto por jogo, com uma unidade por aposta (regras de 12/11/2026 e 15/11/2026).
 
-    Um jogo com dois sinais certos conta um acerto, não dois; com um certo e um errado conta meio acerto e meia falha.
-    É o lado prudente: a evidência nunca cresce por o bot repetir sinais no mesmo jogo.
+    Unidades estatísticas, da mais fina para a independente:
+    - sinal: cada mensagem do bot;
+    - aposta: (jogo, mercado, seleção). Sinais repetidos na mesma aposta são a mesma observação e contam uma vez;
+    - jogo: apostas diferentes no mesmo jogo (outros mercados ou seleções) têm resultados correlacionados e repartem um voto.
+    Um jogo com duas apostas certas conta um acerto, não dois; com uma certa e uma errada conta meio acerto e meia falha.
+    É o lado prudente: a evidência nunca cresce por o bot repetir sinais, nem por cobrir vários mercados do mesmo jogo.
+    Identidade fail-closed (revisão #5910343843): um sinal sem jogo comprovável (match_id vazio ou ausente) não vota e conta
+    em `unidentified`; nunca recebe um jogo próprio. Mercado ou seleção em falta juntam-se numa só aposta dentro do jogo.
     """
     def __init__(self):
         self.m = {}
+        self.unidentified = 0
 
     def add(self, r):
         if r['w'] is None or r['w'] == 0:
             return
-        g = self.m.setdefault(r.get('match_id') or ('sem jogo', id(r)), [0.0, 0.0, 0, 0.0, 0])
-        g[0] += max(r['w'], 0)
-        g[1] += max(-r['w'], 0)
-        g[2] += 1
+        key = game_identity(r)
+        if key is None:
+            self.unidentified += 1
+            return
+        game = self.m.setdefault(key, {})
+        u = game.setdefault(bet_identity(r), [0.0, 0.0, 0, 0.0, 0])   # acertos, falhas, sinais, soma de 1/odd, sinais com odd
+        u[0] += max(r['w'], 0)
+        u[1] += max(-r['w'], 0)
+        u[2] += 1
         if r['odds']:
-            g[3] += 1 / r['odds']
-            g[4] += 1
+            u[3] += 1 / r['odds']
+            u[4] += 1
 
     def totals(self):
-        """-> (acertos, falhas, taxa necessária, jogos)."""
-        priced = [g[3] / g[4] for g in self.m.values() if g[4]]
-        return (sum(g[0] / g[2] for g in self.m.values()), sum(g[1] / g[2] for g in self.m.values()),
-                sum(priced) / len(priced) if priced else None, len(self.m))
+        """-> (acertos, falhas, taxa necessária, jogos). A soma segue uma ordem fixa: o resultado não depende da ordem de entrada."""
+        hits = misses = 0.0
+        priced = []
+        for key in sorted(self.m, key=str):
+            bets = [self.m[key][b] for b in sorted(self.m[key], key=str)]
+            hits += sum(u[0] / u[2] for u in bets) / len(bets)
+            misses += sum(u[1] / u[2] for u in bets) / len(bets)
+            inv = [u[3] / u[4] for u in bets if u[4]]
+            if inv:
+                priced.append(sum(inv) / len(inv))
+        return hits, misses, sum(priced) / len(priced) if priced else None, len(self.m)
+
+    def bets(self):
+        """Apostas distintas (jogo, mercado, seleção) com resultado decidido."""
+        return sum(len(g) for g in self.m.values())
 
 
 def clustered(done):
@@ -146,8 +170,11 @@ def summarize(rows):
     out = {'n': hits + misses, 'signals': len(rows), 'hits': hits, 'misses': misses,
            'hit_rate': round(eh / (eh + em), 4) if eh + em else None, 'ci95': wilson(eh, eh + em),
            'break_even': round(be, 4) if be else None, 'roi': round(sum(pls) / len(pls), 4) if pls else None}
-    ch, cm, cbe, games = clustered(done)
-    out['games'] = games
+    votes = Votes()
+    for r in done:
+        votes.add(r)
+    ch, cm, cbe, games = votes.totals()
+    out['games'], out['bets'], out['unidentified'] = games, votes.bets(), votes.unidentified
     out.update(evidence(ch, cm, cbe))
     out.update(posterior(ch, cm, cbe))
     return out

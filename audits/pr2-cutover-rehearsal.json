@@ -1,0 +1,238 @@
+{
+ "main_sha": "273a5b722f491a599d80bec1f87dad04a02fb80b",
+ "pr_head_sha": "742dffdaf31e5856a3841d87abaaf52e4d1c352b",
+ "at_utc": "2026-11-15T11:41:23+00:00",
+ "python": "3.11.18",
+ "status_rules": "independent_games_hysteresis_v1",
+ "migration_key": "status_rules:independent_games_hysteresis_v1",
+ "merge_conflicts": 0,
+ "integration_diff_vs_main": [
+  "README.md",
+  "audits/pr2-cutover-evidence/mutation_check-output.txt",
+  "audits/pr2-cutover-evidence/mutation_check.py",
+  "audits/pr2-independence-stability.md",
+  "audits/pr2-metrics.json",
+  "docs/index.html",
+  "scangoal/brain.py",
+  "scangoal/eligibility.py",
+  "scangoal/insights.py",
+  "scangoal/notify.py",
+  "scripts/audit_pr2_independence.py",
+  "scripts/pr2_cutover.py",
+  "scripts/rehearse_pr2_cutover.py",
+  "tests/test_independence_stability.py",
+  "tests/test_pr2_cutover.py",
+  "tests/test_scangoal.py"
+ ],
+ "cutover_exit_code": 0,
+ "cutover": {
+  "ok": true,
+  "restored": false,
+  "frozen_main_sha": "273a5b722f491a599d80bec1f87dad04a02fb80b",
+  "head_sha": "06e1e1bf3c855ae9f8955740000b28cd003b3365",
+  "at_utc": "2026-11-15T11:41:23+00:00",
+  "python": "3.11.18",
+  "report_generated_at_utc": "2026-11-15T11:41:30+00:00",
+  "migration_key": "status_rules:independent_games_hysteresis_v1",
+  "status_rules": "independent_games_hysteresis_v1",
+  "brain": {
+   "evidence_scope": "eligible_bets_only",
+   "operational_scope": "eligible_bets_only",
+   "status_rules": "independent_games_hysteresis_v1",
+   "hypotheses": 5228,
+   "tested": 121,
+   "counts": {
+    "em observação": 5215,
+    "promissora": 13
+   },
+   "exploratory_counts": {
+    "em observação": 5178,
+    "promissora": 50
+   },
+   "eligibility": {
+    "total": 507,
+    "eligible": 382,
+    "excluded": 125,
+    "reasons": {
+     "no_valid_odds": 87,
+     "no_market": 87,
+     "no_selection": 87,
+     "burst": 10,
+     "provenance_not_verified": 40,
+     "had_ft_at_first_sight": 29,
+     "edited_at_first_sight": 30
+    }
+   },
+   "walk_forward": {
+    "followed": {
+     "bets": 121,
+     "settled": 103,
+     "games": 101,
+     "wins": 47,
+     "units": 1.01,
+     "roi": 0.0098,
+     "roi_cut": -0.007
+    },
+    "skipped": {
+     "bets": 261,
+     "settled": 197,
+     "games": 121,
+     "wins": 94,
+     "units": -6.78,
+     "roi": -0.0344,
+     "roi_cut": -0.0524
+    }
+   }
+  },
+  "register_true": {
+   "registry_size_after_on_copy": 5228,
+   "status_list_identical": true
+  },
+  "reference": {
+   "previous": 20,
+   "baseline": 13,
+   "silenced_transitions": 11
+  },
+  "checks": {
+   "first_call": "NOTIFY_STATUS_MIGRATED",
+   "second_call": "NOTIFY_STATUS_UNCHANGED",
+   "second_call_byte_identical": true,
+   "pr1_marker_preserved": true,
+   "migration_keys_previous_plus_pr2": true,
+   "register_true_status_list_identical": true,
+   "statuses_equal_report_status_list": true,
+   "previous_statuses_equal_original": true,
+   "baseline_statuses_equal_report_status_list": true,
+   "delivery_fields_preserved": true,
+   "other_fields_preserved": true,
+   "no_unexpected_fields": true,
+   "registry_unchanged": true,
+   "docs_report_equals_data_report": true,
+   "only_allowed_files_changed": true,
+   "next_cycle_status_transitions": 0,
+   "next_cycle_status_transitions_register_true": 0
+  },
+  "next_cycle_simulated_messages": {
+   "register_false": {},
+   "register_true": {}
+  },
+  "changed_files": [
+   "data/notify_state.json",
+   "data/report.json",
+   "docs/report.json"
+  ],
+  "sha256_before": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "7e5a375d8558b5919417692839384346b30cdc9b7287cee32b3572716dc31a7c",
+   "data/hypotheses.json": "6b45787e710c6fdffd37d8c75b37cca21b64e8ea578e51d8740d7735de1b363e",
+   "data/llm_notes.json": "a3058163564d484f0c35f9e39faf1d48e11898fe28944ae57c8e02eeb8d9ff22",
+   "data/llm_state.json": "6823988d4d19e6090263313a37f3055546b8c4d3f362b5f4be0907c24d1e9e7f",
+   "data/messages.jsonl": "c02502cb2684adf74046648663731df0658ed472a94a31125252bc3ef3acdd9a",
+   "data/notify_state.json": "6b5bfd723a87e47d49be02856ad631bf2ff3cd73fab263f42a793a9b65ec0d91",
+   "data/report.json": "8bbbe5f6854556263e75790519e3e9be48f7ae318860d89c35570a7fa079e660",
+   "data/results_bsd.json": "eefc864339f9395f5c21d3248752b6106b97b8fc3fc2938ed89a224203e2aeb0",
+   "data/results_hl.json": "6cca273f9b2f2ef4870059583974ac1dccdfeaa600a112490598f53e02f9cc46",
+   "data/state.json": "5d196b1f1ad62cf56c35be8cba6816416d7709e34f986737f1ddf92ed8186aad",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "90bf5010de681aff0d958b6647a275f63ea88cfa26218a43f43f12c1a5b3ee2c",
+   "docs/report.json": "8bbbe5f6854556263e75790519e3e9be48f7ae318860d89c35570a7fa079e660"
+  },
+  "sha256_after": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "7e5a375d8558b5919417692839384346b30cdc9b7287cee32b3572716dc31a7c",
+   "data/hypotheses.json": "6b45787e710c6fdffd37d8c75b37cca21b64e8ea578e51d8740d7735de1b363e",
+   "data/llm_notes.json": "a3058163564d484f0c35f9e39faf1d48e11898fe28944ae57c8e02eeb8d9ff22",
+   "data/llm_state.json": "6823988d4d19e6090263313a37f3055546b8c4d3f362b5f4be0907c24d1e9e7f",
+   "data/messages.jsonl": "c02502cb2684adf74046648663731df0658ed472a94a31125252bc3ef3acdd9a",
+   "data/notify_state.json": "7fb4bf2bfd9382de4adc2fad3375cf3ce275ebfca8b3e0eb911012b1b045c5c1",
+   "data/report.json": "359393e1e41d2340a6738421ef0ec112d13f951e0dad99c4f867ac704c0468ce",
+   "data/results_bsd.json": "eefc864339f9395f5c21d3248752b6106b97b8fc3fc2938ed89a224203e2aeb0",
+   "data/results_hl.json": "6cca273f9b2f2ef4870059583974ac1dccdfeaa600a112490598f53e02f9cc46",
+   "data/state.json": "5d196b1f1ad62cf56c35be8cba6816416d7709e34f986737f1ddf92ed8186aad",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "90bf5010de681aff0d958b6647a275f63ea88cfa26218a43f43f12c1a5b3ee2c",
+   "docs/report.json": "359393e1e41d2340a6738421ef0ec112d13f951e0dad99c4f867ac704c0468ce"
+  }
+ },
+ "reclassification": {
+  "promissora_to_observacao": [
+   "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+   "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não"
+  ],
+  "abandonada_to_observacao": [
+   "Betfair | Dia = dia de semana",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00",
+   "Stake | Competição = seleções",
+   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+   "Stake | Sinal anterior de outro tipo no mesmo jogo = sim"
+  ],
+  "new_in_baseline": {
+   "Jogo aberto | Golos até ao sinal = 1 ou 2": "promissora",
+   "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90": "promissora"
+  },
+  "changed": {},
+  "unchanged": 11
+ },
+ "pr1_marker_byte_identical": true,
+ "delivery_history_preserved": true,
+ "delivery_counters": {
+  "sent_total": 270,
+  "watch_sent": 93
+ },
+ "first_cycle_same_report": {},
+ "first_cycle_register_true": {
+  "messages": {},
+  "status_list_identical_to_cutover": true,
+  "registry_after_register_true_on_copy": 5228
+ },
+ "counterfactual_without_pr2_migration": {
+  "status_transition": 11
+ },
+ "old_code_risk": {
+  "main_notifier_has_rules_key": false,
+  "old_code_run_after_cutover": {
+   "status_transition": 11
+  },
+  "pr2_reference_overwritten": true,
+  "next_new_code_run": {
+   "status_transition": 11
+  },
+  "pr2_marker_still_present_so_no_rebaseline": true
+ },
+ "legitimate_changes": {
+  "dropped": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90",
+  "added": "Ensaio | hipótese sintética promovida",
+  "expected": 2,
+  "first_call": 2,
+  "repeat_call": 0,
+  "texts": [
+   "Hipótese passou a promissora:\nEnsaio | hipótese sintética promovida",
+   "Hipótese voltou a \"em observação\":\nJogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90"
+  ],
+  "pending_promotions": [
+   "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo",
+   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+   "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não"
+  ],
+  "pending_count": 4,
+  "pending_confirmed_first": 4,
+  "pending_confirmed_repeat": 0
+ },
+ "this_checkout_unchanged": true,
+ "criteria": {
+  "cutover_ok": true,
+  "first_cycle_no_transitions": true,
+  "first_cycle_register_true_no_transitions": true,
+  "register_true_status_list_identical": true,
+  "pr1_marker_byte_identical": true,
+  "delivery_history_preserved": true,
+  "legitimate_change_notified_once": true,
+  "pending_confirmations_notified_once": true,
+  "old_code_risk_measured": true,
+  "this_checkout_unchanged": true
+ },
+ "ok": true
+}

@@ -1,0 +1,686 @@
+{
+ "baseline_commit": "13ae250ccc4f14bf8a5bfa18844e68be0d6d5bc4",
+ "clock_utc": "2026-11-15T10:20:00+00:00",
+ "data_sha256": {
+  ".gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "details_hl.json": "c8300a0833c4410e93adf6c08e092ac34952e45092bc920ad19226ee9c584980",
+  "hypotheses.json": "56d756b4e9aca22076f10cdb9ba8b689988a02c77792815e8aff1dddeed6d7ad",
+  "llm_notes.json": "a3058163564d484f0c35f9e39faf1d48e11898fe28944ae57c8e02eeb8d9ff22",
+  "llm_state.json": "ba1cd8862ae79affdc149751821ddfa51c989f6a363e833c78c1aacca1c55e0f",
+  "messages.jsonl": "c2e024e05451e5b59eb80679c96d3c09b8910ca2f14a47d7e9804122ccead566",
+  "notify_state.json": "84e61be39399d7fbaed9c8e0b1364bb11eaa12c311cd5adfd3c73d993be8906a",
+  "report.json": "9c342aee5fea5123265c209f44a5aacad4d94dd29140b954c8a53f3d2b39359c",
+  "results_bsd.json": "ddeb346995d8b8b7d994311d895b1d1a114be101c1a432f5dec0f1be4b300f4a",
+  "results_hl.json": "4a92212e74a0da58405f5cfa2db5c0fdeff7ebaa604c8d05aa0d97f682369361",
+  "state.json": "c0771b73ecc2b7b4154faced5801b48d6864b835674e8aee6774b4cd06d565da",
+  "team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5"
+ },
+ "python": "3.11.18",
+ "rules": {
+  "pr1": "n = signals, stateless thresholds",
+  "pr2": {
+   "min_support": 8,
+   "max_conditions": 3,
+   "hint_at": 30,
+   "strong_at": 100,
+   "confirm_at": 300,
+   "unit": "independent_games",
+   "status_rules": "independent_games_hysteresis_v1",
+   "promote_at": 0.95,
+   "keep_promising": 0.9,
+   "abandon_at": 0.1,
+   "keep_abandoned": 0.2,
+   "confirm_steps": 2
+  }
+ },
+ "statuses": {
+  "pr1": {
+   "em observação": 5182,
+   "abandonada": 5,
+   "promissora": 15
+  },
+  "pr2": {
+   "em observação": 5189,
+   "promissora": 13
+  },
+  "pr1_exploratory": {
+   "em observação": 5143,
+   "abandonada": 7,
+   "promissora": 52
+  },
+  "pr2_exploratory": {
+   "em observação": 5154,
+   "promissora": 48
+  },
+  "pending_pr2": {
+   "abandonada": 1,
+   "promissora": 4
+  },
+  "held_by_hysteresis_pr2": {
+   "Jogo aberto | Golos até ao sinal = 1 ou 2": {
+    "status": "promissora",
+    "entry_status": "em observação",
+    "prob_above": 0.9496,
+    "games": 43
+   },
+   "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90": {
+    "status": "promissora",
+    "entry_status": "em observação",
+    "prob_above": 0.9429,
+    "games": 36
+   }
+  }
+ },
+ "tested_hypotheses": {
+  "pr1_n_signals_ge_30": 184,
+  "pr2_games_ge_30": 120,
+  "pr1_bar": 0.999728,
+  "pr2_bar": 0.999583
+ },
+ "status_changes_pr1_to_pr2": {
+  "Betfair | Dia = dia de semana": {
+   "pr1": "abandonada",
+   "pr2": "em observação",
+   "n": 36,
+   "games": 33,
+   "prob_above_pr1": 0.0967,
+   "prob_above_pr2": 0.0967,
+   "pending_pr2": "abandonada"
+  },
+  "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "pr1": "promissora",
+   "pr2": "em observação",
+   "n": 32,
+   "games": 32,
+   "prob_above_pr1": 0.9544,
+   "prob_above_pr2": 0.9544,
+   "pending_pr2": "promissora"
+  },
+  "Jogo aberto | Golos até ao sinal = 1 ou 2": {
+   "pr1": "em observação",
+   "pr2": "promissora",
+   "n": 43,
+   "games": 43,
+   "prob_above_pr1": 0.9496,
+   "prob_above_pr2": 0.9496,
+   "pending_pr2": null
+  },
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+   "pr1": "promissora",
+   "pr2": "em observação",
+   "n": 50,
+   "games": 50,
+   "prob_above_pr1": 0.9552,
+   "prob_above_pr2": 0.9552,
+   "pending_pr2": "promissora"
+  },
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+   "pr1": "promissora",
+   "pr2": "em observação",
+   "n": 38,
+   "games": 38,
+   "prob_above_pr1": 0.9517,
+   "prob_above_pr2": 0.9517,
+   "pending_pr2": "promissora"
+  },
+  "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90": {
+   "pr1": "em observação",
+   "pr2": "promissora",
+   "n": 36,
+   "games": 36,
+   "prob_above_pr1": 0.9429,
+   "prob_above_pr2": 0.9429,
+   "pending_pr2": null
+  },
+  "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "pr1": "promissora",
+   "pr2": "em observação",
+   "n": 43,
+   "games": 43,
+   "prob_above_pr1": 0.9514,
+   "prob_above_pr2": 0.9514,
+   "pending_pr2": "promissora"
+  },
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00": {
+   "pr1": "abandonada",
+   "pr2": "em observação",
+   "n": 31,
+   "games": 22,
+   "prob_above_pr1": 0.0825,
+   "prob_above_pr2": 0.0825,
+   "pending_pr2": null
+  },
+  "Stake | Competição = seleções": {
+   "pr1": "abandonada",
+   "pr2": "em observação",
+   "n": 31,
+   "games": 13,
+   "prob_above_pr1": 0.0956,
+   "prob_above_pr2": 0.0956,
+   "pending_pr2": null
+  },
+  "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+   "pr1": "abandonada",
+   "pr2": "em observação",
+   "n": 36,
+   "games": 17,
+   "prob_above_pr1": 0.0836,
+   "prob_above_pr2": 0.0836,
+   "pending_pr2": null
+  },
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": {
+   "pr1": "abandonada",
+   "pr2": "em observação",
+   "n": 31,
+   "games": 14,
+   "prob_above_pr1": 0.0735,
+   "prob_above_pr2": 0.0735,
+   "pending_pr2": null
+  }
+ },
+ "hypotheses_with_changed_prob_above": 0,
+ "historical_churn_replay": {
+  "pr1_rules": {
+   "hypotheses_with_changes": 24,
+   "total_changes": 52,
+   "max_changes_one_hypothesis": 7,
+   "hypotheses_with_3_or_more_changes": 8,
+   "by_transition": {
+    "em observação -> promissora": 29,
+    "promissora -> em observação": 14,
+    "em observação -> abandonada": 7,
+    "abandonada -> em observação": 2
+   }
+  },
+  "pr2_rules": {
+   "hypotheses_with_changes": 13,
+   "total_changes": 13,
+   "max_changes_one_hypothesis": 1,
+   "hypotheses_with_3_or_more_changes": 0,
+   "by_transition": {
+    "em observação -> promissora": 13
+   }
+  }
+ },
+ "walk_forward": {
+  "pr1": {
+   "followed": {
+    "bets": 135,
+    "settled": 120,
+    "games": 106,
+    "wins": 55,
+    "units": -1.07,
+    "roi": -0.0089,
+    "roi_cut": -0.026
+   },
+   "skipped": {
+    "bets": 238,
+    "settled": 177,
+    "games": 116,
+    "wins": 85,
+    "units": -4.58,
+    "roi": -0.0259,
+    "roi_cut": -0.0438
+   },
+   "prob_followed_better": 0.3938
+  },
+  "pr2": {
+   "followed": {
+    "bets": 116,
+    "settled": 102,
+    "games": 100,
+    "wins": 47,
+    "units": 1.01,
+    "roi": 0.0099,
+    "roi_cut": -0.0071
+   },
+   "skipped": {
+    "bets": 257,
+    "settled": 195,
+    "games": 119,
+    "wins": 93,
+    "units": -6.66,
+    "roi": -0.0342,
+    "roi_cut": -0.0521
+   },
+   "prob_followed_better": 0.4826
+  }
+ },
+ "board_best": {
+  "pr1": [
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde",
+   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Valor da aposta = menos de 10 mil $",
+   "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não"
+  ],
+  "pr2": [
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Valor da aposta = menos de 10 mil $",
+   "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $"
+  ]
+ },
+ "agenda_counts": {
+  "pr1": {
+   "favorável": 1,
+   "misto": 5,
+   "sem evidência": 0,
+   "contraditório": 2,
+   "evitar": 5
+  },
+  "pr2": {
+   "favorável": 1,
+   "misto": 2,
+   "sem evidência": 0,
+   "contraditório": 2,
+   "evitar": 8
+  }
+ },
+ "targets": {
+  "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "pr1": {
+    "n": 32,
+    "games": 32,
+    "hits": 23,
+    "prob_above": 0.9544,
+    "status": "promissora",
+    "roi": 0.2921
+   },
+   "pr2": {
+    "n": 32,
+    "games": 32,
+    "hits": 23,
+    "prob_above": 0.9544,
+    "status": "em observação",
+    "roi": 0.2921,
+    "bets": 32,
+    "pending_status": "promissora",
+    "entry_status": "promissora",
+    "status_changes": []
+   }
+  },
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+   "pr1": {
+    "n": 50,
+    "games": 50,
+    "hits": 35,
+    "prob_above": 0.9552,
+    "status": "promissora",
+    "roi": 0.1912
+   },
+   "pr2": {
+    "n": 50,
+    "games": 50,
+    "hits": 35,
+    "prob_above": 0.9552,
+    "status": "em observação",
+    "roi": 0.1912,
+    "bets": 50,
+    "pending_status": "promissora",
+    "entry_status": "promissora",
+    "status_changes": []
+   }
+  },
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+   "pr1": {
+    "n": 38,
+    "games": 38,
+    "hits": 27,
+    "prob_above": 0.9517,
+    "status": "promissora",
+    "roi": 0.194
+   },
+   "pr2": {
+    "n": 38,
+    "games": 38,
+    "hits": 27,
+    "prob_above": 0.9517,
+    "status": "em observação",
+    "roi": 0.194,
+    "bets": 38,
+    "pending_status": "promissora",
+    "entry_status": "promissora",
+    "status_changes": []
+   }
+  },
+  "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "pr1": {
+    "n": 43,
+    "games": 43,
+    "hits": 30,
+    "prob_above": 0.9514,
+    "status": "promissora",
+    "roi": 0.2012
+   },
+   "pr2": {
+    "n": 43,
+    "games": 43,
+    "hits": 30,
+    "prob_above": 0.9514,
+    "status": "em observação",
+    "roi": 0.2012,
+    "bets": 43,
+    "pending_status": "promissora",
+    "entry_status": "promissora",
+    "status_changes": []
+   }
+  },
+  "Stake | Dia = fim de semana": {
+   "pr1": {
+    "n": 37,
+    "games": 18,
+    "hits": 18,
+    "prob_above": 0.201,
+    "status": "em observação",
+    "roi": -0.1236
+   },
+   "pr2": {
+    "n": 37,
+    "games": 18,
+    "hits": 18,
+    "prob_above": 0.201,
+    "status": "em observação",
+    "roi": -0.1236,
+    "bets": 37,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": []
+   }
+  },
+  "Stake | Competição = seleções": {
+   "pr1": {
+    "n": 31,
+    "games": 13,
+    "hits": 14,
+    "prob_above": 0.0956,
+    "status": "abandonada",
+    "roi": -0.1861
+   },
+   "pr2": {
+    "n": 31,
+    "games": 13,
+    "hits": 14,
+    "prob_above": 0.0956,
+    "status": "em observação",
+    "roi": -0.1861,
+    "bets": 31,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": []
+   }
+  },
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00": {
+   "pr1": {
+    "n": 31,
+    "games": 22,
+    "hits": 14,
+    "prob_above": 0.0825,
+    "status": "abandonada",
+    "roi": -0.239
+   },
+   "pr2": {
+    "n": 31,
+    "games": 22,
+    "hits": 14,
+    "prob_above": 0.0825,
+    "status": "em observação",
+    "roi": -0.239,
+    "bets": 31,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": []
+   }
+  },
+  "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+   "pr1": {
+    "n": 36,
+    "games": 17,
+    "hits": 16,
+    "prob_above": 0.0836,
+    "status": "abandonada",
+    "roi": -0.2005
+   },
+   "pr2": {
+    "n": 36,
+    "games": 17,
+    "hits": 16,
+    "prob_above": 0.0836,
+    "status": "em observação",
+    "roi": -0.2005,
+    "bets": 36,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": []
+   }
+  },
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": {
+   "pr1": {
+    "n": 31,
+    "games": 14,
+    "hits": 14,
+    "prob_above": 0.0735,
+    "status": "abandonada",
+    "roi": -0.1976
+   },
+   "pr2": {
+    "n": 31,
+    "games": 14,
+    "hits": 14,
+    "prob_above": 0.0735,
+    "status": "em observação",
+    "roi": -0.1976,
+    "bets": 31,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": []
+   }
+  }
+ },
+ "kashiwa_kawasaki": {
+  "before_win": {
+   "snapshot": "d371c4e384af70365201dfa15598649cd87bca26",
+   "pr1": {
+    "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 31,
+     "games": 31,
+     "hits": 22,
+     "prob_above": 0.9423,
+     "status": "em observação",
+     "roi": 0.2816
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+     "n": 49,
+     "games": 49,
+     "hits": 34,
+     "prob_above": 0.9451,
+     "status": "em observação",
+     "roi": 0.1836
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+     "n": 37,
+     "games": 37,
+     "hits": 26,
+     "prob_above": 0.9398,
+     "status": "em observação",
+     "roi": 0.1841
+    },
+    "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 42,
+     "games": 42,
+     "hits": 29,
+     "prob_above": 0.9401,
+     "status": "em observação",
+     "roi": 0.1925
+    }
+   },
+   "pr2": {
+    "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 31,
+     "games": 31,
+     "hits": 22,
+     "prob_above": 0.9423,
+     "status": "em observação",
+     "roi": 0.2816,
+     "bets": 31,
+     "pending_status": null,
+     "entry_status": "em observação",
+     "status_changes": []
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+     "n": 49,
+     "games": 49,
+     "hits": 34,
+     "prob_above": 0.9451,
+     "status": "em observação",
+     "roi": 0.1836,
+     "bets": 49,
+     "pending_status": null,
+     "entry_status": "em observação",
+     "status_changes": []
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+     "n": 37,
+     "games": 37,
+     "hits": 26,
+     "prob_above": 0.9398,
+     "status": "em observação",
+     "roi": 0.1841,
+     "bets": 37,
+     "pending_status": null,
+     "entry_status": "em observação",
+     "status_changes": []
+    },
+    "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 42,
+     "games": 42,
+     "hits": 29,
+     "prob_above": 0.9401,
+     "status": "em observação",
+     "roi": 0.1925,
+     "bets": 42,
+     "pending_status": null,
+     "entry_status": "em observação",
+     "status_changes": []
+    }
+   }
+  },
+  "after_win": {
+   "snapshot": "bf3ca31474d43cd661b29c96faa18562a7df2167",
+   "pr1": {
+    "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 32,
+     "games": 32,
+     "hits": 23,
+     "prob_above": 0.9544,
+     "status": "promissora",
+     "roi": 0.2921
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+     "n": 50,
+     "games": 50,
+     "hits": 35,
+     "prob_above": 0.9552,
+     "status": "promissora",
+     "roi": 0.1912
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+     "n": 38,
+     "games": 38,
+     "hits": 27,
+     "prob_above": 0.9517,
+     "status": "promissora",
+     "roi": 0.194
+    },
+    "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 43,
+     "games": 43,
+     "hits": 30,
+     "prob_above": 0.9514,
+     "status": "promissora",
+     "roi": 0.2012
+    }
+   },
+   "pr2": {
+    "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 32,
+     "games": 32,
+     "hits": 23,
+     "prob_above": 0.9544,
+     "status": "em observação",
+     "roi": 0.2921,
+     "bets": 32,
+     "pending_status": "promissora",
+     "entry_status": "promissora",
+     "status_changes": []
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo": {
+     "n": 50,
+     "games": 50,
+     "hits": 35,
+     "prob_above": 0.9552,
+     "status": "em observação",
+     "roi": 0.1912,
+     "bets": 50,
+     "pending_status": "promissora",
+     "entry_status": "promissora",
+     "status_changes": []
+    },
+    "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+     "n": 38,
+     "games": 38,
+     "hits": 27,
+     "prob_above": 0.9517,
+     "status": "em observação",
+     "roi": 0.194,
+     "bets": 38,
+     "pending_status": "promissora",
+     "entry_status": "promissora",
+     "status_changes": []
+    },
+    "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+     "n": 43,
+     "games": 43,
+     "hits": 30,
+     "prob_above": 0.9514,
+     "status": "em observação",
+     "roi": 0.2012,
+     "bets": 43,
+     "pending_status": "promissora",
+     "entry_status": "promissora",
+     "status_changes": []
+    }
+   }
+  }
+ },
+ "identity": {
+  "eligible_without_match_id": 0,
+  "eligible_without_selection": 0,
+  "eligible_decided_without_match_id": 0,
+  "all_signals_excluded_for_identity": {
+   "no_match_identity": 0,
+   "no_selection": 84
+  },
+  "unidentified_in_brain_rows": 0,
+  "note": "Fail-closed since review #5910343843: no match_id -> ineligible and no vote; no selection -> ineligible."
+ },
+ "telegram_first_pr2_report_on_production_state": {
+  "with_silent_rules_migration": {},
+  "counterfactual_without_migration": {
+   "status_transition": 11
+  },
+  "migration_key": "status_rules:independent_games_hysteresis_v1"
+ },
+ "report_build_seconds": {
+  "pr1": 5.66,
+  "pr2": 7.44
+ },
+ "checks": {
+  "historical_data_unchanged": true,
+  "exploratory_accuracy_unchanged": true,
+  "operational_regime_unchanged": true,
+  "strict_group_roi_unchanged": true
+ },
+ "interpretation": "Historical sensitivity analysis on one snapshot. Fewer status changes measure stability, not predictive power; the walk-forward reuses the current registry and the 150-minute approximation (PR 3 scope)."
+}

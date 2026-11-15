@@ -5,9 +5,15 @@ Disciplina (fixada a 12/11/2026):
   Por isso as hipóteses do gerador podem ser avaliadas em todos os dados.
 - Hipóteses de origem 'manual' ou 'llm' (escritas por quem já viu resultados) só contam sinais POSTERIORES ao registo.
 - O registo (data/hypotheses.json) só cresce; uma hipótese nunca é apagada nem reescrita.
-- Estados: em observação (<30 resultados); promissora (>=30 e prob. >= 95 %, sem correção: pode ser acaso);
+- Unidade estatística (15/11/2026, PR 2): o JOGO. Sinais repetidos na mesma aposta (jogo, mercado, seleção) contam uma vez;
+  apostas diferentes no mesmo jogo repartem um voto (insights.Votes). Todos os limiares contam jogos independentes,
+  nunca sinais: estados, fasquia corrigida, quadro, agenda, walk-forward e balanço das propostas.
+- Estados (limiares de entrada): em observação (<30 jogos); promissora (>=30 e prob. >= 95 %, sem correção: pode ser acaso);
   forte (>=100 e prob. corrigida pelo número de hipóteses testadas); confirmada (>=300, idem); abandonada (>=30 e prob. <= 10 %).
-- A evidência conta um voto por jogo (insights.Votes): sinais repetidos no mesmo jogo não a fazem crescer.
+- Estabilidade (15/11/2026, PR 2): o estado é reconstituído jogo a jogo, pela ordem em que os resultados ficaram conhecidos.
+  Histerese: uma promissora só sai abaixo de 90 %; uma abandonada só sai acima de 20 %; uma validada mantém-se enquanto a
+  prob. não cair abaixo da fasquia com o dobro do erro admitido. Confirmação: cada mudança exige que a nova condição se mantenha
+  em CONFIRM_STEPS jogos seguidos. Uma oscilação de um jogo não muda o estado; uma deterioração sustentada muda.
 - "Acrescenta ao tipo" (prob_adds): probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo.
   Só informa; não muda o estado.
 - "Seguir o cérebro" (walk_forward): cada aposta é decidida só com os resultados que já se conheciam nesse momento.
@@ -19,14 +25,18 @@ from datetime import datetime, timedelta, timezone
 
 from . import insights
 from .parser import competition_kind
-from .eligibility import eligible, exclusion_reasons
+from .eligibility import eligible, exclusion_reasons, game_identity
 
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
 MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo não tem limite de tamanho
-HINT_AT, STRONG_AT = 30, 100
-BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de resultados e limiares de probabilidade
+HINT_AT, STRONG_AT = 30, 100                       # jogos independentes
+BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de jogos e limiares de probabilidade
 KNOWN_AFTER_MIN = 150    # um resultado considera-se conhecido 150 minutos depois do início do jogo (ou do sinal, se for ao vivo)
-TRACK_MIN = 10           # resultados para uma hipótese entrar no balanço das propostas
+TRACK_MIN = 10           # jogos para uma hipótese entrar no balanço das propostas
+STATUS_RULES = 'independent_games_hysteresis_v1'   # muda quando as regras de estado mudam (migração silenciosa no Telegram)
+PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / manter-se (histerese: o dobro do erro admitido)
+ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
+CONFIRM_STEPS = 2        # jogos seguidos em que a nova condição se tem de manter para o estado mudar
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
 
 
@@ -117,13 +127,67 @@ def update_registry(signals, registry, now=None):
 
 
 def status_of(n, prob, corrected_bar, min_settled):
+    """Estado pelos limiares de entrada, sem memória (n = jogos independentes). É o alvo a partir de "em observação"."""
     if prob is None or n < HINT_AT:
         return 'em observação'
-    if prob <= 0.10:
+    if prob <= ABANDON_AT:
         return 'abandonada'
     if n >= STRONG_AT and prob >= corrected_bar:
         return 'confirmada' if n >= min_settled else 'forte'
-    return 'promissora' if prob >= 0.95 else 'em observação'
+    return 'promissora' if prob >= PROMOTE_AT else 'em observação'
+
+
+def next_status(state, games, prob, corrected_bar, min_settled):
+    """Estado-alvo dado o estado atual (histerese): entrar exige o limiar de entrada; manter-se, só o limiar de saída."""
+    if prob is None or games < HINT_AT:
+        return 'em observação'
+    if state == 'abandonada' and prob <= KEEP_ABANDONED:
+        return 'abandonada'
+    if prob <= ABANDON_AT:
+        return 'abandonada'
+    keep_bar = 1 - 2 * (1 - corrected_bar)
+    if games >= STRONG_AT and prob >= (keep_bar if state in ('forte', 'confirmada') else corrected_bar):
+        return 'confirmada' if games >= min_settled else 'forte'
+    if prob >= (KEEP_PROMISING if state in ('promissora', 'forte', 'confirmada') else PROMOTE_AT):
+        return 'promissora'
+    return 'em observação'
+
+
+def game_steps(match):
+    """Evidência acumulada jogo a jogo, pela ordem em que os resultados ficaram conhecidos (known_at): [(jogos, prob_above, hora)].
+
+    Só devolve os passos a partir de HINT_AT jogos: antes disso o estado é sempre "em observação".
+    """
+    games = {}
+    for b in match:
+        key = game_identity(b)
+        if b['w'] is not None and b['w'] != 0 and key is not None:   # fail-closed: no proven game, no observation
+            games.setdefault(key, []).append(b)
+    order = sorted(games.items(), key=lambda kv: (max(known_at(b) for b in kv[1]), kv[0]))
+    votes, out = insights.Votes(), []
+    for k, (_, rows) in enumerate(order, 1):
+        for b in rows:
+            votes.add(b)
+        if k >= HINT_AT:
+            h, m, be, n = votes.totals()
+            out.append((n, insights.evidence(h, m, be)['prob_above'], max(known_at(b) for b in rows).isoformat()))
+    return out
+
+
+def stable_status(steps, corrected_bar, min_settled):
+    """Máquina de estados com histerese e confirmação. -> (estado, estado pendente ou None, mudanças)."""
+    state, pending, run, changes = 'em observação', None, 0, []
+    for games, prob, when in steps:
+        target = next_status(state, games, prob, corrected_bar, min_settled)
+        if target == state:
+            pending, run = None, 0
+            continue
+        run = run + 1 if target == pending else 1
+        pending = target
+        if run >= CONFIRM_STEPS:
+            changes.append({'games': games, 'from': state, 'to': target, 'prob_above': prob, 'known_utc': when})
+            state, pending, run = target, None, 0
+    return state, pending, changes
 
 
 def evaluate(signals, registry, min_settled, *, exploratory=False):
@@ -131,19 +195,26 @@ def evaluate(signals, registry, min_settled, *, exploratory=False):
         signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
     have = [(b, insights.family(b), set(atoms(b, multi, earlier))) for b in signals]
-    rows = []
+    rows, matched = [], {}
     for hid, h in registry.items():
         conds = {tuple(c) for c in h['conditions']}
         pool = [(b, at) for b, fam, at in have if fam == h['family'] and (h.get('source') == 'gerador' or b['date_utc'] > h['born_utc'])]
         match = [b for b, at in pool if conds <= at]
         s = insights.summarize(match)
         s['prob_adds'] = insights.prob_better(match, [b for b, at in pool if not conds <= at]) if conds else None
+        if s['games'] >= HINT_AT:
+            matched[hid] = match
         rows.append(dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h['born_utc'], reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
                          tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')]))
-    tested = sum(1 for r in rows if r['n'] >= HINT_AT)
+    tested = len(matched)
     bar = 1 - 0.05 / max(1, tested)
     for r in rows:
-        r['status'] = status_of(r['n'], r['prob_above'], bar, min_settled)
+        r['status'], r['pending_status'], r['status_changes'] = 'em observação', None, []
+        if r['id'] in matched:
+            r['status'], r['pending_status'], r['status_changes'] = stable_status(game_steps(matched[r['id']]), bar, min_settled)
+        # Transparency: the status the entry thresholds alone would give now. Different from `status` when the status is held
+        # by hysteresis (inside the keep band) or a change is still waiting for confirmation (`pending_status`).
+        r['entry_status'] = status_of(r['games'], r['prob_above'], bar, min_settled)
     return rows, tested, bar
 
 
@@ -153,7 +224,7 @@ def board(rows, now=None, family_n=None):
     Antes dos 30 resultados uma tática é só um "indício inicial"; o quadro diz sempre quantos resultados tem e quantos faltam.
     """
     now = now or datetime.now(timezone.utc)
-    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['n'] >= BOARD_MIN]
+    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['games'] >= BOARD_MIN]
 
     def pick(ordered, limit):
         out, per_family, samples = [], {}, set()
@@ -174,10 +245,11 @@ def board(rows, now=None, family_n=None):
         return {'id': r['id'], 'family': r['family'], 'conditions': [] if r.get('whole') else r['conditions'], 'n': r['n'], 'hits': r['hits'], 'hit_rate': r['hit_rate'],
                 'break_even': r['break_even'], 'prob_above': r['prob_above'], 'roi': r['roi'], 'source': r['source'], 'reason': r.get('reason'),
                 'games': r.get('games'), 'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'), 'prob_adds': None if r.get('whole') else r.get('prob_adds'),
-                'level': r['status'] if r['status'] != 'em observação' else 'indício inicial', 'missing': max(0, HINT_AT - r['n'])}
+                'bets': r.get('bets'), 'pending_status': r.get('pending_status'), 'entry_status': r.get('entry_status'),
+                'level': r['status'] if r['status'] != 'em observação' else 'indício inicial', 'missing': max(0, HINT_AT - r['games'])}
 
-    best = pick(sorted((r for r in cand if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada'), key=lambda r: (-r['prob_above'], -r['n'])), 5)
-    avoid = pick(sorted((r for r in cand if r['prob_above'] <= BOARD_BAD), key=lambda r: (r['prob_above'], -r['n'])), 3)
+    best = pick(sorted((r for r in cand if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada'), key=lambda r: (-r['prob_above'], -r['games'])), 5)
+    avoid = pick(sorted((r for r in cand if r['prob_above'] <= BOARD_BAD), key=lambda r: (r['prob_above'], -r['games'])), 3)
     live = {}
     for r in best:
         for b in r['open']:
@@ -208,15 +280,15 @@ def agenda(rows, signals, now=None):
     odds_band_n: resultados do mesmo tipo de sinal na faixa de odd deste sinal; poucos = as táticas foram medidas noutras odds.
     """
     now = now or datetime.now(timezone.utc)
-    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['n'] >= BOARD_MIN]
+    cand = [r for r in rows if r['tradable'] and r['conditions'] and r['prob_above'] is not None and r['games'] >= BOARD_MIN]
     signals = [b for b in signals if eligible(b)]
     good, bad = {}, {}
-    for r in sorted(cand, key=lambda r: (-r['prob_above'], -r['n'])):
+    for r in sorted(cand, key=lambda r: (-r['prob_above'], -r['games'])):
         bucket = good if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada' else bad if r['prob_above'] <= BOARD_BAD or r['status'] == 'abandonada' else None
         if bucket is not None:
             for b in r['open']:
                 bucket.setdefault(b['key'], []).append(r)
-    bad = {k: sorted(v, key=lambda r: (r['prob_above'], -r['n'])) for k, v in bad.items()}
+    bad = {k: sorted(v, key=lambda r: (r['prob_above'], -r['games'])) for k, v in bad.items()}
     band_n = {}
     for b in signals:
         if b['w'] is not None and b['w'] != 0 and b.get('odds'):
@@ -241,7 +313,7 @@ def agenda(rows, signals, now=None):
         return out[:limit], len(out)
 
     def card(r):
-        return {'id': r['id'], 'conditions': r['conditions'], 'n': r['n'], 'hits': r['hits'], 'break_even': r['break_even'], 'prob_above': r['prob_above'],
+        return {'id': r['id'], 'conditions': r['conditions'], 'n': r['n'], 'games': r['games'], 'hits': r['hits'], 'break_even': r['break_even'], 'prob_above': r['prob_above'],
                 'roi': r['roi'], 'edge': r.get('edge'), 'status': r['status'], 'source': r['source']}
 
     open_ = [(b, live(b)) for b in signals if b['w'] is None and not b.get('no_source') and b.get('market') is not None and b.get('odds')]
@@ -298,27 +370,30 @@ def build(signals, registry, min_settled):
         for b in r['open']:
             w = watch.setdefault(b['key'], {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'type': b['type'], 'market': b['market'],
                                             'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'reasons': []})
-            w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
+            w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'games': r['games'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even')})
     for r in rows:
         r['open'] = len(r['open'])
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
-    return {'evidence_scope': 'eligible_bets_only',
+    return {'evidence_scope': 'eligible_bets_only', 'status_rules': STATUS_RULES,
             'eligibility': {'total': len(all_signals), 'eligible': len(signals), 'excluded': len(all_signals) - len(signals), 'reasons': excluded},
             'exploratory': {'scope': 'all_signals_not_for_recommendations', 'counts': exploratory_counts,
                             'hypotheses': [{k: r[k] for k in ('id', 'n', 'games', 'roi', 'status')} for r in sorted(exploratory_rows, key=lambda r: (-r['n'], r['id']))[:150]]},
             'hypotheses': len(rows), 'tested': tested, 'corrected_bar': round(bar, 5), 'counts': counts, 'board': brd, 'agenda': agd,
             'track': track_record(rows), 'walk_forward': walk_forward(signals, registry),
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
-                                                                                                    'games', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds')}
+                                                                                                    'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status')}
+                    | {'status_changes': len(r['status_changes']), 'last_change': r['status_changes'][-1] if r['status_changes'] else None}
                     for r in rows if r['n'] >= 5][:150],
             'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
             'abandoned': [r for r in rows if r['status'] == 'abandonada'][:10],
             'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
-            'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled}}
+            'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled,
+                      'unit': 'independent_games', 'status_rules': STATUS_RULES, 'promote_at': PROMOTE_AT, 'keep_promising': KEEP_PROMISING,
+                      'abandon_at': ABANDON_AT, 'keep_abandoned': KEEP_ABANDONED, 'confirm_steps': CONFIRM_STEPS}}
 
 
 def track_record(rows):
@@ -333,16 +408,16 @@ def track_record(rows):
         key = 'gerador' if r['source'] == 'gerador' else '%s/%s' % (r['source'], r.get('mode') or 'novas')
         g = groups.setdefault(key, {'hypotheses': 0, 'judged': 0, 'as_expected': 0})
         g['hypotheses'] += 1
-        if r['n'] < TRACK_MIN or r['prob_above'] is None:
+        if r['games'] < TRACK_MIN or r['prob_above'] is None:
             continue
         ok = (r['prob_above'] < 0.5) if r.get('expect') == 'abaixo' else (r['prob_above'] > 0.5)
         g['judged'] += 1
         g['as_expected'] += ok
         if r['source'] == 'llm':
-            (worked if ok else failed).append({k: r.get(k) for k in ('id', 'n', 'hit_rate', 'break_even', 'prob_above', 'expect')})
+            (worked if ok else failed).append({k: r.get(k) for k in ('id', 'n', 'games', 'hit_rate', 'break_even', 'prob_above', 'expect')})
     llm = [g for k, g in groups.items() if k.startswith('llm')]
     return {'by_source': groups, 'min_results': TRACK_MIN, 'llm_judged': sum(g['judged'] for g in llm), 'llm_as_expected': sum(g['as_expected'] for g in llm),
-            'worked': sorted(worked, key=lambda r: -r['n'])[:6], 'failed': sorted(failed, key=lambda r: -r['n'])[:6]}
+            'worked': sorted(worked, key=lambda r: -r['games'])[:6], 'failed': sorted(failed, key=lambda r: -r['games'])[:6]}
 
 
 def known_at(b):
@@ -383,9 +458,9 @@ def walk_forward(signals, registry):
             pos += 1
         follow = False
         for i in fits[id(b)]:
-            if counts[i] >= BOARD_MIN:
-                h, m, be, _ = votes[i].totals()
-                if (insights.evidence(h, m, be)['prob_above'] or 0) >= BOARD_GOOD:
+            if counts[i] >= BOARD_MIN:                       # filtro barato: menos sinais do que BOARD_MIN implica menos jogos
+                h, m, be, games = votes[i].totals()
+                if games >= BOARD_MIN and (insights.evidence(h, m, be)['prob_above'] or 0) >= BOARD_GOOD:
                     follow = True
                     break
         sides[follow].append(b)
@@ -406,7 +481,7 @@ def walk_forward(signals, registry):
     return {'followed': side(sides[True]), 'skipped': side(sides[False]), 'curve': curve[-400:],
             'prob_followed_better': insights.prob_better(sides[True], sides[False]),
             'first_followed_utc': sides[True][0]['date_utc'] if sides[True] else None,
-            'rule': {'min_results': BOARD_MIN, 'min_prob': BOARD_GOOD, 'known_after_min': KNOWN_AFTER_MIN}}
+            'rule': {'min_results': BOARD_MIN, 'unit': 'independent_games', 'min_prob': BOARD_GOOD, 'known_after_min': KNOWN_AFTER_MIN}}
 
 
 def entry_points(signals):

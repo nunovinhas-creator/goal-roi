@@ -1,0 +1,23 @@
+baseline (unmutated) passes
+guard: PR1 marker required               caught
+guard: PR2 key refused if present        caught
+guard: frozen report PR1-format          caught
+guard: status_rules exact                caught
+guard: migration key agreement           caught
+guard: operational scope                 caught
+guard: register=True identical           caught
+guard: register=True on a copy           caught
+guard: register=False no write           caught
+guard: register=True no leak             caught
+transaction: restore on exception        caught
+transaction: restore on failed check     caught
+check: PR1 marker preserved              caught
+check: delivery fields                   caught
+check: no unexpected fields              caught
+check: next cycle (register=False)       caught
+check: next cycle (register=True)        caught
+check: second migration UNCHANGED        caught
+check: registry unchanged                caught
+check: only allowed files                caught
+checks: registry + only allowed files together caught
+caught 21 of 21 mutants
