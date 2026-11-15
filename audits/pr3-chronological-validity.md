@@ -6,7 +6,11 @@
 - **Relógio fixo:** `2026-11-15T14:34:34Z` (hora do commit base). **Python:** 3.11.
 - **Rede bloqueada** na auditoria e nos testes; sementes fixas (`20261115`).
 
-> **Revisão #5911845265 (commit `9da69d8`): correções feitas nesta versão.** Ver a secção 0-D. P1-F e P1-G foram aprovados e não mudaram. Em resumo:
+> **Revisão #5912303516 (commit `67fb319`): correção feita nesta versão.** Ver a secção 0-E. P1-H e P2-I estão aprovados; a metodologia estatística não mudou.
+> - **P2-J:** o relatório publicado descreve o registo **gravado** no mesmo commit (`ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro, mais `newly_selected`). A versão usada nas contas fica em `evaluated_*`.
+> - **`as_of`:** sinais lidos depois e resultados vistos depois do instante avaliado não contam.
+>
+> **Revisão #5911845265 (commit `9da69d8`): correções de uma ronda anterior.** Ver a secção 0-D. P1-F e P1-G foram aprovados e não mudaram. Em resumo:
 > - **P1-H:** a prova de integridade histórica (`certification.history_proof`, contra o histórico git publicado) passa a fazer parte do percurso real que autoriza a certificação. Sem prova: `history_unverified`, sem certificados, sem alertas validados e sem novas entradas.
 > - **P2-I:** o prazo de 3 dias fecha como perda pelo relógio explícito do relatório (`as_of`), mesmo sem outra aposta.
 >
@@ -29,6 +33,54 @@
 > **Revisão #5911487915 (commit `ef4606a`): correções da ronda anterior.** Ver a secção 0. Em resumo:
 > - **P1-A e P1-B:** existe agora uma definição única de jogo prospetivo. Um jogo só conta se todas as suas apostas foram emitidas e lidas depois do registo, eram decidíveis e têm hora de resultado provada. Essa definição é usada pelo relatório, pela máquina de estados, pelo `entry_status` e pelo teste de confirmação.
 > - **P1 científico:** escolhida a **via 1**. "Forte" e "confirmada" deixam de usar caudas posteriores com Bonferroni e passam a exigir um **certificado** de um e-processo com nível garantido. Acrescenta-se uma proteção fail-closed no cérebro e no Telegram.
+
+## 0-E. Correção após a revisão #5912303516
+
+**P2-J — coerência entre o relatório e o registo publicados.**
+
+Em `67fb319`, `report.build(register=True)` avaliava com o registo anterior e só depois acrescentava a nova seleção. Assim, `ledger_head_sha256`, `ledger_entries` e `candidates` do relatório descreviam a versão anterior à que o mesmo commit publicava.
+
+A correção está em `report.publish_ledger_state`, chamada depois de `brain.build`:
+- **Avaliação** (`evaluated_ledger_head_sha256`, `evaluated_ledger_entries`): o registo usado nas contas desta avaliação.
+- **Gravação:** com `register=True` e o registo ativo, válido e com histórico provado, as candidatas são acrescentadas uma só vez e gravadas. Depois:
+  - `ledger_head_sha256` e `ledger_entries` passam a ser os do ficheiro gravado, publicado no mesmo commit;
+  - `newly_selected` indica o que este relatório acrescentou (rank, α, `selected_utc`), e essas hipóteses saem de `candidates`;
+  - `candidates_meaning` explica o campo.
+- **Sem certificações antecipadas:** o cérebro **não é reexecutado**. As novas seleções só contam a partir da avaliação seguinte (e não têm jogos antes disso). O registo continua só de acréscimo e a prova histórica não mudou.
+
+**Demonstração no percurso real**: `report.build(register=True)` num repositório git temporário, com 40 sinais reais do bot que tornam uma hipótese promissora e com a primeira seleção real.
+
+| | `67fb319` | agora |
+|---|---|---|
+| Cabeça no relatório / no ficheiro | génesis / 1.ª entrada (**diferentes**) | iguais |
+| Entradas no relatório / no ficheiro | 0 / 1 | 1 / 1 |
+| `candidates` depois de gravar | `['x']` (ambíguo) | `[]`, com `newly_selected = ['x']` |
+
+**`as_of` — sem informação futura.** `brain.build(..., as_of)` aplica `chronology.as_of_view`:
+- os sinais lidos depois de `as_of` ainda não existem;
+- um resultado observado depois de `as_of` fica em aberto;
+- uma primeira observação de resultado posterior a `as_of` ainda não aconteceu.
+
+A confirmação ignora também os candidatos cuja janela de decisão (leitura + 15 min) ainda está aberta em `as_of`.
+
+**Limite:** os resultados com hora desconhecida continuam a contar só "agora", como sempre na PR 3. Por isso, uma reavaliação com `as_of` anterior aos dados só é exata sem eles; a certificação nunca os usa.
+
+**Snapshot:** 0 sinais e 0 resultados afetados. Os estados, o walk-forward e as restantes secções das métricas ficam **iguais** à ronda anterior. A única diferença são os 4 campos novos do bloco `validation`.
+
+**Testes** (251 no total, 6 novos):
+- **`PublishedLedgerConsistency`** (git real, sinais reais):
+  - a primeira seleção real é publicada com a cabeça e a contagem do ficheiro;
+  - `evaluated_*` fica igual ao génesis e nada é certificado;
+  - a repetição é idempotente: nada é acrescentado e as cabeças coincidem;
+  - `register=False` no mesmo instante dá a mesma validação;
+  - sem registar, o ficheiro e as candidatas ficam como estão.
+- **`AsOfHasNoFutureInformation`:**
+  - os dados completos avaliados em T coincidem com os dados como eram conhecidos em T (controlo: sem `as_of`, diferem);
+  - regras da vista;
+  - sinal lido exatamente em `as_of`;
+  - janela de decisão aberta.
+
+Contra `67fb319`, os 6 testes novos falham. O de `as_of` falha por comportamento: os dados futuros levavam a hipótese a "forte" em vez de "promissora".
 
 ## 0-D. Correções após a revisão #5911845265
 
@@ -405,7 +457,7 @@ As três margens foram fixadas pelos timeouts **antes** de correr o walk-forward
 | P(seguidas renderem mais) | 0,43 | 0,60 |
 | IC 90 % *bootstrap* por jogo, ROI das seguidas | — | [−11,2 %; +17,5 %] |
 | Primeiro relatório PR 3 sobre o estado Telegram de produção | — | **0 avisos de estado** (sem migração seriam 2) |
-| `report.build` (2 medições, ruidosas neste contentor) | 8,4–8,8 s | 9,7–9,9 s |
+| `report.build` (2 medições, ruidosas neste contentor) | 8,2–8,3 s | 9,2–10,0 s |
 
 **As 2 hipóteses que mudam** (promissora → em observação) são as que a PR 2 descrevia como "mantidas pela histerese":
 - **"Jogo aberto | Golos até ao sinal = 1 ou 2"** (43 jogos, 0,9496). Na PR 2, a promoção foi confirmada a "15/11 00:17", uma hora **fictícia** dada pela aproximação de 150 min. Na ordem provada, a sequência dos passos 30–43 é 0,92, 0,94, 0,91, 0,87, 0,91, 0,93, 0,944, 0,946, **0,955**, 0,93, 0,94, **0,956**, 0,93, 0,95: nunca houve dois jogos seguidos ≥ 0,95.
@@ -464,7 +516,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 
 ## 8. Testes
 
-**Total:** 245 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada; os testes de histórico usam git local). Destes, 178 são anteriores à PR 3 e 67 estão em `tests/test_chronological_validity.py`. Os novos das revisões #5911747123 e #5911845265 estão nas secções 0-C e 0-D.
+**Total:** 251 testes offline e determinísticos (`python scripts/test_offline.py`, rede bloqueada; os testes de histórico usam git local). Destes, 178 são anteriores à PR 3 e 73 estão em `tests/test_chronological_validity.py`. Os novos das revisões #5911747123, #5911845265 e #5912303516 estão nas secções 0-C, 0-D e 0-E.
 
 **Novos após a revisão #5911603577:**
 - **`AsOfMembership`** (P1-C):
@@ -552,7 +604,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 ```bash
 git fetch --unshallow origin    # a verificação git precisa do histórico completo
 git switch --detach <SHA da PR 3>
-python3.11 scripts/test_offline.py                                    # 245 testes
+python3.11 scripts/test_offline.py                                    # 251 testes
 python3.11 -m unittest tests.test_chronological_validity -v
 python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min; data/ tem de ser igual à base
 ```
@@ -560,7 +612,7 @@ python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min;
 ## 12. Parecer do autor (não substitui a revisão independente)
 
 - **Técnico: aprovado pelo autor**, sujeito a revisão.
-  - P1-H e P2-I estão corrigidos no percurso real, com testes end-to-end em repositórios git.
+  - P1-H e P2-I foram aprovados. P2-J está corrigido: o relatório e o registo publicados descrevem o mesmo estado. `as_of` não usa informação futura.
   - P1-F e P1-G, aprovados, ficam inalterados.
   - Sem regressões no mesmo snapshot.
   - Certificação desligada; sem alterações em produção.

@@ -19,12 +19,12 @@
  },
  "build_seconds": {
   "pr2": [
-   8.37,
-   8.83
+   8.19,
+   8.31
   ],
   "pr3": [
-   9.72,
-   9.85
+   9.2,
+   9.97
   ]
  },
  "pr2": {
@@ -379,7 +379,11 @@
   "selected": 0,
   "certified": [],
   "candidates": [],
-  "closest": []
+  "closest": [],
+  "evaluated_ledger_head_sha256": null,
+  "evaluated_ledger_entries": 0,
+  "newly_selected": [],
+  "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
  },
  "prospective_definitions_review_5911487915": {
   "hypotheses": 143,
@@ -1055,6 +1059,30 @@
    "log10_e": 1471.6322,
    "e_value": null,
    "certified": true
+  }
+ },
+ "counterexamples_review_5912303516": {
+  "67fb319": {
+   "report_ledger_head": "e1914e9ec18c5b6fa8cf7232add6c58ad19eb2e1c1f4d4b26e7296bc096229f4",
+   "file_ledger_head": "85ff47ba37ad5c336485b4de75a1bbf9b8f02d418252ff0bd16f0feb359c0791",
+   "report_ledger_entries": 0,
+   "file_ledger_entries": 1,
+   "report_candidates": [
+    "x"
+   ],
+   "newly_selected": [],
+   "consistent": false
+  },
+  "current": {
+   "report_ledger_head": "85ff47ba37ad5c336485b4de75a1bbf9b8f02d418252ff0bd16f0feb359c0791",
+   "file_ledger_head": "85ff47ba37ad5c336485b4de75a1bbf9b8f02d418252ff0bd16f0feb359c0791",
+   "report_ledger_entries": 1,
+   "file_ledger_entries": 1,
+   "report_candidates": [],
+   "newly_selected": [
+    "x"
+   ],
+   "consistent": true
   }
  },
  "counterexamples_review_5911845265": {
