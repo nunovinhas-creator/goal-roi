@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T04:15:13+00:00",
+ "generated_at_utc": "2026-11-15T04:19:38+00:00",
  "messages": 654,
  "types": {
   "SERVICE": 10,
@@ -41,15 +41,15 @@
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 27,
   "hl_last_run_utc": "2026-11-15T02:54:56+00:00",
-  "bsd_results": 17,
+  "bsd_results": 18,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 10,
-  "bsd_last_run_utc": "2026-11-15T03:29:01+00:00",
+  "bsd_last_run_utc": "2026-11-15T04:19:24+00:00",
   "goal_minutes_matches": 48,
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T04:15:09+00:00",
+  "collector_last_run_utc": "2026-11-15T04:19:22+00:00",
   "name_review": [
    {
     "bot": [
@@ -1161,7 +1161,7 @@
    "roi_announced_odds": -0.0009,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 12.1,
+   "per_day": 12.0,
    "days_to_hint": 0,
    "days_to_conclusion": 22,
    "prudent_rate": 0.4136,
@@ -1237,7 +1237,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 33,
-   "days_to_conclusion": 362,
+   "days_to_conclusion": 363,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1496,7 +1496,7 @@
    "by_bot_mark": 0,
    "per_day": 1.5,
    "days_to_hint": 18,
-   "days_to_conclusion": 202,
+   "days_to_conclusion": 203,
    "prudent_rate": 0.4663,
    "prob_above": 0.3227,
    "edge": -0.0599,
@@ -2831,11 +2831,11 @@
   }
  },
  "brain": {
-  "hypotheses": 4978,
+  "hypotheses": 4980,
   "tested": 242,
   "corrected_bar": 0.99979,
   "counts": {
-   "em observação": 4926,
+   "em observação": 4928,
    "abandonada": 6,
    "promissora": 46
   },
@@ -3850,7 +3850,7 @@
     "contraditório": 2,
     "evitar": 1
    },
-   "generated_utc": "2026-11-15T04:15:13+00:00",
+   "generated_utc": "2026-11-15T04:19:38+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3878,7 +3878,7 @@
      "as_expected": 0
     },
     "llm/evitar": {
-     "hypotheses": 3,
+     "hypotheses": 5,
      "judged": 1,
      "as_expected": 1
     }
@@ -9413,6 +9413,80 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Competição = feminino & Minuto = até ao 30",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Competição",
+      "feminino"
+     ],
+     [
+      "Minuto",
+      "até ao 30"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-15T04:19:26+00:00",
+    "reason": "jogos femininos tendem a ter menos golos no início",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Jogo aberto | Golos em falta para ganhar = mais de 2 golos & Ritmo indicado pelo bot = 90 ou mais",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos em falta para ganhar",
+      "mais de 2 golos"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "90 ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-15T04:19:26+00:00",
+    "reason": "jogos com muitos golos em falta e ritmo alto tendem a ter menos chances de acerto",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Stake | Mercado = outros mercados & Momento do aviso = até 45 min depois do início & Valor da aposta = 10 mil $ ou mais",
     "family": "Stake",
     "conditions": [
@@ -10181,97 +10255,9 @@
     "tradable": true,
     "open": 0,
     "status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Volume na seleção = 10 mil $ ou mais",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Volume na seleção",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-13T19:53:45+00:00",
-    "reason": "Combinação de faixa de odd e hora com volume alto",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "status": "em observação"
-   },
-   {
-    "n": 8,
-    "signals": 9,
-    "hits": 6,
-    "misses": 2,
-    "hit_rate": 0.7143,
-    "ci95": [
-     0.3589,
-     0.9178
-    ],
-    "break_even": 0.6104,
-    "roi": 0.1969,
-    "games": 8,
-    "prudent_rate": 0.6532,
-    "prob_above": 0.6595,
-    "edge": 0.0428,
-    "edge_ci": [
-     -0.1523,
-     0.2167
-    ],
-    "prob_above_cut": 0.6209,
-    "prob_adds": 0.2883,
-    "id": "Forma de golos | Golos até ao sinal = nenhum & Marcador no momento = empatado & Minuto = 31 a 60",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "nenhum"
-     ],
-     [
-      "Marcador no momento",
-      "empatado"
-     ],
-     [
-      "Minuto",
-      "31 a 60"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-13T15:58:14+00:00",
-    "reason": "Jogo empatado sem golos e minuto estratégico pode indicar uma oportunidade de apostar na forma de golos",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 1,
-    "status": "em observação"
    }
   ],
-  "llm_total": 38,
+  "llm_total": 40,
   "watch": [
    {
     "date_utc": "2026-11-15T04:14:32+00:00",
@@ -10363,15 +10349,15 @@
    "strong_at": 100,
    "confirm_at": 300
   },
-  "llm_runs": 62,
-  "llm_last_run_utc": "2026-11-15T03:20:22+00:00",
+  "llm_runs": 63,
+  "llm_last_run_utc": "2026-11-15T04:19:26+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-15",
-   "calls_today": 4,
-   "neurons_today": 790.5,
-   "accepted_today": 1,
-   "last_mode": "refinar"
+   "calls_today": 5,
+   "neurons_today": 992.5,
+   "accepted_today": 3,
+   "last_mode": "evitar"
   },
   "notes": [
    {
