@@ -1,5 +1,9 @@
 # PR 4/5 — Auditoria adversarial própria (desenvolvimento)
 
+> **Atualização:** o protocolo v1 foi substituído pelo `llm_incremental_v2` depois da revisão independente preliminar
+> (P1-A, P1-B, P2-C). Ver `audits/pr4-review-response.md`; as evidências em `audits/pr4-evidence/` foram regeneradas com o v2.
+> O texto abaixo descreve a auditoria do v1 (`73bdc7c`).
+
 Auditoria do próprio programador, **não independente**. A auditoria independente deve repetir tudo isto sobre o SHA
 final do ramo `claude/prs-4-5-llm-telegram-faxwbm`, com contexto limpo e só leitura.
 

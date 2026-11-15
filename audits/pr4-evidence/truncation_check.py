@@ -1,6 +1,6 @@
 """PR 4: invariância por truncagem em dados reais (fuga de informação futura).
 
-Uso (raiz de um clone completo): python3.11 audits/pr4-evidence/truncation_check.py <commit antigo> <commit recente> <protocolo> [saída.json]
+Uso (raiz de um clone completo): python3.11 audits/pr4-evidence/truncation_check.py <commit antigo> <commit recente> <protocolo> <publicação UTC> <ligação> [saída.json]
 Avalia no instante T = hora do commit antigo, uma vez com os dados desse commit e outra com os dados do commit recente (que
 contêm tudo o que aconteceu depois de T). Sem fuga, os resultados são idênticos; só podem diferir as contagens de hipóteses
 registadas depois de T (que existem no registo recente mas não são avaliadas). Código de saída: 0 = invariante; 1 = fuga.
@@ -26,13 +26,14 @@ def diff(x, y, p=''):
 
 
 def main(argv):
-    old, new, protocol = argv[:3]
+    old, new, protocol, published, evidence = argv[:5]
     t = subprocess.run(['git', '-C', str(ROOT), 'show', '-s', '--format=%cI', old], capture_output=True, check=True, text=True).stdout.strip()
     res = {}
     with tempfile.TemporaryDirectory() as tmp:
         for name, ref in (('old', old), ('new', new)):
             subprocess.run([sys.executable, str(ROOT / 'scripts' / 'audit_pr4_llm.py'), '--ref', ref, '--protocol-commit', protocol, '--as-of', t,
-                            '--out', str(Path(tmp) / name)], check=True, capture_output=True)
+                            '--out', str(Path(tmp) / name),
+                            '--protocol-published-utc', published, '--protocol-publication-evidence', evidence], check=True, capture_output=True)
             res[name] = json.loads((Path(tmp) / name / 'pr4-llm-evaluation.json').read_text(encoding='utf-8'))
     d = diff(res['old'], res['new'])
     out = {'as_of': t, 'old': res['old']['inputs']['ref'], 'new': res['new']['inputs']['ref'], 'differences': d, 'invariant': not d,
@@ -41,8 +42,8 @@ def main(argv):
            'born_after_as_of': [res['old']['population']['excluded']['born_after_as_of'], res['new']['population']['excluded']['born_after_as_of']],
            'pre_protocol': res['old']['pre_protocol'], 'duplicates_at_birth': len(res['old']['population']['duplicates_at_birth'])}
     text = json.dumps(out, indent=1, ensure_ascii=False, sort_keys=True) + '\n'
-    if len(argv) > 3:
-        Path(argv[3]).write_text(text, encoding='utf-8')
+    if len(argv) > 5:
+        Path(argv[5]).write_text(text, encoding='utf-8')
     print(text)
     return 0 if not d else 1
 

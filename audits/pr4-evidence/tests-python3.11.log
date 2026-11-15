@@ -20,33 +20,33 @@ test_activation_preconditions_and_complete_legacy (test_chronological_validity.L
 test_history_detects_rewrites_that_the_internal_chain_cannot (test_chronological_validity.LedgerHardening.test_history_detects_rewrites_that_the_internal_chain_cannot) ... ok
 test_malformed_ledgers_are_problems_not_crashes (test_chronological_validity.LedgerHardening.test_malformed_ledgers_are_problems_not_crashes) ... ok
 test_brain_without_a_history_proof_is_closed (test_chronological_validity.LedgerHistoryEndToEnd.test_brain_without_a_history_proof_is_closed) ... ok
-test_entry_published_too_late_after_its_selection (test_chronological_validity.LedgerHistoryEndToEnd.test_entry_published_too_late_after_its_selection) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpyjo6bfye/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_entry_published_too_late_after_its_selection (test_chronological_validity.LedgerHistoryEndToEnd.test_entry_published_too_late_after_its_selection) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpyj7ushdv/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
 test_genesis_published_before_its_activation (test_chronological_validity.LedgerHistoryEndToEnd.test_genesis_published_before_its_activation) ... ok
-test_genuine_history_activates_and_appends (test_chronological_validity.LedgerHistoryEndToEnd.test_genuine_history_activates_and_appends) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpscnulrh3/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_genuine_history_activates_and_appends (test_chronological_validity.LedgerHistoryEndToEnd.test_genuine_history_activates_and_appends) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpqi4i7wwy/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpscnulrh3/data/certification_ledger.json' mode='r' encoding='utf-8'>
+/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpqi4i7wwy/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpscnulrh3/data/certification_ledger.json' mode='r' encoding='utf-8'>
-  return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
-ResourceWarning: Enable tracemalloc to get the object allocation traceback
-ok
-test_incomplete_or_missing_history_fails_closed (test_chronological_validity.LedgerHistoryEndToEnd.test_incomplete_or_missing_history_fails_closed) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp6jt91f0h/data/certification_ledger.json' mode='r' encoding='utf-8'>
+/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpqi4i7wwy/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
-test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end (test_chronological_validity.LedgerHistoryEndToEnd.test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpsmh9a5ej/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_incomplete_or_missing_history_fails_closed (test_chronological_validity.LedgerHistoryEndToEnd.test_incomplete_or_missing_history_fails_closed) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpwc7e17u0/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
-test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future (test_chronological_validity.LedgerHistoryEndToEnd.test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpcsra70_r/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end (test_chronological_validity.LedgerHistoryEndToEnd.test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpspjlfvk7/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpcsra70_r/data/certification_ledger.json' mode='r' encoding='utf-8'>
+ok
+test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future (test_chronological_validity.LedgerHistoryEndToEnd.test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp87ka2h05/data/certification_ledger.json' mode='r' encoding='utf-8'>
+  return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp87ka2h05/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
@@ -62,14 +62,14 @@ test_mixed_games_count_nowhere_and_full_games_count_everywhere (test_chronologic
 test_pre_registration_signals_recovered_late_are_never_prospective (test_chronological_validity.ProspectiveEligibility.test_pre_registration_signals_recovered_late_are_never_prospective) ... ok
 test_report_and_state_machine_agree_on_random_data (test_chronological_validity.ProspectiveEligibility.test_report_and_state_machine_agree_on_random_data) ... ok
 test_signals_sent_after_registration_but_not_operational (test_chronological_validity.ProspectiveEligibility.test_signals_sent_after_registration_but_not_operational) ... ok
-test_first_real_selection_is_published_consistently_and_idempotently (test_chronological_validity.PublishedLedgerConsistency.test_first_real_selection_is_published_consistently_and_idempotently) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpg731bp5w/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_first_real_selection_is_published_consistently_and_idempotently (test_chronological_validity.PublishedLedgerConsistency.test_first_real_selection_is_published_consistently_and_idempotently) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpvovigv5z/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpg731bp5w/data/certification_ledger.json' mode='r' encoding='utf-8'>
+/home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpvovigv5z/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
-test_without_registering_nothing_is_written_and_candidates_stay_candidates (test_chronological_validity.PublishedLedgerConsistency.test_without_registering_nothing_is_written_and_candidates_stay_candidates) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp64hnluv6/data/certification_ledger.json' mode='r' encoding='utf-8'>
+test_without_registering_nothing_is_written_and_candidates_stay_candidates (test_chronological_validity.PublishedLedgerConsistency.test_without_registering_nothing_is_written_and_candidates_stay_candidates) ... /home/user/goal-roi/tests/test_chronological_validity.py:932: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpn_rswo6q/data/certification_ledger.json' mode='r' encoding='utf-8'>
   return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
@@ -146,6 +146,8 @@ test_T17_hostile_model_output (test_llm_evaluation.Duplicates.test_T17_hostile_m
 test_T7_permuted_conditions_are_the_same_hypothesis (test_llm_evaluation.Duplicates.test_T7_permuted_conditions_are_the_same_hypothesis) ... ok
 test_T8_redundant_condition_is_rejected_but_similarity_alone_is_not (test_llm_evaluation.Duplicates.test_T8_redundant_condition_is_rejected_but_similarity_alone_is_not) ... ok
 test_equivalent_twins_in_the_same_reply_count_once (test_llm_evaluation.Duplicates.test_equivalent_twins_in_the_same_reply_count_once) ... ok
+test_P2C_data_between_commit_and_publication_is_not_prospective (test_llm_evaluation.GitProofs.test_P2C_data_between_commit_and_publication_is_not_prospective) ... ok
+test_P2C_protocol_start_is_the_first_verifiable_publication (test_llm_evaluation.GitProofs.test_P2C_protocol_start_is_the_first_verifiable_publication) ... ok
 test_first_publication_and_append_only (test_llm_evaluation.GitProofs.test_first_publication_and_append_only) ... ok
 test_non_monotonic_commit_times_and_shallow_clones_are_unverified (test_llm_evaluation.GitProofs.test_non_monotonic_commit_times_and_shallow_clones_are_unverified) ... ok
 test_protocol_must_be_the_registered_text_in_its_introducing_commit (test_llm_evaluation.GitProofs.test_protocol_must_be_the_registered_text_in_its_introducing_commit) ... ok
@@ -160,6 +162,10 @@ test_T2_backdated_birth_is_corrected_by_the_first_publication (test_llm_evaluati
 test_T3_result_known_before_the_start_is_never_evidence (test_llm_evaluation.Leakage.test_T3_result_known_before_the_start_is_never_evidence) ... ok
 test_T4_signal_read_after_its_result_is_never_evidence (test_llm_evaluation.Leakage.test_T4_signal_read_after_its_result_is_never_evidence) ... ok
 test_born_after_as_of_and_missing_birth_are_excluded (test_llm_evaluation.Leakage.test_born_after_as_of_and_missing_birth_are_excluded) ... ok
+test_P1A_signal_sent_before_birth_but_read_after_never_affects_controls (test_llm_evaluation.ReviewP1.test_P1A_signal_sent_before_birth_but_read_after_never_affects_controls) ... ok
+test_P1B_later_games_cannot_merge_a_historical_split (test_llm_evaluation.ReviewP1.test_P1B_later_games_cannot_merge_a_historical_split) ... ok
+test_P1B_later_games_cannot_split_a_historical_group (test_llm_evaluation.ReviewP1.test_P1B_later_games_cannot_split_a_historical_group) ... ok
+test_P1B_unread_signals_at_birth_do_not_count (test_llm_evaluation.ReviewP1.test_P1B_unread_signals_at_birth_do_not_count) ... ok
 test_T13_T20_deterministic_and_never_claims_validation (test_llm_evaluation.Verdicts.test_T13_T20_deterministic_and_never_claims_validation) ... ok
 test_T14_no_network (test_llm_evaluation.Verdicts.test_T14_no_network) ... ok
 test_T18_small_or_concentrated_samples_are_insufficient (test_llm_evaluation.Verdicts.test_T18_small_or_concentrated_samples_are_insufficient) ... ok
@@ -393,6 +399,6 @@ test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Settlement.test_
 test_append_only_versions (test_scangoal.Store.test_append_only_versions) ... ok
 
 ----------------------------------------------------------------------
-Ran 315 tests in 17.374s
+Ran 321 tests in 18.450s
 
 OK
