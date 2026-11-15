@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-15T18:11:19+00:00",
- "messages": 866,
+ "generated_at_utc": "2026-11-15T18:13:33+00:00",
+ "messages": 867,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 36,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 10,
   "OPEN_GAME_NO_ODDS": 12,
   "FULL_TIME_NOTE": 12,
-  "POLYMARKET": 182,
+  "POLYMARKET": 183,
   "None": 28,
   "TOTALS_FORM_NO_ODDS": 53
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1346,
+  "versions": 1347,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 4,
-  "last_collected_at_utc": "2026-11-15T18:11:06+00:00",
+  "last_collected_at_utc": "2026-11-15T18:13:22+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 31,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T18:11:06+00:00",
+  "collector_last_run_utc": "2026-11-15T18:13:22+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 280,
   "goal_lists_consistent": 178
  },
- "unique_bets": 490,
+ "unique_bets": 491,
  "settled_bets": 360,
  "unsettled_market": 34,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -811,7 +811,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/live": {
-   "bets": 14,
+   "bets": 15,
    "settled": 12,
    "matches": 8,
    "wins": 5,
@@ -1392,7 +1392,7 @@
    "prob_above_cut": 0.3663
   },
   "POLYMARKET": {
-   "signals": 98,
+   "signals": 99,
    "with_result": 72,
    "hits": 32,
    "misses": 40,
@@ -2621,7 +2621,7 @@
    },
    {
     "n": 23,
-    "signals": 33,
+    "signals": 34,
     "hits": 12,
     "misses": 11,
     "hit_rate": 0.5217,
@@ -2921,7 +2921,7 @@
    },
    {
     "n": 90,
-    "signals": 137,
+    "signals": 138,
     "hits": 44,
     "misses": 46,
     "hit_rate": 0.4916,
@@ -3000,8 +3000,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "independent_games_hysteresis_v1",
   "eligibility": {
-   "total": 639,
-   "eligible": 490,
+   "total": 640,
+   "eligible": 491,
    "excluded": 149,
    "reasons": {
     "no_valid_odds": 101,
@@ -3016,7 +3016,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5735,
+    "em observação": 5744,
     "promissora": 42
    },
    "hypotheses": [
@@ -4072,11 +4072,11 @@
     }
    ]
   },
-  "hypotheses": 5777,
+  "hypotheses": 5786,
   "tested": 268,
   "corrected_bar": 0.99981,
   "counts": {
-   "em observação": 5773,
+   "em observação": 5782,
    "promissora": 4
   },
   "board": {
@@ -4698,75 +4698,75 @@
      "match_id": "finland-vs-san-marino-20261115",
      "match": "Finland — San Marino",
      "league": "UEFA Nations League",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
      "phase": "live",
      "when": "a decorrer",
-     "kickoff_utc": "2026-11-15T17:00+00:00",
-     "date_utc": "2026-11-15T17:41:59+00:00",
-     "minute": null,
+     "kickoff_utc": null,
+     "date_utc": "2026-11-15T18:11:32+00:00",
+     "minute": 53,
      "score_at_signal": [
-      4,
+      5,
       1
      ],
      "market": "Asian Total",
-     "selection": "Over 7.75",
-     "odds": 1.6,
-     "odds_last": 1.6,
+     "selection": "Over 8.5",
+     "odds": 2.09,
+     "odds_last": 2.09,
      "max_mult": 1,
-     "share": null,
-     "share_last": null,
+     "share": 24,
+     "share_last": 24,
      "verdict": "contraditório",
      "conflict": true,
      "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 33,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 23,
      "good": [
       {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático) & Número de apostas = uma",
+       "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
        "conditions": [
         [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
          "Mercado",
-         "golos (total asiático)"
+         "golos (mais/menos)"
         ],
         [
-         "Número de apostas",
-         "uma"
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
         ]
        ],
-       "n": 10,
-       "games": 8,
-       "hits": 8,
-       "break_even": 0.5705,
-       "prob_above": 0.8593,
-       "roi": 0.395,
-       "edge": 0.1182,
+       "n": 13,
+       "games": 10,
+       "hits": 9,
+       "break_even": 0.5114,
+       "prob_above": 0.887,
+       "roi": 0.3169,
+       "edge": 0.1302,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático)",
+       "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 %",
        "conditions": [
         [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
+         "Mercado",
+         "golos (mais/menos)"
         ],
         [
-         "Mercado",
-         "golos (total asiático)"
+         "Quota de mercado",
+         "menos de 80 %"
         ]
        ],
-       "n": 12,
-       "games": 10,
-       "hits": 9,
-       "break_even": 0.5763,
-       "prob_above": 0.8218,
-       "roi": 0.2875,
-       "edge": 0.0959,
+       "n": 17,
+       "games": 11,
+       "hits": 10,
+       "break_even": 0.5142,
+       "prob_above": 0.8073,
+       "roi": 0.1065,
+       "edge": 0.0915,
        "status": "em observação",
        "source": "gerador"
       }
@@ -4774,55 +4774,43 @@
      "good_total": 2,
      "bad": [
       {
-       "id": "Stake | Hora (UTC) = tarde & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "id": "Polymarket | Hora (UTC) = noite",
        "conditions": [
         [
          "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "sim"
+         "noite"
         ]
        ],
-       "n": 10,
-       "games": 8,
-       "hits": 0,
-       "break_even": 0.5431,
-       "prob_above": 0.0194,
-       "roi": -0.9091,
-       "edge": -0.2361,
+       "n": 19,
+       "games": 11,
+       "hits": 7,
+       "break_even": 0.4657,
+       "prob_above": 0.1469,
+       "roi": -0.2268,
+       "edge": -0.1099,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Stake | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "id": "Polymarket | Dia = fim de semana",
        "conditions": [
         [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "sim"
+         "Dia",
+         "fim de semana"
         ]
        ],
-       "n": 17,
-       "games": 10,
-       "hits": 2,
-       "break_even": 0.5623,
-       "prob_above": 0.0218,
-       "roi": -0.7242,
-       "edge": -0.2188,
+       "n": 66,
+       "games": 26,
+       "hits": 29,
+       "break_even": 0.4858,
+       "prob_above": 0.1922,
+       "roi": -0.1382,
+       "edge": -0.0717,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 33
+     "bad_total": 2
     },
     {
      "match_id": "spain-vs-england-20261115",
@@ -6226,80 +6214,6 @@
      "bad_total": 6
     },
     {
-     "match_id": "cd-universidad-san-martin-vs-union-comercio-20261115",
-     "match": "CD Universidad San Martin — Union Comercio",
-     "league": "PERU LIGA 2",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-15T17:42:10+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "CD Universidad San Martin",
-     "odds": 3.3,
-     "odds_last": 3.3,
-     "max_mult": 1,
-     "share": 84,
-     "share_last": 84,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd acima de 3,00",
-     "odds_band_n": 14,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Betfair | Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Volume na seleção",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 32,
-       "games": 31,
-       "hits": 11,
-       "break_even": 0.4526,
-       "prob_above": 0.1575,
-       "roi": -0.2391,
-       "edge": -0.0761,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Hora (UTC) = tarde & Momento = durante o jogo",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Momento",
-         "durante o jogo"
-        ]
-       ],
-       "n": 30,
-       "games": 30,
-       "hits": 10,
-       "break_even": 0.4331,
-       "prob_above": 0.1615,
-       "roi": -0.217,
-       "edge": -0.0748,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 3
-    },
-    {
      "match_id": "spain-vs-england-20261115",
      "match": "Spain — England",
      "league": "UEFA Nations League",
@@ -6927,9 +6841,9 @@
     "misto": 1,
     "sem evidência": 0,
     "contraditório": 18,
-    "evitar": 10
+    "evitar": 9
    },
-   "generated_utc": "2026-11-15T18:11:18+00:00",
+   "generated_utc": "2026-11-15T18:13:32+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6942,7 +6856,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5729,
+     "hypotheses": 5738,
      "judged": 2274,
      "as_expected": 1047
     },
@@ -7080,7 +6994,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 160,
+    "bets": 161,
     "settled": 136,
     "games": 134,
     "wins": 62,
@@ -14523,7 +14437,7 @@
     "days_to_conclusion": 7
    },
    "POLYMARKET": {
-    "signals": 98,
+    "signals": 99,
     "with_result": 72,
     "hits": 32,
     "misses": 40,
@@ -15017,7 +14931,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 490,
+   "bets": 491,
    "settled": 360,
    "matches": 245,
    "wins": 167,
@@ -15052,6 +14966,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T18:11:32+00:00",
+   "match_id": "finland-vs-san-marino-20261115",
+   "group": "POLYMARKET/live",
+   "match": "Finland — San Marino",
+   "selection": "Over 8.5",
+   "odds": 2.09,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T18:09:27+00:00",
    "match_id": "belgium-vs-italy-20261115",
@@ -15875,22 +15802,6 @@
    "odds": 1.4,
    "ft": [
     0,
-    0
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T14:49:26+00:00",
-   "match_id": "asd-licata-vs-milazzo-20261115",
-   "group": "OPEN_GAME",
-   "match": "ASD Licata — Milazzo",
-   "selection": "Over 3",
-   "odds": 1.77,
-   "ft": [
-    2,
     0
    ],
    "w": -1.0,
@@ -17190,6 +17101,21 @@
      "share": 41,
      "market": "Asian Total",
      "total": 5800.0
+    },
+    {
+     "d": "2026-11-15T18:11:32+00:00",
+     "k": "POLYMARKET",
+     "phase": "live",
+     "selection": "Over 8.5",
+     "odds": 2.09,
+     "minute": 53,
+     "score_at_signal": [
+      5,
+      1
+     ],
+     "share": 24,
+     "market": "Asian Total",
+     "total": 5000.0
     }
    ],
    "goals": null,
@@ -17332,35 +17258,6 @@
    "goals_source": null,
    "ft": [
     0,
-    0
-   ]
-  },
-  "asd-licata-vs-milazzo-20261115": {
-   "teams": [
-    "ASD Licata",
-    "Milazzo"
-   ],
-   "events": [
-    {
-     "d": "2026-11-15T14:49:26+00:00",
-     "k": "OPEN_GAME",
-     "phase": "live",
-     "selection": "Over 3",
-     "odds": 1.77,
-     "minute": 59,
-     "score_at_signal": [
-      2,
-      0
-     ],
-     "rhythm": 95,
-     "bot_over_pct": 80,
-     "market": "Asian Total"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    2,
     0
    ]
   },
@@ -22051,7 +21948,7 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 142,
+   "bets": 143,
    "settled": 73,
    "wins": 34,
    "units": -9.43,
