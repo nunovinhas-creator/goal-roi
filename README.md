@@ -144,6 +144,13 @@ hipóteses, às classificações, comparações com o resto do tipo, agenda, wat
 pontos de entrada e ao treino e avaliação do walk-forward. A LLM recebe esse
 universo filtrado através de `report.LAST['signals']`.
 
+Identidade (PR 2, revisão #5910343843): um sinal só é elegível se o jogo
+(`match_id` com texto) e a seleção forem identificáveis (motivos
+`no_match_identity` e `no_selection`). Mesmo nas estatísticas exploratórias, um
+sinal sem jogo comprovável não vota nem conta como jogo independente (`unidentified`):
+nunca se inventa uma identidade por sinal. A 15/11/2026 nenhum sinal elegível estava
+nestas condições.
+
 `accuracy` e `insights` continuam exploratórios. `brain.exploratory` conserva as
 contagens de estados no universo completo e uma amostra das 150 hipóteses com
 mais resultados; não alimenta recomendações. `brain.eligibility` apresenta os

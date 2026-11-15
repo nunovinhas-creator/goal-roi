@@ -25,7 +25,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import insights
 from .parser import competition_kind
-from .eligibility import eligible, exclusion_reasons
+from .eligibility import eligible, exclusion_reasons, game_identity
 
 MIN_SUPPORT = 8          # sinais com a combinação para a hipótese ser registada
 MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo não tem limite de tamanho
@@ -160,9 +160,10 @@ def game_steps(match):
     """
     games = {}
     for b in match:
-        if b['w'] is not None and b['w'] != 0:
-            games.setdefault(b.get('match_id') or ('sem jogo', id(b)), []).append(b)
-    order = sorted(games.items(), key=lambda kv: (max(known_at(b) for b in kv[1]), str(kv[0])))
+        key = game_identity(b)
+        if b['w'] is not None and b['w'] != 0 and key is not None:   # fail-closed: no proven game, no observation
+            games.setdefault(key, []).append(b)
+    order = sorted(games.items(), key=lambda kv: (max(known_at(b) for b in kv[1]), kv[0]))
     votes, out = insights.Votes(), []
     for k, (_, rows) in enumerate(order, 1):
         for b in rows:

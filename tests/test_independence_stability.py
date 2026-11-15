@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 
 from scangoal import brain, insights, notify
+from scangoal.eligibility import eligible, exclusion_reasons
 
 NOW = datetime.fromisoformat('2026-11-20T12:00:00+00:00')
 BAR = 0.9997   # corrected bar of the same order as production (≈120 tested hypotheses)
@@ -282,6 +283,89 @@ class TelegramRulesMigration(unittest.TestCase):
         self.assertEqual((rows['rules']['unit'], rows['rules']['confirm_steps'], rows['rules']['keep_promising']),
                          ('independent_games', brain.CONFIRM_STEPS, brain.KEEP_PROMISING))
         self.assertEqual(rows['walk_forward']['rule']['unit'], 'independent_games')
+
+
+
+class GameIdentity(unittest.TestCase):
+    """Review #5910343843 (P1): without a provable match_id there is no independent game, ever."""
+
+    def unidentified(self, count, w=1.0, match_id=None):
+        return [sig(match_id, w, i, selection='Over %d.5' % (i % 4)) for i in range(count)]   # distinct objects and bets
+
+    def test_31_wins_without_match_id_are_not_31_games(self):
+        rows = self.unidentified(31)
+        votes = insights.Votes()
+        for r in rows:
+            votes.add(r)
+        self.assertEqual((votes.totals()[3], votes.bets(), votes.unidentified), (0, 0, 31))
+        s = insights.summarize(rows)
+        self.assertEqual((s['n'], s['games'], s['unidentified'], s['prob_above']), (31, 0, 31, None))
+        # What one invented game per signal would have concluded (commit 1635c30): 31 "games", promissora.
+        self.assertEqual(brain.status_of(31, insights.evidence(31, 0, 0.5)['prob_above'], BAR, 300), 'promissora')
+        for exploratory in (False, True):
+            got, tested, _ = brain.evaluate(rows, family_only(), 300, exploratory=exploratory)
+            self.assertEqual((got[0]['games'], got[0]['status'], got[0]['pending_status'], tested), (0, 'em observação', None, 0), exploratory)
+        self.assertEqual(brain.game_steps(rows), [])
+
+    def test_blank_or_non_text_match_id_is_not_an_identity(self):
+        for bad in (None, '', '   ', 0, 17, ['x']):
+            self.assertIn('no_match_identity', exclusion_reasons(sig(bad, 1.0, 0)), repr(bad))
+            v = insights.Votes()
+            v.add(sig(bad, 1.0, 0))
+            self.assertEqual((v.totals()[3], v.unidentified), (0, 1), repr(bad))
+        self.assertTrue(eligible(sig('jogo-1', 1.0, 0)))
+
+    def test_unidentified_signals_never_add_games_to_identified_ones(self):
+        rows = self.unidentified(31) + games([1.0] * 10)
+        s = insights.summarize(rows)
+        self.assertEqual((s['games'], s['unidentified']), (10, 31))
+        got, tested, _ = evaluate(rows)
+        self.assertEqual((got['h']['n'], got['h']['games'], got['h']['status'], tested), (10, 10, 'em observação', 0))   # 31 are ineligible
+
+    def test_missing_selection_never_splits_a_game_or_a_bet(self):
+        a = sig('m', 1.0, 0, selection=None)
+        b = sig('m', -1.0, 0, selection='')
+        c = sig('m', 1.0, 0, selection='Over 2.5')
+        for r in (a, b):
+            self.assertIn('no_selection', exclusion_reasons(r))
+        self.assertEqual(exclusion_reasons(c), [])
+        v = insights.Votes()
+        for r in (a, b, c):
+            v.add(r)
+        self.assertEqual(v.bets(), 2)                       # missing selections merge into one bet of that market
+        self.assertEqual(v.totals(), (0.75, 0.25, 0.5, 1))  # (0.5 + 1.0) / 2 hits; still one game
+
+    def test_unidentified_results_cannot_enable_following(self):
+        # A condition every signal has (walk-forward only follows hypotheses with conditions).
+        reg = {'h': {'family': 'Jogo aberto', 'conditions': [['Parte do jogo', '2.ª parte']], 'born_utc': '2026-01-01T00:00:00+00:00', 'source': 'gerador'}}
+        early = self.unidentified(12)
+        identified = [sig('e%d' % i, 1.0, i) for i in range(12)]
+        late_known = [sig('later%d' % i, -1.0, 60 + i) for i in range(3)]
+        # Control: with 12 identified games the rule follows (2 early signals once 8 results are known, plus the 3 later).
+        self.assertEqual(brain.walk_forward(identified + late_known, reg)['followed']['bets'], 5)
+        late = [sig('later%d' % i, -1.0, 60 + i) for i in range(3)]
+        wf = brain.walk_forward(early + late, reg)
+        self.assertEqual(wf['followed']['bets'], 0)
+
+
+class CorrectedBarIsRetroactive(unittest.TestCase):
+    """Documented limitation (review #5910343843): the corrected bar uses today's count of tested hypotheses for the whole
+    replay, so a validated status can change without any new game of that hypothesis. Promissora/abandonada use fixed
+    thresholds and are not affected. To be addressed with chronological validity (PR 3)."""
+
+    def test_validated_status_depends_on_how_many_other_hypotheses_are_tested(self):
+        base = [1.0] * 64 + [-1.0] * 36
+        random.Random(5).shuffle(base)
+        own = games(base + [1.0, 1.0])                                  # 102 games of "Jogo aberto", p 0.9965..0.9979
+        others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 200 + i, typ='STAKE_LOAD') for i in range(30)]
+        alone = {'a': family_only()['h']}
+        crowded = dict(alone, **{'s%d' % k: dict(family_only('Stake')['h']) for k in range(400)})
+        rows1, tested1, bar1 = brain.evaluate(own + others, alone, 300)
+        rows2, tested2, bar2 = brain.evaluate(own + others, crowded, 300)
+        a1, a2 = rows1[0], next(r for r in rows2 if r['id'] == 'a')
+        self.assertEqual((a1['games'], a1['prob_above']), (a2['games'], a2['prob_above']))   # same games, same evidence
+        self.assertEqual((tested1, tested2), (1, 401))
+        self.assertEqual((a1['status'], a2['status']), ('forte', 'promissora'))              # only other hypotheses changed
 
 
 if __name__ == '__main__':

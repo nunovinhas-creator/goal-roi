@@ -6,6 +6,7 @@ Dimensões fixadas a 12/11/2026, antes de haver dados suficientes para as escolh
 import math
 from datetime import datetime
 
+from .eligibility import bet_identity, game_identity
 from .parser import competition_kind
 
 PRIOR_WEIGHT = 10        # pseudo-observações centradas na taxa necessária ("sem vantagem")
@@ -102,16 +103,22 @@ class Votes:
     - jogo: apostas diferentes no mesmo jogo (outros mercados ou seleções) têm resultados correlacionados e repartem um voto.
     Um jogo com duas apostas certas conta um acerto, não dois; com uma certa e uma errada conta meio acerto e meia falha.
     É o lado prudente: a evidência nunca cresce por o bot repetir sinais, nem por cobrir vários mercados do mesmo jogo.
+    Identidade fail-closed (revisão #5910343843): um sinal sem jogo comprovável (match_id vazio ou ausente) não vota e conta
+    em `unidentified`; nunca recebe um jogo próprio. Mercado ou seleção em falta juntam-se numa só aposta dentro do jogo.
     """
     def __init__(self):
         self.m = {}
+        self.unidentified = 0
 
     def add(self, r):
         if r['w'] is None or r['w'] == 0:
             return
-        game = self.m.setdefault(r.get('match_id') or ('sem jogo', id(r)), {})
-        bet = (r['market'], r.get('selection')) if r.get('market') is not None else ('sinal', id(r))
-        u = game.setdefault(bet, [0.0, 0.0, 0, 0.0, 0])   # acertos, falhas, sinais, soma de 1/odd, sinais com odd
+        key = game_identity(r)
+        if key is None:
+            self.unidentified += 1
+            return
+        game = self.m.setdefault(key, {})
+        u = game.setdefault(bet_identity(r), [0.0, 0.0, 0, 0.0, 0])   # acertos, falhas, sinais, soma de 1/odd, sinais com odd
         u[0] += max(r['w'], 0)
         u[1] += max(-r['w'], 0)
         u[2] += 1
@@ -167,7 +174,7 @@ def summarize(rows):
     for r in done:
         votes.add(r)
     ch, cm, cbe, games = votes.totals()
-    out['games'], out['bets'] = games, votes.bets()
+    out['games'], out['bets'], out['unidentified'] = games, votes.bets(), votes.unidentified
     out.update(evidence(ch, cm, cbe))
     out.update(posterior(ch, cm, cbe))
     return out

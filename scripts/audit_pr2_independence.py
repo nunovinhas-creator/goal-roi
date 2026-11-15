@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 from scangoal import brain, insights, notify, report  # noqa: E402
+from scangoal.eligibility import bet_identity, game_identity  # noqa: E402
 
 BASE = '13ae250ccc4f14bf8a5bfa18844e68be0d6d5bc4'      # main after PR1 + first production cycles (branch point)
 NOW = '2026-11-15T10:20:00+00:00'
@@ -166,6 +167,14 @@ def main():
                for h in sorted(new_by) if h in old_by and old_by[h]['status'] != new_by[h]['status']}
     prob_moved = sum(1 for h in new_by if h in old_by and old_by[h]['prob_above'] != new_by[h]['prob_above'])
     wf = lambda rep: {k: rep['brain']['walk_forward'][k] for k in ('followed', 'skipped', 'prob_followed_better')}
+    exploratory = after['brain']['eligibility']
+    identity = {
+        'eligible_without_match_id': sum(1 for b in signals if game_identity(b) is None),
+        'eligible_without_selection': sum(1 for b in signals if bet_identity(b)[1] is None),
+        'eligible_decided_without_match_id': sum(1 for b in signals if b['w'] not in (None, 0) and game_identity(b) is None),
+        'all_signals_excluded_for_identity': {k: exploratory['reasons'].get(k, 0) for k in ('no_match_identity', 'no_selection')},
+        'unidentified_in_brain_rows': sum(r.get('unidentified', 0) for r in rows),
+        'note': 'Fail-closed since review #5910343843: no match_id -> ineligible and no vote; no selection -> ineligible.'}
     groups_same_roi = all(before['groups'][g]['roi'] == after['groups'][g]['roi'] for g in before['groups']) if before['groups'].keys() == after['groups'].keys() else False
     assert hashes == digest(), 'Historical data changed during the audit'
     assert before['accuracy'] == after['accuracy'], 'Exploratory accuracy changed'
@@ -186,6 +195,7 @@ def main():
         'agenda_counts': {'pr1': before['brain']['agenda']['counts'], 'pr2': after['brain']['agenda']['counts']},
         'targets': {h: {'pr1': row_view(old_by[h]), 'pr2': row_view(new_by[h])} for h in TARGETS if h in new_by},
         'kashiwa_kawasaki': kashiwa,
+        'identity': identity,
         'telegram_first_pr2_report_on_production_state': {'with_silent_rules_migration': kinds(with_migration),
                                                           'counterfactual_without_migration': kinds(without_migration),
                                                           'migration_key': notify.migration_key(after)},

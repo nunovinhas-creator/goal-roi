@@ -513,7 +513,7 @@ class Brain(Hardening):
             'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'games': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
             'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
         now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
-        sig = lambda key, date, ko=None: {'in_roi': True, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
+        sig = lambda key, date, ko=None: {'in_roi': True, 'match_id': 'jogo-' + key, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
         rows = [row('a', 'Jogo aberto', 12, 11, 0.97, [sig('k1', '2026-11-12T19:40:00+00:00'), sig('k2', '2026-11-12T10:00:00+00:00'), sig('k3', '2026-11-12T12:00:00+00:00', '2026-11-12T22:00:00+00:00')]),
                 row('a2', 'Jogo aberto', 12, 11, 0.96),                 # mesma amostra que "a": repetida
                 row('b', 'Jogo aberto', 10, 8, 0.90), row('c', 'Jogo aberto', 9, 7, 0.85),        # a família já tem duas

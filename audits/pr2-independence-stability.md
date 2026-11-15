@@ -26,7 +26,8 @@
    - Apostas diferentes no mesmo jogo repartem um voto.
    - Acertos e falhas acumulam-se separadamente por aposta, para que resultados contraditórios não se anulem.
    - A soma segue uma ordem fixa, por isso o resultado não depende da ordem dos dados.
-   - O relatório mostra `n` (sinais), `bets` (apostas) e `games` (jogos).
+   - O relatório mostra `n` (sinais), `bets` (apostas), `games` (jogos) e `unidentified`.
+   - **Identidade fail-closed** (secção 8): sem `match_id` comprovável não há voto nem jogo; nunca se usa `id(r)`. Sem jogo ou seleção identificáveis, o sinal é inelegível.
 2. **Limiares em jogos independentes:**
    - estados: 30, 100 e 300 jogos;
    - fasquia corrigida: `tested` passa a contar hipóteses com ≥ 30 jogos;
@@ -68,7 +69,7 @@
 | Probabilidade de as seguidas renderem mais | 0,39 | 0,48 |
 | Agenda: favorável / misto / contraditório / evitar | 1 / 5 / 2 / 5 | 1 / 2 / 2 / 8 |
 | Primeiro relatório PR 2 sobre o estado Telegram de produção | — | **0 transições** (sem a migração seriam 11) |
-| Tempo de `report.build` | 5,1 s | 7,2 s |
+| Tempo de `report.build` | 5,7 s | 7,4 s |
 
 Verificações automáticas na comparação:
 - dados históricos com os mesmos hashes antes e depois;
@@ -88,7 +89,7 @@ Com mais uma vitória, as 4 serão promovidas e anunciadas: a redundância conti
 
 ## 4. Testes
 
-21 testes novos em `tests/test_independence_stability.py`, todos offline e determinísticos:
+27 testes novos em `tests/test_independence_stability.py`, todos offline e determinísticos (21 iniciais e 6 da revisão #5910343843, ver secção 8):
 - **Unidades:** repetição na mesma aposta; mercados correlacionados no mesmo jogo; resultados contraditórios; independência da ordem.
 - **Limiares em jogos:** 40 sinais em 10 jogos; padrão Stake/fim de semana (33 sinais, 14 jogos); quadro, agenda e walk-forward.
 - **Estabilidade:**
@@ -105,16 +106,24 @@ Com mais uma vitória, as 4 serão promovidas e anunciadas: a redundância conti
 
 As fixtures de três testes existentes passaram a declarar `games`, sem alterar nenhuma asserção, tal como a PR 1 fez com `in_roi`.
 
-**Total: 153 testes**, com a rede bloqueada (`python scripts/test_offline.py`).
+As fixtures de dois testes existentes passaram a declarar `match_id` (identidade obrigatória), também sem alterar asserções.
 
-Contra o código da PR 1, 18 dos 21 testes novos falham. Os 3 que passam são intencionais:
+**Total: 159 testes**, com a rede bloqueada (`python scripts/test_offline.py`).
+
+Contra o código da PR 1, 23 dos 27 testes novos falham. Os 4 que passam são intencionais:
 - dois protegem propriedades que a PR 1 já tinha (massa de resultados contraditórios e independência da ordem);
-- um documenta a redundância que fica para as PRs 3/5.
+- um documenta a redundância que fica para as PRs 3/5;
+- um demonstra a limitação da fasquia retroativa, que existe nas duas versões.
 
 ## 5. Limitações e riscos
 
 - **A histerese mantém estados abaixo do limiar de entrada.** Hoje são 2 promissoras a 0,943–0,950. Está exposto em `entry_status` e no dashboard, mas promissora continua a não significar validada.
 - **Redundância não resolvida (PRs 3/5).** Hipóteses sobre os mesmos jogos mudam juntas; uma promoção confirmada continua a dar 4 avisos.
+- **Fasquia corrigida retroativa** (revisão #5910343843): `evaluate()` calcula a fasquia com o número **atual** de hipóteses testadas e a reconstituição aplica-a a todo o histórico. Um estado validado (forte/confirmada) pode assim mudar **sem nenhum jogo novo dessa hipótese**, só porque outras hipóteses passaram a ter 30 jogos.
+  - Demonstrado em `CorrectedBarIsRetroactive`: os mesmos 102 jogos dão **forte** com 1 hipótese testada e **promissora** com 401.
+  - Promissora e abandonada usam limiares fixos e não são afetadas.
+  - A garantia "sem evidência nova não há mudança" só foi testada com o conjunto de hipóteses e a fasquia constantes. Não deve ser lida como imutabilidade geral das validadas.
+  - Hoje não existe nenhuma forte ou confirmada. A correção pertence à validade cronológica (PR 3).
 - **Cronologia (PR 3):**
   - a reconstituição usa a fasquia corrigida atual em todo o histórico e a aproximação de 150 minutos;
   - as hipóteses do gerador são reconstituídas também sobre o período anterior ao seu registo;
@@ -125,14 +134,14 @@ Contra o código da PR 1, 18 dos 21 testes novos falham. Os 3 que passam são in
   - o regime (avisos de mudança de comportamento) continua a contar sinais, e as variações estimadas por esse módulo podem sobrestimar a confiança;
   - os textos do Telegram ainda dizem "em N resultados", com N = sinais (PR 5).
 - **Prudência deliberada:** mercados diferentes do mesmo jogo repartem um voto. Isto perde alguma informação, mas nunca sobrecontagem.
-- **Desempenho:** `report.build` passa de cerca de 5 s para 7 s, por cada recolha ou leitura com mensagens novas.
+- **Desempenho:** `report.build` passa de cerca de 5,7 s para 7,4 s, por cada recolha ou leitura com mensagens novas.
 - **Integração:** exige um corte controlado como o da PR 1 (pausa, corte e merge), porque uma execução antiga a correr depois do corte compararia referências diferentes. O `scripts/pr1_cutover.py` recusa correr com o marcador da PR 1 já presente, por isso terá de ser adaptado à chave da regra antes da integração, e essa adaptação terá revisão própria.
 
 ## 6. Reprodução
 
 ```bash
 git switch --detach <SHA da PR 2>
-python3.11 scripts/test_offline.py                                         # 153 testes
+python3.11 scripts/test_offline.py                                         # 159 testes
 python3.11 -m unittest discover -s tests -p test_independence_stability.py -v
 python3.11 scripts/audit_pr2_independence.py > /tmp/pr2-metrics.json       # mesmo JSON (a data/ tem de ser igual à base)
 ```
@@ -142,3 +151,44 @@ python3.11 scripts/audit_pr2_independence.py > /tmp/pr2-metrics.json       # mes
 - **Técnico:** as unidades e os limiares passam a contar observações independentes. As oscilações de um jogo deixam de mudar estados e de gerar avisos, e as deteriorações genuínas continuam a ser detetadas com atraso limitado. A transição no Telegram é silenciosa e única.
 - **Científico: INCONCLUSIVO** quanto a capacidade preditiva. A PR mede estabilidade e corrige a contagem da amostra; não demonstra vantagem.
 - O parecer é do autor da implementação e não substitui a revisão independente.
+
+## 8. Correção após a revisão #5910343843 (commit auditado `1635c30`)
+
+**P1 — sem `match_id`, o código inventava independência.**
+- `Votes.add()` e `game_steps()` usavam `('sem jogo', id(r))`, dando a cada sinal sem jogo identificado um jogo próprio.
+- A elegibilidade da PR 1 não exigia `match_id`.
+- Demonstração no commit auditado: 31 vitórias elegíveis com `match_id=None` contavam como **31 jogos**, a hipótese ficava **promissora** e era contada em `tested`. No walk-forward, sem `match_id`, 12 vitórias passavam a permitir seguir 5 apostas.
+
+**Correção:**
+- **Elegibilidade.** É uma alteração explícita à política da PR 1, que fica submetida a revisão:
+  - `exclusion_reasons()` passa a incluir `no_match_identity` (`match_id` sem texto) e `no_selection`;
+  - a identidade é definida num único sítio: `eligibility.game_identity()`, `bet_identity()` e `text_identity()`.
+  - Esta porta cobre todas as decisões operacionais: cérebro, quadro, agenda, watch, walk-forward, pontos de entrada, universo da LLM e bloco operacional do dashboard e do Telegram.
+- **Contagem**, como defesa em profundidade, porque as estatísticas exploratórias incluem sinais inelegíveis:
+  - sem jogo comprovável, o sinal não vota e conta em `unidentified`;
+  - `game_steps()` ignora-o;
+  - mercado ou seleção em falta juntam-se numa só aposta dentro do jogo (fusão conservadora, nunca divisão);
+  - não resta nenhum `id(r)` usado como identidade.
+
+**Impacto medido**, no snapshot `13ae250` e no `main` atual:
+- 0 sinais elegíveis sem `match_id` e 0 sem seleção;
+- todas as 559 mensagens de aposta têm `match_id`;
+- 84 sinais sem seleção já eram inelegíveis por falta de odd e de mercado; ganham só um motivo adicional, e nenhum é excluído apenas por isso;
+- o conjunto elegível é o mesmo (373 de 495) e as métricas da secção 3 são idênticas às da versão anterior (só mudam os tempos de execução);
+- o bloco `identity` foi acrescentado a `audits/pr2-metrics.json`.
+
+**Testes novos (6):**
+- 31 vitórias sem `match_id` não são 31 jogos nem promovem, tanto no caminho elegível como no exploratório;
+- `match_id` vazio, só com espaços ou não-texto não é identidade;
+- sinais sem identidade não juntam jogos aos identificados;
+- seleção ausente ou vazia nunca divide um jogo nem uma aposta;
+- resultados sem identidade não permitem seguir no walk-forward, com um controlo que confirma que 12 jogos identificados permitem;
+- fasquia corrigida retroativa (limitação documentada).
+
+Contra `1635c30`, os 5 testes de identidade falham:
+- 3 em asserções de comportamento: sem `no_match_identity`, sem `no_selection` e walk-forward a seguir 5 apostas em vez de 0;
+- 2 por erro, porque o campo `unidentified` não existia. O comportamento correspondente (31 jogos, promissora) foi demonstrado diretamente no mesmo commit.
+
+O teste da fasquia passa nas duas versões, porque documenta uma limitação existente.
+
+O caso Kashiwa — Kawasaki e a comparação com a PR 1 foram reproduzidos com resultados idênticos.
