@@ -19,12 +19,12 @@
  },
  "build_seconds": {
   "pr2": [
-   11.53,
-   9.63
+   8.92,
+   9.08
   ],
   "pr3": [
-   11.61,
-   10.04
+   12.35,
+   11.0
   ]
  },
  "pr2": {
@@ -325,6 +325,8 @@
   "ledger_problems": [],
   "activated_utc": null,
   "legacy": 0,
+  "ledger_head_sha256": null,
+  "ledger_entries": 0,
   "test": "test-by-betting e-process on per-game profit at announced odds minus 2 %",
   "lambdas": [
    0.5,
@@ -334,7 +336,7 @@
    0.03125
   ],
   "allocation": "alpha/(j(j+1)) by order of REGISTERED real-time selection (append-only ledger)",
-  "evidence": "games whose bets were sent and read after the registered selection, decidable, decided before any result of the game was observed, with proven result time; only hypotheses whose conditions are all known at the first signal",
+  "evidence": "one committed bet per game (the first decided), sent and read after the registered selection, decidable, decided before any result of the game was observed; games enter a non-overlapping chain (a game is admitted only if the previous admitted one was already closed at its decision); a chain game without proven result within 3 days closes as a loss; only hypotheses whose conditions are all known at the first signal",
   "as_of_dimensions": [
    "Antecedência",
    "Competição",
@@ -367,11 +369,12 @@
    "keep_prob_above": 0.9
   },
   "claim": "no claim: certification is not active, no tactic can be validated",
+  "null": "for every admitted bet, E[profit at odds -2 % | everything the system knew at its decision] <= 0",
   "assumptions": [
-   "null holds conditionally on everything known when each bet was decided (no edge whatever happened before)",
+   "the null above (no edge given all information available at each decision, including earlier chain results)",
    "membership of a bet uses only dimensions known at its first signal (as_of_dimensions)",
    "stored observation times are true (verified against git history in the PR 3 audit)",
-   "the ledger is append-only (verified hash chain; git history as external clock)"
+   "the ledger is append-only: the in-file hash chain proves only internal consistency; append-only history is proven against git history (certification.verify_history), not inside the report"
   ],
   "selected": 0,
   "certified": [],
@@ -780,14 +783,14 @@
   }
  },
  "notify_rehearsal": {
-  "migration_key": "status_rules:chronological_eprocess_v2",
+  "migration_key": "status_rules:chronological_eprocess_v3",
   "markers_before": [
    "eligible_statuses_v1",
    "status_rules:independent_games_hysteresis_v1"
   ],
   "markers_after": [
    "eligible_statuses_v1",
-   "status_rules:chronological_eprocess_v2",
+   "status_rules:chronological_eprocess_v3",
    "status_rules:independent_games_hysteresis_v1"
   ],
   "status_messages_with_migration": 0,
@@ -929,40 +932,40 @@
    {
     "id": "Jogo aberto | Parte do jogo = 2.ª parte",
     "certifiable": true,
-    "games": 17,
-    "log10_e": -0.028,
+    "games": 13,
+    "log10_e": -0.1703,
     "threshold": 40.0,
     "would_certify": false
    },
    {
     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
     "certifiable": true,
-    "games": 12,
-    "log10_e": 0.2713,
+    "games": 9,
+    "log10_e": 0.0625,
     "threshold": 120.0,
     "would_certify": false
    },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
     "certifiable": true,
-    "games": 9,
-    "log10_e": 0.0495,
+    "games": 6,
+    "log10_e": -0.0601,
     "threshold": 240.0,
     "would_certify": false
    },
    {
     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
     "certifiable": false,
-    "games": 10,
-    "log10_e": 0.0236,
+    "games": 7,
+    "log10_e": 0.0118,
     "threshold": 400.0,
     "would_certify": false
    },
    {
     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90",
     "certifiable": false,
-    "games": 8,
-    "log10_e": 0.085,
+    "games": 6,
+    "log10_e": -0.028,
     "threshold": 600.0,
     "would_certify": false
    },
@@ -977,7 +980,7 @@
    {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
     "certifiable": true,
-    "games": 5,
+    "games": 6,
     "log10_e": -0.0641,
     "threshold": 1120.0,
     "would_certify": false
@@ -985,7 +988,7 @@
    {
     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
     "certifiable": false,
-    "games": 4,
+    "games": 5,
     "log10_e": -0.1094,
     "threshold": 1440.0,
     "would_certify": false
@@ -1052,6 +1055,48 @@
    "log10_e": 1471.6322,
    "e_value": null,
    "certified": true
+  }
+ },
+ "counterexamples_review_5911747123": {
+  "P1-F_correlated_open_games": {
+   "X=+1": {
+    "345e008_games": 120,
+    "345e008_certified": true,
+    "current_admitted": 1,
+    "current_skipped_overlap": 119,
+    "current_certified": false
+   },
+   "X=-1": {
+    "345e008_games": 120,
+    "345e008_certified": false,
+    "current_admitted": 1,
+    "current_skipped_overlap": 119,
+    "current_certified": false
+   },
+   "false_certification_probability": {
+    "345e008": 0.5,
+    "current": 0.0
+   }
+  },
+  "P1-G_adaptive_extra_bet": {
+   "exact_expected_profit": {
+    "old_mean_per_game": 0.225,
+    "committed": -0.02
+   },
+   "false_certification_rate_200_runs_alpha_0.05": {
+    "345e008": 0.94,
+    "current": 0.01
+   }
+  },
+  "P2_malformed_id_345e008": "raised TypeError",
+  "P2_malformed_id_current": [
+   "entry 1"
+  ],
+  "P2_rewrite_with_rehash": {
+   "internal_check": [],
+   "history_check": [
+    "version 1 is not an append-only extension"
+   ]
   }
  },
  "data_unchanged_by_audit": true
