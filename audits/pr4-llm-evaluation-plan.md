@@ -1,6 +1,7 @@
-# PR 4/5 — Aprendizagem e avaliação da LLM (plano técnico, NÃO implementado)
+# PR 4/5 — Aprendizagem e avaliação da LLM (plano técnico)
 
-Estado: plano para aprovação. Nada deste documento foi implementado nem executado sobre dados de produção.
+Estado: plano aprovado a 15/11/2026 com as decisões da secção 9, que prevalecem sobre o texto anterior em caso de conflito.
+O protocolo vinculativo é `audits/pr4-llm-protocol.md` (commit próprio).
 Base: `main` depois do merge da PR 3 (59bff9a) e das recolhas #561/#562. Certificação: `not_activated` (continua assim).
 
 ## 0. Âmbito
@@ -188,3 +189,16 @@ Verificação por mutação (`audits/pr4-evidence/mutation_check.py`, como nas P
 1. Rejeitar duplicados extensionais na produção (`llm.accept`)? Recomendado: sim.
 2. Limites "30/dia, 300 no total": aplicar no código ou corrigir o README para o comportamento real? Recomendado: corrigir o README (sem mudança de comportamento nesta PR).
 3. Parâmetros do protocolo (Jaccard 0,85; K = 20; mínimos 10 grupos / 200 jogos; α = 0,05): aceitar ou ajustar antes do registo.
+
+## 9. Decisões do proprietário (15/11/2026) — prevalecem sobre o texto acima
+
+1. Rejeitar só duplicados exatos e redundâncias extensionais demonstradas no instante da proposta (conjunto de sinais igual ao de uma hipótese existente ou de uma sub-combinação). Nunca rejeitar só por Jaccard ≥ 0,85.
+2. Sem limites diários ou totais de hipóteses; corrigir o README; manter o orçamento gratuito de neurónios.
+3. Jaccard 0,85 só para agrupamento exploratório, com sensibilidade a 0,80 e 0,90; ligação completa e regras de compatibilidade (mesma família, mesma expectativa, nenhuma condição contraditória) impedem agrupamentos transitivos de hipóteses incompatíveis.
+4. 20 controlos pré-selecionados, ≥ 10 grupos e ≥ 200 jogos, mais diversidade temporal (≥ 14 dias, nenhum dia com mais de 20 % dos jogos). Nenhuma conclusão positiva com amostra temporal insuficiente.
+5. Uma comparação primária e α = 0,05 fixados antes da avaliação; Holm nas 7 análises adicionais.
+6. Protocolo registado num commit próprio; só dados posteriores a esse commit sustentam conclusões prospetivas pelo protocolo.
+7. Nascimento efetivo pelo histórico git completo; sem prova, avaliação não verificada e nenhuma conclusão científica.
+8. `track_record` deixa de apresentar `prob_above > 0.5` como confirmação e deixa de transmitir essa conclusão à LLM.
+9. A PR 4 não altera as quatro promissoras atuais, as regras da PR 3 nem a certificação (verificado por comparação com `main` sobre os mesmos dados).
+10. Testes adversariais, mutações, avaliação reprodutível e relatório científico.
