@@ -26,6 +26,8 @@ Segue o modelo dos cortes das PRs 1 e 2 (`audits/pr1-cutover-runbook.md`, `audit
 | `audits/pr3-cutover-evidence/collect-fetch-depth-0.patch` | Alteração **proposta, não aplicada** ao workflow (checkout completo), só para a ativação |
 | `audits/pr3-cutover-rehearsal.json` | Resultado do ensaio sobre `main` real |
 | `audits/pr3-certification-activation-plan.md` | Plano da ativação científica (passo separado) |
+| `audits/pr3-cutover-window-plan.md` | Checklist da janela por fases A–D com autorizações separadas (plano aceite depois da revisão #5912630773) |
+| `scripts/post_cutover_check.py` (+ `tests/test_post_cutover_check.py`, 10 testes) | Verificação só de leitura das duas primeiras execuções depois do corte (fase D) |
 
 ## 2. O que `scripts/pr3_cutover.py` garante
 
@@ -204,7 +206,7 @@ Os três têm de sair com código 0 e todos os `criteria` têm de ser verdadeiro
 - zero execuções `in_progress`, `queued`, `waiting`, `requested` ou `pending`;
 - `git ls-remote origin main` igual em duas leituras com pelo menos 3 minutos de intervalo. Esse SHA é **M**.
 
-**A3.** Cópia de segurança: referência `backup/pre-pr3-cutover` em M (requer autorização).
+**A3.** Cópia de segurança **obrigatória**: referência `backup/pre-pr3-cutover` em M, verificada com `git ls-remote` antes da fase B (`audits/pr3-cutover-window-plan.md`, A5).
 
 ### Fase B — autorização
 
@@ -241,9 +243,9 @@ git push origin HEAD:fix/brain-03-chronological-validity
 - existem as três chaves de migração e os marcadores das PRs 1 e 2 estão iguais aos de M;
 - não existe registo de certificação.
 
-**C4.** O proprietário reativa o workflow; é lançada uma única execução.
+**C4.** O proprietário reativa o workflow; é lançada uma única execução. Só com a autorização da fase D (`audits/pr3-cutover-window-plan.md`).
 
-**C5.** Acompanhar as duas primeiras execuções:
+**C5.** Acompanhar as duas primeiras execuções com `python3.11 scripts/post_cutover_check.py <antes> <depois>` (código 0 obrigatório):
 - `NOTIFY_OK sent N` e `sent_total` com +N;
 - marcadores inalterados;
 - zero transições históricas e zero mensagens de tática validada;
@@ -266,7 +268,7 @@ git push origin HEAD:fix/brain-03-chronological-validity
 ```bash
 git fetch origin main fix/brain-03-chronological-validity
 git switch --detach origin/fix/brain-03-chronological-validity
-python3.11 scripts/test_offline.py                                    # 275 testes
+python3.11 scripts/test_offline.py                                    # 285 testes
 python3.11 -m unittest discover -s tests -p test_pr3_cutover.py -v    # 22 regressões do corte
 python3.11 audits/pr3-cutover-evidence/mutation_check.py              # 32 de 32 mutantes apanhados
 python3.11 scripts/rehearse_pr3_cutover.py origin/main > /tmp/pr3-rehearsal.json; echo $?   # 0 esperado

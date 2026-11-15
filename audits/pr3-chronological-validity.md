@@ -63,7 +63,7 @@
   - checkout raso vs completo;
 - **Integração separada da certificação:** o corte recusa qualquer registo e qualquer estado de validação diferente de `not_activated`. A ativação tem plano próprio (`audits/pr3-certification-activation-plan.md`) e o patch `fetch-depth: 0` fica proposto, não aplicado.
 
-**Testes:** 275 no total (`test_offline.py`).
+**Testes:** 285 no total (`test_offline.py`), incluindo os 10 de `scripts/post_cutover_check.py`, a verificação só de leitura da fase D (`audits/pr3-cutover-window-plan.md`).
 
 ## 0-E. Correção após a revisão #5912303516
 
@@ -635,7 +635,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 ```bash
 git fetch --unshallow origin    # a verificação git precisa do histórico completo
 git switch --detach <SHA da PR 3>
-python3.11 scripts/test_offline.py                                    # 275 testes
+python3.11 scripts/test_offline.py                                    # 285 testes
 python3.11 -m unittest tests.test_chronological_validity -v
 python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min; data/ tem de ser igual à base
 ```
