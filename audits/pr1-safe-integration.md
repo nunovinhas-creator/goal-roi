@@ -57,3 +57,7 @@ A primeira referência define a fronteira da migração. Mudanças já presentes
 - Persistir a referência e só depois retomar um escritor. Um relatório antigo recebido pelo código novo não migra nem sobrescreve a referência elegível; essa proteção não existe no código antigo revertido, daí ser indispensável preparar a referência antes de reativar envios.
 
 A reversão também requer autorização explícita e verificação pelo operador. Nenhuma ação deste procedimento foi executada em produção.
+
+## Aditamento (15/11/2026) — automatização dos passos 4–6
+
+Os passos 4–6 acima foram automatizados, sem alterar o mecanismo revisto, em `scripts/pr1_cutover.py`: guardas contra snapshots desatualizados e marcador já presente, rede bloqueada, migração repetida com verificação byte a byte, simulação sem emissor e restauro automático em falha. O ensaio sobre os dados reais (`audits/pr1-cutover-rehearsal.json`), o risco medido de uma execução antiga depois do corte e o procedimento detalhado estão em `audits/pr1-cutover-runbook.md`. Nada disto foi executado em produção.
