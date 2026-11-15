@@ -2,9 +2,9 @@
 import copy
 import random
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from scangoal import brain, insights, notify
+from scangoal import brain, certification, insights, notify
 from scangoal.eligibility import eligible, exclusion_reasons
 
 NOW = datetime.fromisoformat('2026-11-20T12:00:00+00:00')
@@ -12,12 +12,18 @@ BAR = 0.9997   # corrected bar of the same order as production (≈120 tested hy
 
 
 def sig(match, w, k, *, market='Asian Total', selection='Over 2.5', odds=2.0, typ='OPEN_GAME', phase='live', **extra):
-    """One eligible signal; k orders games in time (results known 150 min after the signal)."""
+    """One eligible signal; k orders games in time (results known 150 min after the signal).
+
+    PR 3 provenance: the system read the signal when it was sent and first observed the result 145 min later (available
+    150 min after the signal, with the 5-minute observation margin) - the same timing these fixtures always assumed.
+    """
     d = '2026-11-%02dT%02d:00:00+00:00' % (1 + k // 20, k % 20)
+    seen = (datetime.fromisoformat(d) + timedelta(minutes=145)).isoformat() if w is not None else None
     return dict({'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': phase, 'market': market, 'selection': selection,
                  'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'],
                  'in_roi': True, 'key': (match, market, selection, d), 'n_signals': 1, 'max_mult': 1, 'no_source': False,
-                 'share': None, 'total': None, 'n_bets': None}, **extra)
+                 'share': None, 'total': None, 'n_bets': None, 'signal_seen_utc': d, 'result_known_utc': seen,
+                 'match_result_first_seen_utc': seen}, **extra)
 
 
 def games(outcomes, typ='OPEN_GAME', start=0):
@@ -348,24 +354,34 @@ class GameIdentity(unittest.TestCase):
         self.assertEqual(wf['followed']['bets'], 0)
 
 
-class CorrectedBarIsRetroactive(unittest.TestCase):
-    """Documented limitation (review #5910343843): the corrected bar uses today's count of tested hypotheses for the whole
-    replay, so a validated status can change without any new game of that hypothesis. Promissora/abandonada use fixed
-    thresholds and are not affected. To be addressed with chronological validity (PR 3)."""
+class CorrectedBarIsChronological(unittest.TestCase):
+    """PR 2 documented limitation (review #5910343843), fixed in PR 3. In PR 2 the corrected bar used TODAY's count of tested
+    hypotheses for the whole replay, so the same 102 games gave 'forte' with 1 tested hypothesis and 'promissora' with 401:
+    a validated status changed without any new game of that hypothesis. In PR 3 (review #5911487915) validation is an
+    e-process on games after the selection, with an alpha budget fixed by the order of selection: hypotheses that reach 30
+    games (or are selected) later never change an earlier certificate."""
 
-    def test_validated_status_depends_on_how_many_other_hypotheses_are_tested(self):
-        base = [1.0] * 64 + [-1.0] * 36
-        random.Random(5).shuffle(base)
-        own = games(base + [1.0, 1.0])                                  # 102 games of "Jogo aberto", p 0.9965..0.9979
-        others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 200 + i, typ='STAKE_LOAD') for i in range(30)]
+    def test_validated_status_no_longer_depends_on_hypotheses_tested_later(self):
+        base = ([1.0, 1.0, 1.0, -1.0] * 26)[:102]
+        # 102 games of "Jogo aberto", one every 3 hours: each result is known before the next decision (certification chain).
+        own = [sig('g%d' % i, w, 3 * i) for i, w in enumerate(base)]
+        others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 400 + i, typ='STAKE_LOAD') for i in range(30)]   # days 21-22
         alone = {'a': family_only()['h']}
         crowded = dict(alone, **{'s%d' % k: dict(family_only('Stake')['h']) for k in range(400)})
-        rows1, tested1, bar1 = brain.evaluate(own + others, alone, 300)
-        rows2, tested2, bar2 = brain.evaluate(own + others, crowded, 300)
+        # Selection registered in real time before a's games (ledger), rank 1; the 400 others are never selected.
+        led = certification.activate({}, datetime.fromisoformat('2026-10-31T00:00:00+00:00'))
+        certification.append(led, ['a'], alone, datetime.fromisoformat('2026-10-31T12:00:00+00:00'))
+        sel = lambda reg: certification.selections(led, reg)[0]
+        rows1, tested1, _ = brain.evaluate(own + others, alone, 300, selected=sel(alone))
+        rows2, tested2, _ = brain.evaluate(own + others, crowded, 300, selected=sel(crowded))
         a1, a2 = rows1[0], next(r for r in rows2 if r['id'] == 'a')
         self.assertEqual((a1['games'], a1['prob_above']), (a2['games'], a2['prob_above']))   # same games, same evidence
-        self.assertEqual((tested1, tested2), (1, 401))
-        self.assertEqual((a1['status'], a2['status']), ('forte', 'promissora'))              # only other hypotheses changed
+        self.assertEqual((tested1, tested2), (1, 401))                                       # today's family differs
+        self.assertEqual((a1['status'], a2['status']), ('forte', 'forte'))                   # PR 2: ('forte', 'promissora')
+        self.assertEqual(a1['status_changes'], a2['status_changes'])
+        self.assertEqual(a1['confirmation'], a2['confirmation'])
+        self.assertEqual(a2['confirmation']['rank'], 1)                                      # budget fixed in the ledger
+        self.assertNotIn(brain.evaluate(own + others, alone, 300)[0][0]['status'], brain.VALIDATED)   # no ledger: never validated
 
 
 if __name__ == '__main__':

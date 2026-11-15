@@ -55,7 +55,9 @@ contents, digests, restore, kind, offline, data_dir_of, guards = (pr1.contents, 
                                                                   pr1.offline, pr1.data_dir_of, pr1.guards)
 
 PR1_MARKER = notify.STATUS_MIGRATION
-PR2_KEY = 'status_rules:%s' % brain.STATUS_RULES
+# Pinned (PR 3): this script performed the PR 2 cutover only. It must never accept reports produced under later rules.
+PR2_RULES = 'independent_games_hysteresis_v1'
+PR2_KEY = 'status_rules:%s' % PR2_RULES
 WRITES = pr1.WRITES
 DELIVERY = pr1.DELIVERY
 
@@ -79,8 +81,8 @@ def check_report(rep, label):
         raise CutoverError('%s has no valid eligible status_list' % label)
     if (rep.get('operational') or {}).get('scope') != notify.EVIDENCE_SCOPE:
         raise CutoverError('%s has no eligible operational block (operational.scope)' % label)
-    if (rep.get('brain') or {}).get('status_rules') != brain.STATUS_RULES:
-        raise CutoverError('%s is not produced under status rules %s' % (label, brain.STATUS_RULES))
+    if (rep.get('brain') or {}).get('status_rules') != PR2_RULES:
+        raise CutoverError('%s is not produced under status rules %s' % (label, PR2_RULES))
     if notify.migration_key(rep) != PR2_KEY:
         raise CutoverError('%s maps to migration key %s, expected %s' % (label, notify.migration_key(rep), PR2_KEY))
     return statuses
@@ -205,7 +207,7 @@ def execute(root, frozen, head, original, before_state, now, build, progress):
     return {
         'ok': ok, 'restored': False, 'frozen_main_sha': frozen, 'head_sha': head, 'at_utc': now.isoformat(),
         'python': sys.version.split()[0], 'report_generated_at_utc': rep.get('generated_at_utc'),
-        'migration_key': PR2_KEY, 'status_rules': brain.STATUS_RULES,
+        'migration_key': PR2_KEY, 'status_rules': PR2_RULES,
         'brain': {'evidence_scope': b.get('evidence_scope'), 'operational_scope': (rep.get('operational') or {}).get('scope'),
                   'status_rules': b.get('status_rules'), 'hypotheses': b.get('hypotheses'), 'tested': b.get('tested'), 'counts': b.get('counts'),
                   'exploratory_counts': (b.get('exploratory') or {}).get('counts'), 'eligibility': b.get('eligibility'),

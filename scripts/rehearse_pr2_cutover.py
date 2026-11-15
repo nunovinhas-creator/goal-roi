@@ -89,7 +89,7 @@ def rehearse(main_ref):
     before = cut.digests(cut.contents(ROOT))
     now = datetime.now(timezone.utc).replace(microsecond=0)
     out = {'main_sha': main, 'pr_head_sha': head, 'at_utc': now.isoformat(), 'python': sys.version.split()[0],
-           'status_rules': brain.STATUS_RULES, 'migration_key': cut.PR2_KEY}
+           'status_rules': cut.PR2_RULES, 'migration_key': cut.PR2_KEY}
     tmp = Path(tempfile.mkdtemp(prefix='pr2-rehearsal-'))
     wt = tmp / 'worktree'
     try:

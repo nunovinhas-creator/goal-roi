@@ -1,0 +1,358 @@
+{
+ "main_sha": "f6a9097cb55ba681c770684d09ee7b5d56167cbf",
+ "pr_head_sha": "5ea90e4515b43d4133a1f550c5a9e5133a7a76ad",
+ "at_utc": "2026-11-15T20:56:51+00:00",
+ "python": "3.11.18",
+ "status_rules": "chronological_eprocess_v3",
+ "migration_key": "status_rules:chronological_eprocess_v3",
+ "merge_conflicts": 0,
+ "integration_diff_vs_main": [
+  "README.md",
+  "audits/pr3-certification-activation-plan.md",
+  "audits/pr3-chronological-validity.md",
+  "audits/pr3-cutover-evidence/collect-fetch-depth-0.patch",
+  "audits/pr3-cutover-evidence/mutation_check.py",
+  "audits/pr3-cutover-evidence/mutation_check.txt",
+  "audits/pr3-cutover-rehearsal.json",
+  "audits/pr3-cutover-runbook.md",
+  "audits/pr3-cutover-window-plan.md",
+  "audits/pr3-metrics.json",
+  "docs/index.html",
+  "scangoal/brain.py",
+  "scangoal/certification.py",
+  "scangoal/chronology.py",
+  "scangoal/insights.py",
+  "scangoal/notify.py",
+  "scangoal/report.py",
+  "scripts/audit_pr3_chronology.py",
+  "scripts/post_cutover_check.py",
+  "scripts/pr2_cutover.py",
+  "scripts/pr3_cutover.py",
+  "scripts/rehearse_pr2_cutover.py",
+  "scripts/rehearse_pr3_cutover.py",
+  "tests/test_chronological_validity.py",
+  "tests/test_independence_stability.py",
+  "tests/test_notify_migration.py",
+  "tests/test_post_cutover_check.py",
+  "tests/test_pr2_cutover.py",
+  "tests/test_pr3_cutover.py",
+  "tests/test_scangoal.py"
+ ],
+ "cutover_exit_code": 0,
+ "cutover": {
+  "ok": true,
+  "restored": false,
+  "already_applied": false,
+  "frozen_main_sha": "f6a9097cb55ba681c770684d09ee7b5d56167cbf",
+  "head_sha": "5ea90e4515b43d4133a1f550c5a9e5133a7a76ad",
+  "at_utc": "2026-11-15T20:56:51+00:00",
+  "python": "3.11.18",
+  "report_generated_at_utc": "2026-11-15T20:56:51+00:00",
+  "migration_key": "status_rules:chronological_eprocess_v3",
+  "status_rules": "chronological_eprocess_v3",
+  "brain": {
+   "evidence_scope": "eligible_bets_only",
+   "operational_scope": "eligible_bets_only",
+   "status_rules": "chronological_eprocess_v3",
+   "hypotheses": 6019,
+   "tested": 324,
+   "counts": {
+    "em observação": 6015,
+    "promissora": 4
+   },
+   "exploratory_counts": {
+    "em observação": 5970,
+    "promissora": 46,
+    "abandonada": 3
+   },
+   "eligibility": {
+    "total": 693,
+    "eligible": 539,
+    "excluded": 154,
+    "reasons": {
+     "no_valid_odds": 106,
+     "no_market": 106,
+     "no_selection": 106,
+     "burst": 10,
+     "provenance_not_verified": 50,
+     "had_ft_at_first_sight": 39,
+     "edited_at_first_sight": 40
+    }
+   },
+   "validation_state": "not_activated",
+   "walk_forward": {
+    "followed": {
+     "bets": 175,
+     "settled": 151,
+     "games": 144,
+     "wins": 71,
+     "units": 0.31,
+     "roi": 0.0021,
+     "roi_cut": -0.0144
+    },
+    "skipped": {
+     "bets": 329,
+     "settled": 212,
+     "games": 117,
+     "wins": 96,
+     "units": -18.24,
+     "roi": -0.086,
+     "roi_cut": -0.1029
+    },
+    "not_reconstructible": {
+     "bets": 35,
+     "settled": 26,
+     "games": 26,
+     "wins": 13,
+     "units": -1.18,
+     "roi": -0.0454,
+     "roi_cut": -0.0645
+    }
+   }
+  },
+  "register_true": {
+   "registry_size_after_on_copy": 6019,
+   "status_list_identical": true
+  },
+  "reference": {
+   "previous": 4,
+   "baseline": 4,
+   "silenced_transitions": 0
+  },
+  "checks": {
+   "first_call": "NOTIFY_STATUS_MIGRATED",
+   "second_call": "NOTIFY_STATUS_UNCHANGED",
+   "second_call_byte_identical": true,
+   "pr1_marker_preserved": true,
+   "pr2_marker_preserved": true,
+   "migration_keys_previous_plus_pr3": true,
+   "register_true_status_list_identical": true,
+   "statuses_equal_report_status_list": true,
+   "previous_statuses_equal_original": true,
+   "baseline_statuses_equal_report_status_list": true,
+   "delivery_fields_preserved": true,
+   "other_fields_preserved": true,
+   "no_unexpected_fields": true,
+   "registry_unchanged": true,
+   "no_certification_ledger": true,
+   "certification_not_activated": true,
+   "docs_report_equals_data_report": true,
+   "only_allowed_files_changed": true,
+   "cycle1_status_transitions": 0,
+   "cycle2_status_transitions": 0,
+   "cycle1_validated_messages": 0,
+   "cycle2_validated_messages": 0
+  },
+  "simulated_cycles": {
+   "cycle1": {},
+   "cycle2": {}
+  },
+  "changed_files": [
+   "data/notify_state.json",
+   "data/report.json",
+   "docs/report.json"
+  ],
+  "sha256_before": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+   "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
+   "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+   "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+   "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+   "data/notify_state.json": "4b8489bede424c70dc8716cec1b4902e4ea27116cabe18b2bf9fed8c3c732796",
+   "data/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d",
+   "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+   "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+   "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+   "docs/report.json": "a108b9683ae483fc5210e652fbb0e85a140ecaa8398d6d00fa51209c73a35c2d"
+  },
+  "sha256_after": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+   "data/hypotheses.json": "ba0559605652538a561961914f7c676057b94a08b80e36811c0ecdf9fed245d4",
+   "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+   "data/llm_state.json": "5210b03fff6a802b1e17cf9f7790f80c7aa6f12ef1951e50429e4c151a93bd93",
+   "data/messages.jsonl": "d9a5064c2c61f45bccf1f4f481e83c6c5daa0e6d521da352c99dbe04a50ac945",
+   "data/notify_state.json": "5f7f336eb4e8e736c9d4da4d1cab7802e062483289ffae953c8bf98602842003",
+   "data/report.json": "e94271d04b3cd6e736bebf63e0939078c1832967f0e70fcec6f648851bb6dc8a",
+   "data/results_bsd.json": "d49405ec953ad23a1105155ab017bfb2bd63ae5276486cd35af2ed4250fef307",
+   "data/results_hl.json": "7baf95e8649986accf9479e3bbc1cdaecb837bf953c5e6063147b134b4aac214",
+   "data/state.json": "c37504bbdea0bd9dea633c13a97ffd5f42cb4e7213470440c4d0d1b3253f3df7",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "c580ccaca283a35b0611d5a773c4f2820e2c55dd170bf23b44edc774f3bedf16",
+   "docs/report.json": "e94271d04b3cd6e736bebf63e0939078c1832967f0e70fcec6f648851bb6dc8a"
+  }
+ },
+ "telegram": {
+  "reclassification": {
+   "removed": [],
+   "added": {},
+   "changed": {},
+   "unchanged": 4
+  },
+  "pr1_marker_byte_identical": true,
+  "pr2_marker_byte_identical": true,
+  "delivery_history_preserved": true,
+  "delivery_counters": {
+   "sent_total": 304,
+   "watch_sent": 113
+  },
+  "cycle1": {},
+  "cycle2": {},
+  "validated_messages": {
+   "cycle1": 0,
+   "cycle2": 0
+  },
+  "register_true": {
+   "status_list_identical_to_cutover": true,
+   "validation_state": "not_activated",
+   "ledger_created": false
+  },
+  "counterfactual_without_pr3_migration": {},
+  "old_code_risk": {
+   "old_code_run_after_cutover": {},
+   "pr3_reference_overwritten": false,
+   "next_new_code_run": {}
+  },
+  "legitimate_changes": {
+   "dropped": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
+   "added": "Ensaio | hipótese sintética promovida",
+   "expected": 2,
+   "first_call": 2,
+   "repeat_call": 0
+  }
+ },
+ "failures": {
+  "interrupted": {
+   "aborted_at_stage": "simulate_next_cycles",
+   "restored_byte_identical": true,
+   "rerun_ok": true,
+   "idempotent_rerun": {
+    "ok": true,
+    "already_applied": true,
+    "changed_files": []
+   }
+  },
+  "data_integrity": {
+   "changed_by_cutover_commit": [
+    "data/notify_state.json",
+    "data/report.json",
+    "docs/report.json"
+   ],
+   "data_changed_vs_main": [
+    "data/notify_state.json",
+    "data/report.json",
+    "docs/report.json"
+   ],
+   "only_allowed": true,
+   "messages_identical": true,
+   "code_changed_vs_main": [
+    "README.md",
+    "audits/pr3-certification-activation-plan.md",
+    "audits/pr3-chronological-validity.md",
+    "audits/pr3-cutover-evidence/collect-fetch-depth-0.patch",
+    "audits/pr3-cutover-evidence/mutation_check.py",
+    "audits/pr3-cutover-evidence/mutation_check.txt",
+    "audits/pr3-cutover-rehearsal.json",
+    "audits/pr3-cutover-runbook.md",
+    "audits/pr3-cutover-window-plan.md",
+    "audits/pr3-metrics.json",
+    "docs/index.html",
+    "scangoal/brain.py",
+    "scangoal/certification.py",
+    "scangoal/chronology.py",
+    "scangoal/insights.py",
+    "scangoal/notify.py",
+    "scangoal/report.py",
+    "scripts/audit_pr3_chronology.py",
+    "scripts/post_cutover_check.py",
+    "scripts/pr2_cutover.py",
+    "scripts/pr3_cutover.py",
+    "scripts/rehearse_pr2_cutover.py",
+    "scripts/rehearse_pr3_cutover.py",
+    "tests/test_chronological_validity.py",
+    "tests/test_independence_stability.py",
+    "tests/test_notify_migration.py",
+    "tests/test_post_cutover_check.py",
+    "tests/test_pr2_cutover.py",
+    "tests/test_pr3_cutover.py",
+    "tests/test_scangoal.py"
+   ]
+  },
+  "push_preflight_frozen": [],
+  "push_preflight_after_concurrent_commit": [
+   "remote main moved from the frozen commit f6a9097cb55b to 8efa65763cee: NO-GO (a writer ran)",
+   "HEAD is not a fast-forward of the remote main: a push would need force (forbidden)"
+  ],
+  "stale_writer_rebase": {
+   "rebase_exit_code": 1,
+   "conflicted_files": [
+    "data/report.json"
+   ],
+   "outcome": "conflict: the stale run cannot push (fails safe)"
+  },
+  "rollback": {
+   "files_equal_main": true,
+   "pr3_marker_removed": true,
+   "pr2_marker_present": true,
+   "fast_forward_of_cutover": true
+  }
+ },
+ "publication_window": {
+  "commit_after_5_min": [],
+  "commit_after_29_min": [],
+  "commit_after_31_min": [
+   "genesis published out of time"
+  ],
+  "rebased_at_12_min": [],
+  "rebased_at_40_min": [
+   "genesis published out of time"
+  ]
+ },
+ "checkout": {
+  "shallow_depth_1": {
+   "source": "github",
+   "seconds": 0.88,
+   "git_dir_mib": 0.57,
+   "shallow": "true",
+   "commits_visible": 1,
+   "history_proof_without_ledger": [
+    "history unavailable: shallow repository"
+   ]
+  },
+  "full_fetch_depth_0": {
+   "source": "github",
+   "seconds": 2.34,
+   "git_dir_mib": 4.39,
+   "shallow": "false",
+   "commits_visible": 1091,
+   "history_proof_without_ledger": [
+    "ledger never published"
+   ]
+  }
+ },
+ "this_checkout_unchanged": true,
+ "criteria": {
+  "cutover_ok": true,
+  "certification_not_activated": true,
+  "cycle1_no_transitions_no_validated": true,
+  "cycle2_no_transitions_no_validated": true,
+  "register_true_identical_and_no_ledger": true,
+  "pr1_and_pr2_markers_byte_identical": true,
+  "delivery_history_preserved": true,
+  "legitimate_changes_notified_once": true,
+  "interrupted_run_restored_and_rerun": true,
+  "idempotent_rerun": true,
+  "data_integrity": true,
+  "push_preflight_go_when_frozen": true,
+  "push_preflight_no_go_after_concurrent_commit": true,
+  "rollback_restores_main_files": true,
+  "window_5_ok_31_refused": true,
+  "rebase_inside_window_ok_outside_refused": true,
+  "full_checkout_needed": true,
+  "this_checkout_unchanged": true
+ },
+ "ok": true
+}

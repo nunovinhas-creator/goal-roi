@@ -20,7 +20,8 @@ STATUS_MIGRATION = 'eligible_statuses_v1'
 EVIDENCE_SCOPE = 'eligible_bets_only'
 SUMMARY_HOUR_UTC = 21
 MAX_WATCH_PER_RUN = 5
-VALID = ('forte', 'confirmada')   # tática validada: 100 ou mais resultados e fasquia corrigida pelo número de hipóteses testadas
+VALID = ('forte', 'confirmada')   # tática validada: 100 ou mais resultados e certificada pelo teste de confirmação (PR 3)
+VALIDATION_METHOD = 'eprocess_online_alpha_v1'   # único método aceite para anunciar uma tática como validada (fail-closed)
 ALERT_MAX_AGE_MIN = 30            # alerta só se o jogo ainda não começou ou se o sinal tem no máximo 30 minutos
 LISBON = ZoneInfo('Europe/Lisbon')
 PAGE = 'https://nunovinhas-creator.github.io/goal-roi/'
@@ -84,7 +85,18 @@ def alert(w, r):
     return '\n'.join(x for x in lines if x)
 
 
+def certified_ids(report):
+    """Táticas certificadas pelo método aceite; qualquer outro relatório não tem nenhuma (fail-closed)."""
+    v = (report.get('brain') or {}).get('validation')
+    if (not isinstance(v, dict) or v.get('method') != VALIDATION_METHOD or v.get('state') != 'active' or v.get('ledger_valid') is not True
+            or not isinstance(v.get('certified'), list)):
+        return set()   # sem registo de seleções ativo e verificado: nenhuma tática é anunciada como validada
+    return {i for i in v['certified'] if isinstance(i, str)}
+
+
 def eligible_statuses(report):
+    """Estados elegíveis. Uma "forte"/"confirmada" sem certificado do método aceite é tratada como promissora: nunca é
+    anunciada como validada (PR 3, revisão #5911487915)."""
     brain = report.get('brain') or {}
     statuses = brain.get('status_list')
     if brain.get('evidence_scope') != EVIDENCE_SCOPE or not isinstance(statuses, dict):
@@ -92,7 +104,8 @@ def eligible_statuses(report):
     allowed = {'em observação', 'promissora', 'forte', 'confirmada', 'abandonada'}
     if any(not isinstance(k, str) or v not in allowed for k, v in statuses.items()):
         return None
-    return statuses
+    certified = certified_ids(report)
+    return {k: ('promissora' if v in VALID and k not in certified else v) for k, v in statuses.items()}
 
 
 def migration_key(report):
@@ -169,7 +182,8 @@ def messages(report, state, now):
         key = '%s|%s|%s' % (w.get('date_utc'), w.get('match'), w.get('selection'))
         if key in sent or len(fresh) >= MAX_WATCH_PER_RUN:
             continue
-        valid = next((x for x in w['reasons'] if x['status'] in VALID), None)
+        certified = certified_ids(report)
+        valid = next((x for x in w['reasons'] if x['status'] in VALID and x.get('certified') is True and x.get('id') in certified), None)
         if valid:
             if still_bettable(w, now):   # fora de tempo: não serve de alerta nem de indício
                 sent.add(key)
@@ -182,7 +196,7 @@ def messages(report, state, now):
                 % (pts(r.get('edge')), pts(ci[0]), pts(ci[1]), pct(r.get('prob_above_cut')))) if ci else ''
         fresh.append('A seguir: %s\n%s%s\nEncaixa em: %s (%s em %d resultados, %s)%s\nÉ um indício para observar, não uma recomendação.'
                      % (w.get('match') or 'Jogo', w.get('selection') or 'mais um golo', (' @ ' + str(w['odds']).replace('.', ',')) if w.get('odds') else '',
-                        r['id'], pct(r['hit_rate']), r['n'], r['status'], edge))
+                        r['id'], pct(r['hit_rate']), r['n'], 'promissora' if r['status'] in VALID else r['status'], edge))   # sem certificado: nunca "validada"
     out += fresh
     state['watch_sent'] = sorted(sent)[-400:]
     migrate_status_reference(report, state, now)

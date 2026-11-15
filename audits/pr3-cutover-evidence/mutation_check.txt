@@ -1,0 +1,34 @@
+baseline (unmutated) passes
+guard: pinned rules equal code rules                 caught
+guard: PR1 marker required                           caught
+guard: PR2 marker required                           caught
+guard: PR3 key only if coherent                      caught
+guard: frozen report PR2-format                      caught
+guard: ledger at frozen main                         caught
+guard: status_rules exact                            caught
+guard: migration key agreement                       caught
+guard: operational scope                             caught
+guard: certification not activated                   caught
+guard: no validated status                           caught
+guard: register=True identical                       caught
+guard: register=True on a copy                       caught
+guard: register=True no ledger                       caught
+guard: register=False no write                       caught
+guard: register=True no leak                         caught
+transaction: restore on exception                    caught
+transaction: restore on failed check                 caught
+check: PR1 marker preserved                          caught
+check: PR2 marker preserved                          caught
+check: delivery fields                               caught
+check: no unexpected fields                          caught
+check: zero transitions/validated in both cycles     caught
+check: second migration UNCHANGED                    caught
+check: registry unchanged                            caught
+check: no ledger after                               caught
+check: only allowed files                            caught
+preflight: frozen remote main                        caught
+preflight: fast-forward only                         caught
+checks: registry + only allowed files together       caught
+checks: ledger + only allowed files together         caught
+preflight: both checks together                      caught
+caught 32 of 32 mutants
