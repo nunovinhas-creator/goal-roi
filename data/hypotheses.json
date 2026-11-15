@@ -9356,6 +9356,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = fim de semana & Hora (UTC) = noite & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-15T23:34:48+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = fim de semana & Hora (UTC) = noite & Volume na seleção = menos de 10 mil $": {
   "born_utc": "2026-11-15T23:23:52+00:00",
   "conditions": [
@@ -14321,6 +14340,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Faixa de odd = odd acima de 3,00 & Hora (UTC) = noite & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-15T23:34:48+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
    ]
   ],
   "family": "Betfair",
@@ -21598,6 +21636,21 @@
    [
     "Volume na seleção",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Momento = durante o jogo & Seleção = empate": {
+  "born_utc": "2026-11-15T23:34:48+00:00",
+  "conditions": [
+   [
+    "Momento",
+    "durante o jogo"
+   ],
+   [
+    "Seleção",
+    "empate"
    ]
   ],
   "family": "Betfair",
@@ -91046,6 +91099,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Competição = liga & Mercado = outros mercados & Momento do aviso = até 45 min depois do início": {
+  "born_utc": "2026-11-15T23:38:48+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Competição = liga & Mercado = outros mercados & Número de apostas = uma": {
   "born_utc": "2026-11-14T22:06:13+00:00",
   "conditions": [
@@ -91151,6 +91223,44 @@
    [
     "Momento do aviso",
     "até 45 min depois do início"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Momento do aviso = até 45 min depois do início & Número de apostas = uma": {
+  "born_utc": "2026-11-15T23:38:48+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Momento do aviso = até 45 min depois do início & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-15T23:38:48+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Stake",
@@ -91291,6 +91401,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-15T23:38:48+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Stake",
@@ -107582,6 +107711,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Mercado = outros mercados & Momento do aviso = até 45 min depois do início & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-15T23:38:48+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Stake",
