@@ -6,7 +6,11 @@
 - **Relógio fixo:** `2026-11-15T14:34:34Z` (hora do commit base). **Python:** 3.11.
 - **Rede bloqueada** na auditoria e nos testes; sementes fixas (`20261115`).
 
-> **Revisão #5912303516 (commit `67fb319`): correção feita nesta versão.** Ver a secção 0-E. P1-H e P2-I estão aprovados; a metodologia estatística não mudou.
+> **Revisão #5912461690 (commit `95a5f4c`): correção e preparação do corte nesta versão.** Ver a secção 0-F. P2-J foi aprovado.
+> - **P2-K:** na vista `as_of`, um sinal sem prova de leitura (carimbo ausente, inválido, sem fuso ou contraditório) não existe, mesmo que tenha sido emitido antes. Impacto em produção: 0 de 565 sinais.
+> - **Corte preparado, não executado:** script idempotente, runbook, ensaio Telegram de dois ciclos, falhas e janela de publicação, e plano de ativação separado. A certificação continua desligada.
+>
+> **Revisão #5912303516 (commit `67fb319`): correção de uma ronda anterior.** Ver a secção 0-E. P1-H e P2-I estão aprovados; a metodologia estatística não mudou.
 > - **P2-J:** o relatório publicado descreve o registo **gravado** no mesmo commit (`ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro, mais `newly_selected`). A versão usada nas contas fica em `evaluated_*`.
 > - **`as_of`:** sinais lidos depois e resultados vistos depois do instante avaliado não contam.
 >
@@ -33,6 +37,33 @@
 > **Revisão #5911487915 (commit `ef4606a`): correções da ronda anterior.** Ver a secção 0. Em resumo:
 > - **P1-A e P1-B:** existe agora uma definição única de jogo prospetivo. Um jogo só conta se todas as suas apostas foram emitidas e lidas depois do registo, eram decidíveis e têm hora de resultado provada. Essa definição é usada pelo relatório, pela máquina de estados, pelo `entry_status` e pelo teste de confirmação.
 > - **P1 científico:** escolhida a **via 1**. "Forte" e "confirmada" deixam de usar caudas posteriores com Bonferroni e passam a exigir um **certificado** de um e-processo com nível garantido. Acrescenta-se uma proteção fail-closed no cérebro e no Telegram.
+
+## 0-F. Correção e preparação do corte após a revisão #5912461690
+
+**P2-K — leitura não provada.** `chronology.as_of_view` excluía só os sinais lidos depois de `as_of`. Um sinal sem prova de leitura passava se tivesse sido emitido antes, e podia então influenciar uma decisão histórica. Agora a vista exige `decision_time(b) ≤ as_of`. A hora da decisão só existe com leitura provada e coerente (`signal_seen`). Sem ela, o sinal não existe em `as_of` (fail-closed).
+
+- **Testes** (`AsOfNeedsProofOfReading`):
+  - leitura ausente, vazia, ilegível, sem fuso, numérica ou anterior ao envio: o sinal não aparece;
+  - 40 vitórias sem leitura provada não mudam nada numa avaliação com `as_of`;
+  - controlo: sem `as_of`, diferem.
+- **Fixture corrigida** (`test_scangoal`, modo de linguagem): o fixture tinha leituras até 8 min antes do envio, o que é contraditório. Corrigiu-se só a proveniência do fixture; o comportamento testado não mudou.
+- **Produção:** os 565 sinais têm leitura provada. Estados, walk-forward e métricas ficam iguais.
+
+**Preparação do corte** (só preparação, sem operações reais). Ver `audits/pr3-cutover-runbook.md`:
+- `scripts/pr3_cutover.py`: idempotente, transacional, sem certificação; `push_preflight` contra commits concorrentes;
+- 22 regressões; teste de mutação com 32 de 32 mutantes apanhados;
+- `scripts/rehearse_pr3_cutover.py` sobre `main` real:
+  - migração silenciosa;
+  - 2 ciclos simulados com 0 transições e 0 mensagens validadas;
+  - marcadores das PRs 1 e 2 byte a byte iguais;
+  - execução interrompida restaurada; repetição idempotente;
+  - preflight NO-GO depois de um commit concorrente;
+  - reversão por `git revert`;
+  - janela de 30 min (5/29 aceites, 31 recusado; rebase 12 aceite, 40 recusado);
+  - checkout raso vs completo;
+- **Integração separada da certificação:** o corte recusa qualquer registo e qualquer estado de validação diferente de `not_activated`. A ativação tem plano próprio (`audits/pr3-certification-activation-plan.md`) e o patch `fetch-depth: 0` fica proposto, não aplicado.
+
+**Testes:** 275 no total (`test_offline.py`).
 
 ## 0-E. Correção após a revisão #5912303516
 
@@ -575,7 +606,7 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 - **Ensaio** sobre o `notify_state.json` real, só com `messages()` em memória: 0 avisos de estado com a migração, contra 2 sem ela ("voltou a em observação").
 - **Proteção fail-closed:** `notify.eligible_statuses` e os alertas só reconhecem validadas com o método aceite, `validation.state = active`, `ledger_valid = true` e o certificado da tática. Com a validação desligada, que é o estado após o merge até à ativação, nada é anunciado como validado.
 - **Ativação do registo de certificação:** é um passo separado, manual e por autorizar (`python -m scangoal.certification --activate`). Não foi executado nem preparado.
-- **Não executado.** Como na PR 2, a integração exige corte controlado: pausa, corte e merge. Uma execução com código da PR 2 que corra depois do primeiro relatório PR 3 gravaria estados da PR 2 sob uma referência já migrada, e a seguinte anunciaria essas diferenças. O script de corte da PR 3 (variante de `scripts/pr2_cutover.py` com a chave nova) **não foi criado**: fica para depois da aprovação da metodologia.
+- **Não executado.** Como na PR 2, a integração exige corte controlado: pausa, corte e merge. Uma execução com código da PR 2 que corra depois do primeiro relatório PR 3 gravaria estados da PR 2 sob uma referência já migrada, e a seguinte anunciaria essas diferenças. O script de corte (`scripts/pr3_cutover.py`), o ensaio e o runbook foram preparados (secção 0-F, `audits/pr3-cutover-runbook.md`); nada foi executado.
 
 ## 10. Limitações e riscos residuais
 
@@ -597,14 +628,14 @@ Nesta tabela, os jogos são separados por 3 h, ou seja, não sobrepostos; esta r
 6. **Fora do âmbito:** o regime (avisos de mudança de comportamento), o quadro e a agenda continuam a usar a evidência atual, que é exploratória. Não decidem estados.
 7. **Atributos dependentes de outros sinais** ("Sinal anterior de outro tipo"): usam sinais com `date_utc` anterior. O leitor relê as 400 mensagens mais recentes, por isso estes foram lidos na mesma recolha ou antes. Só uma lacuna de mais de 400 mensagens o violaria (o leitor avisa com `SCANGOAL_GAP_POSSIBLE`).
 8. **Desempenho:** `report.build` mede 8,6–10,3 s em ambas as versões neste contentor (várias corridas). A diferença (≈ +0–15 %) está próxima do ruído das medições.
-9. **Integração:** exige o corte da secção 9.
+9. **Integração:** exige o corte da secção 9, segundo `audits/pr3-cutover-runbook.md`; a certificação exige depois `audits/pr3-certification-activation-plan.md`.
 
 ## 11. Reprodução
 
 ```bash
 git fetch --unshallow origin    # a verificação git precisa do histórico completo
 git switch --detach <SHA da PR 3>
-python3.11 scripts/test_offline.py                                    # 251 testes
+python3.11 scripts/test_offline.py                                    # 275 testes
 python3.11 -m unittest tests.test_chronological_validity -v
 python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min; data/ tem de ser igual à base
 ```
@@ -612,7 +643,8 @@ python3.11 scripts/audit_pr3_chronology.py > /tmp/pr3-metrics.json    # ~15 min;
 ## 12. Parecer do autor (não substitui a revisão independente)
 
 - **Técnico: aprovado pelo autor**, sujeito a revisão.
-  - P1-H e P2-I foram aprovados. P2-J está corrigido: o relatório e o registo publicados descrevem o mesmo estado. `as_of` não usa informação futura.
+  - P1-H, P2-I e P2-J foram aprovados. P2-K está corrigido: `as_of` exige leitura provada.
+  - Corte preparado e ensaiado, não executado.
   - P1-F e P1-G, aprovados, ficam inalterados.
   - Sem regressões no mesmo snapshot.
   - Certificação desligada; sem alterações em produção.

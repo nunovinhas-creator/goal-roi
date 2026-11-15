@@ -1,0 +1,340 @@
+{
+ "main_sha": "9ef2ee3183a24b386165808c930dca66635ed151",
+ "pr_head_sha": "70f3c485f4cf1a16183bdc43184513c0cd79838f",
+ "at_utc": "2026-11-15T19:41:25+00:00",
+ "python": "3.11.18",
+ "status_rules": "chronological_eprocess_v3",
+ "migration_key": "status_rules:chronological_eprocess_v3",
+ "merge_conflicts": 0,
+ "integration_diff_vs_main": [
+  "README.md",
+  "audits/pr3-chronological-validity.md",
+  "audits/pr3-metrics.json",
+  "docs/index.html",
+  "scangoal/brain.py",
+  "scangoal/certification.py",
+  "scangoal/chronology.py",
+  "scangoal/insights.py",
+  "scangoal/notify.py",
+  "scangoal/report.py",
+  "scripts/audit_pr3_chronology.py",
+  "scripts/pr2_cutover.py",
+  "scripts/pr3_cutover.py",
+  "scripts/rehearse_pr2_cutover.py",
+  "scripts/rehearse_pr3_cutover.py",
+  "tests/test_chronological_validity.py",
+  "tests/test_independence_stability.py",
+  "tests/test_notify_migration.py",
+  "tests/test_pr2_cutover.py",
+  "tests/test_pr3_cutover.py",
+  "tests/test_scangoal.py"
+ ],
+ "cutover_exit_code": 0,
+ "cutover": {
+  "ok": true,
+  "restored": false,
+  "already_applied": false,
+  "frozen_main_sha": "9ef2ee3183a24b386165808c930dca66635ed151",
+  "head_sha": "532ddd01257099a723624e6c6f878fa077dc2bfd",
+  "at_utc": "2026-11-15T19:41:26+00:00",
+  "python": "3.11.18",
+  "report_generated_at_utc": "2026-11-15T19:41:26+00:00",
+  "migration_key": "status_rules:chronological_eprocess_v3",
+  "status_rules": "chronological_eprocess_v3",
+  "brain": {
+   "evidence_scope": "eligible_bets_only",
+   "operational_scope": "eligible_bets_only",
+   "status_rules": "chronological_eprocess_v3",
+   "hypotheses": 5897,
+   "tested": 288,
+   "counts": {
+    "em observação": 5893,
+    "promissora": 4
+   },
+   "exploratory_counts": {
+    "em observação": 5850,
+    "promissora": 44,
+    "abandonada": 3
+   },
+   "eligibility": {
+    "total": 665,
+    "eligible": 515,
+    "excluded": 150,
+    "reasons": {
+     "no_valid_odds": 102,
+     "no_market": 102,
+     "no_selection": 102,
+     "burst": 10,
+     "provenance_not_verified": 50,
+     "had_ft_at_first_sight": 39,
+     "edited_at_first_sight": 40
+    }
+   },
+   "validation_state": "not_activated",
+   "walk_forward": {
+    "followed": {
+     "bets": 166,
+     "settled": 145,
+     "games": 138,
+     "wins": 68,
+     "units": 0.86,
+     "roi": 0.006,
+     "roi_cut": -0.0107
+    },
+    "skipped": {
+     "bets": 314,
+     "settled": 210,
+     "games": 116,
+     "wins": 95,
+     "units": -20.19,
+     "roi": -0.0961,
+     "roi_cut": -0.1128
+    },
+    "not_reconstructible": {
+     "bets": 35,
+     "settled": 26,
+     "games": 26,
+     "wins": 13,
+     "units": -1.18,
+     "roi": -0.0454,
+     "roi_cut": -0.0645
+    }
+   }
+  },
+  "register_true": {
+   "registry_size_after_on_copy": 5897,
+   "status_list_identical": true
+  },
+  "reference": {
+   "previous": 4,
+   "baseline": 4,
+   "silenced_transitions": 0
+  },
+  "checks": {
+   "first_call": "NOTIFY_STATUS_MIGRATED",
+   "second_call": "NOTIFY_STATUS_UNCHANGED",
+   "second_call_byte_identical": true,
+   "pr1_marker_preserved": true,
+   "pr2_marker_preserved": true,
+   "migration_keys_previous_plus_pr3": true,
+   "register_true_status_list_identical": true,
+   "statuses_equal_report_status_list": true,
+   "previous_statuses_equal_original": true,
+   "baseline_statuses_equal_report_status_list": true,
+   "delivery_fields_preserved": true,
+   "other_fields_preserved": true,
+   "no_unexpected_fields": true,
+   "registry_unchanged": true,
+   "no_certification_ledger": true,
+   "certification_not_activated": true,
+   "docs_report_equals_data_report": true,
+   "only_allowed_files_changed": true,
+   "cycle1_status_transitions": 0,
+   "cycle2_status_transitions": 0,
+   "cycle1_validated_messages": 0,
+   "cycle2_validated_messages": 0
+  },
+  "simulated_cycles": {
+   "cycle1": {},
+   "cycle2": {}
+  },
+  "changed_files": [
+   "data/notify_state.json",
+   "data/report.json",
+   "docs/report.json"
+  ],
+  "sha256_before": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "15a661e0df27a76c1df1fa387735236ee9e32b855c3ac7475d4f5a07a9839c41",
+   "data/hypotheses.json": "be21d2b70bbae21a7f0f95ba01a36eade4b1ee3acf54f8fae5da2222eafd3e0e",
+   "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+   "data/llm_state.json": "b0252915b84c4cdbc8fd13ab9e0ffe36137db293fb9d869c4bd2cc9f091fc27f",
+   "data/messages.jsonl": "11fe27e6d23d0d5a0dc67c27fe0e020f91881054e78c709957e22dac16f04267",
+   "data/notify_state.json": "4ddb870769e59f11b906ab5ff9a827e6ce03cff422a7d30731dd69eae94648ae",
+   "data/report.json": "bd887ce1e913b488fa569501339a58f5e145c4756fc5ed0e25ce6f25a8367f5e",
+   "data/results_bsd.json": "62fefd45a916f4a0012d9e1f272b0632d32fc37559d1f1eb61c7c241f3120b50",
+   "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
+   "data/state.json": "5e424b6e9ae5dcc98d31e84f9fc13abc8b71320ac6263a8921dcbab0cb1cbc78",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "15a80161cc7fe941036b5f1b4530ce864dbbc5dd190d5614c90e8601d38ea013",
+   "docs/report.json": "bd887ce1e913b488fa569501339a58f5e145c4756fc5ed0e25ce6f25a8367f5e"
+  },
+  "sha256_after": {
+   "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data/details_hl.json": "15a661e0df27a76c1df1fa387735236ee9e32b855c3ac7475d4f5a07a9839c41",
+   "data/hypotheses.json": "be21d2b70bbae21a7f0f95ba01a36eade4b1ee3acf54f8fae5da2222eafd3e0e",
+   "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
+   "data/llm_state.json": "b0252915b84c4cdbc8fd13ab9e0ffe36137db293fb9d869c4bd2cc9f091fc27f",
+   "data/messages.jsonl": "11fe27e6d23d0d5a0dc67c27fe0e020f91881054e78c709957e22dac16f04267",
+   "data/notify_state.json": "74f58c5c8edb45771f8cf39ec0bab5170aaa707344e25e4b599ae016afcc13b1",
+   "data/report.json": "634c8afb50f136c8a59c4ed81f56edd01c644b7323b3c1098e8fb40d163907ed",
+   "data/results_bsd.json": "62fefd45a916f4a0012d9e1f272b0632d32fc37559d1f1eb61c7c241f3120b50",
+   "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
+   "data/state.json": "5e424b6e9ae5dcc98d31e84f9fc13abc8b71320ac6263a8921dcbab0cb1cbc78",
+   "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
+   "docs/bets.csv": "15a80161cc7fe941036b5f1b4530ce864dbbc5dd190d5614c90e8601d38ea013",
+   "docs/report.json": "634c8afb50f136c8a59c4ed81f56edd01c644b7323b3c1098e8fb40d163907ed"
+  }
+ },
+ "telegram": {
+  "reclassification": {
+   "removed": [],
+   "added": {},
+   "changed": {},
+   "unchanged": 4
+  },
+  "pr1_marker_byte_identical": true,
+  "pr2_marker_byte_identical": true,
+  "delivery_history_preserved": true,
+  "delivery_counters": {
+   "sent_total": 303,
+   "watch_sent": 112
+  },
+  "cycle1": {},
+  "cycle2": {},
+  "validated_messages": {
+   "cycle1": 0,
+   "cycle2": 0
+  },
+  "register_true": {
+   "status_list_identical_to_cutover": true,
+   "validation_state": "not_activated",
+   "ledger_created": false
+  },
+  "counterfactual_without_pr3_migration": {},
+  "old_code_risk": {
+   "old_code_run_after_cutover": {},
+   "pr3_reference_overwritten": false,
+   "next_new_code_run": {}
+  },
+  "legitimate_changes": {
+   "dropped": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
+   "added": "Ensaio | hipótese sintética promovida",
+   "expected": 2,
+   "first_call": 2,
+   "repeat_call": 0
+  }
+ },
+ "failures": {
+  "interrupted": {
+   "aborted_at_stage": "simulate_next_cycles",
+   "restored_byte_identical": true,
+   "rerun_ok": true,
+   "idempotent_rerun": {
+    "ok": true,
+    "already_applied": true,
+    "changed_files": []
+   }
+  },
+  "data_integrity": {
+   "changed_by_cutover_commit": [
+    "data/notify_state.json",
+    "data/report.json",
+    "docs/report.json"
+   ],
+   "data_changed_vs_main": [
+    "data/notify_state.json",
+    "data/report.json",
+    "docs/report.json"
+   ],
+   "only_allowed": true,
+   "messages_identical": true,
+   "code_changed_vs_main": [
+    "README.md",
+    "audits/pr3-chronological-validity.md",
+    "audits/pr3-metrics.json",
+    "docs/index.html",
+    "scangoal/brain.py",
+    "scangoal/certification.py",
+    "scangoal/chronology.py",
+    "scangoal/insights.py",
+    "scangoal/notify.py",
+    "scangoal/report.py",
+    "scripts/audit_pr3_chronology.py",
+    "scripts/pr2_cutover.py",
+    "scripts/pr3_cutover.py",
+    "scripts/rehearse_pr2_cutover.py",
+    "scripts/rehearse_pr3_cutover.py",
+    "tests/test_chronological_validity.py",
+    "tests/test_independence_stability.py",
+    "tests/test_notify_migration.py",
+    "tests/test_pr2_cutover.py",
+    "tests/test_pr3_cutover.py",
+    "tests/test_scangoal.py"
+   ]
+  },
+  "push_preflight_frozen": [],
+  "push_preflight_after_concurrent_commit": [
+   "remote main moved from the frozen commit 9ef2ee3183a2 to 8182c906d1b0: NO-GO (a writer ran)",
+   "HEAD is not a fast-forward of the remote main: a push would need force (forbidden)"
+  ],
+  "stale_writer_rebase": {
+   "rebase_exit_code": 1,
+   "conflicted_files": [
+    "data/report.json"
+   ],
+   "outcome": "conflict: the stale run cannot push (fails safe)"
+  },
+  "rollback": {
+   "files_equal_main": true,
+   "pr3_marker_removed": true,
+   "pr2_marker_present": true,
+   "fast_forward_of_cutover": true
+  }
+ },
+ "publication_window": {
+  "commit_after_5_min": [],
+  "commit_after_29_min": [],
+  "commit_after_31_min": [
+   "genesis published out of time"
+  ],
+  "rebased_at_12_min": [],
+  "rebased_at_40_min": [
+   "genesis published out of time"
+  ]
+ },
+ "checkout": {
+  "shallow_depth_1": {
+   "source": "github",
+   "seconds": 0.84,
+   "git_dir_mib": 0.56,
+   "shallow": "true",
+   "commits_visible": 1,
+   "history_proof_without_ledger": [
+    "history unavailable: shallow repository"
+   ]
+  },
+  "full_fetch_depth_0": {
+   "source": "github",
+   "seconds": 1.63,
+   "git_dir_mib": 4.31,
+   "shallow": "false",
+   "commits_visible": 1076,
+   "history_proof_without_ledger": [
+    "ledger never published"
+   ]
+  }
+ },
+ "this_checkout_unchanged": true,
+ "criteria": {
+  "cutover_ok": true,
+  "certification_not_activated": true,
+  "cycle1_no_transitions_no_validated": true,
+  "cycle2_no_transitions_no_validated": true,
+  "register_true_identical_and_no_ledger": true,
+  "pr1_and_pr2_markers_byte_identical": true,
+  "delivery_history_preserved": true,
+  "legitimate_changes_notified_once": true,
+  "interrupted_run_restored_and_rerun": true,
+  "idempotent_rerun": true,
+  "data_integrity": true,
+  "push_preflight_go_when_frozen": true,
+  "push_preflight_no_go_after_concurrent_commit": true,
+  "rollback_restores_main_files": true,
+  "window_5_ok_31_refused": true,
+  "rebase_inside_window_ok_outside_refused": true,
+  "full_checkout_needed": true,
+  "this_checkout_unchanged": true
+ },
+ "ok": true
+}
