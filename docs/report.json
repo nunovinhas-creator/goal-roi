@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T17:44:58+00:00",
+ "generated_at_utc": "2026-11-15T17:45:27+00:00",
  "messages": 858,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1332,
+  "versions": 1333,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 4,
-  "last_collected_at_utc": "2026-11-15T17:44:45+00:00",
+  "last_collected_at_utc": "2026-11-15T17:45:11+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 31,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T17:44:45+00:00",
+  "collector_last_run_utc": "2026-11-15T17:45:11+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,43 +448,43 @@
   "stake_original_seen": 107,
   "stake_no_score_after_kickoff": 19,
   "stake_sent_45_after_kickoff": 31,
-  "goal_lists": 274,
-  "goal_lists_consistent": 173
+  "goal_lists": 275,
+  "goal_lists_consistent": 174
  },
  "unique_bets": 487,
- "settled_bets": 356,
+ "settled_bets": 358,
  "unsettled_market": 34,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
    "bets": 59,
-   "settled": 24,
-   "matches": 24,
+   "settled": 25,
+   "matches": 25,
    "wins": 10,
    "pushes": 0,
-   "units": 0.41,
-   "avg_odds": 2.409,
+   "units": -0.59,
+   "avg_odds": 2.444,
    "roi": {
     "odd-0%": {
-     "roi": 0.0171,
+     "roi": -0.0236,
      "ci95": [
-      -0.4936,
-      0.5277
+      -0.5199,
+      0.4727
      ]
     },
     "odd-2%": {
-     "roi": -0.0033,
+     "roi": -0.0431,
      "ci95": [
-      -0.5037,
-      0.4972
+      -0.5295,
+      0.4432
      ]
     },
     "odd-5%": {
-     "roi": -0.0338,
+     "roi": -0.0724,
      "ci95": [
-      -0.5189,
-      0.4514
+      -0.5439,
+      0.399
      ]
     }
    },
@@ -512,7 +512,8 @@
     0.45,
     -0.55,
     1.41,
-    0.41
+    0.41,
+    -0.59
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -647,32 +648,32 @@
   },
   "OPEN_GAME": {
    "bets": 129,
-   "settled": 126,
-   "matches": 126,
-   "wins": 59,
+   "settled": 127,
+   "matches": 127,
+   "wins": 60,
    "pushes": 26,
-   "units": 11.32,
-   "avg_odds": 1.887,
+   "units": 12.0,
+   "avg_odds": 1.885,
    "roi": {
     "odd-0%": {
-     "roi": 0.0898,
+     "roi": 0.0945,
      "ci95": [
-      -0.059,
-      0.2387
+      -0.0535,
+      0.2425
      ]
     },
     "odd-2%": {
-     "roi": 0.0726,
+     "roi": 0.0771,
      "ci95": [
-      -0.0733,
-      0.2184
+      -0.0679,
+      0.222
      ]
     },
     "odd-5%": {
-     "roi": 0.0467,
+     "roi": 0.051,
      "ci95": [
-      -0.0946,
-      0.1879
+      -0.0894,
+      0.1914
      ]
     }
    },
@@ -799,10 +800,11 @@
     13.09,
     13.82,
     13.82,
-    12.82,
-    13.32,
-    12.32,
-    11.32
+    14.5,
+    13.5,
+    14.0,
+    13.0,
+    12.0
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1204,40 +1206,40 @@
  "accuracy": {
   "BETFAIR/live": {
    "signals": 95,
-   "with_result": 47,
+   "with_result": 48,
    "hits": 19,
-   "misses": 28,
+   "misses": 29,
    "pushes": 0,
    "eff_hits": 19.0,
-   "eff_misses": 28.0,
+   "eff_misses": 29.0,
    "vote_hits": 19.0,
-   "vote_misses": 28.0,
-   "vote_break_even": 0.4263,
-   "games": 47,
+   "vote_misses": 29.0,
+   "vote_break_even": 0.4237,
+   "games": 48,
    "no_source": 18,
    "unsettleable": 0,
-   "hit_rate": 0.4043,
+   "hit_rate": 0.3958,
    "ci95": [
-    0.2764,
-    0.5466
+    0.2702,
+    0.5369
    ],
-   "avg_odds": 4.375,
-   "break_even": 0.4263,
+   "avg_odds": 4.353,
+   "break_even": 0.4237,
    "baseline": false,
-   "roi_announced_odds": -0.0026,
+   "roi_announced_odds": -0.0233,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 11.2,
+   "per_day": 11.4,
    "days_to_hint": 0,
    "days_to_conclusion": 23,
-   "prudent_rate": 0.4081,
-   "prob_above": 0.3846,
-   "edge": -0.0182,
+   "prudent_rate": 0.4006,
+   "prob_above": 0.3547,
+   "edge": -0.0231,
    "edge_ci": [
-    -0.1226,
-    0.0899
+    -0.1261,
+    0.0839
    ],
-   "prob_above_cut": 0.3354
+   "prob_above_cut": 0.3069
   },
   "BETFAIR/pre": {
    "signals": 20,
@@ -1315,40 +1317,40 @@
   },
   "OPEN_GAME": {
    "signals": 149,
-   "with_result": 146,
-   "hits": 73,
+   "with_result": 147,
+   "hits": 74,
    "misses": 45,
    "pushes": 28,
-   "eff_hits": 71.0,
+   "eff_hits": 72.0,
    "eff_misses": 43.5,
-   "vote_hits": 71.0,
+   "vote_hits": 72.0,
    "vote_misses": 43.5,
-   "vote_break_even": 0.5479,
-   "games": 118,
+   "vote_break_even": 0.5483,
+   "games": 119,
    "no_source": 0,
    "unsettleable": 0,
-   "hit_rate": 0.6201,
+   "hit_rate": 0.6234,
    "ci95": [
-    0.5287,
-    0.7037
+    0.5324,
+    0.7064
    ],
-   "avg_odds": 1.876,
-   "break_even": 0.5479,
+   "avg_odds": 1.874,
+   "break_even": 0.5483,
    "baseline": false,
-   "roi_announced_odds": 0.1384,
+   "roi_announced_odds": 0.142,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 28.9,
+   "per_day": 29.1,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
-   "prudent_rate": 0.6143,
-   "prob_above": 0.9342,
-   "edge": 0.0664,
+   "prudent_rate": 0.6174,
+   "prob_above": 0.9425,
+   "edge": 0.0691,
    "edge_ci": [
-    -0.0062,
-    0.1368
+    -0.0031,
+    0.1391
    ],
-   "prob_above_cut": 0.896
+   "prob_above_cut": 0.9076
   },
   "OPEN_GAME_NO_ODDS": {
    "signals": 12,
@@ -1577,7 +1579,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 47,
+    "n": 48,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -1589,22 +1591,22 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 118,
+    "n": 119,
     "needed": 80,
-    "state": "piorou",
+    "state": "estável",
     "before": {
-     "n": 78,
-     "hit_rate": 0.6733,
-     "break_even": 0.5295,
-     "roi": 0.2937
+     "n": 79,
+     "hit_rate": 0.6645,
+     "break_even": 0.5291,
+     "roi": 0.2773
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.519,
-     "break_even": 0.5837,
-     "roi": -0.0678
+     "hit_rate": 0.5443,
+     "break_even": 0.5861,
+     "roi": -0.0258
     },
-    "z": -2.19
+    "z": -1.87
    },
    {
     "type": "POLYMARKET",
@@ -1634,11 +1636,11 @@
   "bot_confidence": [
    {
     "band": "menos de 85 %",
-    "n": 36,
-    "hits": 21,
-    "hit_rate": 0.5735,
-    "break_even": 0.5847,
-    "stated": 0.78
+    "n": 37,
+    "hits": 22,
+    "hit_rate": 0.5857,
+    "break_even": 0.585,
+    "stated": 0.7781
    },
    {
     "band": "85 a 94 %",
@@ -1666,7 +1668,7 @@
    }
   ],
   "next_goal": {
-   "n": 103,
+   "n": 104,
    "median_min": 13
   },
   "segments": [
@@ -1887,6 +1889,33 @@
     "value": "jogo com vários tipos de sinal"
    },
    {
+    "n": 33,
+    "signals": 41,
+    "hits": 23,
+    "misses": 10,
+    "hit_rate": 0.6935,
+    "ci95": [
+     0.5176,
+     0.8268
+    ],
+    "break_even": 0.5394,
+    "roi": 0.2508,
+    "games": 33,
+    "bets": 33,
+    "unidentified": 0,
+    "prudent_rate": 0.656,
+    "prob_above": 0.938,
+    "edge": 0.1165,
+    "edge_ci": [
+     -0.0084,
+     0.2328
+    ],
+    "prob_above_cut": 0.9191,
+    "family": "Jogo aberto",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com vários tipos de sinal"
+   },
+   {
     "n": 86,
     "signals": 108,
     "hits": 56,
@@ -1912,33 +1941,6 @@
     "family": "Jogo aberto",
     "dimension": "Parte do jogo",
     "value": "2.ª parte"
-   },
-   {
-    "n": 32,
-    "signals": 41,
-    "hits": 22,
-    "misses": 10,
-    "hit_rate": 0.6833,
-    "ci95": [
-     0.5044,
-     0.8206
-    ],
-    "break_even": 0.5375,
-    "roi": 0.2392,
-    "games": 32,
-    "bets": 32,
-    "unidentified": 0,
-    "prudent_rate": 0.6469,
-    "prob_above": 0.9229,
-    "edge": 0.1094,
-    "edge_ci": [
-     -0.0177,
-     0.228
-    ],
-    "prob_above_cut": 0.9011,
-    "family": "Jogo aberto",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com vários tipos de sinal"
    },
    {
     "n": 74,
@@ -2022,6 +2024,33 @@
     "value": "feminino"
    },
    {
+    "n": 76,
+    "signals": 99,
+    "hits": 49,
+    "misses": 27,
+    "hit_rate": 0.6395,
+    "ci95": [
+     0.5253,
+     0.7398
+    ],
+    "break_even": 0.5735,
+    "roi": 0.1112,
+    "games": 76,
+    "bets": 76,
+    "unidentified": 0,
+    "prudent_rate": 0.6316,
+    "prob_above": 0.8636,
+    "edge": 0.058,
+    "edge_ci": [
+     -0.0301,
+     0.1426
+    ],
+    "prob_above_cut": 0.8112,
+    "family": "Jogo aberto",
+    "dimension": "Golos em falta para ganhar",
+    "value": "até 1 golo"
+   },
+   {
     "n": 10,
     "signals": 17,
     "hits": 7,
@@ -2047,33 +2076,6 @@
     "family": "Betfair",
     "dimension": "Reforço",
     "value": "reforço ×2"
-   },
-   {
-    "n": 75,
-    "signals": 99,
-    "hits": 48,
-    "misses": 27,
-    "hit_rate": 0.6345,
-    "ci95": [
-     0.5195,
-     0.736
-    ],
-    "break_even": 0.5732,
-    "roi": 0.1053,
-    "games": 75,
-    "bets": 75,
-    "unidentified": 0,
-    "prudent_rate": 0.6271,
-    "prob_above": 0.8441,
-    "edge": 0.0538,
-    "edge_ci": [
-     -0.035,
-     0.1392
-    ],
-    "prob_above_cut": 0.7876,
-    "family": "Jogo aberto",
-    "dimension": "Golos em falta para ganhar",
-    "value": "até 1 golo"
    },
    {
     "n": 12,
@@ -2184,31 +2186,58 @@
     "value": "jogo com um só tipo de sinal"
    },
    {
-    "n": 20,
-    "signals": 50,
-    "hits": 12,
-    "misses": 8,
-    "hit_rate": 0.6,
+    "n": 55,
+    "signals": 65,
+    "hits": 34,
+    "misses": 21,
+    "hit_rate": 0.6132,
     "ci95": [
-     0.3866,
-     0.7812
+     0.4787,
+     0.7324
     ],
-    "break_even": 0.4986,
-    "roi": 0.099,
-    "games": 20,
-    "bets": 20,
+    "break_even": 0.5555,
+    "roi": 0.1584,
+    "games": 55,
+    "bets": 55,
     "unidentified": 0,
-    "prudent_rate": 0.5662,
-    "prob_above": 0.7739,
-    "edge": 0.0676,
+    "prudent_rate": 0.604,
+    "prob_above": 0.7864,
+    "edge": 0.0486,
     "edge_ci": [
-     -0.0816,
-     0.2117
+     -0.054,
+     0.1473
     ],
-    "prob_above_cut": 0.7394,
-    "family": "Betfair",
-    "dimension": "Quota de mercado",
-    "value": "80 % ou mais"
+    "prob_above_cut": 0.7304,
+    "family": "Jogo aberto",
+    "dimension": "Confiança indicada pelo bot",
+    "value": "menos de 95 %"
+   },
+   {
+    "n": 80,
+    "signals": 99,
+    "hits": 49,
+    "misses": 31,
+    "hit_rate": 0.6154,
+    "ci95": [
+     0.5044,
+     0.7155
+    ],
+    "break_even": 0.5694,
+    "roi": 0.0815,
+    "games": 80,
+    "bets": 80,
+    "unidentified": 0,
+    "prudent_rate": 0.6102,
+    "prob_above": 0.7852,
+    "edge": 0.0408,
+    "edge_ci": [
+     -0.0457,
+     0.1244
+    ],
+    "prob_above_cut": 0.7159,
+    "family": "Jogo aberto",
+    "dimension": "Faixa de odd",
+    "value": "odd 1,50 a 2,00"
    },
    {
     "n": 10,
@@ -2238,58 +2267,85 @@
     "value": "jovens"
    },
    {
-    "n": 79,
-    "signals": 99,
-    "hits": 48,
-    "misses": 31,
-    "hit_rate": 0.6104,
+    "n": 43,
+    "signals": 53,
+    "hits": 24,
+    "misses": 19,
+    "hit_rate": 0.5647,
     "ci95": [
-     0.4987,
-     0.7116
+     0.4165,
+     0.7022
     ],
-    "break_even": 0.5691,
-    "roi": 0.0754,
-    "games": 79,
-    "bets": 79,
+    "break_even": 0.5116,
+    "roi": 0.1233,
+    "games": 43,
+    "bets": 43,
     "unidentified": 0,
-    "prudent_rate": 0.6056,
-    "prob_above": 0.7597,
-    "edge": 0.0366,
+    "prudent_rate": 0.5546,
+    "prob_above": 0.7361,
+    "edge": 0.043,
     "edge_ci": [
-     -0.0505,
-     0.1209
+     -0.0701,
+     0.1537
     ],
-    "prob_above_cut": 0.6871,
+    "prob_above_cut": 0.6847,
     "family": "Jogo aberto",
-    "dimension": "Faixa de odd",
-    "value": "odd 1,50 a 2,00"
+    "dimension": "Parte do jogo",
+    "value": "1.ª parte"
    },
    {
-    "n": 54,
-    "signals": 65,
-    "hits": 33,
-    "misses": 21,
-    "hit_rate": 0.6058,
+    "n": 21,
+    "signals": 50,
+    "hits": 12,
+    "misses": 9,
+    "hit_rate": 0.5714,
     "ci95": [
-     0.4701,
-     0.7269
+     0.3655,
+     0.7553
     ],
-    "break_even": 0.5547,
-    "roi": 0.15,
-    "games": 54,
-    "bets": 54,
+    "break_even": 0.4893,
+    "roi": 0.0467,
+    "games": 21,
+    "bets": 21,
     "unidentified": 0,
-    "prudent_rate": 0.5975,
-    "prob_above": 0.7564,
-    "edge": 0.0428,
+    "prudent_rate": 0.5449,
+    "prob_above": 0.7343,
+    "edge": 0.0557,
     "edge_ci": [
-     -0.0607,
-     0.1427
+     -0.0911,
+     0.199
     ],
-    "prob_above_cut": 0.6972,
+    "prob_above_cut": 0.6969,
+    "family": "Betfair",
+    "dimension": "Quota de mercado",
+    "value": "80 % ou mais"
+   },
+   {
+    "n": 64,
+    "signals": 82,
+    "hits": 37,
+    "misses": 27,
+    "hit_rate": 0.576,
+    "ci95": [
+     0.4526,
+     0.6906
+    ],
+    "break_even": 0.5381,
+    "roi": 0.0661,
+    "games": 64,
+    "bets": 64,
+    "unidentified": 0,
+    "prudent_rate": 0.5708,
+    "prob_above": 0.7153,
+    "edge": 0.0327,
+    "edge_ci": [
+     -0.0635,
+     0.1266
+    ],
+    "prob_above_cut": 0.6489,
     "family": "Jogo aberto",
-    "dimension": "Confiança indicada pelo bot",
-    "value": "menos de 95 %"
+    "dimension": "Ritmo indicado pelo bot",
+    "value": "90 ou mais"
    },
    {
     "n": 34,
@@ -2373,60 +2429,6 @@
     "value": "jovens"
    },
    {
-    "n": 42,
-    "signals": 53,
-    "hits": 23,
-    "misses": 19,
-    "hit_rate": 0.5542,
-    "ci95": [
-     0.4049,
-     0.6944
-    ],
-    "break_even": 0.5094,
-    "roi": 0.1109,
-    "games": 42,
-    "bets": 42,
-    "unidentified": 0,
-    "prudent_rate": 0.5455,
-    "prob_above": 0.7002,
-    "edge": 0.0361,
-    "edge_ci": [
-     -0.0781,
-     0.1483
-    ],
-    "prob_above_cut": 0.6468,
-    "family": "Jogo aberto",
-    "dimension": "Parte do jogo",
-    "value": "1.ª parte"
-   },
-   {
-    "n": 40,
-    "signals": 79,
-    "hits": 20,
-    "misses": 20,
-    "hit_rate": 0.5,
-    "ci95": [
-     0.352,
-     0.648
-    ],
-    "break_even": 0.4553,
-    "roi": 0.1008,
-    "games": 40,
-    "bets": 40,
-    "unidentified": 0,
-    "prudent_rate": 0.4911,
-    "prob_above": 0.6923,
-    "edge": 0.0357,
-    "edge_ci": [
-     -0.0793,
-     0.1512
-    ],
-    "prob_above_cut": 0.6447,
-    "family": "Betfair",
-    "dimension": "Tamanho do mercado",
-    "value": "menos de 10 mil $"
-   },
-   {
     "n": 25,
     "signals": 35,
     "hits": 14,
@@ -2481,112 +2483,85 @@
     "value": "até 1 golo"
    },
    {
-    "n": 63,
-    "signals": 82,
-    "hits": 36,
-    "misses": 27,
-    "hit_rate": 0.5691,
+    "n": 68,
+    "signals": 85,
+    "hits": 40,
+    "misses": 28,
+    "hit_rate": 0.5833,
     "ci95": [
-     0.4449,
-     0.6852
+     0.463,
+     0.6945
     ],
-    "break_even": 0.5371,
-    "roi": 0.0579,
-    "games": 63,
-    "bets": 63,
+    "break_even": 0.5555,
+    "roi": 0.091,
+    "games": 68,
+    "bets": 68,
     "unidentified": 0,
-    "prudent_rate": 0.5646,
-    "prob_above": 0.6832,
-    "edge": 0.0276,
+    "prudent_rate": 0.5797,
+    "prob_above": 0.6686,
+    "edge": 0.0242,
     "edge_ci": [
-     -0.0693,
-     0.1224
+     -0.0696,
+     0.1156
     ],
-    "prob_above_cut": 0.6147,
+    "prob_above_cut": 0.5941,
     "family": "Jogo aberto",
-    "dimension": "Ritmo indicado pelo bot",
-    "value": "90 ou mais"
+    "dimension": "Competição",
+    "value": "liga"
    },
    {
-    "n": 17,
+    "n": 41,
+    "signals": 79,
+    "hits": 20,
+    "misses": 21,
+    "hit_rate": 0.4878,
+    "ci95": [
+     0.3425,
+     0.6352
+    ],
+    "break_even": 0.4516,
+    "roi": 0.0739,
+    "games": 41,
+    "bets": 41,
+    "unidentified": 0,
+    "prudent_rate": 0.4807,
+    "prob_above": 0.6596,
+    "edge": 0.0291,
+    "edge_ci": [
+     -0.0846,
+     0.1436
+    ],
+    "prob_above_cut": 0.6101,
+    "family": "Betfair",
+    "dimension": "Tamanho do mercado",
+    "value": "menos de 10 mil $"
+   },
+   {
+    "n": 18,
     "signals": 48,
     "hits": 6,
-    "misses": 11,
-    "hit_rate": 0.3529,
+    "misses": 12,
+    "hit_rate": 0.3333,
     "ci95": [
-     0.1731,
-     0.587
+     0.1628,
+     0.5625
     ],
-    "break_even": 0.2875,
-    "roi": 0.1829,
-    "games": 17,
-    "bets": 17,
+    "break_even": 0.2884,
+    "roi": 0.1172,
+    "games": 18,
+    "bets": 18,
     "unidentified": 0,
-    "prudent_rate": 0.3287,
-    "prob_above": 0.661,
-    "edge": 0.0412,
+    "prudent_rate": 0.3173,
+    "prob_above": 0.6109,
+    "edge": 0.0289,
     "edge_ci": [
-     -0.0974,
-     0.1945
+     -0.1056,
+     0.1785
     ],
-    "prob_above_cut": 0.6361,
+    "prob_above_cut": 0.5844,
     "family": "Betfair",
     "dimension": "Dia",
     "value": "fim de semana"
-   },
-   {
-    "n": 13,
-    "signals": 47,
-    "hits": 6,
-    "misses": 7,
-    "hit_rate": 0.4615,
-    "ci95": [
-     0.2321,
-     0.7086
-    ],
-    "break_even": 0.3943,
-    "roi": 0.0338,
-    "games": 13,
-    "bets": 13,
-    "unidentified": 0,
-    "prudent_rate": 0.4323,
-    "prob_above": 0.6361,
-    "edge": 0.038,
-    "edge_ci": [
-     -0.1252,
-     0.2081
-    ],
-    "prob_above_cut": 0.6063,
-    "family": "Betfair",
-    "dimension": "Competição",
-    "value": "liga"
-   },
-   {
-    "n": 67,
-    "signals": 85,
-    "hits": 39,
-    "misses": 28,
-    "hit_rate": 0.5769,
-    "ci95": [
-     0.4558,
-     0.6894
-    ],
-    "break_even": 0.5549,
-    "roi": 0.0837,
-    "games": 67,
-    "bets": 67,
-    "unidentified": 0,
-    "prudent_rate": 0.574,
-    "prob_above": 0.6345,
-    "edge": 0.0191,
-    "edge_ci": [
-     -0.0754,
-     0.1113
-    ],
-    "prob_above_cut": 0.5584,
-    "family": "Jogo aberto",
-    "dimension": "Competição",
-    "value": "liga"
    },
    {
     "n": 10,
@@ -2643,6 +2618,33 @@
     "value": "odd 2,00 a 3,00"
    },
    {
+    "n": 14,
+    "signals": 47,
+    "hits": 6,
+    "misses": 8,
+    "hit_rate": 0.4286,
+    "ci95": [
+     0.2138,
+     0.6741
+    ],
+    "break_even": 0.3878,
+    "roi": -0.04,
+    "games": 14,
+    "bets": 14,
+    "unidentified": 0,
+    "prudent_rate": 0.4116,
+    "prob_above": 0.5837,
+    "edge": 0.0238,
+    "edge_ci": [
+     -0.1341,
+     0.1902
+    ],
+    "prob_above_cut": 0.5527,
+    "family": "Betfair",
+    "dimension": "Competição",
+    "value": "liga"
+   },
+   {
     "n": 12,
     "signals": 12,
     "hits": 8,
@@ -2670,6 +2672,33 @@
     "value": "taça"
    },
    {
+    "n": 100,
+    "signals": 125,
+    "hits": 56,
+    "misses": 44,
+    "hit_rate": 0.559,
+    "ci95": [
+     0.46,
+     0.6534
+    ],
+    "break_even": 0.551,
+    "roi": 0.0534,
+    "games": 100,
+    "bets": 100,
+    "unidentified": 0,
+    "prudent_rate": 0.5582,
+    "prob_above": 0.5625,
+    "edge": 0.0072,
+    "edge_ci": [
+     -0.0719,
+     0.085
+    ],
+    "prob_above_cut": 0.4693,
+    "family": "Jogo aberto",
+    "dimension": "Dia",
+    "value": "fim de semana"
+   },
+   {
     "n": 16,
     "signals": 20,
     "hits": 8,
@@ -2695,33 +2724,6 @@
     "family": "Betfair",
     "dimension": "Momento",
     "value": "antes do jogo"
-   },
-   {
-    "n": 99,
-    "signals": 125,
-    "hits": 55,
-    "misses": 44,
-    "hit_rate": 0.5544,
-    "ci95": [
-     0.455,
-     0.6496
-    ],
-    "break_even": 0.5506,
-    "roi": 0.0478,
-    "games": 99,
-    "bets": 99,
-    "unidentified": 0,
-    "prudent_rate": 0.554,
-    "prob_above": 0.5316,
-    "edge": 0.0035,
-    "edge_ci": [
-     -0.076,
-     0.0818
-    ],
-    "prob_above_cut": 0.4389,
-    "family": "Jogo aberto",
-    "dimension": "Dia",
-    "value": "fim de semana"
    },
    {
     "n": 34,
@@ -2891,28 +2893,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 222,
+    "n": 223,
     "signals": 302,
-    "hits": 128,
+    "hits": 129,
     "misses": 94,
-    "hit_rate": 0.5624,
+    "hit_rate": 0.5644,
     "ci95": [
-     0.4951,
-     0.6274
+     0.4973,
+     0.6292
     ],
     "break_even": 0.5769,
-    "roi": -0.0154,
-    "games": 173,
-    "bets": 220,
+    "roi": -0.0125,
+    "games": 174,
+    "bets": 221,
     "unidentified": 0,
-    "prudent_rate": 0.5708,
-    "prob_above": 0.4596,
-    "edge": -0.0041,
+    "prudent_rate": 0.5732,
+    "prob_above": 0.4844,
+    "edge": -0.0017,
     "edge_ci": [
-     -0.066,
-     0.057
+     -0.0635,
+     0.0591
     ],
-    "prob_above_cut": 0.339,
+    "prob_above_cut": 0.3618,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -2941,48 +2943,47 @@
     "band": "odd 2,00 a 3,00"
    },
    {
-    "n": 31,
+    "n": 32,
     "signals": 62,
     "hits": 6,
-    "misses": 25,
-    "hit_rate": 0.1967,
+    "misses": 26,
+    "hit_rate": 0.1905,
     "ci95": [
-     0.0934,
-     0.3679
+     0.0904,
+     0.3579
     ],
-    "break_even": 0.2544,
-    "roi": -0.3039,
-    "games": 24,
-    "bets": 31,
+    "break_even": 0.2559,
+    "roi": -0.3256,
+    "games": 25,
+    "bets": 32,
     "unidentified": 0,
-    "prudent_rate": 0.2332,
-    "prob_above": 0.364,
-    "edge": -0.0206,
+    "prudent_rate": 0.2271,
+    "prob_above": 0.3215,
+    "edge": -0.0287,
     "edge_ci": [
-     -0.129,
-     0.1061
+     -0.1345,
+     0.0951
     ],
-    "prob_above_cut": 0.3389,
+    "prob_above_cut": 0.2973,
     "band": "odd acima de 3,00"
    }
   ],
   "luck": {
-   "n": 356,
-   "units": -16.78,
-   "luck_sd": 21.52,
-   "z": -0.78,
+   "n": 358,
+   "units": -17.1,
+   "luck_sd": 21.59,
+   "z": -0.79,
    "max_drawdown": 24.36,
    "longest_losing_run": 9
   },
   "narrative": [
-   "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 73 em 118, precisa de 55 %, e a probabilidade de estar acima do mínimo é 93 %.",
+   "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 74 em 119, precisa de 55 %, e a probabilidade de estar acima do mínimo é 94 %.",
    "O mais fraco é aposta grande na Stake: 26 em 62, precisa de 55 %, probabilidade de estar acima do mínimo 5 %.",
-   "Saldo de -16,78 unidades em 356 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±43,0 unidades).",
+   "Saldo de -17,10 unidades em 358 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±43,2 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 15 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 31 em 35 (88 % contra 59 % necessários). Indício positivo.",
    "Forma de golos, dia = fim de semana: 60 em 76 (77 % contra 61 % necessários). Indício positivo.",
    "Forma de golos, outros sinais no mesmo jogo = jogo com um só tipo de sinal: 52 em 68 (74 % contra 61 % necessários). Indício positivo.",
-   "Mudança de comportamento em jogo aberto com odd: nos últimos 40 resultados o acerto foi 52 %, contra 67 % antes (piorou).",
    "Foram comparados 77 segmentos; com tantos cortes, alguns parecem bons ou maus só por acaso. Um segmento só conta depois de se repetir em dados novos e de chegar a 300 resultados."
   ],
   "method": {
@@ -3013,23 +3014,22 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5729,
-    "promissora": 35,
-    "abandonada": 1
+    "em observação": 5730,
+    "promissora": 35
    },
    "hypotheses": [
     {
      "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 103,
-     "games": 103,
-     "roi": 0.1139,
+     "n": 104,
+     "games": 104,
+     "roi": 0.1186,
      "status": "em observação"
     },
     {
      "id": "Jogo aberto | Dia = fim de semana",
-     "n": 99,
-     "games": 99,
-     "roi": 0.0478,
+     "n": 100,
+     "games": 100,
+     "roi": 0.0534,
      "status": "em observação"
     },
     {
@@ -3041,9 +3041,9 @@
     },
     {
      "id": "Jogo aberto | Minuto = 31 a 60",
-     "n": 88,
-     "games": 88,
-     "roi": 0.1657,
+     "n": 89,
+     "games": 89,
+     "roi": 0.1709,
      "status": "promissora"
     },
     {
@@ -3054,6 +3054,13 @@
      "status": "promissora"
     },
     {
+     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 84,
+     "games": 84,
+     "roi": 0.0239,
+     "status": "em observação"
+    },
+    {
      "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 83,
      "games": 83,
@@ -3061,17 +3068,10 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 83,
-     "games": 83,
-     "roi": 0.0169,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00",
-     "n": 79,
-     "games": 79,
-     "roi": 0.0754,
+     "n": 80,
+     "games": 80,
+     "roi": 0.0815,
      "status": "em observação"
     },
     {
@@ -3090,9 +3090,9 @@
     },
     {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-     "n": 75,
-     "games": 75,
-     "roi": 0.1053,
+     "n": 76,
+     "games": 76,
+     "roi": 0.1112,
      "status": "em observação"
     },
     {
@@ -3104,16 +3104,16 @@
     },
     {
      "id": "Jogo aberto | Hora (UTC) = tarde",
-     "n": 73,
-     "games": 73,
-     "roi": 0.0904,
+     "n": 74,
+     "games": 74,
+     "roi": 0.0976,
      "status": "em observação"
     },
     {
      "id": "Jogo aberto | Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 71,
-     "games": 71,
-     "roi": 0.1459,
+     "n": 72,
+     "games": 72,
+     "roi": 0.1524,
      "status": "em observação"
     },
     {
@@ -3131,25 +3131,25 @@
      "status": "promissora"
     },
     {
+     "id": "Jogo aberto | Competição = liga",
+     "n": 68,
+     "games": 68,
+     "roi": 0.091,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 68,
+     "games": 68,
+     "roi": 0.0571,
+     "status": "em observação"
+    },
+    {
      "id": "Forma de golos | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 67,
      "games": 67,
      "roi": 0.1862,
      "status": "promissora"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga",
-     "n": 67,
-     "games": 67,
-     "roi": 0.0837,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 67,
-     "games": 67,
-     "roi": 0.0495,
-     "status": "em observação"
     },
     {
      "id": "Jogo aberto | Dia = fim de semana & Parte do jogo = 2.ª parte",
@@ -3173,6 +3173,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60",
+     "n": 65,
+     "games": 65,
+     "roi": 0.0537,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 65,
      "games": 65,
@@ -3187,17 +3194,24 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60",
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde",
      "n": 64,
      "games": 64,
-     "roi": 0.0447,
+     "roi": -0.0099,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde",
-     "n": 63,
-     "games": 63,
-     "roi": -0.0199,
+     "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 64,
+     "games": 64,
+     "roi": 0.0801,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Ritmo indicado pelo bot = 90 ou mais",
+     "n": 64,
+     "games": 64,
+     "roi": 0.0661,
      "status": "em observação"
     },
     {
@@ -3208,13 +3222,6 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 63,
-     "games": 63,
-     "roi": 0.0718,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
      "n": 63,
      "games": 63,
@@ -3222,17 +3229,17 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Ritmo indicado pelo bot = 90 ou mais",
-     "n": 63,
-     "games": 63,
-     "roi": 0.0579,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 63,
      "games": 23,
      "roi": -0.1271,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo",
+     "n": 62,
+     "games": 62,
+     "roi": 0.0244,
      "status": "em observação"
     },
     {
@@ -3243,17 +3250,31 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo",
-     "n": 61,
-     "games": 61,
-     "roi": 0.0158,
-     "status": "em observação"
-    },
-    {
      "id": "Forma de golos | Parte do jogo = 2.ª parte",
      "n": 60,
      "games": 60,
      "roi": 0.0412,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
+     "n": 60,
+     "games": 60,
+     "roi": 0.0649,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00",
+     "n": 60,
+     "games": 60,
+     "roi": -0.0233,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
+     "n": 60,
+     "games": 60,
+     "roi": 0.1917,
      "status": "em observação"
     },
     {
@@ -3264,17 +3285,17 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 60,
+     "games": 60,
+     "roi": 0.0661,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Momento = antes do jogo",
      "n": 60,
      "games": 28,
      "roi": -0.151,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
-     "n": 59,
-     "games": 59,
-     "roi": 0.0562,
      "status": "em observação"
     },
     {
@@ -3285,31 +3306,10 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00",
-     "n": 59,
-     "games": 59,
-     "roi": -0.0331,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
      "n": 59,
      "games": 59,
      "roi": 0.09,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2",
-     "n": 59,
-     "games": 59,
-     "roi": 0.1846,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 59,
-     "games": 59,
-     "roi": 0.058,
      "status": "em observação"
     },
     {
@@ -3334,17 +3334,24 @@
      "status": "promissora"
     },
     {
+     "id": "Jogo aberto | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 57,
+     "games": 57,
+     "roi": 0.0906,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60",
+     "n": 57,
+     "games": 57,
+     "roi": 0.0769,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 57,
      "games": 19,
      "roi": -0.1235,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 56,
-     "games": 56,
-     "roi": 0.0819,
      "status": "em observação"
     },
     {
@@ -3355,10 +3362,17 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60",
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 56,
      "games": 56,
-     "roi": 0.0677,
+     "roi": -0.0167,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
+     "n": 56,
+     "games": 56,
+     "roi": 0.0976,
      "status": "em observação"
     },
     {
@@ -3376,17 +3390,17 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
      "n": 55,
      "games": 55,
-     "roi": -0.0279,
+     "roi": 0.1584,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
+     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 55,
      "games": 55,
-     "roi": 0.0893,
+     "roi": 0.0105,
      "status": "em observação"
     },
     {
@@ -3404,20 +3418,6 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 %",
-     "n": 54,
-     "games": 54,
-     "roi": 0.15,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 54,
-     "games": 54,
-     "roi": -0.0007,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 54,
      "games": 54,
@@ -3432,6 +3432,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 53,
+     "games": 53,
+     "roi": -0.0495,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 3 ou mais",
      "n": 53,
      "games": 53,
@@ -3443,6 +3450,20 @@
      "n": 53,
      "games": 53,
      "roi": -0.0628,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = 90 ou mais",
+     "n": 53,
+     "games": 53,
+     "roi": -0.0377,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60",
+     "n": 53,
+     "games": 53,
+     "roi": 0.2082,
      "status": "em observação"
     },
     {
@@ -3474,24 +3495,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60",
      "n": 52,
      "games": 52,
-     "roi": -0.0611,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Ritmo indicado pelo bot = 90 ou mais",
-     "n": 52,
-     "games": 52,
-     "roi": -0.0498,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60",
-     "n": 52,
-     "games": 52,
-     "roi": 0.1994,
+     "roi": 0.0882,
      "status": "em observação"
     },
     {
@@ -3516,10 +3523,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60",
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 51,
      "games": 51,
-     "roi": 0.0783,
+     "roi": 0.0585,
      "status": "em observação"
     },
     {
@@ -3527,6 +3534,13 @@
      "n": 51,
      "games": 51,
      "roi": 0.0843,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 51,
+     "games": 51,
+     "roi": -0.0321,
      "status": "em observação"
     },
     {
@@ -3572,24 +3586,17 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 50,
-     "games": 50,
-     "roi": 0.0482,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 50,
-     "games": 50,
-     "roi": -0.0435,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
      "n": 50,
      "games": 50,
      "roi": -0.0691,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 50,
+     "games": 50,
+     "roi": 0.1338,
      "status": "em observação"
     },
     {
@@ -3649,10 +3656,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Ritmo indicado pelo bot = 90 ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 49,
      "games": 49,
-     "roi": 0.1242,
+     "roi": 0.0664,
      "status": "em observação"
     },
     {
@@ -3667,6 +3674,13 @@
      "n": 49,
      "games": 24,
      "roi": -0.1188,
+     "status": "em observação"
+    },
+    {
+     "id": "Betfair | Momento = durante o jogo",
+     "n": 48,
+     "games": 48,
+     "roi": -0.0233,
      "status": "em observação"
     },
     {
@@ -3712,10 +3726,10 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Ritmo indicado pelo bot = 90 ou mais & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60",
      "n": 48,
      "games": 48,
-     "roi": 0.0559,
+     "roi": 0.165,
      "status": "em observação"
     },
     {
@@ -3740,10 +3754,17 @@
      "status": "em observação"
     },
     {
-     "id": "Betfair | Momento = durante o jogo",
+     "id": "Betfair | Volume na seleção = menos de 10 mil $",
+     "n": 47,
+     "games": 46,
+     "roi": -0.0011,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2",
      "n": 47,
      "games": 47,
-     "roi": -0.0026,
+     "roi": 0.1053,
      "status": "em observação"
     },
     {
@@ -3772,13 +3793,6 @@
      "n": 47,
      "games": 47,
      "roi": 0.0947,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60",
-     "n": 47,
-     "games": 47,
-     "roi": 0.1563,
      "status": "em observação"
     },
     {
@@ -3824,13 +3838,6 @@
      "status": "em observação"
     },
     {
-     "id": "Betfair | Volume na seleção = menos de 10 mil $",
-     "n": 46,
-     "games": 45,
-     "roi": 0.0207,
-     "status": "em observação"
-    },
-    {
      "id": "Forma de golos | Golos até ao sinal = nenhum",
      "n": 46,
      "games": 46,
@@ -3859,10 +3866,10 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2",
+     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 46,
      "games": 46,
-     "roi": 0.0946,
+     "roi": 0.1618,
      "status": "em observação"
     },
     {
@@ -3901,6 +3908,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Competição = liga & Golos em falta para ganhar = até 1 golo",
+     "n": 45,
+     "games": 45,
+     "roi": 0.0793,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
      "n": 45,
      "games": 45,
@@ -3915,10 +3929,24 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 45,
+     "games": 45,
+     "roi": 0.0867,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
      "n": 45,
      "games": 45,
      "roi": -0.0313,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 45,
+     "games": 45,
+     "roi": 0.0462,
      "status": "em observação"
     },
     {
@@ -3950,13 +3978,6 @@
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 45,
-     "games": 45,
-     "roi": 0.1512,
-     "status": "em observação"
-    },
-    {
      "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 45,
      "games": 45,
@@ -3985,6 +4006,13 @@
      "status": "em observação"
     },
     {
+     "id": "Betfair | Hora (UTC) = tarde",
+     "n": 44,
+     "games": 42,
+     "roi": 0.0066,
+     "status": "em observação"
+    },
+    {
      "id": "Forma de golos | Minuto = 31 a 60",
      "n": 44,
      "games": 44,
@@ -3992,86 +4020,58 @@
      "status": "promissora"
     },
     {
-     "id": "Jogo aberto | Competição = liga & Golos em falta para ganhar = até 1 golo",
+     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Minuto = 31 a 60",
      "n": 44,
      "games": 44,
-     "roi": 0.0681,
+     "roi": 0.0508,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Competição = liga & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 44,
      "games": 44,
-     "roi": 0.0751,
+     "roi": 0.0527,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60",
      "n": 44,
      "games": 44,
-     "roi": 0.0351,
+     "roi": 0.2065,
      "status": "em observação"
     },
     {
-     "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
+     "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Minuto = 31 a 60",
      "n": 44,
      "games": 44,
-     "roi": 0.1194,
+     "roi": 0.0789,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Competição = seleções & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde",
      "n": 44,
-     "games": 10,
-     "roi": -0.1389,
+     "games": 44,
+     "roi": 0.0585,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League",
+     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60",
      "n": 44,
-     "games": 10,
-     "roi": -0.1389,
+     "games": 44,
+     "roi": 0.2065,
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Liga = UEFA Nations League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde",
      "n": 44,
-     "games": 10,
-     "roi": -0.1389,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo & Número de apostas = várias",
-     "n": 44,
-     "games": 21,
-     "roi": -0.1391,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Hora (UTC) = tarde",
-     "n": 44,
-     "games": 22,
-     "roi": -0.1834,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 44,
-     "games": 23,
-     "roi": -0.1873,
-     "status": "em observação"
-    },
-    {
-     "id": "Betfair | Hora (UTC) = tarde",
-     "n": 43,
-     "games": 41,
-     "roi": 0.03,
+     "games": 44,
+     "roi": -0.0087,
      "status": "em observação"
     }
    ]
   },
   "hypotheses": 5765,
-  "tested": 258,
+  "tested": 268,
   "corrected_bar": 0.99981,
   "counts": {
    "em observação": 5761,
@@ -4111,7 +4111,7 @@
       0.3327
      ],
      "prob_above_cut": 0.9826,
-     "prob_adds": 0.9877,
+     "prob_adds": 0.9862,
      "bets": 16,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4146,7 +4146,7 @@
       0.2967
      ],
      "prob_above_cut": 0.9799,
-     "prob_adds": 0.9854,
+     "prob_adds": 0.9835,
      "bets": 24,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4378,7 +4378,7 @@
       -0.02
      ],
      "prob_above_cut": 0.0284,
-     "prob_adds": 0.0391,
+     "prob_adds": 0.0429,
      "bets": 11,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4497,7 +4497,7 @@
        "source": "gerador"
       }
      ],
-     "good_total": 27,
+     "good_total": 29,
      "bad": [
       {
        "id": "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde",
@@ -4515,44 +4515,44 @@
          "tarde"
         ]
        ],
-       "n": 30,
-       "games": 30,
-       "hits": 13,
-       "break_even": 0.5552,
-       "prob_above": 0.1082,
-       "roi": -0.1526,
-       "edge": -0.0993,
+       "n": 31,
+       "games": 31,
+       "hits": 14,
+       "break_even": 0.5565,
+       "prob_above": 0.138,
+       "roi": -0.1313,
+       "edge": -0.0865,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Dia = fim de semana & Hora (UTC) = tarde",
+       "id": "Jogo aberto | Competição = liga & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais",
        "conditions": [
         [
-         "Confiança indicada pelo bot",
-         "menos de 95 %"
+         "Competição",
+         "liga"
         ],
         [
-         "Dia",
-         "fim de semana"
+         "Marcador no momento",
+         "diferença de 2 ou mais golos"
         ],
         [
-         "Hora (UTC)",
-         "tarde"
+         "Ritmo indicado pelo bot",
+         "90 ou mais"
         ]
        ],
-       "n": 25,
-       "games": 25,
-       "hits": 11,
-       "break_even": 0.5496,
-       "prob_above": 0.1776,
-       "roi": -0.1208,
-       "edge": -0.0791,
+       "n": 11,
+       "games": 11,
+       "hits": 4,
+       "break_even": 0.5468,
+       "prob_above": 0.1882,
+       "roi": -0.1514,
+       "edge": -0.0959,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 4
+     "bad_total": 2
     },
     {
      "match_id": "cp-mijas-vs-cd-estepona-20261115",
@@ -4580,7 +4580,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 65,
+     "odds_band_n": 66,
      "good": [
       {
        "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
@@ -4708,7 +4708,7 @@
        "source": "gerador"
       }
      ],
-     "bad_total": 14
+     "bad_total": 13
     },
     {
      "match_id": "deportivo-de-la-coruna-women-vs-barcelona-women-20261115",
@@ -6441,7 +6441,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd acima de 3,00",
-     "odds_band_n": 13,
+     "odds_band_n": 14,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -6519,7 +6519,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd acima de 3,00",
-     "odds_band_n": 13,
+     "odds_band_n": 14,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -6546,20 +6546,24 @@
        "source": "gerador"
       },
       {
-       "id": "Betfair | Sinal anterior de outro tipo no mesmo jogo = não",
+       "id": "Betfair | Hora (UTC) = tarde & Momento = durante o jogo",
        "conditions": [
         [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
+         "Hora (UTC)",
+         "tarde"
+        ],
+        [
+         "Momento",
+         "durante o jogo"
         ]
        ],
-       "n": 42,
-       "games": 41,
-       "hits": 15,
-       "break_even": 0.4402,
-       "prob_above": 0.1828,
-       "roi": -0.1705,
-       "edge": -0.0613,
+       "n": 30,
+       "games": 30,
+       "hits": 10,
+       "break_even": 0.4331,
+       "prob_above": 0.1615,
+       "roi": -0.217,
+       "edge": -0.0748,
        "status": "em observação",
        "source": "gerador"
       }
@@ -7005,7 +7009,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd acima de 3,00",
-     "odds_band_n": 13,
+     "odds_band_n": 14,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -7130,7 +7134,7 @@
     "contraditório": 18,
     "evitar": 10
    },
-   "generated_utc": "2026-11-15T17:44:57+00:00",
+   "generated_utc": "2026-11-15T17:45:26+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7144,8 +7148,8 @@
    "by_source": {
     "gerador": {
      "hypotheses": 5717,
-     "judged": 2245,
-     "as_expected": 1003
+     "judged": 2274,
+     "as_expected": 1047
     },
     "llm/refinar": {
      "hypotheses": 30,
@@ -7225,11 +7229,20 @@
    "failed": [
     {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 39,
-     "games": 39,
-     "hit_rate": 0.4868,
-     "break_even": 0.5707,
-     "prob_above": 0.179,
+     "n": 40,
+     "games": 40,
+     "hit_rate": 0.5,
+     "break_even": 0.5713,
+     "prob_above": 0.214,
+     "expect": "acima"
+    },
+    {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 32,
+     "games": 32,
+     "hit_rate": 0.5,
+     "break_even": 0.5693,
+     "prob_above": 0.2523,
      "expect": "acima"
     },
     {
@@ -7242,30 +7255,21 @@
      "expect": "acima"
     },
     {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 31,
-     "games": 31,
-     "hit_rate": 0.4833,
-     "break_even": 0.5685,
-     "prob_above": 0.2102,
-     "expect": "acima"
-    },
-    {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais",
-     "n": 26,
-     "games": 26,
-     "hit_rate": 0.5,
-     "break_even": 0.572,
-     "prob_above": 0.268,
+     "n": 27,
+     "games": 27,
+     "hit_rate": 0.5185,
+     "break_even": 0.5728,
+     "prob_above": 0.3173,
      "expect": "acima"
     },
     {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60",
-     "n": 26,
-     "games": 26,
-     "hit_rate": 0.5,
-     "break_even": 0.5772,
-     "prob_above": 0.2586,
+     "n": 27,
+     "games": 27,
+     "hit_rate": 0.5192,
+     "break_even": 0.5779,
+     "prob_above": 0.3082,
      "expect": "acima"
     },
     {
@@ -7282,21 +7286,21 @@
   "walk_forward": {
    "followed": {
     "bets": 158,
-    "settled": 134,
-    "games": 132,
-    "wins": 61,
-    "units": -4.51,
-    "roi": -0.0336,
-    "roi_cut": -0.0495
+    "settled": 135,
+    "games": 133,
+    "wins": 62,
+    "units": -3.83,
+    "roi": -0.0283,
+    "roi_cut": -0.0444
    },
    "skipped": {
     "bets": 329,
-    "settled": 222,
-    "games": 134,
+    "settled": 223,
+    "games": 135,
     "wins": 104,
-    "units": -12.27,
-    "roi": -0.0553,
-    "roi_cut": -0.0728
+    "units": -13.27,
+    "roi": -0.0595,
+    "roi_cut": -0.077
    },
    "curve": [
     -1.0,
@@ -7428,13 +7432,14 @@
     -2.78,
     -2.36,
     -2.36,
-    -2.01,
-    -3.01,
-    -2.51,
-    -3.51,
-    -4.51
+    -1.68,
+    -1.33,
+    -2.33,
+    -1.83,
+    -2.83,
+    -3.83
    ],
-   "prob_followed_better": 0.3066,
+   "prob_followed_better": 0.3399,
    "first_followed_utc": "2026-11-12T16:38:51+00:00",
    "rule": {
     "min_results": 8,
@@ -7443,7 +7448,7 @@
     "known_after_min": 150
    }
   },
-  "expected_by_chance": 12.9,
+  "expected_by_chance": 13.4,
   "top": [
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
@@ -7479,7 +7484,7 @@
      0.3327
     ],
     "prob_above_cut": 0.9826,
-    "prob_adds": 0.9877,
+    "prob_adds": 0.9862,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7515,7 +7520,7 @@
      0.2967
     ],
     "prob_above_cut": 0.9799,
-    "prob_adds": 0.9854,
+    "prob_adds": 0.9835,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7551,7 +7556,7 @@
      0.2737
     ],
     "prob_above_cut": 0.9722,
-    "prob_adds": 0.9783,
+    "prob_adds": 0.9754,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7587,7 +7592,7 @@
      0.2831
     ],
     "prob_above_cut": 0.9643,
-    "prob_adds": 0.9682,
+    "prob_adds": 0.9646,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7627,7 +7632,7 @@
      0.2755
     ],
     "prob_above_cut": 0.9603,
-    "prob_adds": 0.9638,
+    "prob_adds": 0.9598,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7667,7 +7672,7 @@
      0.2755
     ],
     "prob_above_cut": 0.9603,
-    "prob_adds": 0.9638,
+    "prob_adds": 0.9598,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7707,7 +7712,7 @@
      0.2788
     ],
     "prob_above_cut": 0.9565,
-    "prob_adds": 0.9588,
+    "prob_adds": 0.9545,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7747,7 +7752,7 @@
      0.2896
     ],
     "prob_above_cut": 0.9518,
-    "prob_adds": 0.9518,
+    "prob_adds": 0.9473,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7787,7 +7792,7 @@
      0.3082
     ],
     "prob_above_cut": 0.949,
-    "prob_adds": 0.948,
+    "prob_adds": 0.9436,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7827,7 +7832,7 @@
      0.2912
     ],
     "prob_above_cut": 0.9479,
-    "prob_adds": 0.947,
+    "prob_adds": 0.9423,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7859,7 +7864,7 @@
      0.2163
     ],
     "prob_above_cut": 0.9411,
-    "prob_adds": 0.952,
+    "prob_adds": 0.9446,
     "pending_status": null,
     "entry_status": "promissora",
     "status_changes": 1,
@@ -7905,7 +7910,7 @@
      0.2712
     ],
     "prob_above_cut": 0.9403,
-    "prob_adds": 0.9382,
+    "prob_adds": 0.9325,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7945,7 +7950,7 @@
      0.2889
     ],
     "prob_above_cut": 0.9352,
-    "prob_adds": 0.9305,
+    "prob_adds": 0.9249,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -7985,7 +7990,7 @@
      0.3348
     ],
     "prob_above_cut": 0.9366,
-    "prob_adds": 0.9347,
+    "prob_adds": 0.9305,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8025,7 +8030,7 @@
      0.3348
     ],
     "prob_above_cut": 0.9366,
-    "prob_adds": 0.9347,
+    "prob_adds": 0.9305,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8065,7 +8070,7 @@
      0.2927
     ],
     "prob_above_cut": 0.9338,
-    "prob_adds": 0.929,
+    "prob_adds": 0.9234,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8105,7 +8110,7 @@
      0.313
     ],
     "prob_above_cut": 0.9348,
-    "prob_adds": 0.9312,
+    "prob_adds": 0.9264,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8141,7 +8146,7 @@
      0.2724
     ],
     "prob_above_cut": 0.9322,
-    "prob_adds": 0.9273,
+    "prob_adds": 0.9211,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8177,7 +8182,7 @@
      0.2156
     ],
     "prob_above_cut": 0.9233,
-    "prob_adds": 0.926,
+    "prob_adds": 0.9165,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 1,
@@ -8223,7 +8228,7 @@
      0.2641
     ],
     "prob_above_cut": 0.9275,
-    "prob_adds": 0.9216,
+    "prob_adds": 0.9147,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8263,7 +8268,7 @@
      0.3272
     ],
     "prob_above_cut": 0.9296,
-    "prob_adds": 0.9241,
+    "prob_adds": 0.9192,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8303,7 +8308,7 @@
      0.2993
     ],
     "prob_above_cut": 0.9281,
-    "prob_adds": 0.921,
+    "prob_adds": 0.9153,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8343,7 +8348,7 @@
      0.3378
     ],
     "prob_above_cut": 0.9304,
-    "prob_adds": 0.9222,
+    "prob_adds": 0.9173,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8379,7 +8384,7 @@
      0.3378
     ],
     "prob_above_cut": 0.9304,
-    "prob_adds": 0.9222,
+    "prob_adds": 0.9173,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8419,7 +8424,7 @@
      0.3378
     ],
     "prob_above_cut": 0.9304,
-    "prob_adds": 0.9222,
+    "prob_adds": 0.9173,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8539,7 +8544,7 @@
      0.2951
     ],
     "prob_above_cut": 0.9183,
-    "prob_adds": 0.9089,
+    "prob_adds": 0.9028,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8579,7 +8584,7 @@
      0.3361
     ],
     "prob_above_cut": 0.9161,
-    "prob_adds": 0.9082,
+    "prob_adds": 0.903,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8655,7 +8660,7 @@
      0.2094
     ],
     "prob_above_cut": 0.9032,
-    "prob_adds": 0.8981,
+    "prob_adds": 0.8866,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 1,
@@ -8701,7 +8706,7 @@
      0.2777
     ],
     "prob_above_cut": 0.9077,
-    "prob_adds": 0.8943,
+    "prob_adds": 0.8869,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8737,7 +8742,7 @@
      0.3039
     ],
     "prob_above_cut": 0.9084,
-    "prob_adds": 0.8967,
+    "prob_adds": 0.8905,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8777,7 +8782,7 @@
      0.3516
     ],
     "prob_above_cut": 0.912,
-    "prob_adds": 0.8991,
+    "prob_adds": 0.8937,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8817,7 +8822,7 @@
      0.2818
     ],
     "prob_above_cut": 0.906,
-    "prob_adds": 0.8923,
+    "prob_adds": 0.8851,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8857,7 +8862,7 @@
      0.2559
     ],
     "prob_above_cut": 0.9035,
-    "prob_adds": 0.8892,
+    "prob_adds": 0.8806,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8897,7 +8902,7 @@
      0.3458
     ],
     "prob_above_cut": 0.9058,
-    "prob_adds": 0.8918,
+    "prob_adds": 0.8861,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8937,7 +8942,7 @@
      0.2957
     ],
     "prob_above_cut": 0.9009,
-    "prob_adds": 0.8859,
+    "prob_adds": 0.879,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -8969,7 +8974,7 @@
      0.1825
     ],
     "prob_above_cut": 0.8858,
-    "prob_adds": 0.8857,
+    "prob_adds": 0.8699,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 1,
@@ -9011,7 +9016,7 @@
      0.24
     ],
     "prob_above_cut": 0.892,
-    "prob_adds": 0.875,
+    "prob_adds": 0.8649,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9051,7 +9056,7 @@
      0.2459
     ],
     "prob_above_cut": 0.8907,
-    "prob_adds": 0.8718,
+    "prob_adds": 0.8623,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9091,7 +9096,7 @@
      0.34
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.8842,
+    "prob_adds": 0.8783,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9131,7 +9136,7 @@
      0.34
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.8842,
+    "prob_adds": 0.8783,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9167,7 +9172,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.8843,
+    "prob_adds": 0.8783,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9207,7 +9212,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.8843,
+    "prob_adds": 0.8783,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9247,7 +9252,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.8843,
+    "prob_adds": 0.8783,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9323,7 +9328,7 @@
      0.2723
     ],
     "prob_above_cut": 0.8923,
-    "prob_adds": 0.8739,
+    "prob_adds": 0.8659,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9363,7 +9368,7 @@
      0.2723
     ],
     "prob_above_cut": 0.8923,
-    "prob_adds": 0.8739,
+    "prob_adds": 0.8659,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9403,7 +9408,7 @@
      0.3256
     ],
     "prob_above_cut": 0.8977,
-    "prob_adds": 0.8804,
+    "prob_adds": 0.8739,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9439,7 +9444,7 @@
      0.3249
     ],
     "prob_above_cut": 0.8969,
-    "prob_adds": 0.8793,
+    "prob_adds": 0.8728,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9559,7 +9564,7 @@
      0.2439
     ],
     "prob_above_cut": 0.8869,
-    "prob_adds": 0.8664,
+    "prob_adds": 0.8567,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9599,7 +9604,7 @@
      0.3452
     ],
     "prob_above_cut": 0.8954,
-    "prob_adds": 0.9759,
+    "prob_adds": 0.9777,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9639,7 +9644,7 @@
      0.2751
     ],
     "prob_above_cut": 0.888,
-    "prob_adds": 0.8678,
+    "prob_adds": 0.8595,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9679,7 +9684,7 @@
      0.2751
     ],
     "prob_above_cut": 0.888,
-    "prob_adds": 0.8678,
+    "prob_adds": 0.8595,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9719,7 +9724,7 @@
      0.2747
     ],
     "prob_above_cut": 0.8872,
-    "prob_adds": 0.8668,
+    "prob_adds": 0.8584,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9795,7 +9800,7 @@
      0.3067
     ],
     "prob_above_cut": 0.8882,
-    "prob_adds": 0.8702,
+    "prob_adds": 0.8633,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9831,7 +9836,7 @@
      0.2579
     ],
     "prob_above_cut": 0.8833,
-    "prob_adds": 0.8613,
+    "prob_adds": 0.8522,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9867,7 +9872,7 @@
      0.3197
     ],
     "prob_above_cut": 0.8899,
-    "prob_adds": 0.9797,
+    "prob_adds": 0.9814,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9943,7 +9948,7 @@
      0.2479
     ],
     "prob_above_cut": 0.8817,
-    "prob_adds": 0.8599,
+    "prob_adds": 0.85,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -9983,7 +9988,7 @@
      0.2479
     ],
     "prob_above_cut": 0.8817,
-    "prob_adds": 0.8599,
+    "prob_adds": 0.85,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10023,7 +10028,7 @@
      0.279
     ],
     "prob_above_cut": 0.8842,
-    "prob_adds": 0.8632,
+    "prob_adds": 0.855,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10063,7 +10068,7 @@
      0.3349
     ],
     "prob_above_cut": 0.8871,
-    "prob_adds": 0.9747,
+    "prob_adds": 0.9767,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10103,7 +10108,7 @@
      0.2987
     ],
     "prob_above_cut": 0.8837,
-    "prob_adds": 0.8635,
+    "prob_adds": 0.856,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10139,7 +10144,7 @@
      0.2312
     ],
     "prob_above_cut": 0.8757,
-    "prob_adds": 0.852,
+    "prob_adds": 0.8409,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10175,7 +10180,7 @@
      0.3514
     ],
     "prob_above_cut": 0.887,
-    "prob_adds": 0.9736,
+    "prob_adds": 0.9756,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10215,7 +10220,7 @@
      0.3304
     ],
     "prob_above_cut": 0.8835,
-    "prob_adds": 0.8661,
+    "prob_adds": 0.8597,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10255,7 +10260,7 @@
      0.3304
     ],
     "prob_above_cut": 0.8835,
-    "prob_adds": 0.8661,
+    "prob_adds": 0.8597,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10295,7 +10300,7 @@
      0.3304
     ],
     "prob_above_cut": 0.8835,
-    "prob_adds": 0.8661,
+    "prob_adds": 0.8597,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10335,7 +10340,7 @@
      0.3304
     ],
     "prob_above_cut": 0.8835,
-    "prob_adds": 0.8661,
+    "prob_adds": 0.8597,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10371,7 +10376,7 @@
      0.3024
     ],
     "prob_above_cut": 0.8813,
-    "prob_adds": 0.8587,
+    "prob_adds": 0.851,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10411,7 +10416,7 @@
      0.2958
     ],
     "prob_above_cut": 0.8796,
-    "prob_adds": 0.858,
+    "prob_adds": 0.8504,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10451,7 +10456,7 @@
      0.3215
     ],
     "prob_above_cut": 0.8783,
-    "prob_adds": 0.8577,
+    "prob_adds": 0.8508,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10491,7 +10496,7 @@
      0.2208
     ],
     "prob_above_cut": 0.8659,
-    "prob_adds": 0.8389,
+    "prob_adds": 0.8265,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10531,7 +10536,7 @@
      0.2208
     ],
     "prob_above_cut": 0.8659,
-    "prob_adds": 0.8389,
+    "prob_adds": 0.8265,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10571,7 +10576,7 @@
      0.2938
     ],
     "prob_above_cut": 0.8734,
-    "prob_adds": 0.8503,
+    "prob_adds": 0.8426,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10611,7 +10616,7 @@
      0.271
     ],
     "prob_above_cut": 0.8712,
-    "prob_adds": 0.8459,
+    "prob_adds": 0.837,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10651,7 +10656,7 @@
      0.271
     ],
     "prob_above_cut": 0.8712,
-    "prob_adds": 0.8459,
+    "prob_adds": 0.837,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10691,7 +10696,7 @@
      0.3202
     ],
     "prob_above_cut": 0.8753,
-    "prob_adds": 0.8551,
+    "prob_adds": 0.8483,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10731,7 +10736,7 @@
      0.3196
     ],
     "prob_above_cut": 0.8748,
-    "prob_adds": 0.9702,
+    "prob_adds": 0.9724,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10771,7 +10776,7 @@
      0.2733
     ],
     "prob_above_cut": 0.8701,
-    "prob_adds": 0.8444,
+    "prob_adds": 0.8358,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10811,7 +10816,7 @@
      0.2497
     ],
     "prob_above_cut": 0.8678,
-    "prob_adds": 0.8406,
+    "prob_adds": 0.8304,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10847,7 +10852,7 @@
      0.2897
     ],
     "prob_above_cut": 0.8709,
-    "prob_adds": 0.8465,
+    "prob_adds": 0.8384,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10887,7 +10892,7 @@
      0.2897
     ],
     "prob_above_cut": 0.8709,
-    "prob_adds": 0.8465,
+    "prob_adds": 0.8384,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10927,7 +10932,7 @@
      0.2897
     ],
     "prob_above_cut": 0.8709,
-    "prob_adds": 0.8465,
+    "prob_adds": 0.8384,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -10967,7 +10972,7 @@
      0.2579
     ],
     "prob_above_cut": 0.8678,
-    "prob_adds": 0.8407,
+    "prob_adds": 0.8309,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11047,7 +11052,7 @@
      0.3128
     ],
     "prob_above_cut": 0.8693,
-    "prob_adds": 0.8468,
+    "prob_adds": 0.8397,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11087,7 +11092,7 @@
      0.234
     ],
     "prob_above_cut": 0.859,
-    "prob_adds": 0.8285,
+    "prob_adds": 0.817,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11123,7 +11128,7 @@
      0.1812
     ],
     "prob_above_cut": 0.8491,
-    "prob_adds": 0.8242,
+    "prob_adds": 0.8059,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 2,
@@ -11169,7 +11174,7 @@
      0.3322
     ],
     "prob_above_cut": 0.8677,
-    "prob_adds": 0.8463,
+    "prob_adds": 0.8395,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11209,7 +11214,7 @@
      0.3322
     ],
     "prob_above_cut": 0.8677,
-    "prob_adds": 0.8463,
+    "prob_adds": 0.8395,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11325,7 +11330,7 @@
      0.3367
     ],
     "prob_above_cut": 0.8678,
-    "prob_adds": 0.8437,
+    "prob_adds": 0.8368,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11365,7 +11370,7 @@
      0.2643
     ],
     "prob_above_cut": 0.8595,
-    "prob_adds": 0.83,
+    "prob_adds": 0.8205,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11405,7 +11410,7 @@
      0.3039
     ],
     "prob_above_cut": 0.8621,
-    "prob_adds": 0.8367,
+    "prob_adds": 0.8292,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11445,7 +11450,7 @@
      0.3039
     ],
     "prob_above_cut": 0.8621,
-    "prob_adds": 0.8367,
+    "prob_adds": 0.8292,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11485,7 +11490,7 @@
      0.2286
     ],
     "prob_above_cut": 0.8537,
-    "prob_adds": 0.8214,
+    "prob_adds": 0.8091,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11521,7 +11526,7 @@
      0.1757
     ],
     "prob_above_cut": 0.8418,
-    "prob_adds": 0.8145,
+    "prob_adds": 0.7949,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 2,
@@ -11567,7 +11572,7 @@
      0.3082
     ],
     "prob_above_cut": 0.862,
-    "prob_adds": 0.8366,
+    "prob_adds": 0.8289,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11607,7 +11612,7 @@
      0.3082
     ],
     "prob_above_cut": 0.862,
-    "prob_adds": 0.8366,
+    "prob_adds": 0.8289,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11643,7 +11648,7 @@
      0.3082
     ],
     "prob_above_cut": 0.862,
-    "prob_adds": 0.8366,
+    "prob_adds": 0.8289,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11679,7 +11684,7 @@
      0.3082
     ],
     "prob_above_cut": 0.862,
-    "prob_adds": 0.8366,
+    "prob_adds": 0.8289,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11719,7 +11724,7 @@
      0.2816
     ],
     "prob_above_cut": 0.8586,
-    "prob_adds": 0.83,
+    "prob_adds": 0.8213,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11759,7 +11764,7 @@
      0.2754
     ],
     "prob_above_cut": 0.8574,
-    "prob_adds": 0.8279,
+    "prob_adds": 0.8188,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11799,7 +11804,7 @@
      0.2894
     ],
     "prob_above_cut": 0.8594,
-    "prob_adds": 0.8308,
+    "prob_adds": 0.8221,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11839,7 +11844,7 @@
      0.2793
     ],
     "prob_above_cut": 0.855,
-    "prob_adds": 0.8252,
+    "prob_adds": 0.8163,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11879,7 +11884,7 @@
      0.2793
     ],
     "prob_above_cut": 0.855,
-    "prob_adds": 0.8252,
+    "prob_adds": 0.8163,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11919,7 +11924,7 @@
      0.3315
     ],
     "prob_above_cut": 0.8608,
-    "prob_adds": 0.8352,
+    "prob_adds": 0.828,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -11951,7 +11956,7 @@
      0.2374
     ],
     "prob_above_cut": 0.8518,
-    "prob_adds": 0.8167,
+    "prob_adds": 0.8046,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12023,7 +12028,7 @@
      0.2963
     ],
     "prob_above_cut": 0.8554,
-    "prob_adds": 0.8268,
+    "prob_adds": 0.8184,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12143,7 +12148,7 @@
      0.2774
     ],
     "prob_above_cut": 0.8519,
-    "prob_adds": 0.8211,
+    "prob_adds": 0.8121,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12183,7 +12188,7 @@
      0.3021
     ],
     "prob_above_cut": 0.8542,
-    "prob_adds": 0.8263,
+    "prob_adds": 0.8183,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12226,6 +12231,46 @@
     "last_change": null
    },
    {
+    "id": "Jogo aberto | Hora (UTC) = tarde & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "tarde"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com vários tipos de sinal"
+     ]
+    ],
+    "n": 5,
+    "hits": 5,
+    "hit_rate": 1.0,
+    "break_even": 0.5503,
+    "prob_above": 0.8726,
+    "roi": 0.788,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 5,
+    "bets": 5,
+    "edge": 0.1396,
+    "edge_ci": [
+     -0.0685,
+     0.317
+    ],
+    "prob_above_cut": 0.8545,
+    "prob_adds": 0.821,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Betfair | Quota de mercado = menos de 80 % & Reforço = reforço ×2",
     "family": "Betfair",
     "conditions": [
@@ -12255,7 +12300,7 @@
      0.3134
     ],
     "prob_above_cut": 0.8555,
-    "prob_adds": 0.9666,
+    "prob_adds": 0.9691,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12295,7 +12340,7 @@
      0.3134
     ],
     "prob_above_cut": 0.8556,
-    "prob_adds": 0.8269,
+    "prob_adds": 0.819,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12331,7 +12376,7 @@
      0.2428
     ],
     "prob_above_cut": 0.8489,
-    "prob_adds": 0.8132,
+    "prob_adds": 0.8016,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12367,7 +12412,7 @@
      0.2428
     ],
     "prob_above_cut": 0.8489,
-    "prob_adds": 0.8132,
+    "prob_adds": 0.8016,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12403,7 +12448,7 @@
      0.2347
     ],
     "prob_above_cut": 0.8448,
-    "prob_adds": 0.8092,
+    "prob_adds": 0.7974,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12435,7 +12480,7 @@
      0.2819
     ],
     "prob_above_cut": 0.851,
-    "prob_adds": 0.8205,
+    "prob_adds": 0.8115,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12471,7 +12516,7 @@
      0.3161
     ],
     "prob_above_cut": 0.8524,
-    "prob_adds": 0.8256,
+    "prob_adds": 0.8181,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12511,7 +12556,7 @@
      0.3265
     ],
     "prob_above_cut": 0.8539,
-    "prob_adds": 0.8268,
+    "prob_adds": 0.8194,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12551,7 +12596,7 @@
      0.2374
     ],
     "prob_above_cut": 0.8434,
-    "prob_adds": 0.8075,
+    "prob_adds": 0.7958,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12591,7 +12636,7 @@
      0.2374
     ],
     "prob_above_cut": 0.8434,
-    "prob_adds": 0.8075,
+    "prob_adds": 0.7958,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12671,7 +12716,7 @@
      0.2976
     ],
     "prob_above_cut": 0.8484,
-    "prob_adds": 0.8186,
+    "prob_adds": 0.8104,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12711,7 +12756,7 @@
      0.2976
     ],
     "prob_above_cut": 0.8484,
-    "prob_adds": 0.8186,
+    "prob_adds": 0.8104,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12751,7 +12796,7 @@
      0.3244
     ],
     "prob_above_cut": 0.8511,
-    "prob_adds": 0.8233,
+    "prob_adds": 0.8158,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12791,7 +12836,7 @@
      0.3101
     ],
     "prob_above_cut": 0.8502,
-    "prob_adds": 0.9618,
+    "prob_adds": 0.9646,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12831,7 +12876,7 @@
      0.3101
     ],
     "prob_above_cut": 0.8502,
-    "prob_adds": 0.9618,
+    "prob_adds": 0.9646,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12878,6 +12923,46 @@
     "last_change": null
    },
    {
+    "id": "Jogo aberto | Competição = liga & Golos até ao sinal = 1 ou 2 & Parte do jogo = 1.ª parte",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Competição",
+      "liga"
+     ],
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Parte do jogo",
+      "1.ª parte"
+     ]
+    ],
+    "n": 13,
+    "hits": 9,
+    "hit_rate": 0.6923,
+    "break_even": 0.4912,
+    "prob_above": 0.8669,
+    "roi": 0.4407,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 13,
+    "bets": 13,
+    "edge": 0.1137,
+    "edge_ci": [
+     -0.056,
+     0.2728
+    ],
+    "prob_above_cut": 0.8454,
+    "prob_adds": 0.8019,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde & Minuto = 31 a 60",
     "family": "Jogo aberto",
     "conditions": [
@@ -12911,7 +12996,7 @@
      0.3093
     ],
     "prob_above_cut": 0.8488,
-    "prob_adds": 0.8185,
+    "prob_adds": 0.8103,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12951,7 +13036,7 @@
      0.236
     ],
     "prob_above_cut": 0.8376,
-    "prob_adds": 0.7993,
+    "prob_adds": 0.7875,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -12991,7 +13076,7 @@
      0.3085
     ],
     "prob_above_cut": 0.8476,
-    "prob_adds": 0.9607,
+    "prob_adds": 0.9635,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -13034,6 +13119,86 @@
     "last_change": null
    },
    {
+    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Confiança indicada pelo bot",
+      "menos de 95 %"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com vários tipos de sinal"
+     ]
+    ],
+    "n": 8,
+    "hits": 7,
+    "hit_rate": 0.8571,
+    "break_even": 0.5515,
+    "prob_above": 0.8652,
+    "roi": 0.5833,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 8,
+    "bets": 8,
+    "edge": 0.1258,
+    "edge_ci": [
+     -0.0674,
+     0.2947
+    ],
+    "prob_above_cut": 0.8446,
+    "prob_adds": 0.8049,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com vários tipos de sinal"
+     ]
+    ],
+    "n": 8,
+    "hits": 7,
+    "hit_rate": 0.8571,
+    "break_even": 0.5515,
+    "prob_above": 0.8652,
+    "roi": 0.5833,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 8,
+    "bets": 8,
+    "edge": 0.1258,
+    "edge_ci": [
+     -0.0674,
+     0.2947
+    ],
+    "prob_above_cut": 0.8446,
+    "prob_adds": 0.8049,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 2,00 a 3,00 & Golos em falta para ganhar = até 1 golo",
     "family": "Jogo aberto",
     "conditions": [
@@ -13067,7 +13232,7 @@
      0.3215
     ],
     "prob_above_cut": 0.8471,
-    "prob_adds": 0.8183,
+    "prob_adds": 0.8106,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -13103,7 +13268,7 @@
      0.2658
     ],
     "prob_above_cut": 0.8397,
-    "prob_adds": 0.8043,
+    "prob_adds": 0.7944,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -13139,163 +13304,7 @@
      0.2658
     ],
     "prob_above_cut": 0.8397,
-    "prob_adds": 0.8043,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Momento do aviso = até 45 min depois do início & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Momento do aviso",
-      "até 45 min depois do início"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 9,
-    "hits": 7,
-    "hit_rate": 0.7778,
-    "break_even": 0.537,
-    "prob_above": 0.8629,
-    "roi": 0.4333,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 8,
-    "bets": 9,
-    "edge": 0.1227,
-    "edge_ci": [
-     -0.0665,
-     0.2912
-    ],
-    "prob_above_cut": 0.842,
-    "prob_adds": 0.9902,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Jogo aberto | Competição = feminino & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Competição",
-      "feminino"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Marcador no momento",
-      "diferença de 2 ou mais golos"
-     ]
-    ],
-    "n": 7,
-    "hits": 6,
-    "hit_rate": 0.8571,
-    "break_even": 0.5555,
-    "prob_above": 0.8628,
-    "roi": 0.5643,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 7,
-    "bets": 7,
-    "edge": 0.1242,
-    "edge_ci": [
-     -0.0688,
-     0.2925
-    ],
-    "prob_above_cut": 0.8417,
-    "prob_adds": 0.8095,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = nenhum",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Dia",
-      "fim de semana"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Golos até ao sinal",
-      "nenhum"
-     ]
-    ],
-    "n": 27,
-    "hits": 21,
-    "hit_rate": 0.7209,
-    "break_even": 0.5873,
-    "prob_above": 0.8625,
-    "roi": 0.1859,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 27,
-    "bets": 27,
-    "edge": 0.0912,
-    "edge_ci": [
-     -0.05,
-     0.2194
-    ],
-    "prob_above_cut": 0.8309,
-    "prob_adds": 0.8412,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Forma de golos | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = empatado",
-    "family": "Forma de golos",
-    "conditions": [
-     [
-      "Dia",
-      "fim de semana"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Marcador no momento",
-      "empatado"
-     ]
-    ],
-    "n": 27,
-    "hits": 21,
-    "hit_rate": 0.7209,
-    "break_even": 0.5873,
-    "prob_above": 0.8625,
-    "roi": 0.1859,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 27,
-    "bets": 27,
-    "edge": 0.0912,
-    "edge_ci": [
-     -0.05,
-     0.2194
-    ],
-    "prob_above_cut": 0.8309,
-    "prob_adds": 0.8412,
+    "prob_adds": 0.7944,
     "pending_status": null,
     "entry_status": "em observação",
     "status_changes": 0,
@@ -13533,7 +13542,7 @@
      0.1393
     ],
     "prob_above_cut": 0.2809,
-    "prob_adds": 0.7076,
+    "prob_adds": 0.6463,
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Jogo aberto",
     "conditions": [
@@ -14089,29 +14098,29 @@
     "entry_status": "em observação"
    },
    {
-    "n": 10,
+    "n": 11,
     "signals": 14,
-    "hits": 5,
+    "hits": 6,
     "misses": 5,
-    "hit_rate": 0.5,
+    "hit_rate": 0.5455,
     "ci95": [
-     0.2366,
-     0.7634
+     0.2801,
+     0.7873
     ],
-    "break_even": 0.4844,
-    "roi": -0.0125,
-    "games": 10,
-    "bets": 10,
+    "break_even": 0.4945,
+    "roi": 0.0408,
+    "games": 11,
+    "bets": 11,
     "unidentified": 0,
-    "prudent_rate": 0.4922,
-    "prob_above": 0.5266,
-    "edge": 0.0078,
+    "prudent_rate": 0.5212,
+    "prob_above": 0.598,
+    "edge": 0.0267,
     "edge_ci": [
-     -0.1716,
-     0.1881
+     -0.1501,
+     0.2011
     ],
-    "prob_above_cut": 0.4917,
-    "prob_adds": 0.449,
+    "prob_above_cut": 0.5623,
+    "prob_adds": 0.5105,
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 1.ª parte",
     "family": "Jogo aberto",
     "conditions": [
@@ -14130,7 +14139,7 @@
     "expect": "acima",
     "mode": "novas",
     "tradable": true,
-    "open": 2,
+    "open": 1,
     "status": "em observação",
     "pending_status": null,
     "status_changes": [],
@@ -14574,12 +14583,12 @@
     "phase": "live",
     "level": 1,
     "signals": 90,
-    "n": 43,
+    "n": 44,
     "hits": 16,
-    "hit_rate": 0.3721,
-    "break_even": 0.4144,
-    "roi": -0.0633,
-    "prob_above": 0.2981
+    "hit_rate": 0.3636,
+    "break_even": 0.4119,
+    "roi": -0.0845,
+    "prob_above": 0.2705
    },
    {
     "phase": "live",
@@ -14632,30 +14641,30 @@
   "accuracy": {
    "BETFAIR/live": {
     "signals": 90,
-    "with_result": 43,
+    "with_result": 44,
     "hits": 16,
-    "misses": 27,
+    "misses": 28,
     "pushes": 0,
     "eff_hits": 16.0,
-    "eff_misses": 27.0,
+    "eff_misses": 28.0,
     "vote_hits": 16.0,
-    "vote_misses": 27.0,
-    "vote_break_even": 0.4144,
-    "games": 43,
+    "vote_misses": 28.0,
+    "vote_break_even": 0.4119,
+    "games": 44,
     "no_source": 17,
     "unsettleable": 0,
-    "hit_rate": 0.3721,
+    "hit_rate": 0.3636,
     "ci95": [
-     0.2438,
-     0.5214
+     0.2378,
+     0.5113
     ],
-    "avg_odds": 4.598,
-    "break_even": 0.4144,
+    "avg_odds": 4.568,
+    "break_even": 0.4119,
     "baseline": false,
-    "roi_announced_odds": -0.0633,
+    "roi_announced_odds": -0.0845,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 10.3,
+    "per_day": 10.5,
     "days_to_hint": 0,
     "days_to_conclusion": 25
    },
@@ -14690,30 +14699,30 @@
    },
    "OPEN_GAME": {
     "signals": 129,
-    "with_result": 126,
-    "hits": 59,
+    "with_result": 127,
+    "hits": 60,
     "misses": 41,
     "pushes": 26,
-    "eff_hits": 57.5,
+    "eff_hits": 58.5,
     "eff_misses": 40.0,
-    "vote_hits": 57.5,
+    "vote_hits": 58.5,
     "vote_misses": 40.0,
-    "vote_break_even": 0.5488,
-    "games": 100,
+    "vote_break_even": 0.5493,
+    "games": 101,
     "no_source": 0,
     "unsettleable": 0,
-    "hit_rate": 0.5897,
+    "hit_rate": 0.5939,
     "ci95": [
-     0.4905,
-     0.6822
+     0.4952,
+     0.6856
     ],
-    "avg_odds": 1.878,
-    "break_even": 0.5488,
+    "avg_odds": 1.876,
+    "break_even": 0.5493,
     "baseline": false,
-    "roi_announced_odds": 0.0898,
+    "roi_announced_odds": 0.0945,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 32.0,
+    "per_day": 32.3,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -14837,7 +14846,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 43,
+    "n": 44,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -14849,22 +14858,22 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 100,
+    "n": 101,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 60,
-     "hit_rate": 0.6207,
-     "break_even": 0.5274,
-     "roi": 0.195
+     "n": 61,
+     "hit_rate": 0.6102,
+     "break_even": 0.5285,
+     "roi": 0.1754
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.5443,
+     "hit_rate": 0.5696,
      "break_even": 0.5809,
-     "roi": -0.0095
+     "roi": 0.0325
     },
-    "z": -1.29
+    "z": -0.93
    },
    {
     "type": "POLYMARKET",
@@ -14929,32 +14938,32 @@
   },
   "Q2 Betfair: sem reforço (sinal único)": {
    "bets": 68,
-   "settled": 28,
-   "matches": 28,
+   "settled": 29,
+   "matches": 29,
    "wins": 7,
    "pushes": 0,
-   "units": -7.29,
-   "avg_odds": 5.959,
+   "units": -8.29,
+   "avg_odds": 5.868,
    "roi": {
     "odd-0%": {
-     "roi": -0.2604,
+     "roi": -0.2859,
      "ci95": [
-      -0.7911,
-      0.2704
+      -0.8004,
+      0.2287
      ]
     },
     "odd-2%": {
-     "roi": -0.2752,
+     "roi": -0.3001,
      "ci95": [
-      -0.7953,
-      0.245
+      -0.8044,
+      0.2041
      ]
     },
     "odd-5%": {
-     "roi": -0.2973,
+     "roi": -0.3216,
      "ci95": [
-      -0.8015,
-      0.2069
+      -0.8104,
+      0.1672
      ]
     }
    },
@@ -15009,32 +15018,32 @@
   },
   "Q3 Betfair: odd [2.50; ∞)": {
    "bets": 59,
-   "settled": 23,
-   "matches": 23,
+   "settled": 24,
+   "matches": 24,
    "wins": 7,
    "pushes": 0,
-   "units": -0.17,
-   "avg_odds": 7.129,
+   "units": -1.17,
+   "avg_odds": 6.97,
    "roi": {
     "odd-0%": {
-     "roi": -0.0074,
+     "roi": -0.0487,
      "ci95": [
-      -0.6669,
-      0.6521
+      -0.6854,
+      0.5879
      ]
     },
     "odd-2%": {
-     "roi": -0.0272,
+     "roi": -0.0678,
      "ci95": [
-      -0.6736,
-      0.6191
+      -0.6917,
+      0.5561
      ]
     },
     "odd-5%": {
-     "roi": -0.057,
+     "roi": -0.0963,
      "ci95": [
-      -0.6836,
-      0.5695
+      -0.7011,
+      0.5085
      ]
     }
    },
@@ -15043,32 +15052,32 @@
   },
   "Q4 Betfair: quota de mercado >= 80 %": {
    "bets": 44,
-   "settled": 15,
-   "matches": 15,
+   "settled": 16,
+   "matches": 16,
    "wins": 7,
    "pushes": 0,
-   "units": -1.35,
-   "avg_odds": 2.515,
+   "units": -2.35,
+   "avg_odds": 2.564,
    "roi": {
     "odd-0%": {
-     "roi": -0.09,
+     "roi": -0.1469,
      "ci95": [
-      -0.6245,
-      0.4445
+      -0.6591,
+      0.3653
      ]
     },
     "odd-2%": {
-     "roi": -0.1082,
+     "roi": -0.1639,
      "ci95": [
-      -0.632,
-      0.4156
+      -0.6659,
+      0.338
      ]
     },
     "odd-5%": {
-     "roi": -0.1355,
+     "roi": -0.1895,
      "ci95": [
-      -0.6432,
-      0.3722
+      -0.6761,
+      0.2971
      ]
     }
    },
@@ -15145,32 +15154,32 @@
   },
   "Q6 Open game: sinal antes do minuto 46": {
    "bets": 44,
-   "settled": 42,
-   "matches": 42,
-   "wins": 18,
+   "settled": 43,
+   "matches": 43,
+   "wins": 19,
    "pushes": 7,
-   "units": 1.85,
-   "avg_odds": 2.008,
+   "units": 2.53,
+   "avg_odds": 2.0,
    "roi": {
     "odd-0%": {
-     "roi": 0.044,
+     "roi": 0.0588,
      "ci95": [
-      -0.245,
-      0.3331
+      -0.2249,
+      0.3426
      ]
     },
     "odd-2%": {
-     "roi": 0.0267,
+     "roi": 0.0411,
      "ci95": [
-      -0.2565,
-      0.31
+      -0.2368,
+      0.3191
      ]
     },
     "odd-5%": {
-     "roi": 0.0008,
+     "roi": 0.0146,
      "ci95": [
-      -0.2737,
-      0.2752
+      -0.2548,
+      0.284
      ]
     }
    },
@@ -15213,32 +15222,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 487,
-   "settled": 356,
-   "matches": 242,
-   "wins": 165,
+   "settled": 358,
+   "matches": 243,
+   "wins": 166,
    "pushes": 29,
-   "units": -16.78,
-   "avg_odds": 2.301,
+   "units": -17.1,
+   "avg_odds": 2.302,
    "roi": {
     "odd-0%": {
-     "roi": -0.0471,
+     "roi": -0.0478,
      "ci95": [
       -0.1547,
-      0.0605
+      0.0592
      ]
     },
     "odd-2%": {
-     "roi": -0.064,
+     "roi": -0.0647,
      "ci95": [
       -0.1695,
-      0.0414
+      0.0402
      ]
     },
     "odd-5%": {
-     "roi": -0.0894,
+     "roi": -0.0901,
      "ci95": [
       -0.1917,
-      0.0128
+      0.0116
      ]
     }
    },
@@ -15539,9 +15548,12 @@
    "match": "UD Logrones — Arenas Club de Getxo",
    "selection": "UD Logrones",
    "odds": 3.3,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    2
+   ],
+   "w": -1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -15610,9 +15622,12 @@
    "match": "UD Logrones — Arenas Club de Getxo",
    "selection": "Over 2",
    "odds": 1.68,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    2
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -16092,6 +16107,15 @@
   }
  ],
  "unsettled": [
+  {
+   "match_id": "ud-castellonense-vs-orihuela-20261115",
+   "match": "UD Castellonense — Orihuela",
+   "league": "Spanish SPAIN SEGUNDA DIVISION RFEF",
+   "date_utc": "2026-11-15T16:51:21+00:00",
+   "kickoff_utc": "2026-11-15T15:45+00:00",
+   "why": "mercado que o resultado final não decide",
+   "signals": 1
+  },
   {
    "match_id": "granada-vs-las-palmas-20261115",
    "match": "Granada — Las Palmas",
@@ -16621,15 +16645,6 @@
    "date_utc": "2026-11-14T14:30:06+00:00",
    "kickoff_utc": "2026-11-14T15:00+00:00",
    "why": "à espera da fonte de resultados",
-   "signals": 1
-  },
-  {
-   "match_id": "spain-u19-vs-wales-u19-20261114",
-   "match": "Spain U19 — Wales U19",
-   "league": "UEFA U19 Championship",
-   "date_utc": "2026-11-14T14:04:50+00:00",
-   "kickoff_utc": "2026-11-14T12:30+00:00",
-   "why": "mercado que o resultado final não decide",
    "signals": 1
   }
  ],
@@ -18216,9 +18231,25 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     56,
+     "1-1"
+    ],
+    [
+     74,
+     "1-2"
+    ],
+    [
+     90,
+     "2-2"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    2,
+    2
+   ]
   },
   "cf-calamocha-vs-reus-fc-reddis-20261115": {
    "teams": [
@@ -22097,8 +22128,18 @@
    "o": 1.72
   },
   {
+   "d": "2026-11-15T16:12:36+00:00",
+   "u": -13.95,
+   "g": 0.68,
+   "w": 1.0,
+   "t": "OPEN_GAME",
+   "m": "UD Logrones — Arenas Club de Getxo",
+   "s": "Over 2",
+   "o": 1.68
+  },
+  {
    "d": "2026-11-15T16:18:14+00:00",
-   "u": -14.28,
+   "u": -13.6,
    "g": 0.35,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -22108,7 +22149,7 @@
   },
   {
    "d": "2026-11-15T16:18:41+00:00",
-   "u": -15.28,
+   "u": -14.6,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -22117,8 +22158,18 @@
    "o": 1.57
   },
   {
+   "d": "2026-11-15T16:21:12+00:00",
+   "u": -15.6,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "BETFAIR/live",
+   "m": "UD Logrones — Arenas Club de Getxo",
+   "s": "UD Logrones",
+   "o": 3.3
+  },
+  {
    "d": "2026-11-15T16:23:06+00:00",
-   "u": -14.78,
+   "u": -15.1,
    "g": 0.5,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -22128,7 +22179,7 @@
   },
   {
    "d": "2026-11-15T16:27:33+00:00",
-   "u": -15.78,
+   "u": -16.1,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -22138,7 +22189,7 @@
   },
   {
    "d": "2026-11-15T16:29:52+00:00",
-   "u": -16.78,
+   "u": -17.1,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -22178,9 +22229,9 @@
   },
   {
    "bets": 139,
-   "settled": 69,
-   "wins": 32,
-   "units": -9.48,
+   "settled": 71,
+   "wins": 33,
+   "units": -9.8,
    "day": "2026-11-15"
   }
  ]
