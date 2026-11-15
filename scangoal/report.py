@@ -7,7 +7,7 @@ Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunc
 import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
-from . import brain, insights
+from . import brain, certification, insights
 from .eligibility import eligible, exclusion_reasons
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
@@ -33,6 +33,7 @@ def load(chronology=None):
     """
     first, ft, marks, notes, goals = {}, {}, {}, [], {}
     seen_ft, seen_mark, seen_note = {}, {}, {}   # valor -> primeira recolha em que apareceu (ficheiro append-only, por ordem)
+    seen_any = {}                                  # jogo -> primeira recolha de QUALQUER resultado do bot (mesmo corrigido depois)
     audit = {'versions': 0, 'edits_changing_signal': 0, 'bot_mark_disagreements': 0, 'last_collected_at_utc': None}
     path = data_dir() / 'messages.jsonl'
     if not path.exists():
@@ -55,6 +56,7 @@ def load(chronology=None):
         elif p.get('ft') and p.get('match_id'):
             ft[p['match_id']] = p['ft']
             seen_ft.setdefault((p['match_id'], tuple(p['ft'])), got)
+            seen_any.setdefault(p['match_id'], got)
             if p.get('bet'):
                 if p.get('bot_mark') is not None:
                     marks[key_of(p)] = p['bot_mark']
@@ -79,6 +81,7 @@ def load(chronology=None):
         chronology['ft'] = {m: seen_ft.get((m, tuple(v))) for m, v in ft.items()}
         chronology['marks'] = {k: seen_mark.get((k, v)) for k, v in marks.items()}
         chronology['notes'] = dict(seen_note)
+        chronology['ft_any'] = dict(seen_any)
     return [first[k] for k in sorted(first)], ft, marks, notes, audit
 
 
@@ -160,6 +163,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             f, from_bsd, source, known = ext['ft'], True, ext.get('provider', 'BSD'), ext.get('known_utc', ext.get('matched_at_utc'))
         b['ft'], b['w'], b['settled_by'] = f, None, None
         b['result_known_utc'], b['result_known_source'] = None, None
+        b['match_result_first_seen_utc'] = match_first_seen(b, notes, chronology)
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
         det = (details or {}).get(b['match_id'])
@@ -188,6 +192,36 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             b['w'], b['settled_by'] = (1.0 if marks[b['key']] else -1.0), 'marca do bot'
             b['result_known_utc'], b['result_known_source'] = (chronology.get('marks') or {}).get(b['key']), 'bot_mark'
     return bets
+
+
+def match_first_seen(b, notes, chronology):
+    """Primeira vez que o sistema viu QUALQUER resultado deste jogo, por qualquer fonte (PR 3, revisão #5911603577).
+
+    Fontes: versão do bot com resultado (mesmo que corrigido depois), nota de fim de jogo, Highlightly, BSD, resultado manual,
+    minutos dos golos. Não depende de que apostas existem, por isso uma aposta nova nunca muda este instante. Uma fonte sem
+    hora provada (por exemplo, manual sem observed_utc) torna-o desconhecido (None): fail-closed.
+    """
+    mid, stamps, unknown = b['match_id'], [], False
+    if mid in (chronology.get('ft_any') or {}):
+        stamps.append(chronology['ft_any'][mid])
+    hit = note_match(b, notes)
+    if hit:
+        stamps.append((chronology.get('notes') or {}).get((hit[0], tuple(hit[1]), tuple(hit[2]))))
+    stamps += (chronology.get('external') or {}).get(mid, [])
+    if mid in (chronology.get('details') or {}):
+        stamps.append(chronology['details'][mid])
+    parsed = [_utc(x) for x in stamps]
+    if not parsed or any(x is None for x in parsed):
+        return None
+    return min(parsed).isoformat(timespec='seconds')
+
+
+def _utc(value):
+    try:
+        dt = datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        return None
+    return dt.astimezone(timezone.utc) if dt.tzinfo else None
 
 
 def provenance_ok(m):
@@ -454,6 +488,13 @@ def build(csv_path=None, register=False):
     manual = brain.load_registry(data_dir() / 'manual_results.json')   # {jogo: {ft: [c, f], source: onde foi visto}}; só entradas revistas à mão
     audit['manual_results'] = len(manual)
     audit['manual_vs_other_disagreements'] = sum(1 for m, r in manual.items() if (ft.get(m) or (bsd.get(m) or {}).get('ft')) not in (None, tuple(r['ft']), list(r['ft'])))
+    chron['external'] = {}
+    for res in ext.values():
+        for m, r in res.items():
+            chron['external'].setdefault(m, []).append(r.get('matched_at_utc'))
+    for m, r in manual.items():
+        chron['external'].setdefault(m, []).append(r.get('observed_utc'))
+    chron['details'] = {m: d.get('fetched_at_utc') for m, d in details.items()}
     for m, r in manual.items():
         if m not in bsd and isinstance(r.get('ft'), list) and len(r['ft']) == 2:
             bsd[m] = {'ft': [int(r['ft'][0]), int(r['ft'][1])], 'provider': 'manual', 'known_utc': r.get('observed_utc')}   # sem hora provada: desconhecida
@@ -493,7 +534,13 @@ def build(csv_path=None, register=False):
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     LAST['signals'] = [b for b in signals if eligible(b)]
-    brn = brain.build(signals, registry, MIN_SETTLED)
+    ledger_path = data_dir() / certification.FILE
+    ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
+    brn = brain.build(signals, registry, MIN_SETTLED, ledger)
+    if register and brn['validation']['ledger_valid'] and brn['validation']['candidates']:
+        # Seleção em tempo real, registada uma só vez (rank, α e início ficam fixos); só com o registo ativado e válido.
+        if certification.append(ledger, brn['validation']['candidates'], registry, datetime.now(timezone.utc)):
+            certification.save(ledger_path, ledger)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}

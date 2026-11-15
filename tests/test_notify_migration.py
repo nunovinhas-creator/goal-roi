@@ -25,7 +25,7 @@ def eligible_report():
     return {'generated_at_utc': NOW.isoformat(), 'brain': {'evidence_scope': 'eligible_bets_only',
             'status_list': {f'h{i}': 'promissora' for i in range(8)},
             # PR 3: validated statuses are only announced with a certificate of the accepted method (fixture declares it).
-            'validation': {'method': notify.VALIDATION_METHOD, 'certified': ['h0', 'h1']}}}
+            'validation': {'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h0', 'h1']}}}
 
 
 class NotifyMigration(unittest.TestCase):

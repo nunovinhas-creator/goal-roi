@@ -31,9 +31,9 @@ Disciplina (fixada a 12/11/2026):
   "informativa": explica, mas não dá para apostar no momento do sinal, e não entra na lista "a seguir".
 """
 import hashlib, itertools, json, math
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from . import chronology, insights
+from . import certification, chronology, insights
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -42,7 +42,7 @@ MAX_CONDITIONS = 3       # o gerador combina até 3 características; o registo 
 HINT_AT, STRONG_AT = 30, 100                       # jogos independentes
 BOARD_MIN, BOARD_GOOD, BOARD_BAD = 8, 0.80, 0.20   # quadro em destaque: mínimo de jogos e limiares de probabilidade
 TRACK_MIN = 10           # jogos para uma hipótese entrar no balanço das propostas
-STATUS_RULES = 'chronological_eprocess_v1'        # muda quando as regras de estado mudam (migração silenciosa no Telegram)
+STATUS_RULES = 'chronological_eprocess_v2'        # muda quando as regras de estado mudam (migração silenciosa no Telegram)
 VALIDATION_METHOD = 'eprocess_online_alpha_v1'     # o Telegram só anuncia validadas certificadas por este método
 FWER_ALPHA = 0.05        # erro de família, para toda a vida do projeto, das táticas certificadas (forte/confirmada)
 EPROCESS_LAMBDAS = (0.5, 0.25, 0.125, 0.0625, 0.03125)   # fixados a priori (grelha geométrica); nunca escolhidos pelos dados
@@ -142,7 +142,7 @@ def update_registry(signals, registry, now=None):
 
 def alpha_for_rank(j):
     """Orçamento α da j-ésima hipótese selecionada (por ordem de seleção): α/(j(j+1)). Soma α sobre j >= 1 (telescópica)."""
-    return FWER_ALPHA / (j * (j + 1))
+    return certification.alpha_for_rank(j)
 
 
 def status_of(n, prob, corrected_bar, min_settled, certified=None):
@@ -220,13 +220,33 @@ def game_set(match):
     return hashlib.sha256('\n'.join(ids).encode('utf-8')).hexdigest()[:16] if ids else None
 
 
+# Dimensões cujo valor é conhecido NO PRIMEIRO SINAL da própria aposta, sem olhar para outras mensagens (revisão #5911603577,
+# P1-C). Só hipóteses cujas condições usam APENAS estas dimensões podem ser certificadas. Excluídas: as de POST (reforço, odd e
+# quota depois do sinal, velocidade do reforço, outros sinais no mesmo jogo — dependem de sinais futuros) e "Sinal anterior de
+# outro tipo no mesmo jogo" (depende de outras mensagens, sem prova de que já tinham sido lidas). Lista fechada: uma dimensão
+# nova não é certificável enquanto não for acrescentada aqui com justificação.
+AS_OF_DIMENSIONS = frozenset({
+    'Competição', 'Faixa de odd', 'Dia', 'Hora (UTC)', 'Liga', 'Momento', 'Quota de mercado', 'Tamanho do mercado', 'Antecedência',
+    'Parte do jogo', 'Confiança indicada pelo bot', 'Ritmo indicado pelo bot', 'Golos em falta para ganhar', 'Vantagem indicada pelo bot',
+    'Mercado', 'Momento do aviso', 'Marcador no momento', 'Golos até ao sinal', 'Minuto', 'Seleção', 'Volume na seleção',
+    'Valor da aposta', 'Número de apostas'})
+
+
+def certifiable(h):
+    """Hipótese certificável: registo válido e todas as condições em AS_OF_DIMENSIONS (a família é o tipo do sinal)."""
+    conds = h.get('conditions') if isinstance(h, dict) else None
+    return (chronology.born(h) is not None and isinstance(conds, list)
+            and all(isinstance(c, (list, tuple)) and len(c) == 2 and c[0] in AS_OF_DIMENSIONS for c in conds))
+
+
 def operational_bet(b, t):
     """Aposta que é evidência OPERACIONAL posterior ao instante t (registo ou seleção da hipótese). Definição única (PR 3,
-    revisão #5911487915), usada pelo relatório, pela máquina de estados e pelo teste de confirmação. Exige, sem exceções:
+    revisões #5911487915 e #5911603577), usada pelo relatório, pela máquina de estados e pelo teste de confirmação:
     - sinal emitido depois de t (date_utc > t): um sinal antigo recuperado tarde nunca é prospetivo;
     - sinal lido pelo sistema depois de t (o carimbo da leitura, não só a hora de envio);
     - sinal decidível quando foi lido (chronology.decidable: ainda dava para apostar);
-    - resultado com hora de observação provada, não anterior ao sinal nem ao início (chronology.result_check == verified).
+    - resultado com hora de observação provada (chronology.result_check == verified).
+    A condição "decidida antes de qualquer resultado do jogo ser conhecido" é do jogo (game_core).
     """
     if t is None:
         return False
@@ -236,38 +256,66 @@ def operational_bet(b, t):
     return chronology.result_check(b)[1] == 'verified'
 
 
+def latest_decision(b):
+    """O instante mais tardio em que a decisão sobre a aposta pode ter acontecido: leitura + atraso máximo do relatório."""
+    t = chronology.decision_time(b)
+    return t + timedelta(minutes=chronology.DECISION_DELAY_MAX_MIN) if t is not None else None
+
+
+def first_result_seen(rows):
+    """Primeira observação de QUALQUER resultado do jogo (report.match_first_seen); None se não provada em alguma aposta."""
+    stamps = [chronology.parse_utc(b.get('match_result_first_seen_utc')) for b in rows]
+    return None if not stamps or any(t is None for t in stamps) else min(stamps)
+
+
+def game_core(rows):
+    """Apostas do jogo decididas ANTES de o sistema conhecer qualquer resultado desse jogo (P1-D). As decididas depois são
+    ignoradas (nunca mudam o jogo retroativamente). None se a primeira observação do resultado não está provada."""
+    first = first_result_seen(rows)
+    if first is None:
+        return None
+    return [b for b in rows if latest_decision(b) is not None and latest_decision(b) < first]
+
+
 def operational_game(rows, t):
-    """Um jogo só é evidência operacional posterior a t se TODAS as suas apostas decididas o forem (jogos mistos: não)."""
-    return bool(rows) and all(operational_bet(b, t) for b in rows)
+    """Um jogo é evidência operacional posterior a t se tem apostas decididas antes do resultado e TODAS essas apostas são
+    operacionais (jogos mistos: não)."""
+    core = game_core(rows)
+    return bool(core) and all(operational_bet(b, t) for b in core)
 
 
 def game_category(rows, born):
-    """Categoria de um jogo face ao registo: prospetivo, misto, anterior ao registo, ou posterior mas não operacional
-    (recolha tardia/backfill, sinal lido tarde demais, hora do resultado não provada)."""
-    ok = [operational_bet(b, born) for b in rows]
+    """Categoria de um jogo face ao registo (auditoria)."""
+    core = game_core(rows)
+    if core is None:
+        return 'result_time_unproven'
+    if not core:
+        return 'result_known_before_decision'
+    ok = [operational_bet(b, born) for b in core]
     if all(ok):
         return 'prospective'
     if any(ok):
         return 'mixed'
-    if all((chronology.signal_time(b) or _LAST) <= born for b in rows):
+    if all((chronology.signal_time(b) or _LAST) <= born for b in core):
         return 'before_registration'
     return 'after_registration_not_operational'
 
 
-def prospective_summary(ordered, born):
-    """Evidência PROSPETIVA de uma hipótese (None sem registo válido): só jogos operacionais posteriores ao registo.
+CATEGORIES = ('prospective', 'mixed', 'before_registration', 'after_registration_not_operational', 'result_known_before_decision',
+              'result_time_unproven')
 
-    Recebe os mesmos jogos ordenados que a máquina de estados (ordered_games) e usa a mesma regra (operational_game), por
-    isso o relatório e o replay contam exatamente os mesmos jogos. Conta também as outras categorias, para auditoria.
-    """
+
+def prospective_summary(ordered, born):
+    """Evidência PROSPETIVA de uma hipótese (None sem registo válido): só jogos operacionais posteriores ao registo, com as
+    apostas decididas antes do resultado (game_core). Mesma regra e mesmos jogos que a máquina de estados."""
     if born is None:
         return None
-    v, cats, pls = insights.Votes(), dict.fromkeys(('prospective', 'mixed', 'before_registration', 'after_registration_not_operational'), 0), []
+    v, cats, pls = insights.Votes(), dict.fromkeys(CATEGORIES, 0), []
     for _, _, rows in ordered:
         cat = game_category(rows, born)
         cats[cat] += 1
         if cat == 'prospective':
-            for b in rows:
+            for b in game_core(rows):
                 v.add(b)
                 pls.append(b['w'] * (b['odds'] - 1) if b['w'] > 0 else b['w'])
     h, m, be, n = v.totals()
@@ -289,31 +337,44 @@ def game_profit(rows):
     return sum(vals) / len(vals) if vals else None
 
 
+def _log_mean_exp(logs):
+    top = max(logs)
+    return top + math.log(sum(math.exp(x - top) for x in logs) / len(logs))
+
+
 def confirmation(ordered, since, alpha):
     """Teste de confirmação com nível garantido: e-processo de apostas (testing by betting) sobre o lucro por jogo.
 
-    Nulo (por hipótese): em cada jogo usado, o lucro esperado à odd anunciada −2 %, dado o passado, é <= 0 ("sem vantagem").
-    E_n = média sobre EPROCESS_LAMBDAS de prod(1 + λ·y_i); como y_i >= −1 e λ <= 1/2, cada fator é > 0 e, sob o nulo, E_n é um
-    supermartingala não negativa (E_0 = 1). Desigualdade de Ville: P(algum n com E_n >= 1/α) <= α, qualquer que seja o
-    momento em que se olha (observação contínua), com odds diferentes e resultados fracionários. Só jogos operacionais com
-    sinal posterior a `since` (a seleção), pela ordem provada de observação; certifica quando E_n >= 1/α e n >= PROSPECTIVE_MIN.
+    Nulo (por hipótese): em cada jogo usado, o lucro esperado à odd anunciada −2 %, dado tudo o que se sabia quando as suas
+    apostas foram decididas, é <= 0 ("sem vantagem"). E_n = média sobre EPROCESS_LAMBDAS de prod(1 + λ·y_i); y_i >= −1 e
+    λ <= 1/2, por isso cada fator é > 0 e, sob o nulo, E_n é uma supermartingala não negativa (E_0 = 1). Desigualdade de
+    Ville: P(algum n com E_n >= 1/α) <= α (observação contínua, odds diferentes, resultados fracionários).
+    Amostra previsível (revisão #5911603577): só jogos operacionais com sinais posteriores a `since` (a seleção REGISTADA),
+    só as apostas decididas antes de qualquer resultado do jogo ser conhecido, pela ordem em que esses jogos ficaram completos.
+    Tudo em domínio logarítmico: séries longas nunca transbordam. Certifica quando log E_n >= log(1/α) e n >= PROSPECTIVE_MIN.
     """
-    logs, n, e, emax, cert = [0.0] * len(EPROCESS_LAMBDAS), 0, 1.0, 1.0, None
-    for known, _, rows in ordered:
-        if known is None or not operational_game(rows, since):
+    games = []
+    for _, key, rows in ordered:
+        if not operational_game(rows, since):
             continue
-        y = game_profit(rows)
+        core = game_core(rows)
+        y = game_profit(core)
         if y is None:
             continue
+        games.append((max(chronology.result_known(b) for b in core), min(chronology.signal_time(b) for b in core), key, y))
+    games.sort()
+    logs, n, log_e, log_max, cert, bar = [0.0] * len(EPROCESS_LAMBDAS), 0, 0.0, 0.0, None, math.log(1 / alpha)
+    for done, _, _, y in games:
         n += 1
         for k, lam in enumerate(EPROCESS_LAMBDAS):
             logs[k] += math.log1p(lam * y)
-        e = sum(math.exp(x) for x in logs) / len(logs)
-        emax = max(emax, e)
-        if cert is None and n >= PROSPECTIVE_MIN and e >= 1 / alpha:
-            cert = known
-    return {'games': n, 'e_value': round(e, 4), 'e_max': round(emax, 4), 'threshold': round(1 / alpha, 2), 'alpha': alpha,
-            'certified_at': cert}
+        log_e = _log_mean_exp(logs)
+        log_max = max(log_max, log_e)
+        if cert is None and n >= PROSPECTIVE_MIN and log_e >= bar:
+            cert = done
+    shown = lambda x: round(math.exp(x), 4) if x < 700 else None   # e-valor legível; acima de e^700 só o log10
+    return {'games': n, 'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
+            'log10_e_max': round(log_max / math.log(10), 4), 'threshold': round(1 / alpha, 2), 'alpha': alpha, 'certified_at': cert}
 
 
 def game_steps(match, born=None, *, prospective_from=None, ordered=None):
@@ -371,16 +432,13 @@ def stable_status(steps, corrected_bar, min_settled, *, certified_from=_PR2):
     return state, pending, changes
 
 
-def selection_time(changes):
-    """Seleção = primeira promoção confirmada a promissora, com hora provada. None se nunca (ou sem hora provada)."""
-    for c in changes:
-        if c['to'] == 'promissora':
-            return chronology.parse_utc(c['known_utc'])
-    return None
+def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None, legacy=()):
+    """-> (linhas, hipóteses testadas, fasquia de referência 1 − α/testadas; esta já não decide estados).
 
-
-def evaluate(signals, registry, min_settled, *, exploratory=False):
-    """-> (linhas, hipóteses testadas, fasquia de referência 1 − α/testadas; esta já não decide estados, ver confirmation)."""
+    selected: {id: (rank, α, hora)} do registo de seleções verificado (certification.selections); None = validação não
+    ativada ou registo inválido: nenhuma certificação, nenhuma forte/confirmada (fail-closed). legacy: ids legados (nunca
+    certificáveis). A avaliação exploratória nunca certifica.
+    """
     if not exploratory:
         signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
@@ -410,26 +468,27 @@ def evaluate(signals, registry, min_settled, *, exploratory=False):
         rows.append(row)
     tested = len(matched)
     by_id = {r['id']: r for r in rows}
-    # 1.ª passagem: estados sem certificado (forte/confirmada impossíveis) e hora de seleção (1.ª promoção a promissora).
-    steps, selected = {}, []
+    # Certificação: só seleções REGISTADAS em tempo real (rank, α e início fixos), só hipóteses certificáveis.
+    certified_at = {}
+    for hid, (rank, alpha, t) in sorted((selected or {}).items()) if not exploratory else ():
+        if hid not in by_id:
+            continue
+        ok = certifiable(registry[hid])
+        c = confirmation(ordered[hid], t, alpha) if ok else {'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
+        by_id[hid]['confirmation'] = dict(c, rank=rank, selected_utc=chronology.iso(t), certifiable=ok, certified_utc=chronology.iso(c['certified_at']))
+        del by_id[hid]['confirmation']['certified_at']
+        if c['certified_at'] is not None:
+            certified_at[hid] = c['certified_at']
+    for hid in legacy:
+        if hid in by_id and not exploratory:
+            by_id[hid]['certification'] = 'legado: não certificável'
     for hid in matched:
         born = born_of[hid]
         if born is None:           # sem registo válido: nunca toma decisões (fail-closed)
             continue
-        steps[hid] = game_steps(matched[hid], born, prospective_from=born, ordered=ordered[hid])
+        steps = game_steps(matched[hid], born, prospective_from=born, ordered=ordered[hid])
         r = by_id[hid]
-        r['status'], r['pending_status'], r['status_changes'] = stable_status(steps[hid], None, min_settled, certified_from=None)
-        t = selection_time(r['status_changes'])
-        if t is not None and not exploratory:
-            selected.append((t, hid))
-    # Confirmação: orçamento α online pela ordem de seleção; e-processo só com jogos operacionais posteriores à seleção.
-    for j, (t, hid) in enumerate(sorted(selected), 1):
-        c = confirmation(ordered[hid], t, alpha_for_rank(j))
-        r = by_id[hid]
-        r['confirmation'] = dict(c, rank=j, selected_utc=chronology.iso(t), certified_utc=chronology.iso(c['certified_at']))
-        del r['confirmation']['certified_at']
-        if c['certified_at'] is not None:   # 2.ª passagem só para as certificadas
-            r['status'], r['pending_status'], r['status_changes'] = stable_status(steps[hid], None, min_settled, certified_from=c['certified_at'])
+        r['status'], r['pending_status'], r['status_changes'] = stable_status(steps, None, min_settled, certified_from=certified_at.get(hid))
     for r in rows:
         r.setdefault('status', 'em observação')
         r.setdefault('pending_status', None)
@@ -593,28 +652,40 @@ def multiplicity(rows, tested):
             'promising_union_games': len(set().union(*(r.get('_games') or set() for r in good))) if good else 0,
             'evidence_levels': {lvl: sum(1 for r in tested_rows if r.get('evidence_level') == lvl) for lvl in ('exploratória', 'prospetiva', 'não verificável')},
             'prospective_categories_tested': {k: sum((r.get('prospective') or {}).get('categories', {}).get(k, 0) for r in tested_rows)
-                                              for k in ('prospective', 'mixed', 'before_registration', 'after_registration_not_operational')},
+                                              for k in CATEGORIES},
             'note': 'promissora/abandonada are uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)'}
 
 
-def validation(rows):
-    """O que "forte"/"confirmada" significam e com que garantia (método, pressupostos, estado atual)."""
+def validation(rows, ledger, problems, registry):
+    """O que "forte"/"confirmada" significam, com que garantia, e se a certificação está ativa (registo de seleções)."""
     sel = sorted((r for r in rows if r.get('confirmation')), key=lambda r: r['confirmation']['rank'])
+    active = ledger is not None and not problems
+    known = ({e['id'] for e in ledger.get('entries') or []} | {x.get('id') for x in ledger.get('legacy') or []}) if active else set()
+    candidates = sorted(r['id'] for r in rows if active and r['status'] == 'promissora' and r['id'] not in known and certifiable(registry.get(r['id'])))
+    closeness = lambda r: (r['confirmation'].get('log10_e') or 0) - math.log10(r['confirmation']['threshold'])
     return {'method': VALIDATION_METHOD, 'alpha': FWER_ALPHA,
+            'state': 'active' if active else 'not_activated' if ledger is None else 'ledger_invalid',
+            'ledger_valid': active, 'ledger_problems': problems if ledger is not None else [],
+            'activated_utc': ledger.get('activated_utc') if active else None, 'legacy': len(ledger.get('legacy') or []) if active else 0,
             'test': 'test-by-betting e-process on per-game profit at announced odds minus %d %%' % round(insights.ODDS_LOSS * 100),
-            'lambdas': list(EPROCESS_LAMBDAS), 'allocation': 'alpha/(j(j+1)) by order of selection (first confirmed promissora)',
-            'evidence': 'operational games whose signals were sent and read after the selection, decidable, with proven result time',
+            'lambdas': list(EPROCESS_LAMBDAS), 'allocation': 'alpha/(j(j+1)) by order of REGISTERED real-time selection (append-only ledger)',
+            'evidence': 'games whose bets were sent and read after the registered selection, decidable, decided before any result of '
+                        'the game was observed, with proven result time; only hypotheses whose conditions are all known at the first signal',
+            'as_of_dimensions': sorted(AS_OF_DIMENSIONS),
             'min_games': PROSPECTIVE_MIN, 'also_requires': {'games': STRONG_AT, 'prob_above': PROMOTE_AT, 'keep_prob_above': KEEP_PROMISING},
-            'claim': 'P(any tactic ever certified while its expected profit at odds -2 %% is <= 0 on its games) <= %.2f, '
-                     'over the whole life of the project, any dependence between hypotheses, continuous monitoring' % FWER_ALPHA,
-            'assumptions': ['null holds conditionally on the past for every game used (no edge whatever happened before)',
-                            'which games a hypothesis contains never depends on their results (fixed conditions)',
-                            'stored observation times are true (verified against git history in the PR 3 audit)'],
-            'selected': len(sel), 'certified': [r['id'] for r in sel if r['confirmation']['certified_utc']],
-            'closest': [dict(r['confirmation'], id=r['id']) for r in sorted(sel, key=lambda r: -r['confirmation']['e_value'] * r['confirmation']['alpha'])[:5]]}
+            'claim': ('P(any tactic ever certified while its expected profit at odds -2 %% is <= 0 on its games) <= %.2f, over the whole '
+                      'life of the project from activation, any dependence between hypotheses, continuous monitoring, under the assumptions'
+                      % FWER_ALPHA) if active else 'no claim: certification is not active, no tactic can be validated',
+            'assumptions': ['null holds conditionally on everything known when each bet was decided (no edge whatever happened before)',
+                            'membership of a bet uses only dimensions known at its first signal (as_of_dimensions)',
+                            'stored observation times are true (verified against git history in the PR 3 audit)',
+                            'the ledger is append-only (verified hash chain; git history as external clock)'],
+            'selected': len(sel), 'certified': [r['id'] for r in sel if r['confirmation']['certified_utc']], 'candidates': candidates,
+            'closest': [dict(r['confirmation'], id=r['id']) for r in sorted(sel, key=closeness, reverse=True)[:5]]}
 
 
-def build(signals, registry, min_settled):
+def build(signals, registry, min_settled, ledger=None):
+    """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada."""
     all_signals = signals
     signals = [b for b in all_signals if eligible(b)]
     excluded = {}
@@ -625,7 +696,9 @@ def build(signals, registry, min_settled):
     exploratory_counts = {}
     for r in exploratory_rows:
         exploratory_counts[r['status']] = exploratory_counts.get(r['status'], 0) + 1
-    rows, tested, _ = evaluate(signals, registry, min_settled)
+    selected, problems = certification.selections(ledger, registry)
+    legacy = {x.get('id') for x in (ledger or {}).get('legacy') or [] if isinstance(x, dict)} if not problems else set()
+    rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected if not problems else None, legacy=legacy)
     fams = {}
     for b in signals:
         if b['w'] is not None and b['w'] != 0 and b['odds']:
@@ -645,7 +718,7 @@ def build(signals, registry, min_settled):
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even'),
                                  'certified': bool(r.get('confirmation') and r['confirmation']['certified_utc'])})
-    mult, valid = multiplicity(rows, tested), validation(rows)
+    mult, valid = multiplicity(rows, tested), validation(rows, ledger, problems, registry)
     for r in rows:
         r['open'] = len(r['open'])
         r.pop('_games', None)
@@ -659,7 +732,7 @@ def build(signals, registry, min_settled):
             'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
                                                                                                     'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status',
                                                                                                     'born_utc', 'born_verified', 'evidence_level', 'prospective', 'at_birth', 'result_time_unknown', 'game_set',
-                                                                                                    'confirmation', 'validation_blocked')}
+                                                                                                    'confirmation', 'validation_blocked', 'certification')}
                     | {'status_changes': len(r['status_changes']), 'last_change': r['status_changes'][-1] if r['status_changes'] else None}
                     for r in rows if r['n'] >= 5][:150],
             'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},

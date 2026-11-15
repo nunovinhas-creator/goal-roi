@@ -756,7 +756,7 @@ class Notify(unittest.TestCase):
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
                           'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4},
                           # PR 3: validated statuses need a certificate of the accepted method (fixture declares it).
-                          'validation': {'method': 'eprocess_online_alpha_v1', 'certified': ['h1', 'Jogo aberto | Minuto = 31 a 60']}},
+                          'validation': {'method': 'eprocess_online_alpha_v1', 'state': 'active', 'ledger_valid': True, 'certified': ['h1', 'Jogo aberto | Minuto = 31 a 60']}},
                 'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'operational': {'scope': 'eligible_bets_only', 'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'daily': [{'day': '2026-11-12', 'bets': 4, 'settled': 3, 'wins': 2, 'units': 0.85}], 'timeline': [{'u': 1.5}], 'settled_bets': 20}

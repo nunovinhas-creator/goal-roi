@@ -88,8 +88,9 @@ def alert(w, r):
 def certified_ids(report):
     """Táticas certificadas pelo método aceite; qualquer outro relatório não tem nenhuma (fail-closed)."""
     v = (report.get('brain') or {}).get('validation')
-    if not isinstance(v, dict) or v.get('method') != VALIDATION_METHOD or not isinstance(v.get('certified'), list):
-        return set()
+    if (not isinstance(v, dict) or v.get('method') != VALIDATION_METHOD or v.get('state') != 'active' or v.get('ledger_valid') is not True
+            or not isinstance(v.get('certified'), list)):
+        return set()   # sem registo de seleções ativo e verificado: nenhuma tática é anunciada como validada
     return {i for i in v['certified'] if isinstance(i, str)}
 
 
