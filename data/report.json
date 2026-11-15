@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-15T11:34:06+00:00",
- "messages": 698,
+ "generated_at_utc": "2026-11-15T11:36:13+00:00",
+ "messages": 699,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 33,
-  "BETFAIR": 159,
+  "BETFAIR": 160,
   "STAKE_LOAD": 108,
   "OPEN_GAME": 124,
   "TOTALS_FORM": 37,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1102,
+  "versions": 1103,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-15T11:33:40+00:00",
+  "last_collected_at_utc": "2026-11-15T11:36:09+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 29,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T11:34:01+00:00",
+  "collector_last_run_utc": "2026-11-15T11:36:09+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 232,
   "goal_lists_consistent": 148
  },
- "unique_bets": 382,
+ "unique_bets": 383,
  "settled_bets": 300,
  "unsettled_market": 27,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -518,7 +518,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
-   "bets": 22,
+   "bets": 23,
    "settled": 17,
    "matches": 17,
    "wins": 5,
@@ -1147,7 +1147,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 78,
+   "signals": 79,
    "with_result": 45,
    "hits": 18,
    "misses": 27,
@@ -1356,7 +1356,7 @@
    "roi_announced_odds": -0.1157,
    "seen_late": 0,
    "by_bot_mark": 36,
-   "per_day": 21.4,
+   "per_day": 21.3,
    "days_to_hint": 0,
    "days_to_conclusion": 12,
    "prudent_rate": 0.4523,
@@ -1966,7 +1966,7 @@
    },
    {
     "n": 26,
-    "signals": 26,
+    "signals": 27,
     "hits": 20,
     "misses": 6,
     "hit_rate": 0.7551,
@@ -2041,7 +2041,7 @@
    },
    {
     "n": 49,
-    "signals": 56,
+    "signals": 55,
     "hits": 35,
     "misses": 14,
     "hit_rate": 0.7021,
@@ -2391,7 +2391,7 @@
    },
    {
     "n": 15,
-    "signals": 31,
+    "signals": 32,
     "hits": 5,
     "misses": 10,
     "hit_rate": 0.3333,
@@ -2769,7 +2769,7 @@
    },
    {
     "n": 83,
-    "signals": 117,
+    "signals": 118,
     "hits": 42,
     "misses": 41,
     "hit_rate": 0.506,
@@ -2843,8 +2843,8 @@
  "brain": {
   "evidence_scope": "eligible_bets_only",
   "eligibility": {
-   "total": 507,
-   "eligible": 382,
+   "total": 508,
+   "eligible": 383,
    "excluded": 125,
    "reasons": {
     "no_valid_odds": 87,
@@ -2858,7 +2858,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5169,
+    "em observação": 5177,
     "abandonada": 7,
     "promissora": 52
    },
@@ -3915,11 +3915,11 @@
     }
    ]
   },
-  "hypotheses": 5228,
+  "hypotheses": 5236,
   "tested": 186,
   "corrected_bar": 0.99973,
   "counts": {
-   "em observação": 5208,
+   "em observação": 5216,
    "abandonada": 5,
    "promissora": 15
   },
@@ -5537,6 +5537,74 @@
      "bad_total": 2
     },
     {
+     "match_id": "fc-chindia-targoviste-vs-steaua-bucharest-20261115",
+     "match": "FC Chindia Targoviste — Steaua Bucharest",
+     "league": "International Friendlies Friendlies",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-15T11:35:04+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Steaua Bucharest",
+     "odds": 2.92,
+     "odds_last": 2.92,
+     "max_mult": 1,
+     "share": 69,
+     "share_last": 69,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 23,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa de fora",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Seleção",
+         "equipa de fora"
+        ]
+       ],
+       "n": 14,
+       "hits": 3,
+       "break_even": 0.4448,
+       "prob_above": 0.0824,
+       "roi": -0.4971,
+       "edge": -0.1344,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 37,
+       "hits": 11,
+       "break_even": 0.4114,
+       "prob_above": 0.1152,
+       "roi": -0.2084,
+       "edge": -0.0839,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 12
+    },
+    {
      "match_id": "tenerife-vs-ad-ceuta-fc-20261115",
      "match": "Tenerife — AD Ceuta FC",
      "league": "Spanish Segunda",
@@ -5930,9 +5998,9 @@
     "misto": 5,
     "sem evidência": 0,
     "contraditório": 2,
-    "evitar": 8
+    "evitar": 9
    },
-   "generated_utc": "2026-11-15T11:34:06+00:00",
+   "generated_utc": "2026-11-15T11:36:13+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5945,7 +6013,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5184,
+     "hypotheses": 5192,
      "judged": 2304,
      "as_expected": 1151
     },
@@ -6064,7 +6132,7 @@
     "roi_cut": -0.0258
    },
    "skipped": {
-    "bets": 242,
+    "bets": 243,
     "settled": 179,
     "games": 118,
     "wins": 86,
@@ -12716,7 +12784,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 73,
+    "signals": 74,
     "n": 41,
     "hits": 15,
     "hit_rate": 0.3659,
@@ -12774,7 +12842,7 @@
   "scope": "eligible_bets_only",
   "accuracy": {
    "BETFAIR/live": {
-    "signals": 73,
+    "signals": 74,
     "with_result": 41,
     "hits": 15,
     "misses": 26,
@@ -12885,7 +12953,7 @@
     "roi_announced_odds": -0.1157,
     "seen_late": 0,
     "by_bot_mark": 36,
-    "per_day": 21.4,
+    "per_day": 21.3,
     "days_to_hint": 0,
     "days_to_conclusion": 12
    },
@@ -12914,7 +12982,7 @@
     "roi_announced_odds": -0.18,
     "seen_late": 0,
     "by_bot_mark": 7,
-    "per_day": 14.8,
+    "per_day": 14.7,
     "days_to_hint": 0,
     "days_to_conclusion": 18
    },
@@ -13071,7 +13139,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 54,
+   "bets": 55,
    "settled": 26,
    "matches": 26,
    "wins": 6,
@@ -13151,7 +13219,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 42,
+   "bets": 43,
    "settled": 21,
    "matches": 21,
    "wins": 6,
@@ -13355,7 +13423,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 382,
+   "bets": 383,
    "settled": 300,
    "matches": 203,
    "wins": 141,
@@ -13390,6 +13458,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T11:35:04+00:00",
+   "match_id": "fc-chindia-targoviste-vs-steaua-bucharest-20261115",
+   "group": "BETFAIR/live/mkt>=10K",
+   "match": "FC Chindia Targoviste — Steaua Bucharest",
+   "selection": "Steaua Bucharest",
+   "odds": 2.92,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T11:33:07+00:00",
    "match_id": "madrid-cff-women-vs-edf-logrono-women-20261115",
@@ -14256,22 +14337,6 @@
    "ft": [
     1,
     0
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T21:09:43+00:00",
-   "match_id": "portugal-vs-denmark-20261114",
-   "group": "OPEN_GAME",
-   "match": "Portugal — Denmark",
-   "selection": "Over 4",
-   "odds": 1.65,
-   "ft": [
-    1,
-    4
    ],
    "w": 1.0,
    "settled_by": "resultado",
@@ -16594,6 +16659,17 @@
       0
      ],
      "market": "Asian Total"
+    },
+    {
+     "d": "2026-11-15T11:35:04+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "2",
+     "odds": 2.92,
+     "mult": 1,
+     "share": 69,
+     "mkt_volume": 13000.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -19701,7 +19777,7 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 34,
+   "bets": 35,
    "settled": 13,
    "wins": 8,
    "units": 1.52,
