@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T18:36:49+00:00",
+ "generated_at_utc": "2026-11-15T18:37:44+00:00",
  "messages": 874,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T18:36:35+00:00",
+  "collector_last_run_utc": "2026-11-15T18:37:02+00:00",
   "name_review": [
    {
     "bot": [
@@ -6970,7 +6970,7 @@
     "contraditório": 19,
     "evitar": 10
    },
-   "generated_utc": "2026-11-15T18:36:48+00:00",
+   "generated_utc": "2026-11-15T18:37:43+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -14179,17 +14179,28 @@
    "keep_abandoned": 0.2,
    "confirm_steps": 2
   },
-  "llm_runs": 75,
-  "llm_last_run_utc": "2026-11-15T17:36:11+00:00",
+  "llm_runs": 76,
+  "llm_last_run_utc": "2026-11-15T18:37:04+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-15",
-   "calls_today": 17,
-   "neurons_today": 3419.6,
+   "calls_today": 18,
+   "neurons_today": 3606.1,
    "accepted_today": 11,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "note": "apresenta um acerto elevado, mas a amostra é pequena",
+    "at_utc": "2026-11-15T18:37:04+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 16,
+    "hits": 14,
+    "hit_rate": 0.875,
+    "break_even": 0.5397,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
     "note": "apresenta um alto acerto de 0.8261, o que sugere um potencial interesse para análise mais aprofundada",
@@ -14304,17 +14315,6 @@
     "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
     "note": "apresenta um acerto de 0.96, mas com apenas 13 resultados, a amostra é pequena e mais dados são necessários para confirmar a tendência",
     "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5578,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "apresenta um acerto de 0.96, mas a amostra é pequena, com apenas 13 resultados.",
-    "at_utc": "2026-11-14T05:41:39+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "n": 7,
     "hits": 7,
