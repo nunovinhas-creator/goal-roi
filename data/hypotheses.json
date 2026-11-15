@@ -44099,6 +44099,33 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-15T16:35:14+00:00",
+  "conditions": [
+   [
+    "Confiança indicada pelo bot",
+    "95 % ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Jogo com vantagem clara e sem sinais anteriores",
+  "source": "llm"
+ },
  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T02:56:06+00:00",
   "conditions": [
@@ -49856,6 +49883,33 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-15T16:35:14+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Fim de semana com golos iniciais e vantagem clara",
+  "source": "llm"
  },
  "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-15T11:16:44+00:00",
@@ -57808,6 +57862,33 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-15T16:35:14+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Combinação de vantagem clara e ritmo baixo",
+  "source": "llm"
  },
  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T14:30:04+00:00",
@@ -66223,6 +66304,33 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 61 em diante & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-15T16:35:14+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Vantagem clara e sem sinais anteriores no final do jogo",
+  "source": "llm"
  },
  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 61 em diante & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T22:59:26+00:00",
