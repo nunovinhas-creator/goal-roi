@@ -34,6 +34,7 @@ FIRST_PR3 = 'ef4606a93d7c576f64a66afc186f9a3d6a2558bf'  # PR 3 as audited in rev
 SECOND_PR3 = 'd946ffdf33198610277ffcf25e42d818ca0bef79' # PR 3 as audited in review #5911603577 (replayed selection order)
 THIRD_PR3 = '345e0081ea6910cfbd5f7f9963879a1fac04b656'  # PR 3 as audited in review #5911747123 (overlap, adaptive per-game mean)
 FOURTH_PR3 = '9da69d88c20e511e4fea21664def4100c79de6fb' # PR 3 as audited in review #5911845265 (history gate, 3-day close)
+FIFTH_PR3 = '67fb3191686dd9d1b75fe038c073ea29f3213da5'  # PR 3 as audited in review #5912303516 (published ledger head)
 SPACING_H = 3                                            # synthetic games every 3 h: each result is seen before the next decision
 NOW = '2026-11-15T14:34:34+00:00'                       # BASE commit time: the report clock for both versions
 UTC = timezone.utc
@@ -602,6 +603,53 @@ def counterexamples_fourth(fourth_brain):
     return out
 
 
+def counterexamples_fifth():
+    """Review #5912303516, P2-J: a real first selection by report.build(register=True) in a temporary git repository,
+    with the 67fb319 report/brain/certification and with this code: does the report describe the ledger it wrote?"""
+    from scangoal import store
+    act, now = datetime(2026, 11, 1, tzinfo=UTC), datetime(2026, 11, 7, 12, tzinfo=UTC)
+    text = ("🔥 Open game — heading for over\n UEFA Women's Europa Cup · 45'\nCzarni Sosnowiec Women 0\nSK Brann Women         4\n"
+            "Rhythm 87/100 · Over 100%\n💰 O 5: 1.81\nhttps://scangoal.com/match/club-aI-vs-club-bI-20261102?lang=en")
+    msg = lambda i: text.replace('club-aI-vs-club-bI', 'club-a%d-vs-club-b%d' % (i, i))
+    reg = {'x': {'family': 'Jogo aberto', 'conditions': [['Ritmo indicado pelo bot', 'menos de 90']], 'born_utc': '2026-11-01T00:00:00+00:00', 'source': 'gerador'}}
+    out = {}
+    for label, mods in (('67fb319', None), ('current', (report, certification))):
+        with tempfile.TemporaryDirectory() as root:
+            data = Path(root) / 'data'
+            data.mkdir()
+            run = lambda *a, when=act: subprocess.run(['git', '-C', root, '-c', 'user.name=a', '-c', 'user.email=a@invalid', '-c', 'commit.gpgsign=false', *a],
+                                                      check=True, capture_output=True, env=dict(os.environ, GIT_AUTHOR_DATE=when.isoformat(), GIT_COMMITTER_DATE=when.isoformat()))
+            run('init', '-q')
+            with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(data)}):
+                versions = []
+                for i in range(40):
+                    sent = datetime(2026, 11, 2, tzinfo=UTC) + timedelta(hours=3 * i)
+                    versions.append({'message_id': 100 + i, 'date_utc': sent.isoformat(), 'edit_date_utc': None,
+                                     'collected_at_utc': (sent + timedelta(minutes=1)).isoformat(), 'text': msg(i)})
+                    versions.append({'message_id': 100 + i, 'date_utc': sent.isoformat(), 'edit_date_utc': (sent + timedelta(hours=2)).isoformat(),
+                                     'collected_at_utc': (sent + timedelta(hours=2, minutes=5)).isoformat(), 'text': msg(i) + '\n\n🏁 FT 1:5 · Over 5 ✅'})
+                store.append_versions(versions)
+                (data / 'hypotheses.json').write_text(json.dumps(reg), encoding='utf-8')
+                run('add', '-A')
+                run('commit', '-q', '-m', 'data', when=act - timedelta(hours=1))
+                if mods is None:
+                    cert = old_module('certification', base=FIFTH_PR3)
+                    old_brain = old_module('brain', base=FIFTH_PR3, certification=cert)
+                    rep_mod = old_module('report', base=FIFTH_PR3, brain=old_brain, certification=cert)
+                else:
+                    rep_mod, cert = mods
+                cert.save(data / cert.FILE, cert.activate({}, act))
+                run('add', '-A')
+                run('commit', '-q', '-m', 'ledger', when=act + timedelta(minutes=5))
+                v = rep_mod.build(None, register=True, now=now)['brain']['validation']
+                led = json.loads((data / cert.FILE).read_text(encoding='utf-8'))
+            out[label] = {'report_ledger_head': v.get('ledger_head_sha256'), 'file_ledger_head': cert.head(led),
+                          'report_ledger_entries': v.get('ledger_entries'), 'file_ledger_entries': len(led['entries']),
+                          'report_candidates': v.get('candidates'), 'newly_selected': [e['id'] for e in v.get('newly_selected', [])],
+                          'consistent': v.get('ledger_head_sha256') == cert.head(led) and v.get('ledger_entries') == len(led['entries'])}
+    return out
+
+
 def review_5911603577(signals, registry, rows_by_id, second_brain):
     """P1-C/D/E on the snapshot: certifiable hypotheses, bets decided after a result was seen, the d946ffd replayed selection
     order versus the current (not activated) ledger, and a RETROSPECTIVE e-process simulation that is NOT a certificate."""
@@ -736,6 +784,7 @@ def main():
             'synthetic_validation_rates': validation_rates(old_brain, old_module('brain', base=FIRST_PR3)),
             'review_5911603577': review_5911603577(signals, registry, by_id, old_module('brain', base=SECOND_PR3)),
             'counterexamples_review_5911603577': counterexamples(old_module('brain', base=SECOND_PR3)),
+            'counterexamples_review_5912303516': counterexamples_fifth(),
             'counterexamples_review_5911845265': counterexamples_fourth(old_module('brain', base=FOURTH_PR3)),
             'counterexamples_review_5911747123': counterexamples_third(old_module('brain', base=THIRD_PR3), old_module('certification', base=THIRD_PR3)),
         }
