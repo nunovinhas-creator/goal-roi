@@ -31,6 +31,8 @@ from scangoal.eligibility import eligible, game_identity  # noqa: E402
 BASE = '82ab9d86593055fbc98420265a469728d914288f'       # main with PR 2 at the start of PR 3 (data snapshot and PR 2 code)
 FIRST_PR3 = 'ef4606a93d7c576f64a66afc186f9a3d6a2558bf'  # PR 3 as audited in review #5911487915 (Bonferroni/posterior tails)
 SECOND_PR3 = 'd946ffdf33198610277ffcf25e42d818ca0bef79' # PR 3 as audited in review #5911603577 (replayed selection order)
+THIRD_PR3 = '345e0081ea6910cfbd5f7f9963879a1fac04b656'  # PR 3 as audited in review #5911747123 (overlap, adaptive per-game mean)
+SPACING_H = 3                                            # synthetic games every 3 h: each result is seen before the next decision
 NOW = '2026-11-15T14:34:34+00:00'                       # BASE commit time: the report clock for both versions
 UTC = timezone.utc
 SIMULATIONS, SEED = 400, 20261115
@@ -412,13 +414,13 @@ def synthetic(rates, seed, odds=2.0):
     """One signal per game, read when sent, result observed 145 min later; family-wide hypothesis registered before."""
     rng, t0, out = random.Random(seed), datetime(2026, 11, 20, tzinfo=UTC), []
     for i, p in enumerate(rates):
-        d = (t0 + timedelta(hours=i)).isoformat()
+        d = (t0 + timedelta(hours=SPACING_H * i)).isoformat()
         w = 1.0 if rng.random() < p else -1.0
         out.append({'match_id': 'g%d' % i, 'w': w, 'odds': odds, 'type': 'OPEN_GAME', 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5',
                     'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True,
                     'key': ('g%d' % i,), 'n_signals': 1, 'max_mult': 1, 'no_source': False, 'share': None, 'total': None, 'n_bets': None,
-                    'signal_seen_utc': d, 'result_known_utc': (t0 + timedelta(hours=i, minutes=145)).isoformat(),
-                    'match_result_first_seen_utc': (t0 + timedelta(hours=i, minutes=145)).isoformat()})
+                    'signal_seen_utc': d, 'result_known_utc': (t0 + timedelta(hours=SPACING_H * i, minutes=145)).isoformat(),
+                    'match_result_first_seen_utc': (t0 + timedelta(hours=SPACING_H * i, minutes=145)).isoformat()})
     return out
 
 
@@ -470,7 +472,7 @@ def counterexamples(second_brain):
     # P1-D: result seen 4 min after the signal, signal read at 8 min (still decidable).
     games = [_sig('d%d' % i, w, i, seen=8, known=4) for i, w in enumerate(pattern[:40])]
     ordered = brain.ordered_games(games)
-    out['P1-D_games_counted'] = {'d946ffd': second_brain.confirmation(ordered, early, 0.025)['games'], 'current': brain.confirmation(ordered, early, 0.025)['games']}
+    out['P1-D_games_counted'] = {'d946ffd': second_brain.confirmation(ordered, early, 0.025)['games'], 'current': brain.confirmation(games, early, 0.025)['games']}
     # P1-C: label "one signal type" flipped by later signals of another family.
     reg = {'post': hyp(conds=(('Outros sinais no mesmo jogo', 'jogo com um só tipo de sinal'),))}
     own = [_sig('g%d' % i, w, i) for i, w in enumerate(pattern)]
@@ -491,14 +493,72 @@ def counterexamples(second_brain):
     out['P1-E_ranks'] = {'d946ffd_before': ranks(a + b), 'd946ffd_after_late_bets': ranks(a + b + late),
                          'current_before': cur(a + b), 'current_after_late_bets': cur(a + b + late)}
     # P2: 5000 winning games at odds 3.0.
-    wins = brain.ordered_games([_sig('w%d' % i, 1.0, i, odds=3.0) for i in range(5000)])
+    raw_wins = [_sig('w%d' % i, 1.0, 3 * i, odds=3.0) for i in range(5000)]
+    wins = brain.ordered_games(raw_wins)
     try:
         second_brain.confirmation(wins, early, 0.001)
         out['P2_d946ffd'] = 'ok'
     except OverflowError as exc:
         out['P2_d946ffd'] = 'OverflowError: %s' % exc
-    c = brain.confirmation(wins, early, 0.001)
+    c = brain.confirmation(raw_wins, early, 0.001)
     out['P2_current'] = {'games': c['games'], 'log10_e': c['log10_e'], 'e_value': c['e_value'], 'certified': c['certified_at'] is not None}
+    return out
+
+
+def counterexamples_third(third_brain, third_cert):
+    """Review #5911747123: P1-F (120 correlated open games), P1-G (adaptive extra bet) and P2 (ledger) against 345e008 and now."""
+    out, early, rng = {}, datetime(2026, 11, 19, tzinfo=UTC), random.Random(SEED)
+    lam_max = lambda logs: max(logs)
+    # P1-F: 120 games, all decided before any result, all driven by the same fair coin X. Enumerate both branches.
+    branches = {}
+    for x in (1.0, -1.0):
+        games = [_sig('c%d' % i, x, i / 60, known=1000 - i) for i in range(120)]
+        old = third_brain.confirmation(third_brain.ordered_games(games), early, 0.025)
+        new = brain.confirmation(games, early, 0.025)
+        branches['X=%+d' % x] = {'345e008_games': old['games'], '345e008_certified': old['certified_at'] is not None,
+                                 'current_admitted': new['admitted'], 'current_skipped_overlap': new['skipped']['overlap'],
+                                 'current_certified': new['certified_at'] is not None}
+    out['P1-F_correlated_open_games'] = dict(branches, false_certification_probability={
+        '345e008': sum(b['345e008_certified'] for b in branches.values()) / 2, 'current': sum(b['current_certified'] for b in branches.values()) / 2})
+    # P1-G: exact enumeration and a 200-run simulation at the boundary null (each single bet has zero expected profit).
+    p = 1 / (2.0 * (1 - insights.ODDS_LOSS))
+    def game(tag, x, y, minute):
+        rows = [_sig('a%s' % tag, x, minute / 60, first=145)]
+        rows[0]['selection'] = 'Over 2.5'
+        if x < 0:
+            extra = _sig('a%s' % tag, y, (minute + 30) / 60, first=115)
+            extra['selection'] = 'Over 1.5'
+            extra['key'] = ('a%s' % tag, 'Asian Total', 'Over 1.5')
+            rows.append(extra)
+        return rows
+    exact = {'old_mean_per_game': 0.0, 'committed': 0.0}
+    for x in (1.0, -1.0):
+        for y in (1.0, -1.0):
+            rows = game('e', x, y, 0)
+            exact['old_mean_per_game'] += third_brain.game_profit(rows) / 4
+            exact['committed'] += brain.bet_profit(brain.committed_bet(rows)) / 4
+    crossed = {'345e008': 0, 'current': 0}
+    for run in range(200):
+        games = []
+        for i in range(200):
+            games += game('%d-%d' % (run, i), 1.0 if rng.random() < p else -1.0, 1.0 if rng.random() < p else -1.0, i * 180)
+        crossed['345e008'] += third_brain.confirmation(third_brain.ordered_games(games), early, 0.05)['certified_at'] is not None
+        crossed['current'] += brain.confirmation(games, early, 0.05)['certified_at'] is not None
+    out['P1-G_adaptive_extra_bet'] = {'exact_expected_profit': {k: round(v, 4) for k, v in exact.items()},
+                                      'false_certification_rate_200_runs_alpha_0.05': {k: v / 200 for k, v in crossed.items()}}
+    # P2: malformed entry and full rewrite with rehash.
+    reg = {'a': {'family': 'Jogo aberto', 'conditions': [['Minuto', '31 a 60']], 'born_utc': '2026-11-01T00:00:00+00:00', 'source': 'gerador'}}
+    led = certification.activate({}, early)
+    certification.append(led, ['a'], reg, early + timedelta(hours=1))
+    bad = dict(led, entries=[dict(led['entries'][0], id=[])])
+    try:
+        out['P2_malformed_id_345e008'] = third_cert.verify(bad, reg) or 'accepted'
+    except Exception as exc:
+        out['P2_malformed_id_345e008'] = 'raised %s' % type(exc).__name__
+    out['P2_malformed_id_current'] = certification.verify(bad, reg)
+    other = certification.activate({}, early)
+    certification.append(other, ['a'], reg, early + timedelta(hours=2))
+    out['P2_rewrite_with_rehash'] = {'internal_check': certification.verify(other, reg), 'history_check': certification.verify_history([led, other])}
     return out
 
 
@@ -538,7 +598,7 @@ def review_5911603577(signals, registry, rows_by_id, second_brain):
         reg = registry[h]
         conds, born, gen = {tuple(c) for c in reg['conditions']}, chronology.born(reg), reg.get('source') == 'gerador'
         match = [b for b, fam, at in have if fam == reg['family'] and conds <= at and (gen or (born and chronology.signal_time(b) > born))]
-        c = brain.confirmation(brain.ordered_games(match), chronology.parse_utc(item['selected_utc']), brain.alpha_for_rank(j))
+        c = brain.confirmation(match, chronology.parse_utc(item['selected_utc']), brain.alpha_for_rank(j))
         sim.append({'id': h, 'certifiable': brain.certifiable(reg), 'games': c['games'], 'log10_e': c['log10_e'], 'threshold': c['threshold'],
                     'would_certify': c['certified_at'] is not None})
     out['retrospective_simulation_not_a_certificate'] = sim
@@ -636,6 +696,7 @@ def main():
             'synthetic_validation_rates': validation_rates(old_brain, old_module('brain', base=FIRST_PR3)),
             'review_5911603577': review_5911603577(signals, registry, by_id, old_module('brain', base=SECOND_PR3)),
             'counterexamples_review_5911603577': counterexamples(old_module('brain', base=SECOND_PR3)),
+            'counterexamples_review_5911747123': counterexamples_third(old_module('brain', base=THIRD_PR3), old_module('certification', base=THIRD_PR3)),
         }
     out['data_unchanged_by_audit'] = digest() == data_before
     print(json.dumps(out, indent=1, ensure_ascii=False, default=str))
