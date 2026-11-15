@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-15T07:34:00+00:00",
- "messages": 667,
+ "generated_at_utc": "2026-11-15T07:40:04+00:00",
+ "messages": 668,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 28,
-  "BETFAIR": 157,
+  "BETFAIR": 158,
   "STAKE_LOAD": 101,
   "OPEN_GAME": 120,
   "TOTALS_FORM": 33,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1062,
+  "versions": 1063,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-15T07:19:24+00:00",
+  "last_collected_at_utc": "2026-11-15T07:40:02+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 28,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T07:33:54+00:00",
+  "collector_last_run_utc": "2026-11-15T07:40:02+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,14 +451,14 @@
   "goal_lists": 224,
   "goal_lists_consistent": 143
  },
- "unique_bets": 365,
+ "unique_bets": 366,
  "settled_bets": 294,
  "unsettled_market": 26,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
-   "bets": 49,
+   "bets": 50,
    "settled": 23,
    "matches": 23,
    "wins": 10,
@@ -1141,7 +1141,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 76,
+   "signals": 77,
    "with_result": 44,
    "hits": 18,
    "misses": 26,
@@ -1241,7 +1241,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 35,
-   "days_to_conclusion": 376,
+   "days_to_conclusion": 377,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1461,7 +1461,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 25.2,
+   "per_day": 25.1,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.783,
@@ -2185,7 +2185,7 @@
    },
    {
     "n": 11,
-    "signals": 34,
+    "signals": 35,
     "hits": 6,
     "misses": 5,
     "hit_rate": 0.5455,
@@ -2235,7 +2235,7 @@
    },
    {
     "n": 39,
-    "signals": 69,
+    "signals": 70,
     "hits": 20,
     "misses": 19,
     "hit_rate": 0.5128,
@@ -2360,7 +2360,7 @@
    },
    {
     "n": 14,
-    "signals": 29,
+    "signals": 30,
     "hits": 5,
     "misses": 9,
     "hit_rate": 0.3571,
@@ -2410,7 +2410,7 @@
    },
    {
     "n": 11,
-    "signals": 22,
+    "signals": 23,
     "hits": 3,
     "misses": 8,
     "hit_rate": 0.2727,
@@ -2435,7 +2435,7 @@
    },
    {
     "n": 33,
-    "signals": 69,
+    "signals": 70,
     "hits": 17,
     "misses": 16,
     "hit_rate": 0.5152,
@@ -2786,7 +2786,7 @@
    },
    {
     "n": 28,
-    "signals": 40,
+    "signals": 41,
     "hits": 6,
     "misses": 22,
     "hit_rate": 0.2182,
@@ -2835,11 +2835,11 @@
   }
  },
  "brain": {
-  "hypotheses": 5072,
+  "hypotheses": 5086,
   "tested": 256,
   "corrected_bar": 0.9998,
   "counts": {
-   "em observação": 5020,
+   "em observação": 5034,
    "abandonada": 7,
    "promissora": 45
   },
@@ -3870,6 +3870,82 @@
      "bad_total": 27
     },
     {
+     "match_id": "fc-ryukyu-vs-kochi-united-20261115",
+     "match": "FC Ryukyu — Kochi United",
+     "league": "Japanese J-League 3",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-15T07:38:10+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Kochi United",
+     "odds": 3.3,
+     "odds_last": 3.3,
+     "max_mult": 1,
+     "share": 62,
+     "share_last": 62,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 11,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa de fora & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Seleção",
+         "equipa de fora"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 12,
+       "hits": 3,
+       "break_even": 0.5092,
+       "prob_above": 0.0874,
+       "roi": -0.435,
+       "edge": -0.1414,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Seleção = equipa de fora",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Seleção",
+         "equipa de fora"
+        ]
+       ],
+       "n": 15,
+       "hits": 4,
+       "break_even": 0.473,
+       "prob_above": 0.1001,
+       "roi": -0.3693,
+       "edge": -0.1238,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 5
+    },
+    {
      "match_id": "granada-vs-las-palmas-20261115",
      "match": "Granada — Las Palmas",
      "league": "Spanish Segunda",
@@ -4079,9 +4155,9 @@
     "misto": 6,
     "sem evidência": 0,
     "contraditório": 2,
-    "evitar": 3
+    "evitar": 4
    },
-   "generated_utc": "2026-11-15T07:34:00+00:00",
+   "generated_utc": "2026-11-15T07:40:04+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4094,7 +4170,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5032,
+     "hypotheses": 5046,
      "judged": 2848,
      "as_expected": 1657
     },
@@ -4213,7 +4289,7 @@
     "roi_cut": 0.0081
    },
    "skipped": {
-    "bets": 160,
+    "bets": 161,
     "settled": 120,
     "games": 67,
     "wins": 55,
@@ -10883,7 +10959,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 76,
+    "signals": 77,
     "n": 44,
     "hits": 18,
     "hit_rate": 0.4091,
@@ -10973,7 +11049,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 52,
+   "bets": 53,
    "settled": 25,
    "matches": 25,
    "wins": 6,
@@ -11053,7 +11129,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 40,
+   "bets": 41,
    "settled": 20,
    "matches": 20,
    "wins": 6,
@@ -11257,7 +11333,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 365,
+   "bets": 366,
    "settled": 294,
    "matches": 197,
    "wins": 137,
@@ -11292,6 +11368,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T07:38:10+00:00",
+   "match_id": "fc-ryukyu-vs-kochi-united-20261115",
+   "group": "BETFAIR/live/mkt<10K",
+   "match": "FC Ryukyu — Kochi United",
+   "selection": "Kochi United",
+   "odds": 3.3,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T07:17:31+00:00",
    "match_id": "granada-vs-las-palmas-20261115",
@@ -12189,22 +12278,6 @@
    "w": null,
    "settled_by": null,
    "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-14T20:01:48+00:00",
-   "match_id": "portugal-vs-denmark-20261114",
-   "group": "STAKE_LOAD/live",
-   "match": "Portugal — Denmark",
-   "selection": "Both Teams to Score: Yes",
-   "odds": 1.7,
-   "ft": [
-    1,
-    4
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 2,
    "max_mult": 1
   }
  ],
@@ -14616,6 +14689,28 @@
      "odds": 1.98,
      "market": "1x2",
      "total": 28000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "fc-ryukyu-vs-kochi-united-20261115": {
+   "teams": [
+    "FC Ryukyu",
+    "Kochi United"
+   ],
+   "events": [
+    {
+     "d": "2026-11-15T07:38:10+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "2",
+     "odds": 3.3,
+     "mult": 1,
+     "share": 62,
+     "mkt_volume": 8000.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -17595,7 +17690,7 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 17,
+   "bets": 18,
    "settled": 7,
    "wins": 4,
    "units": -0.24,
