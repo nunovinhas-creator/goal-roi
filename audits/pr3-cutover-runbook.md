@@ -119,7 +119,7 @@ Devolve NO-GO se:
 
 ## 3. Ensaios sobre `main` real
 
-`python3.11 scripts/rehearse_pr3_cutover.py origin/main` (Python 3.11.18). O SHA de `main` e do HEAD estão em `audits/pr3-cutover-rehearsal.json`. Todos os `criteria` são verdadeiros e `ok: true`.
+`python3.11 scripts/rehearse_pr3_cutover.py origin/main` (Python 3.11.18), `main` = `f71b34f`, HEAD `bc813aa` (o commit seguinte só acrescenta este resultado e números de documentação). Todos os `criteria` são verdadeiros e `ok: true`.
 
 ### Corte e Telegram (item 3 da revisão)
 
@@ -168,8 +168,8 @@ Clone a partir do GitHub, medido:
 
 | Checkout | Tempo | `.git` | Commits visíveis | `history_proof` sem registo |
 |---|---|---|---|---|
-| raso (`actions/checkout` atual, profundidade 1) | 0,84 s | 0,56 MiB | 1 | `history unavailable: shallow repository` |
-| completo (`fetch-depth: 0`) | 1,63 s | 4,31 MiB | 1076 | `ledger never published` |
+| raso (`actions/checkout` atual, profundidade 1) | 0,96 s | 0,56 MiB | 1 | `history unavailable: shallow repository` |
+| completo (`fetch-depth: 0`) | 1,87 s | 4,32 MiB | 1078 | `ledger never published` |
 
 Conclusões:
 - Com o checkout raso, a certificação fica sempre bloqueada (fail-closed): é compatível com a integração sem ativação.

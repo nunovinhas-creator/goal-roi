@@ -24,7 +24,7 @@ Por isso exige um passo próprio, com a recolha parada.
 O workflow de recolha tem de passar a usar `fetch-depth: 0`. A alteração está preparada em `audits/pr3-cutover-evidence/collect-fetch-depth-0.patch` e **não foi aplicada**.
 
 Custo medido num clone do GitHub:
-- 1,63 s e 4,31 MiB (1076 commits), contra 0,84 s e 0,56 MiB do checkout raso;
+- 1,87 s e 4,32 MiB (1078 commits), contra 0,96 s e 0,56 MiB do checkout raso;
 - continua gratuito e cresce cerca de 144 commits por dia.
 
 Ordem recomendada:

@@ -1,14 +1,20 @@
 {
- "main_sha": "9ef2ee3183a24b386165808c930dca66635ed151",
- "pr_head_sha": "70f3c485f4cf1a16183bdc43184513c0cd79838f",
- "at_utc": "2026-11-15T19:41:25+00:00",
+ "main_sha": "f71b34f6a99b9d2688e4bcd304b718a0644336ac",
+ "pr_head_sha": "bc813aa19e0583cbf02c05ccdf666897a146fd4b",
+ "at_utc": "2026-11-15T19:49:04+00:00",
  "python": "3.11.18",
  "status_rules": "chronological_eprocess_v3",
  "migration_key": "status_rules:chronological_eprocess_v3",
  "merge_conflicts": 0,
  "integration_diff_vs_main": [
   "README.md",
+  "audits/pr3-certification-activation-plan.md",
   "audits/pr3-chronological-validity.md",
+  "audits/pr3-cutover-evidence/collect-fetch-depth-0.patch",
+  "audits/pr3-cutover-evidence/mutation_check.py",
+  "audits/pr3-cutover-evidence/mutation_check.txt",
+  "audits/pr3-cutover-rehearsal.json",
+  "audits/pr3-cutover-runbook.md",
   "audits/pr3-metrics.json",
   "docs/index.html",
   "scangoal/brain.py",
@@ -34,31 +40,31 @@
   "ok": true,
   "restored": false,
   "already_applied": false,
-  "frozen_main_sha": "9ef2ee3183a24b386165808c930dca66635ed151",
-  "head_sha": "532ddd01257099a723624e6c6f878fa077dc2bfd",
-  "at_utc": "2026-11-15T19:41:26+00:00",
+  "frozen_main_sha": "f71b34f6a99b9d2688e4bcd304b718a0644336ac",
+  "head_sha": "ef1d8bbc506b3601d05aaa395728966bd1a397e7",
+  "at_utc": "2026-11-15T19:49:05+00:00",
   "python": "3.11.18",
-  "report_generated_at_utc": "2026-11-15T19:41:26+00:00",
+  "report_generated_at_utc": "2026-11-15T19:49:05+00:00",
   "migration_key": "status_rules:chronological_eprocess_v3",
   "status_rules": "chronological_eprocess_v3",
   "brain": {
    "evidence_scope": "eligible_bets_only",
    "operational_scope": "eligible_bets_only",
    "status_rules": "chronological_eprocess_v3",
-   "hypotheses": 5897,
+   "hypotheses": 5912,
    "tested": 288,
    "counts": {
-    "em observação": 5893,
+    "em observação": 5908,
     "promissora": 4
    },
    "exploratory_counts": {
-    "em observação": 5850,
+    "em observação": 5865,
     "promissora": 44,
     "abandonada": 3
    },
    "eligibility": {
-    "total": 665,
-    "eligible": 515,
+    "total": 672,
+    "eligible": 522,
     "excluded": 150,
     "reasons": {
      "no_valid_odds": 102,
@@ -73,7 +79,7 @@
    "validation_state": "not_activated",
    "walk_forward": {
     "followed": {
-     "bets": 166,
+     "bets": 170,
      "settled": 145,
      "games": 138,
      "wins": 68,
@@ -82,7 +88,7 @@
      "roi_cut": -0.0107
     },
     "skipped": {
-     "bets": 314,
+     "bets": 317,
      "settled": 210,
      "games": 116,
      "wins": 95,
@@ -102,7 +108,7 @@
    }
   },
   "register_true": {
-   "registry_size_after_on_copy": 5897,
+   "registry_size_after_on_copy": 5912,
    "status_list_identical": true
   },
   "reference": {
@@ -145,35 +151,35 @@
   ],
   "sha256_before": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "data/details_hl.json": "15a661e0df27a76c1df1fa387735236ee9e32b855c3ac7475d4f5a07a9839c41",
-   "data/hypotheses.json": "be21d2b70bbae21a7f0f95ba01a36eade4b1ee3acf54f8fae5da2222eafd3e0e",
+   "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+   "data/hypotheses.json": "c1f1aba3505337b434ee854e53e067b3620d73a8cd8f758fd091e91b012e6111",
    "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
-   "data/llm_state.json": "b0252915b84c4cdbc8fd13ab9e0ffe36137db293fb9d869c4bd2cc9f091fc27f",
-   "data/messages.jsonl": "11fe27e6d23d0d5a0dc67c27fe0e020f91881054e78c709957e22dac16f04267",
-   "data/notify_state.json": "4ddb870769e59f11b906ab5ff9a827e6ce03cff422a7d30731dd69eae94648ae",
-   "data/report.json": "bd887ce1e913b488fa569501339a58f5e145c4756fc5ed0e25ce6f25a8367f5e",
-   "data/results_bsd.json": "62fefd45a916f4a0012d9e1f272b0632d32fc37559d1f1eb61c7c241f3120b50",
+   "data/llm_state.json": "a9613ac2dbc59e829a69f404063b01e50c836232ce8e3519e50c0192409467c9",
+   "data/messages.jsonl": "82aa47f7e7654a09161d17958f1d8a97ceb46809279e9421ecb8e9e4b15d287d",
+   "data/notify_state.json": "8cfeb4876be80745bd10f67239c552b17d8330f4bb2cd86cf7c4a9743e9c22ff",
+   "data/report.json": "c8ea8ddf9a6bd5590d5bb81783189913aeadf8ab6f87b23a2df7e6f5cebb37da",
+   "data/results_bsd.json": "08097410e86cc471cd5105bafc37160d19bc886dee1e613bdd5548b5eeff8d84",
    "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
-   "data/state.json": "5e424b6e9ae5dcc98d31e84f9fc13abc8b71320ac6263a8921dcbab0cb1cbc78",
+   "data/state.json": "e34099a6b487676895ff32f4236fa9fee74ca545c674577d6bec237d92376be5",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "15a80161cc7fe941036b5f1b4530ce864dbbc5dd190d5614c90e8601d38ea013",
-   "docs/report.json": "bd887ce1e913b488fa569501339a58f5e145c4756fc5ed0e25ce6f25a8367f5e"
+   "docs/bets.csv": "50cc924a5f17dbb95d5068e6b6f94a82935dfd86978246e6553fdeb147a2d7a8",
+   "docs/report.json": "c8ea8ddf9a6bd5590d5bb81783189913aeadf8ab6f87b23a2df7e6f5cebb37da"
   },
   "sha256_after": {
    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "data/details_hl.json": "15a661e0df27a76c1df1fa387735236ee9e32b855c3ac7475d4f5a07a9839c41",
-   "data/hypotheses.json": "be21d2b70bbae21a7f0f95ba01a36eade4b1ee3acf54f8fae5da2222eafd3e0e",
+   "data/details_hl.json": "5dd2ed89435b39128a60099f0683d99b9f456e4bc02f24e84e66fe1dff99c830",
+   "data/hypotheses.json": "c1f1aba3505337b434ee854e53e067b3620d73a8cd8f758fd091e91b012e6111",
    "data/llm_notes.json": "f27e12c0487e3fcd97dbd124b4c1ab3ad9ccde1d0515961d28c6bed023ad2af5",
-   "data/llm_state.json": "b0252915b84c4cdbc8fd13ab9e0ffe36137db293fb9d869c4bd2cc9f091fc27f",
-   "data/messages.jsonl": "11fe27e6d23d0d5a0dc67c27fe0e020f91881054e78c709957e22dac16f04267",
-   "data/notify_state.json": "74f58c5c8edb45771f8cf39ec0bab5170aaa707344e25e4b599ae016afcc13b1",
-   "data/report.json": "634c8afb50f136c8a59c4ed81f56edd01c644b7323b3c1098e8fb40d163907ed",
-   "data/results_bsd.json": "62fefd45a916f4a0012d9e1f272b0632d32fc37559d1f1eb61c7c241f3120b50",
+   "data/llm_state.json": "a9613ac2dbc59e829a69f404063b01e50c836232ce8e3519e50c0192409467c9",
+   "data/messages.jsonl": "82aa47f7e7654a09161d17958f1d8a97ceb46809279e9421ecb8e9e4b15d287d",
+   "data/notify_state.json": "fdcc4e33e9e70be9a8ad225b3176763824ec2103f1ee6aa4e1d866bf2c7cc4c7",
+   "data/report.json": "8db25b0310e422030765e3093d4df5638506436e4603c8db722e958940872224",
+   "data/results_bsd.json": "08097410e86cc471cd5105bafc37160d19bc886dee1e613bdd5548b5eeff8d84",
    "data/results_hl.json": "13106e57211e9eeb72047fc751b03523ea30ce422ef0ddae9ff510fc81d52a81",
-   "data/state.json": "5e424b6e9ae5dcc98d31e84f9fc13abc8b71320ac6263a8921dcbab0cb1cbc78",
+   "data/state.json": "e34099a6b487676895ff32f4236fa9fee74ca545c674577d6bec237d92376be5",
    "data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5",
-   "docs/bets.csv": "15a80161cc7fe941036b5f1b4530ce864dbbc5dd190d5614c90e8601d38ea013",
-   "docs/report.json": "634c8afb50f136c8a59c4ed81f56edd01c644b7323b3c1098e8fb40d163907ed"
+   "docs/bets.csv": "50cc924a5f17dbb95d5068e6b6f94a82935dfd86978246e6553fdeb147a2d7a8",
+   "docs/report.json": "8db25b0310e422030765e3093d4df5638506436e4603c8db722e958940872224"
   }
  },
  "telegram": {
@@ -241,7 +247,13 @@
    "messages_identical": true,
    "code_changed_vs_main": [
     "README.md",
+    "audits/pr3-certification-activation-plan.md",
     "audits/pr3-chronological-validity.md",
+    "audits/pr3-cutover-evidence/collect-fetch-depth-0.patch",
+    "audits/pr3-cutover-evidence/mutation_check.py",
+    "audits/pr3-cutover-evidence/mutation_check.txt",
+    "audits/pr3-cutover-rehearsal.json",
+    "audits/pr3-cutover-runbook.md",
     "audits/pr3-metrics.json",
     "docs/index.html",
     "scangoal/brain.py",
@@ -265,7 +277,7 @@
   },
   "push_preflight_frozen": [],
   "push_preflight_after_concurrent_commit": [
-   "remote main moved from the frozen commit 9ef2ee3183a2 to 8182c906d1b0: NO-GO (a writer ran)",
+   "remote main moved from the frozen commit f71b34f6a99b to cec976d50a71: NO-GO (a writer ran)",
    "HEAD is not a fast-forward of the remote main: a push would need force (forbidden)"
   ],
   "stale_writer_rebase": {
@@ -296,7 +308,7 @@
  "checkout": {
   "shallow_depth_1": {
    "source": "github",
-   "seconds": 0.84,
+   "seconds": 0.96,
    "git_dir_mib": 0.56,
    "shallow": "true",
    "commits_visible": 1,
@@ -306,10 +318,10 @@
   },
   "full_fetch_depth_0": {
    "source": "github",
-   "seconds": 1.63,
-   "git_dir_mib": 4.31,
+   "seconds": 1.87,
+   "git_dir_mib": 4.32,
    "shallow": "false",
-   "commits_visible": 1076,
+   "commits_visible": 1078,
    "history_proof_without_ledger": [
     "ledger never published"
    ]
