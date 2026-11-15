@@ -99,7 +99,7 @@ def signals_of(rep_module):
         if k.get('strict') is False:
             cap['signals'] = res
         return res
-    with patch.object(rep_module, 'build_bets', spy), patch.object(rep_module.brain, 'build', lambda *a, **k: {'top': []}), \
+    with patch.object(rep_module, 'build_bets', spy), patch.object(rep_module.brain, 'build', lambda *a, **k: {'top': [], 'validation': {'ledger_valid': False, 'candidates': []}}), \
             patch.object(rep_module.brain, 'entry_points', lambda s: []):
         rep_module.build(None, register=False)
     return cap['signals']
