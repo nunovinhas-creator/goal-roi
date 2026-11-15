@@ -95,19 +95,31 @@ def eligible_statuses(report):
     return statuses
 
 
+def migration_key(report):
+    """Marker of the status reference a report belongs to.
+
+    PR1 reports (no brain.status_rules) keep the original 'eligible_statuses_v1' key, so the PR1 migration already
+    recorded in production is never repeated. A report produced under new status rules (PR2: independent games and
+    hysteresis) gets its own key, so a rule change re-baselines the reference silently exactly once.
+    """
+    rules = (report.get('brain') or {}).get('status_rules')
+    return STATUS_MIGRATION if not rules else 'status_rules:%s' % rules
+
+
 def migrate_status_reference(report, state, now):
-    """One-time silent baseline change. Does not touch delivery history or send."""
+    """One-time silent baseline change per reference key. Does not touch delivery history or send."""
     new = eligible_statuses(report)
     if new is None:
         return False
+    key = migration_key(report)
     migrations = state.get('migrations') or {}
-    if STATUS_MIGRATION in migrations:
+    if key in migrations:
         return False
     record = {'at_utc': now.isoformat(timespec='seconds'),
               'report_generated_at_utc': report.get('generated_at_utc'),
               'previous_statuses': copy.deepcopy(state.get('statuses')),
               'baseline_statuses': copy.deepcopy(new)}
-    state.setdefault('migrations', {})[STATUS_MIGRATION] = record
+    state.setdefault('migrations', {})[key] = record
     state['statuses'] = copy.deepcopy(new)
     return True
 

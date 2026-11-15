@@ -510,7 +510,7 @@ class Brain(Hardening):
     def test_board_shows_best_and_worst_tactics_and_fresh_open_signals(self):
         from scangoal import brain
         row = lambda hid, fam, n, hits, prob, open_=(), tradable=True, status='em observação': {
-            'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
+            'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'games': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
             'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
         now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
         sig = lambda key, date, ko=None: {'in_roi': True, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
@@ -540,7 +540,7 @@ class Brain(Hardening):
         fresh_live = s('lv2', '1', date='2026-11-13T09:45:00+00:00')            # ao vivo há 15 minutos
         settled = s('done', '1', '2026-11-13T22:00+00:00', w=1.0)
         hist = [s('h%d' % i, '1', odds=1.8, w=1.0) for i in range(3)]          # resultados do tipo na faixa 1,50 a 2,00
-        row = lambda hid, n, hits, prob, open_, status='em observação', tradable=True: {'id': hid, 'family': 'Betfair', 'conditions': [['Seleção', hid]], 'n': n, 'hits': hits,
+        row = lambda hid, n, hits, prob, open_, status='em observação', tradable=True: {'id': hid, 'family': 'Betfair', 'conditions': [['Seleção', hid]], 'n': n, 'games': n, 'hits': hits,
             'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_}
         rows = [row('boa', 12, 11, 0.95, [good, both, conflict1, fresh_live, started]), row('boa-igual', 12, 11, 0.94, [good]),   # mesma amostra: conta uma vez
                 row('ma', 12, 3, 0.05, [both, avoid]), row('neutra', 12, 7, 0.5, [none]), row('poucos', 5, 5, 0.99, [none]),
@@ -997,7 +997,7 @@ class EvidencePerMatch(unittest.TestCase):
 
     def test_track_record_counts_proposals_in_the_expected_direction(self):
         from scangoal import brain
-        row = lambda source, prob, expect=None, n=12, mode=None: {'conditions': [['Minuto', 'x']], 'source': source, 'mode': mode, 'n': n, 'prob_above': prob,
+        row = lambda source, prob, expect=None, n=12, mode=None: {'conditions': [['Minuto', 'x']], 'source': source, 'mode': mode, 'n': n, 'games': n, 'prob_above': prob,
                                                                     'expect': expect, 'id': 'h', 'hit_rate': 0.5, 'break_even': 0.5}
         t = brain.track_record([row('llm', 0.9, 'acima', mode='novas'), row('llm', 0.9, 'abaixo', mode='evitar'), row('llm', 0.2, 'abaixo', mode='evitar'),
                                 row('llm', 0.99, 'acima', n=4), row('gerador', 0.7)])
