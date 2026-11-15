@@ -754,7 +754,9 @@ class Notify(unittest.TestCase):
     def report(self, **over):
         base = {'brain': {'evidence_scope': 'eligible_bets_only', 'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
-                          'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4}},
+                          'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4},
+                          # PR 3: validated statuses need a certificate of the accepted method (fixture declares it).
+                          'validation': {'method': 'eprocess_online_alpha_v1', 'certified': ['h1', 'Jogo aberto | Minuto = 31 a 60']}},
                 'insights': {'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'operational': {'scope': 'eligible_bets_only', 'regime': [{'type': 'OPEN_GAME', 'state': 'estável'}]},
                 'daily': [{'day': '2026-11-12', 'bets': 4, 'settled': 3, 'wins': 2, 'units': 0.85}], 'timeline': [{'u': 1.5}], 'settled_bets': 20}
@@ -784,7 +786,7 @@ class Notify(unittest.TestCase):
         from scangoal import notify
         noon = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
         strong = {'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'forte', 'n': 120, 'hit_rate': 0.7, 'prob_above': 0.9999, 'break_even': 0.55,
-                  'edge': 0.14, 'edge_ci': [0.07, 0.2], 'prudent_rate': 0.69}
+                  'edge': 0.14, 'edge_ci': [0.07, 0.2], 'prudent_rate': 0.69, 'certified': True}
         game = lambda date, ko=None: {'date_utc': date, 'kickoff_utc': ko, 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9, 'reasons': [strong]}
         rep = self.report()
         rep['brain']['watch'] = [game('2026-11-12T11:50:00+00:00'), game('2026-11-12T09:00:00+00:00'), game('2026-11-12T08:00:00+00:00', '2026-11-12T20:00')]

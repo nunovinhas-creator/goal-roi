@@ -47,7 +47,7 @@ def rows_by_id(signals, registry):
     return {r['id']: r for r in rows}, tested, bar
 
 
-SEVEN_IN_TEN = ([1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0] * 11)[:102]   # tail ~5e-5 at 100 games: passes m=1, not m=401
+THREE_IN_FOUR = ([1.0, 1.0, 1.0, -1.0] * 26)[:102]   # 102 games at 3/4 and odds 2.0: a large, certifiable edge
 
 
 def follows(wf):
@@ -142,17 +142,17 @@ class HypothesisBirth(unittest.TestCase):
         self.assertGreaterEqual(r['status_changes'][0]['known_utc'], born)                 # dated after registration
 
     def test_hypothesis_added_later_never_rewrites_fixed_decisions(self):
-        own = series(SEVEN_IN_TEN)                                                     # 102 games, validated with m = 1
+        own = series(THREE_IN_FOUR)                                                    # 102 games, certified with rank 1
         base = {'a': hyp()}
         rows1, _, _ = rows_by_id(own, base)
         self.assertEqual(rows1['a']['status'], 'forte')
-        # 400 hypotheses registered long after a's last game, on games of another family played afterwards.
-        later = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 10000 + i * 60, typ='STAKE_LOAD') for i in range(30)]
-        crowd = dict(base, **{'s%d' % k: hyp(born=at(9000), family='Stake') for k in range(400)})
+        # 400 hypotheses registered long after a's last game (one of them selected later), on games played afterwards.
+        later = [sig('s%d' % i, 1.0 if i % 4 else -1.0, 10000 + i * 60, typ='STAKE_LOAD') for i in range(40)]
+        crowd = dict(base, **{'s%d' % k: hyp(born=at(9000), family='Stake', conditions=()) for k in range(400)})
         rows2, tested2, _ = rows_by_id(own + later, crowd)
         self.assertEqual(tested2, 401)
         self.assertEqual(rows1['a']['status_changes'], rows2['a']['status_changes'])
-        self.assertEqual(rows1['a']['status'], rows2['a']['status'])
+        self.assertEqual((rows1['a']['status'], rows1['a']['confirmation']), (rows2['a']['status'], rows2['a']['confirmation']))
         wf1 = brain.walk_forward(own, base)
         wf2 = brain.walk_forward(own, crowd)
         self.assertEqual((wf1['followed'], wf1['skipped']), (wf2['followed'], wf2['skipped']))
@@ -172,74 +172,6 @@ class HypothesisBirth(unittest.TestCase):
         self.assertEqual(rows_by_id(wins, {'h': llm})[0]['h']['games'], 0)                # nothing counts without a birth
 
 
-class ChronologicalBar(unittest.TestCase):
-    def own(self):
-        return series(SEVEN_IN_TEN)
-
-    def test_bar_is_the_one_in_force_at_each_decision(self):
-        rows, tested, bar = rows_by_id(self.own(), {'a': hyp()})
-        change = rows['a']['status_changes'][-1]
-        self.assertEqual((rows['a']['status'], change['tested']), ('forte', 1))
-        self.assertEqual(change['bar'], round(brain.corrected_bar(1, change['games']), 6))
-
-    def test_looks_are_paid_for(self):
-        # α is spent over the looks n >= STRONG_AT: STRONG_AT/(n(n+1)) telescopes to exactly 1.
-        last = 200000
-        total = sum(brain.look_share(n) for n in range(brain.STRONG_AT, last))
-        self.assertAlmostEqual(total, 1 - brain.STRONG_AT / last, places=9)            # partial sums < 1, limit 1
-        self.assertGreater(brain.corrected_bar(1, 300), brain.corrected_bar(1, 100))
-
-    def test_a_family_that_already_existed_does_apply(self):
-        # 400 hypotheses with 30 games known BEFORE a's games: they were the family at a's decisions.
-        own = [dict(b, date_utc=at(5000 + i * 60), signal_seen_utc=at(5000 + i * 60), result_known_utc=at(5000 + i * 60 + 145))
-               for i, b in enumerate(self.own())]
-        earlier = [sig('s%d' % i, 1.0 if i % 2 else -1.0, i * 60, typ='STAKE_LOAD') for i in range(30)]
-        reg = dict({'a': hyp()}, **{'s%d' % k: hyp(family='Stake') for k in range(400)})
-        rows, tested, _ = rows_by_id(own + earlier, reg)
-        self.assertEqual((tested, rows['a']['status']), (401, 'promissora'))
-
-    def test_family_timeline(self):
-        t = [T0 + timedelta(hours=h) for h in (1, 2, 2, 5)]
-        f = brain.family_timeline(t + [None])
-        self.assertEqual(f(T0)[1], 0)
-        self.assertEqual(f(T0 + timedelta(hours=2))[1], 3)
-        self.assertEqual(f(T0 + timedelta(hours=9))[1], 4)
-        self.assertEqual(f(None), (brain.corrected_bar(5), 5))                              # "now": everyone, unknown included
-
-
-class ProspectiveGate(unittest.TestCase):
-    def test_historical_evidence_alone_never_validates(self):
-        history = series([1.0] * 90 + [-1.0] * 30)                                      # 120 games, p ~ 1, all before birth
-        born = at(200 * 60)
-        r = rows_by_id(history + [sig('x', 1.0, 201 * 60)], {'h': hyp(born=born)})[0]['h']
-        self.assertEqual(r['status'], 'promissora')
-        self.assertEqual(r['prospective']['games'], 1)
-        self.assertNotIn(r['entry_status'], brain.VALIDATED)
-
-    def test_prospective_confirmation_validates(self):
-        history = series([1.0] * 90 + [-1.0] * 30)
-        after = series([1.0] * 24 + [-1.0] * 8, start=200)                            # 32 prospective games, p ~ 0.998
-        r = rows_by_id(history + after, {'h': hyp(born=at(150 * 60))})[0]['h']
-        self.assertEqual((r['status'], r['evidence_level']), ('forte', 'prospetiva'))
-        last = r['status_changes'][-1]
-        self.assertGreaterEqual(last['prospective_games'], brain.PROSPECTIVE_MIN)
-
-    def test_weak_prospective_evidence_blocks_validation(self):
-        history = series([1.0] * 90 + [-1.0] * 30)
-        after = series([1.0, -1.0] * 16, start=200)                                    # 32 prospective games at break-even
-        r = rows_by_id(history + after, {'h': hyp(born=at(150 * 60))})[0]['h']
-        h, m, be, n = insights.clustered(history + after)
-        self.assertLess(insights.tail_below(h, m, be), 1 - brain.corrected_bar(1, n))        # the pooled history passes the bar
-        self.assertNotIn(r['status'], brain.VALIDATED)
-
-    def test_rounded_probability_never_passes_a_stricter_bar(self):
-        # 102 games at 7/10: prob_above rounds to 0.9999 or 1.0, but the true tail (~3e-5) is far above 1.2e-6.
-        h, m, be, n = insights.clustered(series(SEVEN_IN_TEN))
-        bar = brain.corrected_bar(401, n)
-        self.assertGreaterEqual(insights.evidence(h, m, be)['prob_above'], 0.9999)
-        self.assertFalse(brain.passes_bar(insights.evidence(h, m, be)['prob_above'], insights.tail_below(h, m, be), bar))
-
-
 class SameGameIsOneUnit(unittest.TestCase):
     def test_signals_of_one_game_are_one_step_and_one_walk_forward_game(self):
         same = [sig('m%d' % g, 1.0, g * 60 + j, market=mk, selection='x', known=145 + j, typ='POLYMARKET')
@@ -253,19 +185,179 @@ class SameGameIsOneUnit(unittest.TestCase):
         self.assertEqual(follows(brain.walk_forward(same + more + [decision], poly)), 1)   # control: 8 games are enough
 
 
+class OnlineConfirmation(unittest.TestCase):
+    """Validation = e-process on operational games after selection, with alpha/(j(j+1)) by order of selection."""
+
+    def test_certified_tactic_and_its_certificate(self):
+        r = rows_by_id(series(THREE_IN_FOUR), {'a': hyp()})[0]['a']
+        c = r['confirmation']
+        self.assertEqual((r['status'], c['rank'], c['alpha'], c['threshold']), ('forte', 1, 0.025, 40.0))
+        self.assertGreaterEqual(c['e_max'], c['threshold'])
+        self.assertGreaterEqual(c['certified_utc'], c['selected_utc'])
+        sel = chronology.parse_utc(c['selected_utc'])
+        after = sum(1 for g in brain.ordered_games(series(THREE_IN_FOUR)) if brain.operational_game(g[2], sel))
+        self.assertEqual(c['games'], after)                                            # only games read after the selection
+
+    def test_alpha_budget_follows_the_order_of_selection(self):
+        self.assertAlmostEqual(sum(brain.alpha_for_rank(j) for j in range(1, 100000)), brain.FWER_ALPHA * (1 - 1 / 100000), places=12)
+        early = series(THREE_IN_FOUR)
+        late = series(THREE_IN_FOUR, start=200, prefix='p', typ='POLYMARKET', market='1X2', selection='1')
+        reg = {'a': hyp(), 'b': hyp(family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
+        rows = rows_by_id(early + late, reg)[0]
+        self.assertEqual((rows['a']['confirmation']['rank'], rows['b']['confirmation']['rank']), (1, 2))
+        self.assertEqual((rows['a']['confirmation']['threshold'], rows['b']['confirmation']['threshold']), (40.0, 120.0))
+        alone = rows_by_id(early, {'a': reg['a']})[0]['a']
+        self.assertEqual(alone['confirmation'], rows['a']['confirmation'])             # a later selection changes nothing earlier
+        self.assertEqual(alone['status_changes'], rows['a']['status_changes'])
+
+    def test_e_process_keeps_its_level_under_the_null(self):
+        # Boundary null: win probability makes the expected profit at odds -2 % exactly zero; odds 1.4-3.5, some half wins.
+        rng, crossed, means = random.Random(77), 0, []
+        for run in range(300):
+            games, t = [], T0
+            for i in range(400):
+                o = round(rng.uniform(1.4, 3.5), 2)
+                p = 1 / (o * (1 - insights.ODDS_LOSS))
+                u = rng.random()
+                w = 1.0 if u < p else -1.0
+                if w > 0 and rng.random() < 0.1:   # some wins are half wins: lower expected profit, still inside the null
+                    w = 0.5 if rng.random() < 0.5 else 1.0
+                t += timedelta(hours=1)
+                b = sig('n%d-%d' % (run, i), w, i * 60, odds=o)
+                games.append((t, b['match_id'], [b]))
+            c = brain.confirmation(games, T0 - timedelta(days=1), 0.05)
+            crossed += c['e_max'] >= 20
+            means.append(c['e_value'])
+        self.assertLessEqual(crossed / 300, 0.05)                                      # Ville: P(sup E >= 1/alpha) <= alpha
+        self.assertLess(sum(means) / len(means), 1.25)                                 # supermartingale: E[E_n] <= 1 (noisy)
+
+    def test_strong_history_without_post_selection_evidence_is_not_certified(self):
+        history = series([1.0] * 90 + [-1.0] * 30)
+        weak_after = series([1.0, -1.0] * 20, start=200)                               # break-even after the selection
+        r = rows_by_id(history + weak_after, {'h': hyp(born=at(150 * 60))})[0]['h']
+        self.assertGreaterEqual(r['prob_above'], 0.9999)
+        self.assertIsNone(r['confirmation']['certified_utc'])
+        self.assertNotIn(r['status'], brain.VALIDATED)
+
+    def test_no_validated_status_without_a_certificate_even_if_the_machine_says_so(self):
+        real = brain.stable_status
+        try:
+            brain.stable_status = lambda *a, **k: ('forte', None, [])
+            r = rows_by_id(series([1.0] * 40), {'h': hyp()})[0]['h']
+        finally:
+            brain.stable_status = real
+        self.assertEqual((r['status'], r.get('validation_blocked')), ('promissora', True))
+
+
+class ProspectiveEligibility(unittest.TestCase):
+    """Review #5911487915, P1-A and P1-B: one definition of prospective evidence, per game, used everywhere."""
+    BORN = 100 * 60
+
+    def summary(self, sigs):
+        rows = rows_by_id(sigs, {'h': hyp(born=at(self.BORN))})[0]['h']
+        steps = brain.game_steps(sigs, chronology.parse_utc(at(self.BORN)), prospective_from=chronology.parse_utc(at(self.BORN)))
+        return rows, (steps[-1][3]['prospective_games'] if steps else 0)
+
+    def test_pre_registration_signals_recovered_late_are_never_prospective(self):
+        # 40 wins sent BEFORE registration but read by the system only after it (late recovery / backfill).
+        late = [sig('b%d' % i, 1.0, i * 60, seen=self.BORN - i * 60 + 30 + i, known=self.BORN - i * 60 + 200 + i) for i in range(40)]
+        r, replay = self.summary(late)
+        self.assertTrue(all(chronology.decision_time(b) > chronology.parse_utc(at(self.BORN)) for b in late))   # read after birth
+        self.assertEqual((r['prospective']['games'], replay), (0, 0))
+        self.assertEqual(r['prospective']['categories']['before_registration'], 40)
+        self.assertEqual(r['evidence_level'], 'exploratória')
+        self.assertNotIn(r['status'], brain.VALIDATED)
+        self.assertTrue(r['confirmation'] is None or r['confirmation']['games'] == 0)
+
+    def test_signals_sent_after_registration_but_not_operational(self):
+        read_late = [sig('l%d' % i, 1.0, self.BORN + 60 + i * 60, seen=24 * 60) for i in range(35)]        # not bettable
+        unknown = [sig('u%d' % i, 1.0, self.BORN + 60 + i * 60, known=None) for i in range(35)]             # result time unproven
+        for case in (read_late, unknown):
+            r, replay = self.summary(case)
+            self.assertEqual((r['prospective']['games'], replay), (0, 0))
+            self.assertEqual(r['prospective']['categories']['after_registration_not_operational'], 35)
+
+    def test_mixed_games_count_nowhere_and_full_games_count_everywhere(self):
+        def game(i, both_after):
+            # Two bets per game; in a mixed game the first is sent (and read) before registration, the second after it.
+            first = self.BORN + 30 + i * 60 if both_after else self.BORN - 600 + i
+            return [sig('m%d' % i, 1.0, first, typ='POLYMARKET', market='1X2', selection='1'),
+                    sig('m%d' % i, 1.0, self.BORN + 40 + i * 60, typ='POLYMARKET', market='BTTS', selection='Yes')]
+        reg = {'h': hyp(born=at(self.BORN), family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
+        for both_after, expected, cat in ((False, 0, 'mixed'), (True, 35, 'prospective')):
+            sigs = [b for i in range(35) for b in game(i, both_after)]
+            r = rows_by_id(sigs, reg)[0]['h']
+            born = chronology.parse_utc(at(self.BORN))
+            steps = brain.game_steps(sigs, born, prospective_from=born)
+            self.assertEqual((r['prospective']['games'], steps[-1][3]['prospective_games']), (expected, expected))
+            self.assertEqual(r['prospective']['categories'][cat], 35)
+
+    def test_report_and_state_machine_agree_on_random_data(self):
+        rng = random.Random(12)
+        sigs = []
+        for g in range(120):
+            for j in range(rng.choice((1, 1, 2, 3))):
+                minute = g * 50 + j * 7 + rng.choice((-3000, 0, 0, 3000))
+                sigs.append(sig('r%d' % g, rng.choice((1.0, -1.0, 0.5)), minute, seen=rng.choice((0, 1, 2, 60, None)),
+                                known=rng.choice((145, 145, 200, None, -10)), typ='POLYMARKET', market=rng.choice(('1X2', 'BTTS')), selection='x'))
+        born = chronology.parse_utc(at(3000))
+        reg = {'h': hyp(born=at(3000), family='Polymarket', conditions=(('Momento', 'durante o jogo'),))}
+        r = rows_by_id(sigs, reg)[0]['h']
+        ordered = brain.ordered_games([b for b in sigs if b['w'] is not None])
+        direct = sum(1 for _, _, rows in ordered if brain.operational_game(rows, born))
+        steps = brain.game_steps(sigs, born, prospective_from=born)
+        self.assertGreater(direct, 0)
+        self.assertEqual(r['prospective']['games'], direct)
+        self.assertEqual(steps[-1][3]['prospective_games'], direct)
+        self.assertEqual(sum(r['prospective']['categories'].values()), len(ordered))
+
+
 class OverlappingHypotheses(unittest.TestCase):
-    def test_overlap_is_reported_and_never_relaxes_the_bar(self):
-        g = series([1.0] * 30 + [-1.0] * 6 + [1.0, 1.0])
+    def test_overlap_is_reported_and_every_hypothesis_pays_its_own_alpha(self):
+        g = series(THREE_IN_FOUR)
         idx = brain.earlier_index(g)
         common = sorted(set.intersection(*(set(brain.atoms(dict(b), set(), idx)) for b in g)) - {('Dia', 'fim de semana'), ('Dia', 'dia de semana')})
         picks = [[], [common[0]], [common[1]], [common[0], common[1]]]
         reg = {'h%d' % i: hyp(conditions=c) for i, c in enumerate(picks)}
-        rows, tested, bar = rows_by_id(g, reg)
+        rows, tested, _ = rows_by_id(g, reg)
         self.assertEqual(len({r['game_set'] for r in rows.values()}), 1)               # the same evidence four times
-        self.assertEqual((tested, bar), (4, brain.corrected_bar(4)))                     # counted as 4 tests: conservative
-        out = brain.build(g, reg, 300)['multiplicity']
-        self.assertEqual((out['promising_or_better'], out['distinct_game_sets_promising_or_better']), (4, 1))
-        self.assertTrue(out['valid_under_dependence'])
+        self.assertEqual(sorted(r['confirmation']['rank'] for r in rows.values()), [1, 2, 3, 4])   # four tests, four budgets
+        self.assertEqual(sorted(r['confirmation']['threshold'] for r in rows.values()), [40.0, 120.0, 240.0, 400.0])
+        out = brain.build(g, reg, 300)
+        self.assertEqual((out['multiplicity']['promising_or_better'], out['multiplicity']['distinct_game_sets_promising_or_better']), (4, 1))
+        self.assertEqual(out['validation']['method'], notify.VALIDATION_METHOD)
+
+
+class TelegramNeverClaimsUncertifiedValidation(unittest.TestCase):
+    def report(self, validation=None, certified_reason=False):
+        reason = {'id': 'h1', 'status': 'forte', 'n': 120, 'hit_rate': 0.7, 'prob_above': 0.9999, 'break_even': 0.5, 'edge': 0.1,
+                  'edge_ci': [0.05, 0.15], 'prudent_rate': 0.68, 'certified': certified_reason}
+        brain_ = {'evidence_scope': 'eligible_bets_only', 'status_rules': brain.STATUS_RULES, 'status_list': {'h1': 'forte'},
+                  'watch': [{'date_utc': at(0), 'kickoff_utc': at(120), 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9, 'reasons': [reason]}]}
+        if validation is not None:
+            brain_['validation'] = validation
+        return {'generated_at_utc': at(0), 'brain': brain_}
+
+    def test_forte_without_certificate_is_announced_as_promising_only(self):
+        for validation, flag in ((None, True), ({'method': 'bonferroni', 'certified': ['h1']}, True),
+                                 ({'method': notify.VALIDATION_METHOD, 'certified': []}, True),
+                                 ({'method': notify.VALIDATION_METHOD, 'certified': 'h1'}, True)):
+            state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
+            out = notify.messages(self.report(validation, flag), state, T0)
+            self.assertFalse(any('ALERTA' in m or 'validada' in m or 'forte' in m for m in out), (validation, flag, out))
+            self.assertEqual(state['statuses'], {'h1': 'promissora'})
+
+    def test_alert_needs_the_certificate_on_the_reason_too(self):
+        state = {'hello': True, 'statuses': {'h1': 'forte'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
+        out = notify.messages(self.report({'method': notify.VALIDATION_METHOD, 'certified': ['h1']}, False), state, T0)
+        self.assertFalse(any('ALERTA' in m for m in out))
+        self.assertTrue(any('promissora' in m and 'A seguir' in m for m in out))
+
+    def test_certified_tactic_is_announced(self):
+        state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
+        out = notify.messages(self.report({'method': notify.VALIDATION_METHOD, 'certified': ['h1']}, True), state, T0)
+        self.assertTrue(any(m.startswith('🟢 ALERTA') for m in out))
+        self.assertTrue(any(m.startswith('✅ Tática validada') for m in out))
 
 
 class PhysicalOrder(unittest.TestCase):
@@ -313,7 +405,7 @@ class Scenarios(unittest.TestCase):
         rows, _, _ = rows_by_id(sigs, {'h': hyp(born=at(-60))})
         return rows['h'], sigs
 
-    def test_true_edge_is_validated_prospectively(self):
+    def test_true_edge_is_certified_prospectively(self):
         for seed in self.SEEDS:
             r, sigs = self.run_case([0.75] * 160, seed)
             self.assertIn(r['status'], brain.VALIDATED, seed)
@@ -345,12 +437,12 @@ class TelegramRulesMigration(unittest.TestCase):
         return {'generated_at_utc': at(0), 'brain': {'evidence_scope': 'eligible_bets_only', 'status_rules': brain.STATUS_RULES, 'status_list': statuses}}
 
     def test_pr3_rules_rebaseline_silently_once(self):
-        self.assertEqual(brain.STATUS_RULES, 'chronological_prospective_v1')
+        self.assertEqual(brain.STATUS_RULES, 'chronological_eprocess_v1')
         state = self.production_like_state()
         before = json.loads(json.dumps(state))
         out = notify.messages(self.report({'a': 'promissora'}), state, T0)        # b and c lose their status under PR 3 rules
         self.assertEqual([m for m in out if 'Hipótese' in m or 'Tática' in m], [])
-        key = 'status_rules:chronological_prospective_v1'
+        key = 'status_rules:chronological_eprocess_v1'
         self.assertEqual(sorted(state['migrations']), sorted(list(before['migrations']) + [key]))
         for k, v in before['migrations'].items():
             self.assertEqual(state['migrations'][k], v)

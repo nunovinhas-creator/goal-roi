@@ -356,23 +356,25 @@ class GameIdentity(unittest.TestCase):
 class CorrectedBarIsChronological(unittest.TestCase):
     """PR 2 documented limitation (review #5910343843), fixed in PR 3. In PR 2 the corrected bar used TODAY's count of tested
     hypotheses for the whole replay, so the same 102 games gave 'forte' with 1 tested hypothesis and 'promissora' with 401:
-    a validated status changed without any new game of that hypothesis. PR 3 replays each decision with the family that
-    existed at that instant (and records it), so hypotheses that only reach 30 games later never rewrite it."""
+    a validated status changed without any new game of that hypothesis. In PR 3 (review #5911487915) validation is an
+    e-process on games after the selection, with an alpha budget fixed by the order of selection: hypotheses that reach 30
+    games (or are selected) later never change an earlier certificate."""
 
     def test_validated_status_no_longer_depends_on_hypotheses_tested_later(self):
-        base = ([1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0] * 11)[:102]
+        base = ([1.0, 1.0, 1.0, -1.0] * 26)[:102]
         own = games(base)                                               # 102 games of "Jogo aberto" (days 1-6)
         others = [sig('s%d' % i, 1.0 if i % 2 else -1.0, 200 + i, typ='STAKE_LOAD') for i in range(30)]   # days 11-12
         alone = {'a': family_only()['h']}
         crowded = dict(alone, **{'s%d' % k: dict(family_only('Stake')['h']) for k in range(400)})
-        rows1, tested1, bar1 = brain.evaluate(own + others, alone, 300)
-        rows2, tested2, bar2 = brain.evaluate(own + others, crowded, 300)
+        rows1, tested1, _ = brain.evaluate(own + others, alone, 300)
+        rows2, tested2, _ = brain.evaluate(own + others, crowded, 300)
         a1, a2 = rows1[0], next(r for r in rows2 if r['id'] == 'a')
         self.assertEqual((a1['games'], a1['prob_above']), (a2['games'], a2['prob_above']))   # same games, same evidence
         self.assertEqual((tested1, tested2), (1, 401))                                       # today's family differs
         self.assertEqual((a1['status'], a2['status']), ('forte', 'forte'))                   # PR 2: ('forte', 'promissora')
         self.assertEqual(a1['status_changes'], a2['status_changes'])
-        self.assertEqual(a2['status_changes'][-1]['tested'], 1)                              # the family at that decision
+        self.assertEqual(a1['confirmation'], a2['confirmation'])
+        self.assertEqual(a2['confirmation']['rank'], 1)                                      # budget fixed at its selection
 
 
 if __name__ == '__main__':
