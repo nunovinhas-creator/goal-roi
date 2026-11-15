@@ -1,9 +1,9 @@
 {
- "generated_at_utc": "2026-11-15T05:52:09+00:00",
- "messages": 661,
+ "generated_at_utc": "2026-11-15T06:00:16+00:00",
+ "messages": 662,
  "types": {
   "SERVICE": 10,
-  "GOAL_BREWING": 27,
+  "GOAL_BREWING": 28,
   "BETFAIR": 154,
   "STAKE_LOAD": 100,
   "OPEN_GAME": 120,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1054,
+  "versions": 1056,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-15T05:41:26+00:00",
+  "last_collected_at_utc": "2026-11-15T06:00:11+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 27,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T05:52:02+00:00",
+  "collector_last_run_utc": "2026-11-15T06:00:11+00:00",
   "name_review": [
    {
     "bot": [
@@ -452,7 +452,7 @@
   "goal_lists_consistent": 142
  },
  "unique_bets": 361,
- "settled_bets": 292,
+ "settled_bets": 293,
  "unsettled_market": 26,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
@@ -786,32 +786,32 @@
   },
   "POLYMARKET/live": {
    "bets": 10,
-   "settled": 8,
-   "matches": 5,
+   "settled": 9,
+   "matches": 6,
    "wins": 4,
    "pushes": 0,
-   "units": 1.37,
-   "avg_odds": 3.192,
+   "units": 0.37,
+   "avg_odds": 3.049,
    "roi": {
     "odd-0%": {
-     "roi": 0.1712,
+     "roi": 0.0411,
      "ci95": [
-      -0.7981,
-      1.1406
+      -0.8522,
+      0.9344
      ]
     },
     "odd-2%": {
-     "roi": 0.1478,
+     "roi": 0.0203,
      "ci95": [
-      -0.8022,
-      1.0978
+      -0.8551,
+      0.8957
      ]
     },
     "odd-5%": {
-     "roi": 0.1127,
+     "roi": -0.0109,
      "ci95": [
-      -0.8082,
-      1.0336
+      -0.8595,
+      0.8377
      ]
     }
    },
@@ -823,7 +823,8 @@
     -0.14,
     0.99,
     -0.01,
-    1.37
+    1.37,
+    0.37
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1202,7 +1203,7 @@
    "by_bot_mark": 0,
    "per_day": 4.3,
    "days_to_hint": 4,
-   "days_to_conclusion": 66,
+   "days_to_conclusion": 67,
    "prudent_rate": 0.5284,
    "prob_above": 0.532,
    "edge": 0.0073,
@@ -1213,7 +1214,7 @@
    "prob_above_cut": 0.49
   },
   "GOAL_BREWING": {
-   "signals": 27,
+   "signals": 28,
    "with_result": 3,
    "hits": 1,
    "misses": 2,
@@ -1239,7 +1240,7 @@
    "by_bot_mark": 0,
    "per_day": 0.8,
    "days_to_hint": 34,
-   "days_to_conclusion": 369,
+   "days_to_conclusion": 370,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1274,7 +1275,7 @@
    "roi_announced_odds": 0.2176,
    "seen_late": 13,
    "by_bot_mark": 0,
-   "per_day": 27.0,
+   "per_day": 26.9,
    "days_to_hint": 0,
    "days_to_conclusion": 8,
    "prudent_rate": 0.6509,
@@ -1313,7 +1314,7 @@
    "by_bot_mark": 0,
    "per_day": 2.6,
    "days_to_hint": 9,
-   "days_to_conclusion": 111,
+   "days_to_conclusion": 112,
    "prudent_rate": 0.6792,
    "prob_above": 0.482,
    "edge": -0.0112,
@@ -1325,40 +1326,40 @@
   },
   "POLYMARKET": {
    "signals": 66,
-   "with_result": 59,
+   "with_result": 60,
    "hits": 27,
-   "misses": 32,
+   "misses": 33,
    "pushes": 0,
    "eff_hits": 27.0,
-   "eff_misses": 32.0,
+   "eff_misses": 33.0,
    "vote_hits": 11.15,
-   "vote_misses": 13.85,
-   "vote_break_even": 0.5127,
-   "games": 25,
+   "vote_misses": 14.85,
+   "vote_break_even": 0.5132,
+   "games": 26,
    "no_source": 0,
    "unsettleable": 4,
-   "hit_rate": 0.4576,
+   "hit_rate": 0.45,
    "ci95": [
-    0.337,
-    0.5834
+    0.3309,
+    0.5751
    ],
-   "avg_odds": 2.385,
-   "break_even": 0.4841,
+   "avg_odds": 2.377,
+   "break_even": 0.4848,
    "baseline": false,
-   "roi_announced_odds": -0.1007,
+   "roi_announced_odds": -0.1157,
    "seen_late": 0,
-   "by_bot_mark": 35,
-   "per_day": 22.9,
+   "by_bot_mark": 36,
+   "per_day": 23.3,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
-   "prudent_rate": 0.4651,
-   "prob_above": 0.2851,
-   "edge": -0.0476,
+   "prudent_rate": 0.4523,
+   "prob_above": 0.2305,
+   "edge": -0.0609,
    "edge_ci": [
-    -0.1835,
-    0.0905
+    -0.1942,
+    0.0754
    ],
-   "prob_above_cut": 0.2448
+   "prob_above_cut": 0.1944
   },
   "STAKE_LOAD": {
    "signals": 81,
@@ -1459,7 +1460,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 26.4,
+   "per_day": 26.3,
    "days_to_hint": 0,
    "days_to_conclusion": 10,
    "prudent_rate": 0.783,
@@ -1498,7 +1499,7 @@
    "by_bot_mark": 0,
    "per_day": 1.4,
    "days_to_hint": 18,
-   "days_to_conclusion": 206,
+   "days_to_conclusion": 207,
    "prudent_rate": 0.4663,
    "prob_above": 0.3227,
    "edge": -0.0599,
@@ -1544,7 +1545,7 @@
    },
    {
     "type": "POLYMARKET",
-    "n": 59,
+    "n": 60,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -2507,31 +2508,6 @@
     "value": "seleções"
    },
    {
-    "n": 35,
-    "signals": 42,
-    "hits": 15,
-    "misses": 20,
-    "hit_rate": 0.4286,
-    "ci95": [
-     0.2798,
-     0.5914
-    ],
-    "break_even": 0.4561,
-    "roi": -0.1171,
-    "games": 19,
-    "prudent_rate": 0.4789,
-    "prob_above": 0.4555,
-    "edge": -0.01,
-    "edge_ci": [
-     -0.1594,
-     0.1412
-    ],
-    "prob_above_cut": 0.4136,
-    "family": "Polymarket",
-    "dimension": "Mercado",
-    "value": "outro mercado"
-   },
-   {
     "n": 19,
     "signals": 27,
     "hits": 10,
@@ -2605,6 +2581,31 @@
     "family": "Betfair",
     "dimension": "Faixa de odd",
     "value": "odd 1,50 a 2,00"
+   },
+   {
+    "n": 20,
+    "signals": 23,
+    "hits": 10,
+    "misses": 10,
+    "hit_rate": 0.5,
+    "ci95": [
+     0.2993,
+     0.7007
+    ],
+    "break_even": 0.5319,
+    "roi": -0.0635,
+    "games": 13,
+    "prudent_rate": 0.505,
+    "prob_above": 0.4134,
+    "edge": -0.0232,
+    "edge_ci": [
+     -0.1917,
+     0.1448
+    ],
+    "prob_above_cut": 0.3739,
+    "family": "Polymarket",
+    "dimension": "Quota de mercado",
+    "value": "80 % ou mais"
    }
   ],
   "segments_tested": 71,
@@ -2737,26 +2738,26 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 172,
+    "n": 173,
     "signals": 222,
     "hits": 99,
-    "misses": 73,
-    "hit_rate": 0.5663,
+    "misses": 74,
+    "hit_rate": 0.5629,
     "ci95": [
-     0.4902,
-     0.6393
+     0.4871,
+     0.6359
     ],
-    "break_even": 0.5762,
-    "roi": -0.008,
-    "games": 130,
-    "prudent_rate": 0.5694,
-    "prob_above": 0.4617,
-    "edge": -0.0044,
+    "break_even": 0.5759,
+    "roi": -0.0133,
+    "games": 131,
+    "prudent_rate": 0.5652,
+    "prob_above": 0.4256,
+    "edge": -0.0083,
     "edge_ci": [
-     -0.0749,
-     0.0649
+     -0.0786,
+     0.0609
     ],
-    "prob_above_cut": 0.3552,
+    "prob_above_cut": 0.3214,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -2807,17 +2808,17 @@
    }
   ],
   "luck": {
-   "n": 292,
-   "units": -7.52,
-   "luck_sd": 20.23,
-   "z": -0.37,
+   "n": 293,
+   "units": -8.52,
+   "luck_sd": 20.25,
+   "z": -0.42,
    "max_drawdown": 24.36,
    "longest_losing_run": 7
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 64 em 97, precisa de 54 %, e a probabilidade de estar acima do mínimo é 99 %.",
    "O mais fraco é aposta grande na Stake: 21 em 50, precisa de 54 %, probabilidade de estar acima do mínimo 3 %.",
-   "Saldo de -7,52 unidades em 292 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±40,5 unidades).",
+   "Saldo de -8,52 unidades em 293 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±40,5 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 15 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Jogo aberto, parte do jogo = 2.ª parte: 48 em 66 (73 % contra 55 % necessários). Indício positivo.",
    "Jogo aberto, ritmo indicado pelo bot = menos de 90: 38 em 53 (73 % contra 54 % necessários). Indício positivo.",
@@ -2833,12 +2834,12 @@
   }
  },
  "brain": {
-  "hypotheses": 5025,
-  "tested": 253,
+  "hypotheses": 5030,
+  "tested": 254,
   "corrected_bar": 0.9998,
   "counts": {
-   "em observação": 4979,
-   "abandonada": 6,
+   "em observação": 4983,
+   "abandonada": 7,
    "promissora": 40
   },
   "board": {
@@ -3223,12 +3224,12 @@
          "não"
         ]
        ],
-       "n": 18,
+       "n": 19,
        "hits": 5,
-       "break_even": 0.4627,
-       "prob_above": 0.1044,
-       "roi": -0.4606,
-       "edge": -0.1268,
+       "break_even": 0.466,
+       "prob_above": 0.0734,
+       "roi": -0.4889,
+       "edge": -0.1434,
        "status": "em observação",
        "source": "gerador"
       },
@@ -3248,17 +3249,17 @@
          "menos de 80 %"
         ]
        ],
-       "n": 26,
+       "n": 27,
        "hits": 9,
-       "break_even": 0.4349,
-       "prob_above": 0.1877,
-       "roi": -0.2527,
-       "edge": -0.0857,
+       "break_even": 0.4382,
+       "prob_above": 0.14,
+       "roi": -0.2804,
+       "edge": -0.1026,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 2
+     "bad_total": 8
     },
     {
      "match_id": "utc-cajamarca-vs-cd-los-chankas-20261116",
@@ -3901,7 +3902,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 30,
+     "odds_band_n": 31,
      "good": [],
      "good_total": 0,
      "bad": [
@@ -3913,13 +3914,13 @@
          "odd 1,50 a 2,00"
         ]
        ],
-       "n": 30,
+       "n": 31,
        "hits": 14,
-       "break_even": 0.5841,
-       "prob_above": 0.1114,
-       "roi": -0.2137,
-       "edge": -0.1092,
-       "status": "em observação",
+       "break_even": 0.5822,
+       "prob_above": 0.0825,
+       "roi": -0.239,
+       "edge": -0.1222,
+       "status": "abandonada",
        "source": "gerador"
       },
       {
@@ -3934,17 +3935,17 @@
          "odd 1,50 a 2,00"
         ]
        ],
-       "n": 25,
+       "n": 26,
        "hits": 11,
-       "break_even": 0.5828,
-       "prob_above": 0.1212,
-       "roi": -0.2576,
-       "edge": -0.1122,
+       "break_even": 0.5807,
+       "prob_above": 0.0885,
+       "roi": -0.2862,
+       "edge": -0.1269,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 11
+     "bad_total": 13
     }
    ],
    "counts": {
@@ -3954,7 +3955,7 @@
     "contraditório": 2,
     "evitar": 2
    },
-   "generated_utc": "2026-11-15T05:52:09+00:00",
+   "generated_utc": "2026-11-15T06:00:15+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -3967,9 +3968,9 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 4985,
-     "judged": 2838,
-     "as_expected": 1641
+     "hypotheses": 4990,
+     "judged": 2844,
+     "as_expected": 1638
     },
     "llm/refinar": {
      "hypotheses": 22,
@@ -4087,12 +4088,12 @@
    },
    "skipped": {
     "bets": 159,
-    "settled": 119,
-    "games": 66,
+    "settled": 120,
+    "games": 67,
     "wins": 55,
-    "units": -11.01,
-    "roi": -0.0925,
-    "roi_cut": -0.1099
+    "units": -12.01,
+    "roi": -0.1,
+    "roi_cut": -0.1173
    },
    "curve": [
     0.61,
@@ -4269,7 +4270,7 @@
     4.48,
     3.48
    ],
-   "prob_followed_better": 0.8464,
+   "prob_followed_better": 0.8677,
    "first_followed_utc": "2026-11-12T09:07:24+00:00",
    "rule": {
     "min_results": 8,
@@ -9272,6 +9273,7 @@
    "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
    "Jogo aberto | Hora (UTC) = noite": "promissora",
    "Stake | Competição = seleções": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
    "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 %": "abandonada",
    "Stake | Faixa de odd = odd 1,50 a 2,00": "abandonada",
    "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -9316,6 +9318,45 @@
     "mode": null,
     "tradable": true,
     "open": 20,
+    "status": "abandonada"
+   },
+   {
+    "n": 31,
+    "signals": 33,
+    "hits": 14,
+    "misses": 17,
+    "hit_rate": 0.4516,
+    "ci95": [
+     0.2916,
+     0.6223
+    ],
+    "break_even": 0.5822,
+    "roi": -0.239,
+    "games": 22,
+    "prudent_rate": 0.4571,
+    "prob_above": 0.0825,
+    "edge": -0.1222,
+    "edge_ci": [
+     -0.2635,
+     0.0222
+    ],
+    "prob_above_cut": 0.0637,
+    "prob_adds": 0.0724,
+    "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00",
+    "family": "Polymarket",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ]
+    ],
+    "source": "gerador",
+    "born_utc": "2026-11-14T11:33:14+00:00",
+    "reason": null,
+    "expect": null,
+    "mode": null,
+    "tradable": true,
+    "open": 2,
     "status": "abandonada"
    },
    {
@@ -9722,7 +9763,7 @@
    },
    {
     "n": 0,
-    "signals": 2,
+    "signals": 3,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -9754,7 +9795,7 @@
     "expect": "acima",
     "mode": "novas",
     "tradable": true,
-    "open": 2,
+    "open": 3,
     "status": "em observação"
    },
    {
@@ -11302,32 +11343,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 361,
-   "settled": 292,
-   "matches": 195,
+   "settled": 293,
+   "matches": 196,
    "wins": 136,
    "pushes": 24,
-   "units": -7.52,
-   "avg_odds": 2.401,
+   "units": -8.52,
+   "avg_odds": 2.399,
    "roi": {
     "odd-0%": {
-     "roi": -0.0258,
+     "roi": -0.0291,
      "ci95": [
-      -0.1467,
-      0.0952
+      -0.1498,
+      0.0916
      ]
     },
     "odd-2%": {
-     "roi": -0.0432,
+     "roi": -0.0464,
      "ci95": [
-      -0.1617,
-      0.0753
+      -0.1647,
+      0.0719
      ]
     },
     "odd-5%": {
-     "roi": -0.0693,
+     "roi": -0.0725,
      "ci95": [
-      -0.1842,
-      0.0456
+      -0.1872,
+      0.0422
      ]
     }
    },
@@ -11356,9 +11397,12 @@
    "match": "Hokkaido Consadole Sapporo — Tosu",
    "selection": "Polymarket: AH1(-0.5)",
    "odds": 1.9,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    2
+   ],
+   "w": -1.0,
+   "settled_by": "marca do bot",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -14611,7 +14655,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    1,
+    2
+   ]
   },
   "wl-fc-ryukyu-vs-kochi-united-2026-11-15": {
    "teams": [
@@ -17553,6 +17600,16 @@
    "m": "Chivas Guadalajara Women — Juarez FC Women",
    "s": "Over 3",
    "o": 1.62
+  },
+  {
+   "d": "2026-11-15T05:02:06+00:00",
+   "u": -8.52,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "POLYMARKET",
+   "m": "Hokkaido Consadole Sapporo — Tosu",
+   "s": "Polymarket: AH1(-0.5)",
+   "o": 1.9
   }
  ],
  "daily": [
@@ -17586,9 +17643,9 @@
   },
   {
    "bets": 13,
-   "settled": 5,
+   "settled": 6,
    "wins": 3,
-   "units": -0.23,
+   "units": -1.23,
    "day": "2026-11-15"
   }
  ]
