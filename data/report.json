@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-15T14:08:03+00:00",
- "messages": 750,
+ "generated_at_utc": "2026-11-15T14:08:31+00:00",
+ "messages": 751,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 35,
   "BETFAIR": 164,
-  "STAKE_LOAD": 118,
+  "STAKE_LOAD": 119,
   "OPEN_GAME": 133,
   "TOTALS_FORM": 42,
   "WEAKENED_LINEUP": 8,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1167,
+  "versions": 1168,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 3,
-  "last_collected_at_utc": "2026-11-15T14:07:56+00:00",
+  "last_collected_at_utc": "2026-11-15T14:08:21+00:00",
   "hl_results": 49,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 29,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T14:07:56+00:00",
+  "collector_last_run_utc": "2026-11-15T14:08:21+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 0,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 88,
+  "stake_original_seen": 89,
   "stake_no_score_after_kickoff": 18,
   "stake_sent_45_after_kickoff": 26,
   "goal_lists": 250,
   "goal_lists_consistent": 162
  },
- "unique_bets": 412,
+ "unique_bets": 413,
  "settled_bets": 311,
  "unsettled_market": 28,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -926,7 +926,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/live": {
-   "bets": 29,
+   "bets": 30,
    "settled": 20,
    "matches": 15,
    "wins": 10,
@@ -1380,7 +1380,7 @@
    "prob_above_cut": 0.1944
   },
   "STAKE_LOAD": {
-   "signals": 98,
+   "signals": 99,
    "with_result": 54,
    "hits": 23,
    "misses": 29,
@@ -2545,7 +2545,7 @@
    },
    {
     "n": 21,
-    "signals": 32,
+    "signals": 33,
     "hits": 12,
     "misses": 9,
     "hit_rate": 0.5714,
@@ -2847,7 +2847,7 @@
    },
    {
     "n": 192,
-    "signals": 263,
+    "signals": 264,
     "hits": 113,
     "misses": 79,
     "hit_rate": 0.5761,
@@ -2951,8 +2951,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "independent_games_hysteresis_v1",
   "eligibility": {
-   "total": 552,
-   "eligible": 412,
+   "total": 553,
+   "eligible": 413,
    "excluded": 140,
    "reasons": {
     "no_valid_odds": 92,
@@ -2967,7 +2967,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 5349,
+    "em observação": 5354,
     "promissora": 56
    },
    "hypotheses": [
@@ -4023,11 +4023,11 @@
     }
    ]
   },
-  "hypotheses": 5405,
+  "hypotheses": 5410,
   "tested": 143,
   "corrected_bar": 0.99965,
   "counts": {
-   "em observação": 5392,
+   "em observação": 5397,
    "promissora": 13
   },
   "board": {
@@ -5612,6 +5612,79 @@
      "bad_total": 21
     },
     {
+     "match_id": "latvia-vs-armenia-20261115",
+     "match": "Latvia — Armenia",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-15T14:00+00:00",
+     "date_utc": "2026-11-15T14:08:13+00:00",
+     "minute": null,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "1st Half - Asian Total",
+     "selection": "Over 0.5",
+     "odds": 1.55,
+     "odds_last": 1.55,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 26,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Hora (UTC) = tarde",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "tarde"
+        ]
+       ],
+       "n": 17,
+       "games": 12,
+       "hits": 3,
+       "break_even": 0.5354,
+       "prob_above": 0.0299,
+       "roi": -0.6589,
+       "edge": -0.1948,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "tarde"
+        ],
+        [
+         "Mercado",
+         "outros mercados"
+        ]
+       ],
+       "n": 11,
+       "games": 8,
+       "hits": 1,
+       "break_even": 0.5221,
+       "prob_above": 0.0351,
+       "roi": -0.8418,
+       "edge": -0.2055,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 24
+    },
+    {
      "match_id": "granada-vs-las-palmas-20261115",
      "match": "Granada — Las Palmas",
      "league": "Spanish Segunda",
@@ -6499,9 +6572,9 @@
     "misto": 0,
     "sem evidência": 0,
     "contraditório": 10,
-    "evitar": 15
+    "evitar": 16
    },
-   "generated_utc": "2026-11-15T14:08:03+00:00",
+   "generated_utc": "2026-11-15T14:08:30+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6514,7 +6587,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 5361,
+     "hypotheses": 5366,
      "judged": 1935,
      "as_expected": 1092
     },
@@ -6643,7 +6716,7 @@
     "roi_cut": -0.0091
    },
    "skipped": {
-    "bets": 283,
+    "bets": 284,
     "settled": 200,
     "games": 124,
     "wins": 96,
@@ -13147,7 +13220,7 @@
    },
    {
     "n": 16,
-    "signals": 42,
+    "signals": 43,
     "hits": 6,
     "misses": 10,
     "hit_rate": 0.375,
@@ -13187,7 +13260,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 25,
+    "open": 26,
     "status": "em observação",
     "pending_status": null,
     "status_changes": [],
@@ -14167,7 +14240,7 @@
     "days_to_conclusion": 12
    },
    "STAKE_LOAD": {
-    "signals": 88,
+    "signals": 89,
     "with_result": 45,
     "hits": 20,
     "misses": 23,
@@ -14632,7 +14705,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 412,
+   "bets": 413,
    "settled": 311,
    "matches": 213,
    "wins": 148,
@@ -14667,6 +14740,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-15T14:08:13+00:00",
+   "match_id": "latvia-vs-armenia-20261115",
+   "group": "STAKE_LOAD/live",
+   "match": "Latvia — Armenia",
+   "selection": "1st Half - Asian Total: Over 0.5",
+   "odds": 1.55,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-15T14:06:27+00:00",
    "match_id": "granada-vs-las-palmas-20261115",
@@ -15502,22 +15588,6 @@
    "settled_by": null,
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T02:29:12+00:00",
-   "match_id": "wellington-phoenix-women-vs-sydney-fc-women-20261115",
-   "group": "OPEN_GAME",
-   "match": "Wellington Phoenix Women — Sydney FC Women",
-   "selection": "Over 3",
-   "odds": 1.78,
-   "ft": [
-    3,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -16187,44 +16257,6 @@
    "goals": null,
    "goals_source": null,
    "ft": null
-  },
-  "wellington-phoenix-women-vs-sydney-fc-women-20261115": {
-   "teams": [
-    "Wellington Phoenix Women",
-    "Sydney FC Women"
-   ],
-   "events": [
-    {
-     "d": "2026-11-15T02:29:12+00:00",
-     "k": "OPEN_GAME",
-     "phase": "live",
-     "selection": "Over 3",
-     "odds": 1.78,
-     "minute": 59,
-     "score_at_signal": [
-      2,
-      0
-     ],
-     "rhythm": 85,
-     "bot_over_pct": 78,
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     77,
-     "2-1"
-    ],
-    [
-     84,
-     "3-1"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    3,
-    1
-   ]
   },
   "los-cabos-united-vs-chapulineros-de-oaxaca-20261115": {
    "teams": [
@@ -17468,6 +17500,19 @@
      "odds": 1.65,
      "market": "Draw No Bet",
      "total": 12000.0
+    },
+    {
+     "d": "2026-11-15T14:08:13+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "live",
+     "selection": "Over 0.5",
+     "odds": 1.55,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "1st Half - Asian Total",
+     "total": 7500.0
     }
    ],
    "goals": null,
@@ -20677,7 +20722,7 @@
    "day": "2026-11-14"
   },
   {
-   "bets": 64,
+   "bets": 65,
    "settled": 24,
    "wins": 15,
    "units": 2.83,
