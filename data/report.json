@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T14:33:53+00:00",
+ "generated_at_utc": "2026-11-15T14:34:34+00:00",
  "messages": 766,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 1,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-15T14:33:41+00:00",
+  "collector_last_run_utc": "2026-11-15T14:34:08+00:00",
   "name_review": [
    {
     "bot": [
@@ -4497,101 +4497,6 @@
      "bad_total": 0
     },
     {
-     "match_id": "dubai-united-vs-sharjah-scc-20261115",
-     "match": "Dubai United — Sharjah SCC",
-     "league": "UAE Cup",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-15T14:04:30+00:00",
-     "minute": 52,
-     "score_at_signal": [
-      1,
-      1
-     ],
-     "market": "Asian Total",
-     "selection": "Over 3",
-     "odds": 1.71,
-     "odds_last": 1.71,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 55,
-     "good": [
-      {
-       "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
-       "conditions": [
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ]
-       ],
-       "n": 47,
-       "games": 47,
-       "hits": 34,
-       "break_even": 0.5496,
-       "prob_above": 0.9868,
-       "roi": 0.3171,
-       "edge": 0.144,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 43,
-       "games": 43,
-       "hits": 31,
-       "break_even": 0.553,
-       "prob_above": 0.9792,
-       "roi": 0.2932,
-       "edge": 0.1369,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-       "conditions": [
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ]
-       ],
-       "n": 35,
-       "games": 35,
-       "hits": 26,
-       "break_even": 0.5609,
-       "prob_above": 0.9755,
-       "roi": 0.3179,
-       "edge": 0.1428,
-       "status": "promissora",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 66,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "yirga-chefe-bunaa-women-vs-tirunesh-dibaba-sports-academy-women-20261115",
      "match": "Yirga Chefe Bunaa Women — Tirunesh Dibaba Sports Academy Women",
      "league": "Ethiopia Premier League Women",
@@ -7311,13 +7216,13 @@
     }
    ],
    "counts": {
-    "favorável": 5,
+    "favorável": 4,
     "misto": 1,
     "sem evidência": 1,
     "contraditório": 10,
     "evitar": 18
    },
-   "generated_utc": "2026-11-15T14:33:52+00:00",
+   "generated_utc": "2026-11-15T14:34:33+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -14863,17 +14768,50 @@
    "keep_abandoned": 0.2,
    "confirm_steps": 2
   },
-  "llm_runs": 71,
-  "llm_last_run_utc": "2026-11-15T13:33:36+00:00",
+  "llm_runs": 72,
+  "llm_last_run_utc": "2026-11-15T14:34:10+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-15",
-   "calls_today": 13,
-   "neurons_today": 2594.5,
+   "calls_today": 14,
+   "neurons_today": 2774.4,
    "accepted_today": 7,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
+    "note": "apresenta um alto acerto de 0.8261, o que sugere um potencial interesse para análise mais aprofundada",
+    "at_utc": "2026-11-15T14:34:10+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 23,
+    "hits": 19,
+    "hit_rate": 0.8261,
+    "break_even": 0.5498,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
+    "note": "tem uma taxa de acerto de 0.7253, mas a amostra é razoável com 47 resultados, indicando uma tendência a ser mais bem-sucedida do que a odd exige",
+    "at_utc": "2026-11-15T14:34:10+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 47,
+    "hits": 34,
+    "hit_rate": 0.7253,
+    "break_even": 0.5496,
+    "status": "promissora"
+   },
+   {
+    "id": "Jogo aberto | Faixa de odd = odd 2,00 a 3,00 & Golos até ao sinal = 1 ou 2",
+    "note": "tem uma amostra pequena de 9 resultados, o que limita a confiabilidade da observação, mas apresenta um acerto de 0.7778",
+    "at_utc": "2026-11-15T14:34:10+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 9,
+    "hits": 7,
+    "hit_rate": 0.7778,
+    "break_even": 0.4571,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
     "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena com apenas 20 resultados",
@@ -14972,39 +14910,6 @@
     "hit_rate": 0.7019,
     "break_even": 0.5627,
     "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Parte do jogo = 2.ª parte",
-    "note": "tem uma amostra pequena de 12 resultados, o que não permite tirar conclusões definitivas",
-    "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 24,
-    "hits": 18,
-    "hit_rate": 0.7556,
-    "break_even": 0.5703,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "apresenta um acerto de 0.96, mas com apenas 13 resultados, a amostra é pequena e mais dados são necessários para confirmar a tendência",
-    "at_utc": "2026-11-14T13:31:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5578,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "apresenta um acerto de 0.96, mas a amostra é pequena, com apenas 13 resultados.",
-    "at_utc": "2026-11-14T05:41:39+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5578,
-    "status": "em observação"
    }
   ],
   "entry_points": [
