@@ -1194,6 +1194,31 @@ class AsOfHasNoFutureInformation(unittest.TestCase):
         self.assertEqual((c['admitted'], c['games']), (1, 1))
 
 
+class AsOfNeedsProofOfReading(unittest.TestCase):
+    """Review #5912461690, P2-K: in an evaluation at as_of = T, a signal only exists if its first reading is proven by T."""
+    T = T0 + timedelta(hours=10)
+
+    def test_missing_invalid_or_contradictory_reading_is_absent(self):
+        cases = {'missing': None, 'empty': '', 'garbage': 'ontem', 'naive': '2026-11-20T01:00:00', 'number': 7,
+                 'read_before_sent': at(-30)}                                               # contradictory (> 5 min before sending)
+        for name, seen in cases.items():
+            b = dict(sig('m', 1.0, 0), signal_seen_utc=seen)                                # sent long before T
+            self.assertEqual(chronology.as_of_view([b], self.T), [], name)
+        self.assertEqual(len(chronology.as_of_view([sig('ok', 1.0, 0)], self.T)), 1)        # control: proven reading
+
+    def test_unproven_signals_never_shape_statuses_at_as_of(self):
+        reg = {'a': hyp()}
+        proven = series([1.0, -1.0] * 15, every=CHAIN)                                     # 30 games at break-even
+        unproven = [dict(b, signal_seen_utc=None) for b in series([1.0] * 40, start=100, every=10)]   # sent before T, no reading
+        t = T0 + timedelta(days=30)
+        with_unproven = brain.build(proven + unproven, reg, 300, as_of=t)
+        without = brain.build(proven, reg, 300, as_of=t)
+        for key in ('status_list', 'counts', 'walk_forward', 'tested'):
+            self.assertEqual(with_unproven[key], without[key], key)
+        self.assertEqual({r['id']: r['games'] for r in with_unproven['top']}, {r['id']: r['games'] for r in without['top']})
+        self.assertNotEqual(brain.build(proven + unproven, reg, 300)['status_list'], without['status_list'])   # control: no as_of
+
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -132,7 +132,8 @@ def iso(dt):
 def as_of_view(signals, as_of):
     """O que o sistema sabia no instante `as_of` (revisão #5912303516): para avaliações com relógio explícito.
 
-    - sinais lidos depois de `as_of` (ou, sem leitura provada, emitidos depois) não existem ainda;
+    - sinais lidos depois de `as_of` não existem ainda; sem prova de leitura (carimbo ausente, inválido, sem fuso ou
+      contraditório) também não — fail-closed (revisão #5912461690, P2-K), mesmo que emitidos antes de `as_of`;
     - um resultado com observação provada depois de `as_of` ainda não é conhecido: a aposta fica em aberto;
     - a primeira observação de um resultado do jogo posterior a `as_of` ainda não aconteceu.
     Resultados sem hora provada continuam a contar só "agora" (política da PR 3); por isso uma avaliação com `as_of`
@@ -141,8 +142,8 @@ def as_of_view(signals, as_of):
     """
     out = []
     for b in signals:
-        t = decision_time(b) or signal_time(b)
-        if t is not None and t > as_of:
+        t = decision_time(b)
+        if t is None or t > as_of:   # sem prova de leitura até `as_of` (ausente, inválida, contraditória): não existe (P2-K)
             continue
         known = result_known(b)
         if b.get('w') is not None and known is not None and known > as_of:

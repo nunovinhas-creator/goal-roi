@@ -702,6 +702,8 @@ class LanguageModel(Hardening):
             try:
                 rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
                 rows += [self.row(i, live[i] + '\n\n🏁 FT 1:1', '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                for r in rows:   # PR 3 (P2-K): each version is read after it was sent (the shared helper reads all at 12:00)
+                    r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
                 store.append_versions(rows)
                 report.build(register=True)                                                             # o gerador regista "Seleção = empate"
                 t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
