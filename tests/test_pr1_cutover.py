@@ -1,6 +1,7 @@
 """Offline tests for scripts/pr1_cutover.py on synthetic git repositories (no real data, network or sender)."""
 import copy
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -9,6 +10,7 @@ import socket
 import subprocess
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from datetime import datetime
 from unittest.mock import patch
 
@@ -190,6 +192,113 @@ class Cutover(unittest.TestCase):
         self.assertEqual(self.files(), before)
         self.assertFalse((self.root / 'data/extra.json').exists())
 
+    def written_then_restored(self, stage, inject):
+        """Run with an exception injected at `stage`; prove the files had been written and are now byte-identical."""
+        original = cut.contents(self.root)
+        seen, real_restore = {}, cut.restore
+
+        def spy(root, orig):
+            seen.setdefault('at_restore', cut.contents(root))
+            return real_restore(root, orig)
+
+        with patch.object(cut, 'restore', spy), inject():
+            with self.assertRaises(cut.CutoverAborted) as ctx:
+                cut.cutover(self.root, self.main, NOW, build_ok)
+        self.assertEqual(ctx.exception.stage, stage)
+        self.assertIn('injected', str(ctx.exception))
+        self.assertIn('all files restored and verified', str(ctx.exception))
+        at_restore = seen['at_restore']
+        self.assertIn(notify.STATUS_MIGRATION.encode(), at_restore['data/notify_state.json'], 'migration had been written')
+        self.assertNotEqual(at_restore['data/report.json'], original['data/report.json'], 'report had been written')
+        self.assertNotEqual(at_restore['docs/report.json'], original['docs/report.json'], 'docs report had been written')
+        self.assertEqual(cut.contents(self.root), original, 'every file must be byte-identical after the abort')
+
+    def test_exception_reading_migrated_state_restores_byte_for_byte(self):
+        class InjectedJson:
+            dumps = staticmethod(json.dumps)
+
+            @staticmethod
+            def loads(s, *args, **kwargs):
+                text = s.decode('utf-8') if isinstance(s, bytes) else s
+                if notify.STATUS_MIGRATION in text:
+                    raise ValueError('injected failure reading the migrated state')
+                return json.loads(s, *args, **kwargs)
+
+        self.written_then_restored('read_migrated_state', lambda: patch.object(cut, 'json', InjectedJson))
+
+    def test_exceptions_in_final_verification_and_result_restore_byte_for_byte(self):
+        def nth_call_raises(name, n):
+            real, calls = getattr(cut, name), {'n': 0}
+
+            def wrapper(*args, **kwargs):
+                calls['n'] += 1
+                if calls['n'] == n:
+                    raise OSError('injected failure in %s' % name)
+                return real(*args, **kwargs)
+            return lambda: patch.object(cut, name, wrapper)
+
+        def messages_raise():
+            return patch.object(cut.notify, 'messages', side_effect=RuntimeError('injected failure simulating'))
+
+        cases = {'simulate_next_cycle': messages_raise,
+                 'post_checks': nth_call_raises('contents', 2),       # 1: snapshot before; 2: `after` in post-checks
+                 'build_result': nth_call_raises('digests', 1)}        # first digests() call builds the audit hashes
+        for stage, inject in cases.items():
+            with self.subTest(stage=stage):
+                self.written_then_restored(stage, inject)
+        # The aborted attempts left a clean, re-runnable checkout: a normal cutover still succeeds once.
+        self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
+
+    def test_interrupt_after_writes_restores_and_propagates(self):
+        def build_then_interrupt(csv_path=None, register=False):
+            write(self.root, 'data/report.json', {'partial': True})
+            raise KeyboardInterrupt
+        before = self.files()
+        with self.assertRaises(KeyboardInterrupt):
+            cut.cutover(self.root, self.main, NOW, build_then_interrupt)
+        self.assertEqual(self.files(), before)
+
+    def test_restore_failure_is_reported_distinctly(self):
+        fail_messages = patch.object(cut.notify, 'messages', side_effect=RuntimeError('injected after migration'))
+        for label, broken in (('write raises', patch.object(Path, 'write_bytes', side_effect=OSError('disk'))),
+                              ('write silently ignored', patch.object(Path, 'write_bytes', lambda self, data: None))):
+            with self.subTest(label), fail_messages, broken:
+                with self.assertRaises(cut.RestoreFailed) as ctx:
+                    cut.cutover(self.root, self.main, NOW, build_ok)
+                self.assertNotIsInstance(ctx.exception, cut.CutoverError)
+                self.assertEqual(ctx.exception.stage, 'simulate_next_cycle')
+                self.assertIsInstance(ctx.exception.trigger, RuntimeError)
+            git(self.root, 'checkout', '--', 'data', 'docs')    # recoverable from git: the cutover runs on a clean commit
+        self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
+
+    def test_report_without_eligible_operational_block_refused(self):
+        for operational in (None, {'scope': 'all_signals'}, {'regime': []}):
+            rep = eligible_report()
+            if operational is None:
+                rep.pop('operational')
+            else:
+                rep['operational'] = operational
+            with self.subTest(operational=operational):
+                self.refused('operational.scope', build=lambda csv_path=None, register=False, rep=rep: rep)
+
+    def test_cli_exit_codes_for_abort_and_restore_failure(self):
+        def run_cli():
+            with redirect_stdout(io.StringIO()) as buf:
+                code = cut.main([self.main])
+            return code, json.loads(buf.getvalue().strip().splitlines()[-1])
+
+        with patch.object(cut, 'ROOT', self.root), patch.object(cut.report, 'build', build_ok), \
+                patch.object(cut.notify, 'messages', side_effect=RuntimeError('injected')):
+            code, out = run_cli()
+            self.assertEqual(code, 1)
+            self.assertEqual((out['restored'], out['restore_verified'], out['stage'], out['cause']),
+                             (True, True, 'simulate_next_cycle', 'RuntimeError'))
+            with patch.object(Path, 'write_bytes', side_effect=OSError('disk')):
+                code, out = run_cli()
+            self.assertEqual(code, 3)
+            self.assertTrue(out['restore_failed'])
+            self.assertEqual((out['stage'], out['trigger'], out['restore_error']), ('simulate_next_cycle', 'RuntimeError', 'OSError'))
+
     def test_data_dir_pointing_elsewhere_refused(self):
         os.environ['SCANGOAL_DATA_DIR'] = str(self.root / 'elsewhere')
         self.refused('outside the checkout')
@@ -200,6 +309,38 @@ class Cutover(unittest.TestCase):
             with patch.object(cut, 'ROOT', self.root):
                 write(self.root, 'data/state.json', {})
                 self.assertEqual(cut.main([self.main]), 1)
+
+
+class RehearsalCriteria(unittest.TestCase):
+    """scripts/rehearse_pr1_cutover.py must require every criterion explicitly (#5909958197, point 1)."""
+
+    @classmethod
+    def setUpClass(cls):
+        spec = importlib.util.spec_from_file_location('rehearse_pr1_cutover', ROOT / 'scripts' / 'rehearse_pr1_cutover.py')
+        cls.rh = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.rh)
+
+    def verdict(self, **overrides):
+        args = dict(cutover_result={'ok': True}, first_kinds={}, first_true_kinds={'watch': 1},
+                    status_list_identical=True, register_true_scope='eligible_bets_only')
+        args.update(overrides)
+        return self.rh.criteria(**args)
+
+    def test_all_criteria_hold(self):
+        self.assertTrue(all(self.verdict().values()))
+
+    def test_differing_status_list_fails_even_without_transitions(self):
+        c = self.verdict(status_list_identical=False)
+        self.assertFalse(c['status_list_identical_register_true_vs_cutover'])
+        self.assertFalse(all(c.values()))
+        self.assertTrue(c['first_cycle_register_true_no_transitions'])   # zero transitions alone is not enough
+
+    def test_each_other_criterion_is_required(self):
+        for override in ({'cutover_result': {'ok': False}}, {'first_kinds': {'status_transition': 1}},
+                         {'first_true_kinds': {'status_transition': 2}}, {'register_true_scope': None},
+                         {'status_list_identical': None}):
+            with self.subTest(override=override):
+                self.assertFalse(all(self.verdict(**override).values()))
 
 
 if __name__ == '__main__':

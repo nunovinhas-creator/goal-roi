@@ -14,8 +14,10 @@ Usage (clean checkout of the PR branch, after `git fetch origin main`):
    - old-code risk: the notifier currently on <main> fed with the current production report after the migration,
      followed by the new notifier on the resulting state (an old run writing after the cutover).
 4. Removes the worktree and verifies that this checkout's data/ and docs/ files are byte-identical before and after.
-Exit code 0 only if the cutover passed every check, both first-cycle variants have zero status transitions and this
-checkout is unchanged.
+Exit code 0 only if every entry of `criteria` holds: the cutover passed every check; both first-cycle variants have
+zero status transitions; the status_list rebuilt with register=True is identical to the cutover baseline (otherwise the
+first production report could announce statuses that are not new evidence); that report keeps
+operational.scope = eligible_bets_only; and this checkout is unchanged.
 """
 import copy
 import importlib.util
@@ -132,21 +134,42 @@ def rehearse(main_ref):
                         'next_new_code_run': kinds(by_new),
                         'marker_still_present_so_no_remigration': notify.STATUS_MIGRATION in (state.get('migrations') or {})}
 
+        identical = rep_true['brain']['status_list'] == new
         out['first_cycle_same_report'] = kinds(first)
         out['first_cycle_register_true'] = {'messages': kinds(first_true), 'registry_before': reg_before, 'registry_after': reg_after,
-                                            'status_list_identical_to_cutover': rep_true['brain']['status_list'] == new}
+                                            'status_list_identical_to_cutover': identical,
+                                            'operational_scope': (rep_true.get('operational') or {}).get('scope'),
+                                            'status_list_differences': None if identical else {
+                                                'only_in_register_true': sorted(set(rep_true['brain']['status_list']) - set(new)),
+                                                'only_in_cutover': sorted(set(new) - set(rep_true['brain']['status_list'])),
+                                                'changed': sorted(h for h in set(new) & set(rep_true['brain']['status_list'])
+                                                                  if new[h] != rep_true['brain']['status_list'][h])}}
         out['counterfactual_without_migration'] = kinds(without)
         out['main_notifier_already_has_migration'] = main_has_migration
         out['old_code_risk'] = risk
-        out['ok'] = (kinds(first).get('status_transition', 0) == 0
-                     and kinds(first_true).get('status_transition', 0) == 0)
+        out['criteria'] = criteria(out['cutover'], kinds(first), kinds(first_true), identical,
+                                   out['first_cycle_register_true']['operational_scope'])
+        out['ok'] = all(out['criteria'].values())
         return out
     finally:
         git('worktree', 'remove', '--force', str(wt), check=False)
         git('worktree', 'prune', check=False)
         shutil.rmtree(tmp, ignore_errors=True)
         out['this_checkout_unchanged'] = cut.digests(cut.contents(ROOT)) == before
+        if 'criteria' in out:
+            out['criteria']['this_checkout_unchanged'] = out['this_checkout_unchanged']
         out['ok'] = bool(out.get('ok')) and out['this_checkout_unchanged']
+
+
+def criteria(cutover_result, first_kinds, first_true_kinds, status_list_identical, register_true_scope):
+    """Every rehearsal criterion, required explicitly (the JSON shows which one failed)."""
+    return {
+        'cutover_ok': cutover_result.get('ok') is True,
+        'first_cycle_same_report_no_transitions': first_kinds.get('status_transition', 0) == 0,
+        'first_cycle_register_true_no_transitions': first_true_kinds.get('status_transition', 0) == 0,
+        'status_list_identical_register_true_vs_cutover': status_list_identical is True,
+        'register_true_operational_scope_eligible': register_true_scope == notify.EVIDENCE_SCOPE,
+    }
 
 
 def main(argv=None):
