@@ -376,7 +376,7 @@ def confirmation(match, since, alpha, as_of=None):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
-    cands, skipped = [], {'not_operational': 0, 'result_seen_before_decision': 0, 'overlap': 0}
+    cands, skipped = [], {'not_operational': 0, 'decision_window_open': 0, 'result_seen_before_decision': 0, 'overlap': 0}
     for key, rows in games.items():
         b = committed_bet(rows)
         if b is None:
@@ -384,6 +384,9 @@ def confirmation(match, since, alpha, as_of=None):
         t, sent, stamp = chronology.decision_time(b), chronology.signal_time(b), chronology.parse_utc(b.get('signal_seen_utc'))
         if since is None or sent is None or stamp is None or sent <= since or stamp <= since or not chronology.decidable(b):
             skipped['not_operational'] += 1
+            continue
+        if as_of is not None and latest_decision(b) > as_of:
+            skipped['decision_window_open'] += 1              # a janela de decisão ainda não fechou no relógio do relatório
             continue
         first = chronology.parse_utc(b.get('match_result_first_seen_utc'))
         settled = b.get('w') is not None
@@ -756,7 +759,8 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     fica ativa se a prova de integridade histórica tiver sido feita e não tiver problemas; None (prova não feita) também
     desliga tudo (fail-closed). as_of: relógio do relatório, para fechar como perda os jogos pendentes além do prazo.
     """
-    all_signals = signals
+    # Relógio explícito: só o que o sistema sabia em `as_of` (sinais ainda não lidos e resultados ainda não vistos não contam).
+    all_signals = chronology.as_of_view(signals, as_of) if as_of is not None else signals
     signals = [b for b in all_signals if eligible(b)]
     excluded = {}
     for b in all_signals:

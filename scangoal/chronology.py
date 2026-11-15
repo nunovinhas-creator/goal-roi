@@ -127,3 +127,28 @@ def born(h):
 
 def iso(dt):
     return dt.astimezone(UTC).isoformat(timespec='seconds') if dt else None
+
+
+def as_of_view(signals, as_of):
+    """O que o sistema sabia no instante `as_of` (revisão #5912303516): para avaliações com relógio explícito.
+
+    - sinais lidos depois de `as_of` (ou, sem leitura provada, emitidos depois) não existem ainda;
+    - um resultado com observação provada depois de `as_of` ainda não é conhecido: a aposta fica em aberto;
+    - a primeira observação de um resultado do jogo posterior a `as_of` ainda não aconteceu.
+    Resultados sem hora provada continuam a contar só "agora" (política da PR 3); por isso uma avaliação com `as_of`
+    anterior aos dados só é exata sem resultados de hora desconhecida — a certificação nunca os usa (fail-closed).
+    No relatório de produção `as_of` é o instante da recolha e a vista não muda nada.
+    """
+    out = []
+    for b in signals:
+        t = decision_time(b) or signal_time(b)
+        if t is not None and t > as_of:
+            continue
+        known = result_known(b)
+        if b.get('w') is not None and known is not None and known > as_of:
+            b = dict(b, w=None, ft=None, settled_by=None, result_known_utc=None, result_known_source=None)
+        first = parse_utc(b.get('match_result_first_seen_utc'))
+        if first is not None and first > as_of:
+            b = dict(b, match_result_first_seen_utc=None)
+        out.append(b)
+    return out

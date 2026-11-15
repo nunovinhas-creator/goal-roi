@@ -459,6 +459,32 @@ def operational_evidence(signals):
             'regime': insights.regime(rows)}
 
 
+def publish_ledger_state(validation, ledger, ledger_path, registry, now, register):
+    """Seleções em tempo real e coerência do que se publica (revisões #5911603577 e #5912303516, P2-J).
+
+    A avaliação (certificados, estados) usa o registo tal como estava (`evaluated_*`). Com register=True e registo ativo,
+    válido e provado, as candidatas são acrescentadas uma só vez (rank, α e início fixos) e gravadas. Depois, o bloco
+    `validation` passa a descrever o registo GRAVADO — `ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro publicado
+    no mesmo commit — e `newly_selected` lista o que este relatório acrescentou; essas deixam de constar de `candidates`.
+    O cérebro não é reexecutado: as novas seleções só contam (sem jogos ainda) a partir da avaliação seguinte.
+    """
+    validation['evaluated_ledger_head_sha256'] = validation.get('ledger_head_sha256')
+    validation['evaluated_ledger_entries'] = validation.get('ledger_entries', 0)
+    validation['newly_selected'] = []
+    if register and validation['ledger_valid'] and validation['candidates']:
+        n = certification.append(ledger, validation['candidates'], registry, now)
+        if n:
+            certification.save(ledger_path, ledger)
+            validation['newly_selected'] = [{k: e[k] for k in ('rank', 'id', 'alpha', 'selected_utc')} for e in ledger['entries'][-n:]]
+            chosen = {e['id'] for e in validation['newly_selected']}
+            validation['candidates'] = [c for c in validation['candidates'] if c not in chosen]
+    if validation['ledger_valid']:
+        validation['ledger_head_sha256'] = certification.head(ledger)
+        validation['ledger_entries'] = len(ledger['entries'])
+    validation['candidates_meaning'] = ('promising certifiable hypotheses not yet in the ledger; a report with register=True '
+                                        'registers them (see newly_selected)')
+
+
 def build(csv_path=None, register=False, now=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = now or datetime.now(timezone.utc)
@@ -542,10 +568,7 @@ def build(csv_path=None, register=False, now=None):
     # git, com horas coerentes. Sem prova possível (sem git, histórico shallow, nunca publicado): nenhuma certificação.
     history = certification.history_proof(ledger_path, ledger, as_of=now) if isinstance(ledger, dict) and 'invalid' not in ledger else None
     brn = brain.build(signals, registry, MIN_SETTLED, ledger, history_problems=history, as_of=now)
-    if register and brn['validation']['ledger_valid'] and brn['validation']['candidates']:
-        # Seleção em tempo real, registada uma só vez (rank, α e início ficam fixos); só com o registo ativo, válido e provado.
-        if certification.append(ledger, brn['validation']['candidates'], registry, now):
-            certification.save(ledger_path, ledger)
+    publish_ledger_state(brn['validation'], ledger, ledger_path, registry, now, register)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}

@@ -1080,6 +1080,120 @@ class ThreeDayDeadline(unittest.TestCase):
         self.assertEqual(a['validation'], b['validation'])                             # register=False/True use the same clock
 
 
+class PublishedLedgerConsistency(unittest.TestCase):
+    """Review #5912303516, P2-J: the report and the ledger written by the same register=True run describe the same state."""
+    OPEN, ACT = LedgerHistoryEndToEnd.OPEN, LedgerHistoryEndToEnd.ACT
+    git, write, read_ledger, commit = LedgerHistoryEndToEnd.git, LedgerHistoryEndToEnd.write, LedgerHistoryEndToEnd.read_ledger, LedgerHistoryEndToEnd.commit
+    published, tearDown = LedgerHistoryEndToEnd.published, LedgerHistoryEndToEnd.tearDown
+
+    def setUp(self):
+        LedgerHistoryEndToEnd.setUp(self)
+        # 40 real bot signals of one tactic (rhythm < 90), one every 3 h, each settled by an edit 2 h later: a genuine
+        # promising hypothesis built through report.load/build_bets, not injected.
+        versions = []
+        for i in range(40):
+            sent = datetime(2026, 11, 2, tzinfo=UTC) + timedelta(hours=3 * i)
+            text = self.OPEN.replace('czarni-sosnowiec-women-vs-sk-brann-women-20261111', 'club-a%d-vs-club-b%d-20261102' % (i, i))
+            versions.append({'message_id': 100 + i, 'date_utc': sent.isoformat(), 'edit_date_utc': None,
+                             'collected_at_utc': (sent + timedelta(minutes=1)).isoformat(), 'text': text})
+            versions.append({'message_id': 100 + i, 'date_utc': sent.isoformat(), 'edit_date_utc': (sent + timedelta(hours=2)).isoformat(),
+                             'collected_at_utc': (sent + timedelta(hours=2, minutes=5)).isoformat(), 'text': text + '\\n\\n🏁 FT 1:5 · Over 5 ✅'})
+        store.append_versions(versions)
+        self.reg = {'x': {'family': 'Jogo aberto', 'conditions': [['Ritmo indicado pelo bot', 'menos de 90']],
+                          'born_utc': '2026-11-01T00:00:00+00:00', 'source': 'gerador'}}
+        self.write('hypotheses.json', self.reg)
+        self.commit(self.ACT - timedelta(hours=1))
+        self.published()
+
+    def real_report(self, now, register=True):
+        from scangoal import report
+        return report.build(None, register=register, now=now)['brain']
+
+    def test_first_real_selection_is_published_consistently_and_idempotently(self):
+        now = datetime(2026, 11, 7, 12, tzinfo=UTC)
+        b = self.real_report(now)
+        x = next(r for r in b['top'] if r['id'] == 'x')
+        self.assertEqual((x['status'], x['confirmation']), ('promissora', None))        # promising, not yet selected when evaluated
+        v, led = b['validation'], self.read_ledger()
+        self.assertEqual(v['state'], 'active')
+        self.assertEqual([e['id'] for e in v['newly_selected']], ['x'])
+        self.assertEqual(v['newly_selected'][0], {k: led['entries'][0][k] for k in ('rank', 'id', 'alpha', 'selected_utc')})
+        self.assertEqual(v['candidates'], [])                                             # selected now, no longer a candidate
+        self.assertEqual((v['ledger_head_sha256'], v['ledger_entries']), (certification.head(led), len(led['entries'])))   # = file
+        self.assertEqual((v['evaluated_ledger_entries'], v['evaluated_ledger_head_sha256']), (0, led['genesis_sha256']))
+        self.assertEqual(v['certified'], [])                                              # nothing anticipated
+        self.commit(now + timedelta(minutes=10))                                          # published together, within tolerance
+        self.assertEqual(certification.history_proof(os.path.join(self.data, certification.FILE), led), [])
+        later = now + timedelta(hours=1)
+        b2 = self.real_report(later)
+        v2, led2 = b2['validation'], self.read_ledger()
+        self.assertEqual(led2, led)                                                       # idempotent: nothing appended twice
+        self.assertEqual((v2['newly_selected'], v2['candidates']), ([], []))
+        self.assertEqual((v2['ledger_head_sha256'], v2['ledger_entries']), (certification.head(led), 1))
+        self.assertEqual((v2['evaluated_ledger_head_sha256'], v2['evaluated_ledger_entries']), (certification.head(led), 1))
+        c = next(r for r in b2['top'] if r['id'] == 'x')['confirmation']
+        self.assertEqual((c['rank'], c['selected_utc'], c['certified_utc'], c['games']), (1, now.isoformat(timespec='seconds'), None, 0))
+        same = self.real_report(later, register=False)['validation']                    # register=False at the same instant
+        self.assertEqual({k: same[k] for k in ('state', 'ledger_head_sha256', 'ledger_entries', 'certified', 'candidates')},
+                         {k: v2[k] for k in ('state', 'ledger_head_sha256', 'ledger_entries', 'certified', 'candidates')})
+
+    def test_without_registering_nothing_is_written_and_candidates_stay_candidates(self):
+        now = datetime(2026, 11, 7, 12, tzinfo=UTC)
+        v = self.real_report(now, register=False)['validation']
+        led = self.read_ledger()
+        self.assertEqual((v['candidates'], v['newly_selected'], led['entries']), (['x'], [], []))
+        self.assertEqual((v['ledger_head_sha256'], v['ledger_entries']), (certification.head(led), 0))
+
+
+class AsOfHasNoFutureInformation(unittest.TestCase):
+    """Review #5912303516: an evaluation at as_of uses only signals read and results seen by then."""
+    AS_OF = T0 + timedelta(minutes=60 * CHAIN)
+
+    def full(self):
+        early = series(THREE_IN_FOUR[:60], every=CHAIN)
+        later = series([1.0] * 60, start=61, every=CHAIN)                                 # read after as_of
+        straddle = [sig('s', 1.0, 59 * CHAIN + 60, known=600)]                           # read before, result seen after
+        return early + later + straddle
+
+    def as_known_then(self):
+        early = series(THREE_IN_FOUR[:60], every=CHAIN)
+        return early + [sig('s', None, 59 * CHAIN + 60)]                                  # still open at as_of
+
+    def test_future_signals_and_results_change_nothing(self):
+        reg = {'a': hyp()}
+        led = make_ledger(reg, [(['a'], -30)])
+        a = brain.build(self.full(), reg, 300, led, history_problems=[], as_of=self.AS_OF)
+        b = brain.build(self.as_known_then(), reg, 300, led, history_problems=[], as_of=self.AS_OF)
+        for key in ('status_list', 'counts', 'validation', 'walk_forward', 'tested'):
+            self.assertEqual(a[key], b[key], key)
+        ta = {r['id']: r for r in a['top']}['a']
+        tb = {r['id']: r for r in b['top']}['a']
+        self.assertEqual((ta['games'], ta['confirmation']), (tb['games'], tb['confirmation']))
+        self.assertNotEqual(brain.build(self.full(), reg, 300, led, history_problems=[])['validation'], a['validation'])  # control
+
+    def test_a_signal_read_exactly_at_as_of_exists_with_its_window_open(self):
+        b = sig('edge', None, 60 * CHAIN)
+        self.assertEqual(len(chronology.as_of_view([b], self.AS_OF)), 1)
+        c = brain.confirmation([b], T0 - timedelta(days=1), 0.025, as_of=self.AS_OF)
+        self.assertEqual(c['skipped']['decision_window_open'], 1)
+
+    def test_view_rules(self):
+        t = self.AS_OF
+        read_later = sig('r', 1.0, 0, seen=int((t - T0).total_seconds() // 60) + 1)
+        seen_later = sig('k', 1.0, 0, known=int((t - T0).total_seconds() // 60) + 10)
+        view = chronology.as_of_view([read_later, seen_later, sig('ok', 1.0, 0)], t)
+        self.assertEqual([b['match_id'] for b in view], ['k', 'ok'])
+        self.assertEqual((view[0]['w'], view[0]['result_known_utc'], view[0]['match_result_first_seen_utc']), (None, None, None))
+        self.assertEqual(view[1]['w'], 1.0)
+
+    def test_decision_window_still_open_is_not_a_candidate(self):
+        g = [sig('w', 1.0, 0, known=145)]
+        c = brain.confirmation(g, T0 - timedelta(days=1), 0.025, as_of=T0 + timedelta(minutes=10))   # read + 15 min not over
+        self.assertEqual((c['admitted'], c['skipped']['decision_window_open']), (0, 1))
+        c = brain.confirmation(g, T0 - timedelta(days=1), 0.025, as_of=T0 + timedelta(hours=3))
+        self.assertEqual((c['admitted'], c['games']), (1, 1))
+
+
 if __name__ == '__main__':
     unittest.main()
 
