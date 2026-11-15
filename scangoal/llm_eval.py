@@ -1,6 +1,8 @@
 """Avaliação incremental das hipóteses do modelo de linguagem (PR 4, protocolo `llm_incremental_v1`).
 
-Implementa audits/pr4-llm-protocol.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; outra versão é recusada).
+Implementa audits/pr4-llm-protocol-v2.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; outra versão, incluindo o v1,
+é recusada). Emendas do v2 (revisão independente da PR #27): apoio dos controlos pela hora de LEITURA (P1-A); grupos decididos no
+nascimento, com o que já tinha sido lido (P1-B); início P = max(commit, primeira publicação verificável no GitHub) (P2-C).
 Puro e determinístico: sem rede, sem segredos, sem escrita. O git só é lido (histórico do registo e do protocolo).
 
 Pergunta: as hipóteses `llm` escolhem jogos com mais lucro por jogo, depois do seu registo, do que hipóteses comparáveis do
@@ -17,11 +19,11 @@ from pathlib import Path
 
 from . import brain, chronology, insights
 from .eligibility import eligible
-from .equivalence import Index, Redundancy, expectation, groups
+from .equivalence import Index, Redundancy, expectation, groups_at_birth
 
-PROTOCOL = 'llm_incremental_v1'
-PROTOCOL_FILE = 'audits/pr4-llm-protocol.md'
-PROTOCOL_SHA256 = '8b108bf91effb6701bd38e4a582e840804b86e1075b8af55b7976872ff1a5cb0'
+PROTOCOL = 'llm_incremental_v2'
+PROTOCOL_FILE = 'audits/pr4-llm-protocol-v2.md'
+PROTOCOL_SHA256 = '1f4a1001b5eefd90c9f6676a40bd63915900395314bd2243a4162d9433081339'
 REGISTRY_FILE = 'data/hypotheses.json'
 TAU, SENSITIVITY, GROUP_MIN_GAMES = 0.85, (0.80, 0.90), 8
 K, K_MIN = 20, 5
@@ -100,8 +102,12 @@ def registry_history(root, ref, rel=REGISTRY_FILE):
     return first, problems[:50]
 
 
-def protocol_proof(root, commit):
-    """-> (hora P do commit que introduziu o protocolo, problemas). Exige o conteúdo fixado em PROTOCOL_SHA256."""
+def protocol_proof(root, commit, published=None, evidence=None):
+    """-> (P, problemas). P = max(hora do commit que introduziu o protocolo, primeira publicação verificável no GitHub).
+
+    Exige o conteúdo fixado em PROTOCOL_SHA256. `published` é a hora registada pelo servidor GitHub (execução de Actions ou pull
+    request que contém o commit) e `evidence` a ligação para esse registo, confirmada pela auditoria independente (P2-C).
+    Sem publicação comprovada, ou com uma hora anterior ao commit (impossível), a avaliação fica não verificada."""
     try:
         sha = _git(root, 'rev-parse', '--verify', '%s^{commit}' % commit).decode().strip()
         body = _git(root, 'show', '%s:%s' % (sha, PROTOCOL_FILE))
@@ -114,7 +120,14 @@ def protocol_proof(root, commit):
     intro = [line.split() for line in adds if line.strip()]
     if not intro or intro[0][0] != sha:
         problems.append('protocol commit is not the one that introduced the file')
-    return (chronology.parse_utc(intro[0][1]) if intro else None), problems
+    committed = chronology.parse_utc(intro[0][1]) if intro else None
+    pub = chronology.parse_utc(published) if isinstance(published, str) else published
+    if pub is None or not (isinstance(evidence, str) and evidence.startswith('https://github.com/')):
+        problems.append('protocol publication not proven')
+        return committed, problems
+    if committed is not None and pub < committed:
+        problems.append('protocol publication before its commit')
+    return (max(committed, pub) if committed is not None else pub), problems
 
 
 def births(registry, first_seen, verified):
@@ -242,10 +255,13 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         conds = {tuple(c) for c in conds}
         return [b for b, f, at in have if f == fam and conds <= at]
 
-    times = [chronology.signal_time(b) or as_of for b in view]
+    snaps = {}
 
-    def upto(t):
-        return sum(1 << i for i, s in enumerate(times) if s <= t)
+    def snap(t):
+        """Índice dos sinais elegíveis já LIDOS em t (hora de leitura provada): o que o sistema sabia nesse instante."""
+        if t not in snaps:
+            snaps[t] = Index(chronology.as_of_view(view, t))
+        return snaps[t]
 
     cache = {}
 
@@ -271,27 +287,32 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
             duplicates.append({'id': hid, 'reason': why[0], 'with': why[1]})
 
     order = sorted(valid, key=lambda hid: (born_eff[hid], hid))
-    members = {hid: index.games(registry[hid]['family'], registry[hid]['conditions']) for hid in order}
 
-    def grouping(tau):
-        return groups([(hid, registry[hid], members[hid]) for hid in order], tau, GROUP_MIN_GAMES)
+    def games_at(hid, t):
+        return snap(t).games(registry[hid]['family'], registry[hid]['conditions'])
+
+    def grouping(tau):   # decidido no nascimento de cada hipótese, com o que já tinha sido lido (P1-B)
+        return groups_at_birth([(hid, registry[hid], born_eff[hid]) for hid in order], tau, games_at, GROUP_MIN_GAMES)
 
     gens = sorted(hid for hid, h in registry.items() if h.get('source') == 'gerador' and born_eff.get(hid) is not None
                   and not any(c[0] in brain.POST for c in h['conditions']))
 
-    gen_mask = {c: index.mask(registry[c]['family'], registry[c]['conditions']) for c in gens}
-
     def controls(hid):
+        """Sem ler resultados; apoio e exclusão só com os sinais já LIDOS no nascimento de h (P1-A)."""
         h, t = registry[hid], born_eff[hid]
+        ix = snap(t)
         size = min(len(h['conditions']), brain.MAX_CONDITIONS)
-        own, tm = index.mask(h['family'], h['conditions']), upto(t)
-        s = (own & tm).bit_count()
+        own = ix.mask(h['family'], h['conditions'])
+        s = own.bit_count()
         cands = []
         for c in gens:
             g = registry[c]
-            if g['family'] != h['family'] or len(g['conditions']) != size or born_eff[c] >= t or gen_mask[c] == own:
+            if g['family'] != h['family'] or len(g['conditions']) != size or born_eff[c] >= t:
                 continue
-            if s and s / 2 <= (gen_mask[c] & tm).bit_count() <= 2 * s:
+            m = ix.mask(g['family'], g['conditions'])
+            if m == own:
+                continue
+            if s and s / 2 <= m.bit_count() <= 2 * s:
                 cands.append(c)
         cands.sort(key=lambda c: hashlib.sha256(('%s\n%s' % (hid, c)).encode('utf-8')).hexdigest())
         return cands[:K]
@@ -405,7 +426,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         hh, mm, be, n = hits.totals()
         table.append({'id': hid, 'group': group_of[hid], 'representative': grp[group_of[hid]][0] == hid, 'mode': h.get('mode'),
                       'expect': expectation(h), 'born_utc': h.get('born_utc'), 'born_eff': chronology.iso(born_eff[hid]),
-                      'membership_games': len(members[hid]), 'controls': len(ctrl_of.get(hid) or ()), 'parents': len(parents(hid)),
+                      'membership_games_at_birth': len(games_at(hid, born_eff[hid])),
+                      'membership_games_now': len(index.games(h['family'], h['conditions'])), 'controls': len(ctrl_of.get(hid) or ()), 'parents': len(parents(hid)),
                       'controls_sha256': hashlib.sha256('\n'.join(ctrl_of.get(hid) or ()).encode('utf-8')).hexdigest()[:16],
                       'protocol_games': len(prot), 'protocol_mean_profit': _r(sum(v[1] for v in prot.values()) / len(prot)) if prot else None,
                       'pre_protocol_games': len(pre), 'pre_protocol_mean_profit': _r(sum(v[1] for v in pre.values()) / len(pre)) if pre else None,
@@ -430,11 +452,16 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
 
 
 def page_summary(signals, registry):
-    """Resumo barato para a página (sem git: nunca há conclusão científica no relatório de produção)."""
+    """Resumo para a página (sem git: nunca há conclusão científica no relatório de produção). Grupos como no protocolo v2."""
     llm = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm' and chronology.born(h) is not None)
-    index = Index([b for b in signals if eligible(b)])
+    view, snaps = [b for b in signals if eligible(b)], {}
+
+    def games_at(hid, t):
+        if t not in snaps:
+            snaps[t] = Index(chronology.as_of_view(view, t))
+        return snaps[t].games(registry[hid]['family'], registry[hid]['conditions'])
     order = sorted(llm, key=lambda hid: (chronology.born(registry[hid]), hid))
-    grp = groups([(hid, registry[hid], index.games(registry[hid]['family'], registry[hid]['conditions'])) for hid in order], TAU, GROUP_MIN_GAMES)
+    grp = groups_at_birth([(hid, registry[hid], chronology.born(registry[hid])) for hid in order], TAU, games_at, GROUP_MIN_GAMES)
     return {'protocol': PROTOCOL, 'verdict': VERDICTS[0], 'llm_hypotheses': len(llm), 'groups': len(grp),
             'reason': 'the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py',
             'report': 'audits/pr4-llm-evaluation.md'}
@@ -457,7 +484,8 @@ def render(res):
               'mercado e não certifica nenhuma tática. Taxas de acerto, incluindo as superiores a 50 %, são só descrição.', '',
               '## Entradas', '',
               '- Protocolo: `%s`, sha256 `%s`, início P = %s' % (res['protocol'], res['protocol_sha256'], res['protocol_time_utc']),
-              '- Avaliado em: %s' % res['as_of_utc']]
+              '- Avaliado em: %s' % res['as_of_utc'],
+              '- P = max(hora do commit do protocolo, primeira publicação verificável no GitHub); ver `protocol_published_utc` e `protocol_publication_evidence` nas entradas.']
     for k, v in sorted((res.get('inputs') or {}).items()):
         lines.append('- %s: `%s`' % (k, v))
     lines += ['', '## População', '',
@@ -503,6 +531,7 @@ def render(res):
     lines += ['', '## Ameaças à validade e limitações', '',
               '- A hora de publicação é a hora do commit (committer date) na história de primeiro-pai; um commit com data falsificada',
               '  não seria detetado por este método (as horas têm de ser não decrescentes).',
+              '- A hora de publicação do protocolo vem de um registo do servidor GitHub indicado ao avaliador; a auditoria independente confirma-a.',
               '- Os controlos são hipóteses do gerador com tamanho e apoio comparáveis; não esgotam o que um analista humano escolheria.',
               '- Hipóteses diferentes partilham jogos: por isso a unidade é o jogo (um voto por jogo e por lado) e o bootstrap é por dia.',
               '- A janela pré-protocolo é pós-registo, mas foi observada antes de o protocolo existir: só descrição.',

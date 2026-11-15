@@ -107,21 +107,29 @@ def jaccard(x, y):
     return len(x & y) / u if u else 0.0
 
 
-def groups(items, tau, min_games=8):
-    """items: [(id, hipótese, conjunto de jogos)] já pela ordem de prioridade (o primeiro de cada grupo é o representante).
+def groups_at_birth(items, tau, games_at, min_games=8):
+    """Agrupamento decidido no nascimento (protocolo v2, P1-B): items = [(id, hipótese, t)] pela ordem de prioridade (o primeiro
+    de cada grupo é o representante); games_at(id, t) -> conjunto de jogos dos sinais já LIDOS em t.
 
-    Ligação completa: um item entra no primeiro grupo em que é compatível com TODOS os membros e tem Jaccard >= tau com
-    TODOS (ambos com >= min_games jogos); senão abre um grupo novo. -> [[id, ...], ...] na ordem de criação.
+    O item que chega no instante t entra no primeiro grupo em que é compatível com TODOS os membros e tem Jaccard >= tau com
+    TODOS, comparando os conjuntos de todos NESSE instante (ambos com >= min_games jogos); senão abre um grupo novo. A decisão
+    nunca é revista, por isso jogos posteriores não mudam a pertença nem os representantes. -> [[id, ...], ...].
     """
     out = []
-    for hid, h, gs in items:
-        placed = False
+    for hid, h, t in items:
+        gs, placed = games_at(hid, t), False
         if len(gs) >= min_games:
             for g in out:
-                if all(len(mgs) >= min_games and compatible(h, mh) and jaccard(gs, mgs) >= tau for _, mh, mgs in g):
-                    g.append((hid, h, gs))
+                if all(compatible(h, mh) and len(games_at(mid, t)) >= min_games and jaccard(gs, games_at(mid, t)) >= tau for mid, mh, _ in g):
+                    g.append((hid, h, t))
                     placed = True
                     break
         if not placed:
-            out.append([(hid, h, gs)])
+            out.append([(hid, h, t)])
     return [[hid for hid, _, _ in g] for g in out]
+
+
+def groups(items, tau, min_games=8):
+    """Variante com conjuntos fixos: items = [(id, hipótese, conjunto de jogos)] (mesma regra de ligação completa)."""
+    sets = {hid: gs for hid, _, gs in items}
+    return groups_at_birth([(hid, h, None) for hid, h, _ in items], tau, lambda hid, t: sets[hid], min_games)

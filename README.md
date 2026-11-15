@@ -91,13 +91,14 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Balanço das propostas (PR 4): só descritivo, por origem, com evidência prospetiva (jogos independentes depois do registo) e lucro por jogo. Nenhuma hipótese é dada como confirmada ou falhada por acertar mais ou menos de metade; o modelo de linguagem recebe só estes números descritivos.
 
 ## Avaliação científica da LLM (PR 4)
-`scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol.md` (`llm_incremental_v1`; o código recusa outra versão do ficheiro).
+`scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol-v2.md` (`llm_incremental_v2`; o código recusa outra versão do ficheiro, incluindo o v1 `audits/pr4-llm-protocol.md`, substituído depois da revisão independente da PR #27).
 - Pergunta: as hipóteses do modelo escolhem jogos com mais lucro por jogo (odd −2 %), depois do registo, do que hipóteses comparáveis do gerador (20 controlos pré-selecionados sem ler resultados), no mesmo intervalo?
 - Nascimento efetivo provado pelo histórico git completo (registo só a crescer); sem prova, a avaliação é "não verificada" e não tem conclusão.
-- Só jogos prospetivos (definição da PR 3) posteriores ao commit do protocolo sustentam conclusões; os anteriores são descritivos.
+- Só jogos prospetivos (definição da PR 3) posteriores à primeira publicação verificável do protocolo no GitHub (hora do servidor, não do commit) sustentam conclusões; os anteriores são descritivos. Sem prova de publicação, a avaliação é "não verificada".
+- Todas as decisões históricas usam só o que o sistema já tinha lido nesse instante: o apoio dos controlos conta sinais lidos até ao nascimento, e os grupos de equivalência são decididos no nascimento de cada hipótese e nunca revistos.
 - Grupos de hipóteses equivalentes (Jaccard 0,85 por ligação completa, sensibilidade 0,80 e 0,90) contam uma vez. Bootstrap por blocos de dia, uma comparação primária com α = 0,05 e Holm nas 7 análises adicionais; mínimos de grupos, jogos e dias.
 - Nunca altera estados, certificação, Telegram ou o registo.
-- Relatório reprodutível: `python3.11 scripts/audit_pr4_llm.py --ref <commit> --protocol-commit <sha>` (só leitura, sem rede; exige clone completo). Resultado em `audits/pr4-llm-evaluation.md` e `.json`.
+- Relatório reprodutível: `python3.11 scripts/audit_pr4_llm.py --ref <commit> --protocol-commit <sha> --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação>` (só leitura, sem rede; exige clone completo). Resultado em `audits/pr4-llm-evaluation.md` e `.json`.
 - A página mostra só um resumo sem conclusão (o workflow usa um checkout raso).
 
 ## Investigador (modelo de linguagem)

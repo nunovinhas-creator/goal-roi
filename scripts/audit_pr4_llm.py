@@ -1,11 +1,13 @@
-"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol.md).
+"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v2.md).
 
 Só leitura e sem rede: lê `data/` de um commit fixo por `git archive` para uma pasta temporária, constrói o relatório com o
 relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o protocolo pelo histórico git completo, e escreve
 `<out>/pr4-llm-evaluation.json` e `.md`. Duas execuções com os mesmos argumentos produzem ficheiros iguais byte a byte.
 
 Uso (na raiz de um clone completo, `git fetch --unshallow` se preciso):
-    python3.11 scripts/audit_pr4_llm.py --ref <commit de main> --protocol-commit <sha do protocolo> [--as-of <UTC>] [--out audits]
+    python3.11 scripts/audit_pr4_llm.py --ref <commit de main> --protocol-commit <sha do protocolo> \
+        --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação github.com> [--as-of <UTC>] [--out audits]
+Sem prova de publicação do protocolo (§0-A do protocolo v2) a avaliação sai "não verificada".
 
 Códigos de saída: 0 = relatório escrito (qualquer veredicto); 2 = uso errado ou entradas ilegíveis.
 """
@@ -32,6 +34,8 @@ def main(argv=None):
     ap.add_argument('--ref', required=True)
     ap.add_argument('--protocol-commit', required=True)
     ap.add_argument('--as-of')
+    ap.add_argument('--protocol-published-utc')
+    ap.add_argument('--protocol-publication-evidence')
     ap.add_argument('--out', default=str(ROOT / 'audits'))
     args = ap.parse_args(argv)
     from scangoal import brain, chronology, llm_eval
@@ -59,7 +63,7 @@ def main(argv=None):
         signals = report.LAST['signals']
         registry = brain.load_registry(data / 'hypotheses.json')
     first, history = llm_eval.registry_history(ROOT, ref)
-    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit)
+    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit, args.protocol_published_utc, args.protocol_publication_evidence)
     problems = history + protocol
     born = llm_eval.births(registry, first, not history)
     res = llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born, protocol_time=protocol_time, problems=problems)
@@ -67,6 +71,8 @@ def main(argv=None):
         inputs['protocol_commit'] = git('rev-parse', '--verify', '%s^{commit}' % args.protocol_commit).decode().strip()
     except subprocess.CalledProcessError:
         inputs['protocol_commit'] = args.protocol_commit
+    inputs['protocol_published_utc'] = args.protocol_published_utc
+    inputs['protocol_publication_evidence'] = args.protocol_publication_evidence
     res['inputs'] = inputs
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)

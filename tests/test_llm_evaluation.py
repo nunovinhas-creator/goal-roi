@@ -214,6 +214,7 @@ class Grouping(unittest.TestCase):
 
     def test_T9_a_flood_of_equivalent_clones_counts_once(self):
         signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=16, n_llm=3, n_ctrl=6)
+        signals += [sig('A0-early%d' % i, None, -4 * DAY + 1000 + i, league='A0') for i in range(3)]   # 8 jogos de A0 lidos antes do nascimento
         with patch.multiple(llm_eval, **FAST):
             base = run(signals, registry)
             flood = dict(registry)
@@ -408,11 +409,92 @@ class GitProofs(unittest.TestCase):
         self.assertEqual(hashlib.sha256(real).hexdigest(), llm_eval.PROTOCOL_SHA256)       # o ficheiro do repositório é o registado
         sha = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8'), '2026-11-20T10:00:00+00:00')
         later = self.commit('x.txt', 'x', '2026-11-20T11:00:00+00:00')
-        self.assertEqual(llm_eval.protocol_proof(self.root, sha), (T0 + timedelta(hours=10), []))
-        self.assertIn('protocol commit is not the one that introduced the file', llm_eval.protocol_proof(self.root, later)[1])
+        ev = 'https://github.com/o/r/actions/runs/1'
+        self.assertEqual(llm_eval.protocol_proof(self.root, sha, '2026-11-20T10:30:00+00:00', ev), (T0 + timedelta(hours=10, minutes=30), []))
+        self.assertIn('protocol commit is not the one that introduced the file', llm_eval.protocol_proof(self.root, later, '2026-11-20T12:00:00+00:00', ev)[1])
         edited = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8') + '\nalterado\n', '2026-11-20T12:00:00+00:00')
-        self.assertIn('protocol content differs from the registered one', llm_eval.protocol_proof(self.root, edited)[1])
+        self.assertIn('protocol content differs from the registered one', llm_eval.protocol_proof(self.root, edited, '2026-11-20T13:00:00+00:00', ev)[1])
         self.assertEqual(llm_eval.protocol_proof(self.root, 'deadbeef')[1], ['protocol unavailable at deadbeef'])
+
+    def test_P2C_protocol_start_is_the_first_verifiable_publication(self):
+        real = (Path(__file__).resolve().parents[1] / llm_eval.PROTOCOL_FILE).read_bytes()
+        sha = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8'), '2026-11-20T10:00:00+00:00')
+        ev = 'https://github.com/o/r/actions/runs/1'
+        # hora do commit escrita pelo autor: sozinha não prova nada
+        self.assertEqual(llm_eval.protocol_proof(self.root, sha), (T0 + timedelta(hours=10), ['protocol publication not proven']))
+        self.assertIn('protocol publication not proven', llm_eval.protocol_proof(self.root, sha, '2026-11-20T11:00:00+00:00', None)[1])
+        self.assertIn('protocol publication not proven', llm_eval.protocol_proof(self.root, sha, '2026-11-20T11:00:00+00:00', 'https://exemplo.pt/x')[1])
+        self.assertIn('protocol publication before its commit', llm_eval.protocol_proof(self.root, sha, '2026-11-20T09:00:00+00:00', ev)[1])
+        # commit com data recuada, publicação real 3 dias depois: P é a publicação
+        self.assertEqual(llm_eval.protocol_proof(self.root, sha, '2026-11-23T10:00:00+00:00', ev), (T0 + timedelta(days=3, hours=10), []))
+        # o protocolo v1 (commit 9f7b2aa) deixou de ser aceite
+        v1 = (Path(__file__).resolve().parents[1] / 'audits/pr4-llm-protocol.md').read_bytes()
+        old = self.commit('audits/old.md', v1.decode('utf-8'), '2026-11-20T11:00:00+00:00')
+        self.assertNotEqual(hashlib.sha256(v1).hexdigest(), llm_eval.PROTOCOL_SHA256)
+
+    def test_P2C_data_between_commit_and_publication_is_not_prospective(self):
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=21)
+        with patch.multiple(llm_eval, **FAST):
+            at_commit = run(signals, registry, protocol=T0)
+            at_publication = run(signals, registry, protocol=T0 + timedelta(days=10, hours=12))   # publicada 10,5 dias depois do commit
+        self.assertEqual(at_commit['primary']['games_test'], 210)
+        self.assertEqual(at_publication['primary']['games_test'], 110)                   # só os 11 dias depois da publicação
+        self.assertEqual(sum(h['pre_protocol_games'] for h in at_publication['hypotheses']), 100)
+
+
+class ReviewP1(unittest.TestCase):
+    """Revisão independente da PR #27: decisões históricas só com o que o sistema tinha LIDO nesse instante."""
+
+    def test_P1A_signal_sent_before_birth_but_read_after_never_affects_controls(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=3, n_llm=2, n_ctrl=6)
+        late = [sig('B0-late%d' % i, None, -3 * DAY + i, seen=3 * DAY, league='B0') for i in range(20)]   # emitidos antes, lidos depois
+        early = [sig('B0-early%d' % i, None, -3 * DAY + i, seen=10, league='B0') for i in range(20)]     # emitidos e lidos antes
+        with patch.multiple(llm_eval, **FAST):
+            a, b, c = run(signals, registry), run(signals + late, registry), run(signals + early, registry)
+        fp = lambda r: [h['controls_sha256'] for h in r['hypotheses']]
+        self.assertEqual(fp(a), fp(b))                                                        # leitura tardia: nada muda
+        self.assertEqual([h['controls'] for h in a['hypotheses']], [6, 6])
+        self.assertEqual([h['controls'] for h in c['hypotheses']], [5, 5])                   # conhecidos no nascimento: B0 fica fora (5x o apoio)
+
+    def scenario(self):
+        reg = {'Jogo aberto | Liga = A0': hyp('A0', 'llm', LLM_BORN)}
+        y = hyp('C', 'llm', LLM_BORN + timedelta(days=1))
+        y['conditions'] = [['Hora (UTC)', 'tarde']]
+        reg['Jogo aberto | Hora (UTC) = tarde'] = y
+        return reg
+
+    def groups_of(self, res):
+        return [(h['id'], h['group'], h['representative']) for h in res['hypotheses']]
+
+    def test_P1B_later_games_cannot_merge_a_historical_split(self):
+        base = [sig('A0-m%d' % i, None, -4 * DAY + 60 + i * 20, league='A0') for i in range(10)]          # A0 de madrugada
+        base += [sig('C-t%d' % i, None, -4 * DAY + 800 + i * 20, league='C') for i in range(10)]          # outra liga à tarde
+        later = [sig('A0-t%d-%d' % (d, i), None, d * DAY + 760 + i, league='A0') for d in range(1, 21) for i in range(10)]   # depois: A0 à tarde
+        with patch.multiple(llm_eval, **FAST):
+            a, b = run(base, self.scenario()), run(base + later, self.scenario())
+        self.assertEqual(self.groups_of(a), self.groups_of(b))
+        self.assertEqual((b['population']['groups'], [h['representative'] for h in b['hypotheses']]), (2, [True, True]))
+        self.assertEqual(llm_eval.page_summary(base + later, self.scenario())['groups'], 2)
+
+    def test_P1B_later_games_cannot_split_a_historical_group(self):
+        base = [sig('A0-t%d' % i, None, -4 * DAY + 760 + i, league='A0') for i in range(10)]              # no nascimento: iguais
+        later = [sig('C-t%d-%d' % (d, i), None, d * DAY + 760 + i, league='C') for d in range(1, 21) for i in range(10)]   # depois divergem
+        with patch.multiple(llm_eval, **FAST):
+            a, b = run(base, self.scenario()), run(base + later, self.scenario())
+        self.assertEqual(self.groups_of(a), self.groups_of(b))
+        self.assertEqual(b['population']['groups'], 1)
+        self.assertEqual([h['representative'] for h in b['hypotheses']], [True, False])
+        self.assertEqual([h['membership_games_at_birth'] for h in b['hypotheses']], [10, 10])
+
+    def test_P1B_unread_signals_at_birth_do_not_count(self):
+        base = [sig('A0-m%d' % i, None, -4 * DAY + 60 + i * 20, league='A0') for i in range(10)]
+        base += [sig('C-t%d' % i, None, -4 * DAY + 800 + i * 20, league='C') for i in range(10)]
+        # A0 à tarde, emitidos antes do nascimento de "tarde" mas lidos só depois: não podem juntar os grupos
+        unread = [sig('A0-u%d' % i, None, -4 * DAY + 760 + i, seen=4 * DAY, league='A0') for i in range(200)]
+        with patch.multiple(llm_eval, **FAST):
+            a, b = run(base, self.scenario()), run(base + unread, self.scenario())
+        self.assertEqual(self.groups_of(a), self.groups_of(b))
+        self.assertEqual(b['population']['groups'], 2)
 
 
 if __name__ == '__main__':
