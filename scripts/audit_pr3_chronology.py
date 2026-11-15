@@ -29,6 +29,7 @@ from scangoal import brain, chronology, insights, notify, report  # noqa: E402
 from scangoal.eligibility import eligible, game_identity  # noqa: E402
 
 BASE = '82ab9d86593055fbc98420265a469728d914288f'       # main with PR 2 at the start of PR 3 (data snapshot and PR 2 code)
+FIRST_PR3 = 'ef4606a93d7c576f64a66afc186f9a3d6a2558bf'  # PR 3 as audited in review #5911487915 (Bonferroni/posterior tails)
 NOW = '2026-11-15T14:34:34+00:00'                       # BASE commit time: the report clock for both versions
 UTC = timezone.utc
 SIMULATIONS, SEED = 400, 20261115
@@ -60,11 +61,11 @@ def base_digest():
     return out
 
 
-def old_module(name, **extra):
-    source = git('show', '%s:scangoal/%s.py' % (BASE, name))
-    module = types.ModuleType('scangoal._pr2_%s' % name)
+def old_module(name, base=BASE, **extra):
+    source = git('show', '%s:scangoal/%s.py' % (base, name))
+    module = types.ModuleType('scangoal._%s_%s' % (base[:7], name))
     module.__package__ = 'scangoal'
-    exec(compile(source, '%s:%s.py' % (BASE, name), 'exec'), module.__dict__)
+    exec(compile(source, '%s:%s.py' % (base, name), 'exec'), module.__dict__)
     module.datetime = Clock
     module.__dict__.update(extra)
     return module
@@ -406,50 +407,81 @@ def notify_rehearsal(new_report):
             'note': 'messages() only; nothing sent, nothing written'}
 
 
-def synthetic(rates, seed):
+def synthetic(rates, seed, odds=2.0):
     """One signal per game, read when sent, result observed 145 min later; family-wide hypothesis registered before."""
     rng, t0, out = random.Random(seed), datetime(2026, 11, 20, tzinfo=UTC), []
     for i, p in enumerate(rates):
         d = (t0 + timedelta(hours=i)).isoformat()
         w = 1.0 if rng.random() < p else -1.0
-        out.append({'match_id': 'g%d' % i, 'w': w, 'odds': 2.0, 'type': 'OPEN_GAME', 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5',
+        out.append({'match_id': 'g%d' % i, 'w': w, 'odds': odds, 'type': 'OPEN_GAME', 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5',
                     'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True,
                     'key': ('g%d' % i,), 'n_signals': 1, 'max_mult': 1, 'no_source': False, 'share': None, 'total': None, 'n_bets': None,
                     'signal_seen_utc': d, 'result_known_utc': (t0 + timedelta(hours=i, minutes=145)).isoformat()})
     return out
 
 
-def validation_rates(old_brain, seeds=200):
-    """Share of runs where a single hypothesis is EVER validated (forte/confirmada), per rule. Parameters fixed a priori."""
+def validation_rates(old_brain, first_pr3_brain):
+    """Share of runs where a single hypothesis is EVER validated (forte/confirmada), per rule. Parameters fixed a priori.
+
+    At odds 2.0 the break-even rate is 0.50; at odds -2 % (1.96) it is 0.5102. "no edge" uses 0.50 (profit at odds -2 % < 0).
+    """
     reg = {'h': {'family': 'Jogo aberto', 'conditions': [], 'born_utc': '2026-11-19T00:00:00+00:00', 'source': 'gerador'}}
-    cases = {'no_edge_p0.50_160_games': [0.5] * 160, 'no_edge_p0.50_300_games': [0.5] * 300,
-             'edge_p0.60_300_games': [0.6] * 300, 'edge_p0.75_160_games': [0.75] * 160}
-    rules = {'pr2': lambda sigs: old_brain.evaluate(sigs, reg, 300)[0][0],
-             'pr3_without_look_spending': None, 'pr3': lambda sigs: brain.evaluate(sigs, reg, 300)[0][0]}
+    cases = [('no_edge_p0.50_160_games', [0.5] * 160, 200), ('no_edge_p0.50_300_games', [0.5] * 300, 200),
+             ('no_edge_p0.50_1000_games', [0.5] * 1000, 60), ('edge_p0.60_300_games', [0.6] * 300, 200),
+             ('edge_p0.60_1000_games', [0.6] * 1000, 60), ('edge_p0.75_160_games', [0.75] * 160, 200)]
+    rules = {'pr2': old_brain, 'pr3_ef4606a_bonferroni': first_pr3_brain, 'pr3_eprocess': brain}
     out = {}
-    for name, rates in cases.items():
-        row = {}
-        for rule in rules:
+    for name, rates, seeds in cases:
+        row = {'seeds': seeds}
+        for rule, mod in rules.items():
             hits = 0
             for seed in range(seeds):
-                sigs = synthetic(rates, seed)
-                if rule == 'pr3_without_look_spending':
-                    with patch.object(brain, 'look_share', lambda games: 1.0):
-                        r = brain.evaluate(sigs, reg, 300)[0][0]
-                else:
-                    r = rules[rule](sigs)
+                r = mod.evaluate(synthetic(rates, seed), reg, 300)[0][0]
                 hits += r['status'] in ('forte', 'confirmada') or any(c['to'] in ('forte', 'confirmada') for c in r['status_changes'])
             row[rule] = round(hits / seeds, 3)
         out[name] = row
-    return {'seeds': seeds, 'tested_family': 1, 'rates_ever_validated': out,
-            'note': 'one hypothesis, so Bonferroni over hypotheses is inactive: this isolates repeated looks; '
-                    'pr2 uses its own bar 1 - 0.05/m with rounded prob_above'}
+    return {'tested_family': 1, 'rates_ever_validated': out,
+            'note': 'one hypothesis (rank 1, alpha 0.025 for the e-process): isolates repeated looks; pr2 uses 1 - 0.05/m with rounded prob_above'}
+
+
+def prospective_definitions(signals, registry, rows_by_id):
+    """Review #5911487915 P1-A/P1-B: prospective games under the ef4606a definitions and under the unified one."""
+    elig = [b for b in signals if eligible(b)]
+    multi, earlier = brain.multi_matches(elig), brain.earlier_index(elig)
+    have = [(b, insights.family(b), set(brain.atoms(b, multi, earlier))) for b in elig]
+    old_seen = lambda b, born: chronology.decision_time(b) is not None and chronology.decision_time(b) > born
+    out = collections.Counter()
+    changed_levels, examples = 0, []
+    for hid, r in rows_by_id.items():
+        if r['games'] < brain.HINT_AT:
+            continue
+        h = registry[hid]
+        born, gen = chronology.born(h), h.get('source') == 'gerador'
+        conds = {tuple(c) for c in h['conditions']}
+        match = [b for b, fam, at in have if fam == h['family'] and conds <= at and (gen or (born and chronology.signal_time(b) > born))]
+        ordered = brain.ordered_games(match)
+        old_report = len({brain.game_identity(b) for b in match if old_seen(b, born) and b['w'] not in (None, 0)})   # signal by signal
+        old_replay = sum(1 for _, _, rows in ordered if all(old_seen(b, born) for b in rows))                     # all rows of the game
+        new = r['prospective']['games']
+        out['hypotheses'] += 1
+        out['old_report_games'] += old_report
+        out['old_replay_games'] += old_replay
+        out['new_games'] += new
+        out['old_report_vs_replay_disagree'] += old_report != old_replay
+        for cat, n in r['prospective']['categories'].items():
+            out['new_' + cat] += n
+        if (old_report >= brain.PROSPECTIVE_MIN) != (new >= brain.PROSPECTIVE_MIN):
+            changed_levels += 1
+            if len(examples) < 6:
+                examples.append({'id': hid, 'old_report_games': old_report, 'old_replay_games': old_replay, 'new_games': new,
+                                 'categories': r['prospective']['categories']})
+    return dict(out, evidence_level_changed=changed_levels, examples=examples)
 
 
 def summary(rep):
     b = rep['brain']
     wf = b['walk_forward']
-    return {'hypotheses': b['hypotheses'], 'tested': b['tested'], 'corrected_bar': b['corrected_bar'], 'counts': b['counts'],
+    return {'hypotheses': b['hypotheses'], 'tested': b['tested'], 'corrected_bar': b.get('corrected_bar'), 'counts': b['counts'],
             'status_list': b['status_list'], 'exploratory_counts': b['exploratory']['counts'],
             'walk_forward': {k: wf.get(k) for k in ('followed', 'skipped', 'not_reconstructible', 'prob_followed_better', 'first_followed_utc', 'chronology')}}
 
@@ -490,6 +522,8 @@ def main():
             'status_changes_pr2_to_pr3': changed,
             'pr3_status_change_records': {hid: by_id[hid]['status_changes'] for hid in sorted(b['status_list'])},
             'pr3_evidence_levels_tested': b['multiplicity']['evidence_levels'], 'pr3_multiplicity': b['multiplicity'],
+            'pr3_validation': b['validation'],
+            'prospective_definitions_review_5911487915': prospective_definitions(signals, registry, by_id),
             'chronology': chronology_evidence(signals),
             'git_timestamp_verification': git_timestamps(),
             'pr2_walk_forward_leakage': legacy_walk_forward_trace(signals, registry),
@@ -498,7 +532,7 @@ def main():
             'walk_forward_bootstrap_roi_90': {'followed': cluster_bootstrap_roi(split[True]), 'skipped': cluster_bootstrap_roi(split[False])},
             'sensitivity': sensitivity(signals, registry),
             'notify_rehearsal': notify_rehearsal(pr3),
-            'synthetic_validation_rates': validation_rates(old_brain),
+            'synthetic_validation_rates': validation_rates(old_brain, old_module('brain', base=FIRST_PR3)),
         }
     out['data_unchanged_by_audit'] = digest() == data_before
     print(json.dumps(out, indent=1, ensure_ascii=False, default=str))
