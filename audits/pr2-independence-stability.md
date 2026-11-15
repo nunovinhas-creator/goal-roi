@@ -135,7 +135,7 @@ Contra o código da PR 1, 23 dos 27 testes novos falham. Os 4 que passam são in
   - os textos do Telegram ainda dizem "em N resultados", com N = sinais (PR 5).
 - **Prudência deliberada:** mercados diferentes do mesmo jogo repartem um voto. Isto perde alguma informação, mas nunca sobrecontagem.
 - **Desempenho:** `report.build` passa de cerca de 5,7 s para 7,4 s, por cada recolha ou leitura com mensagens novas.
-- **Integração:** exige um corte controlado como o da PR 1 (pausa, corte e merge), porque uma execução antiga a correr depois do corte compararia referências diferentes. O `scripts/pr1_cutover.py` recusa correr com o marcador da PR 1 já presente, por isso terá de ser adaptado à chave da regra antes da integração, e essa adaptação terá revisão própria.
+- **Integração:** exige um corte controlado como o da PR 1 (pausa, corte e merge), porque uma execução antiga a correr depois do corte compararia referências diferentes. A preparação está em `scripts/pr2_cutover.py`, `scripts/rehearse_pr2_cutover.py`, `tests/test_pr2_cutover.py` e `audits/pr2-cutover-runbook.md`, em revisão própria. Nada foi executado em produção.
 
 ## 6. Reprodução
 
