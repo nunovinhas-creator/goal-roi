@@ -459,7 +459,9 @@ def operational_evidence(signals):
             'regime': insights.regime(rows)}
 
 
-def build(csv_path=None, register=False):
+def build(csv_path=None, register=False, now=None):
+    """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
+    now = now or datetime.now(timezone.utc)
     chron = {}
     msgs, ft, marks, notes, audit = load(chron)
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
@@ -536,10 +538,13 @@ def build(csv_path=None, register=False):
     LAST['signals'] = [b for b in signals if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
-    brn = brain.build(signals, registry, MIN_SETTLED, ledger)
+    # Integridade histórica no percurso real (revisão #5911845265, P1-H): o registo tem de prolongar o que foi publicado no
+    # git, com horas coerentes. Sem prova possível (sem git, histórico shallow, nunca publicado): nenhuma certificação.
+    history = certification.history_proof(ledger_path, ledger, as_of=now) if isinstance(ledger, dict) and 'invalid' not in ledger else None
+    brn = brain.build(signals, registry, MIN_SETTLED, ledger, history_problems=history, as_of=now)
     if register and brn['validation']['ledger_valid'] and brn['validation']['candidates']:
-        # Seleção em tempo real, registada uma só vez (rank, α e início ficam fixos); só com o registo ativado e válido.
-        if certification.append(ledger, brn['validation']['candidates'], registry, datetime.now(timezone.utc)):
+        # Seleção em tempo real, registada uma só vez (rank, α e início ficam fixos); só com o registo ativo, válido e provado.
+        if certification.append(ledger, brn['validation']['candidates'], registry, now):
             certification.save(ledger_path, ledger)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
@@ -553,7 +558,7 @@ def build(csv_path=None, register=False):
                          status=by_id[n['id']]['status']) for n in notes if n.get('id') in by_id][:12]
     brn['entry_points'] = brain.entry_points(signals)
     return {
-        'generated_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+        'generated_at_utc': now.isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),
         'unparsed': len(unparsed), 'unparsed_samples': [m['head'] for m in unparsed[-10:]],
         'excluded_first_seen_with_result': sum(1 for m in msgs if m.get('bet') and m['had_ft_at_first_sight']),

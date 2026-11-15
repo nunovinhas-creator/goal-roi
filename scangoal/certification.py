@@ -19,8 +19,9 @@ verify_history() confirma que cada versão publicada (histórico git do ficheiro
 anterior sem alterar nada. O relatório expõe a cabeça da cadeia (ledger_head_sha256), que fica também no histórico git do
 relatório. verify() nunca levanta exceções: qualquer entrada malformada é só um problema, que desliga a certificação.
 """
-import hashlib, json, os, sys, tempfile
-from datetime import datetime, timezone
+import hashlib, json, os, subprocess, sys, tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from . import chronology
 
@@ -114,6 +115,8 @@ def head(ledger):
 def verify_history(versions):
     """Âncora externa: versões publicadas do registo, por ordem (por exemplo, o histórico git do ficheiro). Cada uma tem de ser
     válida e prolongar a anterior sem alterar o génesis, as legadas nem nenhuma entrada já publicada. -> lista de problemas."""
+    if not versions:
+        return ['no published version: nothing proves the history']
     problems, prev = [], None
     for i, led in enumerate(versions):
         p = verify(led)
@@ -126,6 +129,88 @@ def verify_history(versions):
             elif led['entries'][:len(prev['entries'])] != prev['entries']:
                 problems.append('version %d is not an append-only extension' % i)
         prev = led
+    return problems
+
+
+PUBLISH_TOLERANCE_MIN = 30   # um registo escrito por um relatório é publicado no commit do mesmo job (timeout do job: 15 min)
+
+
+def _git(root, *args, data=None):
+    return subprocess.run(['git', '-C', str(root), *args], input=data, capture_output=True, check=True).stdout
+
+
+def published_versions(path):
+    """Histórico publicado do registo (git): -> ([(hora do commit, registo)], problemas). Fail-closed em qualquer dúvida:
+    sem git, repositório shallow (histórico truncado), ficheiro nunca publicado, apagado ou ilegível numa versão."""
+    path = Path(path)
+    try:
+        root = Path(_git(path.parent, 'rev-parse', '--show-toplevel').decode().strip())
+        if _git(root, 'rev-parse', '--is-shallow-repository').decode().strip() != 'false':
+            return [], ['history unavailable: shallow repository']
+        rel = path.resolve().relative_to(root.resolve()).as_posix()
+        log = _git(root, 'log', '--reverse', '--format=%H %cI', '--', rel).decode().split('\n')
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        return [], ['history unavailable: no git repository']
+    commits = [line.split() for line in log if line.strip()]
+    if not commits:
+        return [], ['ledger never published']
+    try:
+        out = _git(root, 'cat-file', '--batch', data=''.join('%s:%s\n' % (sha, rel) for sha, _ in commits).encode())
+    except subprocess.CalledProcessError:
+        return [], ['history unavailable: cannot read versions']
+    versions, problems, pos = [], [], 0
+    for sha, when in commits:
+        header_end = out.index(b'\n', pos)
+        header = out[pos:header_end].decode().split()
+        if header[-1] == 'missing':
+            problems.append('ledger deleted at %s' % sha[:12])
+            pos = header_end + 1
+            continue
+        size = int(header[2])
+        body = out[header_end + 1:header_end + 1 + size]
+        pos = header_end + 1 + size + 1
+        try:
+            versions.append((chronology.parse_utc(when), json.loads(body)))
+        except ValueError:
+            problems.append('unreadable version %s' % sha[:12])
+    return versions, problems
+
+
+def history_proof(path, current, as_of=None, versions=None):
+    """Prova operacional de integridade histórica (revisão #5911845265, P1-H). -> lista de problemas (vazia = provado).
+
+    1. o registo foi publicado pelo menos uma vez, num repositório com histórico completo (published_versions);
+    2. cada versão publicada prolonga a anterior e a cópia atual prolonga a última publicada (verify_history);
+    3. coerência temporal: o génesis e cada entrada foram publicados no commit que os introduziu entre o seu carimbo e
+       PUBLISH_TOLERANCE_MIN depois (nunca antes); entradas ainda não publicadas não são anteriores à última publicação
+       nem posteriores a `as_of`.
+    Qualquer problema desliga toda a certificação e impede novas entradas.
+    """
+    if versions is None:
+        versions, problems = published_versions(path)
+        if problems:
+            return problems
+    if not versions:
+        return ['ledger never published']
+    problems = verify_history([v for _, v in versions] + [current])
+    if problems:
+        return problems
+    tol = timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+    coherent = lambda stamp, commit: stamp is not None and commit is not None and stamp <= commit <= stamp + tol
+    first_time, first = versions[0]
+    if not coherent(chronology.parse_utc(first['activated_utc']), first_time):
+        problems.append('genesis published out of time')
+    seen = 0
+    for when, led in versions:
+        for e in led['entries'][seen:]:
+            if not coherent(chronology.parse_utc(e['selected_utc']), when):
+                problems.append('entry %d published out of time' % e['rank'])
+        seen = len(led['entries'])
+    last_time = versions[-1][0]
+    for e in current['entries'][seen:]:
+        t = chronology.parse_utc(e['selected_utc'])
+        if t is None or t < last_time or (as_of is not None and t > as_of):
+            problems.append('unpublished entry %d out of time' % e['rank'])
     return problems
 
 

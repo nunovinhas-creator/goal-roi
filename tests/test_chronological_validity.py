@@ -353,7 +353,7 @@ class OverlappingHypotheses(unittest.TestCase):
         self.assertEqual(len({r['game_set'] for r in rows.values()}), 1)               # the same evidence four times
         self.assertEqual(sorted(r['confirmation']['rank'] for r in rows.values()), [1, 2, 3, 4])   # four tests, four budgets
         self.assertEqual(sorted(r['confirmation']['threshold'] for r in rows.values()), [40.0, 120.0, 240.0, 400.0])
-        out = brain.build(g, reg, 300, led)
+        out = brain.build(g, reg, 300, led, history_problems=[])
         self.assertEqual((out['multiplicity']['promising_or_better'], out['multiplicity']['distinct_game_sets_promising_or_better']), (4, 1))
         self.assertEqual(out['validation']['method'], notify.VALIDATION_METHOD)
 
@@ -627,7 +627,7 @@ class SelectionLedger(unittest.TestCase):
     def test_candidates_are_only_live_certifiable_promising_hypotheses(self):
         reg = dict(self.reg, post=hyp(conditions=(('Outros sinais no mesmo jogo', 'jogo com um só tipo de sinal'),)))
         led = make_ledger(reg, [], legacy=())
-        out = brain.build(self.data[:40], reg, 300, led)
+        out = brain.build(self.data[:40], reg, 300, led, history_problems=[])           # history proof supplied
         self.assertEqual(out['validation']['state'], 'active')
         self.assertIn('a', out['validation']['candidates'])
         self.assertNotIn('post', out['validation']['candidates'])                      # promising, but not certifiable
@@ -886,30 +886,200 @@ class ReportProvenance(unittest.TestCase):
         b = self.full([v1, v3], {'manual_results.json': {mid: {'ft': [1, 5], 'source': 'x'}}})[0][0]
         self.assertIsNone(b['match_result_first_seen_utc'])                            # a source without proven time: unknown
 
-    def test_the_ledger_is_written_only_when_activated_and_registering(self):
+    def test_the_ledger_is_never_created_by_the_collection(self):
         v1 = self.version(self.OPEN, '2026-11-11T17:50:00+00:00')
         _, files = self.full([v1], register=True)
-        self.assertNotIn(certification.FILE, files)                                     # never created by the collection
-        reg = {'x': hyp()}
-        led = certification.activate({}, datetime(2026, 11, 1, tzinfo=UTC))           # activated in the past; selection uses the real clock
+        self.assertNotIn(certification.FILE, files)
+        bad = {'method': 'x'}                                                           # an invalid ledger is never extended
+        _, files = self.full([v1], {certification.FILE: bad}, register=True)
+        self.assertEqual(json.loads(files[certification.FILE]), bad)
 
-        def inject(real):
-            def build(signals, registry, min_settled, ledger=None):
-                out = real(signals, registry, min_settled, ledger)
-                if out['validation']['ledger_valid']:
-                    out['validation']['candidates'] = ['x']
-                return out
-            return build
-        _, files = self.full([v1], {'hypotheses.json': reg, certification.FILE: led}, register=False, patch_build=inject)
-        self.assertEqual(json.loads(files[certification.FILE])['entries'], [])
-        _, files = self.full([v1], {'hypotheses.json': reg, certification.FILE: led}, register=True, patch_build=inject)
-        written = json.loads(files[certification.FILE])
-        self.assertEqual([(e['rank'], e['id']) for e in written['entries']], [(1, 'x')])
-        self.assertEqual(certification.verify(written, reg), [])
-        bad = dict(led, alpha=0.5)
-        _, files = self.full([v1], {'hypotheses.json': reg, certification.FILE: bad}, register=True, patch_build=inject)
-        self.assertEqual(json.loads(files[certification.FILE]), bad)                    # an invalid ledger is never extended
+class LedgerHistoryEndToEnd(unittest.TestCase):
+    """Review #5911845265, P1-H: the real path (report.build) only certifies with a verified published history (git)."""
+    OPEN = ReportProvenance.OPEN
+    ACT = datetime(2026, 11, 1, tzinfo=UTC)
+
+    def setUp(self):
+        import subprocess
+        self.sp = subprocess
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = self.tmp.name
+        self.data = os.path.join(self.root, 'data')
+        os.makedirs(self.data)
+        self.git('init', '-q')
+        os.environ['SCANGOAL_DATA_DIR'] = self.data
+        store.append_versions([{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None,
+                                'collected_at_utc': '2026-11-11T17:50:00+00:00', 'text': self.OPEN}])
+        self.reg = {'x': hyp()}
+        self.write('hypotheses.json', self.reg)
+        self.commit(self.ACT - timedelta(days=1))
+
+    def tearDown(self):
+        del os.environ['SCANGOAL_DATA_DIR']
+        self.tmp.cleanup()
+
+    def git(self, *args, when=None, cwd=None):
+        env = dict(os.environ, GIT_AUTHOR_DATE=(when or self.ACT).isoformat(), GIT_COMMITTER_DATE=(when or self.ACT).isoformat())
+        return self.sp.run(['git', '-C', cwd or self.root, '-c', 'user.name=t', '-c', 'user.email=t@invalid', '-c', 'commit.gpgsign=false', *args],
+                           check=True, capture_output=True, text=True, env=env).stdout
+
+    def write(self, name, content):
+        with open(os.path.join(self.data, name), 'w', encoding='utf-8') as f:
+            json.dump(content, f, indent=1, sort_keys=True)
+
+    def read_ledger(self):
+        path = os.path.join(self.data, certification.FILE)
+        return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else None
+
+    def commit(self, when):
+        self.git('add', '-A')
+        self.git('commit', '-q', '--allow-empty', '-m', 'data', when=when)
+
+    def run_report(self, now, register=True, candidates=('x',)):
+        from unittest.mock import patch
+        from scangoal import report
+        real = report.brain.build
+
+        def build(signals, registry, min_settled, ledger=None, **kw):
+            out = real(signals, registry, min_settled, ledger, **kw)
+            if out['validation']['ledger_valid']:
+                out['validation']['candidates'] = list(candidates)
+            return out
+        with patch.object(report.brain, 'build', build):
+            return report.build(None, register=register, now=now)['brain']['validation']
+
+    def published(self):
+        led = certification.activate({}, self.ACT)
+        self.write(certification.FILE, led)
+        self.commit(self.ACT + timedelta(minutes=5))
+        return led
+
+    def test_genuine_history_activates_and_appends(self):
+        self.published()
+        now = self.ACT + timedelta(days=1)
+        v = self.run_report(now)
+        self.assertEqual((v['state'], v['ledger_valid']), ('active', True))
+        led = self.read_ledger()
+        self.assertEqual([(e['rank'], e['id'], e['selected_utc']) for e in led['entries']], [(1, 'x', now.isoformat(timespec='seconds'))])
+        self.commit(now + timedelta(minutes=10))                                        # published within the tolerance
+        self.assertEqual(certification.history_proof(os.path.join(self.data, certification.FILE), self.read_ledger()), [])
+        v = self.run_report(now + timedelta(hours=1))
+        self.assertEqual((v['state'], v['ledger_head_sha256']), ('active', certification.head(self.read_ledger())))
+
+    def test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end(self):
+        self.published()
+        now = self.ACT + timedelta(days=1)
+        self.run_report(now)
+        self.commit(now + timedelta(minutes=10))
+        rewritten = certification.activate({}, self.ACT)                               # internally valid, different history
+        certification.append(rewritten, ['x'], self.reg, self.ACT + timedelta(hours=2))
+        self.assertEqual(certification.verify(rewritten, self.reg), [])
+        self.write(certification.FILE, rewritten)
+        v = self.run_report(now + timedelta(hours=1))
+        self.assertEqual((v['state'], v['ledger_valid'], v['certified'], v['candidates']), ('history_unverified', False, [], []))
+        self.assertEqual(self.read_ledger(), rewritten)                                 # never extended
+        report = {'generated_at_utc': at(0), 'brain': {'evidence_scope': 'eligible_bets_only', 'status_list': {'x': 'forte'}, 'validation': v,
+                                                       'watch': [{'date_utc': at(0), 'kickoff_utc': at(120), 'match': 'A — B', 'selection': 'Over 2.5',
+                                                                  'odds': 1.9, 'reasons': [{'id': 'x', 'status': 'forte', 'n': 120, 'hit_rate': 0.7,
+                                                                                            'prob_above': 0.99, 'certified': True}]}]}}
+        msgs = notify.messages(report, {'hello': True, 'statuses': {}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}, T0)
+        self.assertFalse(any('ALERTA' in m or 'validada' in m for m in msgs))
+        self.commit(now + timedelta(hours=2))                                           # even once the rewrite is committed
+        self.assertTrue(certification.history_proof(os.path.join(self.data, certification.FILE), rewritten))
+        self.assertEqual(self.run_report(now + timedelta(hours=3))['state'], 'history_unverified')
+
+    def test_incomplete_or_missing_history_fails_closed(self):
+        led = certification.activate({}, self.ACT)
+        self.write(certification.FILE, led)                                            # never committed
+        self.assertEqual(self.run_report(self.ACT + timedelta(days=1))['state'], 'history_unverified')
+        self.assertEqual(self.read_ledger()['entries'], [])                            # nothing appended
+        self.assertEqual(certification.verify_history([]), ['no published version: nothing proves the history'])
+        self.commit(self.ACT + timedelta(minutes=5))
+        clone = os.path.join(self.root, 'shallow')                                     # truncated history
+        self.sp.run(['git', 'clone', '-q', '--depth', '1', 'file://' + self.root, clone], check=True, capture_output=True)
+        problems = certification.history_proof(os.path.join(clone, 'data', certification.FILE), led)
+        self.assertEqual(problems, ['history unavailable: shallow repository'])
+        outside = tempfile.TemporaryDirectory()                                        # no git at all
+        path = os.path.join(outside.name, certification.FILE)
+        certification.save(__import__('pathlib').Path(path), led)
+        self.assertEqual(certification.history_proof(path, led), ['history unavailable: no git repository'])
+        outside.cleanup()
+        os.remove(os.path.join(self.data, certification.FILE))                         # deleted, then re-created
+        self.commit(self.ACT + timedelta(minutes=10))
+        self.write(certification.FILE, led)
+        self.commit(self.ACT + timedelta(minutes=15))
+        self.assertTrue(any('deleted' in p for p in certification.history_proof(os.path.join(self.data, certification.FILE), led)))
+
+    def path(self):
+        return os.path.join(self.data, certification.FILE)
+
+    def test_genesis_published_before_its_activation(self):
+        led = certification.activate({}, self.ACT)
+        self.write(certification.FILE, led)
+        self.commit(self.ACT - timedelta(minutes=1))
+        self.assertIn('genesis published out of time', certification.history_proof(self.path(), led))
+
+    def test_entry_published_too_late_after_its_selection(self):
+        self.published()
+        late = self.read_ledger()
+        certification.append(late, ['x'], self.reg, self.ACT + timedelta(days=1))
+        self.write(certification.FILE, late)
+        self.commit(self.ACT + timedelta(days=1, hours=2))                             # 2 h > 30 min tolerance
+        self.assertIn('entry 1 published out of time', certification.history_proof(self.path(), late))
+        self.assertEqual(self.run_report(self.ACT + timedelta(days=2))['state'], 'history_unverified')
+
+    def test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future(self):
+        self.published()
+        back = self.read_ledger()
+        certification.append(back, ['x'], self.reg, self.ACT)                         # dated before the last publication
+        self.assertIn('unpublished entry 1 out of time', certification.history_proof(self.path(), back))
+        future = self.read_ledger()
+        certification.append(future, ['x'], self.reg, self.ACT + timedelta(days=9))
+        self.assertIn('unpublished entry 1 out of time', certification.history_proof(self.path(), future, as_of=self.ACT + timedelta(days=1)))
+        self.assertEqual(certification.history_proof(self.path(), future, as_of=self.ACT + timedelta(days=9)), [])
+
+    def test_brain_without_a_history_proof_is_closed(self):
+        led = make_ledger(self.reg, [(['x'], -30)])
+        g = series(THREE_IN_FOUR, every=CHAIN)
+        self.assertEqual(brain.build(g, self.reg, 300, led)['validation']['state'], 'history_unverified')   # proof not performed
+        self.assertEqual(brain.build(g, self.reg, 300, led, history_problems=['x'])['validation']['state'], 'history_unverified')
+        out = brain.build(g, self.reg, 300, led, history_problems=[])
+        self.assertEqual((out['validation']['state'], out['validation']['certified']), ('active', ['x']))
+
+
+class ThreeDayDeadline(unittest.TestCase):
+    """Review #5911845265, P2-I: an admitted game without a proven result is a loss once the report clock passes 3 days."""
+    SINCE = T0 - timedelta(days=1)
+
+    def lonely(self):
+        return [sig('o', None, 0)]                                                    # admitted, never settled, nothing after it
+
+    def test_just_before_and_just_after_the_deadline(self):
+        before = brain.confirmation(self.lonely(), self.SINCE, 0.025, as_of=T0 + timedelta(days=2, hours=23))
+        self.assertEqual((before['admitted'], before['games'], before['pending'], before['voided_as_loss']), (1, 0, 1, 0))
+        after = brain.confirmation(self.lonely(), self.SINCE, 0.025, as_of=T0 + timedelta(days=3, hours=1))
+        self.assertEqual((after['admitted'], after['games'], after['pending'], after['voided_as_loss']), (1, 1, 0, 1))
+        self.assertLess(after['log10_e'], 0)
+        exact = brain.confirmation(self.lonely(), self.SINCE, 0.025, as_of=T0 + timedelta(days=3))
+        self.assertEqual(exact['voided_as_loss'], 1)                                  # closes at the deadline itself
+
+    def test_no_clock_never_anticipates_a_loss(self):
+        c = brain.confirmation(self.lonely(), self.SINCE, 0.025)
+        self.assertEqual((c['games'], c['pending']), (0, 1))
+
+    def test_late_result_after_the_deadline_stays_a_loss_and_same_instant_same_answer(self):
+        late = [sig('o', 1.0, 0, known=4 * 24 * 60)]                                    # result seen on day 4: too late
+        c1 = brain.confirmation(late, self.SINCE, 0.025, as_of=T0 + timedelta(days=5))
+        c2 = brain.confirmation(self.lonely(), self.SINCE, 0.025, as_of=T0 + timedelta(days=5))
+        self.assertEqual((c1['games'], c1['voided_as_loss'], c1['log10_e']), (c2['games'], c2['voided_as_loss'], c2['log10_e']))
+        reg = {'a': hyp()}
+        led = make_ledger(reg, [(['a'], -30)])
+        g = series(THREE_IN_FOUR[:40], every=CHAIN) + [sig('open', None, 41 * CHAIN)]
+        a = brain.build(g, reg, 300, led, history_problems=[], as_of=T0 + timedelta(days=30))
+        b = brain.build(g, reg, 300, led, history_problems=[], as_of=T0 + timedelta(days=30))
+        self.assertEqual(a['validation'], b['validation'])                             # register=False/True use the same clock
 
 
 if __name__ == '__main__':
     unittest.main()
+

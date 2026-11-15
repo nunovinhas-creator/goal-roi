@@ -350,7 +350,7 @@ def _log_mean_exp(logs):
     return top + math.log(sum(math.exp(x - top) for x in logs) / len(logs))
 
 
-def confirmation(match, since, alpha):
+def confirmation(match, since, alpha, as_of=None):
     """Teste de confirmação com nível garantido: e-processo de apostas (testing by betting), em cadeia sem sobreposição.
 
     Amostra (revisões #5911603577 e #5911747123), toda decidida com informação disponível na hora de cada decisão:
@@ -361,7 +361,9 @@ def confirmation(match, since, alpha):
     3. CADEIA SEM SOBREPOSIÇÃO (P1-F): um candidato só é admitido se, na hora da sua decisão, o último jogo admitido já
        estiver fechado; os outros são ignorados. Cada fator é assim decidido depois de revelados todos os anteriores;
     4. um jogo admitido fecha quando o seu resultado é observado (hora provada); se não for observado até OPEN_TIMEOUT_DAYS
-       depois da decisão, fecha nesse instante como PERDA (y = −1), definitivamente.
+       depois da decisão, fecha nesse instante como PERDA (y = −1), definitivamente — logo que o relógio do relatório
+       (`as_of`, explícito e reproduzível) chegue ao prazo, mesmo sem nenhuma aposta posterior (revisão #5911845265, P2-I).
+       Sem `as_of` (avaliações históricas sem relógio), um jogo pendente fica pendente: nunca se antecipa uma perda.
 
     Nulo H₀ (por hipótese): para cada aposta admitida, E[y | tudo o que o sistema sabia na hora da decisão] <= 0, com y o
     lucro à odd anunciada −2 % (y = 0 se devolvida/anulada). Como (1 − λ) <= 1 + λ·y para todo y >= −1, o fator efetivo nunca
@@ -423,6 +425,9 @@ def confirmation(match, since, alpha):
             voided += 1
         open_until = known
         close(y, known)
+    if pending and as_of is not None and as_of >= open_until:   # o prazo passou no relógio do relatório: perda, nesse prazo
+        close(-1.0, open_until)
+        voided, pending = voided + 1, False
     shown = lambda x: round(math.exp(x), 4) if x < 700 else None   # e-valor legível; acima de e^700 só o log10
     return {'games': n, 'admitted': admitted, 'voided_as_loss': voided, 'pending': admitted - n, 'skipped': skipped,
             'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
@@ -484,7 +489,7 @@ def stable_status(steps, corrected_bar, min_settled, *, certified_from=_PR2):
     return state, pending, changes
 
 
-def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None, legacy=()):
+def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None, legacy=(), as_of=None):
     """-> (linhas, hipóteses testadas, fasquia de referência 1 − α/testadas; esta já não decide estados).
 
     selected: {id: (rank, α, hora)} do registo de seleções verificado (certification.selections); None = validação não
@@ -528,7 +533,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if hid not in by_id:
             continue
         ok = certifiable(registry[hid])
-        c = confirmation(matches[hid], t, alpha) if ok else {'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
+        c = confirmation(matches[hid], t, alpha, as_of) if ok else {'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
         by_id[hid]['confirmation'] = dict(c, rank=rank, selected_utc=chronology.iso(t), certifiable=ok, certified_utc=chronology.iso(c['certified_at']))
         del by_id[hid]['confirmation']['certified_at']
         if c['certified_at'] is not None:
@@ -710,7 +715,7 @@ def multiplicity(rows, tested):
             'note': 'promissora/abandonada are uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)'}
 
 
-def validation(rows, ledger, problems, registry):
+def validation(rows, ledger, problems, registry, history_unverified=False):
     """O que "forte"/"confirmada" significam, com que garantia, e se a certificação está ativa (registo de seleções)."""
     sel = sorted((r for r in rows if r.get('confirmation')), key=lambda r: r['confirmation']['rank'])
     active = ledger is not None and not problems
@@ -718,7 +723,8 @@ def validation(rows, ledger, problems, registry):
     candidates = sorted(r['id'] for r in rows if active and r['status'] == 'promissora' and r['id'] not in known and certifiable(registry.get(r['id'])))
     closeness = lambda r: (r['confirmation'].get('log10_e') or 0) - math.log10(r['confirmation']['threshold'])
     return {'method': VALIDATION_METHOD, 'alpha': FWER_ALPHA,
-            'state': 'active' if active else 'not_activated' if ledger is None else 'ledger_invalid',
+            'state': ('active' if active else 'not_activated' if ledger is None else 'history_unverified' if history_unverified
+                      else 'ledger_invalid'),
             'ledger_valid': active, 'ledger_problems': problems if ledger is not None else [],
             'activated_utc': ledger.get('activated_utc') if active else None, 'legacy': len(ledger.get('legacy') or []) if active else 0,
             'ledger_head_sha256': certification.head(ledger) if active else None, 'ledger_entries': len(ledger.get('entries') or []) if active else 0,
@@ -743,8 +749,13 @@ def validation(rows, ledger, problems, registry):
             'closest': [dict(r['confirmation'], id=r['id']) for r in sorted(sel, key=closeness, reverse=True)[:5]]}
 
 
-def build(signals, registry, min_settled, ledger=None):
-    """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada."""
+def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None):
+    """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada.
+
+    history_problems: resultado de certification.history_proof (revisão #5911845265, P1-H). Com registo, a certificação só
+    fica ativa se a prova de integridade histórica tiver sido feita e não tiver problemas; None (prova não feita) também
+    desliga tudo (fail-closed). as_of: relógio do relatório, para fechar como perda os jogos pendentes além do prazo.
+    """
     all_signals = signals
     signals = [b for b in all_signals if eligible(b)]
     excluded = {}
@@ -756,8 +767,11 @@ def build(signals, registry, min_settled, ledger=None):
     for r in exploratory_rows:
         exploratory_counts[r['status']] = exploratory_counts.get(r['status'], 0) + 1
     selected, problems = certification.selections(ledger, registry)
+    history_unverified = ledger is not None and not problems and history_problems != []
+    if history_unverified:
+        problems = ['history: %s' % p for p in (history_problems or ['integrity proof not performed'])]
     legacy = {x.get('id') for x in (ledger or {}).get('legacy') or [] if isinstance(x, dict)} if not problems else set()
-    rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected if not problems else None, legacy=legacy)
+    rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected if not problems else None, legacy=legacy, as_of=as_of)
     fams = {}
     for b in signals:
         if b['w'] is not None and b['w'] != 0 and b['odds']:
@@ -777,7 +791,7 @@ def build(signals, registry, min_settled, ledger=None):
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even'),
                                  'certified': bool(r.get('confirmation') and r['confirmation']['certified_utc'])})
-    mult, valid = multiplicity(rows, tested), validation(rows, ledger, problems, registry)
+    mult, valid = multiplicity(rows, tested), validation(rows, ledger, problems, registry, history_unverified)
     for r in rows:
         r['open'] = len(r['open'])
         r.pop('_games', None)
