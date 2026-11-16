@@ -606,6 +606,10 @@ class RepeatedLooksP1D(unittest.TestCase):
         shifted_t = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in test.items()}   # efeito de dia enorme nos dois lados
         shifted_c = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in ctrl.items()}
         self.assertEqual(llm_eval.compare([(1.0, shifted_t)], [(1.0, shifted_c)])['d'], 1.0)
+        # tamanhos diários desiguais e efeito de dia: só a diferença DENTRO do dia dá D = 1 (comparar com a média global daria −1,5)
+        t2 = {'t0a': (day(0), 1.0, None), 't0b': (day(0), 1.0, None), 't0c': (day(0), 1.0, None), 't1': (day(1), 11.0, None)}
+        c2 = {'c0': (day(0), 0.0, None), 'c1a': (day(1), 10.0, None), 'c1b': (day(1), 10.0, None), 'c1c': (day(1), 10.0, None)}
+        self.assertEqual(llm_eval.compare([(1.0, t2)], [(1.0, c2)])['d'], 1.0)
         unpaired = llm_eval.compare([(1.0, test)], [(1.0, {'c': (day(9), 0.0, None)})])
         self.assertEqual((unpaired['days_paired'], unpaired['p']), (0, None))
 

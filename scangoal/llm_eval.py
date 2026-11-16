@@ -273,7 +273,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     horizon, confirm = windows(protocol_time)
     confirmatory = confirm is not None and as_of >= confirm
     clock = confirm if confirmatory else as_of
-    cutoff = min(clock, horizon) if horizon is not None else clock
+    cutoff = cutoff_of(as_of, protocol_time)   # fecho da janela: min(relógio, H)
     as_of = clock
     # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
@@ -300,8 +300,9 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         key = (hid, start)
         if key not in cache:
             h = registry[hid] if hid in registry else {'family': hid[len('family:'):], 'conditions': []}
-            cache[key] = {g: v for g, v in admitted(match(h['family'], h['conditions']), start).items()
-                          if horizon is None or v[2] <= horizon}   # janela fechada no horizonte H (§0-B)
+            # A janela fecha em H porque a vista só tem sinais lidos até min(relógio, H) e a decisão de uma aposta é a sua leitura
+            # (guarda única, testada: test_P1D_window_ends_at_the_horizon).
+            cache[key] = admitted(match(h['family'], h['conditions']), start)
         return cache[key]
 
     # Hipóteses registadas depois do fecho da janela não existem para esta avaliação (nem nas contagens): o resultado não
@@ -457,10 +458,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         hits = insights.Votes()
         for _, _, gr in brain.ordered_games(rows):
             if brain.game_category(gr, born_eff[hid]) == 'prospective':
-                bet = brain.committed_bet(brain.game_core(gr))
-                if horizon is not None and (bet is None or chronology.decision_time(bet) > horizon):
-                    continue   # mesma janela que a comparação: nada decidido depois de H (§0-B)
-                for b in brain.game_core(gr):
+                for b in brain.game_core(gr):   # mesma janela que a comparação: a vista já termina em min(relógio, H)
                     hits.add(b)
         hh, mm, be, n = hits.totals()
         table.append({'id': hid, 'group': group_of[hid], 'representative': grp[group_of[hid]][0] == hid, 'mode': h.get('mode'),
