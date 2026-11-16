@@ -55253,6 +55253,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-16T12:59:29+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "3f920012831b42f757677b05ae21790d48821da4a5756125e75dfc70927569ae",
+   "registry_size": 6390,
+   "report_generated_at_utc": "2026-11-16T12:59:29+00:00",
+   "response_sha256": "954052169b2fa855acfc788e93d522cd4a4e71368e81a4655e8da8284bd8abcb"
+  },
+  "reason": "Jogo com pouco tempo restante e muitos golos",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Minuto = 61 em diante": {
   "born_utc": "2026-11-14T16:23:50+00:00",
   "conditions": [
