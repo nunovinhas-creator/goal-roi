@@ -56,3 +56,92 @@ declaradas, e publicado de imediato para obter uma prova de publicação do serv
 - O nascimento das hipóteses continua provado pela hora dos commits de dados em `main` (feitos pelo coletor em GitHub Actions).
   Não se cruza com os registos de execução do servidor. É uma melhoria possível, fora destes três pontos.
 - A hora de publicação é indicada ao avaliador e confirmada pela auditoria: o script não tem rede e não a consulta sozinho.
+
+---
+
+# Auditoria independente #5916209217 (SHA `ea3b970`) — P1-D: avaliações repetidas e controlo de α
+
+O v2 é imutável. Foi registado o **protocolo `llm_incremental_v3`** (`audits/pr4-llm-protocol-v3.md`, sha256 `e3190be0…89a4`)
+num commit próprio (`0766a13`), com as emendas declaradas em §0. O v1 e o v2 ficam intactos como registo histórico e são recusados pelo código.
+
+**Prova de publicação do v3:** a execução de Actions
+[43822686064](https://github.com/nunovinhas-creator/goal-roi/actions/runs/43822686064) tem `head_sha` = `0766a13` e
+`created_at` = **2026-11-16T07:16:49Z** (commit às 07:16:42Z). Logo:
+- **P** = 2026-11-16T07:16:49Z;
+- **H** = 2026-12-16T07:16:49Z;
+- **C** = 2026-12-19T07:16:49Z.
+
+## 1. Avaliações repetidas não produzem falsas significâncias
+
+- **Horizonte único:** a janela fecha em H = P + 30 dias. A única avaliação confirmatória é a que tem o relógio em C = H + 3 dias,
+  o prazo de liquidação.
+- **Antes de C**, o veredicto é sempre `exploratória — antes do instante confirmatório (sem conclusão)`, qualquer que seja o p,
+  e as análises adicionais não têm p ajustado.
+- **Em C ou depois**, o relógio fica fixado em C e a avaliação ignora tudo o que veio depois:
+  - sinais lidos depois de H, mesmo dentro de jogos da janela;
+  - resultados observados depois de C;
+  - hipóteses registadas depois de H, que nem entram nas contagens; o script indica quantas são, nas entradas.
+
+  Correr outra vez dá exatamente o mesmo resultado, byte a byte.
+- **Sem extensão:** se faltar amostra em C, o veredicto `evidência insuficiente` é definitivo para o v3. Uma nova tentativa exige
+  outro protocolo, com nova publicação e só dados novos.
+- **Mínimos preservados:** os de jogos, grupos e diversidade temporal mantêm-se. Acresce ≥ 14 dias emparelhados, necessário ao novo teste.
+
+## 2. Calibração do teste sob ausência de utilidade incremental
+
+Simulação reprodutível, com sementes fixas e 2 000 repetições por cenário (erro de Monte Carlo 0,0049):
+`audits/pr4-evidence/calibration_check.py` → `calibration.json`.
+
+| Cenário nulo | v3: inversão de sinais por dia | v2: bootstrap por blocos de dia |
+|---|---|---|
+| 14 dias, efeito de dia moderado | 0,0510 | 0,0730 |
+| 21 dias, efeito de dia forte | 0,0475 | 0,0695 |
+| 30 dias, efeito de dia forte | 0,0540 | 0,0545 |
+| 21 dias, LLM em cotações longas e controlos em curtas | 0,0430 | 0,0545 |
+| 21 dias, LLM em cotações curtas e controlos em longas | **0,0640** | 0,0705 |
+
+- O bootstrap do v2 era anticonservador; foi substituído no v3 por diferenças dentro do mesmo dia, testadas por inversão aleatória de
+  sinais por dia. O efeito comum de cada dia cancela-se.
+- **Risco residual, declarado:** no último cenário (lados com perfis de cotação opostos, que tornam assimétricas as diferenças
+  diárias), o v3 rejeita 6,4 %. O intervalo de 95 % é 0,054–0,074 e exclui 0,05: é ligeiramente anticonservador nesse caso.
+  Fica melhor do que o v2 e dentro do critério de α + 3 erros-padrão que fixei, mas por pouco. Na prática, os controlos são
+  emparelhados por família, tamanho e apoio, o que reduz esta assimetria. Corrigi-la exigiria outro teste, portanto um v4; não o
+  fiz sem autorização.
+- **Poder** (referência, 30 dias): 16,7 % com um efeito de +10 % e 38,5 % com +20 %.
+
+## 3. Paragem oportunista
+
+Sob a hipótese nula, com 600 séries:
+- olhar nos dias 14, 16, …, 30 e parar no primeiro p ≤ 0,05 rejeita **12,0 %**;
+- o olhar único no horizonte rejeita **5,8 %**.
+
+O v3 só permite o segundo.
+
+## 4. Testes e mutação
+
+- **8 testes novos do P1-D:**
+  - antes de C nenhum olhar conclui, mesmo com p < 0,05;
+  - o resultado confirmatório é idêntico em C, C + 1 dia e C + 90 dias, mesmo com dados muito favoráveis depois de H;
+  - a janela termina em H;
+  - hipóteses registadas depois de H não são avaliadas;
+  - a paragem oportunista inflaciona α e o olhar único não;
+  - o teste está calibrado sob a nula;
+  - caso exato pequeno (p = 1/8);
+  - o efeito de dia cancela-se, incluindo com tamanhos diários desiguais.
+- Mais 1 teste para o mínimo de dias emparelhados.
+- **Defeitos encontrados pelos testes novos e corrigidos:** a taxa de acerto descritiva, a contagem de pertença e as
+  características dos sinais usavam dados posteriores a H; a contagem de hipóteses registadas depois da janela vinha do registo posterior.
+- **Primeira mutação (47 mutantes):** 3 sobreviveram.
+  - Dois eram guardas redundantes (os filtros da janela já estavam implicados pela vista lida até H); foram substituídos por uma guarda
+    única e testada, `cutoff_of`.
+  - Um era uma lacuna de teste: o emparelhamento por dia não se distinguia com efeitos de dia simétricos. Acrescentou-se um caso com
+    tamanhos diários desiguais.
+- O resultado final está em `audits/pr4-evidence/mutation_check.txt`.
+
+## 5. Resultado com o v3 (`main` congelado em `d91d839`, 07:28:38Z)
+
+- **Veredicto:** `exploratória — antes do instante confirmatório (sem conclusão)`. Ainda não há jogos depois de P.
+- 56 hipóteses LLM, 56 grupos (iguais a 0,80 e 0,90), 34 representantes na primária, 17 sem controlos suficientes.
+- 27 das 56 propostas eram redundantes no instante da proposta.
+- Janela pós-registo e pré-protocolo, só descrição, 5 dias: LLM 108 jogos a −0,061 por jogo; controlos 150 jogos a +0,033.
+- **Confirmatório:** a avaliação com o relógio em 2026-12-19T07:16:49Z, uma única vez.

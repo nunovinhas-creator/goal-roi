@@ -10,6 +10,15 @@ protocol: content hash                        CAUGHT
 protocol: introducing commit                  CAUGHT
 evidence: only prospective games              CAUGHT
 evidence: as_of view                          CAUGHT
+P1-D: window closes at min(clock, H)          CAUGHT
+P1-D: view limited to signals read by the window close CAUGHT
+P1-D: exploratory before C                    CAUGHT
+P1-D: clock fixed at C                        CAUGHT
+P1-D: born after the window not evaluated     CAUGHT
+P1-D: secondary untested before C             CAUGHT
+P1-D: horizon of 30 days                      CAUGHT
+test: within-day pairing                      CAUGHT
+minimum: paired days                          CAUGHT
 evidence: start = max(birth, protocol)        CAUGHT
 verdict: proof problems first                 CAUGHT
 minimum: groups                               CAUGHT
