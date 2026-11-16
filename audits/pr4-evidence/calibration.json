@@ -1,0 +1,79 @@
+{
+ "alpha": 0.05,
+ "meaning": "null scenarios have no incremental utility: same expected profit on both sides",
+ "null_scenarios": [
+  {
+   "monte_carlo_se": 0.0049,
+   "scenario": "14 dias, efeito de dia moderado",
+   "sims": 2000,
+   "v2_bootstrap_rejection": 0.073,
+   "v3_signflip_rejection": 0.051,
+   "v3_within_alpha_plus_3se": true
+  },
+  {
+   "monte_carlo_se": 0.0049,
+   "scenario": "21 dias, efeito de dia forte",
+   "sims": 2000,
+   "v2_bootstrap_rejection": 0.0695,
+   "v3_signflip_rejection": 0.0475,
+   "v3_within_alpha_plus_3se": true
+  },
+  {
+   "monte_carlo_se": 0.0049,
+   "scenario": "30 dias, efeito de dia forte",
+   "sims": 2000,
+   "v2_bootstrap_rejection": 0.0545,
+   "v3_signflip_rejection": 0.054,
+   "v3_within_alpha_plus_3se": true
+  },
+  {
+   "monte_carlo_se": 0.0049,
+   "scenario": "21 dias, LLM em cotações longas, controlos curtas",
+   "sims": 2000,
+   "v2_bootstrap_rejection": 0.0545,
+   "v3_signflip_rejection": 0.043,
+   "v3_within_alpha_plus_3se": true
+  },
+  {
+   "monte_carlo_se": 0.0049,
+   "scenario": "21 dias, LLM em cotações curtas, controlos longas",
+   "sims": 2000,
+   "v2_bootstrap_rejection": 0.0705,
+   "v3_signflip_rejection": 0.064,
+   "v3_within_alpha_plus_3se": true
+  }
+ ],
+ "ok": true,
+ "optional_stopping": {
+  "looks_days": [
+   14,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   28,
+   30
+  ],
+  "replicates_per_test": 500,
+  "sims": 600,
+  "single_look_at_horizon_rejection": 0.0583,
+  "stop_at_first_significant_look_rejection": 0.12
+ },
+ "power": [
+  {
+   "days": 30,
+   "scenario": "efeito +10 %",
+   "sims": 1000,
+   "v3_signflip_power": 0.167
+  },
+  {
+   "days": 30,
+   "scenario": "efeito +20 %",
+   "sims": 1000,
+   "v3_signflip_power": 0.385
+  }
+ ],
+ "replicates_per_test": 1000
+}
