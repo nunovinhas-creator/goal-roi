@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-16T02:24:59+00:00",
- "messages": 1029,
+ "generated_at_utc": "2026-11-16T02:29:16+00:00",
+ "messages": 1030,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 36,
   "BETFAIR": 197,
-  "STAKE_LOAD": 203,
+  "STAKE_LOAD": 204,
   "OPEN_GAME": 161,
   "TOTALS_FORM": 54,
   "WEAKENED_LINEUP": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1720,
+  "versions": 1721,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 14,
-  "last_collected_at_utc": "2026-11-16T02:01:33+00:00",
+  "last_collected_at_utc": "2026-11-16T02:29:15+00:00",
   "hl_results": 53,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 34,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 2,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T02:24:57+00:00",
+  "collector_last_run_utc": "2026-11-16T02:29:15+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 1,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 138,
+  "stake_original_seen": 139,
   "stake_no_score_after_kickoff": 29,
   "stake_sent_45_after_kickoff": 47,
   "goal_lists": 351,
   "goal_lists_consistent": 197
  },
- "unique_bets": 572,
+ "unique_bets": 573,
  "settled_bets": 460,
  "unsettled_market": 56,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1089,7 +1089,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 83,
+   "bets": 84,
    "settled": 52,
    "matches": 26,
    "wins": 20,
@@ -1516,7 +1516,7 @@
    "roi_announced_odds": -0.0936,
    "seen_late": 0,
    "by_bot_mark": 66,
-   "per_day": 33.0,
+   "per_day": 32.9,
    "days_to_hint": 0,
    "days_to_conclusion": 6,
    "prudent_rate": 0.435,
@@ -1529,7 +1529,7 @@
    "prob_above_cut": 0.1129
   },
   "STAKE_LOAD": {
-   "signals": 148,
+   "signals": 149,
    "with_result": 98,
    "hits": 43,
    "misses": 52,
@@ -2855,7 +2855,7 @@
    },
    {
     "n": 10,
-    "signals": 17,
+    "signals": 18,
     "hits": 6,
     "misses": 4,
     "hit_rate": 0.6,
@@ -3022,7 +3022,7 @@
    },
    {
     "n": 270,
-    "signals": 342,
+    "signals": 343,
     "hits": 153,
     "misses": 117,
     "hit_rate": 0.553,
@@ -3126,8 +3126,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 727,
-   "eligible": 572,
+   "total": 728,
+   "eligible": 573,
    "excluded": 155,
    "reasons": {
     "no_valid_odds": 107,
@@ -3142,7 +3142,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6202,
+    "em observação": 6205,
     "promissora": 51,
     "abandonada": 5
    },
@@ -4199,11 +4199,11 @@
     }
    ]
   },
-  "hypotheses": 6258,
+  "hypotheses": 6261,
   "tested": 380,
   "corrected_bar": null,
   "counts": {
-   "em observação": 6252,
+   "em observação": 6255,
    "abandonada": 2,
    "promissora": 4
   },
@@ -4948,6 +4948,72 @@
       }
      ],
      "bad_total": 11
+    },
+    {
+     "match_id": "switzerland-vs-scotland-20261116",
+     "match": "Switzerland — Scotland",
+     "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-16T19:45+00:00",
+     "date_utc": "2026-11-16T02:28:51+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1x2",
+     "selection": "Switzerland",
+     "odds": 1.71,
+     "odds_last": 1.71,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 52,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 29,
+       "games": 15,
+       "hits": 9,
+       "break_even": 0.5402,
+       "prob_above": 0.022,
+       "roi": -0.4487,
+       "edge": -0.1971,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = várias",
+       "conditions": [
+        [
+         "Número de apostas",
+         "várias"
+        ]
+       ],
+       "n": 27,
+       "games": 19,
+       "hits": 10,
+       "break_even": 0.5421,
+       "prob_above": 0.0309,
+       "roi": -0.3754,
+       "edge": -0.1708,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 30
     }
    ],
    "counts": {
@@ -4955,9 +5021,9 @@
     "misto": 3,
     "sem evidência": 0,
     "contraditório": 0,
-    "evitar": 1
+    "evitar": 2
    },
-   "generated_utc": "2026-11-16T02:25:12+00:00",
+   "generated_utc": "2026-11-16T02:29:29+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4970,7 +5036,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 6205,
+     "hypotheses": 6208,
      "judged": 3055,
      "as_expected": 1433
     },
@@ -5117,7 +5183,7 @@
     "roi_cut": 0.0039
    },
    "skipped": {
-    "bets": 343,
+    "bets": 344,
     "settled": 253,
     "games": 125,
     "wins": 118,
@@ -16401,7 +16467,7 @@
    },
    {
     "n": 31,
-    "signals": 65,
+    "signals": 66,
     "hits": 13,
     "misses": 18,
     "hit_rate": 0.4262,
@@ -16441,7 +16507,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 32,
+    "open": 33,
     "born_verified": true,
     "game_set": "485398173f95ccd5",
     "prospective": {
@@ -16861,12 +16927,12 @@
     "roi_announced_odds": -0.0936,
     "seen_late": 0,
     "by_bot_mark": 66,
-    "per_day": 33.0,
+    "per_day": 32.9,
     "days_to_hint": 0,
     "days_to_conclusion": 6
    },
    "STAKE_LOAD": {
-    "signals": 138,
+    "signals": 139,
     "with_result": 89,
     "hits": 40,
     "misses": 46,
@@ -17357,7 +17423,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 572,
+   "bets": 573,
    "settled": 460,
    "matches": 274,
    "wins": 217,
@@ -17392,6 +17458,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-16T02:28:51+00:00",
+   "match_id": "switzerland-vs-scotland-20261116",
+   "group": "STAKE_LOAD/pre",
+   "match": "Switzerland — Scotland",
+   "selection": "1x2: Switzerland",
+   "odds": 1.71,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-16T01:59:56+00:00",
    "match_id": "quindio-vs-real-cartagena-20261116",
@@ -18319,22 +18398,6 @@
    "w": 1.0,
    "settled_by": "marca do bot",
    "n_signals": 2,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T19:27:11+00:00",
-   "match_id": "croatia-vs-czech-republic-20261115",
-   "group": "POLYMARKET/pre",
-   "match": "Croatia — Czech Republic",
-   "selection": "Under 2.5",
-   "odds": 2.22,
-   "ft": [
-    2,
-    1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
    "max_mult": 1
   }
  ],
@@ -20539,6 +20602,26 @@
      "share": 80,
      "mkt_volume": 16000.0,
      "market": "1X2"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "switzerland-vs-scotland-20261116": {
+   "teams": [
+    "Switzerland",
+    "Scotland"
+   ],
+   "events": [
+    {
+     "d": "2026-11-16T02:28:51+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Switzerland",
+     "odds": 1.71,
+     "market": "1x2",
+     "total": 5000.0
     }
    ],
    "goals": null,
@@ -25185,7 +25268,7 @@
    "day": "2026-11-15"
   },
   {
-   "bets": 7,
+   "bets": 8,
    "settled": 5,
    "wins": 3,
    "units": 0.32,
