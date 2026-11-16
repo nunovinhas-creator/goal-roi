@@ -95,6 +95,13 @@ class Leakage(unittest.TestCase):
         self.assertEqual(llm_eval.admitted(g, T0 + timedelta(minutes=20)), {})              # resultado visto 10 min depois do início
         self.assertEqual(llm_eval.admitted(g, T0 + timedelta(minutes=50)), {})              # sinal anterior ao início
 
+    def test_a_result_of_the_game_seen_before_the_decision_excludes_it(self):
+        # aposta decidível e lida a tempo, mas o sistema já tinha visto um resultado desse jogo (outro mercado ou outro tipo de
+        # sinal) antes da decisão: não é uma decisão válida (com a margem de 15 min do relatório)
+        self.assertEqual(llm_eval.admitted([sig('g', 1.0, 60, first=-10)], T0), {})
+        self.assertEqual(llm_eval.admitted([sig('g', 1.0, 60, first=10)], T0), {})
+        self.assertEqual(len(llm_eval.admitted([sig('g', 1.0, 60, first=20)], T0)), 1)
+
     def test_T4_signal_read_after_its_result_is_never_evidence(self):
         self.assertEqual(llm_eval.admitted([sig('g', 1.0, 60, seen=200, known=145)], T0), {})
         self.assertEqual(len(llm_eval.admitted([sig('g', 1.0, 60)], T0)), 1)
@@ -665,6 +672,10 @@ class EProcessV4(unittest.TestCase):
         self.assertEqual(lm['primary']['path'][0]['x'], -1.0)                                 # LLM sem resultado: perda total
         self.assertEqual(cm['primary']['path'][0]['x'], 0.0)                                  # controlo sem resultado: ganho máximo
         self.assertEqual(lm['hypotheses'][0]['protocol_games'], 1)                            # admitido: a admissão não depende do resultado
+        late = [dict(b, result_known_utc=iso(T0 + timedelta(days=5)), match_result_first_seen_utc=iso(T0 + timedelta(days=5)))
+                if b['match_id'] == 'A0-d1' else b for b in signals]                         # ganhou, mas só se soube 4 dias depois
+        with patch.multiple(llm_eval, **FAST):
+            self.assertEqual(run(late, registry, as_of=T0 + timedelta(days=10))['primary']['path'][0]['x'], -1.0)
 
     def test_admission_never_depends_on_the_result(self):
         signals, registry = world([1.0, -1.0], [1.0, -1.0], days=10)

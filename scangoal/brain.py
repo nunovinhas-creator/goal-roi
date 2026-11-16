@@ -831,7 +831,7 @@ def track_record(rows):
     Só evidência prospetiva (a definição única da PR 3: jogos operacionais posteriores ao registo) e lucro por jogo. Não
     julga nem confirma nenhuma hipótese: uma probabilidade ou taxa de acerto acima de 50 % não é prova de nada e nunca é
     apresentada como tal, nem aqui nem ao modelo de linguagem. A avaliação incremental da LLM está em scangoal.llm_eval
-    (protocolo audits/pr4-llm-protocol-v3.md).
+    (protocolo audits/pr4-llm-protocol-v4.md).
     """
     groups, llm = {}, []
     for r in rows:
@@ -848,7 +848,7 @@ def track_record(rows):
         if r['source'] == 'llm':
             llm.append({'id': r['id'], 'games': p['games'], 'roi': p.get('roi'), 'expect': r.get('expect') or 'acima', 'mode': r.get('mode')})
     return {'by_source': groups, 'min_results': TRACK_MIN, 'unit': 'prospective_independent_games', 'criterion': None,
-            'meaning': 'descriptive only: no hypothesis is confirmed or refuted here; see audits/pr4-llm-protocol-v3.md',
+            'meaning': 'descriptive only: no hypothesis is confirmed or refuted here; see audits/pr4-llm-protocol-v4.md',
             'llm_with_prospective_evidence': len(llm), 'llm': sorted(llm, key=lambda h: (-h['games'], h['id']))[:12]}
 
 

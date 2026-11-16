@@ -1,79 +1,109 @@
 {
+ "a_sel_boundary": {
+  "ci95_upper": 1.0,
+  "meaning": "H0 does not hold here although each bet is fair: this is why A-sel is declared",
+  "rejection": 1.0,
+  "scenario": "composição do dia dependente dos resultados desse dia (viola A-sel)",
+  "sims": 400
+ },
  "alpha": 0.05,
- "meaning": "null scenarios have no incremental utility: same expected profit on both sides",
- "null_scenarios": [
+ "lambda_cap": 0.5,
+ "lambda_start": 0.125,
+ "meaning": "anytime rejection = max over closed days of K >= 20; null = equal expected profit per game on both sides",
+ "null": [
   {
-   "monte_carlo_se": 0.0049,
-   "scenario": "14 dias, efeito de dia moderado",
-   "sims": 2000,
-   "v2_bootstrap_rejection": 0.073,
-   "v3_signflip_rejection": 0.051,
-   "v3_within_alpha_plus_3se": true
+   "ci95_upper": 0.003,
+   "days": 120,
+   "rejection": 0.001,
+   "scenario": "mistura igual, efeito de dia forte",
+   "sims": 1000,
+   "theorem_conditions_hold": true
   },
   {
-   "monte_carlo_se": 0.0049,
-   "scenario": "21 dias, efeito de dia forte",
-   "sims": 2000,
-   "v2_bootstrap_rejection": 0.0695,
-   "v3_signflip_rejection": 0.0475,
-   "v3_within_alpha_plus_3se": true
+   "ci95_upper": 0.0,
+   "days": 120,
+   "rejection": 0.0,
+   "scenario": "LLM curtas, controlos muito longas",
+   "sims": 1000,
+   "theorem_conditions_hold": true
   },
   {
-   "monte_carlo_se": 0.0049,
-   "scenario": "30 dias, efeito de dia forte",
-   "sims": 2000,
-   "v2_bootstrap_rejection": 0.0545,
-   "v3_signflip_rejection": 0.054,
-   "v3_within_alpha_plus_3se": true
+   "ci95_upper": 0.003,
+   "days": 120,
+   "rejection": 0.001,
+   "scenario": "LLM muito longas, controlos curtas",
+   "sims": 1000,
+   "theorem_conditions_hold": true
   },
   {
-   "monte_carlo_se": 0.0049,
-   "scenario": "21 dias, LLM em cotações longas, controlos curtas",
-   "sims": 2000,
-   "v2_bootstrap_rejection": 0.0545,
-   "v3_signflip_rejection": 0.043,
-   "v3_within_alpha_plus_3se": true
+   "ci95_upper": 0.0,
+   "days": 120,
+   "rejection": 0.0,
+   "scenario": "poucos jogos por dia, cotações opostas",
+   "sims": 1000,
+   "theorem_conditions_hold": true
   },
   {
-   "monte_carlo_se": 0.0049,
-   "scenario": "21 dias, LLM em cotações curtas, controlos longas",
-   "sims": 2000,
-   "v2_bootstrap_rejection": 0.0705,
-   "v3_signflip_rejection": 0.064,
-   "v3_within_alpha_plus_3se": true
+   "ci95_upper": 0.0064,
+   "days": 120,
+   "rejection": 0.003,
+   "scenario": "dependência total dentro do dia",
+   "sims": 1000,
+   "theorem_conditions_hold": true
+  },
+  {
+   "ci95_upper": 0.0,
+   "days": 120,
+   "rejection": 0.0,
+   "scenario": "seleção adaptativa entre dias",
+   "sims": 1000,
+   "theorem_conditions_hold": true
   }
  ],
  "ok": true,
- "optional_stopping": {
-  "looks_days": [
-   14,
-   16,
-   18,
-   20,
-   22,
-   24,
-   26,
-   28,
-   30
-  ],
-  "replicates_per_test": 500,
-  "sims": 600,
-  "single_look_at_horizon_rejection": 0.0583,
-  "stop_at_first_significant_look_rejection": 0.12
- },
  "power": [
   {
-   "days": 30,
-   "scenario": "efeito +10 %",
-   "sims": 1000,
-   "v3_signflip_power": 0.167
+   "ci95_upper": 0.0099,
+   "days": 90,
+   "rejection": 0.0033,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300
   },
   {
-   "days": 30,
-   "scenario": "efeito +20 %",
-   "sims": 1000,
-   "v3_signflip_power": 0.385
+   "ci95_upper": 0.0213,
+   "days": 90,
+   "rejection": 0.01,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300
+  },
+  {
+   "ci95_upper": 0.0213,
+   "days": 180,
+   "rejection": 0.01,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300
+  },
+  {
+   "ci95_upper": 0.0788,
+   "days": 180,
+   "rejection": 0.0533,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300
+  },
+  {
+   "ci95_upper": 0.0099,
+   "days": 365,
+   "rejection": 0.0033,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300
+  },
+  {
+   "ci95_upper": 0.1339,
+   "days": 365,
+   "rejection": 0.1,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300
   }
  ],
- "replicates_per_test": 1000
+ "threshold": 20.0
 }

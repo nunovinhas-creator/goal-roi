@@ -145,3 +145,109 @@ O v3 só permite o segundo.
 - 27 das 56 propostas eram redundantes no instante da proposta.
 - Janela pós-registo e pré-protocolo, só descrição, 5 dias: LLM 108 jogos a −0,061 por jogo; controlos 150 jogos a +0,033.
 - **Confirmatório:** a avaliação com o relógio em 2026-12-19T07:16:49Z, uma única vez.
+
+---
+
+# Auditoria independente #5916502096 (SHA `1986596`) — P1-E: calibração sob cotações diferentes e assimetria
+
+Decisões do proprietário (16/11/2026):
+- o teste por apostas é o único critério confirmatório;
+- o bootstrap-t fica só como diagnóstico;
+- o horizonte é de 365 dias;
+- é preciso demonstrar o controlo do erro de tipo I a 5 % para a hipótese definida; sem garantia demonstrável, o resultado fica exploratório.
+
+## 1. O problema confirmou-se e é maior do que 6,4 %
+
+`audits/pr4-evidence/p1e_method_comparison.py` → `p1e_method_comparison.json`: 2 000 simulações por cenário, mesma esperança de
+lucro por jogo nos dois lados.
+
+| Cenário nulo | Inversão de sinais (v3) | Bootstrap-t | Apostas (grelha) | Apostas (λ adaptativo) |
+|---|---|---|---|---|
+| mesma mistura, efeito de dia forte | 0,059 | 0,061 [0,051–0,071] | 0,000 | 0,000 |
+| LLM curtas, controlos muito longas | 0,063 | 0,052 | 0,000 | 0,000 |
+| idem, poucos jogos por dia | **0,092** [0,079–0,104] | 0,051 | 0,000 | 0,000 |
+
+- A inversão de sinais exige diferenças diárias simétricas, que cotações opostas destroem.
+- O bootstrap-t fica perto do nominal, mas sem prova (até 6,1 %).
+
+## 2. Protocolo v4 e garantia
+
+- **Registo:** `audits/pr4-llm-protocol-v4.md` (sha256 `055d7a62…b167`), commit próprio `d48e3b7`. O v1, o v2 e o v3 ficam intactos.
+- **Prova de publicação:** Actions run [43828482856](https://github.com/nunovinhas-creator/goal-roi/actions/runs/43828482856),
+  `head_sha` = `d48e3b7`, `created_at` **2026-11-16T08:05:26Z** (commit às 08:05:15Z). Logo:
+  - P = 2026-11-16T08:05:26Z;
+  - H = 2027-11-16T08:05:26Z;
+  - C = 2027-11-19T08:05:26Z.
+- **H0 (§6-A):** para cada dia emparelhado e fechado j, E[X_j | X_1..X_{j−1}] ≤ 0, com
+  X_j = (m_L,j − m_C,j) / (1 + ganho máximo médio dos controlos) ≥ −1.
+- **Teorema:** com λ_j ∈ [0, 1/2] dependente só dos dias anteriores, K_j = Π(1 + λ_i X_i) é uma supermartingala não negativa.
+  Pela desigualdade de Ville, P(existe j com K_j ≥ 20) ≤ 0,05. A demonstração está no protocolo.
+- **O que a garantia cobre:**
+  - qualquer dependência entre jogos e entre dias;
+  - quaisquer cotações e assimetria;
+  - seleção que dependa de dias anteriores;
+  - resultados em falta (imputação desfavorável: −1 na LLM, ganho máximo nos controlos);
+  - olhares repetidos e paragem a qualquer momento.
+
+  Por isso o v4 permite concluir antes do horizonte, e uma conclusão nunca é reescrita.
+- **Fronteira declarada (A-sel):** se a composição de um dia dependesse dos resultados desse mesmo dia, H0 deixa de coincidir com
+  "cada aposta é justa". A suposição fica explícita em cada relatório e foi testada em simulação: nesse caso o teste rejeita, como devia.
+- **Demonstrável:** a garantia vale para H0 tal como definida. A interpretação "por aposta" depende de A-sel, que é plausível no
+  sistema (a entrada depende só das mensagens do bot e de hipóteses fixadas antes do dia) mas não é verificável pelos dados.
+
+## 3. Calibração adversarial do v4
+
+Feita com a função de produção `llm_eval.eprocess`: `audits/pr4-evidence/calibration_check.py` → `calibration.json`.
+Usa 1 000 simulações por cenário, 120 dias, 5 % de resultados em falta e rejeição a qualquer momento.
+
+| Cenário nulo | Rejeição | Limite superior a 95 % | Hipóteses do teorema |
+|---|---|---|---|
+| mistura igual, efeito de dia forte | 0,001 | 0,003 | sempre |
+| LLM curtas, controlos muito longas | 0,000 | 0,000 | sempre |
+| LLM muito longas, controlos curtas | 0,001 | 0,003 | sempre |
+| poucos jogos por dia, cotações opostas | 0,000 | 0,000 | sempre |
+| dependência total dentro do dia | 0,003 | 0,006 | sempre |
+| seleção adaptativa entre dias | 0,000 | 0,000 | sempre |
+| **fronteira A-sel (viola H0)** | 1,000 | — | — |
+
+As simulações não substituem o teorema: confirmam que a implementação respeita as suas hipóteses e que o erro fica muito abaixo de 5 %.
+
+## 4. Revisões retroativas dos dados (ponto 4)
+
+- **Prova de publicação das observações**, exigida em cada avaliação:
+  - `messages.jsonl` só cresce;
+  - os resultados nunca são alterados nem removidos depois de publicados;
+  - cada observação é publicada até 30 min depois do seu carimbo.
+
+  No histórico real há zero problemas: as mensagens chegam ao git até 6,3 min depois do carimbo e os resultados até 1 min.
+- **Avaliação final** sempre sobre o primeiro commit de `main` com hora ≥ C; revisões posteriores não lhe chegam.
+- **Testes com repositórios git temporários:**
+  - mensagem reescrita;
+  - mensagem ou resultado com data recuada;
+  - resultado alterado ou removido;
+  - histórico raso;
+  - observações antigas não verificadas de novo, mas reescritas sempre detetadas;
+  - escolha do commit final.
+
+## 5. Risco residual principal: poder baixo, sobretudo pelos resultados em falta
+
+- **Taxa real** (`audits/pr4-evidence/missing_results_rate.txt`, dias já fechados): 12 de 51 jogos (23,5 %) sem resultado
+  comprovado em 3 dias, quase todos Betfair (12 de 39, 31 %). A amostra é pequena.
+- **Efeito no poder:** com a imputação desfavorável, o poder simulado com 5 % em falta e efeito de +20 % é de 1 % a 90 dias, 5 % a
+  180 dias e 10 % a 365 dias (sem dados em falta seria ≈ 84 % a 365 dias). Com 31 % em falta nas hipóteses Betfair, o poder é
+  praticamente nulo.
+- **Conclusão honesta:** o v4 controla o erro de tipo I, mas dificilmente concluirá utilidade enquanto a cobertura de resultados
+  Betfair não melhorar. Qualquer alternativa (por exemplo, tratar os resultados em falta como aleatórios) trocaria a garantia por
+  uma suposição e exigiria um v5 com decisão do proprietário. Não foi feito.
+
+## 6. Testes, mutação e resultado
+
+- **Testes:** 340 em Python 3.11.
+- **Mutação:** 64 mutantes. Na primeira passagem sobreviveu 1 ("nenhum resultado do jogo observado antes da decisão"): era uma
+  lacuna real, porque a regra só era exercida em conjunto com a exigência de decidibilidade. Acrescentou-se um teste com um resultado
+  do mesmo jogo, vindo de outro mercado, observado antes da decisão. O resultado final está em `audits/pr4-evidence/mutation_check.txt`.
+- **Resultado** (`main` congelado em `ab60140`): `em curso — sem conclusão (e-processo abaixo de 20)`, ainda sem dias fechados depois
+  de P. 56 hipóteses LLM, 56 grupos.
+- **Comparação com `main`:** estados, certificação desligada, mensagens Telegram (0) e dados idênticos.
+- **Truncagem em dados reais:** invariante.
+- **Conclusão científica:** exploratória; nenhuma validação de vantagem.
