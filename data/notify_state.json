@@ -163,13 +163,15 @@
    "attempt_utc": "2026-11-16T21:01:32+00:00",
    "chars": 609,
    "created_utc": "2026-11-16T21:01:32+00:00",
+   "done_utc": "2026-11-16T21:01:32+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "status",
    "sha256": "080b64d1d219b0b9930098941cdc93a2c11d3a8a4aedeeb3d76cff1a5b5cae40",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "status|em observação>promissora|d2f3630cf125|31@2026-11-16T18:19:52+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T18:20:17+00:00",
@@ -186,16 +188,20 @@
    "state": "delivered"
   },
   "summary|2026-11-16": {
+   "attempt_utc": "2026-11-16T21:01:32+00:00",
+   "chars": 520,
    "created_utc": "2026-11-16T21:01:32+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "summary",
-   "state": "pending"
+   "sha256": "aca21599c12434095800976259cf3dc07f0d86dd9492d247816ec0c35eeff653",
+   "state": "in_flight"
   }
  },
  "delivery_counts": {
-  "delivered": 10
+  "delivered": 11
  },
  "format_last_run_utc": "2026-11-16T20:59:32+00:00",
  "health": {
@@ -416,6 +422,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
+ "oscillations": [],
  "regime": {
   "BETFAIR/live": "poucos dados",
   "BETFAIR/pre": "poucos dados",
@@ -425,7 +432,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 322,
+ "sent_total": 323,
  "statuses": {
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
@@ -437,7 +444,10 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada"
  },
- "summary_day": "2026-11-15",
+ "summary_counts": {
+  "delivered": 11
+ },
+ "summary_day": "2026-11-16",
  "watch_sent": [
   "2026-11-14T09:24:18+00:00|Bayswater City — Sydney Olympic|Over 5",
   "2026-11-14T10:09:15+00:00|India — Bhutan|Over 4.5",
