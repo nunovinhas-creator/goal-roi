@@ -20,7 +20,11 @@ retro: 30-minute publication window           CAUGHT
 retro: observations need full history         CAUGHT
 retro: final data commit at or after C        CAUGHT
 evidence: as_of view                          CAUGHT
-evidence: start = max(birth, protocol)        CAUGHT
+evidence: start = max(next day after birth, protocol) CAUGHT
+v5: next-day rule (not the birth instant)     CAUGHT
+v5: next day is the following midnight        CAUGHT
+v5: per-bet claim only with a conclusion      CAUGHT
+v5: result digest excludes run metadata       CAUGHT
 admission: committed bet operational after start CAUGHT
 admission: no result seen before the decision CAUGHT
 admission: result only within 3 days          CAUGHT
