@@ -1,5 +1,10 @@
 {
  "announced_changes": {
+  "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "at_utc": "2026-11-16T18:31:13+00:00",
+   "from": "em observação",
+   "to": "abandonada"
+  },
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": {
    "at_utc": "2026-11-16T18:20:17+00:00",
    "from": "em observação",
@@ -8,6 +13,7 @@
  },
  "announced_statuses": {
   "Betfair | Dia = dia de semana": "abandonada",
+  "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -59,6 +65,18 @@
    "sha256": "44ad13fe6f2e35932f546a477dc10762acfb31ad449cea9a5fd821e2805c5488",
    "state": "delivered"
   },
+  "status|em observação>abandonada|804b9a582d13|37@2026-11-16T18:29:37+00:00|3973e022e932": {
+   "attempt_utc": "2026-11-16T18:31:13+00:00",
+   "chars": 582,
+   "created_utc": "2026-11-16T18:31:13+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "status",
+   "sha256": "bc597a7a406c9a02e6c2f6231a9e6311d5b0e5d7ecb5c9163038f1c9f8b437b3",
+   "state": "in_flight"
+  },
   "status|em observação>promissora|d2f3630cf125|31@2026-11-16T18:19:52+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T18:20:17+00:00",
    "chars": 597,
@@ -77,22 +95,22 @@
  "delivery_counts": {
   "delivered": 4
  },
- "format_last_run_utc": "2026-11-16T18:24:54+00:00",
+ "format_last_run_utc": "2026-11-16T18:29:13+00:00",
  "health": {
   "reference": {
    "bsd_results": 20,
-   "eligible": 627,
+   "eligible": 630,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 61,
-   "hypotheses": 6817,
+   "hypotheses": 6857,
    "settled_bets": 479,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 8,
+   "statuses": 9,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-16T18:24:54+00:00",
+ "last_run_utc": "2026-11-16T18:29:13+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -256,6 +274,7 @@
   }
  },
  "notice_games": {
+  "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 5,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": 49,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 29,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 41,
@@ -293,6 +312,7 @@
  "sent_total": 316,
  "statuses": {
   "Betfair | Dia = dia de semana": "abandonada",
+  "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
