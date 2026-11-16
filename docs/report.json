@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-16T02:35:49+00:00",
+ "generated_at_utc": "2026-11-16T02:42:26+00:00",
  "messages": 1032,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 2,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T02:35:49+00:00",
+  "collector_last_run_utc": "2026-11-16T02:42:03+00:00",
   "name_review": [
    {
     "bot": [
@@ -1516,7 +1516,7 @@
    "roi_announced_odds": -0.0936,
    "seen_late": 0,
    "by_bot_mark": 66,
-   "per_day": 32.9,
+   "per_day": 32.8,
    "days_to_hint": 0,
    "days_to_conclusion": 6,
    "prudent_rate": 0.435,
@@ -1590,7 +1590,7 @@
    "roi_announced_odds": 0.0366,
    "seen_late": 7,
    "by_bot_mark": 0,
-   "per_day": 12.4,
+   "per_day": 12.3,
    "days_to_hint": 0,
    "days_to_conclusion": 20,
    "prudent_rate": 0.6256,
@@ -5183,7 +5183,7 @@
     "contraditório": 0,
     "evitar": 2
    },
-   "generated_utc": "2026-11-16T02:36:02+00:00",
+   "generated_utc": "2026-11-16T02:42:40+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -16715,17 +16715,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 83,
-  "llm_last_run_utc": "2026-11-16T01:41:54+00:00",
+  "llm_runs": 84,
+  "llm_last_run_utc": "2026-11-16T02:42:05+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-16",
-   "calls_today": 2,
-   "neurons_today": 440.1,
+   "calls_today": 3,
+   "neurons_today": 624.9,
    "accepted_today": 2,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "note": "apresenta um alto acerto de 0.8889, mas a amostra é pequena",
+    "at_utc": "2026-11-16T02:42:05+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 18,
+    "hits": 16,
+    "hit_rate": 0.8889,
+    "break_even": 0.5527,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Faixa de odd = odd 2,00 a 3,00 & Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
+    "note": "tem uma taxa de acerto baixa, de 0.7273, o que pode indicar uma hipótese menos promissora",
+    "at_utc": "2026-11-16T02:42:05+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 11,
+    "hits": 8,
+    "hit_rate": 0.7273,
+    "break_even": 0.463,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite",
+    "note": "mostra um acerto de 0.814, mas é necessário mais dados para confirmar sua eficácia",
+    "at_utc": "2026-11-16T02:42:05+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 22,
+    "hits": 18,
+    "hit_rate": 0.814,
+    "break_even": 0.5873,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "note": "apresenta um acerto alto, mas a amostra é pequena",
@@ -16824,39 +16857,6 @@
     "hit_rate": 0.701,
     "break_even": 0.5442,
     "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
-    "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena com apenas 20 resultados",
-    "at_utc": "2026-11-14T21:24:11+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 11,
-    "hits": 9,
-    "hit_rate": 0.8182,
-    "break_even": 0.5551,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
-    "note": "tem um acerto de 0.7391, o que pode ser considerado moderado, com uma amostra razoável de 48 resultados",
-    "at_utc": "2026-11-14T21:24:11+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 58,
-    "hits": 38,
-    "hit_rate": 0.6549,
-    "break_even": 0.5619,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
-    "note": "apresenta um alto acerto de 0.9211, mas a amostra é pequena",
-    "at_utc": "2026-11-14T17:27:37+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 11,
-    "hits": 9,
-    "hit_rate": 0.8182,
-    "break_even": 0.5551,
-    "status": "em observação"
    }
   ],
   "entry_points": [
@@ -17058,7 +17058,7 @@
     "roi_announced_odds": 0.1113,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 31.8,
+    "per_day": 31.7,
     "days_to_hint": 0,
     "days_to_conclusion": 6
    },
@@ -17087,7 +17087,7 @@
     "roi_announced_odds": -0.0936,
     "seen_late": 0,
     "by_bot_mark": 66,
-    "per_day": 32.9,
+    "per_day": 32.8,
     "days_to_hint": 0,
     "days_to_conclusion": 6
    },
@@ -17116,7 +17116,7 @@
     "roi_announced_odds": -0.1608,
     "seen_late": 0,
     "by_bot_mark": 19,
-    "per_day": 24.8,
+    "per_day": 24.7,
     "days_to_hint": 0,
     "days_to_conclusion": 9
    },

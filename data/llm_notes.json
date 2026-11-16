@@ -1,6 +1,24 @@
 [
  {
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+  "note": "apresenta um alto acerto de 0.8889, mas a amostra é pequena",
+  "at_utc": "2026-11-16T02:42:05+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Faixa de odd = odd 2,00 a 3,00 & Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
+  "note": "tem uma taxa de acerto baixa, de 0.7273, o que pode indicar uma hipótese menos promissora",
+  "at_utc": "2026-11-16T02:42:05+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite",
+  "note": "mostra um acerto de 0.814, mas é necessário mais dados para confirmar sua eficácia",
+  "at_utc": "2026-11-16T02:42:05+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
   "note": "apresenta um acerto alto, mas a amostra é pequena",
   "at_utc": "2026-11-15T22:38:16+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
@@ -219,24 +237,6 @@
   "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
   "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena",
   "at_utc": "2026-11-13T14:00:08+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-  "note": "apresenta um alto acerto de 1.0, mas a amostra é pequena com apenas 11 resultados.",
-  "at_utc": "2026-11-13T10:04:50+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Betfair | Faixa de odd = odd 2,00 a 3,00 & Odd depois do sinal = subiu",
-  "note": "tem um baixo acerto de 0.5714, sugerindo que esta hipótese pode não ser promissora.",
-  "at_utc": "2026-11-13T10:04:50+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais",
-  "note": "apresenta um acerto de 1.0, mas a amostra é muito pequena com apenas 8 resultados, requerendo mais dados para confirmação.",
-  "at_utc": "2026-11-13T10:04:50+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
  }
 ]
