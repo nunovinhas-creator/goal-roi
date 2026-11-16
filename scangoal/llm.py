@@ -7,14 +7,20 @@ Como o modelo viu resultados, as propostas entram com origem 'llm' e só contam 
 Segredos: CLOUDFLARE_ACCOUNT_ID e MASTER_BRAIN_LLM_API_KEY (só no cabeçalho; nunca impressos). Sem eles, não faz nada.
 Orçamento (plano gratuito: 10 000 neurónios por dia, reposto às 00:00 UTC): uma chamada por hora, em quatro modos que
 rodam (novas, refinar, evitar, notas); pára quando a estimativa do dia chega a 8 000 neurónios.
-Limites: 5 propostas por chamada, 30 por dia e 300 no total; uma proposta precisa de pelo menos 5 sinais já existentes.
+Limites: 5 propostas por chamada; sem limite diário nem total de hipóteses (só o orçamento de neurónios limita); uma proposta
+precisa de pelo menos 5 sinais já existentes.
+PR 4: rejeita duplicados exatos e redundâncias extensionais demonstradas no instante da proposta (mesmos sinais que uma
+hipótese existente ou que uma sub-combinação das suas condições; nunca por semelhança). Cada proposta aceite guarda a sua
+proveniência (sha256 do pedido e da resposta). O balanço enviado ao modelo é só descritivo e só com evidência prospetiva:
+nenhuma percentagem acima de 50 % lhe é apresentada como confirmação.
 """
+import hashlib
 import json, os, re, sys
 from datetime import datetime, timedelta, timezone
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from . import brain, insights
+from . import brain, equivalence, insights
 from .results_bsd import load_json
 from .store import data_dir
 
@@ -74,15 +80,12 @@ def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None):
     if weak:
         lines += ['', 'Hipóteses com pior desempenho até agora:']
         lines += ['- %s -> %d resultados, acerto %s, precisa %s' % (h['id'], h['n'], h['hit_rate'], h['break_even']) for h in weak[:12]]
-    if track and track.get('llm_judged'):   # o modelo recebe o balanço das suas propostas anteriores, medido só em dados posteriores a cada uma
-        row = lambda h: '- %s -> %d resultados, acerto %s, precisa %s' % (h['id'], h['n'], h['hit_rate'], h['break_even'])
-        lines += ['', 'Balanço das propostas anteriores do modelo (resultados posteriores à proposta; %d ou mais): %d de %d foram no sentido esperado.'
-                  % (track['min_results'], track['llm_as_expected'], track['llm_judged'])]
-        if track.get('worked'):
-            lines += ['Confirmaram-se até agora:'] + [row(h) for h in track['worked']]
-        if track.get('failed'):
-            lines += ['Falharam até agora:'] + [row(h) for h in track['failed']]
-        lines.append('Aprende com este balanço: aproxima-te do género de hipótese que se confirmou e não repitas o género que falhou.')
+    if track and track.get('llm'):   # PR 4: só descrição, só jogos prospetivos posteriores a cada proposta; nunca "confirmou-se"
+        lines += ['', 'Propostas anteriores do modelo com %d ou mais jogos independentes depois do registo (só descrição: nenhuma está'
+                  % track['min_results'], 'confirmada nem refutada; uma taxa de acerto acima de 50 % não prova nada):']
+        lines += ['- %s -> %d jogos, lucro médio por jogo %s à odd anunciada (esperado: %s)'
+                  % (h['id'], h['games'], '—' if h.get('roi') is None else ('%+.2f' % h['roi']), h.get('expect') or 'acima') for h in track['llm']]
+        lines.append('Amostras curtas e ruidosas: não concluas que um género de hipótese funciona ou falhou. Propõe hipóteses com lógica própria.')
     if mode == 'notas':
         lines += ['', 'Escreve até 3 observações curtas e prudentes sobre o que estes números sugerem. Cada observação refere UMA hipótese da lista,',
                   'copiando o identificador exatamente como está escrito (o texto antes de "->"). Não inventes números; diz quando a amostra é pequena.',
@@ -126,8 +129,13 @@ def neurons(model, usage, prompt, raw):
     return round((tin * pin + tout * pout) / 1e6, 1)
 
 
-def accept(raw, vocab, registry, support=None, expect='acima'):
-    """Texto do modelo -> propostas válidas [(id, entrada)] e número de rejeitadas. Tudo o que não bate com o vocabulário é rejeitado."""
+def accept(raw, vocab, registry, support=None, expect='acima', redundancy=None, reasons=None):
+    """Texto do modelo -> propostas válidas [(id, entrada)] e número de rejeitadas. Tudo o que não bate com o vocabulário é rejeitado.
+
+    redundancy: equivalence.Redundancy do instante da proposta (redundância extensional demonstrada agora; as aceites na mesma
+    resposta também contam).
+    reasons: dicionário opcional que recebe a contagem das rejeições por motivo."""
+    count = (lambda k: reasons.__setitem__(k, reasons.get(k, 0) + 1)) if reasons is not None else (lambda k: None)
     m = re.search(r'\{.*\}', raw or '', re.S)
     try:
         items = json.loads(m[0])['hypotheses'] if m else []
@@ -139,17 +147,28 @@ def accept(raw, vocab, registry, support=None, expect='acima'):
             fam, conds = it['family'], [(str(c[0]), str(c[1])) for c in it['conditions']]
         except (KeyError, TypeError, IndexError):
             bad += 1
+            count('malformed')
             continue
         dims = [c[0] for c in conds]
         ok = (fam in vocab and 1 <= len(conds) <= MAX_CONDITIONS and len(set(dims)) == len(dims)
               and all(d in vocab[fam] and v in vocab[fam][d] for d, v in conds))
         hid = brain.hyp_id(fam, conds) if ok else None
+        why = None if ok else 'vocabulary'
         if ok and support is not None and support(fam, set(conds)) < MIN_SUPPORT:
-            ok = False                                       # poucos sinais assim: nunca chegaria a ter amostra
-        if not ok or hid in registry or hid in seen or len(good) >= MAX_PER_RUN:
+            ok, why = False, 'support'                       # poucos sinais assim: nunca chegaria a ter amostra
+        if ok and (hid in registry or hid in seen):
+            ok, why = False, 'duplicate'
+        if ok and len(good) >= MAX_PER_RUN:
+            ok, why = False, 'over_limit'
+        if ok and redundancy is not None and redundancy.reason(fam, conds):
+            ok, why = False, 'equivalent'                    # mesmos sinais que uma hipótese existente ou que uma sub-combinação
+        if not ok:
             bad += 1
+            count(why)
             continue
         seen.add(hid)
+        if redundancy is not None:
+            redundancy.register(fam, conds, hid)
         good.append((hid, {'family': fam, 'conditions': [list(c) for c in sorted(conds)], 'source': 'llm', 'reason': clean(it.get('reason')), 'expect': expect}))
     return good, bad
 
@@ -182,11 +201,12 @@ def run(call=request, now=None, env=None):
     support = lambda fam, conds: sum(1 for f, at in have if f == fam and conds <= at)
     top = rep['brain']['top']
     weak = sorted((h for h in top if h['prob_above'] is not None), key=lambda h: h['prob_above'])[:12]
-    outcome, good, bad, used, notes, cost = 'ok', [], 0, None, [], 0.0
+    outcome, good, bad, used, notes, cost, why = 'ok', [], 0, None, [], 0.0, {}
     if not vocab:
         outcome = 'no_data'
     else:
         prompt, raw = build_prompt(vocab, top, len(registry), mode, weak, rep['brain'].get('track')), None
+        checker = equivalence.Redundancy(signals, registry)
         for model in MODELS:
             try:
                 res = call(account, key, model, prompt)
@@ -204,14 +224,19 @@ def run(call=request, now=None, env=None):
                     stamped = [dict(n, at_utc=now.isoformat(timespec='seconds'), model=used) for n in notes]
                     npath.write_text(json.dumps((stamped + old)[:40], indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
             else:
-                good, bad = accept(raw, vocab, registry, support, 'abaixo' if mode == 'evitar' else 'acima')
+                size = len(registry)
+                good, bad = accept(raw, vocab, registry, support, 'abaixo' if mode == 'evitar' else 'acima', checker, why)
+                provenance = {'prompt_sha256': hashlib.sha256(prompt.encode('utf-8')).hexdigest(),
+                              'response_sha256': hashlib.sha256(raw.encode('utf-8')).hexdigest(),
+                              'report_generated_at_utc': rep.get('generated_at_utc'), 'registry_size': size}
                 for hid, entry in good:
-                    registry[hid] = dict(entry, born_utc=now.isoformat(timespec='seconds'), model=used, mode=mode)
+                    registry[hid] = dict(entry, born_utc=now.isoformat(timespec='seconds'), model=used, mode=mode, provenance=provenance)
                 if good:
                     rpath.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     state.update(last_run_utc=now.isoformat(timespec='seconds'), runs=state.get('runs', 0) + 1, accepted=state.get('accepted', 0) + len(good),
                  rejected=state.get('rejected', 0) + bad, last_outcome=outcome, last_model=used, last_accepted=len(good), last_rejected=bad,
-                 last_mode=mode, last_notes=len(notes), neurons_today=round(state.get('neurons_today', 0) + cost, 1),
+                 last_mode=mode, last_notes=len(notes), rejected_equivalent=state.get('rejected_equivalent', 0) + why.get('equivalent', 0),
+                 last_rejected_equivalent=why.get('equivalent', 0), neurons_today=round(state.get('neurons_today', 0) + cost, 1),
                  accepted_today=state.get('accepted_today', 0) + len(good), calls_today=state.get('calls_today', 0) + (1 if used else 0))
     spath.parent.mkdir(parents=True, exist_ok=True)
     spath.write_text(json.dumps(state, indent=1, sort_keys=True) + '\n', encoding='utf-8')

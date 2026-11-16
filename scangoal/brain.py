@@ -826,27 +826,30 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
 
 
 def track_record(rows):
-    """Balanço do processo de descoberta: das hipóteses com 10 ou mais resultados, quantas foram no sentido esperado, por origem.
+    """Balanço DESCRITIVO do processo de descoberta, por origem (PR 4, decisão do proprietário de 15/11/2026).
 
-    As do modelo de linguagem só contam resultados posteriores à proposta; as do gerador servem de termo de comparação.
+    Só evidência prospetiva (a definição única da PR 3: jogos operacionais posteriores ao registo) e lucro por jogo. Não
+    julga nem confirma nenhuma hipótese: uma probabilidade ou taxa de acerto acima de 50 % não é prova de nada e nunca é
+    apresentada como tal, nem aqui nem ao modelo de linguagem. A avaliação incremental da LLM está em scangoal.llm_eval
+    (protocolo audits/pr4-llm-protocol-v5.md).
     """
-    groups, worked, failed = {}, [], []
+    groups, llm = {}, []
     for r in rows:
         if not r['conditions']:
             continue
         key = 'gerador' if r['source'] == 'gerador' else '%s/%s' % (r['source'], r.get('mode') or 'novas')
-        g = groups.setdefault(key, {'hypotheses': 0, 'judged': 0, 'as_expected': 0})
+        g = groups.setdefault(key, {'hypotheses': 0, 'with_prospective_evidence': 0, 'prospective_games': 0})
         g['hypotheses'] += 1
-        if r['games'] < TRACK_MIN or r['prob_above'] is None:
+        p = r.get('prospective') or {}
+        if (p.get('games') or 0) < TRACK_MIN:
             continue
-        ok = (r['prob_above'] < 0.5) if r.get('expect') == 'abaixo' else (r['prob_above'] > 0.5)
-        g['judged'] += 1
-        g['as_expected'] += ok
+        g['with_prospective_evidence'] += 1
+        g['prospective_games'] += p['games']
         if r['source'] == 'llm':
-            (worked if ok else failed).append({k: r.get(k) for k in ('id', 'n', 'games', 'hit_rate', 'break_even', 'prob_above', 'expect')})
-    llm = [g for k, g in groups.items() if k.startswith('llm')]
-    return {'by_source': groups, 'min_results': TRACK_MIN, 'llm_judged': sum(g['judged'] for g in llm), 'llm_as_expected': sum(g['as_expected'] for g in llm),
-            'worked': sorted(worked, key=lambda r: -r['games'])[:6], 'failed': sorted(failed, key=lambda r: -r['games'])[:6]}
+            llm.append({'id': r['id'], 'games': p['games'], 'roi': p.get('roi'), 'expect': r.get('expect') or 'acima', 'mode': r.get('mode')})
+    return {'by_source': groups, 'min_results': TRACK_MIN, 'unit': 'prospective_independent_games', 'criterion': None,
+            'meaning': 'descriptive only: no hypothesis is confirmed or refuted here; see audits/pr4-llm-protocol-v5.md',
+            'llm_with_prospective_evidence': len(llm), 'llm': sorted(llm, key=lambda h: (-h['games'], h['id']))[:12]}
 
 
 def known_at(b):

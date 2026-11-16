@@ -7,7 +7,7 @@ Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunc
 import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
-from . import brain, certification, insights
+from . import brain, certification, insights, llm_eval
 from .eligibility import eligible, exclusion_reasons
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
@@ -580,6 +580,7 @@ def build(csv_path=None, register=False, now=None):
     brn['notes'] = [dict(n, n=by_id[n['id']]['n'], hits=by_id[n['id']]['hits'], hit_rate=by_id[n['id']]['hit_rate'], break_even=by_id[n['id']]['break_even'],
                          status=by_id[n['id']]['status']) for n in notes if n.get('id') in by_id][:12]
     brn['entry_points'] = brain.entry_points(signals)
+    brn['llm_evaluation'] = llm_eval.page_summary(signals, registry)   # PR 4: sem histórico git, nunca uma conclusão científica
     return {
         'generated_at_utc': now.isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),

@@ -88,13 +88,33 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Vantagem com intervalo: além da probabilidade de estar acima do necessário, cada hipótese mostra a vantagem estimada em pontos percentuais (acerto menos taxa necessária) com um intervalo de 90 %, e a probabilidade de continuar acima do necessário com 2 % de perda de odd.
 - "Rende mais do que o resto do tipo": probabilidade de a hipótese ter mais vantagem do que os restantes sinais do mesmo tipo. Serve para distinguir uma condição que acrescenta algo de uma que só herda o desempenho do tipo. Só informa; não muda o estado.
 - "Seguir o cérebro teria compensado?": cada sinal com odd é decidido quando o sistema o leu, só com os resultados que já tinha observado e só com as táticas já registadas (PR 3; antes, 150 minutos depois do início do jogo). Segue-se quando encaixa numa tática apostável com 8 jogos e 80 % de probabilidade nessa altura. Sinais lidos tarde demais para apostar são "não reconstituíveis". Compara seguidos com não seguidos.
-- Balanço das propostas: das hipóteses com 10 ou mais jogos, quantas foram no sentido esperado, por origem. O modelo de linguagem recebe o balanço das suas propostas (as que se confirmaram e as que falharam) antes de propor mais.
+- Balanço das propostas (PR 4): só descritivo, por origem, com evidência prospetiva (jogos independentes depois do registo) e lucro por jogo. Nenhuma hipótese é dada como confirmada ou falhada por acertar mais ou menos de metade; o modelo de linguagem recebe só estes números descritivos.
+
+## Avaliação científica da LLM (PR 4)
+`scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol-v5.md` (`llm_incremental_v5`; o código recusa outra versão do ficheiro). O v1 (`audits/pr4-llm-protocol.md`) e os v2 a v4 (`-v2.md` a `-v4.md`) ficam como registo histórico, substituídos depois da revisão e das auditorias independentes da PR #27.
+- Pergunta: as hipóteses do modelo escolhem jogos com mais lucro por jogo (odd −2 %), depois do registo, do que hipóteses comparáveis do gerador (20 controlos pré-selecionados sem ler resultados), no mesmo intervalo?
+- Nascimento efetivo provado pelo histórico git completo (registo só a crescer); sem prova, a avaliação é "não verificada" e não tem conclusão.
+- Só jogos prospetivos (definição da PR 3) posteriores à primeira publicação verificável do protocolo no GitHub (hora do servidor, não do commit) sustentam conclusões; os anteriores são descritivos. Sem prova de publicação, a avaliação é "não verificada".
+- Todas as decisões históricas usam só o que o sistema já tinha lido nesse instante: o apoio dos controlos conta sinais lidos até ao nascimento, e os grupos de equivalência são decididos no nascimento de cada hipótese e nunca revistos.
+- Grupos de hipóteses equivalentes (Jaccard 0,85 por ligação completa, sensibilidade 0,80 e 0,90) contam uma vez.
+- Critério confirmatório único (protocolos v4/v5): um teste por apostas (e-processo) sobre os dias fechados, comparando LLM e controlos dentro de cada dia. A probabilidade de rejeitar falsamente a hipótese nula condicional definida no protocolo (§6-A) é ≤ 5 % por um teorema (desigualdade de Ville), com qualquer dependência entre jogos, mistura de cotações, assimetria e seleção dependente do passado, e mesmo olhando repetidamente. O bootstrap-t é só diagnóstico. Mínimos de grupos, jogos, dias e dias emparelhados.
+- Regra do dia seguinte (v5): uma hipótese, e os seus controlos, só contribui a partir do dia UTC seguinte ao seu nascimento. Assim, tudo o que o sistema escolhe para um dia existe antes de o dia começar.
+- Alcance: o relatório separa a rejeição da hipótese nula condicional (garantida pelo teorema) da afirmação "as apostas da LLM rendem mais", que exige ainda que o bot não escolha que jogos sinalizar em função de resultados de outros jogos do mesmo dia (A-sel; plausível, não verificável). Nunca é prova de vantagem nem certificação.
+- Janela de 365 dias depois da publicação do protocolo. Um dia só entra quando está fechado (3 dias depois do fim); a conclusão, se acontecer, fica com a sua data e nunca é reescrita. Jogos sem resultado comprovado em 3 dias contam contra a hipótese em teste (perda total no lado LLM, ganho máximo no lado dos controlos).
+- Revisões retroativas: a avaliação exige que as mensagens e os resultados só tenham crescido no git e que cada observação tenha sido publicada até 30 minutos depois do seu carimbo; a avaliação final usa sempre o primeiro commit de `main` com hora ≥ C.
+- O resultado científico tem um `result_sha256` próprio; os metadados de cada execução (commit pedido, versão do Python) ficam à parte, em `run`.
+- Calibração e poder: `audits/pr4-evidence/calibration.json` (intervalos exatos de Clopper-Pearson). Com resultados em falta, o poder é baixo (ver `audits/pr4-evidence/missing_results_rate.txt`). Melhorar a cobertura de resultados (por exemplo, aliases de equipas no Betfair) é uma alteração de dados separada, que não muda a metodologia: só ajuda jogos futuros cujo resultado passe a ser observado até 3 dias depois da decisão, e nunca altera dias já fechados.
+- Nunca altera estados, certificação, Telegram ou o registo.
+- Relatório reprodutível: `python3.11 scripts/audit_pr4_llm.py --ref <commit> --protocol-commit <sha> --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação>` (só leitura, sem rede; exige clone completo). Resultado em `audits/pr4-llm-evaluation.md` e `.json`.
+- A página mostra só um resumo sem conclusão (o workflow usa um checkout raso).
 
 ## Investigador (modelo de linguagem)
 `scangoal/llm.py` chama, de hora a hora, um modelo no Cloudflare Workers AI (segredos `CLOUDFLARE_ACCOUNT_ID` e `MASTER_BRAIN_LLM_API_KEY`). Sem os segredos, o passo é ignorado.
 - Quatro modos que rodam: hipóteses novas, refinar as melhores, situações a evitar, e notas sobre uma hipótese concreta.
 - Orçamento: o plano gratuito dá 10 000 neurónios por dia; o código estima o custo de cada chamada e pára aos 8 000.
-- Limites: 5 propostas por chamada, 30 por dia, 300 no total; cada proposta precisa de pelo menos 5 sinais já existentes com essas características.
+- Limites: 5 propostas por chamada; não há limite diário nem total de hipóteses (só o orçamento gratuito de neurónios limita). Cada proposta precisa de pelo menos 5 sinais já existentes com essas características.
+- Duplicados (PR 4): são rejeitadas as propostas iguais a uma hipótese existente e as redundantes no instante da proposta (apanham exatamente os mesmos sinais que uma hipótese existente ou que uma sub-combinação das suas condições). Nunca se rejeita por semelhança. `llm_state.json` conta estas rejeições em `rejected_equivalent`.
+- Proveniência (PR 4): cada proposta aceite guarda o `sha256` do pedido e da resposta, a hora do relatório usado e o tamanho do registo nesse momento.
 - O modelo só recebe números agregados; nunca mensagens. O texto que devolve é limpo e nunca é executado.
 - As propostas entram com origem `llm`: só contam os sinais posteriores ao registo. As notas só entram se referirem uma hipótese existente; os números mostrados vêm dos dados.
 

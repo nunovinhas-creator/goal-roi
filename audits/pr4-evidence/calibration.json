@@ -1,0 +1,174 @@
+{
+ "a_sel_boundary": {
+  "ci95_exact": [
+   0.99082,
+   1.0
+  ],
+  "meaning": "H0 does not hold here although each bet is fair: this is why A-sel is declared",
+  "rejection": 1.0,
+  "rejections": 400,
+  "scenario": "composição do dia dependente dos resultados desse dia (viola A-sel)",
+  "sims": 400,
+  "upper95_one_sided_exact": 1.0
+ },
+ "alpha": 0.05,
+ "lambda_cap": 0.5,
+ "lambda_start": 0.125,
+ "meaning": "anytime rejection = max over closed days of K >= 20; null = equal expected profit per game on both sides",
+ "null": [
+  {
+   "ci95_exact": [
+    2.5e-05,
+    0.005559
+   ],
+   "days": 120,
+   "rejection": 0.001,
+   "rejections": 1,
+   "scenario": "mistura igual, efeito de dia forte",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.004735
+  },
+  {
+   "ci95_exact": [
+    0.0,
+    0.003682
+   ],
+   "days": 120,
+   "rejection": 0.0,
+   "rejections": 0,
+   "scenario": "LLM curtas, controlos muito longas",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.002991
+  },
+  {
+   "ci95_exact": [
+    2.5e-05,
+    0.005559
+   ],
+   "days": 120,
+   "rejection": 0.001,
+   "rejections": 1,
+   "scenario": "LLM muito longas, controlos curtas",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.004735
+  },
+  {
+   "ci95_exact": [
+    0.0,
+    0.003682
+   ],
+   "days": 120,
+   "rejection": 0.0,
+   "rejections": 0,
+   "scenario": "poucos jogos por dia, cotações opostas",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.002991
+  },
+  {
+   "ci95_exact": [
+    0.000619,
+    0.008742
+   ],
+   "days": 120,
+   "rejection": 0.003,
+   "rejections": 3,
+   "scenario": "dependência total dentro do dia",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.007735
+  },
+  {
+   "ci95_exact": [
+    0.0,
+    0.003682
+   ],
+   "days": 120,
+   "rejection": 0.0,
+   "rejections": 0,
+   "scenario": "seleção adaptativa entre dias",
+   "sims": 1000,
+   "theorem_conditions_hold": true,
+   "upper95_one_sided_exact": 0.002991
+  }
+ ],
+ "ok": true,
+ "power": [
+  {
+   "ci95_exact": [
+    8.4e-05,
+    0.018431
+   ],
+   "days": 90,
+   "rejection": 0.0033,
+   "rejections": 1,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.015715
+  },
+  {
+   "ci95_exact": [
+    0.002067,
+    0.028945
+   ],
+   "days": 90,
+   "rejection": 0.01,
+   "rejections": 3,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.025641
+  },
+  {
+   "ci95_exact": [
+    0.002067,
+    0.028945
+   ],
+   "days": 180,
+   "rejection": 0.01,
+   "rejections": 3,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.025641
+  },
+  {
+   "ci95_exact": [
+    0.030788,
+    0.085167
+   ],
+   "days": 180,
+   "rejection": 0.0533,
+   "rejections": 16,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.07988
+  },
+  {
+   "ci95_exact": [
+    8.4e-05,
+    0.018431
+   ],
+   "days": 365,
+   "rejection": 0.0033,
+   "rejections": 1,
+   "scenario": "mistura igual, efeito +10 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.015715
+  },
+  {
+   "ci95_exact": [
+    0.068492,
+    0.139673
+   ],
+   "days": 365,
+   "rejection": 0.1,
+   "rejections": 30,
+   "scenario": "mistura igual, efeito +20 %",
+   "sims": 300,
+   "upper95_one_sided_exact": 0.133188
+  }
+ ],
+ "threshold": 20.0
+}
