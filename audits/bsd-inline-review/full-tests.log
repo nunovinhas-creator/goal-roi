@@ -177,7 +177,7 @@ test_runner_dies_at_every_point_of_a_delivery (test_notify_durability.AcrossRunn
 test_without_the_barrier_a_dead_runner_causes_a_duplicate (test_notify_durability.AcrossRunners.test_without_the_barrier_a_dead_runner_causes_a_duplicate)
 Characterisation of the defect found by the audit (workflow without the barrier, NOTIFY_DURABLE unset). ... ok
 test_nothing_is_transmitted_before_the_intent_of_that_text_is_on_the_remote (test_notify_durability.BarrierOrdering.test_nothing_is_transmitted_before_the_intent_of_that_text_is_on_the_remote) ... ok
-test_real_sender_and_fast_reads_path_publish_before_the_http_request (test_notify_durability.BarrierOrdering.test_real_sender_and_fast_reads_path_publish_before_the_http_request) ... FAIL
+test_real_sender_and_fast_reads_path_publish_before_the_http_request (test_notify_durability.BarrierOrdering.test_real_sender_and_fast_reads_path_publish_before_the_http_request) ... ok
 test_withdrawn_in_state_but_not_in_log (test_notify_durability.WithdrawalCrash.test_withdrawn_in_state_but_not_in_log) ... ok
 test_barrier_enabled_exactly_in_the_two_notifying_steps (test_notify_durability.WorkflowActivation.test_barrier_enabled_exactly_in_the_two_notifying_steps) ... ok
 test_fast_reads_go_through_the_same_run (test_notify_durability.WorkflowActivation.test_fast_reads_go_through_the_same_run) ... ok
@@ -455,7 +455,7 @@ test_network_bridge_and_arbitrary_injection_forbidden (test_recovery_trial_opera
 test_no_inventory_approval_is_not_global_exclusion (test_recovery_trial_operations.Operations.test_no_inventory_approval_is_not_global_exclusion) ... ok
 test_no_key_no_reservation_no_wire_calls (test_recovery_trial_operations.Operations.test_no_key_no_reservation_no_wire_calls) ... ok
 test_output_production_rejected_before_reservation (test_recovery_trial_operations.Operations.test_output_production_rejected_before_reservation) ... ok
-test_preflight_never_asks_for_key_and_remains_blocked (test_recovery_trial_operations.Operations.test_preflight_never_asks_for_key_and_remains_blocked) ... {"as_of_utc": "2026-11-16T22:02:46+00:00", "blockers": ["bsd_key_check_deferred_to_authorized_execution", "quota_not_verified", "insufficient_or_unknown_balance", "account_wide_exclusion_not_proven", "cross_run_budget_not_proven", "live_transport_not_enabled_pending_review"], "bsd_requests": 0, "engine_sha": "247deee40e5e6ebdb107808b66adb96622074238", "excluded_ids": [], "hl_requests": 0, "mode": "preflight_only", "originals_unchanged": true, "production_integrations": 0, "selected_ids": [], "trial_id": "goal-roi-bsd-20261113-15-v1"}
+test_preflight_never_asks_for_key_and_remains_blocked (test_recovery_trial_operations.Operations.test_preflight_never_asks_for_key_and_remains_blocked) ... {"as_of_utc": "2026-11-16T22:03:54+00:00", "blockers": ["bsd_key_check_deferred_to_authorized_execution", "quota_not_verified", "insufficient_or_unknown_balance", "account_wide_exclusion_not_proven", "cross_run_budget_not_proven", "live_transport_not_enabled_pending_review"], "bsd_requests": 0, "engine_sha": "247deee40e5e6ebdb107808b66adb96622074238", "excluded_ids": [], "hl_requests": 0, "mode": "preflight_only", "originals_unchanged": true, "production_integrations": 0, "selected_ids": [], "trial_id": "goal-roi-bsd-20261113-15-v1"}
 ok
 test_reflected_credential_never_written (test_recovery_trial_operations.Operations.test_reflected_credential_never_written) ... ok
 test_remote_cas_descriptor_exact_expected_oid_no_force (test_recovery_trial_operations.Operations.test_remote_cas_descriptor_exact_expected_oid_no_force) ... ok
@@ -675,25 +675,7 @@ test_order_of_the_content (test_telegram_presentation.X_Presentation.test_order_
 test_report_without_presentation_announces_no_status_change (test_telegram_presentation.X_Presentation.test_report_without_presentation_announces_no_status_change) ... ok
 test_classification (test_telegram_presentation.X_Sender.test_classification) ... ok
 
-======================================================================
-FAIL: test_real_sender_and_fast_reads_path_publish_before_the_http_request (test_notify_durability.BarrierOrdering.test_real_sender_and_fast_reads_path_publish_before_the_http_request)
 ----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/user/goal-roi/tests/test_notify_durability.py", line 368, in test_real_sender_and_fast_reads_path_publish_before_the_http_request
-    self.assertEqual(calls, [['in_flight'], ['in_flight']])
-    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: Lists differ: [['in_flight'], ['in_flight'], ['in_flight']] != [['in_flight'], ['in_flight']]
+Ran 612 tests in 37.678s
 
-First list contains 1 additional elements.
-First extra element 2:
-['in_flight']
-
-- [['in_flight'], ['in_flight'], ['in_flight']]
-?                 ---------------
-
-+ [['in_flight'], ['in_flight']]
-
-----------------------------------------------------------------------
-Ran 612 tests in 35.396s
-
-FAILED (failures=1)
+OK
