@@ -3,15 +3,23 @@
 No bootstrap, ref creation, force push or local fallback. Hosting protection and
 account exclusivity remain activation prerequisites, not inferred from this code.
 """
+import base64
 import json
 import os
 import re
 import subprocess
+from datetime import datetime, timezone
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from .recovery_trial import TrialBlocked
 from .recovery_trial_journal import OfflineGitStore, REF
 
 REPOSITORY = 'nunovinhas-creator/goal-roi'
+GITHUB_REMOTE = 'https://github.com/'+REPOSITORY+'.git'
+# Genesis SHA of the protected journal ref. Set ONLY by a separately reviewed
+# commit after the ref is provisioned; runtime input can never choose it, so a
+# recreated/new genesis can never mint another five slots.
+PROVISIONED_ANCHOR = None
+GIT_OP_TIMEOUT = 10
 
 
 class RemoteGitStore(OfflineGitStore):
@@ -21,19 +29,39 @@ class RemoteGitStore(OfflineGitStore):
     pack then uses Git's atomic ref transaction: competing children cannot both
     advance the ref. Every read fetches the remote; cached heads never authorize.
     """
-    def __init__(self, path, remote, anchor):
+    def __init__(self, path, remote, anchor, *, token=None):
         super().__init__(path)
-        if not re.fullmatch('[0-9a-f]{40}', anchor):
+        if not isinstance(anchor, str) or not re.fullmatch('[0-9a-f]{40}', anchor):
             raise TrialBlocked('fixed_anchor_required')
-        if not (remote == 'https://github.com/'+REPOSITORY+'.git' or remote.startswith('file:///')):
+        if remote == GITHUB_REMOTE:
+            # file:// is the offline test server only; the hosted journal is
+            # authoritative only with the reviewed anchor and an explicit token.
+            if PROVISIONED_ANCHOR is None or anchor != PROVISIONED_ANCHOR:
+                raise TrialBlocked('anchor_not_provisioned')
+            if not isinstance(token, str) or not token.strip():
+                raise TrialBlocked('git_auth_missing')
+        elif not remote.startswith('file:///'):
             raise TrialBlocked('remote_not_allowed')
-        self.remote, self.anchor = remote, anchor
+        self.remote, self.anchor, self._token = remote, anchor, token
+        # Absolute UTC end of the tail; every network Git operation is clipped to it.
+        self.not_after = None
 
     def transfer(self, *args):
+        timeout = GIT_OP_TIMEOUT
+        if self.not_after is not None:
+            timeout = min(timeout, (self.not_after-datetime.now(timezone.utc)).total_seconds())
+            if timeout < 1:
+                raise TrialBlocked('tail_time_budget_exhausted')
         env = dict(os.environ, GIT_TERMINAL_PROMPT='0')
+        if self._token:
+            # The isolated cache has no checkout credential. Pass it through
+            # environment config (never argv, never written to the cache config).
+            basic = base64.b64encode(('x-access-token:'+self._token).encode()).decode()
+            env.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',
+                       GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+basic)
         try:
             return subprocess.check_output(['git', '--git-dir='+str(self.path), *args],
-                env=env, stderr=subprocess.DEVNULL, timeout=10)
+                env=env, stderr=subprocess.DEVNULL, timeout=timeout)
         except Exception:
             raise TrialBlocked('remote_git_operation_uncertain') from None
 

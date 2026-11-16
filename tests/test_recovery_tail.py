@@ -201,5 +201,65 @@ replay(s,json.load(open(sys.argv[4])))
         executor.tracker.observe(self.headers,b'{}',self.now);executor()
         self.assertEqual(self.slots.load()[1]['attempts'],{})
 
+    def test_hosted_remote_requires_reviewed_anchor_and_token(self):
+        cache=self.root/'hosted'
+        with self.assertRaisesRegex(TrialBlocked,'anchor_not_provisioned'):
+            remote.RemoteGitStore(cache,remote.GITHUB_REMOTE,self.anchor,token='fake-github-token')
+        with patch.object(remote,'PROVISIONED_ANCHOR',self.anchor):
+            with self.assertRaisesRegex(TrialBlocked,'git_auth_missing'):
+                remote.RemoteGitStore(cache,remote.GITHUB_REMOTE,self.anchor)
+            with self.assertRaisesRegex(TrialBlocked,'anchor_not_provisioned'):
+                remote.RemoteGitStore(cache,remote.GITHUB_REMOTE,'b'*40,token='fake-github-token')
+
+    def test_git_token_only_in_environment_never_argv(self):
+        store=self.remote_store('client');store._token='fake-github-token'
+        with patch.object(remote.subprocess,'check_output',return_value=b'') as run:
+            store.transfer('fetch','--no-tags',store.remote,REF)
+        argv,env=run.call_args.args[0],run.call_args.kwargs['env']
+        self.assertNotIn('fake-github-token',' '.join(argv))
+        self.assertNotIn('fake-github-token',env['GIT_CONFIG_VALUE_0'])  # base64 header only
+        self.assertEqual(env['GIT_CONFIG_KEY_0'],'http.https://github.com/.extraheader')
+
+    def test_tail_budget_clips_git_and_forbids_late_send(self):
+        store=self.remote_store('client');store.not_after=self.now-timedelta(seconds=1)
+        with patch.object(remote.subprocess,'check_output') as run:
+            with self.assertRaisesRegex(TrialBlocked,'budget_exhausted'):store.head()
+            run.assert_not_called()
+        # Reservation confirmed after the last safe send instant: burned, never sent.
+        wire=OfflineWire([WireResponse(200,self.body())])
+        self.slots.send_not_after=self.now-timedelta(seconds=1)
+        with self.assertRaisesRegex(TrialBlocked,'never_resent'):
+            PreparedBSD(wire,self.slots,'100:1','fixture-token',self.out)('bsd',DAY,0,200)
+        self.assertEqual(wire.calls,[])
+        self.assertEqual(len(self.slots.load()[1]['attempts']),1)
+
+    def test_margin_below_full_tail_budget_skips(self):
+        # 690 s left passed the former +100 s rule but not the enforced 150 s tail.
+        executor=tail.PreparedTail(self.slots,'100:1',OfflineWire([WireResponse(200,self.body())]),'fixture-token',
+            self.targets(),job_deadline=self.now+timedelta(seconds=690),downstream_bound=550)
+        executor.tracker.observe(self.headers,b'{}',self.now);executor()
+        self.assertEqual(executor.outcome,'skipped');self.assertEqual(self.slots.load()[1]['attempts'],{})
+
+    def test_unexplained_quota_drop_between_normal_replies_blocks(self):
+        from scangoal.recovery_inline import NormalQuotaTracker
+        def run(drops):
+            tracker=NormalQuotaTracker('100:1',0);remaining=[120]
+            def normal(url,token,observe):
+                h=dict(self.headers,RateLimit=self.headers['RateLimit'].replace('r=105','r=%d'%remaining[0]))
+                observe(h,b'{}',self.now);remaining[0]-=drops;return {}
+            for _ in range(3):tracker.wrap(normal)('url','fake')
+            return tracker.finish_normals()[0]
+        self.assertEqual(run(1).remaining,118)
+        self.assertIsNone(run(2))
+
+    def test_job_deadline_from_real_job_start_only(self):
+        self.assertIsNone(tail.job_deadline_from_env({}))
+        self.assertIsNone(tail.job_deadline_from_env({'GOAL_ROI_JOB_STARTED_UTC':'not-a-time'}))
+        old=(self.now-timedelta(seconds=901)).isoformat()
+        self.assertIsNone(tail.job_deadline_from_env({'GOAL_ROI_JOB_STARTED_UTC':old}))
+        start=self.now-timedelta(seconds=60)
+        self.assertEqual(tail.job_deadline_from_env({'GOAL_ROI_JOB_STARTED_UTC':start.isoformat()}),
+                         start+timedelta(seconds=870))
+
     def test_network_callback_cannot_be_injected(self):
         with self.assertRaises(TrialBlocked):tail.PreparedTail(self.slots,'100:1',lambda *a:None,'fixture-token',self.targets())

@@ -148,3 +148,47 @@ ou contas pagos; proteção disponível no plano/permissões do hosting exige ve
 Fontes oficiais consultadas:
 - https://git-scm.com/docs/git-push (fast-forward, receive-pack e proteção servidor)
 - https://docs.github.com/en/enterprise-cloud@latest/rest/actions/workflow-runs#get-a-workflow-run-attempt
+
+## Continuação sobre `5888959` (2026-11-16)
+
+Auditado `5888959`; todo o trabalho herdado mantém-se (backend Git, cinco slots,
+abandono autenticado, PreparedTail, replay cronológico, testes de concorrência).
+Correções mínimas, só defeitos reais:
+
+- **P1-E — orçamento do tail imposto, não estimado.** Antes: margem de 100 s
+  verificada uma vez, seguida de até ~13 operações Git (10 s cada) + BSD 20 s, o que
+  podia exceder o `timeout-minutes` e cancelar "Start the next collection" (quebra da
+  cadeia). Agora: `TAIL_BUDGET_S=150` exigidos além do bound posterior (>=550 s);
+  cada operação Git remota é cortada ao fim do tail (`not_after`); nenhuma reserva
+  autoriza envio depois de `tail_end-80 s` (BSD 20 s + 4 ops Git de conclusão +
+  replay + persistência). Reserva confirmada tarde = slot queimado, sem envio.
+- **P1-E — prazo real do job.** `job_deadline_from_env()` lê
+  `GOAL_ROI_JOB_STARTED_UTC` (início do job +900 s −30 s de set-up); ausente/inválido
+  => skip. Requer a linha proposta em `collect-yml-proposal.patch` (NÃO instalada).
+- **P1-A — âncora fixada em código revisto.** O remoto GitHub exige
+  `anchor == PROVISIONED_ANCHOR` (hoje `None` => bloqueado). Nenhum input de runtime
+  escolhe a âncora; recriar genesis não dá novos slots. `file://` é apenas o servidor
+  de teste e não pode servir de journal de produção numa futura ativação.
+- **P1-A — credencial Git do runtime.** A cache bare isolada não herda a credencial
+  do `actions/checkout`. O token passa por `GIT_CONFIG_*` no ambiente (nunca argv
+  nem config gravada); remoto GitHub sem token => bloqueado.
+- **P1-C — concorrência visível nos cabeçalhos normais.** Entre duas respostas
+  normais da mesma execução, `r` tem de descer exatamente 1 por pedido e no mesmo dia
+  UTC; qualquer outro valor => sem recibo => skip. Sem pedidos extra. Deteta só
+  consumo durante o passo BSD; NÃO substitui a prova de exclusividade da conta.
+
+6 testes novos (582 total). Nenhum pedido BSD/Highlightly, nenhuma ref criada,
+workflow, secrets, Telegram e certificação intactos.
+
+### Ainda pendentes (intervenção humana)
+
+1. Criar `refs/heads/bsd-trial-journal` com genesis revisto (prior_debits reconciliado
+   de PR29/30/31) e ruleset: bloquear eliminação e non-fast-forward; restringir
+   escrita. Leitura da proteção devolveu 403 a esta integração: requer admin.
+   Depois, fixar o SHA em `PROVISIONED_ANCHOR` num commit revisto.
+2. Atestado de uso exclusivo da conta BSD (todos os consumidores da chave).
+3. Bound posterior revisto: LLM, report, notify e commits não têm timeout de passo;
+   só fast reads (550 s) é limitado. Sem bound revisto, `downstream_bound` fica ausente
+   => skip. Não reduzir passos normais para ganhar margem.
+4. Instalar `collect-yml-proposal.patch` e `collector-tail-proposal.patch`.
+5. Ponte HTTP BSD real + namespace real separado de `synthetic_wire`: nova auditoria.

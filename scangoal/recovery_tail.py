@@ -5,13 +5,37 @@ Rebuilding it uses their original receipt time, never the replay wall clock.
 """
 import copy
 import json
-from datetime import datetime, timezone
+import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from . import recovery as engine
 from .recovery_inline import NormalQuotaTracker
 from .recovery_trial import MATCH_IDS, DAYS, TrialBlocked, isolated
 from .recovery_trial_journal import utc
 from .recovery_trial_transport import PreparedBSD, OfflineWire
+
+# collect.yml: timeout-minutes 15. The start stamp is written by the first step,
+# after runner set-up; 30 s covers set-up already counted by GitHub.
+JOB_TIMEOUT_S, JOB_SETUP_SLACK_S = 900, 30
+# Hard wall clock of the whole tail (every Git op is clipped to it).
+TAIL_BUDGET_S = 150
+# After the send: BSD timeout 20 + completion load/check/push/confirm 4x10 +
+# final replay fetch 10 + local persistence 10. No send if less remains.
+POST_SEND_RESERVE_S = 80
+# Fast reads alone are 540+10 s; the other post-BSD steps have no reviewed bound.
+MIN_DOWNSTREAM_S = 550
+
+
+def job_deadline_from_env(environ=None):
+    """Deadline from the real job start, or None (=> skip). Never the step start."""
+    raw = (os.environ if environ is None else environ).get('GOAL_ROI_JOB_STARTED_UTC')
+    try:
+        started = utc(raw)
+    except TrialBlocked:
+        return None
+    if not timedelta(0) <= datetime.now(timezone.utc)-started <= timedelta(seconds=JOB_TIMEOUT_S):
+        return None
+    return started+timedelta(seconds=JOB_TIMEOUT_S-JOB_SETUP_SLACK_S)
 
 
 def validate_targets(targets):
@@ -108,9 +132,14 @@ class PreparedTail:
             self.slots.receipt, self.slots.normal_sequence = self.tracker.finish_normals()
             now = datetime.now(timezone.utc)
             if (self.slots.receipt is None or not self.token or self.job_deadline is None
-                or type(self.downstream_bound) is not int or self.downstream_bound < 550
-                or (self.job_deadline-now).total_seconds() < self.downstream_bound+100):
+                or type(self.downstream_bound) is not int or self.downstream_bound < MIN_DOWNSTREAM_S
+                or (self.job_deadline-now).total_seconds() < self.downstream_bound+TAIL_BUDGET_S):
                 return
+            # Enforce the budget instead of estimating it once: Git operations are
+            # clipped to tail_end and no send is authorized after send_end.
+            tail_end = now+timedelta(seconds=TAIL_BUDGET_S)
+            self.slots.store.not_after = tail_end
+            self.slots.send_not_after = tail_end-timedelta(seconds=POST_SEND_RESERVE_S)
             validate_targets(self.targets)
             # Rebuild from the authoritative journal, not a runner's state cache.
             state = replay(self.slots, self.targets, aliases=self.aliases, existing=self.existing)

@@ -1,0 +1,11 @@
+--- a/.github/workflows/collect.yml
++++ b/.github/workflows/collect.yml
+@@ -19,6 +19,8 @@
+     runs-on: ubuntu-latest
+     timeout-minutes: 15
+     steps:
++      # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
++      - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+       - uses: actions/checkout@v4
+       - uses: actions/setup-python@v5
+         with:

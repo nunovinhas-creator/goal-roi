@@ -79,6 +79,8 @@ class InlineSlots:
         self.output=isolated(Path(__file__).resolve().parents[1],output)
         if self.output.name!='prepared-fixture-trial':raise TrialBlocked('fixture_namespace_required')
         self.receipt,self.normal_sequence=receipt,normal_sequence
+        # Latest UTC instant a confirmed reservation may still authorize a send.
+        self.send_not_after=None
     def load(self):
         head=self.store.head();cursor=head;events=[];seen=set()
         while cursor:
@@ -163,7 +165,8 @@ class InlineSlots:
         # slot rather than send using stale proof; never refund it.
         confirmed=datetime.now(UTC)
         valid=(r.received_utc.date()==confirmed.date()
-               and timedelta(0)<=confirmed-r.received_utc<=timedelta(seconds=60))
+               and timedelta(0)<=confirmed-r.received_utc<=timedelta(seconds=60)
+               and (self.send_not_after is None or confirmed<=self.send_not_after))
         return {'send_permitted':valid,'head':candidate,'operation_id':operation_id}
     def append(self,event):
         if event['kind']!='complete':raise TrialBlocked('inline_operation_forbidden')
@@ -205,10 +208,12 @@ class NormalQuotaTracker:
     def __init__(self,owner,slot_debits):
         self.owner,self.slot_debits=owner,slot_debits
         self.sequence=0;self.receipt=None;self.sealed=False
+        self.observed=[];self.uncontrolled_consumption=False
     def observe(self,headers,body,received):
         self.receipt=None
         try:
             self.receipt=QuotaReceipt.from_normal_response(headers,body,self.owner,self.sequence,received,self.slot_debits)
+            self.observed.append((self.sequence,self.receipt.remaining,self.receipt.received_utc.date()))
         except Exception:
             # Quota capture cannot fail the normal collector or retain old proof.
             pass
@@ -220,4 +225,10 @@ class NormalQuotaTracker:
         return fetch
     def finish_normals(self):
         self.sealed=True
+        # Within the serial step each normal request costs exactly one unit. Any
+        # other drop (or a reset) between two of our own replies means a consumer
+        # we do not control, or a counter we do not model: never reserve on it.
+        for (s1,r1,d1),(s2,r2,d2) in zip(self.observed,self.observed[1:]):
+            if d1!=d2 or r1-r2!=s2-s1:
+                self.uncontrolled_consumption=True;self.receipt=None
         return self.receipt,self.sequence
