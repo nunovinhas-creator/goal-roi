@@ -135,6 +135,92 @@ def protocol_proof(root, commit, published=None, evidence=None):
     return (max(committed, pub) if committed is not None else pub), problems
 
 
+MESSAGES_FILE = 'data/messages.jsonl'
+OBSERVATION_FILES = (('data/results_hl.json', 'results', 'matched_at_utc'), ('data/results_bsd.json', 'results', 'matched_at_utc'),
+                     ('data/details_hl.json', 'details', 'fetched_at_utc'), ('data/manual_results.json', None, 'observed_utc'))
+PUBLISH_TOLERANCE_MIN = 30   # = certification.PUBLISH_TOLERANCE_MIN: uma observação é publicada no commit do próprio job
+
+
+def _coherent(stamp, published):
+    """Carimbo de observação provado pela publicação: escrito antes do commit que o publicou e no máximo 30 min antes."""
+    return stamp is not None and published is not None and stamp <= published <= stamp + timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+
+
+def observation_proof(root, ref, since):
+    """Revisões retroativas dos dados (protocolo v4, §0-C) -> lista de problemas (vazia = provado).
+
+    Pela história de primeiro-pai de `ref`: (1) data/messages.jsonl só cresce (nenhuma linha removida ou reescrita); (2) nos
+    ficheiros de resultados, nenhuma entrada é removida ou alterada depois de publicada; (3) cada observação publicada a partir
+    de `since` (mensagem recolhida, resultado associado, minutos dos golos, resultado manual) foi publicada no git entre o seu
+    carimbo e 30 min depois. Um carimbo recuado, uma correção posterior ou um resultado acrescentado depois com data antiga
+    tornam a avaliação não verificada (fail-closed)."""
+    try:
+        if _git(root, 'rev-parse', '--is-shallow-repository').decode().strip() != 'false':
+            return ['observations: shallow repository']
+        diff = _git(root, 'log', '--first-parent', '--reverse', '-p', '--unified=0', '--format=@@C %H %cI', ref, '--', MESSAGES_FILE)
+    except (OSError, subprocess.CalledProcessError):
+        return ['observations: history unavailable']
+    problems, when, sha = [], None, None
+    for line in diff.decode('utf-8', 'replace').split('\n'):
+        if line.startswith('@@C '):
+            _, sha, stamp = line.split()
+            when = chronology.parse_utc(stamp)
+        elif line.startswith('-{'):
+            problems.append('messages rewritten at %s' % sha[:12])
+        elif line.startswith('+{') and when is not None and since is not None and when >= since:
+            try:
+                row = json.loads(line[1:])
+            except ValueError:
+                problems.append('unreadable message line at %s' % sha[:12])
+                continue
+            if not _coherent(chronology.parse_utc(row.get('collected_at_utc')), when):
+                problems.append('message %s published out of time at %s' % (row.get('message_id'), sha[:12]))
+    for rel, key, field in OBSERVATION_FILES:
+        try:
+            log = _git(root, 'log', '--first-parent', '--reverse', '--format=%H %cI', ref, '--', rel).decode().split('\n')
+        except subprocess.CalledProcessError:
+            problems.append('observations: cannot read %s' % rel)
+            continue
+        commits = [tuple(x.split()) for x in log if x.strip()]
+        prev = {}
+        for sha, stamp, body in _versions(root, rel, commits) if commits else ():
+            t = chronology.parse_utc(stamp)
+            try:
+                cur = json.loads(body) if body is not None else {}
+                cur = (cur.get(key) or {}) if key else cur
+            except (ValueError, AttributeError):
+                problems.append('unreadable %s at %s' % (rel, sha[:12]))
+                continue
+            for k, v in prev.items():
+                if k not in cur:
+                    problems.append('%s entry removed at %s: %s' % (rel, sha[:12], k))
+                elif cur[k] != v:
+                    problems.append('%s entry rewritten at %s: %s' % (rel, sha[:12], k))
+            for k, v in cur.items():
+                if k not in prev and t is not None and since is not None and t >= since:
+                    if not _coherent(chronology.parse_utc(v.get(field) if isinstance(v, dict) else None), t):
+                        problems.append('%s entry published out of time at %s: %s' % (rel, sha[:12], k))
+            prev = cur
+    return problems[:50]
+
+
+def confirmation_snapshot(root, ref, confirm):
+    """O commit de dados da avaliação confirmatória (§0-C): o primeiro da história de primeiro-pai de `ref` com hora >= C.
+    None se ainda não existe. Avaliações confirmatórias usam sempre este commit, nunca um posterior (revisões retroativas
+    feitas depois não lhe chegam)."""
+    try:
+        log = _git(root, 'log', '--first-parent', '--reverse', '--format=%H %cI', ref).decode().split('\n')
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    for line in log:
+        if line.strip():
+            sha, stamp = line.split()
+            t = chronology.parse_utc(stamp)
+            if t is not None and t >= confirm:
+                return sha
+    return None
+
+
 def births(registry, first_seen, verified):
     """{id: born_eff ou None}. Com prova: max(born_utc, primeira publicação); sem publicação provada: None (fail-closed).
     Sem histórico verificado: born_utc (só para descrição; a avaliação fica não verificada)."""
