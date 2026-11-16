@@ -1,0 +1,49 @@
+--- a/scangoal/results_bsd.py
++++ b/scangoal/results_bsd.py
+@@ -39,13 +39,22 @@
+     return ' '.join(words)
+ 
+ 
+-def request_json(url, token):
++def request_json(url, token, *, observe=None):
+     if not url.startswith(ROOT):
+         raise BSDError('unexpected URL')
+     req = Request(url, headers={'Authorization': 'Token ' + token, 'Accept': 'application/json', 'User-Agent': 'goal-roi/1.0'})
+     try:
+         with urlopen(req, timeout=20) as r:
+-            return json.loads(r.read(3_000_000))
++            body = r.read(3_000_000)
++            payload = json.loads(body)
++            if observe is not None:
++                try:
++                    observe({k: v for k, v in r.headers.items()
++                             if k.lower() in ('ratelimit', 'ratelimit-policy') and token not in str(v)},
++                            body, datetime.now(UTC))
++                except Exception:
++                    print('BSD_RECOVERY_QUOTA_UNAVAILABLE')
++            return payload
+     except HTTPError as exc:
+         raise BSDError('HTTP %d' % exc.code) from None       # nunca imprimir URL, corpo ou cabeçalhos
+     except (URLError, TimeoutError, OSError, ValueError):
+@@ -139,7 +148,7 @@
+         return default
+ 
+ 
+-def run(fetch=request_json, now=None, token=None):
++def run(fetch=request_json, now=None, token=None, *, after_bsd=None):
+     now = now or datetime.now(UTC)
+     token = (token if token is not None else os.environ.get('BSD_API_KEY', '')).strip()
+     if not token:
+@@ -193,6 +202,12 @@
+     path.parent.mkdir(parents=True, exist_ok=True)
+     path.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+     print('BSD_OK', json.dumps(state['stats']))
++    # Optional tail only after normal queries and their saved results.
++    if after_bsd is not None:
++        try:
++            after_bsd()
++        except Exception:
++            print('BSD_RECOVERY_TAIL_SKIPPED')
+     return state
+ 
+ 
