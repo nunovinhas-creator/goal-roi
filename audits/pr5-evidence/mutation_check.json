@@ -1,6 +1,6 @@
 {
- "mutations": 36,
- "killed": 36,
+ "mutations": 37,
+ "killed": 37,
  "ok": true,
  "results": [
   {
@@ -263,7 +263,7 @@
     "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
     "test_telegram_presentation.LogAndStateRecovery.test_torn_log_line_is_isolated_and_never_rewritten"
    ],
-   "failing_count": 35
+   "failing_count": 36
   },
   {
    "mutation": "M30 watch_sent truncated to 400",
@@ -318,6 +318,14 @@
    "status": "KILLED",
    "failing_tests": [
     "test_telegram_presentation.LogAndStateRecovery.test_torn_log_line_is_isolated_and_never_rewritten"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M37 no resync after a foreign writer",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_revert_then_roll_forward_does_not_repeat_what_the_old_code_announced"
    ],
    "failing_count": 1
   },

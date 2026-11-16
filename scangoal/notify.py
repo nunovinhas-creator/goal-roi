@@ -333,6 +333,21 @@ def migrate_format(report, state, now):
     return True
 
 
+def resync_after_foreign_writer(state, now):
+    """Reversão seguida de nova integração: se outro escritor (o código anterior à PR 5) correu depois da última execução
+    desta versão, ele anunciou as mudanças com a sua referência (`statuses`). A referência anunciada passa a essa, em silêncio
+    e com registo, para nada ser anunciado duas vezes. Os avisos de jogos já estão protegidos pelas chaves antigas
+    (`watch_sent`), o resumo por `summary_day` e os regimes por `operational_regime`, que o código anterior mantém."""
+    mine = state.get('format_last_run_utc')
+    if FORMAT_MIGRATION not in (state.get('migrations') or {}) or not mine or state.get('last_run_utc') == mine:
+        return False
+    state.setdefault('format_resyncs', []).append({'at_utc': iso(now), 'foreign_last_run_utc': state.get('last_run_utc'),
+                                                   'own_last_run_utc': mine, 'previous_announced': copy.deepcopy(state.get('announced_statuses'))})
+    state['announced_statuses'] = copy.deepcopy(state.get('statuses') or {})
+    state['format_last_run_utc'] = state.get('last_run_utc')
+    return True
+
+
 def save_state(path, state):
     """Atomic local replacement; caller must keep the existing single-writer policy."""
     temp = None
@@ -626,7 +641,16 @@ def game_notice(report, state, now, gk, g):
     match = first.get('match') or 'Jogo'
     lines = head + [('🟢 ALERTA: %s' % match) if g['alert'] else ('A seguir: %s' % match)]
     effects = []
+    per_group = []
     for gr in shown:
+        sels = []
+        for h in gr:
+            for s_ in covers.get(h, ()):
+                if s_ not in sels:
+                    sels.append(s_)
+        per_group.append(sels)
+    common = all(x == per_group[0] for x in per_group)   # as mesmas seleções em todos os grupos: a aposta sai uma só vez
+    for gr, sels in zip(shown, per_group):
         rep = gr[0]
         r = reasons.get(rep) or next(reasons[h] for h in gr if h in reasons)
         if rep in alerted:
@@ -634,12 +658,8 @@ def game_notice(report, state, now, gk, g):
         else:
             lines.append('Encaixa em: %s (%s)' % (rep, 'promissora' if r.get('status') in VALID else r.get('status')))
         lines += evidence_lines(report, state, rep, r, gr[1:])
-        sels = []
-        for h in gr:
-            for s in covers.get(h, ()):
-                if s not in sels:
-                    sels.append(s)
-        lines.append('Aposta: %s' % '; '.join(sels))
+        if not common:
+            lines.append('Aposta: %s' % '; '.join(sels))
         if rep in alerted and r.get('prudent_rate'):
             lines.append('Odd mínima para valer a pena: %s.' % odd('%.2f' % (1 / r['prudent_rate'])))
         for h in gr:
@@ -648,6 +668,8 @@ def game_notice(report, state, now, gk, g):
                 effects.append(['notice_games', h, row['prospective_games']])
     if len(grouped) > len(shown):
         lines.append('… e mais %d grupos de hipóteses.' % (len(grouped) - len(shown)))
+    if common:
+        lines.append('Aposta: %s' % '; '.join(per_group[0]))
     ko = lisbon(next((w['kickoff_utc'] for _, it in items for w in it['entries'] if w.get('kickoff_utc')), None))
     lines.append('Jogo às %s (hora de Lisboa).' % ko if ko else None)
     lines.append('Resultados passados não garantem os futuros; a decisão é tua.' if g['alert'] else 'É um indício para observar, não uma recomendação.')
@@ -819,6 +841,7 @@ def plan(report, state, now):
     aviso (o que fica marcado como avisado) só são aplicados quando a intenção de envio é gravada."""
     migrate_status_reference(report, state, now)
     migrate_format(report, state, now)
+    resync_after_foreign_writer(state, now)
     out = [] if state.get('hello') else [hello_notice(report)]
     out += game_notices(report, state, now)
     new = eligible_statuses(report)
@@ -1071,7 +1094,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None):
         if outcome != 'delivered':
             print('NOTIFY_DELIVERY_%s' % outcome.upper())
             break
-    state['last_run_utc'] = iso(now)
+    state['last_run_utc'] = state['format_last_run_utc'] = iso(now)
     store.save_state(state)
     return state, delivered
 

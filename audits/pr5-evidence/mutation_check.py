@@ -70,6 +70,7 @@ MUTATIONS = [
     ('M34 scientific state not on top', "    lines = head + [title] + evidence_lines(report, state, rep, None, gr[1:])",
      "    lines = [title] + head + evidence_lines(report, state, rep, None, gr[1:])"),
     ('M35 log written without fsync of a newline separator', "                        data = b'\\n' + data      # linha cortada", "                        data = data      # linha cortada"),
+    ('M37 no resync after a foreign writer', "    resync_after_foreign_writer(state, now)\n    out = []", "    out = []"),
     ('M36 sender HTTP 5xx counted as confirmed failure', "        if 400 <= exc.code < 500:", "        if 400 <= exc.code < 600:"),
 ]
 

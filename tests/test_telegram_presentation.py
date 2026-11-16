@@ -1012,6 +1012,23 @@ class X_LegacyAndHistory(unittest.TestCase):
         d.run(now=NOW + timedelta(minutes=1))
         self.assertEqual(d.sent, [])
 
+    def test_revert_then_roll_forward_does_not_repeat_what_the_old_code_announced(self):
+        d = Data(self, base_state(), report())
+        d.run()
+        st = d.state()                                                     # the old code runs after a revert:
+        st['statuses'] = {HA: 'abandonada'}                                # it announced the change with its own reference
+        st['sent_total'] += 1
+        st['last_run_utc'] = (NOW + timedelta(minutes=10)).isoformat()
+        d.write_state(st)
+        d.write_report(report({HA: 'abandonada'}))
+        d.run(now=NOW + timedelta(minutes=20))                             # PR 5 again
+        st = d.state()
+        self.assertEqual(d.sent, [])
+        self.assertEqual(st['announced_statuses'], {HA: 'abandonada'})
+        self.assertEqual(len(st['format_resyncs']), 1)
+        d.run(now=NOW + timedelta(minutes=30))
+        self.assertEqual(len(d.state()['format_resyncs']), 1)              # its own runs never trigger it
+
     def test_absent_but_still_certified_is_unknown_not_a_loss(self):
         rows = {HA: row('forte', confirmation=certificate())}
         d = Data(self, base_state({HA: 'forte'}), report({HA: 'forte'}, rows=rows, validation=active(HA)))
