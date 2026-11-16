@@ -1,7 +1,7 @@
 {
  "mutations": 48,
- "killed": 47,
- "ok": false,
+ "killed": 48,
+ "ok": true,
  "results": [
   {
    "mutation": "M01 no intent persisted before the send",
@@ -91,9 +91,11 @@
   },
   {
    "mutation": "M10 legacy keys ignored",
-   "status": "SURVIVED",
-   "failing_tests": [],
-   "failing_count": 0
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_exact_legacy_key_protects_even_with_an_unreadable_signal_time"
+   ],
+   "failing_count": 1
   },
   {
    "mutation": "M11 grouping off",
@@ -264,7 +266,7 @@
     "test_notify_durability.AcrossRunners.test_remote_moved_by_another_commit",
     "test_notify_durability.AcrossRunners.test_runner_dies_after_sending"
    ],
-   "failing_count": 51
+   "failing_count": 52
   },
   {
    "mutation": "M30 watch_sent truncated to 400",

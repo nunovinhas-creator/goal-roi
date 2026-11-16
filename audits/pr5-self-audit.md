@@ -19,8 +19,13 @@ Ramo atualizado com o `main` `4af4c95` por merge (sem force-push; o `main` só t
 | **P2** perda de estado | `notify_state.json` ausente → `StateMissing`, nada enviado, nada criado (`NOTIFY_STATE_MISSING`; a recolha continua). Estado vazio, anterior à PR 5 ou com `sent_total` abaixo do da migração ao lado de um registo → `StateRegressed`. Instalação nova só com `--init-state`, que recusa se houver estado ou registo. A pré-visualização segue a mesma regra. | `P2_StateLoss` (7) | M41–M43 |
 | **Contrato** seleção nova num jogo avisado | Cada aposta é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem juntas. Uma seleção genuinamente nova num jogo já avisado sai como **atualização**: título "A seguir (nova seleção num jogo já avisado)" ou "🟢 ALERTA (nova seleção num jogo já avisado)", só com a aposta nova e a linha "Apostas já avisadas neste jogo: N (não repetidas)". O reforço dessa aposta nova também não se repete. Documentado no README e em `notify.game_notices`. | U4 (alargado), P1 | M40 |
 
-Resultados desta ronda: **420 testes OK** (343 anteriores + 65 + 12); mutações em `mutation_check.json`; ensaio de migração
-sobre `main` `4af4c95` `ok: true`; reconstituição das 24 h até `4af4c95` em `replay-24h.md`.
+Resultados desta ronda, sobre o código `740f664`:
+- **421 testes OK** em Python 3.11 e 3.13 (343 anteriores + 66 em `test_telegram_presentation.py` + 12 em
+  `test_notify_durability.py`);
+- **48/48 mutações apanhadas** (`mutation_check.json`; M09/M10 reescritas para o código novo, M38–M48 novas);
+- ensaio de migração sobre `main` `4af4c95` `ok: true` (zero mensagens, `sent_total` 312, `watch_sent` 117, três marcas iguais);
+- reconstituição das 24 h até `4af4c95`: 34 avisos contra 37 reais, nenhum aviso real perdido, diferenças explicadas
+  (`replay-24h.md`).
 
 ## 1. Objetivos obrigatórios → implementação → prova
 
