@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-16T15:31:00+00:00",
- "messages": 1082,
+ "generated_at_utc": "2026-11-16T15:33:15+00:00",
+ "messages": 1083,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 39,
-  "BETFAIR": 208,
+  "BETFAIR": 209,
   "STAKE_LOAD": 205,
   "OPEN_GAME": 162,
   "TOTALS_FORM": 54,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1778,
+  "versions": 1779,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 14,
-  "last_collected_at_utc": "2026-11-16T15:28:30+00:00",
+  "last_collected_at_utc": "2026-11-16T15:33:15+00:00",
   "hl_results": 56,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 35,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 4,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T15:30:54+00:00",
+  "collector_last_run_utc": "2026-11-16T15:33:15+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 354,
   "goal_lists_consistent": 199
  },
- "unique_bets": 602,
+ "unique_bets": 603,
  "settled_bets": 467,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -522,7 +522,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
-   "bets": 40,
+   "bets": 41,
    "settled": 27,
    "matches": 27,
    "wins": 7,
@@ -1314,7 +1314,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 111,
+   "signals": 112,
    "with_result": 59,
    "hits": 23,
    "misses": 36,
@@ -2700,7 +2700,7 @@
    },
    {
     "n": 25,
-    "signals": 58,
+    "signals": 59,
     "hits": 13,
     "misses": 12,
     "hit_rate": 0.52,
@@ -2835,7 +2835,7 @@
    },
    {
     "n": 22,
-    "signals": 48,
+    "signals": 49,
     "hits": 6,
     "misses": 16,
     "hit_rate": 0.2727,
@@ -3079,7 +3079,7 @@
    },
    {
     "n": 51,
-    "signals": 83,
+    "signals": 84,
     "hits": 10,
     "misses": 41,
     "hit_rate": 0.198,
@@ -3133,8 +3133,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 761,
-   "eligible": 602,
+   "total": 762,
+   "eligible": 603,
    "excluded": 159,
    "reasons": {
     "no_valid_odds": 111,
@@ -3149,7 +3149,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6502,
+    "em observação": 6514,
     "abandonada": 7,
     "promissora": 51
    },
@@ -4206,11 +4206,11 @@
     }
    ]
   },
-  "hypotheses": 6560,
+  "hypotheses": 6572,
   "tested": 388,
   "corrected_bar": null,
   "counts": {
-   "em observação": 6553,
+   "em observação": 6565,
    "abandonada": 3,
    "promissora": 4
   },
@@ -6413,6 +6413,76 @@
      "bad_total": 13
     },
     {
+     "match_id": "kazakhstan-vs-slovakia-20261116",
+     "match": "Kazakhstan — Slovakia",
+     "league": "UEFA Nations League",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-16T15:32:49+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Slovakia",
+     "odds": 4.9,
+     "odds_last": 4.9,
+     "max_mult": 1,
+     "share": 82,
+     "share_last": 82,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 22,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Competição = seleções & Dia = dia de semana",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Dia",
+         "dia de semana"
+        ]
+       ],
+       "n": 16,
+       "games": 13,
+       "hits": 4,
+       "break_even": 0.4715,
+       "prob_above": 0.0806,
+       "roi": -0.3937,
+       "edge": -0.1411,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Competição = seleções",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ]
+       ],
+       "n": 19,
+       "games": 16,
+       "hits": 5,
+       "break_even": 0.4342,
+       "prob_above": 0.1106,
+       "roi": -0.3237,
+       "edge": -0.1135,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 10
+    },
+    {
      "match_id": "estonia-vs-bulgaria-20261116",
      "match": "Estonia — Bulgaria",
      "league": "UEFA Nations League",
@@ -6636,9 +6706,9 @@
     "misto": 7,
     "sem evidência": 0,
     "contraditório": 7,
-    "evitar": 6
+    "evitar": 7
    },
-   "generated_utc": "2026-11-16T15:31:11+00:00",
+   "generated_utc": "2026-11-16T15:33:27+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6651,7 +6721,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 6501,
+     "hypotheses": 6513,
      "with_prospective_evidence": 1507,
      "prospective_games": 29418
     },
@@ -6774,7 +6844,7 @@
     "roi_cut": 0.0024
    },
    "skipped": {
-    "bets": 361,
+    "bets": 362,
     "settled": 257,
     "games": 129,
     "wins": 120,
@@ -16534,7 +16604,7 @@
   "abandoned": [
    {
     "n": 41,
-    "signals": 66,
+    "signals": 67,
     "hits": 15,
     "misses": 26,
     "hit_rate": 0.3659,
@@ -16570,7 +16640,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 6,
+    "open": 7,
     "born_verified": true,
     "game_set": "adab5b4c73fc9169",
     "prospective": {
@@ -16610,7 +16680,7 @@
    },
    {
     "n": 38,
-    "signals": 79,
+    "signals": 80,
     "hits": 9,
     "misses": 29,
     "hit_rate": 0.2368,
@@ -16646,7 +16716,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 18,
+    "open": 19,
     "born_verified": true,
     "game_set": "ae7d78fc6fd34718",
     "prospective": {
@@ -19658,7 +19728,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 106,
+    "signals": 107,
     "n": 55,
     "hits": 20,
     "hit_rate": 0.3636,
@@ -19724,7 +19794,7 @@
   "scope": "eligible_bets_only",
   "accuracy": {
    "BETFAIR/live": {
-    "signals": 106,
+    "signals": 107,
     "with_result": 55,
     "hits": 20,
     "misses": 35,
@@ -20047,7 +20117,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 79,
+   "bets": 80,
    "settled": 38,
    "matches": 38,
    "wins": 9,
@@ -20127,7 +20197,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 78,
+   "bets": 79,
    "settled": 36,
    "matches": 35,
    "wins": 11,
@@ -20161,7 +20231,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q4 Betfair: quota de mercado >= 80 %": {
-   "bets": 52,
+   "bets": 53,
    "settled": 20,
    "matches": 20,
    "wins": 8,
@@ -20331,7 +20401,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 602,
+   "bets": 603,
    "settled": 467,
    "matches": 278,
    "wins": 221,
@@ -20366,6 +20436,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-16T15:32:49+00:00",
+   "match_id": "kazakhstan-vs-slovakia-20261116",
+   "group": "BETFAIR/live/mkt>=10K",
+   "match": "Kazakhstan — Slovakia",
+   "selection": "Slovakia",
+   "odds": 4.9,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-16T15:27:32+00:00",
    "match_id": "czech-republic-u20-vs-germany-u20-20261116",
@@ -21224,22 +21307,6 @@
    "w": null,
    "settled_by": null,
    "n_signals": 2,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T21:11:24+00:00",
-   "match_id": "spain-vs-england-20261115",
-   "group": "OPEN_GAME",
-   "match": "Spain — England",
-   "selection": "Over 4",
-   "odds": 1.63,
-   "ft": [
-    2,
-    3
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
    "max_mult": 1
   }
  ],
@@ -23432,6 +23499,17 @@
      "share": 100,
      "market": "Asian Total",
      "total": 21000.0
+    },
+    {
+     "d": "2026-11-16T15:32:49+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "2",
+     "odds": 4.9,
+     "mult": 1,
+     "share": 82,
+     "mkt_volume": 475000.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -28323,7 +28401,7 @@
    "day": "2026-11-15"
   },
   {
-   "bets": 37,
+   "bets": 38,
    "settled": 11,
    "wins": 7,
    "units": 4.05,
