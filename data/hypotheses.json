@@ -78690,6 +78690,29 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Dia = fim de semana & Mercado = outro mercado & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-16T03:42:30+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Mercados com volume alto em fins de semana",
+  "source": "llm"
+ },
  "Polymarket | Dia = fim de semana & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-14T13:16:28+00:00",
   "conditions": [
@@ -93753,6 +93776,29 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Competição = seleções & Faixa de odd = odd 1,50 a 2,00 & Liga = UEFA Nations League": {
+  "born_utc": "2026-11-16T03:42:30+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Liga",
+    "UEFA Nations League"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Seleções com odd baixa em ligas fortes",
+  "source": "llm"
  },
  "Stake | Competição = seleções & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = empatado": {
   "born_utc": "2026-11-14T19:55:22+00:00",
