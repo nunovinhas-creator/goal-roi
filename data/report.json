@@ -1,16 +1,16 @@
 {
- "generated_at_utc": "2026-11-16T21:30:45+00:00",
- "messages": 1195,
+ "generated_at_utc": "2026-11-16T21:39:28+00:00",
+ "messages": 1197,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 44,
   "BETFAIR": 229,
   "STAKE_LOAD": 205,
-  "OPEN_GAME": 172,
+  "OPEN_GAME": 173,
   "TOTALS_FORM": 56,
   "WEAKENED_LINEUP": 11,
   "OPEN_GAME_NO_ODDS": 13,
-  "FULL_TIME_NOTE": 12,
+  "FULL_TIME_NOTE": 13,
   "POLYMARKET": 350,
   "None": 33,
   "TOTALS_FORM_NO_ODDS": 60
@@ -33,14 +33,14 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1932,
+  "versions": 1934,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 14,
-  "last_collected_at_utc": "2026-11-16T21:28:15+00:00",
-  "hl_results": 63,
+  "last_collected_at_utc": "2026-11-16T21:39:25+00:00",
+  "hl_results": 68,
   "hl_vs_bot_disagreements": 0,
-  "hl_near_misses": 36,
-  "hl_last_run_utc": "2026-11-16T20:01:57+00:00",
+  "hl_near_misses": 37,
+  "hl_last_run_utc": "2026-11-16T21:39:27+00:00",
   "bsd_results": 21,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 13,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T21:30:43+00:00",
+  "collector_last_run_utc": "2026-11-16T21:39:25+00:00",
   "name_review": [
    {
     "bot": [
@@ -365,6 +365,19 @@
    },
    {
     "bot": [
+     "Macedonia",
+     "Slovenia"
+    ],
+    "bsd_candidates": [
+     [
+      "North Macedonia",
+      "Slovenia"
+     ]
+    ],
+    "provider": "HL"
+   },
+   {
+    "bot": [
      "Prykarpattya Ivano Frankivsk",
      "Kolos Kovalivka II"
     ],
@@ -427,19 +440,6 @@
      ]
     ],
     "provider": "HL"
-   },
-   {
-    "bot": [
-     "UAE",
-     "Honduras"
-    ],
-    "bsd_candidates": [
-     [
-      "United Arab Emirates",
-      "Honduras"
-     ]
-    ],
-    "provider": "HL"
    }
   ],
   "deleted_by_bot": 0,
@@ -451,40 +451,40 @@
   "goal_lists": 363,
   "goal_lists_consistent": 208
  },
- "unique_bets": 658,
- "settled_bets": 505,
- "unsettled_market": 57,
+ "unique_bets": 659,
+ "settled_bets": 514,
+ "unsettled_market": 66,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
    "bets": 70,
-   "settled": 28,
-   "matches": 28,
+   "settled": 29,
+   "matches": 29,
    "wins": 13,
    "pushes": 0,
-   "units": 6.32,
-   "avg_odds": 2.536,
+   "units": 5.32,
+   "avg_odds": 2.677,
    "roi": {
     "odd-0%": {
-     "roi": 0.2257,
+     "roi": 0.1834,
      "ci95": [
-      -0.2966,
-      0.748
+      -0.3273,
+      0.6942
      ]
     },
     "odd-2%": {
-     "roi": 0.2012,
+     "roi": 0.1598,
      "ci95": [
-      -0.3107,
-      0.7131
+      -0.3408,
+      0.6603
      ]
     },
     "odd-5%": {
-     "roi": 0.1644,
+     "roi": 0.1243,
      "ci95": [
-      -0.3318,
-      0.6606
+      -0.3609,
+      0.6095
      ]
     }
    },
@@ -516,39 +516,40 @@
     -0.59,
     2.36,
     4.56,
-    6.32
+    6.32,
+    5.32
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
    "bets": 51,
-   "settled": 34,
-   "matches": 34,
+   "settled": 35,
+   "matches": 35,
    "wins": 11,
    "pushes": 0,
-   "units": 1.33,
-   "avg_odds": 6.411,
+   "units": 0.33,
+   "avg_odds": 6.353,
    "roi": {
     "odd-0%": {
-     "roi": 0.0391,
+     "roi": 0.0094,
      "ci95": [
-      -0.5573,
-      0.6355
+      -0.5726,
+      0.5914
      ]
     },
     "odd-2%": {
-     "roi": 0.0183,
+     "roi": -0.0108,
      "ci95": [
-      -0.5661,
-      0.6028
+      -0.5811,
+      0.5596
      ]
     },
     "odd-5%": {
-     "roi": -0.0128,
+     "roi": -0.041,
      "ci95": [
-      -0.5794,
-      0.5537
+      -0.594,
+      0.5119
      ]
     }
    },
@@ -586,7 +587,8 @@
     -9.08,
     -6.63,
     -0.63,
-    1.33
+    1.33,
+    0.33
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -668,7 +670,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "OPEN_GAME": {
-   "bets": 152,
+   "bets": 153,
    "settled": 150,
    "matches": 150,
    "wins": 75,
@@ -855,32 +857,32 @@
   },
   "POLYMARKET/live": {
    "bets": 28,
-   "settled": 25,
-   "matches": 15,
+   "settled": 27,
+   "matches": 17,
    "wins": 12,
    "pushes": 0,
-   "units": -0.21,
-   "avg_odds": 2.585,
+   "units": -2.21,
+   "avg_odds": 2.632,
    "roi": {
     "odd-0%": {
-     "roi": -0.0084,
+     "roi": -0.0819,
      "ci95": [
-      -0.413,
-      0.3962
+      -0.4679,
+      0.3042
      ]
     },
     "odd-2%": {
-     "roi": -0.0282,
+     "roi": -0.1002,
      "ci95": [
-      -0.4247,
-      0.3683
+      -0.4786,
+      0.2781
      ]
     },
     "odd-5%": {
-     "roi": -0.058,
+     "roi": -0.1278,
      "ci95": [
-      -0.4423,
-      0.3264
+      -0.4945,
+      0.239
      ]
     }
    },
@@ -909,39 +911,41 @@
     -0.73,
     -1.73,
     -0.77,
-    -0.21
+    -0.21,
+    -1.21,
+    -2.21
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
    "bets": 139,
-   "settled": 108,
-   "matches": 42,
-   "wins": 52,
+   "settled": 112,
+   "matches": 44,
+   "wins": 54,
    "pushes": 0,
-   "units": -7.65,
-   "avg_odds": 2.167,
+   "units": -7.32,
+   "avg_odds": 2.16,
    "roi": {
     "odd-0%": {
-     "roi": -0.0708,
+     "roi": -0.0654,
      "ci95": [
-      -0.2344,
-      0.0928
+      -0.2231,
+      0.0924
      ]
     },
     "odd-2%": {
-     "roi": -0.0894,
+     "roi": -0.084,
      "ci95": [
-      -0.2497,
-      0.0709
+      -0.2386,
+      0.0705
      ]
     },
     "odd-5%": {
-     "roi": -0.1173,
+     "roi": -0.1121,
      "ci95": [
-      -0.2727,
-      0.0381
+      -0.262,
+      0.0378
      ]
     }
    },
@@ -1039,21 +1043,25 @@
     -9.85,
     -10.85,
     -9.85,
-    -9.0,
+    -10.85,
     -10.0,
     -11.0,
-    -10.08,
-    -9.06,
-    -8.13,
+    -12.0,
+    -11.08,
+    -10.06,
     -9.13,
     -10.13,
-    -9.13,
-    -10.13,
-    -8.8,
-    -8.21,
-    -7.28,
-    -8.28,
-    -7.65
+    -11.13,
+    -12.13,
+    -11.13,
+    -12.13,
+    -10.8,
+    -10.21,
+    -9.28,
+    -10.28,
+    -9.65,
+    -8.65,
+    -7.32
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1133,32 +1141,32 @@
   },
   "STAKE_LOAD/pre": {
    "bets": 84,
-   "settled": 52,
-   "matches": 26,
+   "settled": 53,
+   "matches": 27,
    "wins": 20,
    "pushes": 3,
-   "units": -12.34,
-   "avg_odds": 2.051,
+   "units": -13.34,
+   "avg_odds": 2.047,
    "roi": {
     "odd-0%": {
-     "roi": -0.2372,
+     "roi": -0.2516,
      "ci95": [
-      -0.4911,
-      0.0167
+      -0.5043,
+      0.0011
      ]
     },
     "odd-2%": {
-     "roi": -0.2509,
+     "roi": -0.2651,
      "ci95": [
-      -0.4998,
-      -0.002
+      -0.5128,
+      -0.0173
      ]
     },
     "odd-5%": {
-     "roi": -0.2715,
+     "roi": -0.2853,
      "ci95": [
-      -0.5129,
-      -0.0301
+      -0.5256,
+      -0.0449
      ]
     }
    },
@@ -1188,33 +1196,34 @@
     -4.84,
     -4.84,
     -5.84,
-    -5.28,
+    -6.84,
     -6.28,
     -7.28,
-    -6.48,
+    -8.28,
     -7.48,
     -8.48,
     -9.48,
     -10.48,
-    -10.48,
-    -9.55,
-    -8.64,
+    -11.48,
+    -11.48,
+    -10.55,
     -9.64,
     -10.64,
     -11.64,
-    -11.12,
-    -10.56,
+    -12.64,
+    -12.12,
     -11.56,
     -12.56,
+    -13.56,
+    -12.41,
     -11.41,
-    -10.41,
-    -9.91,
     -10.91,
     -11.91,
-    -12.41,
-    -12.19,
+    -12.91,
+    -13.41,
     -13.19,
-    -12.34
+    -14.19,
+    -13.34
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1353,40 +1362,40 @@
  "accuracy": {
   "BETFAIR/live": {
    "signals": 126,
-   "with_result": 66,
+   "with_result": 68,
    "hits": 27,
-   "misses": 39,
+   "misses": 41,
    "pushes": 0,
    "eff_hits": 27.0,
-   "eff_misses": 39.0,
+   "eff_misses": 41.0,
    "vote_hits": 26.5,
-   "vote_misses": 38.5,
-   "vote_break_even": 0.383,
-   "games": 65,
+   "vote_misses": 40.5,
+   "vote_break_even": 0.3772,
+   "games": 67,
    "no_source": 36,
    "unsettleable": 0,
-   "hit_rate": 0.4091,
+   "hit_rate": 0.3971,
    "ci95": [
-    0.2987,
-    0.5295
+    0.2893,
+    0.5158
    ],
-   "avg_odds": 4.499,
-   "break_even": 0.3812,
+   "avg_odds": 4.528,
+   "break_even": 0.3756,
    "baseline": false,
-   "roi_announced_odds": 0.1553,
+   "roi_announced_odds": 0.1213,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 12.3,
+   "per_day": 12.7,
    "days_to_hint": 0,
-   "days_to_conclusion": 20,
-   "prudent_rate": 0.4044,
-   "prob_above": 0.6419,
-   "edge": 0.0214,
+   "days_to_conclusion": 19,
+   "prudent_rate": 0.3931,
+   "prob_above": 0.6065,
+   "edge": 0.0159,
    "edge_ci": [
-    -0.0698,
-    0.1155
+    -0.0735,
+    0.1086
    ],
-   "prob_above_cut": 0.5889
+   "prob_above_cut": 0.5523
   },
   "BETFAIR/pre": {
    "signals": 25,
@@ -1463,7 +1472,7 @@
    "prob_above_cut": 0.436
   },
   "OPEN_GAME": {
-   "signals": 172,
+   "signals": 173,
    "with_result": 170,
    "hits": 89,
    "misses": 49,
@@ -1538,77 +1547,77 @@
   },
   "POLYMARKET": {
    "signals": 167,
-   "with_result": 133,
-   "hits": 64,
-   "misses": 69,
+   "with_result": 139,
+   "hits": 66,
+   "misses": 73,
    "pushes": 0,
-   "eff_hits": 64.0,
-   "eff_misses": 69.0,
-   "vote_hits": 20.08,
-   "vote_misses": 23.92,
-   "vote_break_even": 0.5153,
-   "games": 44,
+   "eff_hits": 66.0,
+   "eff_misses": 73.0,
+   "vote_hits": 20.75,
+   "vote_misses": 25.25,
+   "vote_break_even": 0.5126,
+   "games": 46,
    "no_source": 0,
-   "unsettleable": 8,
-   "hit_rate": 0.4812,
+   "unsettleable": 17,
+   "hit_rate": 0.4748,
    "ci95": [
-    0.398,
-    0.5654
+    0.3936,
+    0.5574
    ],
-   "avg_odds": 2.246,
-   "break_even": 0.4934,
+   "avg_odds": 2.252,
+   "break_even": 0.4918,
    "baseline": false,
-   "roi_announced_odds": -0.0591,
+   "roi_announced_odds": -0.0686,
    "seen_late": 0,
    "by_bot_mark": 77,
-   "per_day": 31.5,
+   "per_day": 32.9,
    "days_to_hint": 0,
-   "days_to_conclusion": 6,
-   "prudent_rate": 0.4673,
-   "prob_above": 0.2393,
-   "edge": -0.048,
+   "days_to_conclusion": 5,
+   "prudent_rate": 0.4621,
+   "prob_above": 0.2237,
+   "edge": -0.0505,
    "edge_ci": [
-    -0.1581,
-    0.0635
+    -0.1585,
+    0.059
    ],
-   "prob_above_cut": 0.1941
+   "prob_above_cut": 0.1799
   },
   "STAKE_LOAD": {
    "signals": 150,
-   "with_result": 98,
+   "with_result": 99,
    "hits": 43,
-   "misses": 52,
+   "misses": 53,
    "pushes": 3,
    "eff_hits": 42.5,
-   "eff_misses": 51.5,
+   "eff_misses": 52.5,
    "vote_hits": 19.45,
-   "vote_misses": 27.47,
-   "vote_break_even": 0.5435,
-   "games": 47,
+   "vote_misses": 28.47,
+   "vote_break_even": 0.5434,
+   "games": 48,
    "no_source": 0,
    "unsettleable": 50,
-   "hit_rate": 0.4521,
+   "hit_rate": 0.4474,
    "ci95": [
-    0.3554,
-    0.5526
+    0.3514,
+    0.5475
    ],
-   "avg_odds": 1.951,
+   "avg_odds": 1.95,
    "break_even": 0.5441,
    "baseline": false,
-   "roi_announced_odds": -0.1864,
+   "roi_announced_odds": -0.1946,
    "seen_late": 9,
    "by_bot_mark": 20,
-   "per_day": 17.7,
+   "per_day": 17.9,
    "days_to_hint": 0,
    "days_to_conclusion": 12,
-   "prudent_rate": 0.4372,
-   "prob_above": 0.0537,
-   "edge": -0.1063,
+   "prudent_rate": 0.4296,
+   "prob_above": 0.041,
+   "edge": -0.1138,
    "edge_ci": [
-    -0.2124,
-    0.0023
+    -0.2186,
+    -0.0062
    ],
-   "prob_above_cut": 0.0377
+   "prob_above_cut": 0.0282
   },
   "TOTALS_FORM": {
    "signals": 56,
@@ -1635,7 +1644,7 @@
    "roi_announced_odds": 0.056,
    "seen_late": 7,
    "by_bot_mark": 0,
-   "per_day": 10.9,
+   "per_day": 10.8,
    "days_to_hint": 0,
    "days_to_conclusion": 23,
    "prudent_rate": 0.6351,
@@ -1709,8 +1718,8 @@
    "roi_announced_odds": -0.2117,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 1.8,
-   "days_to_hint": 12,
+   "per_day": 1.7,
+   "days_to_hint": 13,
    "days_to_conclusion": 167,
    "prudent_rate": 0.4731,
    "prob_above": 0.3223,
@@ -1726,7 +1735,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 66,
+    "n": 68,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -1757,33 +1766,33 @@
    },
    {
     "type": "POLYMARKET",
-    "n": 133,
+    "n": 139,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 93,
-     "hit_rate": 0.4624,
-     "break_even": 0.4906,
-     "roi": -0.0871
+     "n": 99,
+     "hit_rate": 0.4646,
+     "break_even": 0.4934,
+     "roi": -0.0912
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.525,
-     "break_even": 0.5,
-     "roi": 0.006
+     "hit_rate": 0.5,
+     "break_even": 0.4877,
+     "roi": -0.0125
     },
-    "z": 0.56
+    "z": 0.44
    },
    {
     "type": "STAKE_LOAD",
-    "n": 95,
+    "n": 96,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 55,
-     "hit_rate": 0.4182,
-     "break_even": 0.538,
-     "roi": -0.2602
+     "n": 56,
+     "hit_rate": 0.4107,
+     "break_even": 0.5381,
+     "roi": -0.2734
     },
     "recent": {
      "n": 40,
@@ -1791,7 +1800,7 @@
      "break_even": 0.5526,
      "roi": -0.0989
     },
-    "z": 0.65
+    "z": 0.73
    },
    {
     "type": "TOTALS_FORM",
@@ -1874,7 +1883,7 @@
    },
    {
     "n": 40,
-    "signals": 49,
+    "signals": 50,
     "hits": 32,
     "misses": 8,
     "hit_rate": 0.8052,
@@ -2009,7 +2018,7 @@
    },
    {
     "n": 103,
-    "signals": 130,
+    "signals": 131,
     "hits": 69,
     "misses": 34,
     "hit_rate": 0.6683,
@@ -2117,7 +2126,7 @@
    },
    {
     "n": 95,
-    "signals": 122,
+    "signals": 123,
     "hits": 64,
     "misses": 31,
     "hit_rate": 0.6685,
@@ -2171,7 +2180,7 @@
    },
    {
     "n": 41,
-    "signals": 53,
+    "signals": 54,
     "hits": 28,
     "misses": 13,
     "hit_rate": 0.6795,
@@ -2252,7 +2261,7 @@
    },
    {
     "n": 66,
-    "signals": 75,
+    "signals": 76,
     "hits": 43,
     "misses": 23,
     "hit_rate": 0.6484,
@@ -2333,7 +2342,7 @@
    },
    {
     "n": 96,
-    "signals": 120,
+    "signals": 121,
     "hits": 61,
     "misses": 35,
     "hit_rate": 0.6364,
@@ -2441,7 +2450,7 @@
    },
    {
     "n": 77,
-    "signals": 95,
+    "signals": 96,
     "hits": 48,
     "misses": 29,
     "hit_rate": 0.62,
@@ -2468,7 +2477,7 @@
    },
    {
     "n": 74,
-    "signals": 94,
+    "signals": 95,
     "hits": 45,
     "misses": 29,
     "hit_rate": 0.6069,
@@ -2492,6 +2501,33 @@
     "family": "Jogo aberto",
     "dimension": "Ritmo indicado pelo bot",
     "value": "90 ou mais"
+   },
+   {
+    "n": 51,
+    "signals": 61,
+    "hits": 28,
+    "misses": 23,
+    "hit_rate": 0.549,
+    "ci95": [
+     0.4138,
+     0.6773
+    ],
+    "break_even": 0.4462,
+    "roi": 0.2167,
+    "games": 30,
+    "bets": 51,
+    "unidentified": 0,
+    "prudent_rate": 0.5242,
+    "prob_above": 0.8366,
+    "edge": 0.0774,
+    "edge_ci": [
+     -0.0518,
+     0.2052
+    ],
+    "prob_above_cut": 0.8065,
+    "family": "Polymarket",
+    "dimension": "Faixa de odd",
+    "value": "odd 2,00 a 3,00"
    },
    {
     "n": 11,
@@ -2519,33 +2555,6 @@
     "family": "Jogo aberto",
     "dimension": "Competição",
     "value": "jovens"
-   },
-   {
-    "n": 48,
-    "signals": 61,
-    "hits": 26,
-    "misses": 22,
-    "hit_rate": 0.5417,
-    "ci95": [
-     0.4029,
-     0.6742
-    ],
-    "break_even": 0.4462,
-    "roi": 0.2025,
-    "games": 28,
-    "bets": 48,
-    "unidentified": 0,
-    "prudent_rate": 0.5124,
-    "prob_above": 0.7894,
-    "edge": 0.0653,
-    "edge_ci": [
-     -0.067,
-     0.1968
-    ],
-    "prob_above_cut": 0.7554,
-    "family": "Polymarket",
-    "dimension": "Faixa de odd",
-    "value": "odd 2,00 a 3,00"
    },
    {
     "n": 111,
@@ -2683,58 +2692,31 @@
     "value": "odd 1,50 a 2,00"
    },
    {
-    "n": 47,
+    "n": 48,
     "signals": 93,
     "hits": 23,
-    "misses": 24,
-    "hit_rate": 0.4894,
+    "misses": 25,
+    "hit_rate": 0.4792,
     "ci95": [
-     0.3528,
-     0.6276
+     0.3447,
+     0.6167
     ],
-    "break_even": 0.4359,
-    "roi": 0.1477,
-    "games": 47,
-    "bets": 47,
+    "break_even": 0.43,
+    "roi": 0.1238,
+    "games": 48,
+    "bets": 48,
     "unidentified": 0,
-    "prudent_rate": 0.48,
-    "prob_above": 0.746,
-    "edge": 0.0441,
+    "prudent_rate": 0.4707,
+    "prob_above": 0.731,
+    "edge": 0.0407,
     "edge_ci": [
-     -0.0636,
-     0.1525
+     -0.0657,
+     0.1483
     ],
-    "prob_above_cut": 0.7009,
+    "prob_above_cut": 0.6848,
     "family": "Betfair",
     "dimension": "Tamanho do mercado",
     "value": "menos de 10 mil $"
-   },
-   {
-    "n": 27,
-    "signals": 59,
-    "hits": 8,
-    "misses": 19,
-    "hit_rate": 0.2963,
-    "ci95": [
-     0.1585,
-     0.4848
-    ],
-    "break_even": 0.2333,
-    "roi": 0.2037,
-    "games": 27,
-    "bets": 27,
-    "unidentified": 0,
-    "prudent_rate": 0.2793,
-    "prob_above": 0.7218,
-    "edge": 0.0459,
-    "edge_ci": [
-     -0.0667,
-     0.1724
-    ],
-    "prob_above_cut": 0.6981,
-    "family": "Betfair",
-    "dimension": "Faixa de odd",
-    "value": "odd acima de 3,00"
    },
    {
     "n": 31,
@@ -2791,31 +2773,58 @@
     "value": "entre 1 e 2 golos"
    },
    {
-    "n": 14,
+    "n": 15,
     "signals": 22,
     "hits": 8,
-    "misses": 6,
-    "hit_rate": 0.5714,
+    "misses": 7,
+    "hit_rate": 0.5333,
     "ci95": [
-     0.3259,
-     0.7862
+     0.3012,
+     0.7519
     ],
-    "break_even": 0.4752,
-    "roi": 0.2771,
-    "games": 14,
-    "bets": 14,
+    "break_even": 0.4536,
+    "roi": 0.192,
+    "games": 15,
+    "bets": 15,
     "unidentified": 0,
-    "prudent_rate": 0.5313,
-    "prob_above": 0.7099,
-    "edge": 0.0561,
+    "prudent_rate": 0.5014,
+    "prob_above": 0.6826,
+    "edge": 0.0478,
     "edge_ci": [
-     -0.1099,
-     0.2191
+     -0.1139,
+     0.2094
     ],
-    "prob_above_cut": 0.6769,
+    "prob_above_cut": 0.6491,
     "family": "Betfair",
     "dimension": "Competição",
     "value": "jovens"
+   },
+   {
+    "n": 29,
+    "signals": 59,
+    "hits": 8,
+    "misses": 21,
+    "hit_rate": 0.2759,
+    "ci95": [
+     0.147,
+     0.4572
+    ],
+    "break_even": 0.2303,
+    "roi": 0.1207,
+    "games": 29,
+    "bets": 29,
+    "unidentified": 0,
+    "prudent_rate": 0.2642,
+    "prob_above": 0.6677,
+    "edge": 0.0339,
+    "edge_ci": [
+     -0.0736,
+     0.1553
+    ],
+    "prob_above_cut": 0.6419,
+    "family": "Betfair",
+    "dimension": "Faixa de odd",
+    "value": "odd acima de 3,00"
    },
    {
     "n": 33,
@@ -2872,58 +2881,58 @@
     "value": "odd 2,00 a 3,00"
    },
    {
-    "n": 42,
+    "n": 13,
+    "signals": 13,
+    "hits": 9,
+    "misses": 4,
+    "hit_rate": 0.6667,
+    "ci95": [
+     0.3906,
+     0.8619
+    ],
+    "break_even": 0.6157,
+    "roi": -0.01,
+    "games": 13,
+    "bets": 13,
+    "unidentified": 0,
+    "prudent_rate": 0.6435,
+    "prob_above": 0.6213,
+    "edge": 0.0278,
+    "edge_ci": [
+     -0.1442,
+     0.1845
+    ],
+    "prob_above_cut": 0.575,
+    "family": "Forma de golos",
+    "dimension": "Competição",
+    "value": "taça"
+   },
+   {
+    "n": 43,
     "signals": 45,
     "hits": 16,
-    "misses": 26,
-    "hit_rate": 0.381,
+    "misses": 27,
+    "hit_rate": 0.3721,
     "ci95": [
-     0.25,
-     0.5319
+     0.2438,
+     0.5214
     ],
-    "break_even": 0.356,
-    "roi": 0.0983,
-    "games": 39,
-    "bets": 42,
+    "break_even": 0.353,
+    "roi": 0.0728,
+    "games": 40,
+    "bets": 43,
     "unidentified": 0,
-    "prudent_rate": 0.3776,
-    "prob_above": 0.6462,
-    "edge": 0.0275,
+    "prudent_rate": 0.3694,
+    "prob_above": 0.6194,
+    "edge": 0.0224,
     "edge_ci": [
-     -0.0825,
-     0.1432
+     -0.0858,
+     0.1366
     ],
-    "prob_above_cut": 0.6066,
+    "prob_above_cut": 0.5789,
     "family": "Betfair",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com vários tipos de sinal"
-   },
-   {
-    "n": 26,
-    "signals": 52,
-    "hits": 15,
-    "misses": 11,
-    "hit_rate": 0.5769,
-    "ci95": [
-     0.3895,
-     0.7446
-    ],
-    "break_even": 0.5295,
-    "roi": 0.0673,
-    "games": 11,
-    "bets": 26,
-    "unidentified": 0,
-    "prudent_rate": 0.5809,
-    "prob_above": 0.6432,
-    "edge": 0.0376,
-    "edge_ci": [
-     -0.1402,
-     0.2065
-    ],
-    "prob_above_cut": 0.605,
-    "family": "Polymarket",
-    "dimension": "Dia",
-    "value": "dia de semana"
    }
   ],
   "segments_tested": 82,
@@ -3066,93 +3075,93 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 293,
-    "signals": 379,
+    "n": 296,
+    "signals": 380,
     "hits": 170,
-    "misses": 123,
-    "hit_rate": 0.5666,
+    "misses": 126,
+    "hit_rate": 0.5606,
     "ci95": [
-     0.5082,
-     0.6232
+     0.5025,
+     0.6171
     ],
-    "break_even": 0.5792,
-    "roi": -0.0135,
-    "games": 208,
-    "bets": 288,
+    "break_even": 0.579,
+    "roi": -0.0227,
+    "games": 210,
+    "bets": 291,
     "unidentified": 0,
-    "prudent_rate": 0.5809,
-    "prob_above": 0.5626,
-    "edge": 0.0052,
+    "prudent_rate": 0.5753,
+    "prob_above": 0.4988,
+    "edge": -0.0003,
     "edge_ci": [
-     -0.0515,
-     0.061
+     -0.0568,
+     0.0553
     ],
-    "prob_above_cut": 0.4266,
+    "prob_above_cut": 0.3642,
     "band": "odd 1,50 a 2,00"
    },
    {
-    "n": 132,
+    "n": 135,
     "signals": 189,
-    "hits": 69,
-    "misses": 63,
-    "hit_rate": 0.5249,
+    "hits": 71,
+    "misses": 64,
+    "hit_rate": 0.5281,
     "ci95": [
-     0.4397,
-     0.6086
+     0.4438,
+     0.6108
     ],
-    "break_even": 0.4408,
-    "roi": 0.1766,
-    "games": 96,
-    "bets": 130,
+    "break_even": 0.441,
+    "roi": 0.182,
+    "games": 98,
+    "bets": 133,
     "unidentified": 0,
-    "prudent_rate": 0.4974,
-    "prob_above": 0.8881,
-    "edge": 0.0593,
+    "prudent_rate": 0.5022,
+    "prob_above": 0.9073,
+    "edge": 0.0639,
     "edge_ci": [
-     -0.0206,
-     0.1393
+     -0.0153,
+     0.1431
     ],
-    "prob_above_cut": 0.8489,
+    "prob_above_cut": 0.8725,
     "band": "odd 2,00 a 3,00"
    },
    {
-    "n": 57,
+    "n": 60,
     "signals": 96,
     "hits": 12,
-    "misses": 45,
-    "hit_rate": 0.2124,
+    "misses": 48,
+    "hit_rate": 0.2017,
     "ci95": [
-     0.1259,
-     0.3355
+     0.1193,
+     0.3202
     ],
-    "break_even": 0.2562,
-    "roi": -0.1954,
-    "games": 43,
-    "bets": 57,
+    "break_even": 0.2539,
+    "roi": -0.2357,
+    "games": 46,
+    "bets": 60,
     "unidentified": 0,
-    "prudent_rate": 0.2466,
-    "prob_above": 0.4492,
-    "edge": -0.0044,
+    "prudent_rate": 0.2329,
+    "prob_above": 0.3729,
+    "edge": -0.0155,
     "edge_ci": [
-     -0.0954,
-     0.0976
+     -0.1021,
+     0.0821
     ],
-    "prob_above_cut": 0.4159,
+    "prob_above_cut": 0.3407,
     "band": "odd acima de 3,00"
    }
   ],
   "luck": {
-   "n": 505,
-   "units": -2.0,
-   "luck_sd": 25.89,
-   "z": -0.08,
-   "max_drawdown": 27.65,
+   "n": 514,
+   "units": -6.67,
+   "luck_sd": 26.23,
+   "z": -0.25,
+   "max_drawdown": 28.65,
    "longest_losing_run": 7
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 89 em 138, precisa de 55 %, e a probabilidade de estar acima do mínimo é 98 %.",
-   "O mais fraco é aposta grande na Stake: 43 em 95, precisa de 54 %, probabilidade de estar acima do mínimo 5 %.",
-   "Saldo de -2,00 unidades em 505 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±51,8 unidades).",
+   "O mais fraco é aposta grande na Stake: 43 em 96, precisa de 54 %, probabilidade de estar acima do mínimo 4 %.",
+   "Saldo de -6,67 unidades em 514 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±52,5 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 18 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 40 em 44 (91 % contra 58 % necessários). Indício positivo.",
    "Jogo aberto, dia = dia de semana: 32 em 40 (81 % contra 54 % necessários). Indício positivo.",
@@ -3171,8 +3180,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 823,
-   "eligible": 658,
+   "total": 824,
+   "eligible": 659,
    "excluded": 165,
    "reasons": {
     "no_valid_odds": 117,
@@ -3187,7 +3196,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7077,
+    "em observação": 7089,
     "abandonada": 7,
     "promissora": 60
    },
@@ -4244,11 +4253,11 @@
     }
    ]
   },
-  "hypotheses": 7144,
+  "hypotheses": 7156,
   "tested": 447,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7134,
+   "em observação": 7146,
    "abandonada": 4,
    "promissora": 6
   },
@@ -4574,109 +4583,6 @@
   "agenda": {
    "items": [
     {
-     "match_id": "switzerland-vs-scotland-20261116",
-     "match": "Switzerland — Scotland",
-     "league": "UEFA Nations League",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-16T21:05:41+00:00",
-     "minute": 58,
-     "score_at_signal": [
-      3,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Over 4",
-     "odds": 1.73,
-     "odds_last": 1.73,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 82,
-     "good": [
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ]
-       ],
-       "n": 19,
-       "games": 19,
-       "hits": 17,
-       "break_even": 0.5555,
-       "prob_above": 0.9947,
-       "roi": 0.6162,
-       "edge": 0.2223,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ]
-       ],
-       "n": 27,
-       "games": 27,
-       "hits": 22,
-       "break_even": 0.5493,
-       "prob_above": 0.9934,
-       "roi": 0.5072,
-       "edge": 0.1937,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ]
-       ],
-       "n": 33,
-       "games": 33,
-       "hits": 26,
-       "break_even": 0.5678,
-       "prob_above": 0.9903,
-       "roi": 0.3481,
-       "edge": 0.1689,
-       "status": "promissora",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 56,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "cusco-fc-vs-ad-tarma-20261116",
      "match": "Cusco FC — AD Tarma",
      "league": "Peru Primera Division",
@@ -4770,6 +4676,154 @@
      "good_total": 29,
      "bad": [],
      "bad_total": 0
+    },
+    {
+     "match_id": "deportivo-moquegua-vs-atletico-grau-20261116",
+     "match": "Deportivo Moquegua — Atletico Grau",
+     "league": "Peru Primera Division",
+     "family": "Jogo aberto",
+     "type": "OPEN_GAME",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-16T21:34:42+00:00",
+     "minute": 53,
+     "score_at_signal": [
+      1,
+      1
+     ],
+     "market": "Asian Total",
+     "selection": "Over 3",
+     "odds": 1.58,
+     "odds_last": 1.58,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 82,
+     "good": [
+      {
+       "id": "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "noite"
+        ],
+        [
+         "Parte do jogo",
+         "2.ª parte"
+        ]
+       ],
+       "n": 29,
+       "games": 29,
+       "hits": 23,
+       "break_even": 0.5728,
+       "prob_above": 0.9797,
+       "roi": 0.3019,
+       "edge": 0.1569,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Jogo aberto | Hora (UTC) = noite",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "noite"
+        ]
+       ],
+       "n": 38,
+       "games": 38,
+       "hits": 28,
+       "break_even": 0.5666,
+       "prob_above": 0.9671,
+       "roi": 0.2413,
+       "edge": 0.1284,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Parte do jogo",
+         "2.ª parte"
+        ]
+       ],
+       "n": 20,
+       "games": 20,
+       "hits": 16,
+       "break_even": 0.5625,
+       "prob_above": 0.961,
+       "roi": 0.3394,
+       "edge": 0.1536,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 32,
+     "bad": [
+      {
+       "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = empatado",
+       "conditions": [
+        [
+         "Confiança indicada pelo bot",
+         "menos de 95 %"
+        ],
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Marcador no momento",
+         "empatado"
+        ]
+       ],
+       "n": 22,
+       "games": 22,
+       "hits": 10,
+       "break_even": 0.5833,
+       "prob_above": 0.1617,
+       "roi": -0.16,
+       "edge": -0.0887,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Marcador no momento = empatado & Minuto = 31 a 60",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Marcador no momento",
+         "empatado"
+        ],
+        [
+         "Minuto",
+         "31 a 60"
+        ]
+       ],
+       "n": 18,
+       "games": 18,
+       "hits": 8,
+       "break_even": 0.5864,
+       "prob_above": 0.1711,
+       "roi": -0.167,
+       "edge": -0.0914,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 2
     },
     {
      "match_id": "germany-vs-netherlands-20261116",
@@ -4900,162 +4954,6 @@
       }
      ],
      "bad_total": 1
-    },
-    {
-     "match_id": "greece-vs-serbia-20261116",
-     "match": "Greece — Serbia",
-     "league": "UEFA Nations League",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-16T21:05:46+00:00",
-     "minute": 58,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Under 0.5",
-     "odds": 4.0,
-     "odds_last": 4.0,
-     "max_mult": 1,
-     "share": 23,
-     "share_last": 23,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd acima de 3,00",
-     "odds_band_n": 17,
-     "good": [
-      {
-       "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Mercado",
-         "golos (mais/menos)"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 22,
-       "games": 15,
-       "hits": 14,
-       "break_even": 0.5015,
-       "prob_above": 0.9395,
-       "roi": 0.2373,
-       "edge": 0.1502,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Mercado = golos (mais/menos) & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Mercado",
-         "golos (mais/menos)"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 13,
-       "games": 12,
-       "hits": 10,
-       "break_even": 0.5341,
-       "prob_above": 0.8735,
-       "roi": 0.4477,
-       "edge": 0.1168,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Mercado = golos (mais/menos) & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Mercado",
-         "golos (mais/menos)"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 39,
-       "games": 24,
-       "hits": 25,
-       "break_even": 0.5089,
-       "prob_above": 0.8517,
-       "roi": 0.2664,
-       "edge": 0.0875,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 11,
-     "bad": [
-      {
-       "id": "Polymarket | Hora (UTC) = noite & Mercado = golos (mais/menos) & Número de apostas = várias",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Mercado",
-         "golos (mais/menos)"
-        ],
-        [
-         "Número de apostas",
-         "várias"
-        ]
-       ],
-       "n": 11,
-       "games": 9,
-       "hits": 3,
-       "break_even": 0.4832,
-       "prob_above": 0.1078,
-       "roi": -0.4573,
-       "edge": -0.136,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 43,
-       "games": 25,
-       "hits": 18,
-       "break_even": 0.4911,
-       "prob_above": 0.1216,
-       "roi": -0.1935,
-       "edge": -0.0973,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 14
     },
     {
      "match_id": "trinidad-and-tobago-vs-antigua-barbuda-20261117",
@@ -5771,13 +5669,13 @@
     }
    ],
    "counts": {
-    "favorável": 2,
+    "favorável": 1,
     "misto": 6,
     "sem evidência": 0,
     "contraditório": 0,
     "evitar": 2
    },
-   "generated_utc": "2026-11-16T21:30:58+00:00",
+   "generated_utc": "2026-11-16T21:39:44+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5790,7 +5688,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7085,
+     "hypotheses": 7097,
      "with_prospective_evidence": 1740,
      "prospective_games": 34321
     },
@@ -5904,7 +5802,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 244,
+    "bets": 245,
     "settled": 202,
     "games": 170,
     "wins": 101,
@@ -17507,6 +17405,35 @@
   "llm_total": 59,
   "watch": [
    {
+    "date_utc": "2026-11-16T21:34:42+00:00",
+    "match": "Deportivo Moquegua — Atletico Grau",
+    "match_id": "deportivo-moquegua-vs-atletico-grau-20261116",
+    "type": "OPEN_GAME",
+    "market": "Asian Total",
+    "selection": "Over 3",
+    "odds": 1.58,
+    "kickoff_utc": null,
+    "reasons": [
+     {
+      "id": "Jogo aberto | Hora (UTC) = noite",
+      "status": "promissora",
+      "n": 38,
+      "games": 38,
+      "hit_rate": 0.7297,
+      "prob_above": 0.9671,
+      "edge": 0.1284,
+      "edge_ci": [
+       0.0144,
+       0.2329
+      ],
+      "prob_above_cut": 0.9538,
+      "prudent_rate": 0.695,
+      "break_even": 0.5666,
+      "certified": false
+     }
+    ]
+   },
+   {
     "date_utc": "2026-11-16T21:27:49+00:00",
     "match": "Cusco FC — AD Tarma",
     "match_id": "cusco-fc-vs-ad-tarma-20261116",
@@ -19458,12 +19385,12 @@
     "phase": "live",
     "level": 1,
     "signals": 121,
-    "n": 62,
+    "n": 64,
     "hits": 24,
-    "hit_rate": 0.3871,
-    "break_even": 0.3701,
-    "roi": 0.1234,
-    "prob_above": 0.5719
+    "hit_rate": 0.375,
+    "break_even": 0.3644,
+    "roi": 0.0883,
+    "prob_above": 0.5343
    },
    {
     "phase": "live",
@@ -19524,32 +19451,32 @@
   "accuracy": {
    "BETFAIR/live": {
     "signals": 121,
-    "with_result": 62,
+    "with_result": 64,
     "hits": 24,
-    "misses": 38,
+    "misses": 40,
     "pushes": 0,
     "eff_hits": 24.0,
-    "eff_misses": 38.0,
+    "eff_misses": 40.0,
     "vote_hits": 23.5,
-    "vote_misses": 37.5,
-    "vote_break_even": 0.3718,
-    "games": 61,
+    "vote_misses": 39.5,
+    "vote_break_even": 0.366,
+    "games": 63,
     "no_source": 35,
     "unsettleable": 0,
-    "hit_rate": 0.3871,
+    "hit_rate": 0.375,
     "ci95": [
-     0.2758,
-     0.5115
+     0.2667,
+     0.4975
     ],
-    "avg_odds": 4.661,
-    "break_even": 0.3701,
+    "avg_odds": 4.687,
+    "break_even": 0.3644,
     "baseline": false,
-    "roi_announced_odds": 0.1234,
+    "roi_announced_odds": 0.0883,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 11.6,
+    "per_day": 12.0,
     "days_to_hint": 0,
-    "days_to_conclusion": 21
+    "days_to_conclusion": 20
    },
    "BETFAIR/pre": {
     "signals": 19,
@@ -19581,7 +19508,7 @@
     "days_to_conclusion": 118
    },
    "OPEN_GAME": {
-    "signals": 152,
+    "signals": 153,
     "with_result": 150,
     "hits": 75,
     "misses": 45,
@@ -19611,59 +19538,59 @@
    },
    "POLYMARKET": {
     "signals": 167,
-    "with_result": 133,
-    "hits": 64,
-    "misses": 69,
+    "with_result": 139,
+    "hits": 66,
+    "misses": 73,
     "pushes": 0,
-    "eff_hits": 64.0,
-    "eff_misses": 69.0,
-    "vote_hits": 20.08,
-    "vote_misses": 23.92,
-    "vote_break_even": 0.5153,
-    "games": 44,
+    "eff_hits": 66.0,
+    "eff_misses": 73.0,
+    "vote_hits": 20.75,
+    "vote_misses": 25.25,
+    "vote_break_even": 0.5126,
+    "games": 46,
     "no_source": 0,
-    "unsettleable": 8,
-    "hit_rate": 0.4812,
+    "unsettleable": 17,
+    "hit_rate": 0.4748,
     "ci95": [
-     0.398,
-     0.5654
+     0.3936,
+     0.5574
     ],
-    "avg_odds": 2.246,
-    "break_even": 0.4934,
+    "avg_odds": 2.252,
+    "break_even": 0.4918,
     "baseline": false,
-    "roi_announced_odds": -0.0591,
+    "roi_announced_odds": -0.0686,
     "seen_late": 0,
     "by_bot_mark": 77,
-    "per_day": 31.5,
+    "per_day": 32.9,
     "days_to_hint": 0,
-    "days_to_conclusion": 6
+    "days_to_conclusion": 5
    },
    "STAKE_LOAD": {
     "signals": 140,
-    "with_result": 89,
+    "with_result": 90,
     "hits": 40,
-    "misses": 46,
+    "misses": 47,
     "pushes": 3,
     "eff_hits": 39.5,
-    "eff_misses": 45.5,
+    "eff_misses": 46.5,
     "vote_hits": 16.95,
-    "vote_misses": 22.97,
-    "vote_break_even": 0.5371,
-    "games": 40,
+    "vote_misses": 23.97,
+    "vote_break_even": 0.5372,
+    "games": 41,
     "no_source": 0,
     "unsettleable": 49,
-    "hit_rate": 0.4647,
+    "hit_rate": 0.4593,
     "ci95": [
-     0.3625,
-     0.57
+     0.358,
+     0.5641
     ],
-    "avg_odds": 1.973,
+    "avg_odds": 1.972,
     "break_even": 0.5406,
     "baseline": false,
-    "roi_announced_odds": -0.1608,
+    "roi_announced_odds": -0.1702,
     "seen_late": 0,
     "by_bot_mark": 19,
-    "per_day": 20.2,
+    "per_day": 20.4,
     "days_to_hint": 0,
     "days_to_conclusion": 11
    },
@@ -19729,7 +19656,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 62,
+    "n": 64,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -19760,33 +19687,33 @@
    },
    {
     "type": "POLYMARKET",
-    "n": 133,
+    "n": 139,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 93,
-     "hit_rate": 0.4624,
-     "break_even": 0.4906,
-     "roi": -0.0871
+     "n": 99,
+     "hit_rate": 0.4646,
+     "break_even": 0.4934,
+     "roi": -0.0912
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.525,
-     "break_even": 0.5,
-     "roi": 0.006
+     "hit_rate": 0.5,
+     "break_even": 0.4877,
+     "roi": -0.0125
     },
-    "z": 0.56
+    "z": 0.44
    },
    {
     "type": "STAKE_LOAD",
-    "n": 86,
+    "n": 87,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 46,
-     "hit_rate": 0.4348,
-     "break_even": 0.5301,
-     "roi": -0.2252
+     "n": 47,
+     "hit_rate": 0.4255,
+     "break_even": 0.5304,
+     "roi": -0.2417
     },
     "recent": {
      "n": 40,
@@ -19794,7 +19721,7 @@
      "break_even": 0.5526,
      "roi": -0.0989
     },
-    "z": 0.4
+    "z": 0.49
    },
    {
     "type": "TOTALS_FORM",
@@ -19847,32 +19774,32 @@
   },
   "Q2 Betfair: sem reforço (sinal único)": {
    "bets": 92,
-   "settled": 43,
-   "matches": 43,
+   "settled": 45,
+   "matches": 45,
    "wins": 11,
    "pushes": 0,
-   "units": -4.54,
-   "avg_odds": 5.719,
+   "units": -6.54,
+   "avg_odds": 5.709,
    "roi": {
     "odd-0%": {
-     "roi": -0.1056,
+     "roi": -0.1453,
      "ci95": [
-      -0.6193,
-      0.4082
+      -0.639,
+      0.3483
      ]
     },
     "odd-2%": {
-     "roi": -0.1235,
+     "roi": -0.1624,
      "ci95": [
-      -0.6269,
-      0.38
+      -0.6462,
+      0.3214
      ]
     },
     "odd-5%": {
-     "roi": -0.1503,
+     "roi": -0.1881,
      "ci95": [
-      -0.6384,
-      0.3378
+      -0.657,
+      0.2809
      ]
     }
    },
@@ -19927,32 +19854,32 @@
   },
   "Q3 Betfair: odd [2.50; ∞)": {
    "bets": 95,
-   "settled": 45,
-   "matches": 44,
+   "settled": 47,
+   "matches": 46,
    "wins": 15,
    "pushes": 0,
-   "units": 7.2,
-   "avg_odds": 5.865,
+   "units": 5.2,
+   "avg_odds": 5.849,
    "roi": {
     "odd-0%": {
-     "roi": 0.16,
+     "roi": 0.1106,
      "ci95": [
-      -0.3563,
-      0.6763
+      -0.3881,
+      0.6094
      ]
     },
     "odd-2%": {
-     "roi": 0.1368,
+     "roi": 0.0884,
      "ci95": [
-      -0.3692,
-      0.6428
+      -0.4004,
+      0.5772
      ]
     },
     "odd-5%": {
-     "roi": 0.102,
+     "roi": 0.0551,
      "ci95": [
-      -0.3885,
-      0.5925
+      -0.4187,
+      0.529
      ]
     }
    },
@@ -20096,7 +20023,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q6 Open game: sinal do minuto 46 em diante": {
-   "bets": 107,
+   "bets": 108,
    "settled": 105,
    "matches": 105,
    "wins": 54,
@@ -20130,33 +20057,33 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 658,
-   "settled": 505,
-   "matches": 295,
-   "wins": 244,
+   "bets": 659,
+   "settled": 514,
+   "matches": 299,
+   "wins": 246,
    "pushes": 33,
-   "units": -2.0,
-   "avg_odds": 2.327,
+   "units": -6.67,
+   "avg_odds": 2.339,
    "roi": {
     "odd-0%": {
-     "roi": -0.004,
+     "roi": -0.013,
      "ci95": [
-      -0.0921,
-      0.0842
+      -0.1001,
+      0.0742
      ]
     },
     "odd-2%": {
-     "roi": -0.0221,
+     "roi": -0.0309,
      "ci95": [
-      -0.1085,
-      0.0643
+      -0.1163,
+      0.0545
      ]
     },
     "odd-5%": {
-     "roi": -0.0492,
+     "roi": -0.0579,
      "ci95": [
-      -0.133,
-      0.0345
+      -0.1407,
+      0.0249
      ]
     }
    },
@@ -20166,15 +20093,31 @@
  },
  "recent_bets": [
   {
+   "date_utc": "2026-11-16T21:34:42+00:00",
+   "match_id": "deportivo-moquegua-vs-atletico-grau-20261116",
+   "group": "OPEN_GAME",
+   "match": "Deportivo Moquegua — Atletico Grau",
+   "selection": "Over 3",
+   "odds": 1.58,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
    "date_utc": "2026-11-16T21:27:56+00:00",
    "match_id": "gibraltar-vs-malta-20261116",
    "group": "BETFAIR/live/mkt>=10K",
    "match": "Gibraltar — Malta",
    "selection": "Malta",
    "odds": 4.4,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    1
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -20198,9 +20141,12 @@
    "match": "Germany — Netherlands",
    "selection": "Under 4.5",
    "odds": 2.44,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    5,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -20224,9 +20170,12 @@
    "match": "Greece — Serbia",
    "selection": "Under 0.5",
    "odds": 4.0,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -20334,7 +20283,10 @@
    "match": "Greece — Serbia",
    "selection": "Polymarket: AH2(+0.5)",
    "odds": 3.03,
-   "ft": null,
+   "ft": [
+    1,
+    0
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 1,
@@ -20360,7 +20312,10 @@
    "match": "Greece — Serbia",
    "selection": "Polymarket: AH2(+1.5)",
    "odds": 1.75,
-   "ft": null,
+   "ft": [
+    1,
+    0
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 2,
@@ -20373,7 +20328,10 @@
    "match": "Gibraltar — Malta",
    "selection": "Polymarket: AH2(-0.5)",
    "odds": 1.67,
-   "ft": null,
+   "ft": [
+    1,
+    1
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 1,
@@ -20386,7 +20344,10 @@
    "match": "Greece — Serbia",
    "selection": "Polymarket: AH1(-1.5)",
    "odds": 2.33,
-   "ft": null,
+   "ft": [
+    1,
+    0
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 2,
@@ -20499,9 +20460,12 @@
    "match": "Greece — Serbia",
    "selection": "Under 2.5",
    "odds": 2.33,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -20541,9 +20505,12 @@
    "match": "Germany — Netherlands",
    "selection": "Over 3.5",
    "odds": 2.0,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    5,
+    0
+   ],
+   "w": 1.0,
+   "settled_by": "resultado HL",
    "n_signals": 6,
    "max_mult": 1
   },
@@ -20570,9 +20537,12 @@
    "match": "Italy U21 — Belgium U21",
    "selection": "Italy U21",
    "odds": 6.6,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    2
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -20891,9 +20861,12 @@
    "match": "Greece — Serbia",
    "selection": "Over 2.5",
    "odds": 1.67,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    1,
+    0
+   ],
+   "w": -1.0,
+   "settled_by": "resultado HL",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -21018,22 +20991,6 @@
    "settled_by": "marca do bot",
    "n_signals": 2,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T15:13:55+00:00",
-   "match_id": "kosovo-u21-vs-luxembourg-u21-20261116",
-   "group": "BETFAIR/live/mkt>=10K",
-   "match": "Kosovo U21 — Luxembourg U21",
-   "selection": "Kosovo U21",
-   "odds": 2.88,
-   "ft": [
-    0,
-    2
-   ],
-   "w": -1.0,
-   "settled_by": "resultado HL",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -21042,15 +20999,6 @@
    "match": "Plymouth Argyle U21 — Leicester U21",
    "league": "England English U21 Premier League Cup",
    "date_utc": "2026-11-16T19:05:13+00:00",
-   "kickoff_utc": null,
-   "why": "à espera da fonte de resultados",
-   "signals": 1
-  },
-  {
-   "match_id": "italy-u21-vs-belgium-u21-20261116",
-   "match": "Italy U21 — Belgium U21",
-   "league": "International Friendlies International U20",
-   "date_utc": "2026-11-16T18:27:12+00:00",
    "kickoff_utc": null,
    "why": "à espera da fonte de resultados",
    "signals": 1
@@ -21576,6 +21524,15 @@
    "kickoff_utc": null,
    "why": "à espera da fonte de resultados",
    "signals": 1
+  },
+  {
+   "match_id": "cucuta-deportivo-vs-jaguares-de-cordoba-20261114",
+   "match": "Cucuta Deportivo — Jaguares De Cordoba",
+   "league": "Colombian Primera Division",
+   "date_utc": "2026-11-14T20:53:33+00:00",
+   "kickoff_utc": "2026-11-14T20:30+00:00",
+   "why": "mercado que o resultado final não decide",
+   "signals": 1
   }
  ],
  "matches": {
@@ -21904,7 +21861,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    5,
+    0
+   ]
   },
   "switzerland-vs-scotland-20261116": {
    "teams": [
@@ -22334,7 +22294,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    1,
+    0
+   ]
   },
   "macedonia-vs-slovenia-20261116": {
    "teams": [
@@ -22762,31 +22725,6 @@
     0
    ]
   },
-  "kosovo-u21-vs-luxembourg-u21-20261116": {
-   "teams": [
-    "Kosovo U21",
-    "Luxembourg U21"
-   ],
-   "events": [
-    {
-     "d": "2026-11-16T15:13:55+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "selection": "1",
-     "odds": 2.88,
-     "mult": 1,
-     "share": 84,
-     "mkt_volume": 20000.0,
-     "market": "1X2"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    0,
-    2
-   ]
-  },
   "czech-republic-u20-vs-germany-u20-20261116": {
    "teams": [
     "Czech Republic U20",
@@ -23005,6 +22943,21 @@
      "share": 73,
      "mkt_volume": 34000.0,
      "market": "1X2"
+    },
+    {
+     "d": "2026-11-16T21:34:42+00:00",
+     "k": "OPEN_GAME",
+     "phase": "live",
+     "selection": "Over 3",
+     "odds": 1.58,
+     "minute": 53,
+     "score_at_signal": [
+      1,
+      1
+     ],
+     "rhythm": 91,
+     "bot_over_pct": 78,
+     "market": "Asian Total"
     }
    ],
    "goals": null,
@@ -23244,7 +23197,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    2,
+    2
+   ]
   },
   "guyana-vs-puerto-rico-20261116": {
    "teams": [
@@ -23428,7 +23384,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    1,
+    1
+   ]
   },
   "guadeloupe-vs-bermuda-20261116": {
    "teams": [
@@ -26428,8 +26387,18 @@
    "o": 4.1
   },
   {
-   "d": "2026-11-14T22:57:49+00:00",
+   "d": "2026-11-14T22:49:12+00:00",
    "u": -12.37,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "STAKE_LOAD",
+   "m": "Germany — Netherlands",
+   "s": "1x2: Germany",
+   "o": 1.85
+  },
+  {
+   "d": "2026-11-14T22:57:49+00:00",
+   "u": -13.37,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -26439,7 +26408,7 @@
   },
   {
    "d": "2026-11-14T22:58:06+00:00",
-   "u": -11.6,
+   "u": -12.6,
    "g": 0.77,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26449,7 +26418,7 @@
   },
   {
    "d": "2026-11-14T23:18:43+00:00",
-   "u": -10.6,
+   "u": -11.6,
    "g": 1.0,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -26459,7 +26428,7 @@
   },
   {
    "d": "2026-11-14T23:22:23+00:00",
-   "u": -9.81,
+   "u": -10.81,
    "g": 0.79,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26469,7 +26438,7 @@
   },
   {
    "d": "2026-11-14T23:51:48+00:00",
-   "u": -9.29,
+   "u": -10.29,
    "g": 0.52,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -26479,7 +26448,7 @@
   },
   {
    "d": "2026-11-15T00:19:07+00:00",
-   "u": -8.73,
+   "u": -9.73,
    "g": 0.56,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -26489,7 +26458,7 @@
   },
   {
    "d": "2026-11-15T00:19:12+00:00",
-   "u": -8.17,
+   "u": -9.17,
    "g": 0.56,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -26499,7 +26468,7 @@
   },
   {
    "d": "2026-11-15T02:22:33+00:00",
-   "u": -9.17,
+   "u": -10.17,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -26509,7 +26478,7 @@
   },
   {
    "d": "2026-11-15T02:29:12+00:00",
-   "u": -8.39,
+   "u": -9.39,
    "g": 0.78,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26519,7 +26488,7 @@
   },
   {
    "d": "2026-11-15T03:33:42+00:00",
-   "u": -9.39,
+   "u": -10.39,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26529,7 +26498,7 @@
   },
   {
    "d": "2026-11-15T04:14:32+00:00",
-   "u": -8.96,
+   "u": -9.96,
    "g": 0.43,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -26539,7 +26508,7 @@
   },
   {
    "d": "2026-11-15T04:21:30+00:00",
-   "u": -9.96,
+   "u": -10.96,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -26549,7 +26518,7 @@
   },
   {
    "d": "2026-11-15T04:38:21+00:00",
-   "u": -8.74,
+   "u": -9.74,
    "g": 1.22,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26559,7 +26528,7 @@
   },
   {
    "d": "2026-11-15T04:40:13+00:00",
-   "u": -7.75,
+   "u": -8.75,
    "g": 0.99,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26569,7 +26538,7 @@
   },
   {
    "d": "2026-11-15T04:47:05+00:00",
-   "u": -7.11,
+   "u": -8.11,
    "g": 0.64,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26579,7 +26548,7 @@
   },
   {
    "d": "2026-11-15T05:02:06+00:00",
-   "u": -8.11,
+   "u": -9.11,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26589,7 +26558,7 @@
   },
   {
    "d": "2026-11-15T05:40:03+00:00",
-   "u": -7.23,
+   "u": -8.23,
    "g": 0.88,
    "w": 1.0,
    "t": "WEAKENED_LINEUP",
@@ -26599,7 +26568,7 @@
   },
   {
    "d": "2026-11-15T07:17:31+00:00",
-   "u": -8.23,
+   "u": -9.23,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26609,7 +26578,7 @@
   },
   {
    "d": "2026-11-15T07:38:10+00:00",
-   "u": -9.23,
+   "u": -10.23,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -26619,7 +26588,7 @@
   },
   {
    "d": "2026-11-15T07:56:53+00:00",
-   "u": -8.43,
+   "u": -9.43,
    "g": 0.8,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -26629,7 +26598,7 @@
   },
   {
    "d": "2026-11-15T07:58:43+00:00",
-   "u": -9.43,
+   "u": -10.43,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26639,7 +26608,7 @@
   },
   {
    "d": "2026-11-15T08:22:34+00:00",
-   "u": -9.03,
+   "u": -10.03,
    "g": 0.4,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26649,7 +26618,7 @@
   },
   {
    "d": "2026-11-15T09:25:54+00:00",
-   "u": -8.35,
+   "u": -9.35,
    "g": 0.68,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26659,7 +26628,7 @@
   },
   {
    "d": "2026-11-15T09:52:04+00:00",
-   "u": -8.35,
+   "u": -9.35,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -26669,7 +26638,7 @@
   },
   {
    "d": "2026-11-15T11:17:46+00:00",
-   "u": -9.35,
+   "u": -10.35,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -26679,7 +26648,7 @@
   },
   {
    "d": "2026-11-15T11:22:06+00:00",
-   "u": -8.61,
+   "u": -9.61,
    "g": 0.74,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -26689,7 +26658,7 @@
   },
   {
    "d": "2026-11-15T11:24:39+00:00",
-   "u": -7.93,
+   "u": -8.93,
    "g": 0.68,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -26699,7 +26668,7 @@
   },
   {
    "d": "2026-11-15T11:26:54+00:00",
-   "u": -7.59,
+   "u": -8.59,
    "g": 0.34,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -26709,7 +26678,7 @@
   },
   {
    "d": "2026-11-15T11:27:06+00:00",
-   "u": -8.59,
+   "u": -9.59,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26719,7 +26688,7 @@
   },
   {
    "d": "2026-11-15T11:31:02+00:00",
-   "u": -9.59,
+   "u": -10.59,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -26729,7 +26698,7 @@
   },
   {
    "d": "2026-11-15T11:33:07+00:00",
-   "u": -9.04,
+   "u": -10.04,
    "g": 0.55,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -26739,7 +26708,7 @@
   },
   {
    "d": "2026-11-15T11:35:04+00:00",
-   "u": -7.12,
+   "u": -8.12,
    "g": 1.92,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -26749,7 +26718,7 @@
   },
   {
    "d": "2026-11-15T11:51:54+00:00",
-   "u": -6.74,
+   "u": -7.74,
    "g": 0.39,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -26759,7 +26728,7 @@
   },
   {
    "d": "2026-11-15T11:53:49+00:00",
-   "u": -7.74,
+   "u": -8.74,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26769,7 +26738,7 @@
   },
   {
    "d": "2026-11-15T11:55:41+00:00",
-   "u": -8.74,
+   "u": -9.74,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -26779,7 +26748,7 @@
   },
   {
    "d": "2026-11-15T11:59:52+00:00",
-   "u": -9.74,
+   "u": -10.74,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26789,7 +26758,7 @@
   },
   {
    "d": "2026-11-15T11:59:55+00:00",
-   "u": -10.74,
+   "u": -11.74,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26799,7 +26768,7 @@
   },
   {
    "d": "2026-11-15T12:17:10+00:00",
-   "u": -11.74,
+   "u": -12.74,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -26809,7 +26778,7 @@
   },
   {
    "d": "2026-11-15T12:22:14+00:00",
-   "u": -10.74,
+   "u": -11.74,
    "g": 1.0,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26819,7 +26788,7 @@
   },
   {
    "d": "2026-11-15T12:26:33+00:00",
-   "u": -11.74,
+   "u": -12.74,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26829,7 +26798,7 @@
   },
   {
    "d": "2026-11-15T12:30:34+00:00",
-   "u": -12.74,
+   "u": -13.74,
    "g": -1.0,
    "w": -1.0,
    "t": "WEAKENED_LINEUP",
@@ -26839,7 +26808,7 @@
   },
   {
    "d": "2026-11-15T12:43:01+00:00",
-   "u": -13.74,
+   "u": -14.74,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -26849,7 +26818,7 @@
   },
   {
    "d": "2026-11-15T12:56:28+00:00",
-   "u": -13.07,
+   "u": -14.07,
    "g": 0.67,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26859,7 +26828,7 @@
   },
   {
    "d": "2026-11-15T12:56:28+00:00",
-   "u": -14.07,
+   "u": -15.07,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26869,7 +26838,7 @@
   },
   {
    "d": "2026-11-15T12:56:29+00:00",
-   "u": -15.07,
+   "u": -16.07,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26879,7 +26848,7 @@
   },
   {
    "d": "2026-11-15T13:25:05+00:00",
-   "u": -14.37,
+   "u": -15.37,
    "g": 0.7,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -26889,7 +26858,7 @@
   },
   {
    "d": "2026-11-15T13:30:56+00:00",
-   "u": -13.65,
+   "u": -14.65,
    "g": 0.72,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26899,7 +26868,7 @@
   },
   {
    "d": "2026-11-15T13:45:48+00:00",
-   "u": -13.65,
+   "u": -14.65,
    "g": 0.0,
    "w": 0.0,
    "t": "STAKE_LOAD",
@@ -26909,7 +26878,7 @@
   },
   {
    "d": "2026-11-15T13:45:54+00:00",
-   "u": -14.65,
+   "u": -15.65,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26919,7 +26888,7 @@
   },
   {
    "d": "2026-11-15T13:51:25+00:00",
-   "u": -15.65,
+   "u": -16.65,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26929,7 +26898,7 @@
   },
   {
    "d": "2026-11-15T13:56:45+00:00",
-   "u": -14.83,
+   "u": -15.83,
    "g": 0.82,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26939,7 +26908,7 @@
   },
   {
    "d": "2026-11-15T14:04:30+00:00",
-   "u": -15.83,
+   "u": -16.83,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -26949,7 +26918,7 @@
   },
   {
    "d": "2026-11-15T14:06:27+00:00",
-   "u": -16.83,
+   "u": -17.83,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26959,7 +26928,7 @@
   },
   {
    "d": "2026-11-15T14:09:58+00:00",
-   "u": -15.79,
+   "u": -16.79,
    "g": 1.04,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -26969,7 +26938,7 @@
   },
   {
    "d": "2026-11-15T14:15:38+00:00",
-   "u": -15.79,
+   "u": -16.79,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -26979,7 +26948,7 @@
   },
   {
    "d": "2026-11-15T14:16:06+00:00",
-   "u": -16.79,
+   "u": -17.79,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -26989,7 +26958,7 @@
   },
   {
    "d": "2026-11-15T14:17:58+00:00",
-   "u": -16.07,
+   "u": -17.07,
    "g": 0.72,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -26999,7 +26968,7 @@
   },
   {
    "d": "2026-11-15T14:18:30+00:00",
-   "u": -15.26,
+   "u": -16.26,
    "g": 0.81,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27009,7 +26978,7 @@
   },
   {
    "d": "2026-11-15T14:21:57+00:00",
-   "u": -14.86,
+   "u": -15.86,
    "g": 0.4,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -27019,7 +26988,7 @@
   },
   {
    "d": "2026-11-15T14:22:25+00:00",
-   "u": -14.86,
+   "u": -15.86,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -27029,7 +26998,7 @@
   },
   {
    "d": "2026-11-15T14:30:26+00:00",
-   "u": -15.86,
+   "u": -16.86,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27039,7 +27008,7 @@
   },
   {
    "d": "2026-11-15T14:32:15+00:00",
-   "u": -16.86,
+   "u": -17.86,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27049,7 +27018,7 @@
   },
   {
    "d": "2026-11-15T14:32:15+00:00",
-   "u": -17.86,
+   "u": -18.86,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27059,7 +27028,7 @@
   },
   {
    "d": "2026-11-15T14:36:21+00:00",
-   "u": -18.86,
+   "u": -19.86,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27069,7 +27038,7 @@
   },
   {
    "d": "2026-11-15T14:41:43+00:00",
-   "u": -19.36,
+   "u": -20.36,
    "g": -0.5,
    "w": -0.5,
    "t": "WEAKENED_LINEUP",
@@ -27079,7 +27048,7 @@
   },
   {
    "d": "2026-11-15T14:41:46+00:00",
-   "u": -20.36,
+   "u": -21.36,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27089,7 +27058,7 @@
   },
   {
    "d": "2026-11-15T14:43:41+00:00",
-   "u": -21.36,
+   "u": -22.36,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27099,7 +27068,7 @@
   },
   {
    "d": "2026-11-15T14:47:16+00:00",
-   "u": -20.97,
+   "u": -21.97,
    "g": 0.39,
    "w": 0.5,
    "t": "WEAKENED_LINEUP",
@@ -27109,7 +27078,7 @@
   },
   {
    "d": "2026-11-15T14:49:26+00:00",
-   "u": -21.97,
+   "u": -22.97,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27119,7 +27088,7 @@
   },
   {
    "d": "2026-11-15T14:49:39+00:00",
-   "u": -22.97,
+   "u": -23.97,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27129,7 +27098,7 @@
   },
   {
    "d": "2026-11-15T14:49:39+00:00",
-   "u": -22.32,
+   "u": -23.32,
    "g": 0.65,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27139,7 +27108,7 @@
   },
   {
    "d": "2026-11-15T14:59:20+00:00",
-   "u": -21.98,
+   "u": -22.98,
    "g": 0.34,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -27149,7 +27118,7 @@
   },
   {
    "d": "2026-11-15T15:03:13+00:00",
-   "u": -21.25,
+   "u": -22.25,
    "g": 0.73,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -27159,7 +27128,7 @@
   },
   {
    "d": "2026-11-15T15:05:31+00:00",
-   "u": -20.5,
+   "u": -21.5,
    "g": 0.75,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27169,7 +27138,7 @@
   },
   {
    "d": "2026-11-15T15:16:36+00:00",
-   "u": -21.5,
+   "u": -22.5,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27179,7 +27148,7 @@
   },
   {
    "d": "2026-11-15T15:16:36+00:00",
-   "u": -20.57,
+   "u": -21.57,
    "g": 0.93,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27189,7 +27158,7 @@
   },
   {
    "d": "2026-11-15T15:18:43+00:00",
-   "u": -19.84,
+   "u": -20.84,
    "g": 0.73,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27199,7 +27168,7 @@
   },
   {
    "d": "2026-11-15T15:21:11+00:00",
-   "u": -19.24,
+   "u": -20.24,
    "g": 0.6,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27209,7 +27178,7 @@
   },
   {
    "d": "2026-11-15T15:25:30+00:00",
-   "u": -18.82,
+   "u": -19.82,
    "g": 0.42,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -27219,7 +27188,7 @@
   },
   {
    "d": "2026-11-15T15:37:03+00:00",
-   "u": -17.91,
+   "u": -18.91,
    "g": 0.91,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27229,7 +27198,7 @@
   },
   {
    "d": "2026-11-15T15:46:34+00:00",
-   "u": -17.91,
+   "u": -18.91,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -27239,7 +27208,7 @@
   },
   {
    "d": "2026-11-15T15:46:42+00:00",
-   "u": -17.24,
+   "u": -18.24,
    "g": 0.67,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27249,7 +27218,7 @@
   },
   {
    "d": "2026-11-15T15:46:42+00:00",
-   "u": -16.63,
+   "u": -17.63,
    "g": 0.61,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27259,7 +27228,7 @@
   },
   {
    "d": "2026-11-15T15:56:33+00:00",
-   "u": -17.63,
+   "u": -18.63,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27269,7 +27238,7 @@
   },
   {
    "d": "2026-11-15T15:56:33+00:00",
-   "u": -16.42,
+   "u": -17.42,
    "g": 1.21,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27279,7 +27248,7 @@
   },
   {
    "d": "2026-11-15T15:56:34+00:00",
-   "u": -17.42,
+   "u": -18.42,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27289,7 +27258,7 @@
   },
   {
    "d": "2026-11-15T15:56:34+00:00",
-   "u": -16.42,
+   "u": -17.42,
    "g": 1.0,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27299,7 +27268,7 @@
   },
   {
    "d": "2026-11-15T16:00:44+00:00",
-   "u": -15.7,
+   "u": -16.7,
    "g": 0.72,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27309,7 +27278,7 @@
   },
   {
    "d": "2026-11-15T16:10:33+00:00",
-   "u": -16.7,
+   "u": -17.7,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27319,7 +27288,7 @@
   },
   {
    "d": "2026-11-15T16:10:34+00:00",
-   "u": -17.7,
+   "u": -18.7,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27329,7 +27298,7 @@
   },
   {
    "d": "2026-11-15T16:12:36+00:00",
-   "u": -17.02,
+   "u": -18.02,
    "g": 0.68,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27339,7 +27308,7 @@
   },
   {
    "d": "2026-11-15T16:18:14+00:00",
-   "u": -16.67,
+   "u": -17.67,
    "g": 0.35,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -27349,7 +27318,7 @@
   },
   {
    "d": "2026-11-15T16:18:41+00:00",
-   "u": -17.67,
+   "u": -18.67,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27359,7 +27328,7 @@
   },
   {
    "d": "2026-11-15T16:19:02+00:00",
-   "u": -18.67,
+   "u": -19.67,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27369,7 +27338,7 @@
   },
   {
    "d": "2026-11-15T16:21:02+00:00",
-   "u": -17.17,
+   "u": -18.17,
    "g": 1.5,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27379,7 +27348,7 @@
   },
   {
    "d": "2026-11-15T16:21:12+00:00",
-   "u": -18.17,
+   "u": -19.17,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -27389,7 +27358,7 @@
   },
   {
    "d": "2026-11-15T16:23:06+00:00",
-   "u": -17.67,
+   "u": -18.67,
    "g": 0.5,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27399,7 +27368,7 @@
   },
   {
    "d": "2026-11-15T16:25:33+00:00",
-   "u": -18.67,
+   "u": -19.67,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27409,7 +27378,7 @@
   },
   {
    "d": "2026-11-15T16:27:33+00:00",
-   "u": -19.67,
+   "u": -20.67,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27419,7 +27388,7 @@
   },
   {
    "d": "2026-11-15T16:29:52+00:00",
-   "u": -20.67,
+   "u": -21.67,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27429,7 +27398,7 @@
   },
   {
    "d": "2026-11-15T16:32:17+00:00",
-   "u": -18.34,
+   "u": -19.34,
    "g": 2.33,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27439,7 +27408,7 @@
   },
   {
    "d": "2026-11-15T16:51:21+00:00",
-   "u": -19.34,
+   "u": -20.34,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27449,7 +27418,7 @@
   },
   {
    "d": "2026-11-15T17:01:15+00:00",
-   "u": -20.34,
+   "u": -21.34,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27459,7 +27428,7 @@
   },
   {
    "d": "2026-11-15T17:01:29+00:00",
-   "u": -21.34,
+   "u": -22.34,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27469,7 +27438,7 @@
   },
   {
    "d": "2026-11-15T17:05:45+00:00",
-   "u": -19.99,
+   "u": -20.99,
    "g": 1.35,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27479,7 +27448,7 @@
   },
   {
    "d": "2026-11-15T17:19:37+00:00",
-   "u": -19.99,
+   "u": -20.99,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -27489,7 +27458,7 @@
   },
   {
    "d": "2026-11-15T17:20:01+00:00",
-   "u": -19.56,
+   "u": -20.56,
    "g": 0.43,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27499,7 +27468,7 @@
   },
   {
    "d": "2026-11-15T17:32:13+00:00",
-   "u": -20.56,
+   "u": -21.56,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -27509,7 +27478,7 @@
   },
   {
    "d": "2026-11-15T17:36:02+00:00",
-   "u": -19.51,
+   "u": -20.51,
    "g": 1.05,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27519,7 +27488,7 @@
   },
   {
    "d": "2026-11-15T17:41:59+00:00",
-   "u": -18.91,
+   "u": -19.91,
    "g": 0.6,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27529,7 +27498,7 @@
   },
   {
    "d": "2026-11-15T17:50:25+00:00",
-   "u": -19.91,
+   "u": -20.91,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -27539,7 +27508,7 @@
   },
   {
    "d": "2026-11-15T17:50:37+00:00",
-   "u": -20.91,
+   "u": -21.91,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27549,7 +27518,7 @@
   },
   {
    "d": "2026-11-15T18:09:27+00:00",
-   "u": -20.39,
+   "u": -21.39,
    "g": 0.52,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27559,7 +27528,7 @@
   },
   {
    "d": "2026-11-15T18:11:32+00:00",
-   "u": -19.3,
+   "u": -20.3,
    "g": 1.09,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27569,7 +27538,7 @@
   },
   {
    "d": "2026-11-15T18:22:23+00:00",
-   "u": -18.55,
+   "u": -19.55,
    "g": 0.75,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27579,7 +27548,7 @@
   },
   {
    "d": "2026-11-15T18:27:49+00:00",
-   "u": -19.55,
+   "u": -20.55,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -27589,7 +27558,7 @@
   },
   {
    "d": "2026-11-15T18:36:35+00:00",
-   "u": -19.06,
+   "u": -20.06,
    "g": 0.49,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27599,7 +27568,7 @@
   },
   {
    "d": "2026-11-15T18:36:35+00:00",
-   "u": -20.06,
+   "u": -21.06,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27609,7 +27578,7 @@
   },
   {
    "d": "2026-11-15T18:42:04+00:00",
-   "u": -19.62,
+   "u": -20.62,
    "g": 0.44,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27619,7 +27588,7 @@
   },
   {
    "d": "2026-11-15T18:42:04+00:00",
-   "u": -18.48,
+   "u": -19.48,
    "g": 1.14,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27629,7 +27598,7 @@
   },
   {
    "d": "2026-11-15T18:42:05+00:00",
-   "u": -19.48,
+   "u": -20.48,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27639,7 +27608,7 @@
   },
   {
    "d": "2026-11-15T18:45:48+00:00",
-   "u": -20.48,
+   "u": -21.48,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27649,7 +27618,7 @@
   },
   {
    "d": "2026-11-15T18:45:50+00:00",
-   "u": -21.48,
+   "u": -22.48,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27659,7 +27628,7 @@
   },
   {
    "d": "2026-11-15T18:45:50+00:00",
-   "u": -22.48,
+   "u": -23.48,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27669,7 +27638,7 @@
   },
   {
    "d": "2026-11-15T18:49:31+00:00",
-   "u": -23.48,
+   "u": -24.48,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/pre",
@@ -27679,7 +27648,7 @@
   },
   {
    "d": "2026-11-15T18:53:15+00:00",
-   "u": -20.53,
+   "u": -21.53,
    "g": 2.95,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -27689,7 +27658,7 @@
   },
   {
    "d": "2026-11-15T19:02:20+00:00",
-   "u": -20.53,
+   "u": -21.53,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -27699,7 +27668,7 @@
   },
   {
    "d": "2026-11-15T19:02:35+00:00",
-   "u": -18.83,
+   "u": -19.83,
    "g": 1.7,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27709,7 +27678,7 @@
   },
   {
    "d": "2026-11-15T19:04:37+00:00",
-   "u": -18.49,
+   "u": -19.49,
    "g": 0.34,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -27719,7 +27688,7 @@
   },
   {
    "d": "2026-11-15T19:08:33+00:00",
-   "u": -19.49,
+   "u": -20.49,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27729,7 +27698,7 @@
   },
   {
    "d": "2026-11-15T19:16:01+00:00",
-   "u": -18.93,
+   "u": -19.93,
    "g": 0.56,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27739,7 +27708,7 @@
   },
   {
    "d": "2026-11-15T19:27:11+00:00",
-   "u": -19.93,
+   "u": -20.93,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27749,7 +27718,7 @@
   },
   {
    "d": "2026-11-15T19:27:11+00:00",
-   "u": -19.39,
+   "u": -20.39,
    "g": 0.54,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27759,7 +27728,7 @@
   },
   {
    "d": "2026-11-15T19:28:59+00:00",
-   "u": -18.71,
+   "u": -19.71,
    "g": 0.68,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -27769,7 +27738,7 @@
   },
   {
    "d": "2026-11-15T19:31:18+00:00",
-   "u": -19.71,
+   "u": -20.71,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -27779,7 +27748,7 @@
   },
   {
    "d": "2026-11-15T19:41:22+00:00",
-   "u": -20.71,
+   "u": -21.71,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27789,7 +27758,7 @@
   },
   {
    "d": "2026-11-15T19:41:26+00:00",
-   "u": -21.71,
+   "u": -22.71,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27799,7 +27768,7 @@
   },
   {
    "d": "2026-11-15T19:41:38+00:00",
-   "u": -22.71,
+   "u": -23.71,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27809,7 +27778,7 @@
   },
   {
    "d": "2026-11-15T19:41:38+00:00",
-   "u": -23.71,
+   "u": -24.71,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27819,7 +27788,7 @@
   },
   {
    "d": "2026-11-15T19:47:42+00:00",
-   "u": -22.56,
+   "u": -23.56,
    "g": 1.15,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27829,7 +27798,7 @@
   },
   {
    "d": "2026-11-15T19:51:41+00:00",
-   "u": -23.56,
+   "u": -24.56,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -27839,7 +27808,7 @@
   },
   {
    "d": "2026-11-15T19:52:14+00:00",
-   "u": -22.74,
+   "u": -23.74,
    "g": 0.82,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27849,7 +27818,7 @@
   },
   {
    "d": "2026-11-15T19:54:17+00:00",
-   "u": -22.06,
+   "u": -23.06,
    "g": 0.68,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27859,7 +27828,7 @@
   },
   {
    "d": "2026-11-15T19:58:35+00:00",
-   "u": -21.63,
+   "u": -22.63,
    "g": 0.43,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27869,7 +27838,7 @@
   },
   {
    "d": "2026-11-15T20:04:29+00:00",
-   "u": -22.63,
+   "u": -23.63,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27879,7 +27848,7 @@
   },
   {
    "d": "2026-11-15T20:11:58+00:00",
-   "u": -22.13,
+   "u": -23.13,
    "g": 0.5,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27889,7 +27858,7 @@
   },
   {
    "d": "2026-11-15T20:15:42+00:00",
-   "u": -21.42,
+   "u": -22.42,
    "g": 0.71,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27899,7 +27868,7 @@
   },
   {
    "d": "2026-11-15T20:21:17+00:00",
-   "u": -22.42,
+   "u": -23.42,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -27909,7 +27878,7 @@
   },
   {
    "d": "2026-11-15T20:30:03+00:00",
-   "u": -21.42,
+   "u": -22.42,
    "g": 1.0,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27919,7 +27888,7 @@
   },
   {
    "d": "2026-11-15T20:40:46+00:00",
-   "u": -20.07,
+   "u": -21.07,
    "g": 1.35,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27929,7 +27898,7 @@
   },
   {
    "d": "2026-11-15T20:40:49+00:00",
-   "u": -18.69,
+   "u": -19.69,
    "g": 1.38,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -27939,7 +27908,7 @@
   },
   {
    "d": "2026-11-15T20:45:58+00:00",
-   "u": -18.04,
+   "u": -19.04,
    "g": 0.65,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27949,7 +27918,7 @@
   },
   {
    "d": "2026-11-15T20:59:57+00:00",
-   "u": -19.04,
+   "u": -20.04,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -27959,7 +27928,7 @@
   },
   {
    "d": "2026-11-15T21:07:18+00:00",
-   "u": -19.04,
+   "u": -20.04,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -27969,7 +27938,7 @@
   },
   {
    "d": "2026-11-15T21:09:30+00:00",
-   "u": -18.04,
+   "u": -19.04,
    "g": 1.0,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27979,7 +27948,7 @@
   },
   {
    "d": "2026-11-15T21:11:24+00:00",
-   "u": -17.41,
+   "u": -18.41,
    "g": 0.63,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -27989,7 +27958,7 @@
   },
   {
    "d": "2026-11-15T21:20:11+00:00",
-   "u": -16.91,
+   "u": -17.91,
    "g": 0.5,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -27999,7 +27968,7 @@
   },
   {
    "d": "2026-11-15T21:21:56+00:00",
-   "u": -17.91,
+   "u": -18.91,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28009,7 +27978,7 @@
   },
   {
    "d": "2026-11-15T21:32:19+00:00",
-   "u": -17.91,
+   "u": -18.91,
    "g": 0.0,
    "w": 0.0,
    "t": "OPEN_GAME",
@@ -28019,7 +27988,7 @@
   },
   {
    "d": "2026-11-15T21:32:25+00:00",
-   "u": -18.91,
+   "u": -19.91,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -28029,7 +27998,7 @@
   },
   {
    "d": "2026-11-15T21:35:56+00:00",
-   "u": -19.91,
+   "u": -20.91,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -28039,7 +28008,7 @@
   },
   {
    "d": "2026-11-15T21:35:59+00:00",
-   "u": -18.61,
+   "u": -19.61,
    "g": 1.3,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28049,7 +28018,7 @@
   },
   {
    "d": "2026-11-15T21:35:59+00:00",
-   "u": -19.61,
+   "u": -20.61,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28059,7 +28028,7 @@
   },
   {
    "d": "2026-11-15T21:39:56+00:00",
-   "u": -20.11,
+   "u": -21.11,
    "g": -0.5,
    "w": -0.5,
    "t": "STAKE_LOAD",
@@ -28069,7 +28038,7 @@
   },
   {
    "d": "2026-11-15T21:40:01+00:00",
-   "u": -21.11,
+   "u": -22.11,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28079,7 +28048,7 @@
   },
   {
    "d": "2026-11-15T21:41:55+00:00",
-   "u": -20.88,
+   "u": -21.88,
    "g": 0.22,
    "w": 0.5,
    "t": "STAKE_LOAD",
@@ -28089,7 +28058,7 @@
   },
   {
    "d": "2026-11-15T21:41:58+00:00",
-   "u": -21.88,
+   "u": -22.88,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
@@ -28099,7 +28068,7 @@
   },
   {
    "d": "2026-11-15T22:26:53+00:00",
-   "u": -21.2,
+   "u": -22.2,
    "g": 0.68,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28109,7 +28078,7 @@
   },
   {
    "d": "2026-11-15T22:28:48+00:00",
-   "u": -20.43,
+   "u": -21.43,
    "g": 0.77,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28119,7 +28088,7 @@
   },
   {
    "d": "2026-11-15T23:28:51+00:00",
-   "u": -21.43,
+   "u": -22.43,
    "g": -1.0,
    "w": -1.0,
    "t": "TOTALS_FORM",
@@ -28129,7 +28098,7 @@
   },
   {
    "d": "2026-11-15T23:33:57+00:00",
-   "u": -19.23,
+   "u": -20.23,
    "g": 2.2,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28139,7 +28108,7 @@
   },
   {
    "d": "2026-11-15T23:37:25+00:00",
-   "u": -18.38,
+   "u": -19.38,
    "g": 0.85,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -28149,7 +28118,7 @@
   },
   {
    "d": "2026-11-15T23:54:21+00:00",
-   "u": -19.38,
+   "u": -20.38,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28159,7 +28128,7 @@
   },
   {
    "d": "2026-11-16T00:14:08+00:00",
-   "u": -18.93,
+   "u": -19.93,
    "g": 0.45,
    "w": 1.0,
    "t": "STAKE_LOAD",
@@ -28169,7 +28138,7 @@
   },
   {
    "d": "2026-11-16T00:22:35+00:00",
-   "u": -17.61,
+   "u": -18.61,
    "g": 1.32,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28179,7 +28148,7 @@
   },
   {
    "d": "2026-11-16T00:42:40+00:00",
-   "u": -17.06,
+   "u": -18.06,
    "g": 0.55,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -28189,7 +28158,7 @@
   },
   {
    "d": "2026-11-16T00:51:09+00:00",
-   "u": -18.06,
+   "u": -19.06,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -28199,7 +28168,7 @@
   },
   {
    "d": "2026-11-16T00:54:31+00:00",
-   "u": -19.06,
+   "u": -20.06,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28209,7 +28178,7 @@
   },
   {
    "d": "2026-11-16T01:21:09+00:00",
-   "u": -17.3,
+   "u": -18.3,
    "g": 1.76,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28219,7 +28188,7 @@
   },
   {
    "d": "2026-11-16T01:59:56+00:00",
-   "u": -18.3,
+   "u": -19.3,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28229,7 +28198,7 @@
   },
   {
    "d": "2026-11-16T02:35:23+00:00",
-   "u": -19.3,
+   "u": -20.3,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28239,7 +28208,7 @@
   },
   {
    "d": "2026-11-16T09:28:18+00:00",
-   "u": -18.3,
+   "u": -19.3,
    "g": 1.0,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28248,8 +28217,18 @@
    "o": 2.0
   },
   {
+   "d": "2026-11-16T10:14:44+00:00",
+   "u": -20.3,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "POLYMARKET",
+   "m": "Germany — Netherlands",
+   "s": "Under 3.5",
+   "o": 1.85
+  },
+  {
    "d": "2026-11-16T12:24:53+00:00",
-   "u": -17.45,
+   "u": -19.45,
    "g": 0.85,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28259,7 +28238,7 @@
   },
   {
    "d": "2026-11-16T13:30:09+00:00",
-   "u": -18.45,
+   "u": -20.45,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28269,7 +28248,7 @@
   },
   {
    "d": "2026-11-16T13:34:58+00:00",
-   "u": -19.45,
+   "u": -21.45,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28279,7 +28258,7 @@
   },
   {
    "d": "2026-11-16T13:51:12+00:00",
-   "u": -18.53,
+   "u": -20.53,
    "g": 0.92,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28289,7 +28268,7 @@
   },
   {
    "d": "2026-11-16T13:52:26+00:00",
-   "u": -19.53,
+   "u": -21.53,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/pre",
@@ -28299,7 +28278,7 @@
   },
   {
    "d": "2026-11-16T14:11:35+00:00",
-   "u": -18.51,
+   "u": -20.51,
    "g": 1.02,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28309,7 +28288,7 @@
   },
   {
    "d": "2026-11-16T14:26:54+00:00",
-   "u": -17.74,
+   "u": -19.74,
    "g": 0.77,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28319,7 +28298,7 @@
   },
   {
    "d": "2026-11-16T14:36:48+00:00",
-   "u": -16.81,
+   "u": -18.81,
    "g": 0.93,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28329,7 +28308,7 @@
   },
   {
    "d": "2026-11-16T14:46:42+00:00",
-   "u": -14.46,
+   "u": -16.46,
    "g": 2.35,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28339,7 +28318,7 @@
   },
   {
    "d": "2026-11-16T15:13:55+00:00",
-   "u": -15.46,
+   "u": -17.46,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28349,7 +28328,7 @@
   },
   {
    "d": "2026-11-16T15:17:28+00:00",
-   "u": -16.46,
+   "u": -18.46,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28359,7 +28338,7 @@
   },
   {
    "d": "2026-11-16T15:22:29+00:00",
-   "u": -17.46,
+   "u": -19.46,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28369,7 +28348,7 @@
   },
   {
    "d": "2026-11-16T15:27:32+00:00",
-   "u": -18.46,
+   "u": -20.46,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28379,7 +28358,7 @@
   },
   {
    "d": "2026-11-16T15:32:49+00:00",
-   "u": -19.46,
+   "u": -21.46,
    "g": -1.0,
    "w": -1.0,
    "t": "BETFAIR/live",
@@ -28389,7 +28368,7 @@
   },
   {
    "d": "2026-11-16T15:42:38+00:00",
-   "u": -18.65,
+   "u": -20.65,
    "g": 0.81,
    "w": 1.0,
    "t": "TOTALS_FORM",
@@ -28399,7 +28378,7 @@
   },
   {
    "d": "2026-11-16T16:28:55+00:00",
-   "u": -19.65,
+   "u": -21.65,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28408,8 +28387,18 @@
    "o": 2.0
   },
   {
+   "d": "2026-11-16T16:34:00+00:00",
+   "u": -22.65,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "POLYMARKET",
+   "m": "Greece — Serbia",
+   "s": "Over 2.5",
+   "o": 1.67
+  },
+  {
    "d": "2026-11-16T16:48:58+00:00",
-   "u": -18.65,
+   "u": -21.65,
    "g": 1.0,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28419,7 +28408,7 @@
   },
   {
    "d": "2026-11-16T16:54:01+00:00",
-   "u": -19.65,
+   "u": -22.65,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28429,7 +28418,7 @@
   },
   {
    "d": "2026-11-16T16:54:03+00:00",
-   "u": -18.32,
+   "u": -21.32,
    "g": 1.33,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28439,7 +28428,7 @@
   },
   {
    "d": "2026-11-16T16:59:13+00:00",
-   "u": -17.73,
+   "u": -20.73,
    "g": 0.59,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28449,7 +28438,7 @@
   },
   {
    "d": "2026-11-16T16:59:14+00:00",
-   "u": -16.8,
+   "u": -19.8,
    "g": 0.93,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28459,7 +28448,7 @@
   },
   {
    "d": "2026-11-16T16:59:14+00:00",
-   "u": -17.8,
+   "u": -20.8,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28469,7 +28458,7 @@
   },
   {
    "d": "2026-11-16T17:09:32+00:00",
-   "u": -16.1,
+   "u": -19.1,
    "g": 1.7,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28479,7 +28468,7 @@
   },
   {
    "d": "2026-11-16T17:15:00+00:00",
-   "u": -15.45,
+   "u": -18.45,
    "g": 0.65,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28489,7 +28478,7 @@
   },
   {
    "d": "2026-11-16T17:18:59+00:00",
-   "u": -13.0,
+   "u": -16.0,
    "g": 2.45,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28499,7 +28488,7 @@
   },
   {
    "d": "2026-11-16T17:26:17+00:00",
-   "u": -12.65,
+   "u": -15.65,
    "g": 0.35,
    "w": 0.5,
    "t": "TOTALS_FORM",
@@ -28509,7 +28498,7 @@
   },
   {
    "d": "2026-11-16T18:13:46+00:00",
-   "u": -13.65,
+   "u": -16.65,
    "g": -1.0,
    "w": -1.0,
    "t": "POLYMARKET",
@@ -28519,7 +28508,7 @@
   },
   {
    "d": "2026-11-16T18:18:59+00:00",
-   "u": -12.88,
+   "u": -15.88,
    "g": 0.77,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28529,7 +28518,7 @@
   },
   {
    "d": "2026-11-16T18:19:26+00:00",
-   "u": -13.88,
+   "u": -16.88,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -28539,7 +28528,7 @@
   },
   {
    "d": "2026-11-16T18:19:34+00:00",
-   "u": -12.92,
+   "u": -15.92,
    "g": 0.96,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28549,7 +28538,7 @@
   },
   {
    "d": "2026-11-16T18:21:30+00:00",
-   "u": -13.92,
+   "u": -16.92,
    "g": -1.0,
    "w": -1.0,
    "t": "OPEN_GAME",
@@ -28559,7 +28548,7 @@
   },
   {
    "d": "2026-11-16T18:25:32+00:00",
-   "u": -13.36,
+   "u": -16.36,
    "g": 0.56,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28568,8 +28557,18 @@
    "o": 1.56
   },
   {
+   "d": "2026-11-16T18:27:12+00:00",
+   "u": -17.36,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "BETFAIR/live",
+   "m": "Italy U21 — Belgium U21",
+   "s": "Italy U21",
+   "o": 6.6
+  },
+  {
    "d": "2026-11-16T18:30:30+00:00",
-   "u": -12.73,
+   "u": -16.73,
    "g": 0.63,
    "w": 1.0,
    "t": "POLYMARKET",
@@ -28578,8 +28577,18 @@
    "o": 1.63
   },
   {
+   "d": "2026-11-16T18:44:27+00:00",
+   "u": -15.73,
+   "g": 1.0,
+   "w": 1.0,
+   "t": "POLYMARKET",
+   "m": "Germany — Netherlands",
+   "s": "Over 3.5",
+   "o": 2.0
+  },
+  {
    "d": "2026-11-16T18:44:36+00:00",
-   "u": -6.73,
+   "u": -9.73,
    "g": 6.0,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28588,8 +28597,18 @@
    "o": 7.0
   },
   {
+   "d": "2026-11-16T18:54:56+00:00",
+   "u": -8.4,
+   "g": 1.33,
+   "w": 1.0,
+   "t": "POLYMARKET",
+   "m": "Greece — Serbia",
+   "s": "Under 2.5",
+   "o": 2.33
+  },
+  {
    "d": "2026-11-16T19:15:47+00:00",
-   "u": -6.36,
+   "u": -8.03,
    "g": 0.38,
    "w": 0.5,
    "t": "OPEN_GAME",
@@ -28599,7 +28618,7 @@
   },
   {
    "d": "2026-11-16T19:21:50+00:00",
-   "u": -5.45,
+   "u": -7.12,
    "g": 0.91,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28609,7 +28628,7 @@
   },
   {
    "d": "2026-11-16T19:28:52+00:00",
-   "u": -3.49,
+   "u": -5.16,
    "g": 1.96,
    "w": 1.0,
    "t": "BETFAIR/live",
@@ -28619,7 +28638,7 @@
   },
   {
    "d": "2026-11-16T20:20:18+00:00",
-   "u": -2.75,
+   "u": -4.42,
    "g": 0.74,
    "w": 1.0,
    "t": "OPEN_GAME",
@@ -28629,13 +28648,43 @@
   },
   {
    "d": "2026-11-16T20:22:44+00:00",
-   "u": -2.0,
+   "u": -3.67,
    "g": 0.75,
    "w": 1.0,
    "t": "OPEN_GAME",
    "m": "Guadeloupe — Bermuda",
    "s": "Over 3",
    "o": 1.75
+  },
+  {
+   "d": "2026-11-16T21:05:46+00:00",
+   "u": -4.67,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "POLYMARKET",
+   "m": "Greece — Serbia",
+   "s": "Under 0.5",
+   "o": 4.0
+  },
+  {
+   "d": "2026-11-16T21:20:37+00:00",
+   "u": -5.67,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "POLYMARKET",
+   "m": "Germany — Netherlands",
+   "s": "Under 4.5",
+   "o": 2.44
+  },
+  {
+   "d": "2026-11-16T21:27:56+00:00",
+   "u": -6.67,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "BETFAIR/live",
+   "m": "Gibraltar — Malta",
+   "s": "Malta",
+   "o": 4.4
   }
  ],
  "daily": [
@@ -28662,9 +28711,9 @@
   },
   {
    "bets": 253,
-   "settled": 214,
+   "settled": 215,
    "wins": 103,
-   "units": 2.3,
+   "units": 1.3,
    "day": "2026-11-14"
   },
   {
@@ -28675,10 +28724,10 @@
    "day": "2026-11-15"
   },
   {
-   "bets": 93,
-   "settled": 48,
-   "wins": 30,
-   "units": 17.39,
+   "bets": 94,
+   "settled": 56,
+   "wins": 32,
+   "units": 13.72,
    "day": "2026-11-16"
   }
  ]
