@@ -65349,6 +65349,33 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-16T04:43:23+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Adiciona condição de ritmo para refinar a hipótese",
+  "source": "llm"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T19:15:02+00:00",
   "conditions": [

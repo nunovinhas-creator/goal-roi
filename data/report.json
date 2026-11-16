@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-16T04:34:42+00:00",
+ "generated_at_utc": "2026-11-16T04:43:51+00:00",
  "messages": 1033,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 2,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T04:34:37+00:00",
+  "collector_last_run_utc": "2026-11-16T04:43:21+00:00",
   "name_review": [
    {
     "bot": [
@@ -1630,7 +1630,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 23.1,
+   "per_day": 23.0,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.825,
@@ -3145,7 +3145,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6238,
+    "em observação": 6239,
     "abandonada": 6,
     "promissora": 51
    },
@@ -4202,11 +4202,11 @@
     }
    ]
   },
-  "hypotheses": 6295,
+  "hypotheses": 6296,
   "tested": 381,
   "corrected_bar": null,
   "counts": {
-   "em observação": 6288,
+   "em observação": 6289,
    "abandonada": 3,
    "promissora": 4
   },
@@ -4952,7 +4952,7 @@
     "contraditório": 0,
     "evitar": 1
    },
-   "generated_utc": "2026-11-16T04:34:59+00:00",
+   "generated_utc": "2026-11-16T04:44:09+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4970,7 +4970,7 @@
      "as_expected": 1462
     },
     "llm/refinar": {
-     "hypotheses": 34,
+     "hypotheses": 35,
      "judged": 11,
      "as_expected": 5
     },
@@ -15141,6 +15141,75 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "menos de 90"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-16T04:43:23+00:00",
+    "reason": "Adiciona condição de ritmo para refinar a hipótese",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado & Valor da aposta = 10 mil $ ou mais",
     "family": "Polymarket",
     "conditions": [
@@ -16457,76 +16526,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 6,
-    "signals": 7,
-    "hits": 4,
-    "misses": 2,
-    "hit_rate": 0.6667,
-    "ci95": [
-     0.3,
-     0.9032
-    ],
-    "break_even": 0.6101,
-    "roi": 0.0786,
-    "games": 6,
-    "bets": 6,
-    "unidentified": 0,
-    "prudent_rate": 0.6313,
-    "prob_above": 0.5861,
-    "edge": 0.0212,
-    "edge_ci": [
-     -0.181,
-     0.2042
-    ],
-    "prob_above_cut": 0.5466,
-    "prob_adds": 0.4731,
-    "id": "Jogo aberto | Competição = feminino & Ritmo indicado pelo bot = menos de 90",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Competição",
-      "feminino"
-     ],
-     [
-      "Ritmo indicado pelo bot",
-      "menos de 90"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-14T16:28:18+00:00",
-    "reason": "jogo lento em competição feminina",
-    "expect": "abaixo",
-    "mode": "evitar",
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": "0a001130f996621a",
-    "prospective": {
-     "games": 6,
-     "hits": 4.0,
-     "misses": 2.0,
-     "prob_above": null,
-     "roi": 0.0917,
-     "categories": {
-      "prospective": 6,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 55,
+  "llm_total": 56,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -16548,15 +16550,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 85,
-  "llm_last_run_utc": "2026-11-16T03:42:30+00:00",
+  "llm_runs": 86,
+  "llm_last_run_utc": "2026-11-16T04:43:23+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-16",
-   "calls_today": 4,
-   "neurons_today": 833.1,
-   "accepted_today": 4,
-   "last_mode": "novas"
+   "calls_today": 5,
+   "neurons_today": 1066.5,
+   "accepted_today": 5,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -16949,7 +16951,7 @@
     "roi_announced_odds": -0.1608,
     "seen_late": 0,
     "by_bot_mark": 19,
-    "per_day": 24.2,
+    "per_day": 24.1,
     "days_to_hint": 0,
     "days_to_conclusion": 9
    },
