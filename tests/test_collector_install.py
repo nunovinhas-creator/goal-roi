@@ -122,7 +122,7 @@ class WorkflowInstall(unittest.TestCase):
         self.assertIn('permissions:\n  contents: write\n  actions: write\n'
                       '  # BSD recovery tail only: OIDC attestation of journal events. Adds no repository access.\n'
                       '  id-token: write\nconcurrency:', self.text)
-        self.assertEqual(re.findall(r'timeout-minutes: (\d+)', self.text), ['18'])
+        self.assertEqual(re.findall(r'^    timeout-minutes: (\d+)', self.text, re.M), ['18'])   # job level
         steps = self.text.split('    steps:\n', 1)[1]
         self.assertTrue(steps.startswith('      # BSD recovery tail only'))
         self.assertLess(steps.index('GOAL_ROI_JOB_STARTED_UTC'), steps.index('actions/checkout@'))
