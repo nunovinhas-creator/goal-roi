@@ -30,8 +30,8 @@ def git(cwd, *args, check=True):
     return r
 
 
-@unittest.skipUnless(shutil.which('git'), 'git required')
-class AcrossRunners(unittest.TestCase):
+class GitWorld(unittest.TestCase):
+    """GitHub as a bare repository; every runner is a fresh clone."""
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp)
@@ -80,10 +80,13 @@ class AcrossRunners(unittest.TestCase):
         elif hook.exists():
             hook.unlink()
 
-    # -----------------------------------------------------------------------------------------------------------------
+
+
+@unittest.skipUnless(shutil.which('git'), 'git required')
+class AcrossRunners(GitWorld):
 
     def test_without_the_barrier_a_dead_runner_causes_a_duplicate(self):
-        """Characterisation of the defect found by the audit (current workflow, NOTIFY_DURABLE unset)."""
+        """Characterisation of the defect found by the audit (workflow without the barrier, NOTIFY_DURABLE unset)."""
         a, sent = self.runner(), []
 
         def crash_after_send(token, chat, text):
@@ -269,6 +272,107 @@ class WithdrawalCrash(unittest.TestCase):
         st = consistent(self, d)
         self.assertEqual(len(d.sent), 1)                                             # sent once, not lost as "uncertain"
         self.assertEqual([r['state'] for r in st['deliveries'].values()], ['delivered'])
+
+
+class WorkflowActivation(unittest.TestCase):
+    """The authorised change (review #5921136533): exactly `NOTIFY_DURABLE: git` in the env of the two steps that notify."""
+
+    def steps(self):
+        text = (Path(__file__).resolve().parents[1] / '.github' / 'workflows' / 'collect.yml').read_text(encoding='utf-8')
+        out, name = {}, None
+        for line in text.split('\n'):
+            if line.startswith('      - name: '):
+                name = line[len('      - name: '):]
+                out[name] = []
+            elif name:
+                out[name].append(line)
+        return text, out
+
+    def test_barrier_enabled_exactly_in_the_two_notifying_steps(self):
+        text, steps = self.steps()
+        self.assertEqual(text.count('NOTIFY_DURABLE'), 2)
+        with_barrier = sorted(n for n, lines in steps.items() if '          NOTIFY_DURABLE: git' in lines)
+        self.assertEqual(with_barrier, ["Fast reads every 2 minutes until the next collection (read-only)",
+                                        "Telegram notices through the user's bot (skipped without keys)"])
+        for name in with_barrier:
+            lines = steps[name]
+            self.assertLess(lines.index('        env:'), lines.index('          NOTIFY_DURABLE: git'))
+            self.assertTrue(any('scangoal.notify' in l or 'scangoal.watch' in l for l in lines))
+        failure = next(n for n in steps if n.startswith('Tell the user when a collection fails'))
+        self.assertNotIn('          NOTIFY_DURABLE: git', steps[failure])          # --failure stays outside the barrier
+
+    def test_prerequisites_of_the_barrier_are_in_the_workflow(self):
+        text, steps = self.steps()
+        self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
+        self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)   # single writer
+        self.assertIn('uses: actions/checkout@v4', text)                              # persisted credentials
+        self.assertTrue(any('scangoal.watch' in l for l in steps['Fast reads every 2 minutes until the next collection (read-only)']))
+
+    def test_fast_reads_go_through_the_same_run(self):
+        from scangoal import watch
+        with tempfile.TemporaryDirectory() as d, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': d}), \
+                patch('scangoal.report.build', return_value={'x': 1}), patch.object(notify, 'run') as run:
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                watch.refresh()
+            finally:
+                os.chdir(cwd)
+        run.assert_called_once_with()                    # no arguments: reads os.environ, i.e. NOTIFY_DURABLE of the step
+
+
+@unittest.skipUnless(shutil.which('git'), 'git required')
+class BarrierOrdering(GitWorld):
+    def test_nothing_is_transmitted_before_the_intent_of_that_text_is_on_the_remote(self):
+        a, seen = self.runner(), []
+
+        def sender(token, chat, text):
+            remote = json.loads(git(self.tmp, '--git-dir', str(self.remote), 'show', 'main:data/notify_state.json').stdout)
+            rec = [r for r in remote['deliveries'].values() if r.get('sha256') == notify.sha(text)]
+            seen.append([r['state'] for r in rec])
+        out = self.notify(a, sender)
+        self.assertEqual(seen, [['in_flight'], ['in_flight']])           # each text's own intent was already published
+        self.assertIn('NOTIFY_DURABILITY git', out)
+        self.assertIn('NOTIFY_DURABILITY local', self.notify(self.runner(), lambda *x: None, env=ENV))
+
+    def test_real_sender_and_fast_reads_path_publish_before_the_http_request(self):
+        from scangoal import watch
+        a, calls = self.runner(), []
+
+        class Answer:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *x):
+                return False
+
+            def read(self, n):
+                return b'{"ok": true}'
+
+        def fake_urlopen(req, timeout=None):
+            text = dict(x.split('=', 1) for x in req.data.decode().split('&'))['text']
+            from urllib.parse import unquote_plus
+            remote = json.loads(git(self.tmp, '--git-dir', str(self.remote), 'show', 'main:data/notify_state.json').stdout)
+            calls.append([r['state'] for r in remote['deliveries'].values() if r.get('sha256') == notify.sha(unquote_plus(text))])
+            return Answer()
+        rep = json.loads((a / 'data' / 'report.json').read_text())
+        env = {'SCANGOAL_DATA_DIR': str(a / 'data'), **DURABLE}
+        cwd = os.getcwd()
+        os.chdir(a)
+        try:
+            with patch.dict(os.environ, env), patch('scangoal.report.build', return_value=rep), \
+                    patch.object(notify, 'urlopen', fake_urlopen), redirect_stdout(io.StringIO()) as out:
+                watch.refresh()                                           # the fast-read path, with the real `send`
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(calls, [['in_flight'], ['in_flight']])
+        self.assertIn('NOTIFY_DURABILITY git', out.getvalue())
+        self.commit_step(a)
+        b = self.runner()
+        sent = []
+        self.notify(b, lambda t, c, text: sent.append(text))
+        self.assertEqual(sent, [])                                        # nothing repeated by the next runner
+        self.assertEqual(self.remote_state()['sent_total'], 314)
 
 
 if __name__ == '__main__':

@@ -98,9 +98,13 @@ class NotifyMigration(unittest.TestCase):
         notify.messages({'brain': {'status_list': {'h0': 'forte'}}}, state, NOW)
         self.assertEqual(state, old)
 
-    def files(self, directory):
+    def files(self, directory, history=False):
+        # history=True: a state the PR 5 notifier accepts (P2-R): production history carries at least the PR 1 marker.
         path = Path(directory) / 'notify_state.json'
-        path.write_text(json.dumps(legacy_state()))
+        state = legacy_state()
+        if history:
+            state['migrations'] = {notify.STATUS_MIGRATION: {'at_utc': '2026-11-14T11:00:00+00:00', 'baseline_statuses': {}}}
+        path.write_text(json.dumps(state))
         (Path(directory) / 'report.json').write_text(json.dumps(eligible_report()))
         return path
 
@@ -125,11 +129,11 @@ class NotifyMigration(unittest.TestCase):
         # PR 5 (at most once): the intent is persisted BEFORE the send; an unknown sender error makes the greeting UNCERTAIN,
         # it is never resent and never counted as delivered. The migration persisted before the send stays.
         with tempfile.TemporaryDirectory() as d, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': d}):
-            path = self.files(d)
+            path = self.files(d, history=True)
             state = json.loads(path.read_text()); state['hello'] = False; path.write_text(json.dumps(state))
             def fail(*args):
                 persisted = json.loads(path.read_text())
-                self.assertIn(notify.STATUS_MIGRATION, persisted['migrations'])
+                self.assertIn(notify.FORMAT_MIGRATION, persisted['migrations'])      # PR 5: the silent migration persisted first
                 self.assertEqual(persisted['deliveries']['hello']['state'], 'in_flight')
                 raise RuntimeError('simulated sender failure')
             env = {'TG_BOT_TOKEN': 'fake', 'TG_CHAT_ID': 'fake'}
@@ -144,7 +148,7 @@ class NotifyMigration(unittest.TestCase):
 
     def test_failed_atomic_save_leaves_state_and_sends_nothing(self):
         with tempfile.TemporaryDirectory() as d, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': d}):
-            path = self.files(d); original = path.read_bytes(); sent = []
+            path = self.files(d, history=True); original = path.read_bytes(); sent = []
             with patch.object(notify.os, 'replace', side_effect=OSError('disk failure')):
                 with self.assertRaises(OSError):
                     notify.run(lambda *args: sent.append(args), NOW, {'TG_BOT_TOKEN': 'fake', 'TG_CHAT_ID': 'fake'})

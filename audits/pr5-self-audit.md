@@ -8,6 +8,18 @@ workflows ou secrets; coletor não interrompido; certificação continua `not_ac
   autorizado era `claude/pr5-telegram-presentation`).
 - Plano: `audits/pr5-telegram-plan.md`. Runbook: `audits/pr5-cutover-runbook.md`. Evidência: `audits/pr5-evidence/`.
 
+## 00. Terceira ronda — autorização #5921136533 (barreira ligada no ramo e P2-R)
+
+| Ponto | O que foi feito | Prova |
+|---|---|---|
+| Workflow | Só duas linhas: `NOTIFY_DURABLE: git` no `env` de "Telegram notices" e de "Fast reads". Nada mais mudou (`git diff origin/main -- .github` = 2 linhas `+`). | `WorkflowActivation` (3 testes); M54, M55 |
+| Pré-requisitos | `GITHUB_REF_NAME` do Actions (`main` nas recolhas); `permissions: contents: write`; escritor único (`scangoal-write`, `cancel-in-progress: false`); `watch.refresh()` → `notify.run()` sem argumentos (lê o `NOTIFY_DURABLE` do passo). | `WorkflowActivation` |
+| Nenhum envio antes do push | No instante do envio, o remoto já tem a intenção do mesmo texto (`sha256`), também com o emissor real e pelo caminho das leituras rápidas. | `BarrierOrdering` (2); M44, M47 |
+| Produção | `post_cutover_check.pr5_intent_published_before_outcome`: commit da intenção anterior ao do resultado. Falha sem a barreira. | U15 (2, git real); M56 |
+| P2-R | `--init-state` escreve `{"installation": {"method": "init-state", …}}`. Um estado só é aceite se tiver essa marca ou um histórico de produção (`sent_total`, `watch_sent`, `statuses` e a marca da PR 1). `{}` ou equivalente, com ou sem registo, dá `StateRegressed`: zero envios e nada escrito. `--migrate-format` também recusa. Estados PR 1, PR 2, PR 3 e de produção continuam válidos. | `P2R_ResetStateWithoutLog` (6, incluindo `{}` + log ausente ou vazio + relatório real com avisos históricos → zero envios); M49–M53 |
+| Testes antigos | Dois testes de `test_notify_migration` corriam `notify.run` sobre um estado anterior à PR 1 sem marcas, que hoje é recusado. Passam a usar o mesmo estado com a marca da PR 1; a asserção sobre a migração persistida antes do envio passou a ser a da PR 5. | — |
+| Ensaio de corte | Nova fase `durable_*`: remoto *bare* com os dados congelados, runner limpo, duas execuções com a barreira e o passo de commit do workflow. Resultado: migração dentro da execução, zero mensagens, zero commits de intenção, contadores e marcas iguais, `post_cutover_check` verde. | `cutover-rehearsal.json` |
+
 ## 0. Segunda ronda — correções da auditoria independente (revisão #5920565094)
 
 Ramo atualizado com o `main` `4af4c95` por merge (sem force-push; o `main` só trouxe commits de dados).

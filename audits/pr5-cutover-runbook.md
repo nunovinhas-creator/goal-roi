@@ -15,8 +15,11 @@ O que muda nos dados de produção, sempre por acréscimo:
 
 ## Revisão #5920565094 (segunda ronda)
 
-- P0: a barreira de publicação (`NOTIFY_DURABLE=git`) está no código mas **inativa**. Sem a alteração ao workflow (desenho e
-  diff em `audits/pr5-p0-durability-design.md`, autorização separada), "no máximo uma vez" vale só dentro de cada runner.
+- P0: a barreira de publicação (`NOTIFY_DURABLE=git`) está no código e, por autorização da revisão #5921136533, **ligada no
+  workflow desta PR** (duas linhas, passos "Telegram notices" e "Fast reads"). Entra em funcionamento com o merge, sem janela
+  com a barreira desligada. Desenho e validação: `audits/pr5-p0-durability-design.md`.
+- P2-R: um `{}` (ou um estado sem histórico) nunca é uma instalação nova, mesmo sem registo de entregas. Só `--init-state`
+  escreve a marca `installation`; um estado de produção tem de ter `sent_total`, `watch_sent`, `statuses` e a marca da PR 1.
 - P1: a identidade de um aviso de jogo é a aposta (jogo, mercado, seleção), sem o nível; indício → alerta da mesma aposta não
   repete a aposta.
 - P2: estado ausente ou regredido → recusa, nada enviado (`NOTIFY_STATE_MISSING`, `StateRegressed`). Em produção, a correção
@@ -32,7 +35,8 @@ O que muda nos dados de produção, sempre por acréscimo:
 ## Fase A — preflight (só leitura, no checkout da PR, com o histórico completo)
 
 1. `git fetch origin main` e congelar o SHA M do `main`.
-2. `git diff --stat M...<SHA da PR> -- data .github docs/report.json docs/bets.csv` tem de estar vazio.
+2. `git diff --stat M...<SHA da PR> -- data docs/report.json docs/bets.csv` tem de estar vazio, e
+   `git diff M...<SHA da PR> -- .github` só pode conter as duas linhas `+          NOTIFY_DURABLE: git`.
 3. `python3.11 -m unittest discover -s tests` — tudo a passar.
 4. `python3.11 audits/pr5-evidence/mutation_check.py` — todas as mutações apanhadas.
 5. `python3.11 scripts/rehearse_pr5_cutover.py M /tmp/pr5-rehearsal.json` — `ok: true`:
@@ -55,6 +59,8 @@ O que muda nos dados de produção, sempre por acréscimo:
   scangoal.notify --migrate-format` num checkout do `main` já com o merge, commit de `data/notify_state.json` e só depois retomar.
   Exige que a referência de regras do relatório já esteja migrada (recusa caso contrário) e é idempotente.
 - Não ativar a certificação. Não alterar `fetch-depth`. Não enviar mensagens Telegram de teste.
+- O merge leva as duas linhas `NOTIFY_DURABLE: git`. Cada aviso passa a gerar um commit `notify: intent … [skip ci]` antes do
+  envio.
 
 ## Fase C — verificação (só leitura, nas duas recolhas seguintes)
 
@@ -64,7 +70,9 @@ O que muda nos dados de produção, sempre por acréscimo:
    - `pr5_log_append_only`: o registo só cresce;
    - `pr5_at_most_one_attempt`: nenhuma chave com duas intenções ou dois resultados;
    - `pr5_sent_total_matches_log`: `sent_total` = valor na migração + entregas confirmadas no registo;
-   - `pr5_nothing_in_flight`: nenhuma entrega a meio.
+   - `pr5_nothing_in_flight`: nenhuma entrega a meio;
+   - `pr5_intent_published_before_outcome`: cada entrega tem a intenção num commit anterior ao do resultado (barreira ativa).
+   Os registos dos passos mostram `NOTIFY_DURABILITY git`.
 2. `migrations.telegram_format_v2.sent_total` é igual ao `sent_total` do último commit antes do merge; `announced_statuses`
    é igual ao `statuses` desse commit.
 3. O proprietário confirma no Telegram que a primeira mensagem real depois do merge é um acontecimento novo e que começa por
@@ -79,6 +87,7 @@ O que muda nos dados de produção, sempre por acréscimo:
 - **Nunca** restaurar `data/notify_state.json` nem `data/notify_log.jsonl` de uma cópia anterior: manter sempre os mais
   recentes. O código antigo ignora os campos novos e continua a manter `statuses`, `watch_sent`, `sent_total`, `summary_day`
   e `operational_regime`; o registo fica parado (o código antigo não o escreve).
+- Reverter só a barreira: retirar as duas linhas `NOTIFY_DURABLE: git` (volta a garantia "dentro do mesmo runner").
 - Nova integração depois de uma reversão: a primeira execução com o código novo deteta que outro escritor correu
   (`last_run_utc` diferente de `format_last_run_utc`) e passa a referência anunciada para a do código antigo, em silêncio e
   com registo em `format_resyncs`. Os sinais avisados pelo código antigo ficam protegidos pelas chaves de `watch_sent`.
@@ -94,6 +103,6 @@ O que muda nos dados de produção, sempre por acréscimo:
 | Regra "mesmo jogo em 3 dias" | Um aviso no formato antigo protege reforços com outra hora de sinal pela dupla (jogo, seleção) durante 3 dias. Dois jogos diferentes com as mesmas equipas e seleção em 3 dias não teriam o segundo indício. |
 | Nome de equipa com "validada", "certificado", "forte"… | O aviso desse jogo é bloqueado (fail-closed) e contado em "bloqueados". |
 | Crescimento | `deliveries` ≈ 250 bytes por aviso no estado e ≈ 300 bytes por aviso no registo; rever acima de 5 MB. |
-| `--failure` | O aviso de recolha falhada mantém o comportamento anterior (no máximo um por hora, sem registo). |
-| Entre runners sem a barreira | Um runner que envie e morra antes do commit, ou cujo push final falhe, deixa o runner seguinte reenviar (reproduzido em `test_notify_durability`). Fecha-se com a alteração ao workflow do desenho P0. |
+| `--failure` | **Fora da barreira**: o aviso de recolha falhada mantém o comportamento anterior (no máximo um por hora, sem registo, sem chave de acontecimento). |
+| Barreira e GitHub | A garantia entre runners pressupõe que o GitHub não perde nem reverte commits de intenção já aceites (nunca fazer force-push ao `main`). Um push aceite com a resposta perdida pode perder um aviso (fica incerto), nunca duplicá-lo. |
 | Estado ausente | O notificador pára de enviar até o estado ser reposto (fail-closed). Visível nos registos (`NOTIFY_STATE_MISSING`) e por `post_cutover_check` (ficheiro ilegível). |

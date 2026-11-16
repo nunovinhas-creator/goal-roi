@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = 'scangoal/notify.py'
 TESTS = ['test_telegram_presentation.py', 'test_notify_durability.py', 'test_notify_migration.py', 'test_scangoal.py']
+WORKFLOW, CHECK = '.github/workflows/collect.yml', 'scripts/post_cutover_check.py'
 
 MUTATIONS = [
     ('M01 no intent persisted before the send',
@@ -89,6 +90,21 @@ MUTATIONS = [
      "                self.git('push', '-q', 'origin', 'HEAD:%s' % self.branch)\n                return True"),
     ('M48 P0: misconfiguration falls back to local', "    if mode != 'git' or not branch:\n        raise NotifyError(",
      "    if mode != 'git' or not branch:\n        return None\n        raise NotifyError("),
+    ('M49 P2-R: state without history or installation accepted', "    if not installed and not history:\n", "    if False:\n"),
+    ('M50 P2-R: any installation marker accepted', "    installed = isinstance(state.get(INSTALLATION), dict) and state[INSTALLATION].get('method') == 'init-state'",
+     "    installed = isinstance(state.get(INSTALLATION), dict)"),
+    ('M51 P2-R: history without the PR 1 marker accepted', "               and STATUS_MIGRATION in migrations)", "               )"),
+    ('M52 P2-R: --migrate-format migrates a reset state', "    check_integrity(state, parse_log(log.read_bytes() if log.exists() else b'')[0])", "    pass"),
+    ('M53 P2-R: --init-state writes an unmarked state',
+     "    save_state(store.state_path, {INSTALLATION: {'method': 'init-state', 'at_utc': iso(now or datetime.now(UTC))}})",
+     "    save_state(store.state_path, {})"),
+    ('M54 workflow: barrier off in the fast reads',
+     "          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}\n          NOTIFY_DURABLE: git\n        run: timeout",
+     "          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}\n        run: timeout", WORKFLOW),
+    ('M55 workflow: barrier off in the notices step',
+     "          NOTIFY_DURABLE: git\n        run: python -u -m scangoal.notify\n", "        run: python -u -m scangoal.notify\n", WORKFLOW),
+    ('M56 check: intent-before-outcome always true', "        'pr5_intent_published_before_outcome': intent_before_outcome(root, before, after),",
+     "        'pr5_intent_published_before_outcome': True,", CHECK),
     ('M36 sender HTTP 5xx counted as confirmed failure', "        if 400 <= exc.code < 500:", "        if 400 <= exc.code < 600:"),
 ]
 
@@ -118,10 +134,12 @@ def main(argv):
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d) / 'repo'
         shutil.copytree(ROOT, tmp, ignore=shutil.ignore_patterns('.git', '__pycache__'))
-        original = (tmp / TARGET).read_text(encoding='utf-8')
         code, failed = run(tmp)
         assert code == 0, 'unmutated tests must pass: %s' % failed
-        for name, old, new in MUTATIONS:
+        for mutation in MUTATIONS:
+            name, old, new = mutation[:3]
+            target = mutation[3] if len(mutation) > 3 else TARGET
+            original = (tmp / target).read_text(encoding='utf-8')
             count = original.count(old)
             if count != 1:
                 results.append({'mutation': name, 'status': 'NOT_APPLIED', 'occurrences': count})
@@ -129,13 +147,14 @@ def main(argv):
                 ok = False
                 continue
             mutant = original.replace(old, new) + (SINGLE if '_single_linkage' in new else '')
-            (tmp / TARGET).write_text(mutant, encoding='utf-8')
+            (tmp / target).write_text(mutant, encoding='utf-8')
             code, failed = run(tmp)
+            (tmp / target).write_text(original, encoding='utf-8')
             killed = code != 0
             ok &= killed
-            results.append({'mutation': name, 'status': 'KILLED' if killed else 'SURVIVED', 'failing_tests': failed[:6], 'failing_count': len(failed)})
+            results.append({'mutation': name, 'target': target, 'status': 'KILLED' if killed else 'SURVIVED', 'failing_tests': failed[:6],
+                            'failing_count': len(failed)})
             print('%-58s %s (%d)' % (name, 'KILLED' if killed else 'SURVIVED', len(failed)), flush=True)
-        (tmp / TARGET).write_text(original, encoding='utf-8')
     summary = {'mutations': len(MUTATIONS), 'killed': sum(r['status'] == 'KILLED' for r in results), 'ok': ok, 'results': results}
     if '--json' in argv:
         Path(argv[argv.index('--json') + 1]).write_text(json.dumps(summary, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')

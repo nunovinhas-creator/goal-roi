@@ -396,6 +396,8 @@ def migrate_format_file(now=None):
         raise NotifyError('eligible report required')
     path = data_dir() / STATE_NAME
     state = json.loads(path.read_text(encoding='utf-8'))
+    log = path.parent / LOG_NAME
+    check_integrity(state, parse_log(log.read_bytes() if log.exists() else b'')[0])     # P2-R: nunca migrar um estado reiniciado
     if migration_key(report) not in (state.get('migrations') or {}):
         raise NotifyError('status reference of this report not migrated')
     changed = migrate_format(report, state, now or datetime.now(UTC))
@@ -1011,25 +1013,44 @@ def _bump(state, outcome):
     counts[outcome] = counts.get(outcome, 0) + 1
 
 
+INSTALLATION = 'installation'          # marca explícita escrita só por `--init-state` (P2-R)
+
+
+def _int(v):
+    return isinstance(v, int) and not isinstance(v, bool) and v >= 0
+
+
 def check_integrity(state, entries):
-    """Um estado sem a marca PR 5 (ou com menos entregas do que na migração) ao lado de um registo de entregas é um estado
-    reposto ou reiniciado: recusar (P2). Um estado mais antigo mas já PR 5 é reparado a partir do registo (`reconcile`)."""
+    """Fail-closed (P2 e P2-R, revisões #5920565094 e #5921136533). O estado só é aceite se for:
+    - uma instalação nova registada por `--init-state` (marca `installation`), ou
+    - um histórico de produção: campos essenciais (`sent_total`, `watch_sent`, `statuses`) e pelo menos a marca da PR 1
+      (`eligible_statuses_v1`; os estados das PR 1, 2 e 3 têm-na), com ou sem a marca PR 5.
+    Um `{}` (ou outro estado sem história nem marca de instalação) é um estado reiniciado, mesmo sem registo de entregas.
+    Ao lado de um registo de entregas, o estado tem de ter a marca PR 5 e não pode ter menos entregas do que na migração.
+    Um estado mais antigo mas já PR 5 é reparado a partir do registo (`reconcile`)."""
     if not isinstance(state, dict):
         raise StateRegressed('state is not an object')
-    marker = (state.get('migrations') or {}).get(FORMAT_MIGRATION)
+    migrations = state.get('migrations') if isinstance(state.get('migrations'), dict) else {}
+    installed = isinstance(state.get(INSTALLATION), dict) and state[INSTALLATION].get('method') == 'init-state'
+    history = (_int(state.get('sent_total')) and isinstance(state.get('watch_sent'), list) and isinstance(state.get('statuses'), dict)
+               and STATUS_MIGRATION in migrations)
+    if not installed and not history:
+        raise StateRegressed('state is neither a recorded new installation nor a production history')
+    marker = migrations.get(FORMAT_MIGRATION)
     if entries and not marker:
         raise StateRegressed('delivery log present but state has no %s marker' % FORMAT_MIGRATION)
-    if marker and isinstance(marker.get('sent_total'), int) and (state.get('sent_total') or 0) < marker['sent_total']:
+    if isinstance(marker, dict) and _int(marker.get('sent_total')) and (state.get('sent_total') or 0) < marker['sent_total']:
         raise StateRegressed('sent_total below the value recorded at migration')
 
 
-def init_state_file():
-    """`--init-state`: só para uma instalação NOVA (sem estado e sem registo de entregas). Nunca substitui nada."""
+def init_state_file(now=None):
+    """`--init-state`: só para uma instalação NOVA (sem estado e sem registo de entregas). Nunca substitui nada. Escreve a
+    marca explícita `installation`, a única forma de um estado sem histórico ser aceite."""
     store = FileStore(data_dir())
     if store.state_path.exists() or (store.log_path.exists() and store.log_path.stat().st_size):
         raise NotifyError('refusing to initialise: state or delivery log already present')
     store.state_path.parent.mkdir(parents=True, exist_ok=True)
-    save_state(store.state_path, {})
+    save_state(store.state_path, {INSTALLATION: {'method': 'init-state', 'at_utc': iso(now or datetime.now(UTC))}})
     print('NOTIFY_STATE_INITIALISED')
     return True
 

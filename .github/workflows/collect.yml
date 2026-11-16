@@ -57,6 +57,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify
       - name: Commit data
         run: |
@@ -83,6 +84,7 @@ jobs:
           TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          NOTIFY_DURABLE: git
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
       - name: Commit data from the fast reads
         if: ${{ !cancelled() && github.ref_name == 'main' }}

@@ -1,6 +1,8 @@
 # PR 5 — P0: intenção de envio publicada no GitHub antes de contactar o Telegram
 
-Revisão #5920565094, P0. **Desenho para autorização separada. O workflow NÃO foi alterado.**
+Revisão #5920565094, P0. **Atualização (revisão #5921136533):** o proprietário autorizou as duas linhas
+`NOTIFY_DURABLE: git` **só no ramo da PR #28**. Estão aplicadas nesse ramo (secção 5); o `main` não foi alterado e o merge
+continua por autorizar.
 
 ## 1. O problema (reproduzido)
 
@@ -70,7 +72,7 @@ reenviada.
 
 As mutações M44–M48 removem cada peça da barreira e são todas apanhadas.
 
-## 5. Alteração ao workflow necessária (a autorizar; NÃO aplicada)
+## 5. Alteração ao workflow (autorizada e aplicada só no ramo da PR #28)
 
 ```diff
        - name: Telegram notices through the user's bot (skipped without keys)
@@ -113,10 +115,27 @@ Efeitos operacionais:
 
 ## 7. Integração proposta
 
-1. Merge da PR 5 (barreira inativa), seguindo o runbook.
-2. Com autorização expressa e separada, alterar o workflow como na secção 5.
-3. Verificar nas duas recolhas seguintes:
+1. As duas linhas seguem na mesma PR. Depois do merge não há nenhuma janela com a barreira inativa.
+2. Verificar nas duas recolhas seguintes:
    - `NOTIFY_DURABILITY git` aparece nos registos;
    - cada aviso tem um commit `notify: intent` **anterior** ao commit com o seu resultado;
    - `post_cutover_check` está verde.
-4. Reversão: retirar as duas linhas `NOTIFY_DURABLE: git`. Nenhum dado a restaurar.
+3. Reversão: retirar as duas linhas `NOTIFY_DURABLE: git` (perde-se a garantia entre runners) ou reverter a PR inteira (runbook).
+   Nenhum dado a restaurar.
+
+## 8. Validação com a barreira ligada (terceira ronda)
+
+- Estrutura (`WorkflowActivation`): `NOTIFY_DURABLE: git` aparece exatamente duas vezes, no `env` dos passos "Telegram
+  notices" e "Fast reads", e não no passo `--failure`. `permissions: contents: write`, o grupo `scangoal-write` com
+  `cancel-in-progress: false` e `actions/checkout@v4` estão presentes. `watch.refresh()` chama `notify.run()` sem
+  argumentos, e por isso lê o `NOTIFY_DURABLE` do passo.
+- Ordem (`BarrierOrdering`): no instante em que cada texto chega ao emissor, o remoto já tem a intenção desse mesmo texto
+  (`in_flight` com o mesmo `sha256`). Vale também com o emissor real (`send`, `urlopen` simulado) e pelo caminho das leituras
+  rápidas (`watch.refresh`). `NOTIFY_DURABILITY git` e `NOTIFY_DURABILITY local` aparecem nos registos.
+- Produção: `post_cutover_check` tem a verificação `pr5_intent_published_before_outcome`. Para cada entrega confirmada, o
+  commit da intenção é anterior ao do resultado. Falha se a barreira estiver desligada, o que está testado.
+- Ensaio de corte: fase `durable_*` com um remoto *bare* e um runner limpo, que corre o notificador duas vezes com a barreira:
+  migração dentro da execução, zero mensagens, zero commits de intenção, contadores e marcas iguais.
+
+O passo `--failure` (aviso de recolha falhada, no máximo um por hora) fica **fora da barreira** com o comportamento anterior:
+não é um acontecimento com chave nem conta em `sent_total`.

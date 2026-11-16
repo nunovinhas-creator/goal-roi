@@ -24,7 +24,10 @@ Verificações PR 5 (vazias e verdadeiras enquanto o estado não tiver a marca `
 - pr5_at_most_one_attempt: no registo, nenhuma chave tem mais do que uma intenção de envio não retirada nem mais do que um
   resultado (uma intenção retirada por falha de publicação não chegou ao Telegram);
 - pr5_sent_total_matches_log: `sent_total` = valor na migração + chaves com entrega confirmada no registo;
-- pr5_nothing_in_flight: nenhuma entrega ficou "em curso" (queda do processo a meio de um envio: investigar).
+- pr5_nothing_in_flight: nenhuma entrega ficou "em curso" (queda do processo a meio de um envio: investigar);
+- pr5_intent_published_before_outcome (barreira P0, `NOTIFY_DURABLE=git`): cada entrega confirmada entre `antes` e
+  `depois` tem a sua intenção num commit ANTERIOR ao commit que traz o resultado (a intenção chegou ao GitHub antes do
+  `sendMessage`). Falha se a barreira não estiver ativa.
 
 `status_list_changes` não é uma falha: lista as mudanças reais de estado entre os dois commits, que têm de corresponder
 uma a uma aos avisos de estado recebidos no Telegram nessa execução (verificação manual do proprietário).
@@ -76,6 +79,24 @@ def log_entries(data):
     return out
 
 
+def intent_before_outcome(root, before, after):
+    """Para cada chave entregue pela primeira vez no intervalo: commit da intenção < commit do resultado."""
+    r = subprocess.run(['git', '-C', str(root), 'rev-list', '--reverse', '%s..%s' % (before, after), '--', LOG], capture_output=True, text=True)
+    if r.returncode:
+        raise Unreadable('history of %s not readable' % LOG)
+    known = {(e['key'], e.get('event')) for e in log_entries(raw(root, before, LOG))}
+    first_intent, first_delivered = {}, {}
+    for i, rev in enumerate(r.stdout.split()):
+        for e in log_entries(raw(root, rev, LOG)):
+            if (e['key'], e.get('event')) in known:
+                continue
+            if e.get('event') == 'intent':
+                first_intent.setdefault(e['key'], i)
+            elif e.get('event') == 'delivered':
+                first_delivered.setdefault(e['key'], i)
+    return all(first_intent.get(k, i) < i or (k, 'intent') in known for k, i in first_delivered.items())
+
+
 def pr5_checks(root, before, after, na, nb):
     ma, mb = na.get('migrations') or {}, nb.get('migrations') or {}
     if FORMAT not in ma and FORMAT not in mb:
@@ -99,6 +120,7 @@ def pr5_checks(root, before, after, na, nb):
         'pr5_at_most_one_attempt': all(v <= 1 for v in intents.values()) and all(v == 1 for v in results.values()),
         'pr5_sent_total_matches_log': isinstance(base, int) and nb.get('sent_total') == base + len(delivered),
         'pr5_nothing_in_flight': not any(r.get('state') == 'in_flight' for r in (nb.get('deliveries') or {}).values()),
+        'pr5_intent_published_before_outcome': intent_before_outcome(root, before, after),
     }
 
 

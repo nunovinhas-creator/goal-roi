@@ -780,42 +780,64 @@ class U14_RealStates(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which('git'), 'git required')
 class U15_PostCutoverCheck(unittest.TestCase):
-    def test_check_passes_before_and_after_the_first_pr5_cycles(self):
+    """post_cutover_check over a real history: GitHub (bare remote) <- runner clones with the workflow's commit step."""
+
+    def history(self, durable):
         import importlib.util
         spec = importlib.util.spec_from_file_location('pcc', ROOT / 'scripts' / 'post_cutover_check.py')
         pcc = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(pcc)
         state, rep = json.loads((FIX / 'state_production.json').read_text()), json.loads((FIX / 'report_production.json').read_text())
-        with tempfile.TemporaryDirectory() as root:
-            def git(*a):
-                subprocess.run(['git', '-C', root, '-c', 'user.name=t', '-c', 'user.email=t@invalid', '-c', 'commit.gpgsign=false', *a],
-                               check=True, capture_output=True)
-            git('init', '-q')
-            data = Path(root) / 'data'
-            data.mkdir()
-            (data / 'notify_state.json').write_text(json.dumps(state))
-            (data / 'report.json').write_text(json.dumps(rep))
-            git('add', '-A'); git('commit', '-qm', 'before')
-            revs = [subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()]
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp)
+
+        def git(cwd, *a):
+            return subprocess.run(['git', '-C', str(cwd), '-c', 'user.name=t', '-c', 'user.email=t@invalid', '-c', 'commit.gpgsign=false', *a],
+                                  check=True, capture_output=True, text=True).stdout.strip()
+        remote, clone = tmp / 'github.git', tmp / 'runner'
+        git(tmp, 'init', '-q', '--bare', '-b', 'main', str(remote))
+        git(tmp, 'clone', '-q', str(remote), str(clone))
+        data = clone / 'data'
+        data.mkdir()
+        (data / 'notify_state.json').write_text(json.dumps(state))
+        (data / 'report.json').write_text(json.dumps(rep))
+        git(clone, 'add', '-A'); git(clone, 'commit', '-qm', 'before'); git(clone, 'push', '-q', 'origin', 'HEAD:main')
+        revs = [git(clone, 'rev-parse', 'HEAD')]
+        env = dict(ENV, NOTIFY_DURABLE='git', GITHUB_REF_NAME='main') if durable else ENV
+
+        def cycle(now, rep_):
+            (data / 'report.json').write_text(json.dumps(rep_))
             with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(data)}), redirect_stdout(io.StringIO()):
-                notify.run(lambda *a: None, datetime.fromisoformat(rep['generated_at_utc']), ENV)
-                git('add', '-A'); git('commit', '-qm', 'cycle 1')
-                revs.append(subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip())
-                rep2 = copy.deepcopy(rep)
-                rep2['brain']['watch'] = [entry('m1')]
-                (data / 'report.json').write_text(json.dumps(rep2))
-                notify.run(lambda *a: None, NOW + timedelta(hours=1), ENV)
-                git('add', '-A'); git('commit', '-qm', 'cycle 2')
-                revs.append(subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip())
-            for a, b in ((revs[0], revs[1]), (revs[1], revs[2])):
-                result = pcc.check(Path(root), a, b)
-                self.assertTrue(result['ok'], result['checks'])
-            self.assertEqual(pcc.check(Path(root), revs[1], revs[2])['sent_in_run'], 1)
-            # A rewritten log or a resent key is caught.
-            (data / notify.LOG_NAME).write_text('')
-            git('add', '-A'); git('commit', '-qm', 'log truncated')
-            bad = subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
-            self.assertFalse(pcc.check(Path(root), revs[2], bad)['checks']['pr5_log_append_only'])
+                notify.run(lambda *a: None, now, env)
+            git(clone, 'add', 'data')                                    # the workflow's "Commit data" step
+            git(clone, 'commit', '-qm', 'data: collect [skip ci]')
+            git(clone, 'pull', '-q', '--rebase', 'origin', 'main')
+            git(clone, 'push', '-q', 'origin', 'HEAD:main')
+            revs.append(git(clone, 'rev-parse', 'HEAD'))
+        cycle(datetime.fromisoformat(rep['generated_at_utc']), rep)
+        rep2 = copy.deepcopy(rep)
+        rep2['brain']['watch'] = [entry('m1'), entry('m2', minutes=-3)]
+        cycle(NOW + timedelta(hours=1), rep2)
+        return pcc, clone, revs, git
+
+    def test_check_passes_before_and_after_the_first_pr5_cycles(self):
+        pcc, clone, revs, git = self.history(durable=True)
+        for a, b in ((revs[0], revs[1]), (revs[1], revs[2])):
+            result = pcc.check(clone, a, b)
+            self.assertTrue(result['ok'], result['checks'])
+        self.assertEqual(pcc.check(clone, revs[1], revs[2])['sent_in_run'], 2)
+        self.assertTrue(pcc.check(clone, revs[1], revs[2])['checks']['pr5_intent_published_before_outcome'])
+        # A rewritten log is caught.
+        (clone / 'data' / notify.LOG_NAME).write_text('')
+        git(clone, 'add', '-A'); git(clone, 'commit', '-qm', 'log truncated')
+        bad = git(clone, 'rev-parse', 'HEAD')
+        self.assertFalse(pcc.check(clone, revs[2], bad)['checks']['pr5_log_append_only'])
+
+    def test_without_the_barrier_the_check_reports_it(self):
+        pcc, clone, revs, _ = self.history(durable=False)
+        result = pcc.check(clone, revs[1], revs[2])
+        self.assertFalse(result['checks']['pr5_intent_published_before_outcome'])
+        self.assertFalse(result['ok'])
 
 
 class U16_LongMessages(unittest.TestCase):
@@ -1166,7 +1188,7 @@ class P2_StateLoss(unittest.TestCase):
         d = Data(self, None, report(watch=[entry('m1')]))
         with redirect_stdout(io.StringIO()):
             self.assertTrue(notify.init_state_file())
-        self.assertEqual(d.state(), {})
+        self.assertEqual(d.state(), {'installation': {'method': 'init-state', 'at_utc': d.state()['installation']['at_utc']}})
         d.run()
         self.assertEqual(len(d.sent), 2)                                 # greeting + m1 on a genuinely new installation
         for setup in ('state exists', 'log only'):
@@ -1185,6 +1207,81 @@ class P2_StateLoss(unittest.TestCase):
         d = Data(self, None, report(watch=[entry('m1')]))
         with self.assertRaises(notify.StateMissing):
             notify.preview(d.path / 'notify_state.json', d.path / 'report.json', NOW)
+
+
+class P2R_ResetStateWithoutLog(unittest.TestCase):
+    """Review #5921136533, P2-R: an accidental `{}` (or any state without history) is never a new installation, even when no
+    delivery log exists yet; only `--init-state` (explicit `installation` marker) authorises one. Historical states stay valid."""
+
+    def real_report(self):
+        # The production report plus open signals the pre-PR 5 notifier had already announced (keys in production watch_sent).
+        rep = json.loads((FIX / 'report_production.json').read_text())
+        prod = json.loads((FIX / 'state_production.json').read_text())
+        old = []
+        for k in prod['watch_sent'][-3:]:
+            date, match, sel = k.split('|')[0], '|'.join(k.split('|')[1:-1]), k.split('|')[-1]
+            old.append(dict(entry('old%d' % len(old), sel, match=match), date_utc=date))
+        rep['brain']['watch'] = old
+        return rep
+
+    def test_empty_state_with_no_or_empty_log_sends_nothing(self):
+        for log in (None, b''):
+            for state in ({}, {'hello': True}, {'sent_total': 312, 'watch_sent': [], 'statuses': {}},
+                          {'installation': {'method': 'manual'}}, {'migrations': {notify.FORMAT_MIGRATION: {}}}):
+                with self.subTest(log=log, state=state):
+                    d = Data(self, state, self.real_report())
+                    if log is not None:
+                        (d.path / notify.LOG_NAME).write_bytes(log)
+                    files = {p.name: p.read_bytes() for p in d.path.iterdir()}
+                    with self.assertRaises(notify.StateRegressed):
+                        d.run(now=datetime.fromisoformat(self.real_report()['generated_at_utc']))
+                    self.assertEqual(d.sent, [])
+                    self.assertEqual({p.name: p.read_bytes() for p in d.path.iterdir()}, files)
+        # The same report on the real production state: nothing to send either (the old notices are known).
+        d = Data(self, json.loads((FIX / 'state_production.json').read_text()), self.real_report())
+        d.run(now=datetime.fromisoformat(self.real_report()['generated_at_utc']))
+        self.assertEqual(d.sent, [])
+
+    def test_pre_pr1_copy_without_markers_is_refused(self):
+        st = base_state()
+        del st['migrations']                                             # essential fields but no PR 1 marker
+        d = Data(self, st, report(watch=[entry('m1')]))
+        with self.assertRaises(notify.StateRegressed):
+            d.run()
+        self.assertEqual(d.sent, [])
+
+    def test_historical_states_and_explicit_installation_are_accepted(self):
+        for name in ('state_pr1.json', 'state_pr2.json', 'state_pr3.json', 'state_production.json'):
+            notify.check_integrity(json.loads((FIX / name).read_text()), [])
+        notify.check_integrity({'installation': {'method': 'init-state', 'at_utc': NOW.isoformat()}}, [])
+
+    def test_offline_format_migration_refuses_a_reset_state(self):
+        d = Data(self, {}, report())
+        with redirect_stdout(io.StringIO()), self.assertRaises(notify.StateRegressed):
+            notify.migrate_format_file(NOW)
+        self.assertEqual(d.state(), {})
+
+    def test_cli_reports_and_keeps_the_collection_running(self):
+        d = Data(self, {}, self.real_report())
+        with patch.dict(os.environ, ENV), patch.object(notify, 'send', side_effect=AssertionError('sent')) as real, \
+                patch.object(notify.sys, 'argv', ['notify']), redirect_stdout(io.StringIO()) as out:
+            with self.assertRaises(SystemExit) as code:
+                notify.main()
+        self.assertEqual(code.exception.code, 0)
+        real.assert_not_called()
+        self.assertIn('NOTIFY_FAILED StateRegressed', out.getvalue())
+
+    def test_new_installation_with_init_state_keeps_working(self):
+        d = Data(self, None, report(watch=[entry('m1')]))
+        with redirect_stdout(io.StringIO()):
+            notify.init_state_file(NOW)
+        d.run()
+        d.write_report(report(watch=[entry('m1'), entry('m2', minutes=-1)]))
+        d.run(now=NOW + timedelta(minutes=5))
+        st = consistent(self, d)
+        self.assertEqual(len(d.sent), 3)                                  # greeting, m1, m2: each once
+        self.assertEqual(st['installation']['method'], 'init-state')
+        self.assertIn(notify.FORMAT_MIGRATION, st['migrations'])
 
 
 if __name__ == '__main__':

@@ -30,6 +30,42 @@ def git(*args, cwd=ROOT):
                            '-c', 'commit.gpgsign=false', *args], check=True, capture_output=True).stdout
 
 
+def rehearse_durable(tmp, repo, built_rev, now, before_state, pcc):
+    """As the workflow will run after the merge (NOTIFY_DURABLE=git): GitHub = bare repository with the frozen data and the
+    rebuilt report (no offline migration); a fresh runner clone runs the notifier twice with the barrier and the workflow's
+    commit step. Expected: in-run silent migration, zero messages, zero intent commits, counters and markers intact."""
+    remote, clone = tmp / 'github.git', tmp / 'runner'
+    git('init', '-q', '--bare', '-b', 'main', str(remote), cwd=tmp)
+    git('push', '-q', str(remote), '%s:refs/heads/main' % built_rev, cwd=repo)
+    git('clone', '-q', str(remote), str(clone), cwd=tmp)
+    data, sent, outs = clone / 'data', [], []
+    env = {'TG_BOT_TOKEN': 'rehearsal', 'TG_CHAT_ID': 'rehearsal', 'NOTIFY_DURABLE': 'git', 'GITHUB_REF_NAME': 'main'}
+    with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(data)}), patch.object(notify, 'send', side_effect=AssertionError('real sender')):
+        for _ in range(2):
+            with redirect_stdout(io.StringIO()) as out:
+                notify.run(lambda tok, chat, text: sent.append(text), now, env)
+            outs.append(out.getvalue())
+            git('add', 'data', cwd=clone)
+            if subprocess.run(['git', '-C', str(clone), 'diff', '--cached', '--quiet']).returncode:
+                git('commit', '-qm', 'data: collect [skip ci]', cwd=clone)
+            git('pull', '-q', '--rebase', 'origin', 'main', cwd=clone)
+            git('push', '-q', 'origin', 'HEAD:main', cwd=clone)
+    after = git('rev-parse', 'HEAD', cwd=clone).decode().strip()
+    subjects = git('log', '--format=%s', 'main', cwd=clone).decode().split('\n')
+    state = json.loads((data / 'notify_state.json').read_text(encoding='utf-8'))
+    result = pcc.check(clone, built_rev, after)
+    return {'checks': {
+        'durability_reported': all('NOTIFY_DURABILITY git' in o for o in outs),
+        'zero_messages': sent == [],
+        'zero_intent_commits': not any(x.startswith('notify: intent') for x in subjects),
+        'migrated_in_run': notify.FORMAT_MIGRATION in state['migrations'],
+        'sent_total_unchanged': state.get('sent_total') == before_state.get('sent_total'),
+        'watch_sent_unchanged': state.get('watch_sent') == before_state.get('watch_sent'),
+        'markers_byte_identical': all(state['migrations'][k] == before_state['migrations'][k] for k in MARKERS),
+        'post_cutover_check_ok': result['ok']},
+        'post_cutover_check': result}
+
+
 def main(argv):
     frozen = argv[0]
     out_path = Path(argv[1]) if len(argv) > 1 else None
@@ -101,6 +137,9 @@ def main(argv):
         }
         pcc_results = {'frozen_to_migrated': pcc.check(repo, frozen_rev, migrated_rev), 'migrated_to_after': pcc.check(repo, migrated_rev, after_rev)}
         checks['post_cutover_check_ok'] = all(r['ok'] for r in pcc_results.values())
+        durable = rehearse_durable(Path(tmp), repo, built_rev, now, before_state, pcc)
+        checks.update({'durable_' + k: v for k, v in durable['checks'].items()})
+        pcc_results['durable_frozen_to_after_two_runs'] = durable['post_cutover_check']
         ok = all(v is True for k, v in checks.items() if not k.startswith('migration_')) and checks['migration_first_call'] == 'NOTIFY_FORMAT_MIGRATED' \
             and checks['migration_second_call'] == 'NOTIFY_FORMAT_UNCHANGED' and first is True and second is False
     result = {'ok': ok, 'frozen_main_sha': sha, 'code_sha': code_sha, 'instant_utc': now.isoformat(), 'checks': checks,
