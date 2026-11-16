@@ -8,24 +8,45 @@ history: deleted registry                     CAUGHT
 history: monotonic commit time                CAUGHT
 protocol: content hash                        CAUGHT
 protocol: introducing commit                  CAUGHT
-evidence: only prospective games              CAUGHT
+P2-C: publication required                    CAUGHT
+P2-C: publication not before commit           CAUGHT
+P2-C: start is the publication                CAUGHT
+retro: messages append-only                   CAUGHT
+retro: message published in time              CAUGHT
+retro: result never rewritten                 CAUGHT
+retro: result never removed                   CAUGHT
+retro: result published in time               CAUGHT
+retro: 30-minute publication window           CAUGHT
+retro: observations need full history         CAUGHT
+retro: final data commit at or after C        CAUGHT
 evidence: as_of view                          CAUGHT
-P1-D: window closes at min(clock, H)          CAUGHT
-P1-D: view limited to signals read by the window close CAUGHT
-P1-D: exploratory before C                    CAUGHT
-P1-D: clock fixed at C                        CAUGHT
-P1-D: born after the window not evaluated     CAUGHT
-P1-D: secondary untested before C             CAUGHT
-P1-D: horizon of 30 days                      CAUGHT
-test: within-day pairing                      CAUGHT
-minimum: paired days                          CAUGHT
 evidence: start = max(birth, protocol)        CAUGHT
+admission: committed bet operational after start CAUGHT
+admission: no result seen before the decision CAUGHT
+admission: result only within 3 days          CAUGHT
+imputation: tested side loses                 CAUGHT
+imputation: comparison side wins              CAUGHT
+window: closes at min(clock, H)               CAUGHT
+window: view limited to signals read by the close CAUGHT
+window: born after the close not evaluated    CAUGHT
+window: horizon of 365 days                   CAUGHT
+window: clock fixed at C                      CAUGHT
+closed days: only closed days enter           CAUGHT
+closed days: 3-day settlement                 CAUGHT
+e-process: X normalised by the maximum loss   CAUGHT
+e-process: lambda capped at 1/2               CAUGHT
+e-process: lambda never negative              CAUGHT
+e-process: lambda predictable                 CAUGHT
+e-process: threshold 1/alpha                  CAUGHT
+e-process: minimums gate the conclusion       CAUGHT
 verdict: proof problems first                 CAUGHT
+verdict: conclusion when K crosses            CAUGHT
+verdict: running before C                     CAUGHT
 minimum: groups                               CAUGHT
 minimum: days                                 CAUGHT
+minimum: paired days                          CAUGHT
 minimum: day share                            CAUGHT
 minimum: llm games                            CAUGHT
-test: one-sided p                             CAUGHT
 holm: multiply by remaining tests             CAUGHT
 primary: groups count once                    CAUGHT
 primary: evitar excluded                      CAUGHT
@@ -34,9 +55,6 @@ controls: comparable support                  CAUGHT
 P1-A: controls see only signals read at birth CAUGHT
 P1-B: groups decided with data read at birth  CAUGHT
 P1-B: snapshot is the read-time view          CAUGHT
-P2-C: publication required                    CAUGHT
-P2-C: publication not before commit           CAUGHT
-P2-C: start is the publication                CAUGHT
 groups: complete linkage                      CAUGHT
 groups: same expectation                      CAUGHT
 groups: no contradictory condition            CAUGHT
