@@ -1,0 +1,44 @@
+--- a/scangoal/results_bsd.py
++++ b/scangoal/results_bsd.py
+@@ -8,6 +8,8 @@
+ Segredo: BSD_API_KEY (enviado só em Authorization: Token; nunca impresso). Sem chave, não faz nada.
+ """
+ import json, os, re, sys, unicodedata
++import hashlib
++from contextlib import nullcontext
+ from datetime import datetime, timedelta, timezone
+ from urllib.error import HTTPError, URLError
+ from urllib.parse import urlencode
+@@ -39,16 +41,28 @@
+     return ' '.join(words)
+ 
+ 
+-def request_json(url, token):
++def request_json(url, token, *, coordinator=None):
+     if not url.startswith(ROOT):
+         raise BSDError('unexpected URL')
+     req = Request(url, headers={'Authorization': 'Token ' + token, 'Accept': 'application/json', 'User-Agent': 'goal-roi/1.0'})
+     try:
+-        with urlopen(req, timeout=20) as r:
+-            return json.loads(r.read(3_000_000))
++        # PROPOSAL ONLY: coordinator is injected by a separately reviewed executor.
++        # No environment toggle or automatic fallback enables trial coordination.
++        lease = coordinator.request(url) if coordinator is not None else nullcontext()
++        with lease:
++            with urlopen(req, timeout=20) as r:
++                body = r.read(3_000_000)
++                if coordinator is not None:
++                    coordinator.observe({
++                        'observed_utc': datetime.now(UTC).isoformat(),
++                        'response_sha256': hashlib.sha256(body).hexdigest(),
++                        'quota_headers': {k: v for k, v in r.headers.items()
++                            if k.lower() in ('ratelimit', 'ratelimit-policy') and token not in str(v)},
++                    })
++                return json.loads(body)
+     except HTTPError as exc:
+         raise BSDError('HTTP %d' % exc.code) from None       # nunca imprimir URL, corpo ou cabeçalhos
+-    except (URLError, TimeoutError, OSError, ValueError):
++    except (URLError, TimeoutError, OSError, ValueError, RuntimeError):
+         raise BSDError('unavailable or invalid response') from None
+ 
+ 

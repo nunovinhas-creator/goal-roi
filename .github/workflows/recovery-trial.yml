@@ -27,7 +27,6 @@
         {
           "name": "Prepare isolated snapshot and report blocking conditions",
           "env": {
-            "BSD_API_KEY": "${{ secrets.BSD_API_KEY }}",
             "PYTHONDONTWRITEBYTECODE": "1"
           },
           "run": "python -m scangoal.recovery_trial --output \"$RUNNER_TEMP/recovery-trial\""

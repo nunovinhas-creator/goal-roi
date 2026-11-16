@@ -1,3 +1,5 @@
+> **Atualização operacional:** o estado corrente está em [operations/README.md](operations/README.md). O secret foi removido da pré-verificação; o protocolo Git CAS, a evidência de quota, o adaptador bloqueado e a atualização de snapshot foram acrescentados. O texto abaixo preserva a auditoria inicial do commit a764b281; as suas afirmações sobre ausência de adaptador e exposição do secret são históricas, não o estado atual. A execução real continua bloqueada.
+
 # PR30 — Infraestrutura manual e isolada para ensaio BSD
 
 Data: 16/11/2026. Âmbito: preparação e validação offline; **nenhum workflow novo foi instalado em main ou executado; nenhum pedido desportivo foi feito**.

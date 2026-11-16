@@ -43,7 +43,8 @@ class TrialSafety(unittest.TestCase):
         steps=w['jobs']['preflight']['steps']
         self.assertEqual([s['run'] for s in steps if 'run' in s],
             ['python -m scangoal.recovery_trial --output "$RUNNER_TEMP/recovery-trial"'])
-        self.assertEqual(steps[2]['env']['BSD_API_KEY'],'${{ secrets.BSD_API_KEY }}')
+        self.assertNotIn('secrets.',json.dumps(w))
+        self.assertNotIn('BSD_API_KEY',steps[2]['env'])
         self.assertEqual(steps[-1]['with']['path'],'${{ runner.temp }}/recovery-trial/preflight.json')
         self.assertFalse(steps[0]['with']['persist-credentials'])
         for s in steps:

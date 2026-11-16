@@ -1,6 +1,6 @@
 """Manual trial preparation and OFFLINE simulation; live execution is fail-closed.
 
-No network transport is implemented here. Supplying an integer balance or a
+A prepared, network-disabled adapter is in recovery_trial_transport. Supplying an integer balance or a
 collector-idle assertion cannot establish an account-wide exclusive lease.
 """
 import argparse
@@ -97,11 +97,25 @@ def select_targets(bets, now):
     return {mid: t for mid, t in selected.items() if t['days'] and set(t['days']) <= DAYS}
 
 
-def prepare(root, output, now):
+def prepare(root, output, now, *, snapshot_checkout=None, snapshot_sha=None):
     root = Path(root).resolve()
     output = isolated(root, output)
     verify_engine(root)
-    before = manifest(root / 'data')
+    source=root
+    if (snapshot_checkout is None)!=(snapshot_sha is None):
+        raise TrialBlocked('snapshot_checkout_and_sha_required_together')
+    if snapshot_checkout is not None:
+        source=Path(snapshot_checkout).resolve()
+        isolated(source,output)
+        if (len(snapshot_sha)!=40 or any(c not in '0123456789abcdef' for c in snapshot_sha)
+                or subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=snapshot_sha):
+            raise TrialBlocked('snapshot_revision_mismatch')
+        # Source checkout contributes data ONLY, never executable code.
+        if subprocess.run(['git','diff','--quiet',snapshot_sha,'--','data'],cwd=source).returncode:
+            raise TrialBlocked('dirty_snapshot_data')
+        if subprocess.check_output(['git','ls-files','--others','--exclude-standard','--','data'],cwd=source).strip():
+            raise TrialBlocked('untracked_snapshot_data')
+    before = manifest(source / 'data')
     output.mkdir(parents=True, exist_ok=True)
     # Existing state must be resumed, never recopied/reinitialized silently.
     with (output / 'trial.lock').open('a') as lock:
@@ -109,24 +123,24 @@ def prepare(root, output, now):
         meta = output / 'inputs.json'
         if meta.exists():
             saved = json.loads(meta.read_text())
-            if saved['trial_id'] != TRIAL_ID or saved['original_sha256'] != before:
+            if saved['trial_id'] != TRIAL_ID or saved['original_sha256'] != before or saved.get('source_revision') != snapshot_sha:
                 raise TrialBlocked('snapshot_changed_use_original_snapshot')
             if manifest(output / 'snapshot') != before:
                 raise TrialBlocked('snapshot_tampered')
             return saved
         if any(p.name != 'trial.lock' for p in output.iterdir()):
             raise TrialBlocked('nonempty_unidentified_staging')
-        shutil.copytree(root / 'data', output / 'snapshot')
+        shutil.copytree(source / 'data', output / 'snapshot')
         with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(output / 'snapshot')}):
             bets, _, existing = snapshot()
             aliases = engine.load_aliases()
         targets = select_targets(bets, now)
-        value = {'trial_id': TRIAL_ID, 'engine_sha': ENGINE_SHA,
+        value = {'trial_id': TRIAL_ID, 'engine_sha': ENGINE_SHA, 'source_revision':snapshot_sha,
                  'snapshot_utc': engine.stamp(now), 'original_sha256': before,
                  'targets': targets, 'existing': {k: v for k, v in existing.items() if k in MATCH_IDS},
                  'aliases': aliases, 'excluded_ids': sorted(MATCH_IDS - targets.keys())}
         engine.write_json(meta, value)
-        if manifest(root / 'data') != before or manifest(output / 'snapshot') != before:
+        if manifest(source / 'data') != before or manifest(output / 'snapshot') != before:
             raise TrialBlocked('input_integrity_failure')
         return value
 
@@ -214,6 +228,8 @@ def simulate(output, targets, transport, now, *, aliases=None, existing=None,
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--snapshot-checkout', type=Path)
+    parser.add_argument('--snapshot-sha')
     # There is deliberately no --live flag or unsafe override.
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -221,8 +237,10 @@ def main():
     now = datetime.now(UTC)
     verify_engine(root)
     protected = {name: manifest(root / name) for name in ('data', 'docs', 'scangoal', '.github')}
-    inputs = prepare(root, output, now)
-    reasons = blockers(key_present=bool(os.environ.get('BSD_API_KEY')))
+    inputs = prepare(root, output, now, snapshot_checkout=args.snapshot_checkout, snapshot_sha=args.snapshot_sha)
+    # Preflight has no secret access. Availability is checked only at execution.
+    reasons = blockers(key_present=True)
+    reasons.insert(0, 'bsd_key_check_deferred_to_authorized_execution')
     report = {'trial_id': TRIAL_ID, 'engine_sha': ENGINE_SHA, 'mode': 'preflight_only',
               'as_of_utc': engine.stamp(now), 'blockers': reasons,
               'selected_ids': sorted(inputs['targets']), 'excluded_ids': inputs['excluded_ids'],
