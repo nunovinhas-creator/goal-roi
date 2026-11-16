@@ -25,12 +25,22 @@
    "from": "em observação",
    "to": "abandonada"
   },
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": {
+   "at_utc": "2026-11-16T21:57:26+00:00",
+   "from": "em observação",
+   "to": "abandonada"
+  },
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
    "at_utc": "2026-11-16T21:01:32+00:00",
    "from": "em observação",
    "to": "abandonada"
   },
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": {
+   "at_utc": "2026-11-16T21:57:26+00:00",
+   "from": "em observação",
+   "to": "abandonada"
+  },
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": {
    "at_utc": "2026-11-16T21:57:26+00:00",
    "from": "em observação",
    "to": "abandonada"
@@ -57,8 +67,10 @@
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Stake | Mercado = outros mercados": "abandonada",
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada"
  },
@@ -221,13 +233,15 @@
    "attempt_utc": "2026-11-16T21:57:26+00:00",
    "chars": 582,
    "created_utc": "2026-11-16T21:57:26+00:00",
+   "done_utc": "2026-11-16T21:57:26+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "status",
    "sha256": "8bff95f122bd0dfc123f47a47f601ffa4a97a44c75fc90e4dc61668dc72c25d2",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "status|em observação>abandonada|0b46ff35a386|31@2026-11-16T21:46:50+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T21:48:07+00:00",
@@ -294,12 +308,16 @@
    "state": "pending"
   },
   "status|em observação>abandonada|d6ffc319d0aa|31@2026-11-16T21:48:49+00:00|3c061abf936d": {
+   "attempt_utc": "2026-11-16T21:57:26+00:00",
+   "chars": 769,
    "created_utc": "2026-11-16T21:57:26+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "status",
-   "state": "pending"
+   "sha256": "759565a26844c137e0b035941fdcee80d2eec9ccca5a28eb497eafc187310310",
+   "state": "in_flight"
   },
   "status|em observação>abandonada|e53adf3f964f|31@2026-11-16T20:59:59+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T21:01:32+00:00",
@@ -359,7 +377,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 18,
+  "delivered": 19,
   "uncertain": 1
  },
  "format_last_run_utc": "2026-11-16T21:49:00+00:00",
@@ -549,8 +567,10 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 42,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 61,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 19,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 14,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 21,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": 26,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 23,
   "Stake | Mercado = outros mercados": 27,
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 29
  },
@@ -605,7 +625,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 330,
+ "sent_total": 331,
  "statuses": {
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
