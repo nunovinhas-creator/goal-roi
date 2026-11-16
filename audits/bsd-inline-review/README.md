@@ -8,7 +8,7 @@ Branch de revisão: codex/bsd-inline-review, baseada exatamente em PR30/d59dac00
 
 ## O que foi implementado
 
-- `scangoal/recovery_inline.py` (218 linhas): recibo estrito de quota da última resposta normal, tracker serial, cinco slots irreversíveis com CAS, abandono sem restituição, uma página por run e restauro de respostas a partir do registo durável.
+- `scangoal/recovery_inline.py` (223 linhas): recibo estrito de quota da última resposta normal, tracker serial, cinco slots irreversíveis com CAS, abandono sem restituição, uma página por run e restauro de respostas a partir do registo durável.
 - `tests/test_recovery_inline.py`:20 testes direcionados para estes riscos.
 - `collector-tail-proposal.patch`: duas interfaces opcionais em results_bsd.py: observar os headers de uma resposta já pedida e executar um callback depois das consultas normais e do seu estado guardado. Compilado, aplicado apenas numa cópia temporária de teste e verificado por git apply --check. **Não aplicado ao ficheiro real nem instalado.**
 - `main-revalidation.json`: revalidação real, exclusivamente por leitura do GitHub/dados guardados, dos dez jogos.
@@ -73,7 +73,7 @@ NormalQuotaTracker observa só a última resposta das consultas BSD normais. Usa
 
 O parser aceita um subconjunto estrito dos headers documentados RateLimit-Policy e RateLimit: âmbito football único, q7500, w86400, r e t inteiros, sem duplicados/escopos adicionais. Compara t com a meia-noite UTC (tolerância60s). Não é um parser completo de Structured Fields: um formato legal mas não suportado faz saltar o ensaio, sem falhar a recolha. Não interpreta ausência de headers como saldo ou como autorização para pagar um plano ilimitado.
 
-O recibo inclui hash do corpo normal, hash dos headers, receção UTC, dono da run, sequência normal e débitos de slots já observados. Deve ter <=60s no momento da reserva, mesmo dia UTC e nenhuma consulta normal intermédia. O CAS desconta qualquer débito do ensaio posterior ao recibo, para não sobrestimar o saldo numa corrida. Primeiro envio exige >=105 se a reserva é100; depois exige reserva+orçamento ainda não debitado. Reserva superior exige mais saldo. Consumidores não contabilizados invalidam a condição de exclusividade; o código não assume que seguem o registo.
+O recibo inclui hash do corpo normal, hash dos headers, receção UTC, dono da run, sequência normal e débitos de slots já observados. Deve ter <=60s no momento da reserva, mesmo dia UTC e nenhuma consulta normal intermédia. Depois do CAS, o relógio é conferido novamente: se a persistência tiver deixado expirar a prova, o slot é debitado mas não autoriza envio. O CAS desconta qualquer débito do ensaio posterior ao recibo, para não sobrestimar o saldo numa corrida. Primeiro envio exige >=105 se a reserva é100; depois exige reserva+orçamento ainda não debitado. Reserva superior exige mais saldo. Consumidores não contabilizados invalidam a condição de exclusividade; o código não assume que seguem o registo.
 
 **A conta real continua sem saldo observado.** Capturar headers de uma resposta que seria feita de qualquer forma é o caminho mais curto para obter essa prova, sem gastar um dos cinco pedidos num diagnóstico. Não há endpoint inventado nem pedido API extra.
 
@@ -89,7 +89,7 @@ O recibo inclui hash do corpo normal, hash dos headers, receção UTC, dono da r
 | Limite HTTP adicional por run | Lote poderia usar até5 timeouts | 1 página, timeout20s |
 | Tempo HTTP máximo das cinco tentativas | Até100s | Até100s totais, repartidos por até5 ocasiões elegíveis |
 | Saldo antes do primeiro envio | Captura externa/revisão+débitos globais | Última resposta normal, mesmo processo, sem pedido de diagnóstico |
-| Código novo nesta alternativa | Não aplicável | 218 linhas; reutiliza transporte e Git da PR30, não elimina esses ficheiros do repo |
+| Código novo nesta alternativa | Não aplicável | 223 linhas; reutiliza transporte e Git da PR30, não elimina esses ficheiros do repo |
 | Consumidores externos | Exigem prova/coordenação | Continuam a exigir prova de exclusividade; não resolvido por inline |
 
 Os20s são apenas o timeout HTTP adicional, **não uma promessa de duração total**. O backend remoto deve ter deadlines para metadados e o executor deve verificar margem restante do job. collect.yml tem timeout15min, leitura inicial até220s e fast reads até540s, além dos restantes passos; uma página adicional pode aproximar o job do limite e atrasar o encadeamento. Sem margem demonstrada para HTTP+persistência+passos seguintes, saltar a recuperação. Não diminuir o trabalho normal para criar essa margem nem alterar o agendamento nesta revisão.
@@ -97,6 +97,8 @@ Os20s são apenas o timeout HTTP adicional, **não uma promessa de duração tot
 Os números de complexidade são contagens do desenho/código, não medições de desempenho real nem percentagens inventadas de redução de risco. Não há garantia de zero latência. O custo monetário da preparação é zero; a proposta usa GitHub já existente e a BSD gratuita, sujeitos aos limites da conta/Actions/API. Nenhuma opção paga ou dependência nova foi adicionada.
 
 ## Validação e estado dos bloqueios
+
+O CI inicial detetou uma dependência indevida do teste num commit histórico ausente num checkout shallow. A verificação foi corrigida para comparar o Git blob hash com o manifesto auditado, sem alterar workflows ou reduzir a exigência de integridade.
 
 563 testes da suíte completa aprovados (543 anteriores+20 específicos). A regressão inclui os bloqueios anteriores de chave/transporte. Os testes novos cobrem CAS concorrente, headers ausentes/stale, consulta normal intermédia, 104 insuficiente, reservas abandonadas, dono/attempt errados, sexto envio e dia UTC seguinte, ausência de TTL steal, caminho externo sem inventário, uma página por run, pedido incerto não reemitido, evidência restaurada noutro processo e hook depois do estado normal guardado. Falha do tail é contida. Todos os dados HTTP usados nos testes são sintéticos e não provam recuperação real.
 

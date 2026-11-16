@@ -159,7 +159,12 @@ class InlineSlots:
                    started_utc=now.isoformat(),quota=copy.deepcopy(r.__dict__))
         event['quota']['received_utc']=r.received_utc.isoformat()
         candidate=self.write(event)
-        return {'send_permitted':True,'head':candidate,'operation_id':operation_id}
+        # Metadata persistence may outlive the quota witness. Burn the reserved
+        # slot rather than send using stale proof; never refund it.
+        confirmed=datetime.now(UTC)
+        valid=(r.received_utc.date()==confirmed.date()
+               and timedelta(0)<=confirmed-r.received_utc<=timedelta(seconds=60))
+        return {'send_permitted':valid,'head':candidate,'operation_id':operation_id}
     def append(self,event):
         if event['kind']!='complete':raise TrialBlocked('inline_operation_forbidden')
         # PR30 prepared transport writes the raw bytes before completing its reservation.

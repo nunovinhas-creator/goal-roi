@@ -1,5 +1,6 @@
 """Collector-tail specific safety checks. No live HTTP or deployed refs."""
 import json
+import hashlib
 import tempfile
 import subprocess
 import sys
@@ -50,6 +51,10 @@ class InlineTests(unittest.TestCase):
         with self.assertRaises(TrialBlocked):self.reserve()
         self.slots.normal_sequence=4
         with self.assertRaises(TrialBlocked):self.slots.reserve('x','100:1',DAY,0,self.now+timedelta(seconds=61))
+        with patch.object(inline,'datetime') as clock:
+            clock.now.return_value=self.now+timedelta(seconds=61)
+            self.assertFalse(self.reserve()['send_permitted'])
+        self.assertEqual(len(self.slots.load()[1]['attempts']),1)
     def test_104_remaining_blocks_initial_budget(self):
         from dataclasses import replace
         self.slots.receipt=replace(self.receipt,remaining=104)
@@ -146,8 +151,9 @@ class InlineTests(unittest.TestCase):
         result=namespace['run'](fetch=normal,now=self.now,token='fake',after_bsd=tail)
         self.assertEqual(events,['normal','tail']);self.assertEqual(result['stats']['requests'],1)
     def test_no_new_workflow_no_modified_collector(self):
-        original=subprocess.check_output(['git','show','247deee40e5e6ebdb107808b66adb96622074238:.github/workflows/collect.yml'],cwd=ROOT)
-        self.assertEqual(original,(ROOT/'.github/workflows/collect.yml').read_bytes())
+        original=json.loads((ROOT/'audits/bsd-inline-review/integrity.json').read_text())['git_blobs']['.github/workflows/collect.yml']
+        raw=(ROOT/'.github/workflows/collect.yml').read_bytes()
+        self.assertEqual(original,hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest())
         self.assertNotIn('gh workflow run',(ROOT/'scangoal/recovery_inline.py').read_text())
         self.assertNotIn('urlopen',(ROOT/'scangoal/recovery_inline.py').read_text())
 
