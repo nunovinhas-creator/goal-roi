@@ -12,7 +12,9 @@ from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from .recovery_trial import CAP,DAYS,TRIAL_ID,TrialBlocked,isolated
 from .recovery_trial_journal import canonical,utc
+from .recovery_remote import GITHUB_REMOTE
 from . import recovery as engine
+from . import recovery_oidc as oidc
 
 UTC=timezone.utc
 
@@ -74,13 +76,14 @@ class InlineSlots:
     is a one-shot send permit. A lost permit is burned, not reused. Run-terminal
     proof can retire an abandoned slot; never refunds or reissues the same query.
     """
-    def __init__(self,store,anchor,output,receipt=None,normal_sequence=None):
+    def __init__(self,store,anchor,output,receipt=None,normal_sequence=None,*,attestor=None,verifier=None):
         self.store,self.anchor=store,anchor
         self.output=isolated(Path(__file__).resolve().parents[1],output)
         if self.output.name!='prepared-fixture-trial':raise TrialBlocked('fixture_namespace_required')
         self.receipt,self.normal_sequence=receipt,normal_sequence
         # Latest UTC instant a confirmed reservation may still authorize a send.
         self.send_not_after=None
+        self.attestor,self.verifier,self._verified=attestor,verifier,set()
     def load(self):
         head=self.store.head();cursor=head;events=[];seen=set()
         while cursor:
@@ -95,10 +98,32 @@ class InlineSlots:
                     or not config.get('predecessor_budget_review_ref')):
                     raise TrialBlocked('inline_anchor_invalid')
                 state={'config':config,'attempts':{},'lease':None,'halted':False};break
-            events.append(event);cursor=parent
+            events.append((cursor,parent,event));cursor=parent
         else:raise TrialBlocked('inline_anchor_missing')
-        for e in reversed(events):self.apply(state,e)
+        self.authenticate(state['config'],events)
+        for _,_,e in reversed(events):self.apply(state,e)
         return head,state
+    @staticmethod
+    def attested_owner(event):
+        # reserve/complete: token run must be the reservation owner. abandon: any
+        # collect.yml@main run (the terminal proof itself is inside the attested event).
+        return event.get('owner') if event.get('kind') in ('reserve','complete') else None
+    def authenticate(self,config,events):
+        """Every state transition after the reviewed genesis must carry a valid OIDC
+        attestation bound to its parent commit and exact content."""
+        mode=config.get('attestation')
+        if getattr(self.store,'remote',None)==GITHUB_REMOTE and mode!=oidc.MODE:
+            raise TrialBlocked('attestation_required')
+        if mode is None:return  # offline fixture journals only (never the hosted remote)
+        if mode!=oidc.MODE or self.verifier is None:raise TrialBlocked('attestation_unverifiable')
+        for sha,parent,e in events:
+            if sha in self._verified:continue
+            if e.get('kind') not in ('reserve','complete','abandon'):raise TrialBlocked('inline_unknown_event')
+            att=e.get('attestation')
+            if not isinstance(att,dict) or set(att)!={'mode','jwt'} or att['mode']!=oidc.MODE:
+                raise TrialBlocked('attestation_missing')
+            self.verifier.verify(att['jwt'],oidc.audience(parent,e),utc(e.get('attested_utc')),self.attested_owner(e))
+            self._verified.add(sha)
     @staticmethod
     def apply(s,e):
         op=e.get('operation_id');kind=e['kind']
@@ -137,7 +162,17 @@ class InlineSlots:
             prior.update(outcome='abandoned',proof_sha256=e['proof_sha256']);s['lease']=None
         else:raise TrialBlocked('inline_unknown_event')
     def write(self,event):
-        head,state=self.load();self.apply(state,event)
+        head,state=self.load()
+        if state['config'].get('attestation'):
+            if self.attestor is None or self.verifier is None:raise TrialBlocked('attestation_unavailable')
+            event=dict(event,attested_utc=datetime.now(UTC).isoformat())
+            aud=oidc.audience(head,event)
+            token=self.attestor.token(aud)
+            # Fresh check BEFORE any CAS: identity, key availability and freshness.
+            # A failure writes nothing; an existing reservation stays burned.
+            self.verifier.verify(token,aud,utc(event['attested_utc']),self.attested_owner(event),now=datetime.now(UTC))
+            event=dict(event,attestation={'mode':oidc.MODE,'jwt':token})
+        self.apply(state,event)
         candidate=self.store.propose(head,event)
         if not self.store.cas(head,candidate):raise TrialBlocked('inline_atomic_conflict')
         return candidate

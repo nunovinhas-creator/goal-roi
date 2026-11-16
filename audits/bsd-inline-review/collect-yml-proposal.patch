@@ -1,6 +1,14 @@
 --- a/.github/workflows/collect.yml
 +++ b/.github/workflows/collect.yml
-@@ -17,8 +17,12 @@
+@@ -11,14 +11,20 @@
+ permissions:
+   contents: write
+   actions: write
++  # BSD recovery tail only: OIDC attestation of journal events. Adds no repository access.
++  id-token: write
+ concurrency:
+   group: scangoal-write
+   cancel-in-progress: false
  jobs:
    collect:
      runs-on: ubuntu-latest

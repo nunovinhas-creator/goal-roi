@@ -213,3 +213,14 @@ verificável (há indícios de uso da BSD); 650 s é só estimativa, e a garanti
 é `timeout-minutes: 18` (patch atualizado, não instalado); genesis não construído por
 falta de dados comprovados. Parecer: GO para preparar a instalação; NO-GO para o
 primeiro pedido.
+
+## Atestação OIDC (sobre `0ceb0cd`)
+
+`scangoal/recovery_oidc.py` foi integrado em `InlineSlots.load/write`. Cada `reserve`,
+`complete` e `abandon` passa a levar um JWT OIDC do GitHub Actions ligado ao evento
+canónico e ao commit pai. A verificação RS256 é feita com pyca/cryptography e a claim
+de identidade é `workflow_ref` (não `job_workflow_ref`). O histórico tolera a expiração
+do token; uma chave desconhecida torna o evento não verificável e pausa o ensaio. O
+remoto GitHub exige um genesis atestado. 22 testes adversariais; 608 no total. Patches
+(não instalados): `id-token: write`, `cryptography==44.0.3`. Detalhe e riscos em
+`AUTHORIZATION.md`, secção D.

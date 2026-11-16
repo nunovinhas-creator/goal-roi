@@ -23,9 +23,9 @@ JOB_TIMEOUT_S, JOB_SETUP_SLACK_S = 900, 30
 # Hard wall clock of the whole tail: one SIGALRM watchdog covers local Git,
 # replay CPU, persistence and completion; network Git ops are also clipped to it.
 TAIL_BUDGET_S = 150
-# After the send: BSD timeout 20 + completion load/check/push/confirm 4x10 +
-# final replay fetch 10 + local persistence 10. No send if less remains.
-POST_SEND_RESERVE_S = 80
+# After the send: BSD timeout 20 + OIDC token for `complete` 10 + completion
+# load/check/push/confirm 4x10 + final replay fetch 10 + local persistence 10.
+POST_SEND_RESERVE_S = 90
 # Fast reads alone are 540+10 s; the other post-BSD steps have no reviewed bound.
 MIN_DOWNSTREAM_S = 550
 
@@ -171,6 +171,9 @@ class PreparedTail:
         # to tail_end and no send is authorized after send_end.
         tail_end = now+timedelta(seconds=TAIL_BUDGET_S)
         self.slots.store.not_after = tail_end
+        for party in (getattr(self.slots, 'attestor', None), getattr(self.slots, 'verifier', None)):
+            if party is not None:
+                party.not_after = tail_end
         self.slots.send_not_after = tail_end-timedelta(seconds=POST_SEND_RESERVE_S)
         validate_targets(self.targets)
         # Rebuild from the authoritative journal, not a runner's state cache.
