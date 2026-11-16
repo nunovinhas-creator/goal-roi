@@ -1,12 +1,14 @@
 """Remote receive-pack, exact attempt authentication and full chronological replay."""
 import copy
 import json
+import signal
 import subprocess
 import sys
 import threading
+import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 import test_recovery_inline as baseline
@@ -170,14 +172,19 @@ replay(s,json.load(open(sys.argv[4])))
                 with self.assertRaises(TrialBlocked):remote.GitHubAttempts('fake-github-token').abandon(self.slots,'one')
         self.assertEqual(self.slots.load()[1]['attempts']['one']['outcome'],'reserved')
 
-    def test_executor_patch_normal_first_failure_contained(self):
-        checkout=self.root/'patch';(checkout/'scangoal').mkdir(parents=True)
+    def collector(self, name, patched=True):
+        checkout=self.root/name;(checkout/'scangoal').mkdir(parents=True)
         (checkout/'scangoal/results_bsd.py').write_bytes((ROOT/'scangoal/results_bsd.py').read_bytes())
-        subprocess.run(['git','apply','--unsafe-paths','--directory='+str(checkout),str(ROOT/'audits/bsd-inline-review/collector-tail-proposal.patch')],check=True)
+        if patched:
+            subprocess.run(['git','apply','--unsafe-paths','--directory='+str(checkout),str(ROOT/'audits/bsd-inline-review/collector-tail-proposal.patch')],check=True)
         ns={'__package__':'scangoal','__name__':'scangoal.patch_test'}
         exec(compile((checkout/'scangoal/results_bsd.py').read_text(),'patch','exec'),ns)
-        data=self.root/'normal';data.mkdir();ns['data_dir']=lambda:data;ns['load_aliases']=lambda:{}
+        data=self.root/(name+'-data');data.mkdir();ns['data_dir']=lambda:data;ns['load_aliases']=lambda:{}
         ns['pending_targets']=lambda now:{'normal':{'days':[DAY],'teams':['Home','Away'],'kickoff_utc':DAY+'T12:00:00+00:00','date_utc':DAY+'T11:00:00+00:00'}}
+        return ns,data
+
+    def test_executor_patch_normal_first_failure_contained(self):
+        ns,data=self.collector('patch')
         def normal(url,token,observe=None):
             if observe:observe(self.headers,b'{}',self.now)
             return {'results':[],'count':0}
@@ -260,6 +267,65 @@ replay(s,json.load(open(sys.argv[4])))
         start=self.now-timedelta(seconds=60)
         self.assertEqual(tail.job_deadline_from_env({'GOAL_ROI_JOB_STARTED_UTC':start.isoformat()}),
                          start+timedelta(seconds=870))
+
+    def test_installed_patch_without_callback_is_behaviour_neutral(self):
+        results=[]
+        for patched in (False,True):
+            ns,data=self.collector('neutral'+str(patched),patched)
+            def normal(url,token):return json.loads(self.body())
+            state=ns['run'](fetch=normal,token='fixture-token',now=self.now)
+            results.append((state,(data/'results_bsd.json').read_bytes()))
+        self.assertEqual(results[0],results[1])
+        self.assertTrue(results[1][0]['results'])
+
+    def watchdog_executor(self, wire):
+        executor=tail.PreparedTail(self.slots,'100:1',wire,'fixture-token',self.targets(),
+            job_deadline=self.now+timedelta(seconds=900),downstream_bound=550)
+        executor.tracker.observe(self.headers,b'{}',self.now)
+        return executor
+
+    def assert_watchdog_cleared(self, handler):
+        self.assertEqual(signal.getitimer(signal.ITIMER_REAL),(0.0,0.0))
+        self.assertIs(signal.getsignal(signal.SIGALRM),handler)
+
+    def test_watchdog_bounds_blocked_work_before_reservation(self):
+        handler=signal.getsignal(signal.SIGALRM)
+        ns,data=self.collector('blocked')
+        def normal(url,token,observe=None):
+            if observe:observe(self.headers,b'{}',self.now)
+            return {'results':[],'count':0}
+        executor=tail.PreparedTail(self.slots,'100:1',OfflineWire([]),'fixture-token',self.targets(),
+            job_deadline=datetime.now(timezone.utc)+timedelta(seconds=900),downstream_bound=550)
+        started=time.monotonic()
+        with patch.object(tail,'TAIL_BUDGET_S',1),patch.object(tail,'replay',lambda *a,**k:time.sleep(30)):
+            result=executor.attach(ns['run'],normal,token='fixture-token',now=self.now)
+        self.assertLess(time.monotonic()-started,5)
+        self.assertEqual(executor.outcome,'trial_deadline_normal_preserved')
+        self.assertEqual(result['stats']['requests'],1);self.assertTrue((data/'results_bsd.json').is_file())
+        self.assertEqual(self.slots.load()[1]['attempts'],{})
+        self.assert_watchdog_cleared(handler)
+
+    def test_watchdog_bounds_blocked_send_reservation_burned_never_resent(self):
+        handler=signal.getsignal(signal.SIGALRM)
+        wire=OfflineWire([WireResponse(200,self.body())]);sent=[]
+        def stuck(spec):sent.append(spec);time.sleep(30)
+        wire.send=stuck
+        executor=self.watchdog_executor(wire);started=time.monotonic()
+        with patch.object(tail,'TAIL_BUDGET_S',1),patch.object(tail,'POST_SEND_RESERVE_S',0):
+            executor()
+        self.assertLess(time.monotonic()-started,5)
+        self.assertEqual(executor.outcome,'trial_deadline_normal_preserved')
+        ledger=self.slots.load()[1]
+        self.assertEqual([a['outcome'] for a in ledger['attempts'].values()],['reserved'])
+        self.assertIsNotNone(ledger['lease']);self.assertEqual(len(sent),1)
+        self.assert_watchdog_cleared(handler)
+        self.watchdog_executor(wire)();self.assertEqual(len(sent),1)
+
+    def test_watchdog_unavailable_outside_main_thread_skips(self):
+        executor=self.watchdog_executor(OfflineWire([WireResponse(200,self.body())]))
+        worker=threading.Thread(target=executor);worker.start();worker.join(10)
+        self.assertEqual(executor.outcome,'trial_failed_normal_preserved')
+        self.assertEqual(self.slots.load()[1]['attempts'],{})
 
     def test_network_callback_cannot_be_injected(self):
         with self.assertRaises(TrialBlocked):tail.PreparedTail(self.slots,'100:1',lambda *a:None,'fixture-token',self.targets())

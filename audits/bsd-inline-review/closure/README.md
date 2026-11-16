@@ -192,3 +192,14 @@ workflow, secrets, Telegram e certificação intactos.
    => skip. Não reduzir passos normais para ganhar margem.
 4. Instalar `collect-yml-proposal.patch` e `collector-tail-proposal.patch`.
 5. Ponte HTTP BSD real + namespace real separado de `synthetic_wire`: nova auditoria.
+
+## Revisão para autorização final (sobre `be199e4`)
+
+- O limite de 150 s passa a ser global: watchdog `SIGALRM` à volta de todo o tail
+  (Git local, replay, persistência e conclusão), além dos cortes já existentes.
+- Teste de neutralidade: com os patches instalados e sem callback, o coletor produz
+  estado e ficheiro byte-a-byte iguais aos atuais.
+- 4 testes novos (586 no total); os logs `full-tests.log` e `specific-tests.log`
+  foram regenerados sobre este código.
+- Procedimento administrativo exato, declaração de exclusividade, margem empírica,
+  riscos dos patches e procedimento da primeira consulta: `AUTHORIZATION.md`.

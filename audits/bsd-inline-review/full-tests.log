@@ -183,13 +183,25 @@ test_barrier_enabled_exactly_in_the_two_notifying_steps (test_notify_durability.
 test_fast_reads_go_through_the_same_run (test_notify_durability.WorkflowActivation.test_fast_reads_go_through_the_same_run) ... ok
 test_prerequisites_of_the_barrier_are_in_the_workflow (test_notify_durability.WorkflowActivation.test_prerequisites_of_the_barrier_are_in_the_workflow) ... ok
 test_33_to_8_silent_and_idempotent_with_history (test_notify_migration.NotifyMigration.test_33_to_8_silent_and_idempotent_with_history) ... ok
-test_corrupt_state_is_not_replaced_with_empty_history (test_notify_migration.NotifyMigration.test_corrupt_state_is_not_replaced_with_empty_history) ... ok
+test_corrupt_state_is_not_replaced_with_empty_history (test_notify_migration.NotifyMigration.test_corrupt_state_is_not_replaced_with_empty_history) ... NOTIFY_DURABILITY local
+ok
 test_explicit_observation_and_abandonment_are_silent_at_boundary (test_notify_migration.NotifyMigration.test_explicit_observation_and_abandonment_are_silent_at_boundary) ... ok
-test_failed_atomic_save_leaves_state_and_sends_nothing (test_notify_migration.NotifyMigration.test_failed_atomic_save_leaves_state_and_sends_nothing) ... ok
+test_failed_atomic_save_leaves_state_and_sends_nothing (test_notify_migration.NotifyMigration.test_failed_atomic_save_leaves_state_and_sends_nothing) ... NOTIFY_DURABILITY local
+ok
 test_genuine_subsequent_changes_are_not_silenced (test_notify_migration.NotifyMigration.test_genuine_subsequent_changes_are_not_silenced) ... ok
 test_missing_scope_does_not_migrate_or_overwrite_reference (test_notify_migration.NotifyMigration.test_missing_scope_does_not_migrate_or_overwrite_reference) ... ok
-test_offline_migration_persists_once_without_sender_or_counters (test_notify_migration.NotifyMigration.test_offline_migration_persists_once_without_sender_or_counters) ... ok
-test_send_failure_cannot_undo_migration_or_consume_delivery (test_notify_migration.NotifyMigration.test_send_failure_cannot_undo_migration_or_consume_delivery) ... ok
+test_offline_migration_persists_once_without_sender_or_counters (test_notify_migration.NotifyMigration.test_offline_migration_persists_once_without_sender_or_counters) ... NOTIFY_STATUS_MIGRATED
+NOTIFY_STATUS_UNCHANGED
+NOTIFY_STATUS_UNCHANGED
+ok
+test_send_failure_cannot_undo_migration_or_consume_delivery (test_notify_migration.NotifyMigration.test_send_failure_cannot_undo_migration_or_consume_delivery) ... NOTIFY_DURABILITY local
+NOTIFY_DELIVERY_UNCERTAIN
+NOTIFY_OK sent 0
+NOTIFY_DURABILITY local
+NOTIFY_OK sent 0
+NOTIFY_DURABILITY local
+NOTIFY_OK sent 0
+ok
 test_watch_and_daily_summary_keep_working (test_notify_migration.NotifyMigration.test_watch_and_daily_summary_keep_working) ... ok
 test_ineligible_wins_change_only_exploratory_statistics (test_operational_evidence.OperationalEvidence.test_ineligible_wins_change_only_exploratory_statistics) ... ok
 test_ineligible_wins_do_not_create_behavior_alerts (test_operational_evidence.OperationalEvidence.test_ineligible_wins_do_not_create_behavior_alerts) ... ok
@@ -243,7 +255,8 @@ test_register_true_build_must_not_write_into_the_checkout (test_pr2_cutover.PR2C
 test_register_true_divergence_refused_before_any_write (test_pr2_cutover.PR2Cutover.test_register_true_divergence_refused_before_any_write) ... ok
 test_report_without_the_new_rules_or_eligible_blocks_is_refused (test_pr2_cutover.PR2Cutover.test_report_without_the_new_rules_or_eligible_blocks_is_refused) ... ok
 test_rerun_after_committed_cutover_cannot_reset_the_reference (test_pr2_cutover.PR2Cutover.test_rerun_after_committed_cutover_cannot_reset_the_reference) ... ok
-test_restore_failure_is_reported_distinctly_with_exit_code_3 (test_pr2_cutover.PR2Cutover.test_restore_failure_is_reported_distinctly_with_exit_code_3) ... ok
+test_restore_failure_is_reported_distinctly_with_exit_code_3 (test_pr2_cutover.PR2Cutover.test_restore_failure_is_reported_distinctly_with_exit_code_3) ... {"ok": false, "error": "usage: pr2_cutover.py <frozen_main_sha>"}
+ok
 test_retroactive_transitions_are_silenced_and_legitimate_changes_still_notified (test_pr2_cutover.PR2Cutover.test_retroactive_transitions_are_silenced_and_legitimate_changes_still_notified) ... ok
 test_second_migration_must_report_unchanged (test_pr2_cutover.PR2Cutover.test_second_migration_must_report_unchanged) ... ok
 test_stale_dirty_or_unrelated_snapshots_are_refused (test_pr2_cutover.PR2Cutover.test_stale_dirty_or_unrelated_snapshots_are_refused) ... ok
@@ -265,7 +278,8 @@ test_pinned_rules_must_match_the_code (test_pr3_cutover.PR3Cutover.test_pinned_r
 test_push_preflight_detects_a_moved_main_and_non_fast_forward (test_pr3_cutover.PR3Cutover.test_push_preflight_detects_a_moved_main_and_non_fast_forward) ... ok
 test_register_true_creating_a_ledger_is_refused (test_pr3_cutover.PR3Cutover.test_register_true_creating_a_ledger_is_refused) ... ok
 test_rerun_is_idempotent_after_the_committed_cutover (test_pr3_cutover.PR3Cutover.test_rerun_is_idempotent_after_the_committed_cutover) ... ok
-test_restore_failure_is_reported_with_exit_code_3 (test_pr3_cutover.PR3Cutover.test_restore_failure_is_reported_with_exit_code_3) ... ok
+test_restore_failure_is_reported_with_exit_code_3 (test_pr3_cutover.PR3Cutover.test_restore_failure_is_reported_with_exit_code_3) ... {"ok": false, "error": "usage: pr3_cutover.py <frozen_main_sha>"}
+ok
 test_second_migration_must_report_unchanged (test_pr3_cutover.PR3Cutover.test_second_migration_must_report_unchanged) ... ok
 test_stale_dirty_or_unrelated_snapshots_are_refused (test_pr3_cutover.PR3Cutover.test_stale_dirty_or_unrelated_snapshots_are_refused) ... ok
 test_two_cycles_after_cutover_send_nothing_historical_and_later_changes_are_notified_once (test_pr3_cutover.PR3Cutover.test_two_cycles_after_cutover_send_nothing_historical_and_later_changes_are_notified_once) ... ok
@@ -333,7 +347,9 @@ test_no_externally_unproven_inventory (test_recovery_inline.InlineTests.test_no_
 test_no_new_workflow_no_modified_collector (test_recovery_inline.InlineTests.test_no_new_workflow_no_modified_collector) ... ok
 test_no_timeout_based_lease_steal (test_recovery_inline.InlineTests.test_no_timeout_based_lease_steal) ... ok
 test_one_page_per_existing_run (test_recovery_inline.InlineTests.test_one_page_per_existing_run) ... ok
-test_patch_runs_tail_after_normal_save_and_contains_failure (test_recovery_inline.InlineTests.test_patch_runs_tail_after_normal_save_and_contains_failure) ... ok
+test_patch_runs_tail_after_normal_save_and_contains_failure (test_recovery_inline.InlineTests.test_patch_runs_tail_after_normal_save_and_contains_failure) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+BSD_RECOVERY_TAIL_SKIPPED
+ok
 test_prior_debits_carried_not_five_extra_requests (test_recovery_inline.InlineTests.test_prior_debits_carried_not_five_extra_requests) ... ok
 test_quota_headers_only_free_scope_and_integer_subset (test_recovery_inline.InlineTests.test_quota_headers_only_free_scope_and_integer_subset) ... ok
 test_running_or_wrong_attempt_cannot_retire (test_recovery_inline.InlineTests.test_running_or_wrong_attempt_cannot_retire) ... ok
@@ -343,6 +359,34 @@ test_stale_or_interleaved_normal_request_blocks (test_recovery_inline.InlineTest
 test_store_loss_blocks_no_reinitialize (test_recovery_inline.InlineTests.test_store_loss_blocks_no_reinitialize) ... ok
 test_two_atomic_claims_one_winner (test_recovery_inline.InlineTests.test_two_atomic_claims_one_winner) ... ok
 test_unsupported_quota_cannot_interrupt_normal_collection (test_recovery_inline.InlineTests.test_unsupported_quota_cannot_interrupt_normal_collection) ... ok
+test_authenticated_exact_attempt_abandon_no_refund (test_recovery_tail.TailTests.test_authenticated_exact_attempt_abandon_no_refund) ... ok
+test_executor_patch_normal_first_failure_contained (test_recovery_tail.TailTests.test_executor_patch_normal_first_failure_contained) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+ok
+test_forged_run_wrong_repo_attempt_or_active_rejected (test_recovery_tail.TailTests.test_forged_run_wrong_repo_attempt_or_active_rejected) ... ok
+test_full_nonempty_replay_new_process_preserves_chronology (test_recovery_tail.TailTests.test_full_nonempty_replay_new_process_preserves_chronology) ... ok
+test_git_token_only_in_environment_never_argv (test_recovery_tail.TailTests.test_git_token_only_in_environment_never_argv) ... ok
+test_hosted_remote_requires_reviewed_anchor_and_token (test_recovery_tail.TailTests.test_hosted_remote_requires_reviewed_anchor_and_token) ... ok
+test_installed_patch_without_callback_is_behaviour_neutral (test_recovery_tail.TailTests.test_installed_patch_without_callback_is_behaviour_neutral) ... BSD_OK {"targets": 1, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 1, "events_read": 1}}, "event_names_sample": ["Home \u2014 Away"]}
+BSD_OK {"targets": 1, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 1, "events_read": 1}}, "event_names_sample": ["Home \u2014 Away"]}
+ok
+test_job_deadline_from_real_job_start_only (test_recovery_tail.TailTests.test_job_deadline_from_real_job_start_only) ... ok
+test_margin_below_full_tail_budget_skips (test_recovery_tail.TailTests.test_margin_below_full_tail_budget_skips) ... ok
+test_network_callback_cannot_be_injected (test_recovery_tail.TailTests.test_network_callback_cannot_be_injected) ... ok
+test_quarantine_consistent_on_replay (test_recovery_tail.TailTests.test_quarantine_consistent_on_replay) ... ok
+test_remote_delete_and_reset_rejected (test_recovery_tail.TailTests.test_remote_delete_and_reset_rejected) ... ok
+test_remote_loss_never_uses_cached_head (test_recovery_tail.TailTests.test_remote_loss_never_uses_cached_head) ... ok
+test_response_before_git_completion_crash_burns_slot (test_recovery_tail.TailTests.test_response_before_git_completion_crash_burns_slot) ... ok
+test_tail_budget_clips_git_and_forbids_late_send (test_recovery_tail.TailTests.test_tail_budget_clips_git_and_forbids_late_send) ... ok
+test_two_remote_runners_last_slot (test_recovery_tail.TailTests.test_two_remote_runners_last_slot) ... ok
+test_unexplained_quota_drop_between_normal_replies_blocks (test_recovery_tail.TailTests.test_unexplained_quota_drop_between_normal_replies_blocks) ... ok
+test_unproven_time_budget_skips_without_reservation (test_recovery_tail.TailTests.test_unproven_time_budget_skips_without_reservation) ... ok
+test_watchdog_bounds_blocked_send_reservation_burned_never_resent (test_recovery_tail.TailTests.test_watchdog_bounds_blocked_send_reservation_burned_never_resent) ... ok
+test_watchdog_bounds_blocked_work_before_reservation (test_recovery_tail.TailTests.test_watchdog_bounds_blocked_work_before_reservation) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+ok
+test_watchdog_unavailable_outside_main_thread_skips (test_recovery_tail.TailTests.test_watchdog_unavailable_outside_main_thread_skips) ... ok
+test_write_timeout_committed_is_confirmed_but_never_send (test_recovery_tail.TailTests.test_write_timeout_committed_is_confirmed_but_never_send) ... ok
+test_write_timeout_confirmation_unavailable_blocks (test_recovery_tail.TailTests.test_write_timeout_confirmation_unavailable_blocks) ... ok
 test_429_stops_trial_and_resume (test_recovery_trial.TrialSafety.test_429_stops_trial_and_resume) ... ok
 test_already_final_or_settled_excluded (test_recovery_trial.TrialSafety.test_already_final_or_settled_excluded) ... ok
 test_assertions_cannot_enable_live (test_recovery_trial.TrialSafety.test_assertions_cannot_enable_live) ... ok
@@ -384,7 +428,8 @@ test_network_bridge_and_arbitrary_injection_forbidden (test_recovery_trial_opera
 test_no_inventory_approval_is_not_global_exclusion (test_recovery_trial_operations.Operations.test_no_inventory_approval_is_not_global_exclusion) ... ok
 test_no_key_no_reservation_no_wire_calls (test_recovery_trial_operations.Operations.test_no_key_no_reservation_no_wire_calls) ... ok
 test_output_production_rejected_before_reservation (test_recovery_trial_operations.Operations.test_output_production_rejected_before_reservation) ... ok
-test_preflight_never_asks_for_key_and_remains_blocked (test_recovery_trial_operations.Operations.test_preflight_never_asks_for_key_and_remains_blocked) ... ok
+test_preflight_never_asks_for_key_and_remains_blocked (test_recovery_trial_operations.Operations.test_preflight_never_asks_for_key_and_remains_blocked) ... {"as_of_utc": "2026-11-16T18:53:44+00:00", "blockers": ["bsd_key_check_deferred_to_authorized_execution", "quota_not_verified", "insufficient_or_unknown_balance", "account_wide_exclusion_not_proven", "cross_run_budget_not_proven", "live_transport_not_enabled_pending_review"], "bsd_requests": 0, "engine_sha": "247deee40e5e6ebdb107808b66adb96622074238", "excluded_ids": [], "hl_requests": 0, "mode": "preflight_only", "originals_unchanged": true, "production_integrations": 0, "selected_ids": [], "trial_id": "goal-roi-bsd-20261113-15-v1"}
+ok
 test_reflected_credential_never_written (test_recovery_trial_operations.Operations.test_reflected_credential_never_written) ... ok
 test_remote_cas_descriptor_exact_expected_oid_no_force (test_recovery_trial_operations.Operations.test_remote_cas_descriptor_exact_expected_oid_no_force) ... ok
 test_response_loss_on_new_runner_blocks_before_new_debit (test_recovery_trial_operations.Operations.test_response_loss_on_new_runner_blocks_before_new_debit) ... ok
@@ -411,10 +456,16 @@ test_result_edit_is_not_counted_as_a_changed_signal (test_scangoal.AuditFixes.te
 test_stake_original_layout_is_trusted_and_late_arrival_is_counted (test_scangoal.AuditFixes.test_stake_original_layout_is_trusted_and_late_arrival_is_counted) ... ok
 test_stake_phase_comes_from_time_not_from_layout (test_scangoal.AuditFixes.test_stake_phase_comes_from_time_not_from_layout) ... ok
 test_weakened_lineup_bets_against_the_weakened_side (test_scangoal.AuditFixes.test_weakened_lineup_bets_against_the_weakened_side) ... ok
-test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.BSD.test_alias_file_is_the_only_way_to_bridge_names) ... ok
-test_exact_identity_time_window_and_no_fuzzy (test_scangoal.BSD.test_exact_identity_time_window_and_no_fuzzy) ... ok
-test_pagination_follows_next_and_respects_cap (test_scangoal.BSD.test_pagination_follows_next_and_respects_cap) ... ok
-test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.BSD.test_unfinished_ambiguous_throttle_and_missing_key) ... ok
+test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.BSD.test_alias_file_is_the_only_way_to_bridge_names) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_exact_identity_time_window_and_no_fuzzy (test_scangoal.BSD.test_exact_identity_time_window_and_no_fuzzy) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_pagination_follows_next_and_respects_cap (test_scangoal.BSD.test_pagination_follows_next_and_respects_cap) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
+ok
+test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.BSD.test_unfinished_ambiguous_throttle_and_missing_key) ... BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
+BSD_SKIPPED_TOO_SOON
+BSD_NOT_CONFIGURED
+ok
 test_agenda_classifies_open_signals_and_drops_started_games (test_scangoal.Brain.test_agenda_classifies_open_signals_and_drops_started_games) ... ok
 test_board_shows_best_and_worst_tactics_and_fresh_open_signals (test_scangoal.Brain.test_board_shows_best_and_worst_tactics_and_fresh_open_signals) ... ok
 test_collector_state_daily_csv_and_name_review (test_scangoal.Brain.test_collector_state_daily_csv_and_name_review) ... ok
@@ -432,9 +483,15 @@ test_prompt_carries_the_track_record_only_as_description (test_scangoal.Evidence
 test_signals_in_the_same_match_share_one_vote (test_scangoal.EvidencePerMatch.test_signals_in_the_same_match_share_one_vote) ... ok
 test_track_record_is_descriptive_and_never_confirms (test_scangoal.EvidencePerMatch.test_track_record_is_descriptive_and_never_confirms) ... ok
 test_walk_forward_never_uses_results_from_the_future (test_scangoal.EvidencePerMatch.test_walk_forward_never_uses_results_from_the_future) ... ok
-test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop (test_scangoal.FastReads.test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop) ... ok
+test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop (test_scangoal.FastReads.test_one_failed_read_is_tolerated_and_two_in_a_row_stop_the_loop) ... WATCH_READ_FAILED RuntimeError
+WATCH_READ_FAILED RuntimeError
+WATCH_READ_FAILED RuntimeError
+ok
 test_reads_every_two_minutes_and_reports_only_when_there_is_something_new (test_scangoal.FastReads.test_reads_every_two_minutes_and_reports_only_when_there_is_something_new) ... ok
-test_budget_priority_and_unfinished_are_respected (test_scangoal.GoalMinutes.test_budget_priority_and_unfinished_are_respected) ... ok
+test_budget_priority_and_unfinished_are_respected (test_scangoal.GoalMinutes.test_budget_priority_and_unfinished_are_respected) ... HL_DETAILS_OK {"pending": 8, "requests": 4, "stopped": "daily_quota_low", "quota_remaining": 14, "fields_seen": ["awayTeam", "events", "homeTeam", "id", "state"], "stored": 3, "consistent": 3}
+HL_DETAILS_SKIPPED_TOO_SOON
+HL_DETAILS_NOT_CONFIGURED
+ok
 test_collector_state_daily_csv_and_name_review (test_scangoal.GoalMinutes.test_collector_state_daily_csv_and_name_review) ... ok
 test_goal_brewing_is_measured_with_goal_minutes_and_extra_time_uses_90_minutes (test_scangoal.GoalMinutes.test_goal_brewing_is_measured_with_goal_minutes_and_extra_time_uses_90_minutes) ... ok
 test_goals_must_add_up_to_the_final_score (test_scangoal.GoalMinutes.test_goals_must_add_up_to_the_final_score) ... ok
@@ -443,23 +500,44 @@ test_stake_phase_comes_from_time_not_from_layout (test_scangoal.GoalMinutes.test
 test_collector_state_daily_csv_and_name_review (test_scangoal.Hardening.test_collector_state_daily_csv_and_name_review) ... ok
 test_interval_groups_bets_of_the_same_match (test_scangoal.Hardening.test_interval_groups_bets_of_the_same_match) ... ok
 test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Hardening.test_stake_phase_comes_from_time_not_from_layout) ... ok
-test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.Highlightly.test_alias_file_is_the_only_way_to_bridge_names) ... ok
-test_exact_identity_time_window_and_no_fuzzy (test_scangoal.Highlightly.test_exact_identity_time_window_and_no_fuzzy) ... ok
-test_finished_only_and_report_priority (test_scangoal.Highlightly.test_finished_only_and_report_priority) ... ok
-test_pagination_follows_next_and_respects_cap (test_scangoal.Highlightly.test_pagination_follows_next_and_respects_cap) ... ok
-test_quota_guard_pagination_and_throttle (test_scangoal.Highlightly.test_quota_guard_pagination_and_throttle) ... ok
-test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.Highlightly.test_unfinished_ambiguous_throttle_and_missing_key) ... ok
+test_alias_file_is_the_only_way_to_bridge_names (test_scangoal.Highlightly.test_alias_file_is_the_only_way_to_bridge_names) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_exact_identity_time_window_and_no_fuzzy (test_scangoal.Highlightly.test_exact_identity_time_window_and_no_fuzzy) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
+ok
+test_finished_only_and_report_priority (test_scangoal.Highlightly.test_finished_only_and_report_priority) ... HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 2, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}}
+ok
+test_pagination_follows_next_and_respects_cap (test_scangoal.Highlightly.test_pagination_follows_next_and_respects_cap) ... BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
+ok
+test_quota_guard_pagination_and_throttle (test_scangoal.Highlightly.test_quota_guard_pagination_and_throttle) ... HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 1, "stopped": "daily_quota_low", "quota_remaining": 10, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 1}}}
+HL_SKIPPED_TOO_SOON
+ok
+test_unfinished_ambiguous_throttle_and_missing_key (test_scangoal.Highlightly.test_unfinished_ambiguous_throttle_and_missing_key) ... BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
+BSD_SKIPPED_TOO_SOON
+BSD_NOT_CONFIGURED
+ok
 test_beta_and_evidence (test_scangoal.Insights.test_beta_and_evidence) ... ok
 test_competition_kind_and_league (test_scangoal.Insights.test_competition_kind_and_league) ... ok
 test_report_has_insights_and_safe_narrative (test_scangoal.Insights.test_report_has_insights_and_safe_narrative) ... ok
 test_collector_state_daily_csv_and_name_review (test_scangoal.LanguageModel.test_collector_state_daily_csv_and_name_review) ... ok
 test_interval_groups_bets_of_the_same_match (test_scangoal.LanguageModel.test_interval_groups_bets_of_the_same_match) ... ok
-test_modes_rotate_notes_are_anchored_and_budget_stops_the_day (test_scangoal.LanguageModel.test_modes_rotate_notes_are_anchored_and_budget_stops_the_day) ... ok
+test_modes_rotate_notes_are_anchored_and_budget_stops_the_day (test_scangoal.LanguageModel.test_modes_rotate_notes_are_anchored_and_budget_stops_the_day) ... LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
+LLM_OK {"last_mode": "refinar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 94.2}
+LLM_OK {"last_mode": "evitar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 141.3}
+LLM_OK {"last_mode": "notas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 0, "last_notes": 1, "neurons_today": 188.4}
+LLM_SKIPPED_DAILY_BUDGET
+LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
+ok
 test_only_proposals_made_of_known_features_are_accepted (test_scangoal.LanguageModel.test_only_proposals_made_of_known_features_are_accepted) ... ok
-test_run_registers_with_birth_date_and_respects_daily_limit (test_scangoal.LanguageModel.test_run_registers_with_birth_date_and_respects_daily_limit) ... ok
+test_run_registers_with_birth_date_and_respects_daily_limit (test_scangoal.LanguageModel.test_run_registers_with_birth_date_and_respects_daily_limit) ... LLM_NOT_CONFIGURED
+LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.1-8b-instruct-fast", "last_accepted": 1, "last_rejected": 1, "last_notes": 0, "neurons_today": 3.9}
+LLM_SKIPPED_TOO_SOON
+ok
 test_stake_phase_comes_from_time_not_from_layout (test_scangoal.LanguageModel.test_stake_phase_comes_from_time_not_from_layout) ... ok
 test_each_notice_is_sent_once_and_summary_waits_for_the_evening (test_scangoal.Notify.test_each_notice_is_sent_once_and_summary_waits_for_the_evening) ... ok
-test_run_needs_keys_never_prints_token_and_failure_is_hourly (test_scangoal.Notify.test_run_needs_keys_never_prints_token_and_failure_is_hourly) ... ok
+test_run_needs_keys_never_prints_token_and_failure_is_hourly (test_scangoal.Notify.test_run_needs_keys_never_prints_token_and_failure_is_hourly) ... NOTIFY_NOT_CONFIGURED
+NOTIFY_DURABILITY local
+NOTIFY_OK sent 2
+ok
 test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation (test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation) ... ok
 test_page_does_not_name_the_bot (test_scangoal.PageName.test_page_does_not_name_the_bot) ... ok
 test_betfair_live_draw (test_scangoal.Parser.test_betfair_live_draw) ... ok
@@ -487,7 +565,11 @@ test_asian_handicap_and_market_name_case (test_scangoal.Settle.test_asian_handic
 test_asian_totals (test_scangoal.Settle.test_asian_totals) ... ok
 test_other_markets (test_scangoal.Settle.test_other_markets) ... ok
 test_collector_state_daily_csv_and_name_review (test_scangoal.Settlement.test_collector_state_daily_csv_and_name_review) ... ok
-test_highlightly_gives_up_only_after_two_complete_late_checks (test_scangoal.Settlement.test_highlightly_gives_up_only_after_two_complete_late_checks) ... ok
+test_highlightly_gives_up_only_after_two_complete_late_checks (test_scangoal.Settlement.test_highlightly_gives_up_only_after_two_complete_late_checks) ... HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 1, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
+HL_OK {"not_covered": 1, "targets": 0, "matched_this_run": 0, "requests": 0, "events_seen": 0, "stopped": null, "quota_remaining": null, "per_day": {}}
+ok
 test_interval_groups_bets_of_the_same_match (test_scangoal.Settlement.test_interval_groups_bets_of_the_same_match) ... ok
 test_manual_result_settles_and_missing_matches_are_listed_with_a_reason (test_scangoal.Settlement.test_manual_result_settles_and_missing_matches_are_listed_with_a_reason) ... ok
 test_stake_phase_comes_from_time_not_from_layout (test_scangoal.Settlement.test_stake_phase_comes_from_time_not_from_layout) ... ok
@@ -567,60 +649,6 @@ test_report_without_presentation_announces_no_status_change (test_telegram_prese
 test_classification (test_telegram_presentation.X_Sender.test_classification) ... ok
 
 ----------------------------------------------------------------------
-Ran 563 tests in 31.303s
+Ran 586 tests in 33.778s
 
 OK
-NOTIFY_DURABILITY local
-NOTIFY_DURABILITY local
-NOTIFY_STATUS_MIGRATED
-NOTIFY_STATUS_UNCHANGED
-NOTIFY_STATUS_UNCHANGED
-NOTIFY_DURABILITY local
-NOTIFY_DELIVERY_UNCERTAIN
-NOTIFY_OK sent 0
-NOTIFY_DURABILITY local
-NOTIFY_OK sent 0
-NOTIFY_DURABILITY local
-NOTIFY_OK sent 0
-{"ok": false, "error": "usage: pr2_cutover.py <frozen_main_sha>"}
-{"ok": false, "error": "usage: pr3_cutover.py <frozen_main_sha>"}
-BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
-BSD_RECOVERY_TAIL_SKIPPED
-{"as_of_utc": "2026-11-16T17:52:57+00:00", "blockers": ["bsd_key_check_deferred_to_authorized_execution", "quota_not_verified", "insufficient_or_unknown_balance", "account_wide_exclusion_not_proven", "cross_run_budget_not_proven", "live_transport_not_enabled_pending_review"], "bsd_requests": 0, "engine_sha": "247deee40e5e6ebdb107808b66adb96622074238", "excluded_ids": [], "hl_requests": 0, "mode": "preflight_only", "originals_unchanged": true, "production_integrations": 0, "selected_ids": [], "trial_id": "goal-roi-bsd-20261113-15-v1"}
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
-BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
-BSD_SKIPPED_TOO_SOON
-BSD_NOT_CONFIGURED
-WATCH_READ_FAILED RuntimeError
-WATCH_READ_FAILED RuntimeError
-WATCH_READ_FAILED RuntimeError
-HL_DETAILS_OK {"pending": 8, "requests": 4, "stopped": "daily_quota_low", "quota_remaining": 14, "fields_seen": ["awayTeam", "events", "homeTeam", "id", "state"], "stored": 3, "consistent": 3}
-HL_DETAILS_SKIPPED_TOO_SOON
-HL_DETAILS_NOT_CONFIGURED
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 1}}, "event_names_sample": ["Sheffield Wednesday \u2014 Accrington"]}
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley FC \u2014 Oldham", "Barnsley \u2014 Oldham", "Sheffield Wednesday \u2014 Accrington"]}
-HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 1, "requests": 1, "events_seen": 2, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}}
-BSD_OK {"targets": 2, "matched_this_run": 1, "requests": 2, "events_seen": 2, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 2}}, "event_names_sample": ["A \u2014 B", "Barnsley \u2014 Oldham"]}
-HL_OK {"not_covered": 0, "targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 1, "stopped": "daily_quota_low", "quota_remaining": 10, "per_day": {"2026-11-11": {"count_reported": 2, "events_read": 1}}}
-HL_SKIPPED_TOO_SOON
-BSD_OK {"targets": 2, "matched_this_run": 0, "requests": 1, "events_seen": 3, "page_cap_reached": false, "per_day": {"2026-11-11": {"count_reported": null, "events_read": 3}}, "event_names_sample": ["Barnsley \u2014 Oldham", "Sheff Wed \u2014 Accrington"]}
-BSD_SKIPPED_TOO_SOON
-BSD_NOT_CONFIGURED
-LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
-LLM_OK {"last_mode": "refinar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 94.2}
-LLM_OK {"last_mode": "evitar", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 141.3}
-LLM_OK {"last_mode": "notas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 0, "last_notes": 1, "neurons_today": 188.4}
-LLM_SKIPPED_DAILY_BUDGET
-LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "last_accepted": 0, "last_rejected": 1, "last_notes": 0, "neurons_today": 47.1}
-LLM_NOT_CONFIGURED
-LLM_OK {"last_mode": "novas", "last_outcome": "ok", "last_model": "@cf/meta/llama-3.1-8b-instruct-fast", "last_accepted": 1, "last_rejected": 1, "last_notes": 0, "neurons_today": 3.9}
-LLM_SKIPPED_TOO_SOON
-NOTIFY_NOT_CONFIGURED
-NOTIFY_DURABILITY local
-NOTIFY_OK sent 2
-HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
-HL_OK {"not_covered": 0, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
-HL_OK {"not_covered": 1, "targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "stopped": null, "quota_remaining": 90, "per_day": {"2026-11-11": {"count_reported": 0, "events_read": 0}}}
-HL_OK {"not_covered": 1, "targets": 0, "matched_this_run": 0, "requests": 0, "events_seen": 0, "stopped": null, "quota_remaining": null, "per_day": {}}

@@ -8,7 +8,9 @@ test_no_externally_unproven_inventory (test_recovery_inline.InlineTests.test_no_
 test_no_new_workflow_no_modified_collector (test_recovery_inline.InlineTests.test_no_new_workflow_no_modified_collector) ... ok
 test_no_timeout_based_lease_steal (test_recovery_inline.InlineTests.test_no_timeout_based_lease_steal) ... ok
 test_one_page_per_existing_run (test_recovery_inline.InlineTests.test_one_page_per_existing_run) ... ok
-test_patch_runs_tail_after_normal_save_and_contains_failure (test_recovery_inline.InlineTests.test_patch_runs_tail_after_normal_save_and_contains_failure) ... ok
+test_patch_runs_tail_after_normal_save_and_contains_failure (test_recovery_inline.InlineTests.test_patch_runs_tail_after_normal_save_and_contains_failure) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+BSD_RECOVERY_TAIL_SKIPPED
+ok
 test_prior_debits_carried_not_five_extra_requests (test_recovery_inline.InlineTests.test_prior_debits_carried_not_five_extra_requests) ... ok
 test_quota_headers_only_free_scope_and_integer_subset (test_recovery_inline.InlineTests.test_quota_headers_only_free_scope_and_integer_subset) ... ok
 test_running_or_wrong_attempt_cannot_retire (test_recovery_inline.InlineTests.test_running_or_wrong_attempt_cannot_retire) ... ok
@@ -18,10 +20,36 @@ test_stale_or_interleaved_normal_request_blocks (test_recovery_inline.InlineTest
 test_store_loss_blocks_no_reinitialize (test_recovery_inline.InlineTests.test_store_loss_blocks_no_reinitialize) ... ok
 test_two_atomic_claims_one_winner (test_recovery_inline.InlineTests.test_two_atomic_claims_one_winner) ... ok
 test_unsupported_quota_cannot_interrupt_normal_collection (test_recovery_inline.InlineTests.test_unsupported_quota_cannot_interrupt_normal_collection) ... ok
+test_authenticated_exact_attempt_abandon_no_refund (test_recovery_tail.TailTests.test_authenticated_exact_attempt_abandon_no_refund) ... ok
+test_executor_patch_normal_first_failure_contained (test_recovery_tail.TailTests.test_executor_patch_normal_first_failure_contained) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+ok
+test_forged_run_wrong_repo_attempt_or_active_rejected (test_recovery_tail.TailTests.test_forged_run_wrong_repo_attempt_or_active_rejected) ... ok
+test_full_nonempty_replay_new_process_preserves_chronology (test_recovery_tail.TailTests.test_full_nonempty_replay_new_process_preserves_chronology) ... ok
+test_git_token_only_in_environment_never_argv (test_recovery_tail.TailTests.test_git_token_only_in_environment_never_argv) ... ok
+test_hosted_remote_requires_reviewed_anchor_and_token (test_recovery_tail.TailTests.test_hosted_remote_requires_reviewed_anchor_and_token) ... ok
+test_installed_patch_without_callback_is_behaviour_neutral (test_recovery_tail.TailTests.test_installed_patch_without_callback_is_behaviour_neutral) ... BSD_OK {"targets": 1, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 1, "events_read": 1}}, "event_names_sample": ["Home \u2014 Away"]}
+BSD_OK {"targets": 1, "matched_this_run": 1, "requests": 1, "events_seen": 1, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 1, "events_read": 1}}, "event_names_sample": ["Home \u2014 Away"]}
+ok
+test_job_deadline_from_real_job_start_only (test_recovery_tail.TailTests.test_job_deadline_from_real_job_start_only) ... ok
+test_margin_below_full_tail_budget_skips (test_recovery_tail.TailTests.test_margin_below_full_tail_budget_skips) ... ok
+test_network_callback_cannot_be_injected (test_recovery_tail.TailTests.test_network_callback_cannot_be_injected) ... ok
+test_quarantine_consistent_on_replay (test_recovery_tail.TailTests.test_quarantine_consistent_on_replay) ... ok
+test_remote_delete_and_reset_rejected (test_recovery_tail.TailTests.test_remote_delete_and_reset_rejected) ... ok
+test_remote_loss_never_uses_cached_head (test_recovery_tail.TailTests.test_remote_loss_never_uses_cached_head) ... ok
+test_response_before_git_completion_crash_burns_slot (test_recovery_tail.TailTests.test_response_before_git_completion_crash_burns_slot) ... ok
+test_tail_budget_clips_git_and_forbids_late_send (test_recovery_tail.TailTests.test_tail_budget_clips_git_and_forbids_late_send) ... ok
+test_two_remote_runners_last_slot (test_recovery_tail.TailTests.test_two_remote_runners_last_slot) ... ok
+test_unexplained_quota_drop_between_normal_replies_blocks (test_recovery_tail.TailTests.test_unexplained_quota_drop_between_normal_replies_blocks) ... ok
+test_unproven_time_budget_skips_without_reservation (test_recovery_tail.TailTests.test_unproven_time_budget_skips_without_reservation) ... ok
+test_watchdog_bounds_blocked_send_reservation_burned_never_resent (test_recovery_tail.TailTests.test_watchdog_bounds_blocked_send_reservation_burned_never_resent) ... ok
+test_watchdog_bounds_blocked_work_before_reservation (test_recovery_tail.TailTests.test_watchdog_bounds_blocked_work_before_reservation) ... BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
+ok
+test_watchdog_unavailable_outside_main_thread_skips (test_recovery_tail.TailTests.test_watchdog_unavailable_outside_main_thread_skips) ... ok
+test_write_timeout_committed_is_confirmed_but_never_send (test_recovery_tail.TailTests.test_write_timeout_committed_is_confirmed_but_never_send) ... ok
+test_write_timeout_confirmation_unavailable_blocks (test_recovery_tail.TailTests.test_write_timeout_confirmation_unavailable_blocks) ... ok
 
 ----------------------------------------------------------------------
-Ran 20 tests in 1.009s
+Ran 43 tests in 4.394s
 
 OK
-BSD_OK {"targets": 1, "matched_this_run": 0, "requests": 1, "events_seen": 0, "page_cap_reached": false, "per_day": {"2026-11-14": {"count_reported": 0, "events_read": 0}}, "event_names_sample": []}
-BSD_RECOVERY_TAIL_SKIPPED

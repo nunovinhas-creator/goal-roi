@@ -6,6 +6,7 @@ Rebuilding it uses their original receipt time, never the replay wall clock.
 import copy
 import json
 import os
+import signal
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from . import recovery as engine
@@ -17,13 +18,22 @@ from .recovery_trial_transport import PreparedBSD, OfflineWire
 # collect.yml: timeout-minutes 15. The start stamp is written by the first step,
 # after runner set-up; 30 s covers set-up already counted by GitHub.
 JOB_TIMEOUT_S, JOB_SETUP_SLACK_S = 900, 30
-# Hard wall clock of the whole tail (every Git op is clipped to it).
+# Hard wall clock of the whole tail: one SIGALRM watchdog covers local Git,
+# replay CPU, persistence and completion; network Git ops are also clipped to it.
 TAIL_BUDGET_S = 150
 # After the send: BSD timeout 20 + completion load/check/push/confirm 4x10 +
 # final replay fetch 10 + local persistence 10. No send if less remains.
 POST_SEND_RESERVE_S = 80
 # Fast reads alone are 540+10 s; the other post-BSD steps have no reviewed bound.
 MIN_DOWNSTREAM_S = 550
+
+
+class TailDeadline(BaseException):
+    """BaseException so no inner `except Exception` can swallow the watchdog."""
+
+
+def _tail_expired(signum, frame):
+    raise TailDeadline()
 
 
 def job_deadline_from_env(environ=None):
@@ -128,39 +138,56 @@ class PreparedTail:
 
     def __call__(self):
         self.outcome = 'skipped'
+        previous = None
+        start = datetime.now(timezone.utc)
         try:
-            self.slots.receipt, self.slots.normal_sequence = self.tracker.finish_normals()
-            now = datetime.now(timezone.utc)
-            if (self.slots.receipt is None or not self.token or self.job_deadline is None
-                or type(self.downstream_bound) is not int or self.downstream_bound < MIN_DOWNSTREAM_S
-                or (self.job_deadline-now).total_seconds() < self.downstream_bound+TAIL_BUDGET_S):
-                return
-            # Enforce the budget instead of estimating it once: Git operations are
-            # clipped to tail_end and no send is authorized after send_end.
-            tail_end = now+timedelta(seconds=TAIL_BUDGET_S)
-            self.slots.store.not_after = tail_end
-            self.slots.send_not_after = tail_end-timedelta(seconds=POST_SEND_RESERVE_S)
-            validate_targets(self.targets)
-            # Rebuild from the authoritative journal, not a runner's state cache.
-            state = replay(self.slots, self.targets, aliases=self.aliases, existing=self.existing)
-            _, ledger = self.slots.load()
-            if ledger['halted'] or ledger['lease']:
-                return
-            used_queries = {(a['day'],a['offset']) for a in ledger['attempts'].values()}
-            jobs = []
-            for day in sorted({d for t in self.targets.values() for d in t['days']}):
-                page = state['pages'].get('bsd|'+day, {})
-                if page.get('status') == 'complete' or page.get('terminal_error'):
-                    continue
-                offset = page.get('offset', 0)
-                if (day,offset) not in used_queries:
-                    jobs.append((day, offset))
-            if not jobs:
-                return
-            day, offset = jobs[0]
-            PreparedBSD(self.wire,self.slots,self.owner,self.token,self.slots.output)('bsd',day,offset,200)
-            replay(self.slots,self.targets,aliases=self.aliases,existing=self.existing)
-            self.outcome = 'synthetic_page_staged'
+            try:
+                # Main thread only (ValueError otherwise => contained, no reservation).
+                previous = signal.signal(signal.SIGALRM, _tail_expired)
+                signal.setitimer(signal.ITIMER_REAL, TAIL_BUDGET_S)
+                self._run(start)
+            finally:
+                signal.setitimer(signal.ITIMER_REAL, 0)
+        except TailDeadline:
+            # Any uncertain reservation stays burned; the normal state is already saved.
+            self.outcome = 'trial_deadline_normal_preserved'
         except Exception:
             # No provider/body/credential/exception text exposed.
             self.outcome = 'trial_failed_normal_preserved'
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            if previous is not None:
+                signal.signal(signal.SIGALRM, previous)
+
+    def _run(self, now):
+        self.slots.receipt, self.slots.normal_sequence = self.tracker.finish_normals()
+        if (self.slots.receipt is None or not self.token or self.job_deadline is None
+            or type(self.downstream_bound) is not int or self.downstream_bound < MIN_DOWNSTREAM_S
+            or (self.job_deadline-now).total_seconds() < self.downstream_bound+TAIL_BUDGET_S):
+            return
+        # Defence in depth under the watchdog: network Git operations are clipped
+        # to tail_end and no send is authorized after send_end.
+        tail_end = now+timedelta(seconds=TAIL_BUDGET_S)
+        self.slots.store.not_after = tail_end
+        self.slots.send_not_after = tail_end-timedelta(seconds=POST_SEND_RESERVE_S)
+        validate_targets(self.targets)
+        # Rebuild from the authoritative journal, not a runner's state cache.
+        state = replay(self.slots, self.targets, aliases=self.aliases, existing=self.existing)
+        _, ledger = self.slots.load()
+        if ledger['halted'] or ledger['lease']:
+            return
+        used_queries = {(a['day'],a['offset']) for a in ledger['attempts'].values()}
+        jobs = []
+        for day in sorted({d for t in self.targets.values() for d in t['days']}):
+            page = state['pages'].get('bsd|'+day, {})
+            if page.get('status') == 'complete' or page.get('terminal_error'):
+                continue
+            offset = page.get('offset', 0)
+            if (day,offset) not in used_queries:
+                jobs.append((day, offset))
+        if not jobs:
+            return
+        day, offset = jobs[0]
+        PreparedBSD(self.wire,self.slots,self.owner,self.token,self.slots.output)('bsd',day,offset,200)
+        replay(self.slots,self.targets,aliases=self.aliases,existing=self.existing)
+        self.outcome = 'synthetic_page_staged'
