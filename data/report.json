@@ -1,17 +1,17 @@
 {
- "generated_at_utc": "2026-11-16T19:26:53+00:00",
- "messages": 1156,
+ "generated_at_utc": "2026-11-16T19:31:13+00:00",
+ "messages": 1158,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 40,
-  "BETFAIR": 221,
+  "BETFAIR": 222,
   "STAKE_LOAD": 205,
   "OPEN_GAME": 168,
   "TOTALS_FORM": 56,
   "WEAKENED_LINEUP": 11,
   "OPEN_GAME_NO_ODDS": 13,
   "FULL_TIME_NOTE": 12,
-  "POLYMARKET": 328,
+  "POLYMARKET": 329,
   "None": 33,
   "TOTALS_FORM_NO_ODDS": 59
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1887,
+  "versions": 1889,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 14,
-  "last_collected_at_utc": "2026-11-16T19:26:17+00:00",
+  "last_collected_at_utc": "2026-11-16T19:31:12+00:00",
   "hl_results": 61,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 35,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 5,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T19:26:51+00:00",
+  "collector_last_run_utc": "2026-11-16T19:31:12+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 358,
   "goal_lists_consistent": 203
  },
- "unique_bets": 640,
+ "unique_bets": 641,
  "settled_bets": 497,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -522,7 +522,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/live/mkt>=10K": {
-   "bets": 47,
+   "bets": 48,
    "settled": 32,
    "matches": 32,
    "wins": 9,
@@ -1344,7 +1344,7 @@
  },
  "accuracy": {
   "BETFAIR/live": {
-   "signals": 120,
+   "signals": 121,
    "with_result": 64,
    "hits": 25,
    "misses": 39,
@@ -2892,7 +2892,7 @@
    },
    {
     "n": 40,
-    "signals": 41,
+    "signals": 42,
     "hits": 15,
     "misses": 25,
     "hit_rate": 0.375,
@@ -3084,7 +3084,7 @@
    },
    {
     "n": 131,
-    "signals": 185,
+    "signals": 186,
     "hits": 68,
     "misses": 63,
     "hit_rate": 0.5212,
@@ -3163,8 +3163,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 800,
-   "eligible": 640,
+   "total": 801,
+   "eligible": 641,
    "excluded": 160,
    "reasons": {
     "no_valid_odds": 112,
@@ -3179,7 +3179,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6871,
+    "em observação": 6889,
     "abandonada": 8,
     "promissora": 53
    },
@@ -4236,11 +4236,11 @@
     }
    ]
   },
-  "hypotheses": 6932,
+  "hypotheses": 6950,
   "tested": 431,
   "corrected_bar": null,
   "counts": {
-   "em observação": 6923,
+   "em observação": 6941,
    "abandonada": 4,
    "promissora": 5
   },
@@ -5521,7 +5521,7 @@
      "odds_last": 2.44,
      "max_mult": 1,
      "share": 51,
-     "share_last": 51,
+     "share_last": 58,
      "verdict": "contraditório",
      "conflict": true,
      "validated": false,
@@ -7657,6 +7657,84 @@
      "bad_total": 18
     },
     {
+     "match_id": "guyana-vs-puerto-rico-20261116",
+     "match": "Guyana — Puerto Rico",
+     "league": "America CONCACAF Nations League",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-16T19:28:52+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Guyana",
+     "odds": 2.96,
+     "odds_last": 2.96,
+     "max_mult": 1,
+     "share": 72,
+     "share_last": 72,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 31,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Competição = seleções & Dia = dia de semana & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 12,
+       "games": 11,
+       "hits": 1,
+       "break_even": 0.4691,
+       "prob_above": 0.0255,
+       "roi": -0.795,
+       "edge": -0.2031,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 29,
+       "games": 27,
+       "hits": 8,
+       "break_even": 0.4465,
+       "prob_above": 0.0503,
+       "roi": -0.3841,
+       "edge": -0.1302,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 16
+    },
+    {
      "match_id": "switzerland-vs-scotland-20261116",
      "match": "Switzerland — Scotland",
      "league": "UEFA Nations League",
@@ -7880,9 +7958,9 @@
     "misto": 5,
     "sem evidência": 0,
     "contraditório": 16,
-    "evitar": 4
+    "evitar": 5
    },
-   "generated_utc": "2026-11-16T19:27:08+00:00",
+   "generated_utc": "2026-11-16T19:31:28+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7895,7 +7973,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 6873,
+     "hypotheses": 6891,
      "with_prospective_evidence": 1685,
      "prospective_games": 33053
     },
@@ -8018,7 +8096,7 @@
     "roi_cut": 0.011
    },
    "skipped": {
-    "bets": 376,
+    "bets": 377,
     "settled": 271,
     "games": 138,
     "wins": 126,
@@ -17874,7 +17952,7 @@
   "abandoned": [
    {
     "n": 47,
-    "signals": 77,
+    "signals": 78,
     "hits": 17,
     "misses": 30,
     "hit_rate": 0.3617,
@@ -17910,7 +17988,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 10,
+    "open": 11,
     "born_verified": true,
     "game_set": "90be684921f1f08f",
     "prospective": {
@@ -17950,7 +18028,7 @@
    },
    {
     "n": 42,
-    "signals": 88,
+    "signals": 89,
     "hits": 10,
     "misses": 32,
     "hit_rate": 0.2381,
@@ -17986,7 +18064,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 22,
+    "open": 23,
     "born_verified": true,
     "game_set": "87873289d8883cc4",
     "prospective": {
@@ -21343,7 +21421,7 @@
    {
     "phase": "live",
     "level": 1,
-    "signals": 115,
+    "signals": 116,
     "n": 60,
     "hits": 22,
     "hit_rate": 0.3667,
@@ -21409,7 +21487,7 @@
   "scope": "eligible_bets_only",
   "accuracy": {
    "BETFAIR/live": {
-    "signals": 115,
+    "signals": 116,
     "with_result": 60,
     "hits": 22,
     "misses": 38,
@@ -21732,7 +21810,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 88,
+   "bets": 89,
    "settled": 42,
    "matches": 42,
    "wins": 10,
@@ -21812,7 +21890,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 89,
+   "bets": 90,
    "settled": 42,
    "matches": 41,
    "wins": 13,
@@ -22016,7 +22094,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 640,
+   "bets": 641,
    "settled": 497,
    "matches": 290,
    "wins": 237,
@@ -22052,6 +22130,19 @@
  },
  "recent_bets": [
   {
+   "date_utc": "2026-11-16T19:28:52+00:00",
+   "match_id": "guyana-vs-puerto-rico-20261116",
+   "group": "BETFAIR/live/mkt>=10K",
+   "match": "Guyana — Puerto Rico",
+   "selection": "Guyana",
+   "odds": 2.96,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
    "date_utc": "2026-11-16T19:25:22+00:00",
    "match_id": "macedonia-vs-slovenia-20261116",
    "group": "POLYMARKET/pre",
@@ -22061,7 +22152,7 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
+   "n_signals": 2,
    "max_mult": 1
   },
   {
@@ -22912,19 +23003,6 @@
    "w": null,
    "settled_by": null,
    "n_signals": 3,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T10:14:44+00:00",
-   "match_id": "germany-vs-netherlands-20261116",
-   "group": "POLYMARKET/pre",
-   "match": "Germany — Netherlands",
-   "selection": "Under 3.5",
-   "odds": 1.85,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 5,
    "max_mult": 1
   }
  ],
@@ -24219,6 +24297,16 @@
      "share": 51,
      "market": "Polymarket",
      "total": 6800.0
+    },
+    {
+     "d": "2026-11-16T19:30:33+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "BTTS: Yes",
+     "odds": 2.44,
+     "share": 58,
+     "market": "Polymarket",
+     "total": 10000.0
     }
    ],
    "goals": null,
@@ -25089,6 +25177,17 @@
      "share": 100,
      "market": "Polymarket",
      "total": 6800.0
+    },
+    {
+     "d": "2026-11-16T19:28:52+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "selection": "1",
+     "odds": 2.96,
+     "mult": 1,
+     "share": 72,
+     "mkt_volume": 13000.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -30175,7 +30274,7 @@
    "day": "2026-11-15"
   },
   {
-   "bets": 75,
+   "bets": 76,
    "settled": 41,
    "wins": 23,
    "units": 9.57,
