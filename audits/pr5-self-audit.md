@@ -1,7 +1,24 @@
-# PR 5/5 — Telegram e apresentação: autoauditoria (antes da auditoria independente)
+# PR 5/5 — Telegram e apresentação: autoauditoria
 
-Estado: desenvolvido, **não integrado**. Nenhuma mensagem real enviada, nenhuma alteração a `main`, dados de produção,
-workflows ou secrets; coletor não interrompido; certificação continua `not_activated`; regras científicas das PR 3 e 4 intactas.
+## Estado atual (depois da 3.ª auditoria independente, revisão #5921609334)
+
+- **Não integrado.** PR #28 em Draft; o merge exige autorização expressa do proprietário.
+- **Workflow:** no ramo da PR, `.github/workflows/collect.yml` tem exatamente duas linhas novas, `NOTIFY_DURABLE: git`, nos
+  passos "Telegram notices" e "Fast reads" (autorização da revisão #5921136533). Nenhuma outra alteração a workflows; o `main`
+  não foi alterado.
+- **Barreira P0 ativa no ramo:** cada intenção é publicada no GitHub antes de contactar o Telegram. A garantia "no máximo uma
+  vez" entre runners cobre os avisos desses dois passos. **Não cobre `--failure`**, o aviso de recolha falhada, que fica fora
+  da barreira com o comportamento anterior.
+- **Reversão:** retirar as duas linhas reabre o defeito P0 e não é uma reversão segura (runbook).
+- **Fora do âmbito, nada mudou:** nenhuma mensagem real enviada, nenhuma alteração a `main`, dados de produção ou secrets; o
+  coletor não foi interrompido; a certificação continua `not_activated`; as regras científicas das PR 3 e 4 estão intactas.
+- **Histórico das rondas, mantido tal como foi escrito e datado por SHA:**
+  - 1.ª ronda (`4b92b5b`): secções 1 a 6;
+  - 2.ª ronda (`72107cf`): secção 0;
+  - 3.ª ronda (`183b384`): secção 00;
+  - fecho da 3.ª auditoria: secção 000.
+  
+  Onde uma passagem antiga já não descreve o estado atual, leva uma nota "[superado]".
 
 - Base: `main` `60ba009` (contém o merge da PR 4 `5710113`), integrado por *fast-forward*, sem force-push.
 - Ramo: `claude/pr5-telegram-presentation-catr19` (o ambiente de desenvolvimento só permite publicar neste nome; o
@@ -27,7 +44,7 @@ Ramo atualizado com o `main` `4af4c95` por merge (sem force-push; o `main` só t
 
 | Ponto | Correção | Testes | Mutações |
 |---|---|---|---|
-| **P0** persistência entre runners | Barreira `GitPublisher`: commit e push da intenção (só `notify_state.json` e `notify_log.jsonl`) **antes** de contactar o Telegram; se a publicação falhar, a intenção é retirada (`withdrawn`), nada é enviado e o aviso fica pendente. **Inativa** até `NOTIFY_DURABLE=git` no workflow, que NÃO foi alterado: desenho, diff proposto e riscos em `audits/pr5-p0-durability-design.md`, para autorização separada. Até lá, a garantia declarada é "no máximo uma vez dentro do mesmo runner". | `tests/test_notify_durability.py` (12, git real: remoto *bare* e um clone limpo por runner; inclui a reprodução do defeito sem barreira, morte em 6 pontos, push recusado, push aceite mas dado como falhado, conflito, leituras rápidas, queda durante a retirada) | M44–M48 |
+| **P0** persistência entre runners | Barreira `GitPublisher`: commit e push da intenção (só `notify_state.json` e `notify_log.jsonl`) **antes** de contactar o Telegram; se a publicação falhar, a intenção é retirada (`withdrawn`), nada é enviado e o aviso fica pendente. [superado na 3.ª ronda: ligada no workflow do ramo, ver secção 00] **Inativa** até `NOTIFY_DURABLE=git` no workflow, que NÃO foi alterado: desenho, diff proposto e riscos em `audits/pr5-p0-durability-design.md`, para autorização separada. Até lá, a garantia declarada é "no máximo uma vez dentro do mesmo runner". | `tests/test_notify_durability.py` (12, git real: remoto *bare* e um clone limpo por runner; inclui a reprodução do defeito sem barreira, morte em 6 pontos, push recusado, push aceite mas dado como falhado, conflito, leituras rápidas, queda durante a retirada) | M44–M48 |
 | **P1** duplicação após promoção | A identidade de um aviso de jogo é a **aposta** (jogo, mercado, seleção), sem o nível indício/alerta; a proteção das chaves antigas (mesmo jogo e seleção em 3 dias) vale para todos os níveis. A certificação da hipótese continua a ser um acontecimento separado ("✅ Tática validada"). | `P1_PromotionDoesNotRepeatTheBet` (3: indício → reforço com outra hora → certificada → mesma aposta: só o aviso de estado; seleção nova depois da promoção: alerta de atualização só com ela; indício enviado pelo código antigo → alerta da mesma aposta: nada) | M38, M39 |
 | **P2** perda de estado | `notify_state.json` ausente → `StateMissing`, nada enviado, nada criado (`NOTIFY_STATE_MISSING`; a recolha continua). Estado vazio, anterior à PR 5 ou com `sent_total` abaixo do da migração ao lado de um registo → `StateRegressed`. Instalação nova só com `--init-state`, que recusa se houver estado ou registo. A pré-visualização segue a mesma regra. | `P2_StateLoss` (7) | M41–M43 |
 | **Contrato** seleção nova num jogo avisado | Cada aposta é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem juntas. Uma seleção genuinamente nova num jogo já avisado sai como **atualização**: título "A seguir (nova seleção num jogo já avisado)" ou "🟢 ALERTA (nova seleção num jogo já avisado)", só com a aposta nova e a linha "Apostas já avisadas neste jogo: N (não repetidas)". O reforço dessa aposta nova também não se repete. Documentado no README e em `notify.game_notices`. | U4 (alargado), P1 | M40 |
@@ -129,5 +146,7 @@ Nenhum teste foi apagado ou desativado. Fixture nova `tests/pr5_fixtures.py` (o 
 
 Ver a tabela do runbook. Os principais: "no máximo uma vez" perde raramente um aviso (falha ou incerteza, contadas no
 resumo); a persistência real é o commit do workflow (um runner que morra antes de qualquer commit perde a intenção — não
-evitável sem mexer em workflows, fora de âmbito); nomes de equipas com palavras de afirmação bloqueiam o aviso desse jogo
-(fail-closed); o aviso de recolha falhada (`--failure`) mantém o comportamento anterior.
+evitável sem mexer em workflows, fora de âmbito) [superado na 3.ª ronda: a barreira publica a intenção antes do envio; fica
+só o risco de um push aceite cuja resposta se perde, que pode perder um aviso, nunca duplicá-lo]; nomes de equipas com
+palavras de afirmação bloqueiam o aviso desse jogo (fail-closed); o aviso de recolha falhada (`--failure`) mantém o
+comportamento anterior e fica fora da garantia "no máximo uma vez".

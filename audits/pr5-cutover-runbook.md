@@ -1,19 +1,27 @@
 # PR 5/5 — Procedimento de integração (NÃO executado; exige autorização expressa)
 
 A PR 5 muda só a forma como os avisos Telegram são decididos, entregues e apresentados. Não muda regras de estado,
-certificação (continua `not_activated`), avaliação LLM, leitor do ScanGoal, workflows nem secrets.
+certificação (continua `not_activated`), avaliação LLM, leitor do ScanGoal nem secrets.
+
+**Workflow:** `.github/workflows/collect.yml` tem **exatamente duas linhas novas**, `NOTIFY_DURABLE: git`, no `env` dos passos
+"Telegram notices through the user's bot" e "Fast reads every 2 minutes until the next collection". Foram autorizadas na
+revisão #5921136533 e não há mais nenhuma alteração a workflows.
+
+**Âmbito da garantia "no máximo uma vez":** cobre os avisos dos passos "Telegram notices" e "Fast reads" com
+`NOTIFY_DURABLE=git`, entre runners. **Não cobre o aviso de recolha falhada (`--failure`)**: esse passo fica fora da barreira,
+sem chave de acontecimento, sem registo e sem `sent_total`, e mantém o comportamento anterior (no máximo um por hora).
 
 O que muda nos dados de produção, sempre por acréscimo:
 - `data/notify_state.json` ganha campos novos (`announced_statuses`, `announced_changes`, `notified_items`, `notice_games`,
   `deliveries`, `delivery_counts`, `summary_counts`, `oscillations`, `health`, `format_last_run_utc`, `format_resyncs`) e a marca
   `migrations.telegram_format_v2`. Nenhum campo existente é removido, renomeado ou reiniciado; `sent_total` e `watch_sent`
   continuam a crescer; as três marcas anteriores ficam byte a byte iguais.
-- `data/notify_log.jsonl` (novo, só a crescer) aparece no primeiro aviso tentado depois da integração. É apanhado pelo
-  `git add data` do workflow, sem alterar o workflow.
+- `data/notify_log.jsonl` (novo, só a crescer) aparece no primeiro aviso tentado depois da integração. Entra nos commits de
+  intenção da barreira e no `git add data` que o workflow já fazia.
 - `data/report.json` e `docs/report.json` ganham `brain.presentation` e `match_id` nos sinais em aberto (aditivos; a página não
   os lê).
 
-## Revisão #5920565094 (segunda ronda)
+## Estado atual (depois das revisões #5920565094, #5921136533 e #5921609334)
 
 - P0: a barreira de publicação (`NOTIFY_DURABLE=git`) está no código e, por autorização da revisão #5921136533, **ligada no
   workflow desta PR** (duas linhas, passos "Telegram notices" e "Fast reads"). Entra em funcionamento com o merge, sem janela
@@ -87,7 +95,11 @@ O que muda nos dados de produção, sempre por acréscimo:
 - **Nunca** restaurar `data/notify_state.json` nem `data/notify_log.jsonl` de uma cópia anterior: manter sempre os mais
   recentes. O código antigo ignora os campos novos e continua a manter `statuses`, `watch_sent`, `sent_total`, `summary_day`
   e `operational_regime`; o registo fica parado (o código antigo não o escreve).
-- Reverter só a barreira: retirar as duas linhas `NOTIFY_DURABLE: git` (volta a garantia "dentro do mesmo runner").
+- **Retirar só as duas linhas `NOTIFY_DURABLE: git` NÃO é uma reversão segura.** Reabre o defeito P0 tal como os testes o
+  reproduzem (`test_without_the_barrier_a_dead_runner_causes_a_duplicate`): um runner que envie e morra, ou cujo push final
+  falhe, deixa o runner seguinte reenviar a mesma mensagem. Só serve como medida de emergência, aceitando expressamente a perda
+  da garantia entre runners. Nesse caso `pr5_intent_published_before_outcome` passa a falhar. A reversão completa
+  (`git revert -m 1 <merge>`) também volta ao comportamento anterior à PR 5, que não tinha esta garantia.
 - Nova integração depois de uma reversão: a primeira execução com o código novo deteta que outro escritor correu
   (`last_run_utc` diferente de `format_last_run_utc`) e passa a referência anunciada para a do código antigo, em silêncio e
   com registo em `format_resyncs`. Os sinais avisados pelo código antigo ficam protegidos pelas chaves de `watch_sent`.

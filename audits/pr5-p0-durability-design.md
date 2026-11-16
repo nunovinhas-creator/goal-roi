@@ -14,8 +14,8 @@ com o estado antigo e volta a enviar.
 O teste `test_notify_durability.test_without_the_barrier_a_dead_runner_causes_a_duplicate` reproduz exatamente isto com
 repositórios git reais: um remoto *bare* e um clone limpo por runner.
 
-Sem a barreira, a garantia "no máximo uma vez" vale só **dentro do mesmo runner**. É assim que a PR a descreve enquanto a
-barreira não estiver ativa.
+Sem a barreira, a garantia "no máximo uma vez" vale só **dentro do mesmo runner**. Era essa a situação até à 2.ª ronda. Desde
+a 3.ª ronda, a barreira está ligada no workflow desta PR.
 
 ## 2. A barreira (implementada, inativa por omissão)
 
@@ -120,8 +120,10 @@ Efeitos operacionais:
    - `NOTIFY_DURABILITY git` aparece nos registos;
    - cada aviso tem um commit `notify: intent` **anterior** ao commit com o seu resultado;
    - `post_cutover_check` está verde.
-3. Reversão: retirar as duas linhas `NOTIFY_DURABLE: git` (perde-se a garantia entre runners) ou reverter a PR inteira (runbook).
-   Nenhum dado a restaurar.
+3. Reversão: retirar as duas linhas `NOTIFY_DURABLE: git` **não é uma reversão segura**. Reabre o defeito P0 reproduzido por
+   `test_without_the_barrier_a_dead_runner_causes_a_duplicate` (duplicação depois da morte de um runner) e só serve como
+   emergência, aceitando a perda da garantia entre runners. A reversão da PR inteira (runbook) volta ao comportamento anterior à
+   PR 5, que também não tinha a garantia. Nenhum dado a restaurar.
 
 ## 8. Validação com a barreira ligada (terceira ronda)
 
