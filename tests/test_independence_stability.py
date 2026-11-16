@@ -4,7 +4,7 @@ import random
 import unittest
 from datetime import datetime, timedelta
 
-from pr5_fixtures import body, present
+from pr5_fixtures import body, changes, evening, present
 from scangoal import brain, certification, insights, notify
 from scangoal.eligibility import eligible, exclusion_reasons
 
@@ -242,7 +242,7 @@ class KashiwaKawasakiCase(unittest.TestCase):
                 sent.append(sum(1 for h in set(prev) | set(cur) if prev.get(h) != cur.get(h)))
                 prev = cur
             else:
-                sent.append(sum(body(m).startswith('Hipótese') for m in notify.messages(rep, state, NOW)))
+                sent.append(len(changes(notify.messages(rep, state, evening(NOW + timedelta(days=k + 1))))))   # one summary a day
         return sent
 
     def test_one_win_at_the_edge_no_longer_announces_four_promotions(self):
@@ -288,8 +288,9 @@ class TelegramRulesMigration(unittest.TestCase):
         self.assertEqual(notify.messages(self.pr2_report({'c': 'promissora', 'd': 'promissora'}), state, NOW), [])
         self.assertEqual(state, frozen)                                                                    # idempotent
         self.assertEqual(notify.messages(self.pr2_report({'c': 'promissora'}), state, NOW), [])            # PR 5: absent = unknown
-        out = notify.messages(present(self.pr2_report({'c': 'promissora'}), observed=['d']), state, NOW)
-        self.assertEqual([body(m).split('\n')[0] for m in out], ['Hipótese voltou a "em observação" (antes: promissora): d'])   # genuine change still notified
+        self.assertEqual(notify.messages(present(self.pr2_report({'c': 'promissora'}), observed=['d']), copy.deepcopy(state), NOW), [])
+        out = notify.messages(present(self.pr2_report({'c': 'promissora'}), observed=['d']), state, evening(NOW))
+        self.assertEqual(changes(out), [('d', 'Estado: Em observação (antes: promissora)')])   # genuine change: in the 22:00 summary
 
     def test_pr1_reports_keep_the_original_key(self):
         pr1 = {'brain': {'evidence_scope': 'eligible_bets_only', 'status_list': {}}}
