@@ -1,4 +1,4 @@
-"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v3.md).
+"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v4.md).
 
 Só leitura e sem rede: lê `data/` de um commit fixo por `git archive` para uma pasta temporária, constrói o relatório com o
 relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o protocolo pelo histórico git completo, e escreve
@@ -7,8 +7,9 @@ relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o
 Uso (na raiz de um clone completo, `git fetch --unshallow` se preciso):
     python3.11 scripts/audit_pr4_llm.py --ref <commit de main> --protocol-commit <sha do protocolo> \
         --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação github.com> [--as-of <UTC>] [--out audits]
-Sem prova de publicação do protocolo (§0-A do protocolo v3) a avaliação sai "não verificada". Antes do instante confirmatório C
-(§0-B) sai "exploratória"; com --as-of em C ou depois, a avaliação é a confirmatória e é sempre a mesma.
+Sem prova de publicação do protocolo (§0-A do protocolo v4), do nascimento ou das observações (§0-C), a avaliação sai "não
+verificada". O e-processo é válido a qualquer momento; com --as-of em C ou depois, os dados são sempre os do primeiro commit de
+main com hora >= C (registado em `ref`; o pedido fica em `requested_ref`).
 
 Códigos de saída: 0 = relatório escrito (qualquer veredicto); 2 = uso errado ou entradas ilegíveis.
 """
@@ -40,22 +41,37 @@ def main(argv=None):
     ap.add_argument('--out', default=str(ROOT / 'audits'))
     args = ap.parse_args(argv)
     from scangoal import brain, chronology, llm_eval
+    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit, args.protocol_published_utc, args.protocol_publication_evidence)
     try:
-        ref = git('rev-parse', '--verify', '%s^{commit}' % args.ref).decode().strip()
+        requested = git('rev-parse', '--verify', '%s^{commit}' % args.ref).decode().strip()
+        requested_time = chronology.parse_utc(git('show', '-s', '--format=%cI', requested).decode().strip())
+    except subprocess.CalledProcessError:
+        print('AUDIT_PR4_BAD_REF')
+        return 2
+    as_of = chronology.parse_utc(args.as_of) if args.as_of else requested_time
+    if as_of is None:
+        print('AUDIT_PR4_BAD_AS_OF')
+        return 2
+    # Protocolo v4, §0-C: em C ou depois, os dados são sempre os do primeiro commit de main com hora >= C (nunca um posterior).
+    ref, problems = requested, list(protocol)
+    _, final = llm_eval.windows(protocol_time)
+    if final is not None and as_of >= final:
+        snapshot = llm_eval.confirmation_snapshot(ROOT, requested, final)
+        if snapshot is None:
+            problems.append('final data commit (first commit at or after C) not available in %s' % requested[:12])
+        else:
+            ref = snapshot
+    try:
         ref_time = chronology.parse_utc(git('show', '-s', '--format=%cI', ref).decode().strip())
         archive = git('archive', '--format=tar', ref, 'data')
     except subprocess.CalledProcessError:
         print('AUDIT_PR4_BAD_REF')
         return 2
-    as_of = chronology.parse_utc(args.as_of) if args.as_of else ref_time
-    if as_of is None:
-        print('AUDIT_PR4_BAD_AS_OF')
-        return 2
     with tempfile.TemporaryDirectory() as tmp:
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(tmp, filter='data')
         data = Path(tmp) / 'data'
-        inputs = {'ref': ref, 'ref_commit_time_utc': chronology.iso(ref_time), 'python': '%d.%d' % sys.version_info[:2]}
+        inputs = {'ref': ref, 'requested_ref': requested, 'ref_commit_time_utc': chronology.iso(ref_time), 'python': '%d.%d' % sys.version_info[:2]}
         for f in sorted(p for p in data.rglob('*') if p.is_file()):
             inputs['sha256 data/%s' % f.relative_to(data).as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
         os.environ['SCANGOAL_DATA_DIR'] = str(data)
@@ -64,8 +80,7 @@ def main(argv=None):
         signals = report.LAST['signals']
         registry = brain.load_registry(data / 'hypotheses.json')
     first, history = llm_eval.registry_history(ROOT, ref)
-    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit, args.protocol_published_utc, args.protocol_publication_evidence)
-    problems = history + protocol
+    problems = history + problems + (llm_eval.observation_proof(ROOT, ref, protocol_time) if protocol_time is not None else [])
     born = llm_eval.births(registry, first, not history)
     res = llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born, protocol_time=protocol_time, problems=problems)
     try:

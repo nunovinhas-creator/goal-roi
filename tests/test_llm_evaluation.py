@@ -62,8 +62,9 @@ def run(signals, registry, *, as_of=None, problems=(), born=None, protocol=P):
     return llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born_eff, protocol_time=protocol, problems=list(problems))
 
 
-FAST = dict(REPLICATES=500)
-CONFIRM = T0 + timedelta(days=33)          # C = P + 30 + 3 dias com P = T0 (protocolo v3, §0-B)
+FAST = dict(BOOT_REPLICATES=99)
+FINAL = T0 + timedelta(days=368)           # C = P + 365 + 3 dias com P = T0 (protocolo v4, §0-B)
+V = llm_eval.VERDICTS
 
 
 class Leakage(unittest.TestCase):
@@ -113,13 +114,12 @@ class HitRateIsNotEvidence(unittest.TestCase):
     def test_T5_T6_high_hit_rate_with_the_same_profit_as_the_controls_is_not_utility(self):
         sixty = [1.0, 1.0, 1.0, -1.0, -1.0]                     # 60 % de acerto à odd 1,50: perde dinheiro (necessário 68 %)
         signals, registry = world(sixty, sixty, llm_odds=1.5, ctrl_odds=1.5)
-        res = run(signals, registry)
-        self.assertEqual(res['primary']['d'], 0.0)
-        self.assertEqual(res['verdict'], 'sem utilidade incremental demonstrada')
-        self.assertTrue(all(h['protocol_mean_profit'] < 0 for h in res['hypotheses']))
+        res = run(signals, registry, as_of=FINAL)
+        self.assertEqual((res['primary']['k_sup'], res['verdict']), (1.0, V[4]))
+        self.assertTrue(all(h['protocol_mean_profit_observed'] < 0 for h in res['hypotheses']))
         seventy = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]
-        res = run(*world(seventy, seventy))
-        self.assertEqual((res['primary']['d'], res['verdict']), (0.0, 'sem utilidade incremental demonstrada'))
+        res = run(*world(seventy, seventy), as_of=FINAL)
+        self.assertEqual((res['primary']['k_sup'], res['verdict']), (1.0, V[4]))
 
     def test_no_criterion_reads_hit_rates(self):
         # mesma evidência de lucro, acertos descritivos diferentes: o veredicto e a comparação não mudam
@@ -129,9 +129,9 @@ class HitRateIsNotEvidence(unittest.TestCase):
         tampered = [dict(b, w=0.5) if b['w'] == 1.0 and b['league'].startswith('A') else b for b in signals]   # meia vitória: menos lucro
         with patch.multiple(llm_eval, **FAST):
             b = run(tampered, registry)
-        self.assertLess(b['primary']['d'], a['primary']['d'])
+        self.assertLess(b['primary']['mean_daily_diff_descriptive'], a['primary']['mean_daily_diff_descriptive'])
+        self.assertLessEqual(b['primary']['k_final'], a['primary']['k_final'])
         self.assertNotIn('"prob_above":', json.dumps(a))
-
 
 class Duplicates(unittest.TestCase):
     VOCAB = {'Jogo aberto': {'Liga': {'A0': 9, 'A1': 9}, 'Minuto': {'31 a 60': 18}, 'Faixa de odd': {'odd 2,00 a 3,00': 18},
@@ -238,7 +238,7 @@ class Comparisons(unittest.TestCase):
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry)
         s4 = res['secondary']['S4_refinar_vs_parents']
-        self.assertEqual((s4['games_test'], s4['games_control'], s4['d']), (16, 16, 0.0))   # a refinada não herda crédito da mãe
+        self.assertEqual((s4['games_test'], s4['games_control'], s4['k_sup'], s4['p_e']), (16, 16, 1.0, 1.0))   # não herda crédito da mãe
         child_row = next(h for h in res['hypotheses'] if h['mode'] == 'refinar')
         self.assertEqual((child_row['parents'], child_row['controls']), (1, 0))             # sem controlos de 2 condições: fora da primária
         self.assertEqual(res['primary']['games_test'], 0)
@@ -250,9 +250,8 @@ class Comparisons(unittest.TestCase):
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry)
         s5 = res['secondary']['S5_evitar_vs_baseline']
-        self.assertTrue(res['hypotheses'][0]['protocol_mean_profit'] < 0)                   # "acertou abaixo do necessário"...
-        self.assertEqual(s5['d'], 0.0)                                                       # ...mas igual à família: nada
-        self.assertFalse(s5['significant_holm'])
+        self.assertTrue(res['hypotheses'][0]['protocol_mean_profit_observed'] < 0)          # "acertou abaixo do necessário"...
+        self.assertEqual((s5['k_sup'], s5['significant_holm_exploratory']), (1.0, False))   # ...mas igual à família: nada
         self.assertEqual(res['hypotheses'][0]['controls'], 6)                                # tem controlos (escolhidos sem resultados)...
         self.assertEqual(res['primary']['games_test'], 0)                                    # ...mas evitar nunca entra na primária
 
@@ -276,35 +275,37 @@ class Comparisons(unittest.TestCase):
 
 class Verdicts(unittest.TestCase):
     def test_positive_verdict_needs_every_minimum_and_proofs(self):
-        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0])
-        res = run(signals, registry)
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=60)
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry, as_of=FINAL)
+            unproven = run(signals, registry, as_of=FINAL, problems=['history unavailable: shallow repository'])
         self.assertEqual(res['insufficient'], [])
-        self.assertLess(res['primary']['p'], 0.05)
-        self.assertTrue(res['verdict'].startswith('utilidade incremental estatisticamente significativa'))
+        self.assertGreaterEqual(res['primary']['k_sup'], 20)
+        self.assertEqual(res['verdict'], V[1])
         self.assertIn('não é prova de vantagem', res['verdict'])
-        unproven = run(signals, registry, problems=['history unavailable: shallow repository'])
+        self.assertIsNotNone(res['concluded_on'])
         self.assertEqual((unproven['verdict'], unproven['verified']), ('não verificada', False))
 
     def test_T18_small_or_concentrated_samples_are_insufficient(self):
         with patch.multiple(llm_eval, **FAST):
-            small = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=5))
-            self.assertEqual(small['verdict'], 'evidência insuficiente')
+            small = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=5), as_of=FINAL)
+            self.assertEqual(small['verdict'], V[3])
             # 10 grupos x 24 jogos, mas tudo em 6 dias (4 jogos por dia e liga): falta diversidade temporal
             signals, registry = world([1.0], [1.0], n_llm=10, n_ctrl=10, days=0)
             for i in range(10):
                 for lg, out in (('A%d' % i, [1.0, 1.0, 1.0, -1.0]), ('B%d' % i, [1.0, -1.0])):
                     signals += [sig('%s-x%d' % (lg, k), out[k % len(out)], (k // 4 + 1) * DAY + (i * 4 + k % 4) * 20 + (300 if lg[0] == 'B' else 0), league=lg) for k in range(24)]
-            dense = run(signals, registry)
+            dense = run(signals, registry, as_of=FINAL)
         self.assertEqual(dense['primary']['games_test'], 240)
-        self.assertEqual(dense['verdict'], 'evidência insuficiente')
+        self.assertEqual(dense['verdict'], V[3])
         self.assertIn('days with llm games < 14', dense['insufficient'])
 
     def test_each_minimum_fails_on_its_own(self):
         with patch.multiple(llm_eval, **FAST):
-            few = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=30, n_llm=8))   # 240 jogos em 30 dias (janela até H), mas só 8 grupos
+            few = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=30, n_llm=8), as_of=FINAL)   # 240 jogos em 30 dias, mas só 8 grupos
             signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=14, n_ctrl=15)      # 14 dias, 10 grupos, 140 + 75 jogos LLM...
             signals += [sig('A%d-burst%d' % (i, k), 1.0, DAY + 600 + k * 15 + i, league='A%d' % i) for i in range(5) for k in range(15)]
-            burst = run(signals, registry)                                                         # ...com 75 + 10 no 1.º dia (40 %)
+            burst = run(signals, registry, as_of=FINAL)                                            # ...com 75 + 10 no 1.º dia (40 %)
             short = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=15, n_ctrl=15))              # 150 jogos LLM em 15 dias, 10 grupos
         self.assertEqual(few['insufficient'], ['groups with >= 10 games < 10'])
         self.assertEqual(burst['insufficient'], ['one day holds more than 20 % of llm games'])
@@ -323,7 +324,7 @@ class Verdicts(unittest.TestCase):
         signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=21)
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry, protocol=T0 + timedelta(days=40))                   # tudo anterior ao protocolo
-        self.assertEqual((res['primary']['games_test'], res['verdict']), (0, llm_eval.VERDICTS[1]))   # antes de C: exploratória
+        self.assertEqual((res['primary']['games_test'], res['primary']['k_sup'], res['verdict']), (0, 1.0, V[2]))
         self.assertEqual(sum(h['pre_protocol_games'] for h in res['hypotheses']), 210)
 
     def test_T13_T20_deterministic_and_never_claims_validation(self):
@@ -352,7 +353,7 @@ class Verdicts(unittest.TestCase):
         self.assertEqual(llm_eval.holm([0.01, 0.04, None, 0.03]), [0.04, 0.09, 1.0, 0.09])
 
 
-class GitProofs(unittest.TestCase):
+class GitRepo(unittest.TestCase):
     """Nascimento e protocolo provados pelo histórico git (repositórios temporários; nada de produção)."""
 
     def setUp(self):
@@ -383,6 +384,8 @@ class GitProofs(unittest.TestCase):
         self.n += 1
         return self.git('rev-parse', 'HEAD').strip()
 
+
+class GitProofs(GitRepo):
     def test_first_publication_and_append_only(self):
         a = hyp('A0', 'llm', T0 - timedelta(days=3))
         self.commit('data/hypotheses.json', {'a': a}, '2026-11-20T10:00:00+00:00')
@@ -453,6 +456,74 @@ class GitProofs(unittest.TestCase):
         self.assertEqual(sum(h['pre_protocol_games'] for h in at_publication['hypotheses']), 100)
 
 
+class RetroactiveRevisions(GitRepo):
+    """Ponto 4 da auditoria #5916502096: a avaliação não pode ser mudada por revisões retroativas dos dados."""
+
+    SINCE = T0
+
+    def msg(self, mid, collected):
+        return json.dumps({'collected_at_utc': collected, 'date_utc': collected, 'message_id': mid, 'sha256': 'x%d' % mid, 'text': 't'}, sort_keys=True)
+
+    def write_messages(self, lines, when):
+        return self.commit('data/messages.jsonl', ''.join(l + '\n' for l in lines), when)
+
+    def results(self, entries, when):
+        return self.commit('data/results_hl.json', {'results': entries}, when)
+
+    def problems(self):
+        return llm_eval.observation_proof(self.root, 'HEAD', self.SINCE)
+
+    def test_clean_history_is_proven(self):
+        m1 = self.msg(1, '2026-11-20T10:00:00+00:00')
+        self.write_messages([m1], '2026-11-20T10:04:00+00:00')
+        self.write_messages([m1, self.msg(2, '2026-11-20T11:00:00+00:00')], '2026-11-20T11:06:00+00:00')
+        self.results({'g1': {'ft': [1, 0], 'matched_at_utc': '2026-11-20T12:00:00+00:00'}}, '2026-11-20T12:01:00+00:00')
+        self.assertEqual(self.problems(), [])
+
+    def test_rewritten_message_is_detected(self):
+        self.write_messages([self.msg(1, '2026-11-20T10:00:00+00:00')], '2026-11-20T10:04:00+00:00')
+        self.write_messages([self.msg(1, '2026-11-20T09:00:00+00:00')], '2026-11-20T12:00:00+00:00')
+        self.assertTrue(any(x.startswith('messages rewritten') for x in self.problems()))
+
+    def test_backdated_message_or_result_is_detected(self):
+        self.write_messages([self.msg(1, '2026-11-20T08:00:00+00:00')], '2026-11-20T10:00:00+00:00')         # carimbo 2 h antes
+        self.results({'g1': {'ft': [1, 0], 'matched_at_utc': '2026-11-20T08:00:00+00:00'}}, '2026-11-20T10:00:00+00:00')
+        found = self.problems()
+        self.assertTrue(any('message 1 published out of time' in x for x in found))
+        self.assertTrue(any('results_hl.json entry published out of time' in x for x in found))
+
+    def test_result_changed_or_removed_after_publication_is_detected(self):
+        self.results({'g1': {'ft': [1, 0], 'matched_at_utc': '2026-11-20T10:00:00+00:00'},
+                      'g2': {'ft': [0, 0], 'matched_at_utc': '2026-11-20T10:00:00+00:00'}}, '2026-11-20T10:01:00+00:00')
+        self.results({'g1': {'ft': [2, 0], 'matched_at_utc': '2026-11-20T10:00:00+00:00'}}, '2026-11-20T11:00:00+00:00')
+        found = self.problems()
+        self.assertTrue(any('entry rewritten' in x and 'g1' in x for x in found))
+        self.assertTrue(any('entry removed' in x and 'g2' in x for x in found))
+
+    def test_observations_before_the_protocol_are_not_rechecked_but_rewrites_always_are(self):
+        self.write_messages([self.msg(1, '2026-11-10T08:00:00+00:00')], '2026-11-10T12:00:00+00:00')         # antigo, publicado tarde
+        self.assertEqual(self.problems(), [])
+        self.write_messages([], '2026-11-21T10:00:00+00:00')                                                     # apagado depois
+        self.assertTrue(any(x.startswith('messages rewritten') for x in self.problems()))
+
+    def test_shallow_clone_is_unverified(self):
+        self.write_messages([self.msg(1, '2026-11-20T10:00:00+00:00')], '2026-11-20T10:04:00+00:00')
+        self.write_messages([self.msg(1, '2026-11-20T10:00:00+00:00'), self.msg(2, '2026-11-20T11:00:00+00:00')], '2026-11-20T11:04:00+00:00')
+        clone = Path(self.tmp.name) / 'shallow'
+        self.git('clone', '-q', '--depth', '1', 'file://%s' % self.root, str(clone), cwd=self.tmp.name)
+        self.assertEqual(llm_eval.observation_proof(clone, 'HEAD', self.SINCE), ['observations: shallow repository'])
+
+    def test_final_data_commit_is_the_first_at_or_after_C(self):
+        c = T0 + timedelta(days=368)
+        self.results({'g1': {'ft': [1, 0], 'matched_at_utc': '2027-11-20T10:00:00+00:00'}}, '2027-11-20T10:01:00+00:00')
+        first = self.results({'g1': {'ft': [1, 0], 'matched_at_utc': '2027-11-20T10:00:00+00:00'},
+                              'g2': {'ft': [0, 1], 'matched_at_utc': '2027-11-23T00:05:00+00:00'}}, '2027-11-23T00:06:00+00:00')
+        self.commit('data/results_hl.json', {'results': {'g1': {'ft': [3, 0], 'matched_at_utc': '2027-11-20T10:00:00+00:00'}}}, '2027-11-25T00:00:00+00:00')
+        self.assertEqual(c.isoformat(), '2027-11-23T00:00:00+00:00')
+        self.assertEqual(llm_eval.confirmation_snapshot(self.root, 'HEAD', c), first)             # a revisão posterior não lhe chega
+        self.assertIsNone(llm_eval.confirmation_snapshot(self.root, 'HEAD', c + timedelta(days=30)))
+
+
 class ReviewP1(unittest.TestCase):
     """Revisão independente da PR #27: decisões históricas só com o que o sistema tinha LIDO nesse instante."""
 
@@ -508,110 +579,159 @@ class ReviewP1(unittest.TestCase):
         self.assertEqual(b['population']['groups'], 2)
 
 
-class RepeatedLooksP1D(unittest.TestCase):
-    """Auditoria #5916209217, P1-D: avaliações repetidas e paragem oportunista não podem produzir falsas significâncias."""
+class EProcessV4(unittest.TestCase):
+    """Protocolo v4 (P1-D e P1-E): e-processo com garantia de Ville, dias fechados, imputação desfavorável."""
 
-    def test_P1D_before_C_every_look_is_exploratory_whatever_the_p(self):
-        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0])
+    def test_conclusion_at_any_time_is_permanent(self):
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=60)
         with patch.multiple(llm_eval, **FAST):
-            looks = [run(signals, registry, as_of=T0 + timedelta(days=d)) for d in (15, 22, 29)] + [run(signals, registry, as_of=CONFIRM - timedelta(minutes=1))]
-            final = run(signals, registry, as_of=CONFIRM)
-        for r in looks:
-            self.assertEqual((r['verdict'], r['phase']), (llm_eval.VERDICTS[1], 'exploratory'))
-            self.assertTrue(all(x['significant_holm'] is None and x['p_holm'] is None for x in r['secondary'].values()))
-        self.assertLess(looks[-1]['primary']['p'], 0.05)                                       # o número existe, a conclusão não
-        self.assertEqual((final['phase'], final['verdict']), ('confirmatory', llm_eval.VERDICTS[4]))
+            looks = [run(signals, registry, as_of=T0 + timedelta(days=d)) for d in (10, 25, 45, 70, 200)] + [run(signals, registry, as_of=FINAL + timedelta(days=100))]
+        concluded = [r['concluded_on'] for r in looks]
+        first = next(i for i, c in enumerate(concluded) if c is not None)
+        self.assertTrue(all(c is None for c in concluded[:first]))
+        self.assertEqual(len(set(concluded[first:])), 1)                                    # a mesma data em todas as avaliações seguintes
+        self.assertTrue(all(r['verdict'] == V[1] for r in looks[first:]))
+        self.assertTrue(all(r['verdict'] == V[2] for r in looks[:first]))                  # antes: em curso, sem conclusão
 
-    def test_P1D_the_confirmatory_result_never_changes_after_C(self):
+    def test_closed_days_are_never_rewritten(self):
+        rng = __import__('random').Random(3)
+        outcomes = [rng.choice([1.0, -1.0]) for _ in range(7)]
+        signals, registry = world(outcomes, list(reversed(outcomes)), days=40)
+        with patch.multiple(llm_eval, **FAST):
+            early, late = run(signals, registry, as_of=T0 + timedelta(days=20)), run(signals, registry, as_of=T0 + timedelta(days=50))
+        self.assertEqual(late['primary']['path'][:len(early['primary']['path'])], early['primary']['path'])
+        self.assertTrue(all(row['day'] <= (T0 + timedelta(days=16)).date().isoformat() for row in early['primary']['path']))
+
+    def test_final_result_identical_after_C_even_with_later_data(self):
         signals, registry = world([1.0, -1.0], [1.0, -1.0])
-        # depois de H: dias 31 a 90 muito favoráveis à LLM, uma hipótese LLM nova e uma janela de liquidação longa
-        extra = [sig('A%d-late%d' % (i, d), 1.0, d * DAY + i * 30, league='A%d' % i) for i in range(10) for d in range(31, 91)]
-        later_reg = dict(registry, **{'Jogo aberto | Liga = A9 & Minuto = 31 a 60': hyp('A9', 'llm', T0 + timedelta(days=31), extra=[('Minuto', '31 a 60')])})
+        extra = [sig('A%d-late%d' % (i, d), 1.0, d * DAY + i * 30, league='A%d' % i) for i in range(10) for d in range(366, 400)]
+        later_reg = dict(registry, **{'Jogo aberto | Liga = A9 & Minuto = 31 a 60': hyp('A9', 'llm', T0 + timedelta(days=366), extra=[('Minuto', '31 a 60')])})
         with patch.multiple(llm_eval, **FAST):
-            base = llm_eval.dumps(run(signals, registry, as_of=CONFIRM))
-            for as_of in (CONFIRM + timedelta(days=1), CONFIRM + timedelta(days=90)):
+            base = llm_eval.dumps(run(signals, registry, as_of=FINAL))
+            for as_of in (FINAL + timedelta(days=1), FINAL + timedelta(days=90)):
                 self.assertEqual(llm_eval.dumps(run(signals + extra, later_reg, as_of=as_of)), base)
-        self.assertIn('"phase": "confirmatory"', base)
+        self.assertIn('"phase": "final"', base)
         self.assertIn('"verdict": "sem utilidade incremental demonstrada"', base)
 
-    def test_P1D_window_ends_at_the_horizon(self):
+    def test_window_ends_at_the_horizon(self):
         signals, registry = world([1.0, -1.0], [1.0, -1.0], days=40)
-        with patch.multiple(llm_eval, **FAST):
-            res = run(signals, registry)
+        with patch.multiple(llm_eval, HORIZON_DAYS=30, **FAST):
+            res = run(signals, registry, as_of=T0 + timedelta(days=60))
         # dias 1 a 29 inteiros; no dia 30 só A0 (decidido exatamente em H); nada depois de H
         self.assertEqual(res['primary']['games_test'], 10 * 29 + 1)
-        self.assertEqual(res['horizon_utc'], iso(T0 + timedelta(days=30)))
-        self.assertEqual(res['confirmation_utc'], iso(CONFIRM))
+        self.assertEqual((res['horizon_utc'], res['final_utc']), (iso(T0 + timedelta(days=30)), iso(T0 + timedelta(days=33))))
 
-    def test_P1D_hypotheses_born_after_the_horizon_are_not_evaluated(self):
+    def test_hypotheses_born_after_the_horizon_are_not_evaluated(self):
         signals, registry = world([1.0, -1.0], [1.0, -1.0], days=3, n_llm=2, n_ctrl=6)
         registry['late'] = hyp('A7', 'llm', T0 + timedelta(days=30, minutes=1))
-        with patch.multiple(llm_eval, **FAST):
-            res = run(signals, registry)
+        with patch.multiple(llm_eval, HORIZON_DAYS=30, **FAST):
+            res = run(signals, registry, as_of=T0 + timedelta(days=60))
         self.assertEqual(res['population']['evaluated'], 2)
         self.assertNotIn('late', [h['id'] for h in res['hypotheses']])
 
+    def test_minimums_gate_the_conclusion(self):
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=60, n_llm=8)      # efeito forte, mas só 8 grupos
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry, as_of=FINAL)
+        self.assertGreaterEqual(res['primary']['k_sup'], 20)
+        self.assertIsNone(res['concluded_on'])
+        self.assertEqual(res['verdict'], V[3])
+
+    def test_threshold_is_exactly_one_over_alpha(self):
+        day = lambda d: (T0 + timedelta(days=d)).date().isoformat()
+        test = {'t%d' % d: (day(d), 0.96, T0, 0.96) for d in range(40)}
+        ctrl = {'c%d' % d: (day(d), -1.0, T0, 0.96) for d in range(40)}                        # X = 1 todos os dias
+        with patch.multiple(llm_eval, BOOT_REPLICATES=9):
+            res = llm_eval.eprocess([(1.0, test)], [(1.0, ctrl)], T0 + timedelta(days=60), None)
+        ks = [row['k'] for row in res['path']]
+        first = next(i for i, k in enumerate(ks) if k >= 20)
+        self.assertEqual(res['crossed_day'], res['path'][first]['day'])
+        self.assertLess(ks[first - 1], 20)
+        self.assertEqual(res['path'][0]['lambda'], 0.125)                                     # λ_1 = 1/8, sem passado
+        self.assertEqual(res['path'][1]['lambda'], 0.5)                                       # depois, no máximo 1/2
+
+    def without_result(self, b):
+        return dict(b, w=None, ft=None, result_known_utc=None, match_result_first_seen_utc=None)
+
+    def test_missing_results_are_imputed_against_the_hypothesis_only_once_the_day_is_closed(self):
+        signals, registry = world([1.0], [1.0], days=1, n_llm=1, n_ctrl=5)
+        llm_missing = [self.without_result(b) if b['match_id'] == 'A0-d1' else b for b in signals]
+        ctrl_missing = [self.without_result(b) if b['match_id'].startswith('B') and b['match_id'].endswith('-d1') else b for b in signals]
+        with patch.multiple(llm_eval, **FAST):
+            open_day = run(llm_missing, registry, as_of=T0 + timedelta(days=2, hours=12))
+            lm = run(llm_missing, registry, as_of=T0 + timedelta(days=10))
+            cm = run(ctrl_missing, registry, as_of=T0 + timedelta(days=10))
+        self.assertEqual(open_day['primary']['path'], [])                                      # dia 1 ainda aberto: nada imputado
+        self.assertEqual(lm['primary']['path'][0]['x'], -1.0)                                 # LLM sem resultado: perda total
+        self.assertEqual(cm['primary']['path'][0]['x'], 0.0)                                  # controlo sem resultado: ganho máximo
+        self.assertEqual(lm['hypotheses'][0]['protocol_games'], 1)                            # admitido: a admissão não depende do resultado
+
+    def test_admission_never_depends_on_the_result(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=10)
+        hidden = [self.without_result(b) if b['league'].startswith('A') else b for b in signals]
+        with patch.multiple(llm_eval, **FAST):
+            a, b = run(signals, registry), run(hidden, registry)
+        self.assertEqual([h['protocol_games'] for h in a['hypotheses']], [h['protocol_games'] for h in b['hypotheses']])
+        self.assertEqual(a['primary']['games_test'], b['primary']['games_test'])
+
     @staticmethod
-    def null_days(rng, days, n_llm, n_ctrl, day_sd=0.15, odds=(1.5, 1.8, 2.0, 2.5, 3.5, 5.0)):
-        """Sem utilidade incremental: os dois lados com a mesma distribuição e um efeito comum por dia (dependência)."""
-        test, ctrl = {}, {}
+    def null_units(rng, days, odds_llm, odds_ctrl, n_llm=8, n_ctrl=12, day_sd=0.15, adaptive=False):
+        """Sem utilidade incremental (mesma esperança de lucro por jogo), com efeito comum de dia. adaptive=True: a composição de
+        cada dia depende dos resultados do dia ANTERIOR (seleção adaptativa coberta pela garantia)."""
+        test, ctrl, last = {}, {}, 0.0
         for d in range(days):
             day, shift = (T0 + timedelta(days=d)).date().isoformat(), rng.gauss(0, day_sd)
-            for side, n, out in (('L', max(1, int(rng.expovariate(1 / n_llm))), test), ('C', max(1, int(rng.expovariate(1 / n_ctrl))), ctrl)):
+            nl = (2 if last > 0 else 15) if adaptive else max(1, int(rng.expovariate(1 / n_llm)))
+            total = 0.0
+            for side, n, out, odds in (('L', nl, test, odds_llm), ('C', max(1, int(rng.expovariate(1 / n_ctrl))), ctrl, odds_ctrl)):
                 for k in range(n):
                     o = rng.choice(odds)
-                    win = rng.random() < min(0.97, max(0.01, (1 + 2 * shift) / o))
-                    out['%s%d-%d' % (side, d, k)] = (day, (o * 0.98 - 1) if win else -1.0, None)
-        return test, ctrl
+                    top = o * 0.98 - 1
+                    v = top if rng.random() < min(0.97, max(0.01, (1 + 2 * shift) / o)) else -1.0
+                    if rng.random() < 0.05:
+                        v = None                                                                # resultado em falta
+                    out['%s%d-%d' % (side, d, k)] = (day, v, T0 + timedelta(days=d, hours=12), top)
+                    total += (v or 0.0) * (1 if side == 'L' else -1)
+            last = total
+        return [(1.0, test)], [(1.0, ctrl)]
 
-    @staticmethod
-    def upto(units, last_day):
-        return {g: v for g, v in units.items() if v[0] <= last_day}
+    def test_eprocess_controls_type_one_error_under_adversarial_nulls(self):
+        rng, sims, days = __import__('random').Random(17), 150, 60
+        clock = T0 + timedelta(days=days + 10)
+        scenarios = [((1.5, 1.8, 2.0, 2.5, 3.5, 5.0), (1.5, 1.8, 2.0, 2.5, 3.5, 5.0), False),
+                     ((1.4, 1.6, 1.8), (6.0, 8.0, 10.0), False),                                # a assimetria que derrubou o v3
+                     ((6.0, 8.0, 10.0), (1.4, 1.6, 1.8), False),
+                     ((1.4, 1.6, 1.8), (6.0, 8.0, 10.0), True)]                                 # e seleção adaptativa entre dias
+        with patch.multiple(llm_eval, BOOT_REPLICATES=9):
+            for odds_l, odds_c, adaptive in scenarios:
+                hits = 0
+                for _ in range(sims):
+                    res = llm_eval.eprocess(*self.null_units(rng, days, odds_l, odds_c, adaptive=adaptive), clock, None)
+                    self.assertTrue(all(row['x'] >= -1 and 0 <= row['lambda'] <= 0.5 for row in res['path']))   # hipóteses do teorema
+                    hits += res['k_sup'] >= 20
+                self.assertLessEqual(hits / sims, 0.05, (odds_l, odds_c, adaptive))
 
-    def test_P1D_optional_stopping_inflates_alpha_and_the_single_look_does_not(self):
-        rng, S, looks = __import__('random').Random(2026), 150, range(14, 31, 2)
-        single = naive = 0
-        with patch.object(llm_eval, 'REPLICATES', 300):
-            for _ in range(S):
-                test, ctrl = self.null_days(rng, 30, 8, 12)
-                ps = [llm_eval.compare([(1.0, self.upto(test, (T0 + timedelta(days=k - 1)).date().isoformat()))],
-                                       [(1.0, self.upto(ctrl, (T0 + timedelta(days=k - 1)).date().isoformat()))])['p'] for k in looks]
-                single += ps[-1] <= 0.05                                   # o protocolo v3: só o olhar no horizonte
-                naive += any(p <= 0.05 for p in ps)                        # parar no primeiro olhar com p <= 0,05
-        self.assertLessEqual(single / S, 0.09)                             # α = 0,05 com 3 erros-padrão de Monte Carlo
-        self.assertGreater(naive, single)                                  # a paragem oportunista inflaciona o erro
-        self.assertGreater(naive / S, 0.06)
-
-    def test_sign_flip_is_calibrated_under_the_null(self):
-        rng, S = __import__('random').Random(5), 300
-        hits = {0.05: 0, 0.10: 0, 0.50: 0}
-        with patch.object(llm_eval, 'REPLICATES', 300):
-            for _ in range(S):
-                test, ctrl = self.null_days(rng, 21, 10, 15)
-                p = llm_eval.compare([(1.0, test)], [(1.0, ctrl)])['p']
-                for a in hits:
-                    hits[a] += p <= a
-        self.assertLessEqual(hits[0.05] / S, 0.05 + 3 * (0.05 * 0.95 / S) ** 0.5)
-        self.assertLessEqual(hits[0.10] / S, 0.10 + 3 * (0.10 * 0.90 / S) ** 0.5)
-        self.assertGreater(hits[0.50] / S, 0.35)                           # não é um teste que nunca rejeita
-        self.assertLess(hits[0.50] / S, 0.65)
-
-    def test_sign_flip_exact_small_case_and_common_day_effect_cancels(self):
-        day = lambda d: (T0 + timedelta(days=d)).date().isoformat()
-        test = {'t%d' % d: (day(d), 1.0, None) for d in range(3)}
-        ctrl = {'c%d' % d: (day(d), 0.0, None) for d in range(3)}
-        r = llm_eval.compare([(1.0, test)], [(1.0, ctrl)])
-        self.assertEqual((r['d'], r['days_paired']), (1.0, 3))
-        self.assertAlmostEqual(r['p'], 1 / 8, delta=0.01)                 # só a combinação (+,+,+) iguala D
-        shifted_t = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in test.items()}   # efeito de dia enorme nos dois lados
-        shifted_c = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in ctrl.items()}
-        self.assertEqual(llm_eval.compare([(1.0, shifted_t)], [(1.0, shifted_c)])['d'], 1.0)
-        # tamanhos diários desiguais e efeito de dia: só a diferença DENTRO do dia dá D = 1 (comparar com a média global daria −1,5)
-        t2 = {'t0a': (day(0), 1.0, None), 't0b': (day(0), 1.0, None), 't0c': (day(0), 1.0, None), 't1': (day(1), 11.0, None)}
-        c2 = {'c0': (day(0), 0.0, None), 'c1a': (day(1), 10.0, None), 'c1b': (day(1), 10.0, None), 'c1c': (day(1), 10.0, None)}
-        self.assertEqual(llm_eval.compare([(1.0, t2)], [(1.0, c2)])['d'], 1.0)
-        unpaired = llm_eval.compare([(1.0, test)], [(1.0, {'c': (day(9), 0.0, None)})])
-        self.assertEqual((unpaired['days_paired'], unpaired['p']), (0, None))
+    def test_a_sel_boundary_within_day_outcome_dependent_composition(self):
+        """Fronteira declarada (§6-A): se a composição do dia dependesse dos resultados desse mesmo dia (parar quando se
+        ganha), a média diária fica positiva com apostas justas. H0 deixa de valer e o teste rejeita: por isso A-sel é declarada."""
+        rng, sims, days = __import__('random').Random(23), 60, 60
+        clock, hits = T0 + timedelta(days=days + 10), 0
+        with patch.multiple(llm_eval, BOOT_REPLICATES=9):
+            for _ in range(sims):
+                test, ctrl = {}, {}
+                for d in range(days):
+                    day = (T0 + timedelta(days=d)).date().isoformat()
+                    k = 0
+                    while k < 10:                                    # LLM: pára no primeiro ganho do dia (composição pelo resultado)
+                        win = rng.random() < 0.49
+                        test['L%d-%d' % (d, k)] = (day, 0.96 if win else -1.0, T0, 0.96)
+                        k += 1
+                        if win:
+                            break
+                    for k in range(10):
+                        ctrl['C%d-%d' % (d, k)] = (day, 0.96 if rng.random() < 0.49 else -1.0, T0, 0.96)
+                hits += llm_eval.eprocess([(1.0, test)], [(1.0, ctrl)], clock, None)['k_sup'] >= 20
+        self.assertGreater(hits / sims, 0.05)
 
 
 if __name__ == '__main__':
