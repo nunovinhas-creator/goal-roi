@@ -1,8 +1,8 @@
 {
  "ok": true,
- "frozen_main_sha": "4af4c952659d91e7bf8ec6b3cf01cff6aa43cbcb",
- "code_sha": "740f664e70525dd0aaf40b09b236db4c15e89d03",
- "instant_utc": "2026-11-16T13:17:24+00:00",
+ "frozen_main_sha": "61cdb04bbe491a92d26ea56a90d2d5f85073191f",
+ "code_sha": "987b016a1c1f95a077b94c6fe25ce51b4d12a011",
+ "instant_utc": "2026-11-16T14:02:05+00:00",
  "checks": {
   "migration_first_call": "NOTIFY_FORMAT_MIGRATED",
   "migration_second_call": "NOTIFY_FORMAT_UNCHANGED",
@@ -21,7 +21,15 @@
   "no_deliveries": true,
   "science_identical_to_production": true,
   "certification_not_activated": true,
-  "post_cutover_check_ok": true
+  "post_cutover_check_ok": true,
+  "durable_durability_reported": true,
+  "durable_zero_messages": true,
+  "durable_zero_intent_commits": true,
+  "durable_migrated_in_run": true,
+  "durable_sent_total_unchanged": true,
+  "durable_watch_sent_unchanged": true,
+  "durable_markers_byte_identical": true,
+  "durable_post_cutover_check_ok": true
  },
  "changed_data_files": [
   "data/notify_state.json",
@@ -42,7 +50,8 @@
     "pr5_log_append_only": true,
     "pr5_at_most_one_attempt": true,
     "pr5_sent_total_matches_log": true,
-    "pr5_nothing_in_flight": true
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
    },
    "sent_in_run": 0
   },
@@ -59,7 +68,26 @@
     "pr5_log_append_only": true,
     "pr5_at_most_one_attempt": true,
     "pr5_sent_total_matches_log": true,
-    "pr5_nothing_in_flight": true
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
+   },
+   "sent_in_run": 0
+  },
+  "durable_frozen_to_after_two_runs": {
+   "ok": true,
+   "checks": {
+    "markers_unchanged": true,
+    "delivery_monotonic": true,
+    "status_rules": true,
+    "certification_off": true,
+    "no_validated_statuses": true,
+    "statuses_follow_report": true,
+    "pr5_format_marker_stable": true,
+    "pr5_log_append_only": true,
+    "pr5_at_most_one_attempt": true,
+    "pr5_sent_total_matches_log": true,
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
    },
    "sent_in_run": 0
   }

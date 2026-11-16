@@ -2,9 +2,9 @@
 
 Script: `audits/pr5-evidence/replay_24h.py` (só leitura; sem rede, credenciais nem Telegram). Dados: `replay-24h.json`.
 
-- Janela: 2026-11-15T13:17:44Z → 2026-11-16T13:17:44Z (`main` congelado em `4af4c95`, segunda ronda; a primeira, até `60ba009`,
-  deu os mesmos totais).
-- 237 commits do coletor que mexeram em `data/notify_state.json`, por ordem. Para cada um: relatório refeito com o código da
+- Janela: 2026-11-15T14:02:25Z → 2026-11-16T14:02:25Z (`main` congelado em `61cdb04`, terceira ronda; as rondas anteriores,
+  até `60ba009` e `4af4c95`, deram 34 contra 37 com as mesmas diferenças — a janela atual já não inclui um jogo das 13:34).
+- 239 commits do coletor que mexeram em `data/notify_state.json`, por ordem. Para cada um: relatório refeito com o código da
   PR 5 a partir dos dados desse commit, no instante do relatório de produção; notificador PR 5 corrido em cadeia a partir do
   estado real anterior à janela (`acec88e`, marcas PR 1 e PR 2).
 - Envios reais lidos do histórico de `notify_state.json` (`sent_total`, `watch_sent`, `statuses`, `summary_day`).
@@ -13,15 +13,15 @@ Script: `audits/pr5-evidence/replay_24h.py` (só leitura; sem rede, credenciais 
 
 | | Produção | PR 5 (reconstituição) |
 |---|---|---|
-| Mensagens | 37 | 34 |
-| Avisos de jogos | 24 (24 jogos) | 24 (os mesmos 24 jogos, **no mesmo commit**) |
+| Mensagens | 36 | 33 |
+| Avisos de jogos | 23 (23 jogos) | 23 (os mesmos 23 jogos, **no mesmo commit**) |
 | Mudanças de estado depois do corte PR 3 (20:59) | 3 | 3 (as mesmas hipóteses, no mesmo commit) |
 | Mudanças de estado antes do corte PR 3 (regras PR 2 em produção) | 9 | 6 |
 | Resumo diário | 1 | 1 |
 | Palavras "validad…", "confirmad…", "forte" | — | 0 |
 | Avisos reais perdidos | — | **0** |
 
-Estados do relatório refeito iguais aos de produção: 137/137 commits depois do corte PR 3; 48/100 antes (antes do corte,
+Estados do relatório refeito iguais aos de produção: 146/146 commits depois do corte PR 3; 48/93 antes (antes do corte,
 produção usava as regras PR 2; a reconstituição usa as regras atuais em todos os relatórios e fez a re-referência silenciosa
 no primeiro commit da janela, como o corte PR 3 fez às 20:58).
 
