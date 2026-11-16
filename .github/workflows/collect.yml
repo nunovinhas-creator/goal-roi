@@ -111,6 +111,7 @@ jobs:
           gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main
       # TEMPORARY OIDC diagnostic: remove after one observed run. Runs last, never fails the job,
       # no BSD/Highlightly request, no journal, never prints tokens (scripts/oidc_runner_probe.py).
+      # Can add up to 60 s to this job; the next run (concurrency scangoal-write) waits for it.
       - name: OIDC diagnostic (temporary, read-only)
         if: ${{ !cancelled() && github.ref_name == 'main' }}
         continue-on-error: true

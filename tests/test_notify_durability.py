@@ -359,10 +359,18 @@ class BarrierOrdering(GitWorld):
             return Answer()
         rep = json.loads((a / 'data' / 'report.json').read_text())
         env = {'SCANGOAL_DATA_DIR': str(a / 'data'), **DURABLE}
+        real_run = notify.run
+
+        def run_at_fixture_time(*args, **kwargs):
+            # watch.refresh() calls notify.run() without a time, i.e. the wall clock: after 21:00 UTC the
+            # daily summary became a third message. Pin the fixture's NOW; sender and barrier stay real.
+            kwargs.setdefault('now', NOW)
+            return real_run(*args, **kwargs)
         cwd = os.getcwd()
         os.chdir(a)
         try:
             with patch.dict(os.environ, env), patch('scangoal.report.build', return_value=rep), \
+                    patch.object(notify, 'run', run_at_fixture_time), \
                     patch.object(notify, 'urlopen', fake_urlopen), redirect_stdout(io.StringIO()) as out:
                 watch.refresh()                                           # the fast-read path, with the real `send`
         finally:

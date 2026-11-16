@@ -106,6 +106,7 @@ class ProbeTests(unittest.TestCase):
         for part in jwt.split('.'):
             self.assertNotIn(part, serialized)
         self.assertNotIn(BEARER, serialized)
+        self.assertNotIn('runner.example', serialized)                # request URL never reported
 
     def test_unavailable_when_permission_not_effective(self):
         report = self.run_probe(Opener(token()), {k: v for k, v in ENV.items() if not k.startswith('ACTIONS_ID_TOKEN')})
