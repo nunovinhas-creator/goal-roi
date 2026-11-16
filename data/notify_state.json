@@ -29,6 +29,11 @@
    "at_utc": "2026-11-16T21:01:32+00:00",
    "from": "em observação",
    "to": "abandonada"
+  },
+  "Stake | Mercado = outros mercados": {
+   "at_utc": "2026-11-16T21:48:07+00:00",
+   "from": "em observação",
+   "to": "abandonada"
   }
  },
  "announced_statuses": {
@@ -42,7 +47,8 @@
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada"
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Mercado = outros mercados": "abandonada"
  },
  "deliveries": {
   "game|id:andorra-vs-azerbaijan-20261116|7e99eab2331d": {
@@ -211,21 +217,27 @@
    "attempt_utc": "2026-11-16T21:48:07+00:00",
    "chars": 635,
    "created_utc": "2026-11-16T21:48:07+00:00",
+   "done_utc": "2026-11-16T21:48:07+00:00",
+   "events": [
+    "pending",
+    "intent",
+    "delivered"
+   ],
+   "kind": "status",
+   "sha256": "34d81885d18e90c3a7d2f752c6d6320a2c84d836846aee1ec3cf2ff43ecda1e8",
+   "state": "delivered"
+  },
+  "status|em observação>abandonada|6fcf94cfdc4a|31@2026-11-16T21:46:50+00:00|3973e022e932": {
+   "attempt_utc": "2026-11-16T21:48:07+00:00",
+   "chars": 536,
+   "created_utc": "2026-11-16T21:48:07+00:00",
    "events": [
     "pending",
     "intent"
    ],
    "kind": "status",
-   "sha256": "34d81885d18e90c3a7d2f752c6d6320a2c84d836846aee1ec3cf2ff43ecda1e8",
+   "sha256": "160a7a2a09ac0a92f763d6c81538a9bd59bf3949d27a9162563911018d98bda1",
    "state": "in_flight"
-  },
-  "status|em observação>abandonada|6fcf94cfdc4a|31@2026-11-16T21:46:50+00:00|3973e022e932": {
-   "created_utc": "2026-11-16T21:48:07+00:00",
-   "events": [
-    "pending"
-   ],
-   "kind": "status",
-   "state": "pending"
   },
   "status|em observação>abandonada|804b9a582d13|37@2026-11-16T18:29:37+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T18:31:13+00:00",
@@ -299,7 +311,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 15,
+  "delivered": 16,
   "uncertain": 1
  },
  "format_last_run_utc": "2026-11-16T21:44:07+00:00",
@@ -489,7 +501,8 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 42,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 61,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 19,
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 21
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 21,
+  "Stake | Mercado = outros mercados": 27
  },
  "notified_items": {
   "item|id:andorra-vs-azerbaijan-20261116|Asian Total|Over 3.75": {
@@ -542,7 +555,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 327,
+ "sent_total": 328,
  "statuses": {
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
