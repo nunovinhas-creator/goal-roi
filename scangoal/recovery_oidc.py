@@ -30,7 +30,12 @@ OWNER = REPOSITORY.split('/')[0]
 # Plain (non-reusable) workflow: `workflow_ref` is the contract. `job_workflow_ref`
 # only exists for reusable workflows and must never point elsewhere.
 WORKFLOW_REF = REPOSITORY+'/.github/workflows/collect.yml@refs/heads/main'
-SUBJECT = 'repo:'+REPOSITORY+':ref:refs/heads/main'   # job without `environment:`
+# Immutable IDs (GitHub API). Repositories created after 2026-07-15 get the
+# immutable default subject `repo:OWNER@OWNER_ID/REPO@REPO_ID:ref:...`; this one was
+# created 2026-11-11. The name-only legacy subject and any customized template are
+# rejected: no fallback.
+OWNER_ID, REPOSITORY_ID = '278368112', '1454375710'
+SUBJECT = 'repo:'+OWNER+'@'+OWNER_ID+'/'+REPOSITORY.split('/')[1]+'@'+REPOSITORY_ID+':ref:refs/heads/main'
 TRIGGERS = ('schedule', 'workflow_dispatch')           # never pull_request*
 AUD_PREFIX = 'goal-roi-bsd-journal-v1:'
 # kid -> RSA JWK {kty, alg, use, n, e, rfc7638_sha256}. Empty until a reviewed
@@ -45,7 +50,7 @@ HTTP_TIMEOUT_S = 10
 MAX_BODY = 256_000
 HEADER_FIELDS = {'alg', 'typ', 'kid', 'x5t'}   # no jwk/jku/x5u/x5c/crit: no key injection
 B64URL = re.compile('[A-Za-z0-9_-]+')
-STRING_CLAIMS = ('iss','aud','sub','repository','repository_owner','ref','ref_type',
+STRING_CLAIMS = ('iss','aud','sub','repository','repository_owner','repository_id','repository_owner_id','ref','ref_type',
                  'workflow_ref','event_name','run_id','run_attempt','runner_environment')
 
 
@@ -187,6 +192,7 @@ class Verifier:
             raise TrialBlocked('oidc_claims_incomplete')
         if (claims['iss'] != ISSUER or claims['aud'] != aud or claims['sub'] != SUBJECT
                 or claims['repository'] != REPOSITORY or claims['repository_owner'] != OWNER
+                or claims['repository_id'] != REPOSITORY_ID or claims['repository_owner_id'] != OWNER_ID
                 or claims['ref'] != 'refs/heads/main' or claims['ref_type'] != 'branch'
                 or claims['workflow_ref'] != WORKFLOW_REF
                 or claims.get('job_workflow_ref', WORKFLOW_REF) != WORKFLOW_REF

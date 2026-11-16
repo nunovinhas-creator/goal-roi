@@ -130,7 +130,8 @@ Leitura (`InlineSlots.load`, em cada execução e em cada replay), por evento
 - assinatura RSA PKCS#1 v1.5/SHA-256 verificada com pyca/cryptography; só depois disso
   as claims são consideradas;
 - `iss = https://token.actions.githubusercontent.com`; `aud` = digest acima (string,
-  não lista); `sub = repo:nunovinhas-creator/goal-roi:ref:refs/heads/main`;
+  não lista); `sub = repo:nunovinhas-creator@278368112/goal-roi@1454375710:ref:refs/heads/main`
+  (subject imutável; repositório criado a 2026-11-11), com `repository_id` e `repository_owner_id` exatos;
   `repository` e `repository_owner` exatos; `ref = refs/heads/main`, `ref_type = branch`;
   `workflow_ref = nunovinhas-creator/goal-roi/.github/workflows/collect.yml@refs/heads/main`;
   `event_name` ∈ {schedule, workflow_dispatch}; `runner_environment = github-hosted`;
@@ -433,3 +434,15 @@ recolher uma segunda observação independente. Não foi pedido nem feito.
 4. Reversão: revert do merge. Nada fica ativo, por isso não há estado a limpar.
 5. Só depois disso: genesis, ruleset, chaves e terceiro commit (H.5), cada um com
    autorização própria.
+
+## I. Subject OIDC imutável (sobre `df55fec`)
+
+A execução real 719 (`ec88f3a`) produziu um JWT com assinatura RS256 válida e todas
+as claims corretas exceto `sub`. O repositório foi criado a 2026-11-11, depois de
+2026-07-15, por isso o GitHub usa por omissão o subject imutável
+`repo:nunovinhas-creator@278368112/goal-roi@1454375710:ref:refs/heads/main` (IDs confirmados
+pela API). O verificador passa a exigir exatamente esse subject e as claims assinadas
+`repository_id = 1454375710` e `repository_owner_id = 278368112`. Não há fallback para
+o formato só com nomes, e qualquer template personalizado é rejeitado. As impressões
+RFC 7638 do JWKS observadas pelo runner estão em `oidc-keys/runner-observation-719.json`
+(3.ª fonte para `PINNED_JWKS`; não fixado).

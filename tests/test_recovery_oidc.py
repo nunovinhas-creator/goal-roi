@@ -45,7 +45,8 @@ def sign(claims, key='gh-1', kid='gh-1', header=None):
 def claims(aud, run='100', attempt='1', iat=None):
     iat = int(time.time()) if iat is None else iat
     return dict(iss=oidc.ISSUER, aud=aud, sub=oidc.SUBJECT, repository=oidc.REPOSITORY,
-                repository_owner=oidc.OWNER, repository_id='1', ref='refs/heads/main', ref_type='branch',
+                repository_owner=oidc.OWNER, repository_id=oidc.REPOSITORY_ID,
+                repository_owner_id=oidc.OWNER_ID, ref='refs/heads/main', ref_type='branch',
                 sha='a'*40, workflow='Collect ScanGoal', workflow_ref=oidc.WORKFLOW_REF, workflow_sha='a'*40,
                 event_name='workflow_dispatch', run_id=run, run_number='700', run_attempt=attempt,
                 runner_environment='github-hosted', actor='github-actions[bot]', iat=iat, nbf=iat, exp=iat+300)
@@ -159,6 +160,44 @@ class OIDCJournalTests(unittest.TestCase):
                     self.setUp()
                     self.forge(self.event(), mutate)
                     self.assert_rejected(reason)
+
+    def test_immutable_subject_is_the_only_accepted_form(self):
+        expected = 'repo:nunovinhas-creator@278368112/goal-roi@1454375710:ref:refs/heads/main'
+        self.assertEqual(oidc.SUBJECT, expected)                       # 1: exact documented form
+        verifier = oidc.Verifier({'gh-1':jwk('gh-1')}, offline_only)
+        aud = oidc.AUD_PREFIX+'3'*64
+        now = datetime.now(timezone.utc)
+        self.assertEqual(verifier.verify(sign(claims(aud)), aud, now, '100:1'), '100:1')
+        bad_owner = 'repo:nunovinhas-creator@1/goal-roi@1454375710:ref:refs/heads/main'
+        bad_repo = 'repo:nunovinhas-creator@278368112/goal-roi@1:ref:refs/heads/main'
+        cases = {
+            'owner id wrong (claim + subject)': dict(sub=bad_owner, repository_owner_id='1'),        # 2
+            'repository id wrong (claim + subject)': dict(sub=bad_repo, repository_id='1'),        # 3
+            'legacy name-only subject': dict(sub='repo:nunovinhas-creator/goal-roi:ref:refs/heads/main'),   # 4
+            'customized template': dict(sub='repo:nunovinhas-creator@278368112/goal-roi@1454375710:environment:prod'),
+            'suffix appended': dict(sub=expected+':job_workflow_ref:x'),
+            'claim ids inconsistent with subject': dict(repository_id='999', repository_owner_id='888'),  # 6
+            'subject ids inconsistent with claims': dict(sub=bad_repo),
+            'repository_id missing': dict(repository_id=None),
+        }
+        for name, change in cases.items():
+            c = claims(aud); c.update(change)
+            c = {k:v for k, v in c.items() if v is not None}
+            with self.subTest(name), self.assertRaisesRegex(TrialBlocked, 'identity_rejected|claims_incomplete'):
+                verifier.verify(sign(c), aud, now, '100:1')
+        # 5: subject edited after signing (attacker rewrites the payload, keeps the signature)
+        head, body, sig = sign(claims(aud)).split('.')
+        forged = dict(claims(aud), sub='repo:attacker@1/goal-roi@1:ref:refs/heads/main')
+        with self.assertRaisesRegex(TrialBlocked, 'signature_invalid'):
+            verifier.verify(head+'.'+b64(json.dumps(forged).encode())+'.'+sig, aud, now, '100:1')
+
+    def test_wrong_ids_rejected_in_the_journal(self):
+        for change in (dict(repository_owner_id='1'), dict(repository_id='1'),
+                       dict(sub='repo:nunovinhas-creator/goal-roi:ref:refs/heads/main')):
+            with self.subTest(change=change):
+                self.setUp()
+                self.forge(self.event(), lambda c, change=change: c.update(change))
+                self.assert_rejected('identity_rejected')
 
     # 10
     def test_missing_or_unexpected_claims_and_headers_rejected(self):
