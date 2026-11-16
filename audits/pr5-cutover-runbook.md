@@ -54,7 +54,7 @@ O que muda nos dados de produção, sempre por acréscimo:
    `SCANGOAL_DATA_DIR=<cópia de data/ de M> python3.11 -m scangoal.notify --preview --out /tmp/pr5-preview.txt`
    (com o relatório de M gerado pelo código antigo não há `presentation`: zero avisos de estado é o resultado esperado).
 
-Último ensaio: `main` `4af4c95`, ver `audits/pr5-evidence/cutover-rehearsal.json`.
+Último ensaio: `main` `42acdf8` (preflight do fecho da 3.ª auditoria), ver `audits/pr5-evidence/cutover-rehearsal.json`.
 
 ## Fase B — merge
 

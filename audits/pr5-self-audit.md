@@ -25,6 +25,34 @@
   autorizado era `claude/pr5-telegram-presentation`).
 - Plano: `audits/pr5-telegram-plan.md`. Runbook: `audits/pr5-cutover-runbook.md`. Evidência: `audits/pr5-evidence/`.
 
+## 000. Fecho da 3.ª auditoria (revisão #5921609334): documentação e preflight final
+
+- **Documentação (P2):**
+  - o runbook diz que o workflow tem exatamente duas linhas novas;
+  - retirar essas linhas reabre o defeito P0 e não é uma reversão segura;
+  - o `--failure` fica fora da garantia "no máximo uma vez";
+  - esta autoauditoria tem um bloco de estado atual, com as rondas anteriores preservadas como histórico datado e notas
+    "[superado]";
+  - o desenho P0 e o README foram alinhados.
+- **Preflight:** `main` congelado em `42acdf896c63b18627b3bedafd1c0d7ad71dbc9d` (14:29:07Z) e integrado no ramo por merge.
+  - `git diff M...HEAD -- data docs/report.json docs/bets.csv`: vazio.
+  - `-- .github`: só `+ NOTIFY_DURABLE: git` duas vezes; nenhum secret alterado.
+  - Em `scangoal/` mudam só `notify.py` e `brain.py`. Em `brain.py` a única linha removida é a construção do sinal em aberto,
+    reescrita com `match_id`; o resto são acrescentos de apresentação. Nenhuma regra muda: o ensaio confirma `status_list` e
+    `validation` iguais aos de produção.
+- **Validação sobre o código `262373f`:**
+  - 433 testes OK em Python 3.11 e 3.13, incluindo os 17 de durabilidade com runners git independentes;
+  - 56/56 mutações apanhadas;
+  - ensaio sobre M `ok: true`:
+    - migração silenciosa `NOTIFY_FORMAT_MIGRATED` e depois `UNCHANGED`;
+    - zero mensagens (local, pré-visualização e com a barreira);
+    - `sent_total` 312 e `watch_sent` 117 iguais;
+    - as três marcas iguais byte a byte;
+    - `statuses == status_list`;
+    - certificação `not_activated`;
+    - zero commits de intenção;
+    - `post_cutover_check` verde nas três janelas, incluindo `pr5_intent_published_before_outcome`.
+
 ## 00. Terceira ronda — autorização #5921136533 (barreira ligada no ramo e P2-R)
 
 | Ponto | O que foi feito | Prova |
