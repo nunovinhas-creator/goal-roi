@@ -203,3 +203,13 @@ workflow, secrets, Telegram e certificação intactos.
   foram regenerados sobre este código.
 - Procedimento administrativo exato, declaração de exclusividade, margem empírica,
   riscos dos patches e procedimento da primeira consulta: `AUTHORIZATION.md`.
+
+## Revisão administrativa final (sobre `521b9a3`)
+
+`AUTHORIZATION.md` foi reescrito com: rulesets confirmados em Free/público;
+integridade do orçamento garantida sem "Restrict updates"; autenticidade dos
+resultados NÃO garantida sem atestação OIDC (por implementar); asianodds-h1-lab não
+verificável (há indícios de uso da BSD); 650 s é só estimativa, e a garantia proposta
+é `timeout-minutes: 18` (patch atualizado, não instalado); genesis não construído por
+falta de dados comprovados. Parecer: GO para preparar a instalação; NO-GO para o
+primeiro pedido.

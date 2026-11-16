@@ -1,8 +1,13 @@
 --- a/.github/workflows/collect.yml
 +++ b/.github/workflows/collect.yml
-@@ -19,6 +19,8 @@
+@@ -17,8 +17,12 @@
+ jobs:
+   collect:
      runs-on: ubuntu-latest
-     timeout-minutes: 15
+-    timeout-minutes: 15
++    # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
++    # a run that fits 15 min without the tail can never be cut because of it.
++    timeout-minutes: 18
      steps:
 +      # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
 +      - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"

@@ -1,217 +1,213 @@
-# PR31 — Pacote de decisão administrativa (2026-11-16)
+# PR31 — Pacote de decisão administrativa (revisão final, 2026-11-16)
 
-Estado: PREPARADO, NADA EXECUTADO. Nenhuma referência criada, nenhum ruleset,
-secret, definição do repositório, workflow ou `main` alterado. Zero pedidos BSD/HL.
-Repositório: `nunovinhas-creator/goal-roi`, **público**, conta **pessoal**.
+Estado: PREPARADO, NADA EXECUTADO. Nenhuma ref, ruleset, ambiente, secret,
+permissão, workflow ou `main` alterado. Zero pedidos BSD/HL. Genesis NÃO construído
+(ver F). Repositório `nunovinhas-creator/goal-roi`: **público**, conta **pessoal**.
 
-## A. Orçamento temporal (resolvido offline)
+**Parecer: GO para preparar a instalação dos dois patches inertes. NO-GO para o
+primeiro pedido BSD real** (faltam G.1–G.4).
 
-Antes desta revisão o limite de 150 s só cortava as operações Git de rede e o
-instante de envio. Git local, replay (CPU), persistência e conclusão/replay final
-não tinham limite global. Agora:
+## A. Orçamento temporal
 
-- `PreparedTail.__call__` arma um watchdog `SIGALRM` (`setitimer`) de
-  `TAIL_BUDGET_S=150` que cobre TODO o trabalho do tail. A exceção é
-  `BaseException`, portanto nenhum `except Exception` interno a engole; é apanhada
-  só no topo e o resultado é `trial_deadline_normal_preserved`.
-- O temporizador é desarmado e o handler anterior restaurado em `finally`
-  (testado). Fora da thread principal não há watchdog => skip sem reserva.
-- Mantêm-se como defesa em profundidade: corte de cada operação Git de rede ao fim
-  do tail e proibição de envio depois de `tail_end − 80 s`.
-- Limite residual que nenhum código Python resolve: uma syscall em estado D
-  (ex.: `fsync` num disco bloqueado) só devolve o controlo ao terminar; o
-  `timeout-minutes: 15` do job continua a ser o último recurso.
+- Watchdog `SIGALRM` de 150 s sobre todo o tail (Git local/rede, replay, persistência,
+  conclusão). Cortes por operação Git e proibição de envio a `tail_end − 80 s` mantêm-se.
+  Testado: bloqueio antes e depois da reserva, thread não principal, neutralidade do patch.
+- Limite residual: uma syscall em estado D (ex.: `fsync` num disco bloqueado) só
+  devolve o controlo ao terminar.
 
-Testes novos: trabalho bloqueado antes da reserva (recolha normal guardada, zero
-reservas, < 5 s); envio bloqueado depois da reserva (slot fica `reserved` e nunca é
-reenviado; a execução seguinte salta); thread não principal; patch instalado sem
-callback produz estado e ficheiro byte-a-byte iguais ao coletor atual.
+## B. Margem do coletor — 650 s é ESTIMATIVA, não garantia
 
-### Margem empírica (só leitura da API do GitHub, 4 execuções de 2026-11-16)
+Passos depois do BSD e o seu limite real (código em `main` 17a3a5e):
 
-| run | fim do passo BSD após início do job | depois do BSD até fim | leituras rápidas | outros passos |
-|---|---|---|---|---|
-| 43931508179 | +11 s | 522 s | 498 s | 24 s |
-| 43926766931 | +12 s | 565 s | 503 s | 62 s |
-| 43913419359 | +10 s | 504 s | 481 s | 23 s |
-| 43921443044 | +9 s | 522 s | — | — |
+| Passo | Limite | Pior caso analítico |
+|---|---|---|
+| LLM (`scangoal.llm`) | `urlopen(timeout=60)` por modelo, até 3 modelos; `report.build()` | ~180 s de rede + CPU; o timeout é por operação de socket, não total |
+| Relatório | nenhum | CPU (16–22 s observados) |
+| Telegram (`notify`, `NOTIFY_DURABLE=git`) | `timeout=20` por mensagem; Git sem timeout | ilimitado |
+| Commit data | nenhum (`git pull --rebase`, `git push`) | ilimitado |
+| Leituras rápidas | `timeout 540s` + 10 s; duração fixa `WATCH_SECONDS=480` | 550 s |
+| Commit + `gh workflow run` | nenhum | ilimitado |
 
-Leituras rápidas têm limite rígido 540+10 s. LLM, relatório, notify, commits e
-"Start the next collection" NÃO têm timeout de passo (máximo observado conjunto: 62 s).
-Proposta para aprovação: `downstream_bound = 650` (550 rígidos + 100 para os
-restantes, ~1,6× o máximo observado). Isto é EMPÍRICO, não prova. Com prazo
-`início+870 s`, o ensaio só arranca se restarem ≥ 800 s (650 + 150); na amostra
-restavam ~858 s. Uma execução em que o leitor demore >60 s salta o ensaio.
-Não se propõe encurtar nenhum passo normal.
+Amostra real (4 execuções de hoje): BSD termina a +9–12 s; depois disso 504–565 s
+(leituras rápidas 481–503 s, restantes ≤ 62 s). O valor de 650 s dá folga sobre a
+amostra, mas não há limite analítico. Conclusão: **não é um limite operacional seguro.**
 
-## B. Consumidores da conta BSD
+As leituras rápidas têm duração fixa e não encurtam se o tail atrasar o passo; a
+recolha normal não perde funcionalidade. Efeito colateral: a cadeia "Start the next
+collection" atrasa ≤ 150 s em no máximo 5 execuções.
 
-Comprovado por inspeção (main `17a3a5e` e esta branch):
+**Garantia proposta (sem reduzir trabalho normal):** `timeout-minutes: 15 → 18` em
+`collect-yml-proposal.patch`. O código continua a exigir que o tail caiba nos 15 min
+originais (gate `650 + 150` contra `início + 870 s`), e os 180 s extra (≥ 150 s do
+watchdog) asseguram que uma execução que terminaria em 15 min sem o tail nunca é
+cortada por causa dele. Custo: um job pendurado leva +3 min a ser terminado; minutos
+de Actions são gratuitos em repositório público. Com esta alteração, 650 s passa a
+ser apenas um filtro de oportunidade e deixa de ser condição de segurança.
 
-| # | Consumidor | Chave | Volume | Onde corre |
-|---|---|---|---|---|
-| 1 | `scangoal.results_bsd` no passo BSD de `collect.yml` | `secrets.BSD_API_KEY` | ≤ `BSD_MAX_REQUESTS`=12/execução, intervalo ≥50 min (0 com `force_results`) | GitHub Actions, `main`, grupo `scangoal-write` |
-| 2 | `scangoal.recovery` CLI `--allow-live` (PR29, NÃO está em `main`) | `BSD_API_KEY` do ambiente local | manual | só se alguém o correr com a chave fora do Actions |
-| 3 | `PreparedBSD`/`PreparedTail` (PR31) | nenhuma real | 0 (só `OfflineWire`) | testes |
-| — | `recovery-trial.yml` (PR30, não em `main`) | não recebe a chave | 0 | — |
+## C. Consumidores BSD
 
-`collect.yml` é o ÚNICO workflow que recebe o secret. Nenhum outro ficheiro do
-repositório lê a variável.
+| # | Consumidor | Estado | Evidência |
+|---|---|---|---|
+| 1 | `results_bsd` no passo BSD de `collect.yml` (`main`) | ATIVO, ≤ 12 pedidos/execução, intervalo ≥ 50 min | código + workflow; único workflow com `secrets.BSD_API_KEY` |
+| 2 | `scangoal.recovery --allow-live` (PR29, não está em `main`) | manual; só com chave no ambiente local | código; sem workflow que o execute |
+| 3 | `PreparedBSD`/`PreparedTail` (PR31) | 0 pedidos reais (`OfflineWire`) | testes |
+| 4 | **asianodds-h1-lab** | **NÃO VERIFICÁVEL** | ver abaixo |
+| 5 | Outros repositórios do titular: ET-spotter, Monte-Carlos, tens-direito, tensdireito-content-engine (públicos); comparador, TurnoAL, OBRA-LEVE (privados) | **NÃO VERIFICADO** | o âmbito desta sessão não permite lê-los; a pesquisa de código do GitHub nem encontra `BSD_API_KEY` no próprio goal-roi, por isso a ausência de resultados não prova nada |
 
-NÃO comprovável por código:
-- outras máquinas, scripts ou repositórios com a mesma chave ou outra chave da mesma
-  conta. O comentário de `results_bsd.py` refere o projeto **asianodds-h1-lab**
-  ("padrão já usado no asianodds-h1-lab"): é um candidato concreto a consumidor
-  externo e tem de ser incluído na declaração;
-- uso pelo painel do fornecedor ou por cópias antigas do secret;
-- se a quota `q=7500` é por chave ou por conta.
+asianodds-h1-lab: aparece em dois comentários do commit inicial importado
+(`results_bsd.py`: "padrão já usado no asianodds-h1-lab" a propósito da paginação
+`limit/offset` da BSD; `llm.py`: mesmo serviço Cloudflare). Não existe com esse nome
+entre os repositórios visíveis do titular (pesquisa de repositórios: 0 resultados) e
+não pode ser anexado a esta sessão. Pode ser privado, de outra conta, local ou já
+apagado. O comentário indica que o projeto usou a paginação da API BSD, o que é um
+**indício de que usou a BSD**, mas não prova que o faça hoje nem com que conta.
 
-A deteção nos cabeçalhos (queda ≠ 1 por pedido entre respostas normais) só observa a
-janela do passo BSD. Não substitui a declaração.
+Não se assume que o mesmo nome de variável (`BSD_API_KEY`) noutro projeto seja a
+mesma conta: só o titular pode ligar chaves a contas.
 
-### Declaração para o titular da conta (preencher; NÃO é tida como comprovada)
+### Declaração de exclusividade — só o que precisa da confirmação do titular
 
-> Eu, titular da conta BSD (sports.bzzoiro.com) cuja chave está no secret
-> `BSD_API_KEY` de `nunovinhas-creator/goal-roi`, declaro que, de \_\_\_ até ao fim
-> do ensaio `goal-roi-bsd-20261113-15-v1`:
-> 1. Esta conta tem as seguintes chaves ativas: \_\_\_ (n.º e onde estão guardadas).
-> 2. Os únicos consumidores são: o passo BSD de `collect.yml` em `main`
->    [ ] e também: \_\_\_ (ex.: asianodds-h1-lab — desativado em \_\_\_ / ativo com \_\_\_ pedidos/dia).
-> 3. Não corri nem vou correr `python -m scangoal.recovery --allow-live` com esta
->    chave, exceto: \_\_\_ (data, n.º de pedidos, datas consultadas).
-> 4. Pedidos BSD já feitos ao abrigo deste ensaio (datas 2026-11-13..15, os 10 IDs):
->    \_\_\_ (este número é `prior_debits`).
-> 5. Comprometo-me a não usar a conta noutro lado enquanto o ensaio estiver ativo e a
->    remover o callback se isso mudar.
+> 1. A chave no secret `BSD_API_KEY` de goal-roi pertence à conta BSD \_\_\_ (identificador ou e-mail da conta, a não publicar se for sensível).
+> 2. Chaves ativas nessa conta: \_\_\_ (número). Locais onde cada uma está guardada: \_\_\_.
+> 3. asianodds-h1-lab: [ ] nunca usou a BSD [ ] usou outra conta [ ] usa esta conta; neste caso está [ ] desativado desde \_\_\_ / [ ] ativo com ≈ \_\_\_ pedidos/dia.
+> 4. Algum dos repositórios ET-spotter, Monte-Carlos, tens-direito, tensdireito-content-engine, comparador, TurnoAL, OBRA-LEVE, ou outra máquina ou script, usa esta conta? [ ] não [ ] sim: \_\_\_.
+> 5. Pedidos BSD já feitos para 2026-11-13..15 com os 10 IDs do ensaio, fora do passo normal (ex.: `scangoal.recovery --allow-live`): \_\_\_ (número; 0 se nenhum). → `prior_debits`.
+> 6. Comprometo-me a não usar esta conta fora do coletor enquanto o ensaio estiver ativo.
 > Data / assinatura: \_\_\_
 
-O revisor confirma os pontos 1–4 contra evidência (painel do fornecedor, histórico
-local, repositório asianodds-h1-lab) antes de os citar no genesis.
+O revisor confere 2–5 com o painel do fornecedor e com o histórico do asianodds-h1-lab
+antes de citar a declaração no genesis. A deteção nos cabeçalhos só cobre a janela
+do passo BSD.
 
-## C. Âncora Git protegida — procedimento exato
+## D. Registo remoto: integridade do orçamento ≠ autenticidade dos resultados
 
-O que o código já exige (`InlineSlots.load`, `RemoteGitStore`): commit sem pais,
-árvore vazia, mensagem = JSON canónico `{"config":{...},"kind":"genesis"}`; remoto
-exatamente `https://github.com/nunovinhas-creator/goal-roi.git`; ref
-`refs/heads/bsd-trial-journal`; âncora == `PROVISIONED_ANCHOR` (hoje `None` =>
-bloqueado); ≤32 commits até à âncora; push nunca forçado.
+Factos confirmados: os rulesets estão disponíveis em repositórios públicos no GitHub
+Free ([about rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)).
+Os ambientes, os secrets de ambiente e as regras de branch de deployment estão
+disponíveis em repositórios públicos de todos os planos ([deployments and environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)).
+Por confirmar: que atores de bypass (deploy keys) uma conta pessoal oferece. A
+recomendação abaixo NÃO depende disso.
 
-Disponibilidade no GitHub: `docs.github.com` não é acessível desta sessão, por isso
-NÃO verifiquei a documentação aqui. Pelo que conheço, os rulesets estão disponíveis
-em repositórios públicos no plano Free e, numa conta pessoal, a lista de bypass é
-limitada (sem equipas/apps). O procedimento abaixo usa lista de bypass VAZIA e não
-depende disso. Passo 0 confirma na interface. A leitura da proteção da ref por esta
-integração devolveu 403: requer o titular.
+**Integridade do orçamento** (5 débitos irreversíveis, âncora única, sem reescrita ou
+recriação). Já é garantida com rulesets de Free e o código atual:
+- âncora fixada em `PROVISIONED_ANCHOR` (o código não aceita outra; um novo genesis
+  não dá mais slots);
+- ruleset: Restrict creations + Restrict deletions + Block force pushes, bypass vazio;
+- cada `reserve` acrescentado, legítimo ou não, conta para o cap. Um evento forjado
+  não pode reembolsar nem desfazer `halted`. Quem tem escrita só consegue gastar
+  slots ou parar o ensaio (fail-closed), nunca obter mais de 5.
 
-0. **Verificar disponibilidade (só leitura).** Settings → Rules → Rulesets: existe
-   "New branch ruleset" com "Restrict creations", "Restrict deletions", "Block force
-   pushes"? Se não existir, PARAR: o ensaio continua bloqueado.
-1. **Pré-requisitos.** Declaração B assinada e revista (link estável, ex.: issue ou
-   ficheiro revisto). Reconciliação dos débitos: evidência do repositório
-   (PR29/30/31) = **0 pedidos BSD de ensaio**; `prior_debits` = valor do ponto 4 da
-   declaração. Se for desconhecido, não provisionar. `snapshot_sha` = SHA do `main`
-   usado na revalidação final dos 10 IDs.
-2. **Construir o genesis localmente (máquina do titular, sem push).**
-   ```sh
-   W=$(mktemp -d); git init --bare -q "$W/j.git"
-   cat > "$W/genesis.json" <<'JSON'
-   {"kind":"genesis","config":{"mode":"inline-five-slots",
-    "trial_id":"goal-roi-bsd-20261113-15-v1","cap":5,"reserve":100,
-    "prior_debits":0,"snapshot_sha":"<SHA main revalidado>",
-    "predecessor_budget_review_ref":"<link reconciliação>",
-    "exclusive_account_review_ref":"<link declaração revista>"}}
-   JSON
-   python3 -c 'import json,sys;sys.stdout.write(json.dumps(json.load(open(sys.argv[1])),sort_keys=True,separators=(",",":"))+"\n")' "$W/genesis.json" > "$W/msg"
-   TREE=$(git --git-dir="$W/j.git" mktree </dev/null)
-   ANCHOR=$(git --git-dir="$W/j.git" commit-tree "$TREE" < "$W/msg")
-   git --git-dir="$W/j.git" update-ref refs/heads/bsd-trial-journal "$ANCHOR"
-   echo "$ANCHOR"
-   ```
-3. **Validar com o código do projeto (offline)**, a partir da checkout da PR31:
-   ```sh
-   python3 -c 'import sys;from scangoal.recovery_inline import InlineSlots;from scangoal.recovery_trial_journal import OfflineGitStore;print(InlineSlots(OfflineGitStore(sys.argv[1]),sys.argv[2],sys.argv[3]).load()[1]["config"])' "$W/j.git" "$ANCHOR" "$W/prepared-fixture-trial"
-   ```
-   Tem de imprimir a configuração; qualquer `TrialBlocked` => corrigir e repetir.
-   Rever `git --git-dir="$W/j.git" cat-file -p "$ANCHOR"` (sem `parent`).
-4. **Criar a ref e uma ref de prova (única escrita na produção).**
-   ```sh
-   PROBE=$(echo '{"kind":"ruleset-probe"}' | git --git-dir="$W/j.git" commit-tree "$TREE")
-   git --git-dir="$W/j.git" push https://github.com/nunovinhas-creator/goal-roi.git \
-       "$ANCHOR:refs/heads/bsd-trial-journal" "$PROBE:refs/heads/bsd-ruleset-probe"
-   ```
-5. **Ruleset (Settings → Rules → Rulesets → New branch ruleset).**
-   Nome `bsd-trial-journal`; Enforcement **Active**; Bypass list **vazia**;
-   Target branches → Include by pattern: `bsd-trial-journal` e `bsd-ruleset-probe`;
-   regras: **Restrict creations**, **Restrict deletions**, **Block force pushes**.
-   NÃO ativar "Restrict updates" (ver D). Guardar.
-6. **Testar a proteção só na ref de prova.**
-   ```sh
-   git --git-dir="$W/j.git" push https://github.com/nunovinhas-creator/goal-roi.git :refs/heads/bsd-ruleset-probe      # tem de ser REJEITADO
-   OTHER=$(echo '{"kind":"rewrite-probe"}' | git --git-dir="$W/j.git" commit-tree "$TREE")
-   git --git-dir="$W/j.git" push --force https://github.com/nunovinhas-creator/goal-roi.git "$OTHER:refs/heads/bsd-ruleset-probe"  # REJEITADO
-   git ls-remote https://github.com/nunovinhas-creator/goal-roi.git refs/heads/bsd-trial-journal   # == $ANCHOR
-   ```
-   Se algum push for aceite: desativar o callback (nunca instalado) e rever o
-   ruleset. Nunca testar eliminação na ref do journal.
-   Depois: remover o padrão `bsd-ruleset-probe` do ruleset e apagar essa branch.
-7. **Restringir escrita (Settings → Actions → General → Workflow permissions):**
-   "Read repository contents and packages permissions". `collect.yml` declara
-   `contents: write` e `actions: write` explicitamente, por isso não muda;
-   `tests.yml` (sem bloco `permissions`, corre em PRs) passa a só leitura e deixa de
-   poder escrever na ref. Confirmar a seguir que uma execução do coletor termina verde.
-8. **Fixar a âncora:** commit revisto na PR31 com `PROVISIONED_ANCHOR = '<ANCHOR>'`,
-   CI verde. Concorrência, timeouts incertos, recusa de eliminação/recuo e perda do
-   remoto já estão testados offline (servidor bare + dois clientes); não repetir
-   contra a produção.
+**Autenticidade dos resultados** (respostas aceites como evidência). NÃO está garantida
+hoje: quem tem `contents: write` (o titular, sessões de agentes, qualquer workflow de PR
+do mesmo repositório que declare escrita) pode acrescentar um `reserve` + `complete`
+bem formados com bytes inventados, e o replay aceitá-los-ia. "Restrict updates" sem
+bypass impediria também o coletor de escrever.
 
-## D. Escrita restrita: risco residual e alternativa
+**Solução mínima recomendada: atestação OIDC do GitHub Actions** (gratuita, sem
+secrets, sem ambiente, sem risco de bloquear o coletor):
+- `collect.yml`: `permissions: id-token: write` (acrescentado às permissões atuais).
+- Cada evento `reserve`/`complete` passa a incluir um JWT OIDC pedido pelo próprio
+  passo, com `audience = sha256(evento canónico sem o JWT)`.
+- O replay/load verifica, para cada evento: assinatura RS256 com o JWKS de
+  `token.actions.githubusercontent.com`; `repository = nunovinhas-creator/goal-roi`;
+  `job_workflow_ref = nunovinhas-creator/goal-roi/.github/workflows/collect.yml@refs/heads/main`;
+  `run_id:run_attempt == owner`; `aud` = digest do evento. Falha => o journal pára e
+  nada é aceite como evidência.
+- Implementação estimada em ~60 linhas stdlib (JWT, verificação PKCS#1 v1.5 com `pow`,
+  pedido do token pelas variáveis `ACTIONS_ID_TOKEN_REQUEST_*`). NÃO está implementada
+  nem auditada; é condição G.2.
+- Riscos residuais: (1) a confiança é o código em `main`: quem consegue fazer push
+  para `main` consegue alterar o coletor; (2) se o GitHub rodar a chave OIDC e a
+  antiga sair do JWKS, o replay de eventos antigos falha e o ensaio pára (fail-closed);
+  (3) um append forjado pode parar o ensaio permanentemente (DoS), porque a ref não
+  pode ser reescrita; (4) nem o OIDC nem nada no GitHub prova que os bytes vieram do
+  servidor BSD: isso assenta no TLS e no código auditado do coletor, e não é
+  verificável por terceiros.
 
-Sem "Restrict updates", qualquer credencial com `contents: write` pode ACRESCENTAR
-commits (fast-forward) à ref: o titular, `collect.yml` (incluindo despachos manuais
-noutros refs pelo titular) e sessões de agentes com acesso de escrita. Um evento
-inválido bloqueia o ensaio (fail-closed); não cria slots (o cap conta todas as
-reservas e a âncora é fixa). Mas um `complete` forjado e bem formado poderia
-introduzir uma resposta falsa no staging. Mitigação: o staging não é publicado; cada
-evento é um commit auditável; regra operacional de nenhum agente escrever nessa ref.
+Alternativa (se o titular preferir não usar OIDC): ambiente `bsd-trial-journal` com
+regra de branch de deployment = só `main`, sem revisores nem espera, secret de
+ambiente `BSD_JOURNAL_HMAC_KEY` (32 bytes aleatórios gerados pelo titular) e HMAC em
+cada evento. Desvantagens: o job `collect` inteiro passa a depender do ambiente (uma
+configuração errada bloqueia a recolha), cada execução cria um registo de deployment,
+e é preciso criar um secret.
 
-Alternativa forte (não preparada): "Restrict updates" com bypass para uma deploy key
-usada só pelo coletor. Exige um secret novo, um remoto SSH (o código só aceita HTTPS
-hoje) e confirmar que contas pessoais permitem deploy keys como bypass. Decisão do
-titular: aceitar o risco residual (recomendado para 5 pedidos) ou pedir esta
-alternativa.
+## E. Configuração exata recomendada (por autorizar; nada foi feito)
 
-## E. Patches (não instalados)
+1. **Ruleset** (Settings → Rules → Rulesets → New branch ruleset): nome
+   `bsd-trial-journal`; Enforcement **Active**; Bypass list **vazia**; Target →
+   Include by pattern `bsd-trial-journal` (+ `bsd-ruleset-probe` só durante o teste);
+   regras **Restrict creations**, **Restrict deletions**, **Block force pushes**;
+   **sem** Restrict updates.
+2. **Workflow permissions** (Settings → Actions → General): "Read repository contents
+   and packages permissions". `collect.yml` declara `contents: write` e `actions: write`
+   explicitamente e não muda; `tests.yml` e outros workflows sem bloco passam a só
+   leitura. Confirmar a seguir uma execução verde do coletor.
+3. **Genesis**: construir e validar localmente (comandos em F), e fazer push só da âncora
+   e da ref de prova antes de ativar o ruleset; testar eliminação/force-push SÓ na ref de
+   prova; confirmar `git ls-remote` == âncora; depois retirar e apagar a prova.
+4. **`PROVISIONED_ANCHOR`**: commit revisto com o SHA.
+5. **OIDC** (D): commit revisto com o código de atestação e `id-token: write`.
+
+## F. Genesis — NÃO construído
+
+Campos obrigatórios e estado:
+
+| Campo | Estado |
+|---|---|
+| `mode`, `trial_id`, `cap`, `reserve` | conhecidos (`inline-five-slots`, `goal-roi-bsd-20261113-15-v1`, 5, 100) |
+| `prior_debits` | **não comprovado**: o repositório mostra 0 pedidos de ensaio, mas usos manuais fora do repositório não são verificáveis (declaração, ponto 5) |
+| `exclusive_account_review_ref` | **não existe** (declaração por assinar) |
+| `predecessor_budget_review_ref` | depende de `prior_debits` |
+| `snapshot_sha` | só deve ser fixado na revalidação final dos 10 IDs, imediatamente antes |
+
+Construir agora exigiria inventar valores; por isso não foi feito. Comandos para quando
+houver dados (máquina do titular):
+
+```sh
+W=$(mktemp -d); git init --bare -q "$W/j.git"
+cat > "$W/genesis.json" <<'JSON'
+{"kind":"genesis","config":{"mode":"inline-five-slots",
+ "trial_id":"goal-roi-bsd-20261113-15-v1","cap":5,"reserve":100,
+ "prior_debits":<N>,"snapshot_sha":"<SHA main revalidado>",
+ "predecessor_budget_review_ref":"<link reconciliação>",
+ "exclusive_account_review_ref":"<link declaração revista>"}}
+JSON
+python3 -c 'import json,sys;sys.stdout.write(json.dumps(json.load(open(sys.argv[1])),sort_keys=True,separators=(",",":"))+"\n")' "$W/genesis.json" > "$W/msg"
+TREE=$(git --git-dir="$W/j.git" mktree </dev/null)
+ANCHOR=$(git --git-dir="$W/j.git" commit-tree "$TREE" < "$W/msg")
+git --git-dir="$W/j.git" update-ref refs/heads/bsd-trial-journal "$ANCHOR"
+python3 -c 'import sys;from scangoal.recovery_inline import InlineSlots;from scangoal.recovery_trial_journal import OfflineGitStore;print(InlineSlots(OfflineGitStore(sys.argv[1]),sys.argv[2],sys.argv[3]).load()[1]["config"])' "$W/j.git" "$ANCHOR" "$W/prepared-fixture-trial"
+# só depois de aprovado:
+PROBE=$(echo '{"kind":"ruleset-probe"}' | git --git-dir="$W/j.git" commit-tree "$TREE")
+git --git-dir="$W/j.git" push https://github.com/nunovinhas-creator/goal-roi.git "$ANCHOR:refs/heads/bsd-trial-journal" "$PROBE:refs/heads/bsd-ruleset-probe"
+# ruleset ativo -> estes dois TÊM de ser rejeitados:
+git --git-dir="$W/j.git" push https://github.com/nunovinhas-creator/goal-roi.git :refs/heads/bsd-ruleset-probe
+OTHER=$(echo '{"kind":"rewrite-probe"}' | git --git-dir="$W/j.git" commit-tree "$TREE")
+git --git-dir="$W/j.git" push --force https://github.com/nunovinhas-creator/goal-roi.git "$OTHER:refs/heads/bsd-ruleset-probe"
+```
+
+## G. Patches e condições
 
 | Patch | Alteração | Aplica em `main` 17a3a5e |
 |---|---|---|
-| `collect-yml-proposal.patch` | +2 linhas: 1.º passo grava `GOAL_ROI_JOB_STARTED_UTC` | sim |
-| `collector-tail-proposal.patch` | `results_bsd.py` +18/−3: `request_json(observe=None)`, `run(after_bsd=None)` com try/except | sim |
+| `collect-yml-proposal.patch` | `timeout-minutes` 15 → 18; 1.º passo grava `GOAL_ROI_JOB_STARTED_UTC` | sim |
+| `collector-tail-proposal.patch` | `results_bsd.py` +18/−3: `request_json(observe=None)`, `run(after_bsd=None)` | sim |
 
-Zero linhas tocam em Telegram, notify, relatório, `schedule`/cron, cadeia de
-encadeamento ou certificação (verificado no diff aplicado). Instalados, são
-INERTES: sem `after_bsd`, o estado e o ficheiro são byte-a-byte iguais (testado).
-A ativação exige um TERCEIRO commit, por auditar: construir `PreparedTail` no `main()`
-do coletor, passar `github.token` ao `RemoteGitStore` e a ponte HTTP real.
+Zero linhas tocam em Telegram, notify, relatório, agendamento, encadeamento ou
+certificação. Sem callback, os patches são inertes (testado byte a byte). Riscos: o
+passo novo pode, em teoria, falhar antes da recolha; a variável fica visível nos
+passos seguintes (não é secret); um job pendurado leva +3 min a terminar; o teste de
+integridade que fixa o blob do `collect.yml` tem de ser atualizado na PR de instalação.
 
-Riscos de instalar os dois patches:
-- `request_json` passa a ler o corpo para uma variável antes do `json.loads`: mesmo
-  comportamento e mesmos erros (testado).
-- Novo passo no workflow: se falhar (só se `$GITHUB_ENV` não for gravável), o job
-  falha antes da recolha. Probabilidade muito baixa, mas não nula.
-- A variável de ambiente fica visível a todos os passos seguintes (não é secret).
-- Qualquer alteração ao `collect.yml` muda o blob auditado; os testes de integridade
-  que fixam o blob antigo têm de ser atualizados na mesma PR de instalação.
+Garantias obrigatórias em falta para o primeiro pedido (NO-GO até todas existirem):
+1. Declaração C assinada e revista; `prior_debits` comprovado.
+2. Atestação OIDC (D) implementada, auditada e testada.
+3. Ruleset, permissões, genesis e `PROVISIONED_ANCHOR` (E.1–E.4) concluídos e verificados.
+4. Patches instalados (incluindo `timeout-minutes: 18`) e terceiro commit auditado
+   (wiring no `main()` e ponte HTTP ≤ 20 s, namespace real separado de `synthetic_wire`).
 
-## F. Procedimento mínimo para a primeira consulta BSD real
-
-1. A–E aprovados; passos C.0–C.8 concluídos; `PROVISIONED_ANCHOR` em `main`.
-2. Auditoria e autorização expressa do terceiro commit (wiring + ponte HTTP
-   ≤20 s, sem redirects/retries, namespace real separado de `synthetic_wire`).
-3. Execução elegível (automática; caso contrário, skip silencioso):
-   recolha normal concluída e guardada → recibo do último cabeçalho <60 s, sem queda
-   inexplicada → saldo ≥ 100 + slots restantes → prazo ≥ 650 + 150 s → watchdog
-   armado → replay do journal → reserva confirmada por push não forçado →
-   UMA página BSD → bytes/hash/UTC duráveis → `complete` no journal → replay/staging.
-4. Qualquer erro/incerteza: o slot fica gasto, sem reenvio. O abandono só com prova
-   autenticada da tentativa terminal. Reverter = remover o callback; não tocar na ref.
-5. Rever o staging manualmente antes de qualquer uso; nada é publicado.
+Primeira execução, depois de tudo isso: recolha normal guardada → cabeçalho < 60 s
+sem queda inexplicada → saldo ≥ 100 + slots restantes → tail cabe nos 15 min originais
+→ watchdog → reserva atestada e confirmada → UMA página → bytes/hash/UTC duráveis →
+`complete` atestado → staging com revisão manual. Qualquer incerteza gasta o slot, sem
+reenvio; reverter = remover o callback.

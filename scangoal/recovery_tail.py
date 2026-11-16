@@ -15,7 +15,9 @@ from .recovery_trial import MATCH_IDS, DAYS, TrialBlocked, isolated
 from .recovery_trial_journal import utc
 from .recovery_trial_transport import PreparedBSD, OfflineWire
 
-# collect.yml: timeout-minutes 15. The start stamp is written by the first step,
+# Normal budget = 15 min (the proposal raises timeout-minutes to 18 so the tail
+# never causes a cut; the gate below still fits the tail inside the old 15 min).
+# The start stamp is written by the first step,
 # after runner set-up; 30 s covers set-up already counted by GitHub.
 JOB_TIMEOUT_S, JOB_SETUP_SLACK_S = 900, 30
 # Hard wall clock of the whole tail: one SIGALRM watchdog covers local Git,
