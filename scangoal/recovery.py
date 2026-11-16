@@ -134,11 +134,58 @@ def parse_page(source, payload, offset):
     return events, total, remaining
 
 
+def result_signature(event):
+    """A specific valid final result, independent of unrelated metadata updates."""
+    score = score_of(event)
+    if score is None:
+        return None
+    kickoff = kickoff_of(event)
+    return (event['id'], norm_team(name_of(event, 'home_team')),
+            norm_team(name_of(event, 'away_team')),
+            stamp(kickoff) if kickoff else None, norm_team(name_of(event, 'league')), tuple(score))
+
+
+def final_observation(versions, event):
+    """First proven observation of THIS final result, never first sight of the fixture."""
+    signature = result_signature(event)
+    if signature is None:
+        return None
+    times = [parse_utc(v.get('observed_utc')) for v in versions
+             if result_signature(v['event']) == signature]
+    proven = [t for t in times if t is not None]
+    return stamp(min(proven)) if proven else None
+
+
+def lineage_conflicts(versions):
+    finals = {result_signature(v['event']) for v in versions if score_of(v['event']) is not None}
+    reasons = []
+    if len(finals) > 1:
+        reasons.append('provider_result_changed')
+    if finals and versions and score_of(versions[-1]['event']) is None:
+        reasons.append('provider_result_withdrawn')
+    return reasons
+
+
 def reconcile(state, targets, aliases, existing):
-    """Rebuild staged acceptances; corrections/conflicts revoke staging, never rewrite history."""
-    accepted = {}
+    """Retain staged decisions independently of the scheduling window; fail closed on new evidence."""
+    previous = copy.deepcopy(state['accepted'])
+    accepted = copy.deepcopy(previous)
+    registry = state.setdefault('target_history', {})
     for mid, target in targets.items():
+        # Retain identity/time constraints, including when a target later ages out.
+        saved = registry.setdefault(mid, copy.deepcopy(target))
+        saved['invalid'] = saved.get('invalid', False) or target.get('invalid', False)
+        for variant in target['variants']:
+            if variant not in saved['variants']:
+                saved['variants'].append(copy.deepcopy(variant))
+        saved['days'] = sorted(set(saved['days']) | set(target['days']))
+    for mid, target in registry.items():
         observed, bad = [], []
+        if target.get('invalid'):
+            bad.append('target_identity_conflict')
+        for evidence in previous.get(mid, {}).get('evidence', []):
+            if identity(target, [evidence['event']], aliases)[0] is None:
+                bad.append('staged_identity_invalidated')
         for src in PLAN_CAP:
             pages = [state['pages'].get(src + '|' + day) for day in target['days']]
             evs = [ev for page in pages if page for ev in page.get('events', {}).values()]
@@ -151,30 +198,69 @@ def reconcile(state, targets, aliases, existing):
                 bad.append(criterion)
             if ev:
                 versions = state['observations'].get(src + '|' + str(ev['id']), [])
-                if len({digest(v['event']) for v in versions}) > 1:
-                    bad.append('provider_event_changed')
+                bad.extend(lineage_conflicts(versions))
                 score = score_of(ev)
                 if score is None:
-                    bad.append('non_regular_or_invalid_score')
+                    # Upcoming/live -> finished is normal progression, not a sticky conflict.
                     continue
-                # Uniqueness cannot be certified from a partial set of pages.
+                known = final_observation(versions, ev)
+                if known is None:
+                    bad.append('missing_final_observation_time')
+                    continue
                 complete = all(page and page.get('status') == 'complete' for page in pages)
                 observed.append({'complete_search': complete, 'source': src, 'event_id': ev['id'], 'ft': score, 'status': ev['status'],
                                  'event_date': ev.get('event_date'), 'criteria': criterion,
-                                 'observed_utc': versions[0]['observed_utc'] if versions else None,
-                                 'raw_sha256': digest(ev), 'event': ev})
+                                 'observed_utc': known, 'raw_sha256': digest(ev), 'event': ev})
         scores = {tuple(o['ft']) for o in observed}
         historical = existing.get(mid)
         if historical and scores and tuple(historical['ft']) not in scores:
             bad.append('previously_confirmed_conflict')
         if len(scores) > 1:
             bad.append('provider_conflict')
+        # A new candidate contradicting an already accepted score is evidence even
+        # before a second source's day scan is complete.
+        if mid in previous and any(tuple(o['ft']) != tuple(previous[mid]['ft']) for o in observed):
+            bad.append('staged_result_conflict')
         if bad:
-            state['conflicts'][mid] = sorted(set(bad))
+            state['conflicts'][mid] = sorted(set(state['conflicts'].get(mid, [])) | set(bad))
         if len(scores) == 1 and any(o['complete_search'] for o in observed) and not bad and mid not in state['conflicts'] and not historical:
-            observed.sort(key=lambda o: o['observed_utc'] or '9999')
+            observed.sort(key=lambda o: o['observed_utc'])
             accepted[mid] = {'ft': observed[0]['ft'], 'matched_at_utc': observed[0]['observed_utc'],
                              'evidence': observed, 'historical_recovery': True}
+
+    # Also validate migrated acceptances with no saved target (old PR29 states).
+    # Scheduling, page resets or expiration must not hide a later correction.
+    for mid, result in list(accepted.items()):
+        bad = []
+        if mid in existing and tuple(existing[mid]['ft']) != tuple(result['ft']):
+            bad.append('previously_confirmed_conflict')
+        for evidence in result['evidence']:
+            versions = state['observations'].get(evidence['source'] + '|' + str(evidence['event_id']), [])
+            bad.extend(lineage_conflicts(versions))
+            if versions and result_signature(versions[-1]['event']) != result_signature(evidence['event']):
+                bad.append('staged_evidence_invalidated')
+            known = final_observation(versions, evidence['event'])
+            if known is None:
+                bad.append('missing_final_observation_time')
+            else:
+                evidence['observed_utc'] = known
+        if bad:
+            state['conflicts'][mid] = sorted(set(state['conflicts'].get(mid, [])) | set(bad))
+        if mid in state['conflicts']:
+            accepted.pop(mid)
+        else:
+            result['matched_at_utc'] = min(e['observed_utc'] for e in result['evidence'])
+
+    # Append decisions, including the old acceptance before a migration/revocation.
+    history = state.setdefault('decision_history', {})
+    for mid in sorted(set(previous) | set(accepted) | set(state['conflicts'])):
+        entries = history.setdefault(mid, [])
+        if not entries and mid in previous:
+            entries.append({'accepted': previous[mid], 'conflicts': [], 'reason': 'prior_staged_decision'})
+        decision = {'accepted': copy.deepcopy(accepted.get(mid)), 'conflicts': state['conflicts'].get(mid, []),
+                    'reason': 'quarantined' if mid in state['conflicts'] else 'verified_final_observation'}
+        if not entries or digest(entries[-1]) != digest(decision):
+            entries.append(decision)
     state['accepted'] = accepted
 
 
@@ -195,7 +281,17 @@ def run_batch(state, targets, fetch, now, *, aliases=None, existing=None, max_re
             raise ValueError('quota configuration outside free plan')
     for src in PLAN_CAP:
         for day in sorted({d for t in targets.values() for d in t['days']}):
-            state['pages'].setdefault(src + '|' + day, {'offset': 0, 'status': 'pending', 'events': {}, 'passes': 0, 'attempts': 0, 'page_hashes': []})
+            state['pages'].setdefault(src + '|' + day, {'offset': 0, 'status': 'pending', 'events': {}, 'passes': 0, 'attempts': 0, 'page_hashes': [],
+                                                      'query_filter': 'status=finished' if src == 'bsd' else None})
+            page = state['pages'][src + '|' + day]
+            if src == 'bsd' and page.get('query_filter') != 'status=finished':
+                # Offsets belong to a query, not just a date. Archive the unfiltered
+                # cursor before restarting the filtered scan; retain observations/usage.
+                state.setdefault('page_history', {}).setdefault(src + '|' + day, []).append(copy.deepcopy(page))
+                page.update(offset=0, status='pending', events={}, passes=0, attempts=0, page_hashes=[],
+                            failures=0, query_filter='status=finished')
+                page.pop('retry_at_utc', None)
+                page.pop('terminal_error', None)
     used = 0
     while used < max_requests:
         jobs = []
@@ -252,7 +348,7 @@ def run_batch(state, targets, fetch, now, *, aliases=None, existing=None, max_re
             for ev in events:
                 page['events'][str(ev['id'])] = ev
                 obs = state['observations'].setdefault(src + '|' + str(ev['id']), [])
-                if not any(digest(v['event']) == digest(ev) for v in obs):
+                if not obs or digest(obs[-1]['event']) != digest(ev):
                     obs.append({'event': ev, 'observed_utc': stamp(observed_at)})
             page['page_hashes'].append(fingerprint)
             page['offset'] += len(events)
@@ -285,7 +381,7 @@ class LiveFetch:
     def __call__(self, source, day, offset, limit):
         if source == 'hl':
             return hl_request({'date': day, 'offset': offset, 'limit': limit}, os.environ['HIGHLIGHTLY_KEY'])
-        return bsd_request(ROOT + '?' + urlencode({'date_from': day, 'date_to': day, 'limit': limit, 'offset': offset}), os.environ['BSD_API_KEY'])
+        return bsd_request(ROOT + '?' + urlencode({'date_from': day, 'date_to': day, 'status': 'finished', 'limit': limit, 'offset': offset}), os.environ['BSD_API_KEY'])
 
 
 def replay_events(states):

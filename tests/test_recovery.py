@@ -236,6 +236,211 @@ class RecoveryTransport(unittest.TestCase):
         self.assertEqual(len(calls),1)
 
 
+class RecoveryIndependentAudit(unittest.TestCase):
+    """Adversarial P1-A/B/C regressions, entirely synthetic and offline."""
+
+    def test_live_final_correction_timeline(self):
+        t1, t2, t3 = NOW, NOW + timedelta(days=1), NOW + timedelta(days=2)
+        state = initial_state()
+        for when, event in ((t1, dict(EV, status='live', home_score=None, away_score=None)),
+                            (t2, EV), (t3, dict(EV, home_score=3))):
+            state = run_batch(state, {'match': TARGET}, lambda *args: payload(event), when,
+                              daily={'hl': 0, 'bsd': 20}, available={'hl': 0, 'bsd': 200},
+                              max_requests=1, max_passes=3)
+            if when == t1:
+                self.assertNotIn('match', state['accepted'])
+                self.assertNotIn('match', state['conflicts'])
+            elif when == t2:
+                self.assertEqual(state['accepted']['match']['ft'], [2, 1])
+                self.assertEqual(state['accepted']['match']['matched_at_utc'], t2.isoformat())
+                self.assertNotEqual(state['accepted']['match']['matched_at_utc'], t1.isoformat())
+                t2_evidence = copy.deepcopy(state['accepted']['match'])
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('provider_result_changed', state['conflicts']['match'])
+        self.assertEqual([v['observed_utc'] for v in state['observations']['bsd|42']],
+                         [t.isoformat() for t in (t1, t2, t3)])
+        self.assertEqual([v['event']['home_score'] for v in state['observations']['bsd|42']], [None, 2, 3])
+        self.assertIn(t2_evidence, [d['accepted'] for d in state['decision_history']['match']])
+        self.assertIsNone(state['decision_history']['match'][-1]['accepted'])
+
+    def test_live_provisional_score_never_counts_as_final(self):
+        state = run(fetch=lambda *args: payload(dict(EV, status='live')))
+        state = run_batch(state, {'match': TARGET}, lambda *args: payload(), NOW + timedelta(days=1),
+                          daily={'hl': 0, 'bsd': 20}, available={'hl': 0, 'bsd': 200}, max_requests=1)
+        self.assertEqual(state['accepted']['match']['matched_at_utc'], (NOW + timedelta(days=1)).isoformat())
+
+    def test_same_final_metadata_update_keeps_first_final_timestamp(self):
+        state = run()
+        first = copy.deepcopy(state['accepted']['match'])
+        state = run_batch(state, {'match': TARGET}, lambda *args: payload(dict(EV, provider_note='refresh')),
+                          NOW + timedelta(days=1), daily={'hl': 0, 'bsd': 20},
+                          available={'hl': 0, 'bsd': 200}, max_requests=1)
+        self.assertEqual(state['accepted']['match']['matched_at_utc'], first['matched_at_utc'])
+        self.assertNotIn('match', state['conflicts'])
+        self.assertEqual(len(state['observations']['bsd|42']), 2)
+
+    def test_missing_final_timestamp_never_uses_live_timestamp(self):
+        state = run()
+        state['observations']['bsd|42'] = [
+            {'event': dict(EV, status='live'), 'observed_utc': NOW.isoformat()},
+            {'event': EV, 'observed_utc': None}]
+        reconcile(state, {'match': TARGET}, {}, {})
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('missing_final_observation_time', state['conflicts']['match'])
+
+    def test_window_expiry_day31_and_process_restart_preserve_acceptance(self):
+        state = run()
+        accepted = copy.deepcopy(state['accepted'])
+        history = copy.deepcopy(state['decision_history'])
+        # Thirty-one days after the fixture: it is no longer a query target.
+        day31 = datetime.fromisoformat(VAR['kickoff_utc']) + timedelta(days=31)
+        bets = [dict(VAR, match_id='match', w=None, ft=None)]
+        targets = targets_from(bets, day31, history_days=30)
+        self.assertFalse(targets)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'state.json'
+            write_json(path, state)
+            def no_requests(*args):
+                self.fail('Expired targets must not dispatch requests')
+            # Deserialize in a NEW Python process, not just a shared object.
+            script = ("import json, sys; from datetime import datetime; "
+                      "from scangoal.recovery import run_batch; "
+                      "state=json.load(open(sys.argv[1])); "
+                      "state=run_batch(state, {}, lambda *a: (_ for _ in ()).throw(AssertionError('network')), "
+                      "datetime.fromisoformat(sys.argv[2])); "
+                      "print(json.dumps(state))")
+            resumed = json.loads(subprocess.check_output([sys.executable, '-c', script, str(path), day31.isoformat()]))
+        self.assertEqual(resumed['accepted'], accepted)
+        self.assertEqual(resumed['decision_history'], history)
+        self.assertEqual(resumed['observations'], state['observations'])
+        self.assertEqual(resumed['usage'], state['usage'])
+        self.assertEqual(resumed, run_batch(resumed, {}, no_requests, day31))
+
+    def test_expired_result_revoked_on_correction_without_current_targets(self):
+        state = run()
+        accepted = copy.deepcopy(state['accepted']['match'])
+        state['observations']['bsd|42'].append({'event': dict(EV, home_score=3),
+                                               'observed_utc': (NOW + timedelta(days=31)).isoformat()})
+        reconcile(state, {}, {}, {})
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('provider_result_changed', state['conflicts']['match'])
+        self.assertIn(accepted, [d['accepted'] for d in state['decision_history']['match']])
+        before = copy.deepcopy(state)
+        reconcile(state, {}, {}, {})
+        self.assertEqual(state, before)
+
+    def test_legacy_expired_acceptance_and_timestamp_migration(self):
+        state = run()
+        state.pop('target_history')
+        state.pop('decision_history')
+        t1 = (NOW - timedelta(hours=2)).isoformat()
+        state['observations']['bsd|42'].insert(0, {'event': dict(EV, status='live'), 'observed_utc': t1})
+        state['accepted']['match']['matched_at_utc'] = t1
+        state['accepted']['match']['evidence'][0]['observed_utc'] = t1
+        old = copy.deepcopy(state['accepted']['match'])
+        reconcile(state, {}, {}, {})
+        self.assertEqual(state['accepted']['match']['matched_at_utc'], NOW.isoformat())
+        self.assertEqual(state['decision_history']['match'][0]['accepted'], old)
+        state['observations']['bsd|42'].append({'event': dict(EV, status='abandoned'),
+                                               'observed_utc': (NOW + timedelta(days=31)).isoformat()})
+        reconcile(state, {}, {}, {})
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('provider_result_withdrawn', state['conflicts']['match'])
+
+    def test_reversion_to_previous_live_payload_is_preserved_and_revokes(self):
+        state = initial_state()
+        live = dict(EV, status='live')
+        for i, ev in enumerate((live, EV, live)):
+            state = run_batch(state, {'match': TARGET}, lambda *args: payload(ev), NOW + timedelta(days=i),
+                              daily={'hl': 0, 'bsd': 20}, available={'hl': 0, 'bsd': 200},
+                              max_requests=1, max_passes=3)
+        self.assertEqual(len(state['observations']['bsd|42']), 3)
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('provider_result_withdrawn', state['conflicts']['match'])
+
+    def test_new_conflict_after_expiry_preserves_all_prior_reasons(self):
+        state = run()
+        state['conflicts']['match'] = ['manual_review_required']
+        state['pages']['hl|' + DAY] = {'status': 'incomplete', 'events': {'42': dict(EV, home_score=0)}}
+        state['observations']['hl|42'] = [{'event': dict(EV, home_score=0), 'observed_utc': NOW.isoformat()}]
+        reconcile(state, {}, {}, {})
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('manual_review_required', state['conflicts']['match'])
+        self.assertIn('provider_conflict', state['conflicts']['match'])
+
+    def test_new_incompatible_identity_revokes_prior_acceptance(self):
+        state = run()
+        changed = copy.deepcopy(TARGET)
+        changed['variants'][0]['teams'][1] = 'Distinct Club'
+        reconcile(state, {'match': changed}, {}, {})
+        self.assertNotIn('match', state['accepted'])
+        self.assertIn('staged_identity_invalidated', state['conflicts']['match'])
+        self.assertTrue(any(d['accepted'] for d in state['decision_history']['match']))
+
+    def test_partial_rescan_without_invalidating_evidence_keeps_acceptance(self):
+        state = run()
+        accepted = copy.deepcopy(state['accepted'])
+        state = run_batch(state, {'match': TARGET}, lambda *args: payload(dict(EV, id=43, home_team='Other'), total=2),
+                          NOW + timedelta(days=1), daily={'hl': 0, 'bsd': 20},
+                          available={'hl': 0, 'bsd': 200}, max_requests=1)
+        self.assertEqual(state['pages']['bsd|' + DAY]['status'], 'incomplete')
+        self.assertEqual(state['accepted'], accepted)
+
+    def test_bsd_actual_transport_parameters_are_filtered(self):
+        from scangoal.recovery import LiveFetch
+        from urllib.parse import parse_qs, urlparse
+        with patch.dict(os.environ, {'BSD_API_KEY': 'synthetic-test-token'}), \
+                patch('scangoal.recovery.bsd_request', return_value=payload()) as mocked:
+            LiveFetch()('bsd', DAY, 200, 200)
+        url, token = mocked.call_args.args
+        self.assertEqual(parse_qs(urlparse(url).query), {'date_from': [DAY], 'date_to': [DAY],
+                         'status': ['finished'], 'limit': ['200'], 'offset': ['200']})
+        self.assertEqual(token, 'synthetic-test-token')
+
+    def test_bsd_filter_synthetic_page_count_and_final_detection(self):
+        from scangoal.recovery import LiveFetch
+        from urllib.parse import parse_qs, urlparse
+        # 401 synthetic events, only one finished: unfiltered requires 3 pages,
+        # filtered requires one. This is a fixture measurement, not a real gain.
+        events = [dict(EV, id=1000+i, status='live', home_team='Other') for i in range(400)] + [EV]
+        filtered = [e for e in events if e['status'] == 'finished']
+        self.assertEqual((len(events)+199)//200, 3)
+        calls = []
+        def transport(url, token):
+            params = parse_qs(urlparse(url).query)
+            self.assertEqual(params['status'], ['finished'])
+            calls.append(params)
+            offset, limit = int(params['offset'][0]), int(params['limit'][0])
+            return {'results': filtered[offset:offset+limit], 'count': len(filtered), 'next': None}
+        with patch.dict(os.environ, {'BSD_API_KEY': 'synthetic-test-token'}), \
+                patch('scangoal.recovery.bsd_request', side_effect=transport):
+            # Adapter is wrapped to keep the synthetic observation clock deterministic.
+            state = run(fetch=lambda *args: LiveFetch()(*args), max_requests=4)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(state['accepted']['match']['ft'], [2, 1])
+        self.assertEqual(state['pages']['bsd|' + DAY]['offset'], 1)
+        self.assertEqual(state['usage']['bsd|2026-11-16']['reserved_requests'], 1)
+
+    def test_bsd_legacy_unfiltered_cursor_archived_before_filtered_query(self):
+        state = run(fetch=lambda *args: payload(total=2))
+        page = state['pages']['bsd|' + DAY]
+        page.pop('query_filter')
+        prior = copy.deepcopy(page)
+        usage = copy.deepcopy(state['usage'])
+        calls = []
+        def fetch(src, day, offset, limit):
+            calls.append(offset)
+            return payload()
+        state = run(state=state, fetch=fetch)
+        self.assertEqual(calls, [0])
+        self.assertEqual(state['page_history']['bsd|' + DAY], [prior])
+        self.assertEqual(state['pages']['bsd|' + DAY]['query_filter'], 'status=finished')
+        self.assertEqual(state['usage']['bsd|2026-11-16']['reserved_requests'],
+                         usage['bsd|2026-11-16']['reserved_requests'] + 1)
+        self.assertEqual(len(state['observations']['bsd|42']), 1)
+        self.assertIn('match', state['accepted'])
+
+
 class RecoveryRealData(unittest.TestCase):
     def test_offline_trial_preserves_all_data_and_scientific_files(self):
         paths=[p for root in ('data','scangoal') for p in Path(root).glob('*') if p.is_file()]

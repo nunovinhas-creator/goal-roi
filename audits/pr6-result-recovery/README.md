@@ -1,5 +1,7 @@
 # PR 6 — Result Recovery
 
+**Revisão após auditoria independente:** P1-A/P1-B/P1-C corrigidos. Validação atual: **53 testes específicos e 486 testes totais passaram**. Ver [relatório das correções](corrections/README.md), incluindo evidência T1/T2/T3, retenção no dia 31 e filtro BSD. Os logs e números da implementação inicial abaixo são preservados como histórico. A eficácia real continua não demonstrada.
+
 Parecer: **APROVAR COM CONDIÇÕES para revisão técnica em Draft; REJEITAR ativação de produção neste estado.**
 
 Base auditada: `50a94386b0ffb9d881428d89d122a2e8ac3734c1`, main de 16/11/2026.

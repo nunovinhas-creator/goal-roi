@@ -1,0 +1,180 @@
+{
+ "kind": "SYNTHETIC_FIXTURES_ONLY",
+ "real_api_requests": 0,
+ "real_recoveries": 0,
+ "timeline": [
+  {
+   "label": "T1",
+   "observed_utc": "2026-11-16T15:40:00+00:00",
+   "accepted": {},
+   "conflicts": {}
+  },
+  {
+   "label": "T2",
+   "observed_utc": "2026-11-17T15:40:00+00:00",
+   "accepted": {
+    "match": {
+     "ft": [
+      2,
+      1
+     ],
+     "matched_at_utc": "2026-11-17T15:40:00+00:00",
+     "evidence": [
+      {
+       "complete_search": true,
+       "source": "bsd",
+       "event_id": 42,
+       "ft": [
+        2,
+        1
+       ],
+       "status": "finished",
+       "event_date": "2026-11-12T18:00:00+00:00",
+       "criteria": "exact_or_reviewed_alias+all_signal_times+competition+unique",
+       "observed_utc": "2026-11-17T15:40:00+00:00",
+       "raw_sha256": "c1ea1f6c2102753e57d54bdedd5b8e86f6689cb33cf4588e5ef755be1f041481",
+       "event": {
+        "id": 42,
+        "status": "finished",
+        "home_team": "AlbinoLeffe",
+        "away_team": "Brescia",
+        "home_score": 2,
+        "away_score": 1,
+        "event_date": "2026-11-12T18:00:00+00:00",
+        "league": "Serie C"
+       }
+      }
+     ],
+     "historical_recovery": true
+    }
+   },
+   "conflicts": {}
+  },
+  {
+   "label": "T3",
+   "observed_utc": "2026-11-18T15:40:00+00:00",
+   "accepted": {},
+   "conflicts": {
+    "match": [
+     "provider_result_changed",
+     "staged_evidence_invalidated",
+     "staged_result_conflict"
+    ]
+   }
+  }
+ ],
+ "observations": {
+  "bsd|42": [
+   {
+    "event": {
+     "id": 42,
+     "status": "live",
+     "home_team": "AlbinoLeffe",
+     "away_team": "Brescia",
+     "home_score": null,
+     "away_score": null,
+     "event_date": "2026-11-12T18:00:00+00:00",
+     "league": "Serie C"
+    },
+    "observed_utc": "2026-11-16T15:40:00+00:00"
+   },
+   {
+    "event": {
+     "id": 42,
+     "status": "finished",
+     "home_team": "AlbinoLeffe",
+     "away_team": "Brescia",
+     "home_score": 2,
+     "away_score": 1,
+     "event_date": "2026-11-12T18:00:00+00:00",
+     "league": "Serie C"
+    },
+    "observed_utc": "2026-11-17T15:40:00+00:00"
+   },
+   {
+    "event": {
+     "id": 42,
+     "status": "finished",
+     "home_team": "AlbinoLeffe",
+     "away_team": "Brescia",
+     "home_score": 3,
+     "away_score": 1,
+     "event_date": "2026-11-12T18:00:00+00:00",
+     "league": "Serie C"
+    },
+    "observed_utc": "2026-11-18T15:40:00+00:00"
+   }
+  ]
+ },
+ "decisions": {
+  "match": [
+   {
+    "accepted": {
+     "ft": [
+      2,
+      1
+     ],
+     "matched_at_utc": "2026-11-17T15:40:00+00:00",
+     "evidence": [
+      {
+       "complete_search": true,
+       "source": "bsd",
+       "event_id": 42,
+       "ft": [
+        2,
+        1
+       ],
+       "status": "finished",
+       "event_date": "2026-11-12T18:00:00+00:00",
+       "criteria": "exact_or_reviewed_alias+all_signal_times+competition+unique",
+       "observed_utc": "2026-11-17T15:40:00+00:00",
+       "raw_sha256": "c1ea1f6c2102753e57d54bdedd5b8e86f6689cb33cf4588e5ef755be1f041481",
+       "event": {
+        "id": 42,
+        "status": "finished",
+        "home_team": "AlbinoLeffe",
+        "away_team": "Brescia",
+        "home_score": 2,
+        "away_score": 1,
+        "event_date": "2026-11-12T18:00:00+00:00",
+        "league": "Serie C"
+       }
+      }
+     ],
+     "historical_recovery": true
+    },
+    "conflicts": [],
+    "reason": "verified_final_observation"
+   },
+   {
+    "accepted": null,
+    "conflicts": [
+     "provider_result_changed",
+     "staged_evidence_invalidated",
+     "staged_result_conflict"
+    ],
+    "reason": "quarantined"
+   }
+  ]
+ },
+ "synthetic_reserved_requests": {
+  "hl|2026-11-16": {
+   "reserved_requests": 0
+  },
+  "bsd|2026-11-16": {
+   "reserved_requests": 1
+  },
+  "hl|2026-11-17": {
+   "reserved_requests": 0
+  },
+  "bsd|2026-11-17": {
+   "reserved_requests": 1
+  },
+  "hl|2026-11-18": {
+   "reserved_requests": 0
+  },
+  "bsd|2026-11-18": {
+   "reserved_requests": 1
+  }
+ }
+}
