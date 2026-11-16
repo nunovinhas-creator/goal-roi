@@ -6,9 +6,9 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from pr5_fixtures import body, present
+from pr5_fixtures import body, changes, evening, present
 from scangoal import notify
 import test_scangoal as fixtures
 
@@ -62,28 +62,29 @@ class NotifyMigration(unittest.TestCase):
         new['h2'] = 'abandonada'
         new['new'] = 'promissora'
         # PR 5: only what the report shows is announced; a bare absence is "unknown" and h1 needs its own certificate.
-        self.assertEqual(notify.messages(copy.deepcopy(rep), copy.deepcopy(state), NOW), [])
+        self.assertEqual(changes(notify.messages(copy.deepcopy(rep), copy.deepcopy(state), evening(NOW))), [])
         present(rep, certified=['h0', 'h1'], observed=['h0'])
-        messages = notify.messages(rep, state, NOW)
-        self.assertEqual(len(messages), 4)
-        self.assertTrue(any('voltou a "em observação"' in m and 'h0' in m for m in messages))
-        self.assertTrue(any('passou a forte' in m for m in messages))
-        self.assertTrue(any('passou a abandonada' in m for m in messages))
-        self.assertTrue(any('passou a promissora' in m for m in messages))
-        self.assertEqual(notify.messages(rep, state, NOW), [])
+        self.assertEqual(notify.messages(rep, copy.deepcopy(state), NOW), [])           # never during the day
+        messages = notify.messages(rep, state, evening(NOW))
+        self.assertEqual(len(messages), 1)                                                # one consolidated summary
+        self.assertEqual(sorted(changes(messages)), sorted([
+            ('h0', 'Estado: Em observação (antes: promissora)'), ('h1', '✅ Tática validada, passou a forte (antes: promissora): h1'),
+            ('h2', 'Estado: Abandonada (antes: promissora)'), ('new', 'Estado: Promissora (antes: em observação)')]))
+        self.assertEqual(changes(notify.messages(rep, state, evening(NOW + timedelta(days=1)))), [])
 
     def test_watch_and_daily_summary_keep_working(self):
         rep = fixtures.Notify().report()
         rep['brain']['evidence_scope'] = 'eligible_bets_only'
         state = legacy_state()
-        evening = NOW.replace(hour=21)
-        messages = notify.messages(rep, state, evening)
+        at = evening(NOW)
+        messages = notify.messages(rep, state, at)
         self.assertEqual(len(messages), 2)
-        self.assertTrue(any(body(m).startswith('A seguir:') for m in messages))
-        self.assertTrue(any(body(m).startswith('Resumo de') for m in messages))
-        self.assertTrue(all(m.startswith('Estado científico:') for m in messages))   # PR 5: scientific state on top
+        self.assertTrue(any(m.startswith('A seguir:') for m in messages))
+        self.assertTrue(any(m.startswith('Resumo das táticas — 14/11') for m in messages))
+        self.assertTrue(all(notify.guard_claims(m, rep) for m in messages))           # no positive claim in either
+        self.assertIn('Estado científico:', next(m for m in messages if m.startswith('Resumo')))
         self.assertIn('already-sent', state['watch_sent'])
-        self.assertEqual(notify.messages(rep, state, evening), [])
+        self.assertEqual(notify.messages(rep, state, at), [])
 
     def test_missing_scope_does_not_migrate_or_overwrite_reference(self):
         for brain in ({}, {'status_list': {}}, {'evidence_scope': 'all_signals', 'status_list': {}},
@@ -123,7 +124,9 @@ class NotifyMigration(unittest.TestCase):
                 self.assertEqual(state[k], legacy_state()[k])
             rep = eligible_report()
             rep['brain']['status_list']['h0'] = 'forte'
-            self.assertEqual(len(notify.messages(present(rep, certified=['h0', 'h1']), state, NOW)), 1)
+            self.assertEqual(notify.messages(present(rep, certified=['h0', 'h1']), copy.deepcopy(state), NOW), [])
+            out = notify.messages(present(rep, certified=['h0', 'h1']), state, evening(NOW))
+            self.assertEqual((len(out), changes(out)), (1, [('h0', '✅ Tática validada, passou a forte (antes: promissora): h0')]))
 
     def test_send_failure_cannot_undo_migration_or_consume_delivery(self):
         # PR 5 (at most once): the intent is persisted BEFORE the send; an unknown sender error makes the greeting UNCERTAIN,

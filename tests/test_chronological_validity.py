@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from pr5_fixtures import body, present
+from pr5_fixtures import body, changes, evening, present
 from scangoal import brain, certification, chronology, insights, notify, store
 
 UTC = timezone.utc
@@ -392,12 +392,16 @@ class TelegramNeverClaimsUncertifiedValidation(unittest.TestCase):
         state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
         rep = present(self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, True), certified=['h1'])
         out = notify.messages(rep, state, T0)
-        self.assertTrue(any(body(m).startswith('🟢 ALERTA') for m in out))
-        self.assertTrue(any(body(m).startswith('✅ Tática validada') for m in out))
-        self.assertTrue(all(m.startswith('Estado científico: CERTIFICADA') for m in out if 'validada' in m))
+        self.assertTrue(any(m.startswith('🟢 ALERTA') for m in out))                    # the bet's eligibility changes at once
+        self.assertFalse(any(m.startswith('Resumo') for m in out))                      # the status change waits for 22:00
+        self.assertTrue(all(m.split('\n')[-1].startswith('Estado científico: CERTIFICADA') for m in out if 'validada' in m))
+        later = notify.messages(rep, state, evening(T0))
+        self.assertEqual(changes(later), [('h1', '✅ Tática validada, passou a forte (antes: promissora): h1')])
+        self.assertIn(notify.scientific_label(rep, 'h1')[0], later[0])
         state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
         rep = self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, True)
-        self.assertFalse(any('ALERTA' in m or 'validada' in m for m in notify.messages(rep, state, T0)))   # listed but no own certificate
+        for t in (T0, evening(T0)):                                                      # listed but no own certificate
+            self.assertFalse(any('ALERTA' in m or 'validada' in m for m in notify.messages(rep, state, t)))
 
 
 class PhysicalOrder(unittest.TestCase):
@@ -493,8 +497,8 @@ class TelegramRulesMigration(unittest.TestCase):
         again = notify.messages(self.report({'a': 'promissora'}), state, T0)       # no second migration, nothing to say
         self.assertEqual([m for m in again if 'Hipótese' in m], [])
         self.assertEqual(notify.messages(self.report({}), state, T0), [])          # PR 5: absence is "unknown", not a return
-        later = notify.messages(present(self.report({}), observed=['a']), state, T0)   # a genuine later change is announced
-        self.assertEqual(sum('Hipótese voltou a "em observação"' in m for m in later), 1)
+        later = notify.messages(present(self.report({}), observed=['a']), state, evening(T0))   # a genuine later change: 22:00 summary
+        self.assertEqual(changes(later), [('a', 'Estado: Em observação (antes: promissora)')])
 
 
 class AsOfMembership(unittest.TestCase):

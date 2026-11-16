@@ -18,12 +18,14 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 
+from pr5_fixtures import changes, evening
 from scangoal import brain, notify
 
 ROOT = Path(__file__).resolve().parents[1]
 FIX = ROOT / 'tests' / 'fixtures' / 'pr5'
 UTC = timezone.utc
 NOW = datetime(2026, 11, 16, 12, 0, tzinfo=UTC)
+EVENING = evening(NOW)                     # 22:05 in Lisbon (= UTC in November): the daily summary
 TOKEN, CHAT = 'SECRET-TOKEN-7f3a9', '987654321'
 ENV = {'TG_BOT_TOKEN': TOKEN, 'TG_CHAT_ID': CHAT}
 HA, HB, HC = 'Jogo aberto | Minuto = 31 a 60', 'Jogo aberto | Minuto = 31 a 60 & Parte do jogo = 2.ª parte', 'Jogo aberto | Liga = Liga X'
@@ -381,9 +383,10 @@ class U04_SelectionsOfOneGame(unittest.TestCase):
         self.assertNotIn('Over 2.5', d.sent[1])
         self.assertNotIn('Over 3.5', d.sent[1])
         # Contract (review #5920565094): a genuinely new bet in a game already notified is an UPDATE of that game, labelled as such.
-        self.assertIn('A seguir (nova seleção num jogo já avisado): Home m1 — Away m1', d.sent[1])
-        self.assertIn('Apostas já avisadas neste jogo: 2 (não repetidas).', d.sent[1])
-        self.assertNotIn('nova seleção', d.sent[0])
+        self.assertEqual(d.sent[1].split('\n'), ['A seguir (nova seleção num jogo já avisado): Home m1 — Away m1',
+                                                  'Encaixa em: %s (promissora)' % HA, 'Aposta: BTTS Yes @ 1,8'])
+        self.assertEqual(d.sent[0].split('\n'), ['A seguir: Home m1 — Away m1', 'Encaixa em: %s (promissora)' % HA,
+                                                  'Aposta: Over 2.5 @ 1,9; Over 3.5 @ 2,4'])
         d.write_report(report(watch=later + [entry('m1', 'BTTS Yes', minutes=0, market='BTTS', odds=1.9)]))   # its reinforcement
         d.run(now=NOW + timedelta(minutes=4))
         self.assertEqual(len(d.sent), 2)
@@ -407,8 +410,10 @@ class P1_PromotionDoesNotRepeatTheBet(unittest.TestCase):
 
     def test_same_bet_is_not_repeated_and_the_certification_is_its_own_event(self):
         d = self.scenario()
+        self.assertEqual(len(d.sent), 1)                                # the certification waits for the 22:00 summary
+        d.run(now=EVENING)
         self.assertEqual(len(d.sent), 2)
-        self.assertTrue(body(d.sent[1]).startswith('✅ Tática validada, passou a forte: %s' % HA))
+        self.assertEqual(changes(d.sent[1:]), [(HA, '✅ Tática validada, passou a forte (antes: promissora): %s' % HA)])
         self.assertNotIn('Over 2.5', d.sent[1])
         self.assertFalse(any('ALERTA' in m for m in d.sent))
         self.assertEqual(list(consistent(self, d)['notified_items']), ['item|id:m1|Asian Total|Over 2.5'])
@@ -449,18 +454,21 @@ class U05_U06_Grouping(unittest.TestCase):
         d.run()
         d.write_report(report(statuses, rows=rows))
         d.run(now=NOW + timedelta(minutes=2))
+        self.assertEqual(d.sent, [])                                    # never during the day
+        d.run(now=EVENING)
+        self.assertEqual(len(d.sent), 1)                                # one consolidated summary
+        d.blocks = changes(d.sent)
         return d
 
-    def test_u05_three_equivalent_hypotheses_one_message(self):
+    def test_u05_three_equivalent_hypotheses_one_block(self):
         d = self.run_change(equivalent_rows())
-        self.assertEqual(len(d.sent), 1)
-        self.assertIn('Hipótese passou a promissora (antes: em observação): %s' % HA, d.sent[0])
-        self.assertIn('e mais 2 equivalentes (partilham ≥ 85 % dos jogos)', d.sent[0])
+        self.assertEqual(d.blocks, [(HA, 'Estado: Promissora (antes: em observação)')])
+        self.assertIn('43 jogos independentes · ROI +25,9% · e mais 2 equivalentes', d.sent[0])
         self.assertEqual(set(d.state()['announced_statuses']), set(equivalent_rows()))
 
-    def test_u06_three_unrelated_hypotheses_three_messages(self):
+    def test_u06_three_unrelated_hypotheses_three_blocks(self):
         rows = {h: row(ids=games(h[-4:], 40), conditions=[('Liga', h)]) for h in ('Jogo aberto | Liga = A', 'Jogo aberto | Liga = B', 'Polymarket | Liga = C')}
-        self.assertEqual(len(self.run_change(rows).sent), 3)
+        self.assertEqual(len(self.run_change(rows).blocks), 3)
 
     def test_no_transitive_chain_and_no_incompatible_pair(self):
         rows = {'Jogo aberto | Minuto = 31 a 60': row(ids=games('g', 43), conditions=[('Minuto', '31 a 60')], games_=43),
@@ -470,10 +478,10 @@ class U05_U06_Grouping(unittest.TestCase):
         sets = [frozenset(r['game_ids']) for r in rows.values()]
         self.assertGreaterEqual(min(jac(sets[0], sets[1]), jac(sets[1], sets[2])), 0.85)   # A~B, B~C
         self.assertLess(jac(sets[0], sets[2]), 0.85)                                          # but not A~C
-        self.assertEqual(len(self.run_change(rows).sent), 2)                                  # complete linkage: never A+B+C
+        self.assertEqual(len(self.run_change(rows).blocks), 2)                                # complete linkage: never A+B+C
         incompatible = {'Jogo aberto | Liga = X': row(ids=games('g', 40), conditions=[('Liga', 'X')]),
                         'Jogo aberto | Liga = Y': row(ids=games('g', 40), conditions=[('Liga', 'Y')])}
-        self.assertEqual(len(self.run_change(incompatible).sent), 2)                          # identical games, conflicting value
+        self.assertEqual(len(self.run_change(incompatible).blocks), 2)                        # identical games, conflicting value
 
     def test_watch_reasons_are_grouped_too(self):
         rows = equivalent_rows()
@@ -481,8 +489,8 @@ class U05_U06_Grouping(unittest.TestCase):
         d = Data(self, base_state({h: 'promissora' for h in rows}), report({h: 'promissora' for h in rows}, rows=rows, watch=[w]))
         d.run()
         self.assertEqual(len(d.sent), 1)
-        self.assertEqual(d.sent[0].count('Encaixa em:'), 1)
-        self.assertIn('e mais 2 equivalentes', d.sent[0])
+        self.assertEqual(d.sent[0].split('\n'), ['A seguir: Home m1 — Away m1', 'Encaixa em: %s (promissora) e mais 2 equivalentes' % HA,
+                                                  'Aposta: Over 2.5 @ 1,9'])
 
 
 class U07_DegradedReports(unittest.TestCase):
@@ -510,10 +518,15 @@ class U07_DegradedReports(unittest.TestCase):
         self.assertEqual(self.d.state()['health']['problems'], ['fonte de resultados em falha (HL)'])
         self.assert_silent(report(change, settled=300), minutes=4)            # results vanished: degraded
         self.assertEqual(self.d.state()['health']['problems'], ['resultados em falta'])
+        self.d.run(now=EVENING)                                                # 22:00 while degraded: summary, change held
+        self.assertEqual((len(self.d.sent), changes(self.d.sent)), (1, []))
+        self.assertIn('Relatório degradado desde', self.d.sent[0])
+        self.assertEqual(self.d.state()['announced_statuses'], self.ref)
         self.d.write_report(report(change))                                    # healthy again: the change is delayed, not lost
-        self.d.run(now=NOW + timedelta(minutes=6))
+        self.d.run(now=NOW + timedelta(days=1))
         self.assertEqual(len(self.d.sent), 1)
-        self.assertIn('passou a abandonada', self.d.sent[0])
+        self.d.run(now=EVENING + timedelta(days=1))
+        self.assertEqual(changes(self.d.sent[1:]), [(HA, 'Estado: Abandonada (antes: promissora)')])
 
     def test_eligible_universe_drop_and_rule_or_verification_change(self):
         change = dict(self.statuses, **{HA: 'abandonada'})
@@ -529,53 +542,113 @@ class U07_DegradedReports(unittest.TestCase):
     def test_degradation_stable_for_24h_becomes_the_reference(self):
         change = dict(self.statuses, **{HA: 'abandonada'})
         self.assert_silent(report(change, eligible=300))
-        self.d.run(now=NOW + timedelta(hours=23))
+        self.d.run(now=NOW + timedelta(hours=9))                              # 21:00: not yet the summary
         self.assertEqual(self.d.sent, [])
-        self.d.run(now=NOW + timedelta(hours=24, minutes=3))
-        self.assertEqual(len(self.d.sent), 1)                                 # delayed by at most 24 h, never discarded
+        self.d.run(now=EVENING)                                               # summary while degraded: change held
+        self.assertEqual(changes(self.d.sent), [])
+        self.d.run(now=NOW + timedelta(hours=24, minutes=3))                  # stable for 24 h: new reference, still no message
         self.assertTrue(self.d.state()['health']['accepted'])
+        self.assertEqual(len(self.d.sent), 1)
+        self.d.run(now=EVENING + timedelta(days=1))                           # announced in the next summary, never discarded
+        self.assertEqual(changes(self.d.sent), [(HA, 'Estado: Abandonada (antes: promissora)')])
 
 
-class U08_Oscillation(unittest.TestCase):
-    def test_a_b_a_within_24h_is_one_notice_and_goes_to_the_summary(self):
+class U08_DailyConsolidation(unittest.TestCase):
+    """Status changes are announced only in the 22:00 (Lisbon) summary: never during the day, all in one message."""
+
+    def test_a_b_a_within_the_day_is_silent_and_not_in_the_summary(self):
         d = Data(self, base_state(), report())
         d.run()
-        d.write_report(report({HA: 'abandonada'}))
-        d.run(now=NOW + timedelta(minutes=10))
-        d.write_report(report({HA: 'promissora'}))
-        d.run(now=NOW + timedelta(minutes=20))
-        d.write_report(report({HA: 'abandonada'}))
-        d.run(now=NOW + timedelta(minutes=30))
+        for k, st in enumerate(('abandonada', 'promissora', 'abandonada', 'promissora')):
+            d.write_report(report({HA: st}))
+            d.run(now=NOW + timedelta(minutes=10 * (k + 1)))
+        self.assertEqual(d.sent, [])
+        d.run(now=EVENING)
         self.assertEqual(len(d.sent), 1)
-        d.write_report(report({HA: 'promissora'}))
-        d.run(now=NOW + timedelta(minutes=40))
-        d.run(now=NOW.replace(hour=21, minute=5))
-        self.assertEqual(len(d.sent), 2)
-        self.assertIn('Resumo de', d.sent[1])
-        self.assertIn('Oscilações em menos de 24 h (não anunciadas): %s: promissora → abandonada → promissora' % HA, d.sent[1])
-        self.assertEqual(d.state()['oscillations'], [])
+        self.assertEqual(changes(d.sent), [])
+        self.assertIn('Sem alterações de estado das táticas desde o último resumo.', d.sent[0])
 
-    def test_a_reversal_that_persists_is_announced_after_24h(self):
+    def test_no_status_message_before_22_lisbon_and_one_consolidated_after(self):
+        statuses = {HA: 'promissora', HB: 'promissora', 'Stake | Faixa de odd 1,50 a 2,00': 'em observação'}
+        d = Data(self, base_state(statuses), report(statuses))
+        d.run()
+        new = {HA: 'abandonada', HB: 'promissora', 'Stake | Faixa de odd 1,50 a 2,00': 'abandonada'}
+        rows = {h: row(s_) for h, s_ in new.items()}
+        rows['Stake | Faixa de odd 1,50 a 2,00'] = row('abandonada', games_=32, game_roi=-0.252)
+        d.write_report(report(new, rows=rows))
+        for hh, mm in ((12, 10), (18, 0), (21, 0), (21, 59)):
+            d.run(now=NOW.replace(hour=hh, minute=mm))
+        self.assertEqual(d.sent, [])
+        d.run(now=NOW.replace(hour=22, minute=0))
+        d.run(now=NOW.replace(hour=22, minute=10))
+        d.run(now=NOW.replace(hour=23, minute=50))
+        self.assertEqual(len(d.sent), 1)
+        text = d.sent[0]
+        self.assertTrue(text.startswith('Resumo das táticas — 16/11\n\nStake | Faixa de odd 1,50 a 2,00\n'
+                                        'Estado: Abandonada (antes: em observação)\n32 jogos independentes · ROI −25,2%\n'
+                                        'Certificação: desligada\n\n'), text)
+        self.assertEqual(sorted(changes(d.sent)), sorted([('Stake | Faixa de odd 1,50 a 2,00', 'Estado: Abandonada (antes: em observação)'),
+                                                          (HA, 'Estado: Abandonada (antes: promissora)')]))
+        self.assertIn('saldo do dia +0,85 un.', text)
+        self.assertEqual(consistent(self, d)['announced_statuses'], {HB: 'promissora', HA: 'abandonada', 'Stake | Faixa de odd 1,50 a 2,00': 'abandonada'})
+
+    def test_a_change_after_the_summary_goes_to_the_next_summary(self):
         d = Data(self, base_state(), report())
-        d.run()
+        d.run(now=EVENING)
+        self.assertEqual((len(d.sent), changes(d.sent)), (1, []))
         d.write_report(report({HA: 'abandonada'}))
-        d.run(now=NOW + timedelta(minutes=10))
-        d.write_report(report({HA: 'promissora'}))
-        d.run(now=NOW + timedelta(minutes=20))
-        d.run(now=NOW + timedelta(hours=24, minutes=11))
-        self.assertEqual(len(d.sent), 2)
-        self.assertIn('passou a promissora (antes: abandonada)', d.sent[1])
+        d.run(now=EVENING + timedelta(minutes=30))                            # 22:35: the day's summary already went
+        d.run(now=EVENING + timedelta(hours=12))
+        self.assertEqual(len(d.sent), 1)
+        d.run(now=EVENING + timedelta(days=1))
+        self.assertEqual(changes(d.sent[1:]), [(HA, 'Estado: Abandonada (antes: promissora)')])
+        self.assertTrue(d.sent[1].startswith('Resumo das táticas — 17/11'))
+        d.write_report(report({HA: 'promissora'}))                            # a reversal one day later is a real change
+        d.run(now=EVENING + timedelta(days=2))
+        self.assertEqual(changes(d.sent[2:]), [(HA, 'Estado: Promissora (antes: abandonada)')])
 
-    def test_critical_changes_are_never_held(self):
+    def test_summer_and_winter_time_in_lisbon(self):
+        for day, first, due in (('2026-07-15', '2026-07-15T20:59:00+00:00', '2026-07-15T21:00:00+00:00'),     # WEST, UTC+1
+                                ('2026-11-16', '2026-11-16T21:59:00+00:00', '2026-11-16T22:00:00+00:00'),     # WET, UTC+0
+                                ('2026-03-29', '2026-03-29T20:59:00+00:00', '2026-03-29T21:00:00+00:00'),     # spring forward
+                                ('2026-10-25', '2026-10-25T21:59:00+00:00', '2026-10-25T22:00:00+00:00')):    # fall back
+            with self.subTest(day):
+                first, due = datetime.fromisoformat(first), datetime.fromisoformat(due)
+                self.assertIsNone(notify.summary_day(first))
+                self.assertEqual(notify.summary_day(due), day)
+                self.assertEqual(notify.summary_day(due + timedelta(hours=1, minutes=59)), day)          # 23:59 in Lisbon
+                self.assertIsNone(notify.summary_day(due + timedelta(hours=2)))                          # 00:00: next Lisbon day
+                self.assertEqual(evening(due, minute=0), due)
+                st = base_state()
+                st['summary_day'] = (due - timedelta(days=1)).date().isoformat()
+                d = Data(self, st, report())
+                d.write_report(report({HA: 'abandonada'}))
+                d.run(now=first)
+                self.assertEqual(d.sent, [])
+                d.run(now=due)
+                self.assertEqual(len(d.sent), 1)
+                self.assertEqual(changes(d.sent), [(HA, 'Estado: Abandonada (antes: promissora)')])
+                self.assertEqual(d.state()['summary_day'], day)
+
+    def test_certification_gain_and_loss_wait_for_the_summary_but_alerts_follow_at_once(self):
         rows = {HA: row('forte', confirmation=certificate())}
-        d = Data(self, base_state({HA: 'promissora'}), report({HA: 'forte'}, rows=rows, validation=active(HA)))
+        cert = lambda watch=(): report({HA: 'forte'}, rows=rows, watch=list(watch), validation=active(HA))
+        d = Data(self, base_state({HA: 'promissora'}), report())
         d.run()
-        d.write_report(report({HA: 'promissora'}, validation=OFF))           # certification lost
+        d.write_report(cert([entry('m1', reasons=[reason(HA, 'forte', certified=True)])]))
         d.run(now=NOW + timedelta(minutes=10))
-        d.write_report(report({HA: 'forte'}, rows=rows, validation=active(HA)))
-        d.run(now=NOW + timedelta(minutes=20))
-        self.assertEqual([body(m).split(',')[0].split(':')[0] for m in d.sent],
-                         ['✅ Tática validada', '⛔ Tática deixou de estar validada', '✅ Tática validada'])
+        self.assertEqual(len(d.sent), 1)                                      # eligibility is immediate: an ALERT, not a status notice
+        self.assertTrue(d.sent[0].startswith('🟢 ALERTA: Home m1 — Away m1\n'))
+        d.write_report(report({HA: 'promissora'}, validation=OFF, watch=[entry('m2', reasons=[reason(HA, 'forte', certified=True)])]))
+        d.run(now=NOW + timedelta(minutes=20))                                # certification lost: m2 is only a hint
+        self.assertEqual(len(d.sent), 2)
+        self.assertTrue(d.sent[1].startswith('A seguir: Home m2 — Away m2\nEncaixa em: %s (promissora)' % HA))
+        d.write_report(cert())
+        d.run(now=NOW + timedelta(minutes=30))
+        self.assertEqual(len(d.sent), 2)                                      # gain, loss, gain: nothing during the day
+        d.run(now=EVENING)
+        self.assertEqual(changes(d.sent[2:]), [(HA, '✅ Tática validada, passou a forte (antes: promissora): %s' % HA)])
+        self.assertIn(notify.scientific_label(cert(), HA)[0], d.sent[2])
 
     def test_certification_loss_is_announced_even_with_a_degraded_report(self):
         rows = {HA: row('forte', confirmation=certificate())}
@@ -583,9 +656,116 @@ class U08_Oscillation(unittest.TestCase):
         d.run()
         d.write_report(report({}, rows={}, validation=dict(OFF, state='ledger_invalid'), hl=0))
         d.run(now=NOW + timedelta(minutes=10))
+        self.assertEqual(d.sent, [])
+        d.run(now=EVENING)
         self.assertEqual(len(d.sent), 1)
-        self.assertIn('⛔ Tática deixou de estar validada, voltou a "em observação": %s' % HA, d.sent[0])
-        self.assertTrue(d.sent[0].startswith('Estado científico: NÃO CERTIFICADA — certificação inválida.'))
+        self.assertEqual(changes(d.sent), [(HA, '⛔ Estado: deixou de estar validada, voltou a em observação')])
+        self.assertIn('\nCertificação: inválida\n', d.sent[0])
+        self.assertIn('Estado científico: nenhuma tática certificada — certificação inválida.', d.sent[0])
+
+    def test_a_block_refused_by_the_claim_barrier_never_blocks_the_summary(self):
+        bad = 'Jogo aberto | Liga = Taça Confirmada'                         # an id with a claim word, no certificate
+        statuses = {HA: 'promissora', bad: 'promissora'}
+        d = Data(self, base_state(statuses), report(statuses))
+        d.run()
+        d.write_report(report({HA: 'abandonada', bad: 'abandonada'}))
+        d.run(now=EVENING)
+        st = consistent(self, d)
+        self.assertEqual(len(d.sent), 1)                                      # delivered, not blocked
+        self.assertEqual(changes(d.sent), [(HA, 'Estado: Abandonada (antes: promissora)')])
+        self.assertIn('1 alterações de estado não mostradas', d.sent[0])
+        self.assertNotIn('Confirmada', d.sent[0])
+        self.assertEqual(st['announced_statuses'], {HA: 'abandonada', bad: 'abandonada'})   # treated once, like a blocked notice
+        d.run(now=EVENING + timedelta(days=1))
+        self.assertNotIn('não mostradas', d.sent[1])
+
+    def test_summary_failure_and_recovery_never_duplicate(self):
+        for error, outcome in ((notify.DeliveryFailed('HTTP 400'), 'failed'), (notify.DeliveryUncertain('timeout'), 'uncertain')):
+            with self.subTest(outcome):
+                d = Data(self, base_state(), report({HA: 'abandonada'}))
+                d.run(now=EVENING, sender=d.sender(fail_at=1, error=error))
+                for minutes in (2, 10, 60):
+                    d.run(now=EVENING + timedelta(minutes=minutes))
+                st = consistent(self, d)
+                self.assertEqual(d.sent, [])                                  # never resent the same day
+                self.assertEqual(st['deliveries']['summary|2026-11-16']['state'], outcome)
+                self.assertEqual(st['summary_day'], '2026-11-16')
+                d.run(now=EVENING + timedelta(days=1))
+                self.assertEqual(len(d.sent), 1)                              # the next day: one summary
+                self.assertIn('Avisos desde o último resumo: 0 entregues, %d com falha, %d incertos'
+                              % (outcome == 'failed', outcome == 'uncertain'), d.sent[0])
+
+    def test_crash_during_the_summary_is_never_resent(self):
+        d = Data(self, base_state(), report({HA: 'abandonada'}))
+
+        def crash(name):
+            if name == 'after_response':
+                raise Crash()
+        with self.assertRaises(Crash):
+            d.run(now=EVENING, checkpoint=crash)
+        self.assertEqual(len(d.sent), 1)
+        d.run(now=EVENING + timedelta(minutes=2))
+        st = consistent(self, d)
+        self.assertEqual(len(d.sent), 1)
+        self.assertEqual(st['deliveries']['summary|2026-11-16']['state'], 'uncertain')
+        self.assertEqual(st['announced_statuses'], {HA: 'abandonada'})       # effects recorded with the intent
+
+    def test_pending_summary_waits_and_includes_later_changes(self):
+        statuses = {HA: 'promissora', HB: 'promissora'}
+        d = Data(self, base_state(statuses), report(statuses))
+        d.run()
+        d.write_report(report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1')]))
+        d.run(now=EVENING, sender=d.sender(fail_at=1, error=notify.DeliveryFailed('HTTP 429')))   # the bet fails: summary stays pending
+        st = d.state()
+        self.assertEqual(st['deliveries']['summary|2026-11-16']['state'], 'pending')
+        self.assertEqual(st['announced_statuses'], statuses)                 # nothing announced while pending
+        d.write_report(report({HA: 'abandonada', HB: 'abandonada'}))
+        d.run(now=EVENING + timedelta(minutes=10))
+        self.assertEqual(len(d.sent), 1)
+        self.assertEqual(sorted(changes(d.sent)), sorted([(HA, 'Estado: Abandonada (antes: promissora)'), (HB, 'Estado: Abandonada (antes: promissora)')]))
+        consistent(self, d)
+
+    def test_existing_history_with_old_status_keys_is_compatible(self):
+        # A production-like state written by the previous format: status notices delivered and one still pending.
+        st = migrated(base_state({HA: 'promissora'}))
+        st['deliveries'] = {'status|em observação>promissora|abc|31@x|def': {'kind': 'status', 'state': 'delivered', 'events': ['pending', 'intent', 'delivered']},
+                            'status|promissora>abandonada|abc|31@x|def': {'kind': 'status', 'state': 'pending', 'events': ['pending']}}
+        st['delivery_counts'] = {'delivered': 1}
+        st['oscillations'] = [{'id': HB, 'path': ['promissora', 'abandonada', 'promissora'], 'announced_utc': '2026-11-16T08:00:00+00:00'}]
+        d = Data(self, st, report({HA: 'abandonada'}))
+        (d.path / notify.LOG_NAME).write_text(''.join(json.dumps({'v': 1, 'key': k, 'event': e, 'kind': 'status'}) + '\n'
+                                                       for k, evs in (('status|em observação>promissora|abc|31@x|def', ('pending', 'intent', 'delivered')),
+                                                                      ('status|promissora>abandonada|abc|31@x|def', ('pending',))) for e in evs))
+        log_before = d.log_bytes()
+        d.run()
+        st = consistent(self, d)
+        self.assertEqual(d.sent, [])                                          # the old pending status notice is never sent now
+        self.assertEqual(st['deliveries']['status|promissora>abandonada|abc|31@x|def']['state'], 'expired')
+        self.assertEqual(st['sent_total'], 312)
+        d.run(now=EVENING)
+        self.assertEqual(changes(d.sent), [(HA, 'Estado: Abandonada (antes: promissora)')])    # it goes to the summary instead
+        self.assertIn('Oscilações em menos de 24 h (não anunciadas): %s' % HB, d.sent[0])
+        st = consistent(self, d)
+        self.assertEqual((st['sent_total'], st['oscillations']), (313, []))
+        self.assertTrue(d.log_bytes().startswith(log_before))
+
+    def test_many_changes_never_exceed_one_message_and_the_rest_wait(self):
+        hids = ['Jogo aberto | Liga = Liga número %02d com um nome bastante comprido para encher' % i for i in range(60)]
+        rows = {h: row(ids=games('L%02d' % i, 40), conditions=[('Liga', h)]) for i, h in enumerate(hids)}
+        d = Data(self, base_state({}), report({}, rows={}))
+        d.run()
+        d.write_report(report({h: 'promissora' for h in hids}, rows=rows))
+        for k in range(8):
+            d.run(now=EVENING + timedelta(days=k))
+        self.assertGreater(len(d.sent), 1)
+        seen = [h for h, _ in changes(d.sent)]
+        self.assertEqual(sorted(seen), sorted(hids))                          # every change once, none lost, none repeated
+        self.assertEqual(len(seen), len(set(seen)))
+        self.assertIn('ficam para o próximo resumo', d.sent[0])
+        self.assertEqual(changes(d.sent[-1:]), [])                            # all announced, nothing left over
+        for m in d.sent:
+            self.assertLessEqual(len(m), notify.MAX_TEXT)
+            self.assertNotIn('mensagem encurtada', m)
 
 
 class U09_Pending(unittest.TestCase):
@@ -621,14 +801,18 @@ class U10_U11_ForgedCertificates(unittest.TestCase):
                 w = entry('m1', reasons=[reason(HA, 'forte', certified=True)])
                 d = Data(self, base_state({HA: 'promissora', HB: 'promissora'}), report({HA: 'forte', HB: 'promissora'}, rows=rows, watch=[w], validation=validation))
                 d.run()
-                d.run(now=NOW.replace(hour=21, minute=1))
-                self.assertEqual(notify.certificate(json.loads((d.path / 'report.json').read_text()), HA), None)
+                d.run(now=EVENING)
+                rep = json.loads((d.path / 'report.json').read_text())
+                self.assertEqual(notify.certificate(rep, HA), None)
+                self.assertEqual(len(d.sent), 2, name)                                  # the hint and the summary
                 for m in d.sent:
                     folded = notify.fold(m)
                     self.assertNotIn('validad', folded, name)
                     self.assertNotIn('forte', folded, name)
                     self.assertNotIn('ALERTA', m, name)
-                    self.assertTrue(labelled(m), name)
+                    self.assertFalse(any('CERTIFICADA' in x and x.endswith(HA) for x in m.split('\n')), name)   # never for HA
+                    self.assertTrue(notify.guard_claims(m, rep, sorted(notify.certified_ids(rep)) if m.startswith('Resumo') else []), name)   # only real certificates
+                    self.assertNotIn(HA, notify.certified_ids(rep), name)
                 self.assertEqual(d.state()['statuses'][HA], 'promissora', name)
                 self.assertTrue(any('A seguir:' in m and '(promissora)' in m for m in d.sent), name)
 
@@ -637,8 +821,10 @@ class U10_U11_ForgedCertificates(unittest.TestCase):
         d.run()
         d.write_report(report({HA: 'forte'}, rows={HA: row('forte', last_to='forte')}))
         d.run(now=NOW + timedelta(minutes=2))
+        self.assertEqual(d.sent, [])
+        d.run(now=EVENING)
         self.assertEqual(len(d.sent), 1)
-        self.assertIn('Hipótese passou a promissora (antes: em observação)', d.sent[0])
+        self.assertEqual(changes(d.sent), [(HA, 'Estado: Promissora (antes: em observação)')])
         self.assertNotIn('forte', notify.fold(d.sent[0]))
         self.assertNotIn('validad', notify.fold(d.sent[0]))
 
@@ -646,11 +832,13 @@ class U10_U11_ForgedCertificates(unittest.TestCase):
         rows = {HA: row('forte', confirmation=certificate(3))}
         d = Data(self, base_state(), report({HA: 'forte'}, rows=rows, watch=[entry('m1', reasons=[reason(HA, 'forte', certified=True)])], validation=active(HA)))
         d.run()
-        self.assertEqual(len(d.sent), 2)
+        self.assertEqual(len(d.sent), 1)
         label = 'Estado científico: CERTIFICADA — método eprocess_online_alpha_v1, registo verificado, seleção n.º 3, certificada em 2026-11-15 10:00 UTC: %s' % HA
-        self.assertTrue(all(m.startswith(label) for m in d.sent))
-        self.assertTrue(body(d.sent[0]).startswith('🟢 ALERTA'))
-        self.assertTrue(body(d.sent[1]).startswith('✅ Tática validada, passou a forte: %s' % HA))
+        self.assertEqual(d.sent[0].split('\n'), ['🟢 ALERTA: Home m1 — Away m1', '🟢 Tática validada (forte): %s' % HA, 'Aposta: Over 2.5 @ 1,9', label])
+        d.run(now=EVENING)
+        self.assertEqual(len(d.sent), 2)
+        self.assertIn('\n%s\n' % label, d.sent[1])
+        self.assertEqual(changes(d.sent[1:]), [(HA, '✅ Tática validada, passou a forte (antes: promissora): %s' % HA)])
 
 
 LLM_TEXT = 'Tática VALIDADA e certificada: confirmada pelo modelo, forte!'
@@ -665,7 +853,7 @@ class U12_U13_Claims(unittest.TestCase):
         rep['brain']['llm'] = [{'id': HA, 'reason': LLM_TEXT}]
         d = Data(self, base_state(), rep)
         d.run()
-        d.run(now=NOW.replace(hour=21, minute=1))
+        d.run(now=EVENING)
         self.assertEqual(len(d.sent), 2)
         for m in d.sent:
             self.assertNotIn('modelo, forte', m)
@@ -841,7 +1029,7 @@ class U15_PostCutoverCheck(unittest.TestCase):
 
 
 class U16_LongMessages(unittest.TestCase):
-    def test_forty_hypotheses_fit_and_keep_the_scientific_state(self):
+    def test_forty_hypotheses_fit_and_keep_one_bet_line(self):
         ids = games('g', 40)
         rows = {'Jogo aberto | Minuto = 31 a 60 & Liga = L%02d com um nome comprido para encher a mensagem' % i:
                 row(ids=ids, conditions=[('Minuto', '31 a 60'), ('Liga', 'L%02d com um nome comprido para encher a mensagem' % i)][:1 + (i > 0)], games_=40)
@@ -849,18 +1037,20 @@ class U16_LongMessages(unittest.TestCase):
         d = Data(self, base_state({}), report({}, rows={}))
         d.run()
         d.write_report(report({h: 'promissora' for h in rows}, rows=rows))
-        d.run(now=NOW + timedelta(minutes=2))
-        self.assertTrue(d.sent)
-        for m in d.sent:
-            self.assertLessEqual(len(m), notify.MAX_TEXT)
-            self.assertTrue(m.startswith('Estado científico: NÃO CERTIFICADA — certificação desligada.'))
+        d.run(now=EVENING)
+        self.assertEqual(len(d.sent), 1)
+        self.assertLessEqual(len(d.sent[0]), notify.MAX_TEXT)
+        self.assertIn('Estado científico: nenhuma tática certificada — certificação desligada.', d.sent[0])
         reasons = [reason(h) for h in rows]
         w = entry('m1', reasons=reasons)
         text = notify.messages(report({h: 'promissora' for h in rows}, rows={h: dict(r, game_ids=None) for h, r in rows.items()}, watch=[w]),
                                base_state({h: 'promissora' for h in rows}), NOW)[0]
         self.assertLessEqual(len(text), notify.MAX_TEXT)
-        self.assertTrue(labelled(text))
-        self.assertIn('mensagem encurtada', text)
+        lines = text.split('\n')
+        self.assertEqual(lines[0], 'A seguir: Home m1 — Away m1')
+        self.assertEqual(sum(x.startswith('Encaixa em:') for x in lines), notify.MAX_GROUPS_PER_MESSAGE)
+        self.assertEqual([x for x in lines if x.startswith('Aposta:')], ['Aposta: Over 2.5 @ 1,9'])     # the bet once
+        self.assertIn('… e mais 32 grupos de táticas.', lines)
 
 
 class U17_Preview(unittest.TestCase):
@@ -904,16 +1094,19 @@ class U17_Preview(unittest.TestCase):
 
 
 class U18_DailySummary(unittest.TestCase):
-    def test_one_summary_per_day_after_21_utc(self):
+    def test_one_summary_per_day_at_22_lisbon(self):
         d = Data(self, base_state(), report())
-        for hh, mm in ((20, 59), (21, 0), (21, 30), (23, 59)):
+        for hh, mm in ((20, 59), (21, 0), (21, 59), (22, 0), (22, 30), (23, 59)):
             d.run(now=NOW.replace(hour=hh, minute=mm))
         self.assertEqual(len(d.sent), 1)
-        self.assertIn('Resumo de 16/11', d.sent[0])
+        self.assertTrue(d.sent[0].startswith('Resumo das táticas — 16/11\nSem alterações de estado das táticas desde o último resumo.\n'))
+        self.assertEqual(consistent(self, d)['deliveries']['summary|2026-11-16']['state'], 'delivered')
         self.assertIn('saldo do dia +0,85 un.', d.sent[0])
         self.assertNotIn('fortes', d.sent[0])
         self.assertNotIn('confirmadas', d.sent[0])
         d.run(now=NOW.replace(hour=21) + timedelta(days=1))
+        self.assertEqual(len(d.sent), 1)
+        d.run(now=NOW.replace(hour=22) + timedelta(days=1))
         self.assertEqual(len(d.sent), 2)
         self.assertIn('Avisos desde o último resumo: 1 entregues', d.sent[1])
 
@@ -948,7 +1141,7 @@ class U20_Log(unittest.TestCase):
             d.write_report(report(watch=[entry('m%d' % i, minutes=-i) for i in range(1, k + 2)]))
             d.run(now=NOW + timedelta(minutes=2 * k))
             snapshots.append(d.log_bytes())
-        d.run(now=NOW.replace(hour=21, minute=1))
+        d.run(now=EVENING)
         snapshots.append(d.log_bytes())
         for a, b in zip(snapshots, snapshots[1:]):
             self.assertTrue(b.startswith(a))
@@ -996,32 +1189,82 @@ class X_Sender(unittest.TestCase):
 
 
 class X_Presentation(unittest.TestCase):
-    def test_order_of_the_content(self):
-        rep = report(watch=[entry('m1')])
-        text = notify.messages(rep, base_state(), NOW)[0]
-        order = ['Estado científico', 'A seguir:', 'Encaixa em:', 'Jogos independentes', 'ROI por jogo', 'Probabilidade de estar acima',
-                 'Evidência nova', 'Aposta:', 'Jogo às']
-        pos = [text.index(k) for k in order]
-        self.assertEqual(pos, sorted(pos), text)
-        self.assertIn('ROI por jogo: +25,9 % à odd anunciada; +23,1 % com 2 % de perda de odd', text)
-        self.assertIn('Evidência nova: 30 jogos prospetivos desde o registo; primeiro aviso desta hipótese.', text)
+    """telegram_bet_short_v1: a simple bet is exactly three lines; science lives in the 22:00 summary."""
 
-    def test_new_evidence_since_the_last_notice(self):
-        d = Data(self, base_state(), report(watch=[entry('m1')]))
-        d.run()
-        rows = {HA: row(prospective=34)}
-        d.write_report(report(rows=rows, watch=[entry('m2')]))
-        d.run(now=NOW + timedelta(minutes=2))
-        self.assertIn('Evidência nova: 34 jogos prospetivos desde o registo; +4 desde o último aviso.', d.sent[1])
+    def test_a_simple_bet_is_exactly_three_lines(self):
+        hid = 'Jogo aberto | Ritmo indicado pelo bot = menos de 90'
+        rep = report({hid: 'promissora'}, watch=[entry('m1', 'Over 5', match='UTC Cajamarca — CD Los Chankas', odds=1.91, reasons=[reason(hid)])])
+        text = notify.messages(rep, base_state({hid: 'promissora'}), NOW)[0]
+        self.assertEqual(text, 'A seguir: UTC Cajamarca — CD Los Chankas\n'
+                               'Encaixa em: Jogo aberto | Ritmo indicado pelo bot = menos de 90 (promissora)\n'
+                               'Aposta: Over 5 @ 1,91')
 
-    def test_every_kind_of_message_starts_with_the_scientific_state(self):
+    def test_no_science_in_bet_notices(self):
+        rep = report(watch=[entry('m1'), entry('m2', 'Under 1.5', minutes=-1, odds=2.05, kickoff=30)])
+        for text in notify.messages(rep, base_state(), NOW):
+            self.assertEqual(len(text.split('\n')), 3, text)
+            for banned in ('Estado científico', 'ROI', 'Probabilidade', 'Jogos independentes', 'jogos independentes', 'Evidência',
+                           'Vantagem', 'acerto', 'Jogo às', 'recomendação', 'garantem', '%'):
+                self.assertNotIn(banned, text)
+
+    def test_every_tactic_and_new_selections_keep_odds_and_selection(self):
+        tactics = ['Jogo aberto | Minuto = 31 a 60', 'Stake | Faixa de odd 1,50 a 2,00', 'Polymarket | Momento = durante o jogo',
+                   'Golo a caminho | Liga = Liga X', 'Uma família futura | Dimensão nova = valor']
+        for k, hid in enumerate(tactics):
+            with self.subTest(hid):
+                w = entry('t%d' % k, 'Mais de %d.5 golos' % k, market='Mercado %d' % k, odds=1.5 + k / 100, reasons=[reason(hid)])
+                text = notify.messages(report({hid: 'promissora'}, watch=[w]), base_state({hid: 'promissora'}), NOW)[0]
+                self.assertEqual(text.split('\n'), ['A seguir: Home t%d — Away t%d' % (k, k), 'Encaixa em: %s (promissora)' % hid,
+                                                    'Aposta: Mais de %d.5 golos @ %s' % (k, ('%s' % (1.5 + k / 100)).replace('.', ','))])
+
+    def test_several_tactics_and_selections_never_duplicate_a_bet(self):
+        rows = {HA: row(ids=games('a', 40), conditions=[('Minuto', '31 a 60')]), HC: row(ids=games('c', 40), conditions=[('Liga', 'Liga X')])}
+        st = {HA: 'promissora', HC: 'promissora'}
+        both = [reason(HA), reason(HC)]
+        watch = [entry('m1', 'Over 2.5', reasons=both), entry('m1', 'BTTS Yes', market='BTTS', odds=1.8, reasons=[reason(HC)]),
+                 entry('m1', 'Over 3.5', odds=2.4, reasons=both)]
+        text = notify.messages(report(st, rows=rows, watch=watch), base_state(st), NOW)[0]
+        lines = text.split('\n')
+        self.assertEqual(lines, ['A seguir: Home m1 — Away m1',                       # tactics in group order (games, then id)
+                                 'Encaixa em: %s (promissora)' % HC, 'Encaixa em: %s (promissora)' % HA, 'Aposta: Over 2.5 @ 1,9; Over 3.5 @ 2,4',
+                                 'Encaixa em: %s (promissora)' % HC, 'Aposta: BTTS Yes @ 1,8'])
+        for sel in ('Over 2.5 @ 1,9', 'Over 3.5 @ 2,4', 'BTTS Yes @ 1,8'):
+            self.assertEqual(text.count(sel), 1)
+
+    def test_status_shown_for_a_hint_is_never_a_validated_one(self):
+        w = entry('m1', reasons=[reason(HA, 'forte', certified=True), reason(HB, 'abandonada')])
+        rep = report({HA: 'forte', HB: 'abandonada'}, watch=[w])           # forte without any certificate
+        text = notify.messages(rep, base_state({HA: 'promissora', HB: 'abandonada'}), NOW)[0]
+        self.assertEqual(text.split('\n')[:1], ['A seguir: Home m1 — Away m1'])
+        self.assertIn('Encaixa em: %s (promissora)' % HA, text)
+        self.assertNotIn('forte', notify.fold(text))
+        self.assertTrue(notify.guard_claims(text, rep))
+
+    def test_an_alert_carries_the_exact_certificate_and_a_hint_never_does(self):
+        rows = {HA: row('forte', confirmation=certificate(2)), HB: row('promissora')}
+        rep = report({HA: 'forte', HB: 'promissora'}, rows=rows, validation=active(HA),
+                     watch=[entry('m1', reasons=[reason(HA, 'forte', certified=True), reason(HB)]), entry('m2', reasons=[reason(HB)])])
+        out = notify.messages(rep, base_state({HA: 'forte', HB: 'promissora'}), NOW)
+        alert = next(m for m in out if m.startswith('🟢 ALERTA'))
+        hint = next(m for m in out if m.startswith('A seguir'))
+        label = notify.scientific_label(rep, HA)[0]
+        self.assertEqual(alert.split('\n'), ['🟢 ALERTA: Home m1 — Away m1', '🟢 Tática validada (forte): %s' % HA,
+                                              'Encaixa em: %s (promissora)' % HB, 'Aposta: Over 2.5 @ 1,9', label])
+        self.assertTrue(notify.guard_claims(alert, rep, [HA]))
+        self.assertFalse(notify.guard_claims(alert.replace('\n' + label, ''), rep, [HA]))   # without the label: blocked
+        self.assertEqual(hint.split('\n'), ['A seguir: Home m2 — Away m2', 'Encaixa em: %s (promissora)' % HB, 'Aposta: Over 2.5 @ 1,9'])
+
+    def test_every_non_bet_message_carries_the_scientific_state(self):
         st = base_state()
         st['hello'] = False
         rep = report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1')],
                      regime=[{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}])
-        out = notify.messages(rep, st, NOW.replace(hour=21, minute=5))
-        self.assertEqual(len(out), 6)            # hello, game, two status changes, regime, summary
-        self.assertTrue(all(labelled(m) for m in out))
+        out = notify.messages(rep, st, EVENING)
+        self.assertEqual(len(out), 4)            # hello, game, regime, ONE summary with both status changes
+        self.assertEqual([labelled(m) for m in out], [True, False, True, False])
+        self.assertIn('Estado científico: nenhuma tática certificada — certificação desligada.', out[3])
+        self.assertEqual(len(changes(out)), 2)
+        self.assertTrue(all(notify.guard_claims(m, rep) for m in out))
 
     def test_report_without_presentation_announces_no_status_change(self):
         rep = report({HA: 'abandonada'})

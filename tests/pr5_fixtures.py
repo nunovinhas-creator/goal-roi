@@ -37,3 +37,29 @@ def body(text):
     while len(lines) > 1 and lines[0].startswith('Estado científico:'):
         lines.pop(0)
     return '\n'.join(lines)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Daily-summary schedule (telegram_bet_short_v1): status changes are announced ONLY in the 22:00 Europe/Lisbon summary.
+
+def evening(t, minute=5):
+    """22:MM in Lisbon on the Lisbon date of `t`, as UTC (the daily summary, the only place a status change is announced)."""
+    from datetime import timezone
+    from zoneinfo import ZoneInfo
+    local = t.astimezone(ZoneInfo('Europe/Lisbon')).replace(hour=22, minute=minute, second=0, microsecond=0)
+    return local.astimezone(timezone.utc)
+
+
+def changes(texts):
+    """Status changes announced in the daily summaries among `texts`: [(hypothesis id, state line)]."""
+    out = []
+    for t in texts:
+        if not t.startswith('Resumo das táticas'):
+            continue
+        for block in t.split('\n\n')[1:]:
+            lines = block.split('\n')
+            if lines[0].startswith('✅'):
+                out.append((lines[0].rsplit(': ', 1)[1], lines[0]))
+            elif len(lines) > 1 and lines[1].startswith(('Estado: ', '⛔ Estado: ')):
+                out.append((lines[0], lines[1]))
+    return out

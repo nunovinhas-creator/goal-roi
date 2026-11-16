@@ -14,7 +14,9 @@ from contextlib import redirect_stdout
 from datetime import datetime
 from unittest.mock import patch
 
-from pr5_fixtures import body, present
+from datetime import timedelta
+
+from pr5_fixtures import body, changes, evening, present
 from scangoal import brain, notify
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -158,12 +160,14 @@ class PR2Cutover(unittest.TestCase):
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
         state = self.state()
         self.assertEqual(notify.messages(pr2_report(), copy.deepcopy(state), NOW), [])   # next cycle: nothing historical
+        self.assertEqual(changes(notify.messages(pr2_report(), state, evening(NOW))), [])   # nor in the 22:00 summary
         later = dict(PR2_STATUSES, n2='promissora')
         later.pop('k0')
-        msgs = notify.messages(present(pr2_report(later), observed=['k0']), state, NOW)   # PR 5: changes shown by the report
-        self.assertEqual(sorted(body(m).split('\n')[0] for m in msgs),
-                         sorted(['Hipótese passou a promissora (antes: em observação): n2', 'Hipótese voltou a "em observação" (antes: promissora): k0']))
-        self.assertEqual(notify.messages(present(pr2_report(later), observed=['k0']), state, NOW), [])   # notified once
+        self.assertEqual(notify.messages(present(pr2_report(later), observed=['k0']), state, NOW + timedelta(days=1)), [])   # not before 22:00
+        msgs = notify.messages(present(pr2_report(later), observed=['k0']), state, evening(NOW + timedelta(days=1)))
+        self.assertEqual(sorted(changes(msgs)),
+                         sorted([('n2', 'Estado: Promissora (antes: em observação)'), ('k0', 'Estado: Em observação (antes: promissora)')]))
+        self.assertEqual(changes(notify.messages(present(pr2_report(later), observed=['k0']), state, evening(NOW + timedelta(days=2)))), [])   # once
 
     # --- guards --------------------------------------------------------------------------------------------------
     def test_rerun_after_committed_cutover_cannot_reset_the_reference(self):

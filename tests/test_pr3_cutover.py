@@ -14,7 +14,9 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from pr5_fixtures import body, present
+from datetime import timedelta
+
+from pr5_fixtures import body, changes, evening, present
 from scangoal import brain, notify
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -160,13 +162,14 @@ class PR3Cutover(unittest.TestCase):
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
         state = self.state()
         self.assertEqual(notify.messages(pr3_report(), state, NOW), [])                  # cycle 1
-        self.assertEqual(notify.messages(pr3_report(), state, NOW), [])                  # cycle 2
+        self.assertEqual(changes(notify.messages(pr3_report(), state, evening(NOW))), [])  # cycle 2 = the 22:00 summary: nothing historical
         later = dict(PR3_STATUSES, n2='promissora')
         later.pop('k0')
-        msgs = notify.messages(present(pr3_report(later), observed=['k0']), state, NOW)   # PR 5: changes shown by the report
-        self.assertEqual(sorted(body(m).split('\n')[0] for m in msgs),
-                         sorted(['Hipótese passou a promissora (antes: em observação): n2', 'Hipótese voltou a "em observação" (antes: promissora): k0']))
-        self.assertEqual(notify.messages(present(pr3_report(later), observed=['k0']), state, NOW), [])
+        self.assertEqual(notify.messages(present(pr3_report(later), observed=['k0']), state, NOW + timedelta(days=1)), [])   # not before 22:00
+        msgs = notify.messages(present(pr3_report(later), observed=['k0']), state, evening(NOW + timedelta(days=1)))
+        self.assertEqual(sorted(changes(msgs)),
+                         sorted([('n2', 'Estado: Promissora (antes: em observação)'), ('k0', 'Estado: Em observação (antes: promissora)')]))
+        self.assertEqual(changes(notify.messages(present(pr3_report(later), observed=['k0']), state, evening(NOW + timedelta(days=2)))), [])
 
     def test_rerun_is_idempotent_after_the_committed_cutover(self):
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])

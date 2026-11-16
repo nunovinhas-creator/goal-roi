@@ -1,8 +1,9 @@
 """Avisos pelo Telegram, por um bot do utilizador (API de bots; não usa a conta que lê o ScanGoal).
 
 Envia: aviso de jogo (indício, ou ALERTA só com certificado ativo e verificado da própria hipótese), um por jogo, com as
-seleções novas desse jogo; mudanças de estado de hipóteses, uma mensagem por grupo de hipóteses equivalentes; mudanças de
-comportamento de um tipo de sinal; e um resumo diário depois das 21:00 UTC.
+seleções novas desse jogo, em formato curto ("A seguir" / "Encaixa em" / "Aposta"); mudanças de comportamento de um tipo de
+sinal; e um ÚNICO resumo diário às 22:00 de Lisboa (Europe/Lisbon, hora de verão e de inverno), que é também o único sítio
+onde saem as mudanças de estado das hipóteses (promoções, abandonos, ganho ou perda de certificação), em blocos curtos.
 
 PR 5 (formato `telegram_format_v2`):
 - Entrega "no máximo uma vez": cada acontecimento tem uma chave determinística. A intenção é gravada (estado atómico e
@@ -12,9 +13,10 @@ PR 5 (formato `telegram_format_v2`):
 - Consolidação: um aviso por jogo; reforços do mesmo (jogo, mercado, seleção) nunca geram outro aviso; hipóteses
   equivalentes (Jaccard >= 0,85 nos jogos, ligação completa e compatibilidade da PR 4) saem numa só mensagem.
 - Mudanças de estado só com relatório saudável, hipótese presente, sem estado pendente e com a mudança registada pelo
-  cérebro; reversões em menos de 24 h ficam para o resumo, exceto as críticas (entrada ou saída de "validada").
-- Estado científico no topo de cada mensagem; afirmações positivas só com certificado verificado da hipótese citada
-  (`scientific_label` + barreira final `guard_claims`).
+  cérebro (a perda de certificação passa mesmo com relatório degradado); só no resumo diário. A elegibilidade das apostas
+  (indício ou alerta) segue o certificado do relatório em cada recolha, sem esperar pelo resumo.
+- Afirmações positivas só com certificado verificado da hipótese citada (`scientific_label` + barreira final `guard_claims`):
+  um ALERTA leva o rótulo exato da tática certificada; um indício não faz nenhuma afirmação de certificação.
 Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nunca é impresso nem gravado). Sem eles, não faz
 nada. `--preview` nunca os lê, nunca abre ligações e nunca grava estado.
 """
@@ -35,7 +37,7 @@ from .store import data_dir
 STATUS_MIGRATION = 'eligible_statuses_v1'
 FORMAT_MIGRATION = 'telegram_format_v2'
 EVIDENCE_SCOPE = 'eligible_bets_only'
-SUMMARY_HOUR_UTC = 21
+SUMMARY_HOUR_LISBON = 22            # resumo diário (e únicas mensagens de mudança de estado) às 22:00 de Lisboa
 MAX_WATCH_PER_RUN = 5             # jogos (não sinais) por execução
 MAX_GROUPS_PER_MESSAGE = 8
 MAX_TEXT = 3900
@@ -44,7 +46,7 @@ VALIDATION_METHOD = 'eprocess_online_alpha_v1'   # único método aceite para an
 ALERT_MAX_AGE_MIN = 30            # alerta só se o jogo ainda não começou ou se o sinal tem no máximo 30 minutos
 TAU = 0.85                        # Jaccard mínimo entre os jogos de duas hipóteses para as agrupar (só apresentação)
 GROUP_MIN_GAMES = 8
-OSCILLATION_HOURS = 24            # reversão de uma mudança anunciada há menos de 24 h: vai para o resumo
+OSCILLATION_HOURS = 24            # só para mostrar registos antigos de oscilações (o resumo diário já as absorve)
 DEGRADED_ACCEPT_HOURS = 24        # degradação estável há 24 h: passa a ser a nova referência (atrasa, nunca descarta)
 COUNT_DROP_TOLERANCE = 0.02       # queda relativa tolerada no universo elegível, hipóteses e apostas com resultado
 LEGACY_PAIR_DAYS = 3
@@ -105,16 +107,8 @@ def pct(v):
     return '—' if v is None else ('%.0f %%' % (v * 100))
 
 
-def pts(v):
-    return '—' if v is None else ('%+.0f' % (v * 100))
-
-
 def dec(v):
     return ('%+.2f' % v).replace('.', ',')
-
-
-def spct(v):
-    return '—' if v is None else ('%+.1f' % (v * 100)).replace('.', ',') + ' %'
 
 
 def odd(v):
@@ -431,7 +425,7 @@ def health_problems(ref, cur, explained=False):
             out.append(why)
     if ref.get('validation_state') != cur.get('validation_state') and not (ref.get('validation_state') == 'not_activated'
                                                                           and cur.get('validation_state') == 'active'):
-        out.append('estado da verificação da certificação mudou')
+        out.append('estado de verificação do registo mudou')   # sem palavras de afirmação: o resumo cita este texto
     for k, why in (('eligible', 'universo elegível caiu'), ('hypotheses', 'hipóteses em falta'), ('settled_bets', 'resultados em falta')):
         if ref.get(k) is not None and (cur.get(k) is None or cur[k] < ref[k] * (1 - COUNT_DROP_TOLERANCE)):
             out.append(why)
@@ -508,7 +502,7 @@ class Notice:
 
 def fit(lines):
     """<= MAX_TEXT caracteres sem cortar o topo (estado científico e título): corta linhas do fim e assinala o corte."""
-    lines = [x for x in lines if x]
+    lines = [x for x in lines if x is not None]           # '' é uma linha em branco intencional (blocos do resumo)
     text = '\n'.join(lines)
     if len(text) <= MAX_TEXT:
         return text
@@ -530,37 +524,6 @@ def labels(report, hids):
         if text not in out:
             out.append(text)
     return out, claims
-
-
-def evidence_lines(report, state, hid, reason=None, members=()):
-    """Jogos independentes, ROI, probabilidade e evidência nova (nesta ordem). reason: dados do sinal em aberto (watch)."""
-    row, reason = hypothesis_row(report, hid) or {}, reason or {}
-    get = lambda k: row.get(k) if row.get(k) is not None else reason.get(k)
-    games, n = get('games'), get('n')
-    out = []
-    if members:
-        listed = '; '.join(members)
-        out.append('e mais %d equivalente%s (partilham ≥ %d %% dos jogos): %s'
-                   % (len(members), 's' if len(members) > 1 else '', round(TAU * 100), listed if len(listed) < 900 else listed[:900] + '…'))
-    if games is not None:
-        acc = ''
-        if reason.get('hit_rate') is not None and n is not None:
-            acc = ' (acerto %s em %d resultados; a odd exige %s)' % (pct(reason['hit_rate']), n, pct(reason.get('break_even')))
-        out.append('Jogos independentes: %d%s' % (games, acc))
-    if row.get('game_roi') is not None:
-        out.append('ROI por jogo: %s à odd anunciada; %s com 2 %% de perda de odd' % (spct(row['game_roi']), spct(row.get('game_roi_cut'))))
-    elif get('roi') is not None:
-        out.append('ROI por aposta à odd anunciada: %s' % spct(get('roi')))
-    if get('prob_above') is not None:
-        out.append('Probabilidade de estar acima do necessário: %s; com 2 %% de perda de odd: %s' % (pct(get('prob_above')), pct(get('prob_above_cut'))))
-    ci = get('edge_ci')
-    if isinstance(ci, list) and len(ci) == 2:
-        out.append('Vantagem estimada: %s pontos (entre %s e %s).' % (pts(get('edge')), pts(ci[0]), pts(ci[1])))
-    pro, last = row.get('prospective_games'), (state.get('notice_games') or {}).get(hid)
-    if pro is not None:
-        since = ('primeiro aviso desta hipótese' if last is None else '%+d desde o último aviso' % (pro - last))
-        out.append('Evidência nova: %d jogos prospetivos desde o registo; %s.' % (pro, since))
-    return out
 
 
 def legacy_key(w):
@@ -643,14 +606,22 @@ def _epoch(v):
 
 
 def game_notice(report, state, now, gk, g):
+    """Aviso curto para apostar (formato `telegram_bet_short_v1`). Uma aposta simples dá exatamente três linhas:
+        A seguir: <jogo>
+        Encaixa em: <tática> (<estado>)
+        Aposta: <seleção> @ <odd>
+    Várias táticas ou seleções: cada APOSTA aparece uma só vez, por baixo das táticas que a sustentam (as apostas com o
+    mesmo conjunto de táticas ficam juntas). Um ALERTA (só com certificado ativo, verificado e da própria tática) acrescenta,
+    no fim, o rótulo científico exato dessa tática, que `guard_claims` exige para qualquer afirmação positiva. Nada de ROI,
+    probabilidades, jogos independentes, evidência ou textos finais: essa informação vai para o resumo diário."""
     items = sorted(g['items'].items(), key=lambda kv: (kv[1]['level'] != 'alerta', kv[0]))
     first = items[0][1]['entries'][0]
-    reasons, covers, alerted = {}, {}, set()
+    reasons, covers, alerted, bets = {}, {}, set(), []
     for ik, it in items:
         latest = max(it['entries'], key=lambda w: w.get('date_utc') or '')
         sel = '%s%s' % (latest.get('selection') or 'mais um golo', (' @ ' + odd(latest['odds'])) if latest.get('odds') else '')
-        if len(it['entries']) > 1:
-            sel += ' (%d sinais)' % len(it['entries'])
+        if sel not in bets:
+            bets.append(sel)
         for w in it['entries']:
             for x in w['reasons']:
                 if isinstance(x, dict) and isinstance(x.get('id'), str):
@@ -662,45 +633,42 @@ def game_notice(report, state, now, gk, g):
     # Certificadas e não certificadas nunca no mesmo grupo: o alerta só fala das certificadas, as outras são indício.
     grouped = groups_of(report, [h for h in reasons if h in alerted]) + groups_of(report, [h for h in reasons if h not in alerted])
     shown = grouped[:MAX_GROUPS_PER_MESSAGE]
-    head, claims = labels(report, [h for gr in shown for h in gr])
     match = first.get('match') or 'Jogo'
     update = ' (nova seleção num jogo já avisado)' if g.get('previous') else ''
-    lines = head + [('🟢 ALERTA%s: %s' % (update, match)) if g['alert'] else ('A seguir%s: %s' % (update, match))]
-    if g.get('previous'):
-        lines.append('Apostas já avisadas neste jogo: %d (não repetidas).' % g['previous'])
-    effects = []
-    per_group = []
-    for gr in shown:
-        sels = []
-        for h in gr:
-            for s_ in covers.get(h, ()):
-                if s_ not in sels:
-                    sels.append(s_)
-        per_group.append(sels)
-    common = all(x == per_group[0] for x in per_group)   # as mesmas seleções em todos os grupos: a aposta sai uma só vez
-    for gr, sels in zip(shown, per_group):
+    lines = [('🟢 ALERTA%s: %s' % (update, match)) if g['alert'] else ('A seguir%s: %s' % (update, match))]
+
+    def tactic(gr):
         rep = gr[0]
         r = reasons.get(rep) or next(reasons[h] for h in gr if h in reasons)
+        more = len(gr) - 1
         if rep in alerted:
-            lines.append('🟢 Tática validada (%s): %s' % (r['status'], rep))
-        else:
-            lines.append('Encaixa em: %s (%s)' % (rep, 'promissora' if r.get('status') in VALID else r.get('status')))
-        lines += evidence_lines(report, state, rep, r, gr[1:])
-        if not common:
-            lines.append('Aposta: %s' % '; '.join(sels))
-        if rep in alerted and r.get('prudent_rate'):
-            lines.append('Odd mínima para valer a pena: %s.' % odd('%.2f' % (1 / r['prudent_rate'])))
+            return '🟢 Tática validada (%s%s): %s' % (r['status'], ('; e mais %d equivalente%s' % (more, 's' if more > 1 else '')) if more else '', rep)
+        return 'Encaixa em: %s (%s)%s' % (rep, 'promissora' if r.get('status') in VALID else r.get('status'),
+                                          (' e mais %d equivalente%s' % (more, 's' if more > 1 else '')) if more else '')
+    # Cada aposta uma só vez, agrupada pelas táticas (mostradas) que a sustentam.
+    clusters = {}
+    for sel in bets:
+        support = tuple(i for i, gr in enumerate(shown) if any(sel in covers.get(h, ()) for h in gr))
+        clusters.setdefault(support, []).append(sel)
+    unsupported = clusters.pop((), [])
+    for support, sels in clusters.items():
+        lines += [tactic(shown[i]) for i in support]
+        lines.append('Aposta: %s' % '; '.join(sels))
+    if len(grouped) > len(shown):
+        lines.append('… e mais %d grupos de táticas.' % (len(grouped) - len(shown)))
+    if unsupported:
+        lines.append('Aposta: %s' % '; '.join(unsupported))
+    claims = [gr[0] for gr in shown if gr[0] in alerted]
+    for hid in claims:                       # rótulo exato (fail-closed): só para a tática do alerta, verificada agora
+        text, positive = scientific_label(report, hid)
+        if positive:
+            lines.append(text)
+    effects = []
+    for gr in shown:
         for h in gr:
             row = hypothesis_row(report, h) or {}
             if row.get('prospective_games') is not None:
                 effects.append(['notice_games', h, row['prospective_games']])
-    if len(grouped) > len(shown):
-        lines.append('… e mais %d grupos de hipóteses.' % (len(grouped) - len(shown)))
-    if common:
-        lines.append('Aposta: %s' % '; '.join(per_group[0]))
-    ko = lisbon(next((w['kickoff_utc'] for _, it in items for w in it['entries'] if w.get('kickoff_utc')), None))
-    lines.append('Jogo às %s (hora de Lisboa).' % ko if ko else None)
-    lines.append('Resultados passados não garantem os futuros; a decisão é tua.' if g['alert'] else 'É um indício para observar, não uma recomendação.')
     for ik, it in items:
         effects.append(['item', ik])
         for w in it['entries']:
@@ -729,9 +697,12 @@ def change_verified(report, hid, new):
     return isinstance(last, dict) and last.get('to') == raw and raw in (new, 'forte', 'confirmada')
 
 
-def status_notices(report, state, now, current, healthy):
+def status_changes(report, state, now, current, healthy):
+    """Mudanças de estado ainda não anunciadas, prontas para o resumo diário: [(antigo, novo, grupo de equivalentes)].
+    Nada é anunciado fora do resumo: este cálculo só corre quando o resumo do dia está em curso. As barreiras são as da PR 5
+    (relatório saudável, hipótese presente, sem estado pendente, mudança fixada pelo cérebro; a perda de certificação passa
+    mesmo com relatório degradado). Uma reversão no mesmo dia cancela-se sozinha (compara-se só o anunciado com o atual)."""
     announced = state.setdefault('announced_statuses', {})
-    changes = state.setdefault('announced_changes', {})
     transitions = {}
     for hid in sorted(set(announced) | set(current)):
         old, new = announced.get(hid, 'em observação'), explicit_status(report, hid, current)
@@ -739,60 +710,53 @@ def status_notices(report, state, now, current, healthy):
             new = 'em observação'                         # validada que desaparece sem certificado: perda, nunca escondida
         if new is None or new == old:
             continue
-        critical = old in VALID or new in VALID          # entrada ou saída de "validada": nunca adiada pela anti-oscilação
         if old in VALID and new not in VALID:
             pass                                          # perda de certificação: anunciada mesmo com relatório degradado
         elif not healthy or not change_verified(report, hid, new):
             continue
-        last = changes.get(hid)
-        at = parse_time((last or {}).get('at_utc'))
-        if (not critical and last and last.get('from') == new and last.get('to') == old and at
-                and now - at < timedelta(hours=OSCILLATION_HOURS)):
-            osc = state.setdefault('oscillations', [])
-            entry = {'id': hid, 'path': [new, old, new], 'announced_utc': last['at_utc']}
-            if entry not in osc:
-                osc.append(entry)
-            continue
         transitions.setdefault((old, new), []).append(hid)
     out = []
-    for (old, new), hids in sorted(transitions.items()):
+    for (old, new), hids in sorted(transitions.items(), key=lambda kv: (not (kv[0][1] in VALID or kv[0][0] in VALID), kv[0])):
         for gr in groups_of(report, hids):
-            out.append(status_notice(report, state, now, old, new, gr))
+            out.append((old, new, gr))
     return out
 
 
-def status_notice(report, state, now, old, new, gr):
-    rep = gr[0]
-    head, claims = labels(report, gr)
+SHORT_INACTIVE = {'not_activated': 'desligada', 'ledger_invalid': 'inválida', 'history_unverified': 'por verificar'}
+
+
+def roi_short(v):
+    if v is None:
+        return None
+    return ('%s%.1f%%' % ('+' if v >= 0 else '−', abs(v) * 100)).replace('.', ',')
+
+
+def change_block(report, old, new, gr):
+    """Bloco curto de uma mudança de estado. -> (linhas, afirmações). Afirmação positiva só para uma tática que passou a
+    validada, com o rótulo exato de `scientific_label` (a barreira `guard_claims` continua a ser a última palavra)."""
+    rep, row = gr[0], hypothesis_row(report, gr[0]) or {}
+    cap = lambda s_: s_[:1].upper() + s_[1:]
     if new in VALID:
-        title = '✅ Tática validada, passou a %s: %s' % (new, rep)
-        tail = 'A partir de agora, cada jogo que encaixe nela gera um alerta.'
+        lines = ['✅ Tática validada, passou a %s (antes: %s): %s' % (new, old, rep)]
     elif old in VALID:
-        title = ('⛔ Tática deixou de estar validada, %s: %s'
-                 % ('voltou a "em observação"' if new == 'em observação' else 'passou a %s' % new, rep))
-        tail = 'Deixa de gerar alertas.'
+        lines = [rep, '⛔ Estado: deixou de estar validada, %s' % ('voltou a em observação' if new == 'em observação' else 'passou a %s' % new)]
     else:
-        title = ('Hipótese %s (antes: %s): %s' % ('voltou a "em observação"' if new == 'em observação' else 'passou a %s' % new, old, rep))
-        tail = None
-    lines = head + [title] + evidence_lines(report, state, rep, None, gr[1:])
-    last = (hypothesis_row(report, rep) or {}).get('last_change')
-    ref = None
-    if isinstance(last, dict) and last.get('to') in (new, 'forte', 'confirmada') and last.get('games') is not None:
-        known = lisbon(last.get('known_utc'))
-        lines.append('Mudança fixada com %d jogos independentes%s.' % (last['games'], (' (resultado conhecido às %s)' % known) if known else ''))
-        ref = '%s@%s' % (last.get('games'), last.get('known_utc'))
-    lines.append(tail)
-    effects = []
-    for h in gr:
-        effects.append(['announce', h, old, new])
-        row = hypothesis_row(report, h) or {}
-        if row.get('prospective_games') is not None:
-            effects.append(['notice_games', h, row['prospective_games']])
-    # A mesma transição pode repetir-se (p. ex. certificação perdida e recuperada): o instante do anúncio anterior distingue
-    # cada ocorrência e não muda enquanto o aviso estiver pendente (só muda quando a intenção é gravada).
-    prev = '+'.join(((state.get('announced_changes') or {}).get(h) or {}).get('at_utc') or '-' for h in sorted(gr))
-    key = 'status|%s>%s|%s|%s|%s' % (old, new, sha('\n'.join(sorted(gr)))[:12], ref or 'sem-referência', sha(prev)[:12])
-    return Notice(key, 'status', lines, effects, claims, gr)
+        lines = [rep, 'Estado: %s (antes: %s)' % (cap(new), old)]
+    games = row.get('games') if isinstance(row.get('games'), int) and not isinstance(row.get('games'), bool) else None
+    roi = row.get('game_roi') if row.get('game_roi') is not None else row.get('roi')
+    parts = (['%d jogos independentes' % games] if games is not None else []) + (['ROI %s' % roi_short(roi)] if roi is not None else [])
+    if len(gr) > 1:
+        parts.append('e mais %d equivalente%s' % (len(gr) - 1, 's' if len(gr) > 2 else ''))
+    if parts:
+        lines.append(' · '.join(parts))
+    label, positive = scientific_label(report, rep)
+    if positive:
+        lines.append(label)
+    elif not certification_active(report):
+        lines.append('Certificação: %s' % SHORT_INACTIVE.get(validation_of(report).get('state'), 'indisponível'))
+    else:
+        lines.append('Certificação ativa; tática não certificada')
+    return lines, ([rep] if positive else [])          # o rótulo positivo (exato, desta tática) é a afirmação a verificar
 
 
 def regime_notices(report, state, now):
@@ -826,8 +790,18 @@ def regime_notices(report, state, now):
     return out
 
 
-def summary_notice(report, state, now):
-    day = now.date().isoformat()
+def summary_day(now):
+    """Dia (Lisboa) cujo resumo já é devido: a partir das 22:00 de Lisboa (hora de verão e de inverno), senão None."""
+    local = now.astimezone(LISBON)
+    return local.date().isoformat() if local.hour >= SUMMARY_HOUR_LISBON else None
+
+
+def summary_notice(report, state, now, changes=()):
+    """O ÚNICO resumo diário (22:00 de Lisboa): as mudanças de estado das táticas desde o último resumo, em blocos curtos, e
+    depois o resumo do dia. Cada mudança mostrada fica anunciada quando a intenção de envio é gravada (efeito `announce`); se
+    não couberem todas, as restantes ficam para o resumo seguinte (nunca se perdem)."""
+    local = now.astimezone(LISBON)
+    day = local.date().isoformat()
     brain = report.get('brain') or {}
     today = next((d for d in report.get('daily') or [] if d.get('day') == day), {'bets': 0, 'settled': 0, 'wins': 0, 'units': 0.0})
     tl, c, t = report.get('timeline') or [], brain.get('counts') or {}, brain.get('llm_today') or {}
@@ -835,32 +809,56 @@ def summary_notice(report, state, now):
     promising = [h for h, s in current.items() if s == 'promissora']
     certified = sorted(certified_ids(report))
     head, claims = labels(report, certified)
-    lines = head + [
-        'Resumo de %s' % now.strftime('%d/%m'),
-        'Apostas de hoje: %d, com resultado %d, ganhas %d, saldo do dia %s un.' % (today['bets'], today['settled'], today['wins'], dec(today['units'])),
-        'Saldo total: %s un. em %d apostas com resultado.' % (dec(tl[-1]['u'] if tl else 0.0), report.get('settled_bets') or 0),
-        'Hipóteses: %d em teste; %d promissoras (%d grupos de equivalentes), %d abandonadas.'
-        % (brain.get('hypotheses') or 0, c.get('promissora', 0), len(groups_of(report, promising)) if promising else 0, c.get('abandonada', 0))]
+    tail = ['', 'Apostas de hoje: %d, com resultado %d, ganhas %d, saldo do dia %s un.' % (today['bets'], today['settled'], today['wins'], dec(today['units'])),
+            'Saldo total: %s un. em %d apostas com resultado.' % (dec(tl[-1]['u'] if tl else 0.0), report.get('settled_bets') or 0),
+            'Hipóteses: %d em teste; %d promissoras (%d grupos de equivalentes), %d abandonadas.'
+            % (brain.get('hypotheses') or 0, c.get('promissora', 0), len(groups_of(report, promising)) if promising else 0, c.get('abandonada', 0))]
     counts, base = state.get('delivery_counts') or {}, state.get('summary_counts') or {}
     d = {k: counts.get(k, 0) - base.get(k, 0) for k in COUNTERS}
     if any(d.values()):
-        lines.append('Avisos desde o último resumo: %d entregues, %d com falha, %d incertos (não reenviados), %d bloqueados, %d caducados.'
-                     % (d['delivered'], d['failed'], d['uncertain'], d['blocked'], d['expired']))
-    osc = state.get('oscillations') or []
+        tail.append('Avisos desde o último resumo: %d entregues, %d com falha, %d incertos (não reenviados), %d bloqueados, %d caducados.'
+                    % (d['delivered'], d['failed'], d['uncertain'], d['blocked'], d['expired']))
+    osc = state.get('oscillations') or []           # registos anteriores a este formato (já não se acrescentam)
     if osc:
-        lines.append('Oscilações em menos de %d h (não anunciadas): %s.' % (OSCILLATION_HOURS, '; '.join(
+        tail.append('Oscilações em menos de %d h (não anunciadas): %s.' % (OSCILLATION_HOURS, '; '.join(
             '%s: %s' % (o['id'], ' → '.join(o['path'])) for o in osc[:10])))
     health = state.get('health') or {}
     if health.get('degraded_since'):
-        lines.append('Relatório degradado desde %s (%s): mudanças de estado retidas.' % (lisbon(health['degraded_since']), ', '.join(health.get('problems') or [])))
-    lines += ['Modelo de linguagem hoje: %s chamadas, cerca de %s neurónios.' % (t.get('calls_today') or 0, int(t.get('neurons_today') or 0)), PAGE]
-    return Notice('summary|%s' % day, 'summary', lines, [['summary', day]], claims, certified)
+        tail.append('Relatório degradado desde %s (%s): mudanças de estado retidas.' % (lisbon(health['degraded_since']), ', '.join(health.get('problems') or [])))
+    tail += head + ['Modelo de linguagem hoje: %s chamadas, cerca de %s neurónios.' % (t.get('calls_today') or 0, int(t.get('neurons_today') or 0)), PAGE]
+    lines, effects, hids, budget = ['Resumo das táticas — %s' % local.strftime('%d/%m')], [], list(certified), MAX_TEXT - len('\n'.join(tail)) - 120
+    shown = hidden = 0
+    for old, new, gr in changes:
+        block, block_claims = change_block(report, old, new, gr)
+        visible = guard_claims('\n'.join(block), report, block_claims)
+        if visible and shown and len('\n'.join(lines + [''] + block)) > budget:
+            break
+        if visible:                       # um bloco recusado pela barreira não bloqueia o resumo inteiro
+            lines += [''] + block
+            claims += [h for h in block_claims if h not in claims]
+            hids += [h for h in gr if h not in hids]
+            shown += 1
+        else:                             # como um aviso bloqueado: conta como tratado (no máximo uma vez), não é mostrado
+            hidden += 1
+        for h in gr:
+            effects.append(['announce', h, old, new])
+            row = hypothesis_row(report, h) or {}
+            if row.get('prospective_games') is not None:
+                effects.append(['notice_games', h, row['prospective_games']])
+    if not changes:
+        lines.append('Sem alterações de estado das táticas desde o último resumo.')
+    if hidden:
+        lines += ['', '%d alterações de estado não mostradas: texto recusado pela barreira de afirmações.' % hidden]
+    if shown + hidden < len(changes):
+        lines += ['', '… e mais %d alterações de estado: ficam para o próximo resumo.' % (len(changes) - shown - hidden)]
+    effects.append(['summary', day])
+    return Notice('summary|%s' % day, 'summary', lines + tail, effects, claims, hids)
 
 
 def hello_notice(report):
     head, _ = labels(report, [])
     return Notice('hello', 'hello', head + ['Avisos do goal-roi ligados. Vais receber: indícios de jogos que encaixam em hipóteses promissoras, '
-                                            'alertas de apostas, mudanças de estado e um resumo diário.', PAGE], [['hello']])
+                                            'alertas de apostas e, às 22:00 (Lisboa), um resumo diário com as mudanças de estado das táticas.', PAGE], [['hello']])
 
 
 def plan(report, state, now):
@@ -873,14 +871,18 @@ def plan(report, state, now):
     out = [] if state.get('hello') else [hello_notice(report)]
     out += game_notices(report, state, now)
     new = eligible_statuses(report)
+    changes = []
+    due = summary_day(now)
+    due = due if due and state.get('summary_day') != due else None
     if new is not None:
-        healthy, _ = check_health(report, state, now)
-        out += status_notices(report, state, now, new, healthy)
+        healthy, _ = check_health(report, state, now)          # corre sempre: a referência de saúde não pode esperar pelas 22h
+        if due:
+            changes = status_changes(report, state, now, new, healthy)
         if state.get('statuses') != new:
             state['statuses'] = copy.deepcopy(new)
     out += regime_notices(report, state, now)
-    if now.hour >= SUMMARY_HOUR_UTC and state.get('summary_day') != now.date().isoformat():
-        out.append(summary_notice(report, state, now))
+    if due:
+        out.append(summary_notice(report, state, now, changes))
     return out
 
 

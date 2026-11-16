@@ -120,13 +120,30 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 
 ## Avisos pelo Telegram
 `scangoal/notify.py` envia avisos por um bot teu (segredos `TG_BOT_TOKEN` e `TG_CHAT_ID`; sem eles, o passo é ignorado). Não usa a conta que lê o ScanGoal.
-- Avisos de jogos com sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 jogos por recolha). Contrato: cada **aposta** (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem numa só mensagem. Reforços (×2, ×4…, outra hora de sinal) e a passagem de indício a alerta da mesma aposta nunca geram outro aviso — a certificação da hipótese é anunciada à parte ("✅ Tática validada"). Uma seleção genuinamente nova num jogo já avisado sai como **atualização** ("A seguir (nova seleção num jogo já avisado)"), só com a aposta nova e a contagem das já avisadas.
-- Hipóteses que mudam de estado (uma mensagem por grupo de hipóteses equivalentes) e tipos de sinal que mudam de comportamento.
-- Resumo diário depois das 21:00 UTC (com entregas falhadas, incertas e bloqueadas, oscilações retidas e relatório degradado, quando os houver).
+- Avisos de jogos com sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 jogos por recolha). Contrato: cada **aposta** (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem numa só mensagem. Reforços (×2, ×4…, outra hora de sinal) e a passagem de indício a alerta da mesma aposta nunca geram outro aviso — a certificação da hipótese é anunciada à parte, no resumo diário ("✅ Tática validada"). Uma seleção genuinamente nova num jogo já avisado sai como **atualização** ("A seguir (nova seleção num jogo já avisado)"), só com a aposta nova.
+- Tipos de sinal que mudam de comportamento.
+- **Um único resumo diário às 22:00 de Lisboa** (`Europe/Lisbon`, hora de verão e de inverno): é o ÚNICO sítio onde saem as mudanças de estado das hipóteses (em observação → promissora, promissora → abandonada, ganho ou perda de certificação…), todas as do período, em blocos curtos, seguidas do resumo do dia (com entregas falhadas, incertas e bloqueadas e relatório degradado, quando os houver). Sem mudanças, o resumo diz "Sem alterações de estado". Uma mudança que surja depois do resumo entra no do dia seguinte; se não couberem todas numa mensagem, as restantes ficam para o seguinte (nunca se perdem nem se repetem).
 - Aviso quando uma recolha falha (no máximo um por hora). Se a cadeia de recolha parar por completo, não há quem avise: a página mostra "Recolha parada".
 
-### O que cada mensagem mostra (PR 5)
-Pela ordem: o **estado científico** (sempre na primeira linha: "NÃO CERTIFICADA — certificação desligada" enquanto a certificação não estiver ativa), os jogos independentes, o ROI por jogo à odd anunciada e com 2 % de perda de odd, a probabilidade de estar acima do necessário (e com a perda de odd), a vantagem com o intervalo de 90 %, a evidência nova (jogos prospetivos desde o registo e desde o último aviso dessa hipótese) e, por fim, a aposta (seleções, odds, hora de Lisboa). Hipóteses equivalentes (partilham ≥ 85 % dos jogos, compatíveis, ligação completa: nunca cadeias A~B~C) aparecem como representante "e mais N equivalentes". O agrupamento é só de apresentação: não muda estados nem avaliação.
+### O que cada mensagem mostra
+Aviso de aposta (formato curto, para apostar depressa) — uma aposta simples tem exatamente três linhas:
+```
+A seguir: UTC Cajamarca — CD Los Chankas
+Encaixa em: Jogo aberto | Ritmo indicado pelo bot = menos de 90 (promissora)
+Aposta: Over 5 @ 1,91
+```
+Sem ROI, probabilidades, jogos independentes, evidência ou textos finais. Com várias táticas ou seleções no mesmo jogo, cada aposta aparece uma só vez, por baixo das táticas que a sustentam. Um ALERTA (só com certificado ativo, válido e da própria tática) começa por "🟢 ALERTA", identifica a tática com "🟢 Tática validada (…)" e termina com o rótulo científico exato dessa tática, que a barreira `guard_claims` exige; um indício nunca faz afirmações de certificação.
+
+Resumo diário (22:00 de Lisboa), um bloco por mudança de estado:
+```
+Resumo das táticas — 16/11
+
+Stake | Faixa de odd 1,50 a 2,00
+Estado: Abandonada (antes: em observação)
+32 jogos independentes · ROI −25,2%
+Certificação: desligada
+```
+Hipóteses equivalentes (partilham ≥ 85 % dos jogos, compatíveis, ligação completa: nunca cadeias A~B~C) aparecem como representante "e mais N equivalentes". O agrupamento é só de apresentação: não muda estados nem avaliação.
 
 ### Entrega no máximo uma vez
 - Cada aviso tem uma chave do acontecimento (jogo e seleções, transição de estado, dia do resumo). Antes de enviar, grava-se a intenção em `data/notify_state.json` (atómico) e em `data/notify_log.jsonl` (registo só a crescer: chave, tipo, hora, `sha256` do texto; nunca o token nem o chat). Depois da resposta grava-se o resultado.
@@ -138,11 +155,11 @@ Pela ordem: o **estado científico** (sempre na primeira linha: "NÃO CERTIFICAD
 ### Mudanças de estado sem falsos avisos
 - Só se anuncia uma mudança com relatório saudável (mesmas regras, âmbito e verificação da certificação; universo elegível, hipóteses e resultados sem quedas anómalas; fontes de resultados sem perdas), com a hipótese presente no relatório, sem estado pendente e com a mudança fixada pelo cérebro. Uma hipótese ausente é "desconhecida", nunca "voltou a em observação".
 - Uma degradação retém as mudanças; se durar 24 h, passa a ser a nova referência (atrasa, nunca descarta).
-- Uma reversão de uma mudança anunciada há menos de 24 h não é anunciada logo: aparece no resumo como oscilação e só sai se persistir 24 h. Entradas e saídas de "validada" nunca são retidas; a perda de certificação é anunciada mesmo com o relatório degradado.
+- O resumo diário compara o último estado anunciado com o atual: uma reversão no mesmo dia (A → B → A) cancela-se sozinha e não é anunciada. A perda de certificação é anunciada mesmo com o relatório degradado. A elegibilidade das apostas (indício ou ALERTA) segue o certificado de cada relatório de imediato, sem esperar pelo resumo.
 
 ### Alertas de táticas validadas
 - Uma tática só é anunciada como validada com certificado ATIVO, VÁLIDO e da PRÓPRIA hipótese (método `eprocess_online_alpha_v1`, registo ativo e verificado, o id na lista de certificadas e a confirmação com seleção e instante na linha da hipótese). Com a certificação desligada (estado atual), nenhuma mensagem diz "validada", "certificada", "confirmada" ou "forte".
-- Cada jogo que encaixe numa tática validada gera um ALERTA com o jogo, as seleções, a odd, a hora, a vantagem estimada e a odd mínima para valer a pena (1 a dividir pela taxa de acerto prudente), enquanto dá para apostar (jogo por começar, ou sinal com 30 minutos no máximo).
+- Cada jogo que encaixe numa tática validada gera um ALERTA curto com o jogo, a tática, as seleções e a odd (e o rótulo do certificado), enquanto dá para apostar (jogo por começar, ou sinal com 30 minutos no máximo).
 - Barreira final (`guard_claims`): qualquer texto com essas palavras (qualquer flexão, acentos ou maiúsculas) sem o rótulo verificado da hipótese citada na mesma linha é bloqueado e contado. "Não certificada" e "sem certificado" continuam permitidos. Textos vindos de dados (razões e notas do modelo de linguagem) nunca entram nas mensagens.
 
 ### Pré-visualização sem envio
