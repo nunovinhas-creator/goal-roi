@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-16T09:40:10+00:00",
+ "generated_at_utc": "2026-11-16T09:49:17+00:00",
  "messages": 1038,
  "types": {
   "SERVICE": 10,
@@ -44,12 +44,12 @@
   "bsd_results": 19,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 13,
-  "bsd_last_run_utc": "2026-11-16T08:56:26+00:00",
+  "bsd_last_run_utc": "2026-11-16T09:48:51+00:00",
   "goal_minutes_matches": 56,
   "goal_minutes_inconsistent": 3,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T09:40:07+00:00",
+  "collector_last_run_utc": "2026-11-16T09:48:49+00:00",
   "name_review": [
    {
     "bot": [
@@ -1520,7 +1520,7 @@
    "roi_announced_odds": -0.0936,
    "seen_late": 0,
    "by_bot_mark": 66,
-   "per_day": 30.3,
+   "per_day": 30.2,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
    "prudent_rate": 0.435,
@@ -3146,7 +3146,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 6258,
+    "em observação": 6259,
     "abandonada": 6,
     "promissora": 51
    },
@@ -4203,11 +4203,11 @@
     }
    ]
   },
-  "hypotheses": 6315,
+  "hypotheses": 6316,
   "tested": 382,
   "corrected_bar": null,
   "counts": {
-   "em observação": 6308,
+   "em observação": 6309,
    "abandonada": 3,
    "promissora": 4
   },
@@ -5279,7 +5279,7 @@
     "contraditório": 0,
     "evitar": 3
    },
-   "generated_utc": "2026-11-16T09:40:23+00:00",
+   "generated_utc": "2026-11-16T09:49:28+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5307,7 +5307,7 @@
      "as_expected": 1
     },
     "llm/evitar": {
-     "hypotheses": 5,
+     "hypotheses": 6,
      "judged": 1,
      "as_expected": 1
     }
@@ -15468,6 +15468,71 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Betfair | Hora (UTC) = manhã & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $",
+    "family": "Betfair",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "manhã"
+     ],
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ],
+     [
+      "Tamanho do mercado",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-16T09:48:53+00:00",
+    "reason": "quota alta em mercado pequeno e hora de menos jogos",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "family": "Jogo aberto",
     "conditions": [
@@ -16786,74 +16851,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 3,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "bets": 0,
-    "unidentified": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Stake | Mercado = outros mercados & Momento do aviso = até 45 min depois do início & Valor da aposta = 10 mil $ ou mais",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Mercado",
-      "outros mercados"
-     ],
-     [
-      "Momento do aviso",
-      "até 45 min depois do início"
-     ],
-     [
-      "Valor da aposta",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-15T02:21:10+00:00",
-    "reason": "Apostas grandes em mercados secundários podem influenciar o resultado",
-    "expect": "acima",
-    "mode": "novas",
-    "tradable": true,
-    "open": 3,
-    "born_verified": true,
-    "game_set": null,
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 57,
+  "llm_total": 58,
   "watch": [],
   "rules": {
    "min_support": 8,
@@ -16875,15 +16875,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 90,
-  "llm_last_run_utc": "2026-11-16T08:47:09+00:00",
+  "llm_runs": 91,
+  "llm_last_run_utc": "2026-11-16T09:48:53+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-16",
-   "calls_today": 9,
-   "neurons_today": 1900.4,
-   "accepted_today": 6,
-   "last_mode": "refinar"
+   "calls_today": 10,
+   "neurons_today": 2110.0,
+   "accepted_today": 7,
+   "last_mode": "evitar"
   },
   "notes": [
    {
@@ -17160,7 +17160,7 @@
     "roi_announced_odds": -0.0706,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 11.2,
+    "per_day": 11.1,
     "days_to_hint": 0,
     "days_to_conclusion": 23
    },
@@ -17218,7 +17218,7 @@
     "roi_announced_odds": 0.1113,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 29.3,
+    "per_day": 29.2,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -17247,7 +17247,7 @@
     "roi_announced_odds": -0.0936,
     "seen_late": 0,
     "by_bot_mark": 66,
-    "per_day": 30.3,
+    "per_day": 30.2,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },

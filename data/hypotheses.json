@@ -16722,6 +16722,29 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Hora (UTC) = manhã & Quota de mercado = 80 % ou mais & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-16T09:48:53+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Betfair",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "quota alta em mercado pequeno e hora de menos jogos",
+  "source": "llm"
+ },
  "Betfair | Hora (UTC) = manhã & Quota de mercado = menos de 80 %": {
   "born_utc": "2026-11-15T07:40:02+00:00",
   "conditions": [
