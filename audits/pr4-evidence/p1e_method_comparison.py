@@ -23,6 +23,9 @@ import random
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from calibration_check import clopper_pearson  # noqa: E402  (intervalo exato; Wald dava [0, 0] com zero rejeições)
+
 ALPHA = 0.05
 LAMBDAS = (0.5, 0.25, 0.125, 0.0625, 0.03125)     # = brain.EPROCESS_LAMBDAS (certificação da PR 3)
 SHORT, MIX, LONG, VERY_LONG = (1.4, 1.6, 1.8), (1.5, 1.8, 2.0, 2.5, 3.5, 5.0), (3.5, 5.0, 6.0), (6.0, 8.0, 10.0)
@@ -132,9 +135,7 @@ def run(name, days, n_llm, n_ctrl, day_sd, odds_llm, odds_ctrl, edge, sims, seed
         hits['betting_plugin'] += betting_plugin(st)
     row = {'scenario': name, 'days': days, 'sims': sims, 'edge': edge}
     for m, k in hits.items():
-        r = k / sims
-        se = math.sqrt(max(r * (1 - r), 1e-12) / sims)
-        row[m] = {'rejection': round(r, 4), 'ci95': [round(max(0.0, r - 1.96 * se), 4), round(r + 1.96 * se, 4)]}
+        row[m] = {'rejection': round(k / sims, 4), 'rejections': k, 'ci95_exact': list(clopper_pearson(k, sims))}   # Clopper-Pearson
     return row
 
 

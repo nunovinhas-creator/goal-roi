@@ -1,6 +1,9 @@
-"""Avaliação incremental das hipóteses do modelo de linguagem (PR 4, protocolo `llm_incremental_v4`).
+"""Avaliação incremental das hipóteses do modelo de linguagem (PR 4, protocolo `llm_incremental_v5`).
 
-Implementa audits/pr4-llm-protocol-v4.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; o v1, o v2 e o v3 são recusados).
+Implementa audits/pr4-llm-protocol-v5.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; o v1 a v4 são recusados).
+v5 (auditoria #5917252470): uma hipótese, e os seus controlos, só contribui a partir do dia UTC seguinte ao seu nascimento
+(A-sel deixa de poder ser violada pelo próprio sistema); o relatório separa a rejeição de H0 condicional da afirmação por aposta;
+os metadados de execução ficam fora do resultado científico (result_sha256).
 Emendas do v2 (revisão independente da PR #27): apoio dos controlos pela hora de LEITURA (P1-A); grupos decididos no nascimento
 (P1-B); início P = max(commit, primeira publicação verificável no GitHub) (P2-C). v3 (P1-D): nada depois do fecho da janela
 existe para a avaliação. v4 (auditoria #5916502096, P1-E, e decisões do proprietário de 16/11/2026): o único critério
@@ -25,9 +28,9 @@ from . import brain, chronology, insights
 from .eligibility import eligible, game_identity
 from .equivalence import Index, Redundancy, expectation, groups_at_birth
 
-PROTOCOL = 'llm_incremental_v4'
-PROTOCOL_FILE = 'audits/pr4-llm-protocol-v4.md'
-PROTOCOL_SHA256 = '055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167'
+PROTOCOL = 'llm_incremental_v5'
+PROTOCOL_FILE = 'audits/pr4-llm-protocol-v5.md'
+PROTOCOL_SHA256 = '3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103'
 REGISTRY_FILE = 'data/hypotheses.json'
 TAU, SENSITIVITY, GROUP_MIN_GAMES = 0.85, (0.80, 0.90), 8
 K, K_MIN = 20, 5
@@ -40,8 +43,9 @@ SECONDARY = ('S1_family_baseline', 'S2_mode_novas', 'S3_mode_refinar', 'S4_refin
 VERDICTS = ('não verificada',
             'utilidade incremental estatisticamente significativa (e-processo, α = 0,05; não é prova de vantagem nem certificação)',
             'em curso — sem conclusão (e-processo abaixo de 20)', 'evidência insuficiente', 'sem utilidade incremental demonstrada')
-A_SEL = ('A garantia (§6-A) vale para H0 tal como definida; a leitura "por aposta" exige A-sel: a entrada de um jogo num dia não '
-         'depende dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).')
+A_SEL = ('A garantia (§6-A) vale para H0 tal como definida. Com a regra do dia seguinte (v5), tudo o que o sistema escolhe para um '
+         'dia existe antes de o dia começar; a leitura "por aposta" exige ainda A-sel quanto ao bot: a emissão de um sinal não depende '
+         'dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).')
 UTC = timezone.utc
 
 
@@ -422,6 +426,25 @@ def _r(x):
     return None if x is None else round(x, 6)
 
 
+def next_day(t):
+    """Início do dia UTC seguinte a t (protocolo v5, §3)."""
+    return (t.astimezone(UTC) + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def claim_scope(verdict):
+    """Alcance da conclusão (§8 do protocolo v5): o que o teorema garante e o que depende ainda de A-sel."""
+    if verdict == VERDICTS[1]:
+        return {'conditional_h0': 'rejeitada (e-processo >= 20); P(rejeição falsa) <= 0,05 pelo teorema de §6-A',
+                'per_bet_utility': ('sugerida, mas só se A-sel valer quanto ao bot (não escolher que jogos sinalizar pelos resultados de '
+                                    'outros jogos do mesmo dia); não verificável pelos dados; não é prova de vantagem nem certificação')}
+    return {'conditional_h0': 'não rejeitada', 'per_bet_utility': 'nenhuma afirmação'}
+
+
+def result_digest(res):
+    """sha256 do resultado científico, sem os metadados de execução (`run`): igual em todas as execuções com relógio >= C (§10)."""
+    return hashlib.sha256(dumps({k: v for k, v in res.items() if k not in ('run', 'result_sha256')}).encode('utf-8')).hexdigest()
+
+
 def windows(protocol_time):
     """(H, C) do protocolo v4 (§0-B): horizonte da janela e instante final; (None, None) sem P."""
     if protocol_time is None:
@@ -536,7 +559,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
                 out.append(pid)
         return sorted(set(out))
 
-    starts = {hid: max(born_eff[hid], protocol_time) if protocol_time is not None else None for hid in valid}
+    # v5 (§3): só a partir do dia UTC seguinte ao nascimento; os controlos, mães e base usam o mesmo início (side()).
+    starts = {hid: max(next_day(born_eff[hid]), protocol_time) if protocol_time is not None else None for hid in valid}
     ctrl_of = {hid: controls(hid) for hid in valid}   # sem ler resultados; a primária só usa os de expectativa 'acima' (reps_of)
 
     def side(reps, ref):
@@ -642,7 +666,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
             'as_of_utc': chronology.iso(as_of), 'verified': not problems, 'proof_problems': list(problems),
             'phase': 'final' if final else 'running', 'horizon_utc': chronology.iso(horizon),
             'final_utc': chronology.iso(confirm), 'verdict': verdict, 'concluded_on': primary['crossed_day'],
-            'insufficient': fails, 'assumption_a_sel': A_SEL,
+            'insufficient': fails, 'assumption_a_sel': A_SEL, 'claim': claim_scope(verdict),
             'parameters': {'tau': TAU, 'sensitivity': list(SENSITIVITY), 'group_min_games': GROUP_MIN_GAMES, 'k': K, 'k_min': K_MIN,
                            'test': 'betting e-process (Ville), predictable plug-in lambda', 'threshold': round(1 / ALPHA, 6),
                            'lambda_start': LAMBDA_START, 'lambda_cap': LAMBDA_CAP, 'alpha': ALPHA, 'seed': SEED,
@@ -691,7 +715,10 @@ def render(res):
     lines += ['Fase: **%s**. Horizonte H = %s; fim do v4 C = %s. O e-processo é válido a qualquer momento (Ville): olhar repetidamente'
               % ('final' if res['phase'] == 'final' else 'em curso', res['horizon_utc'], res['final_utc']),
               'não aumenta o erro de tipo I acima de α = 0,05 para H0 (§6-A do protocolo). Só dias fechados entram.', '',
-              '**Suposição A-sel:** ' + res['assumption_a_sel'], '']
+              '**Suposição A-sel:** ' + res['assumption_a_sel'], '',
+              '**Alcance da conclusão (§8 do protocolo v5):**', '',
+              '- H0 condicional (§6-A), garantida pelo teorema: %s' % res['claim']['conditional_h0'],
+              '- Utilidade incremental por aposta: %s' % res['claim']['per_bet_utility'], '']
     if res['proof_problems']:
         lines += ['Falhas de prova (nenhuma conclusão científica):', ''] + ['- %s' % x for x in res['proof_problems']] + ['']
     if res['insufficient']:

@@ -657,6 +657,41 @@ class EProcessV4(unittest.TestCase):
         self.assertEqual(res['path'][0]['lambda'], 0.125)                                     # λ_1 = 1/8, sem passado
         self.assertEqual(res['path'][1]['lambda'], 0.5)                                       # depois, no máximo 1/2
 
+    def test_v5_hypothesis_born_mid_day_contributes_only_from_the_next_day(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=8, n_llm=1, n_ctrl=6)
+        born = T0 + timedelta(days=5, hours=6)
+        registry['Jogo aberto | Liga = A0']['born_utc'] = iso(born)
+        signals += [sig('A0-noon5', 1.0, 5 * DAY + 720, league='A0')]                          # a meio do dia 5, depois do nascimento
+        signals += [sig('B%d-noon5' % i, -1.0, 5 * DAY + 730 + i, league='B%d' % i) for i in range(6)]
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry)
+        # nada do dia 5; o jogo do dia 6 é às 00:00 exatas (= início, a admissão exige depois): ficam os dias 7 e 8
+        self.assertEqual(res['hypotheses'][0]['protocol_games'], 2)
+        self.assertEqual(res['primary']['path'][0]['day'], (T0 + timedelta(days=7)).date().isoformat())
+        self.assertEqual(llm_eval.next_day(born), T0 + timedelta(days=6))
+        self.assertEqual(llm_eval.next_day(T0 + timedelta(days=6)), T0 + timedelta(days=7))   # nascido à meia-noite: o dia seguinte
+
+    def test_v5_claim_scope_separates_conditional_h0_from_per_bet_utility(self):
+        positive = llm_eval.claim_scope(V[1])
+        self.assertIn('teorema', positive['conditional_h0'])
+        self.assertIn('A-sel', positive['per_bet_utility'])
+        self.assertIn('não é prova de vantagem', positive['per_bet_utility'])
+        for verdict in V[2:]:
+            self.assertEqual(llm_eval.claim_scope(verdict)['per_bet_utility'], 'nenhuma afirmação')
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=3)
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry)
+        self.assertIn('Alcance da conclusão', llm_eval.render(res))
+
+    def test_v5_result_digest_ignores_run_metadata_only(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=3)
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry, as_of=FINAL)
+        a = dict(res, run={'requested_ref': 'aaa', 'python': '3.11'})
+        b = dict(res, run={'requested_ref': 'bbb', 'python': '3.12'})
+        self.assertEqual(llm_eval.result_digest(a), llm_eval.result_digest(b))
+        self.assertNotEqual(llm_eval.result_digest(a), llm_eval.result_digest(dict(b, verdict='x')))
+
     def without_result(self, b):
         return dict(b, w=None, ft=None, result_known_utc=None, match_result_first_seen_utc=None)
 

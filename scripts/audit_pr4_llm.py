@@ -1,4 +1,4 @@
-"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v4.md).
+"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v5.md).
 
 Só leitura e sem rede: lê `data/` de um commit fixo por `git archive` para uma pasta temporária, constrói o relatório com o
 relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o protocolo pelo histórico git completo, e escreve
@@ -7,9 +7,10 @@ relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o
 Uso (na raiz de um clone completo, `git fetch --unshallow` se preciso):
     python3.11 scripts/audit_pr4_llm.py --ref <commit de main> --protocol-commit <sha do protocolo> \
         --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação github.com> [--as-of <UTC>] [--out audits]
-Sem prova de publicação do protocolo (§0-A do protocolo v4), do nascimento ou das observações (§0-C), a avaliação sai "não
+Sem prova de publicação do protocolo (§0-A do protocolo v5), do nascimento ou das observações (§0-C), a avaliação sai "não
 verificada". O e-processo é válido a qualquer momento; com --as-of em C ou depois, os dados são sempre os do primeiro commit de
-main com hora >= C (registado em `ref`; o pedido fica em `requested_ref`).
+main com hora >= C (registado em `inputs.ref`; o commit pedido fica em `run.requested_ref`, fora do resultado científico, cujo
+`result_sha256` não muda entre execuções depois de C).
 
 Códigos de saída: 0 = relatório escrito (qualquer veredicto); 2 = uso errado ou entradas ilegíveis.
 """
@@ -71,7 +72,7 @@ def main(argv=None):
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(tmp, filter='data')
         data = Path(tmp) / 'data'
-        inputs = {'ref': ref, 'requested_ref': requested, 'ref_commit_time_utc': chronology.iso(ref_time), 'python': '%d.%d' % sys.version_info[:2]}
+        inputs = {'ref': ref, 'ref_commit_time_utc': chronology.iso(ref_time)}
         for f in sorted(p for p in data.rglob('*') if p.is_file()):
             inputs['sha256 data/%s' % f.relative_to(data).as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
         os.environ['SCANGOAL_DATA_DIR'] = str(data)
@@ -93,6 +94,9 @@ def main(argv=None):
     inputs['llm_hypotheses_registered_after_window'] = sum(1 for hid, h in registry.items() if h.get('source') == 'llm'
                                                           and born.get(hid) is not None and born[hid] > cut)
     res['inputs'] = inputs
+    # v5 (§10): metadados de execução fora do resultado científico; result_sha256 é igual em todas as execuções com relógio >= C.
+    res['result_sha256'] = llm_eval.result_digest(res)
+    res['run'] = {'requested_ref': requested, 'python': '%d.%d' % sys.version_info[:2]}
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / 'pr4-llm-evaluation.json').write_text(llm_eval.dumps(res), encoding='utf-8')

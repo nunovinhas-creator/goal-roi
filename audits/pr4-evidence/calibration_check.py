@@ -53,10 +53,44 @@ def world(rng, days, odds_l, odds_c, n_l, n_c, day_sd, edge=0.0, clustered=False
     return [(1.0, test)], [(1.0, ctrl)]
 
 
+def _binom_cdf(k, n, p):
+    """P(X <= k) para X ~ Binomial(n, p), exata (inteiros grandes e floats; n até alguns milhares)."""
+    if p <= 0:
+        return 1.0
+    if p >= 1:
+        return 1.0 if k >= n else 0.0
+    return min(1.0, sum(math.comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(k + 1)))
+
+
+def _solve(f, target, lo=0.0, hi=1.0):
+    """f decrescente em p; p com f(p) = target, por bisseção (precisão 1e-9)."""
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        if f(mid) > target:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def clopper_pearson(k, n, conf=0.95):
+    """Intervalo exato de Clopper-Pearson para k sucessos em n: [lo, hi] bilateral. Com k = 0, lo = 0 e hi = 1 − (α/2)^(1/n)
+    (o intervalo de Wald dá [0, 0], o que é errado: zero rejeições observadas não provam uma probabilidade nula)."""
+    a = (1 - conf) / 2
+    lo = 0.0 if k == 0 else _solve(lambda p: _binom_cdf(k - 1, n, p), 1 - a)
+    hi = 1.0 if k == n else _solve(lambda p: _binom_cdf(k, n, p), a)
+    return round(lo, 6), round(hi, 6)
+
+
+def upper_one_sided(k, n, conf=0.95):
+    """Limite superior exato unilateral (Clopper-Pearson): P(X <= k | p) = 1 − conf."""
+    return 1.0 if k == n else round(_solve(lambda p: _binom_cdf(k, n, p), 1 - conf), 6)
+
+
 def rate(hits, sims):
-    r = hits / sims
-    se = math.sqrt(max(r * (1 - r), 1e-12) / sims)
-    return {'rejection': round(r, 4), 'ci95_upper': round(r + 1.96 * se, 4), 'sims': sims}
+    lo, hi = clopper_pearson(hits, sims)
+    return {'rejection': round(hits / sims, 4), 'rejections': hits, 'sims': sims, 'ci95_exact': [lo, hi],
+            'upper95_one_sided_exact': upper_one_sided(hits, sims)}
 
 
 def main(argv):
