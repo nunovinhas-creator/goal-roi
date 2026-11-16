@@ -2,8 +2,8 @@
 
 Uso (raiz de um clone completo): python3.11 audits/pr4-evidence/truncation_check.py <commit antigo> <commit recente> <protocolo> <publicação UTC> <ligação> [saída.json]
 Avalia no instante T = hora do commit antigo, uma vez com os dados desse commit e outra com os dados do commit recente (que
-contêm tudo o que aconteceu depois de T). Sem fuga, os resultados são idênticos; só podem diferir as contagens de hipóteses
-registadas depois de T (que existem no registo recente mas não são avaliadas). Código de saída: 0 = invariante; 1 = fuga.
+contêm tudo o que aconteceu depois de T). Sem fuga, a avaliação é idêntica em todos os campos (só as entradas diferem, por
+exemplo a contagem de hipóteses registadas depois de T, que não existem para a avaliação). Código de saída: 0 = invariante; 1 = fuga.
 """
 import json
 import subprocess
@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ALLOWED = {'/inputs', '/population/llm_hypotheses', '/population/excluded/born_after_as_of'}
+ALLOWED = {'/inputs'}
 
 
 def diff(x, y, p=''):
@@ -39,7 +39,7 @@ def main(argv):
     out = {'as_of': t, 'old': res['old']['inputs']['ref'], 'new': res['new']['inputs']['ref'], 'differences': d, 'invariant': not d,
            'llm_hypotheses_in_registry': [res['old']['population']['llm_hypotheses'], res['new']['population']['llm_hypotheses']],
            'evaluated': [res['old']['population']['evaluated'], res['new']['population']['evaluated']],
-           'born_after_as_of': [res['old']['population']['excluded']['born_after_as_of'], res['new']['population']['excluded']['born_after_as_of']],
+           'registered_after_window': [res['old']['inputs']['llm_hypotheses_registered_after_window'], res['new']['inputs']['llm_hypotheses_registered_after_window']],
            'pre_protocol': res['old']['pre_protocol'], 'duplicates_at_birth': len(res['old']['population']['duplicates_at_birth'])}
     text = json.dumps(out, indent=1, ensure_ascii=False, sort_keys=True) + '\n'
     if len(argv) > 5:

@@ -1,8 +1,11 @@
-"""Avaliação incremental das hipóteses do modelo de linguagem (PR 4, protocolo `llm_incremental_v1`).
+"""Avaliação incremental das hipóteses do modelo de linguagem (PR 4, protocolo `llm_incremental_v3`).
 
-Implementa audits/pr4-llm-protocol-v2.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; outra versão, incluindo o v1,
-é recusada). Emendas do v2 (revisão independente da PR #27): apoio dos controlos pela hora de LEITURA (P1-A); grupos decididos no
-nascimento, com o que já tinha sido lido (P1-B); início P = max(commit, primeira publicação verificável no GitHub) (P2-C).
+Implementa audits/pr4-llm-protocol-v3.md (o sha256 do ficheiro está fixado em PROTOCOL_SHA256; outra versão, incluindo o v1 e
+o v2, é recusada). Emendas do v2 (revisão independente da PR #27): apoio dos controlos pela hora de LEITURA (P1-A); grupos
+decididos no nascimento, com o que já tinha sido lido (P1-B); início P = max(commit, primeira publicação verificável no GitHub)
+(P2-C). Emendas do v3 (auditoria #5916209217, P1-D): um único olhar confirmatório no instante C = P + 30 + 3 dias, com a
+janela fechada em H = P + 30 dias (antes de C, tudo é exploratório; depois de C, o resultado é sempre o mesmo); teste de
+inversão de sinais por dia sobre diferenças dentro do mesmo dia (calibrado sob a hipótese nula), em vez do bootstrap.
 Puro e determinístico: sem rede, sem segredos, sem escrita. O git só é lido (histórico do registo e do protocolo).
 
 Pergunta: as hipóteses `llm` escolhem jogos com mais lucro por jogo, depois do seu registo, do que hipóteses comparáveis do
@@ -14,24 +17,26 @@ import json
 import math
 import random
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from . import brain, chronology, insights
 from .eligibility import eligible
 from .equivalence import Index, Redundancy, expectation, groups_at_birth
 
-PROTOCOL = 'llm_incremental_v2'
-PROTOCOL_FILE = 'audits/pr4-llm-protocol-v2.md'
-PROTOCOL_SHA256 = '1f4a1001b5eefd90c9f6676a40bd63915900395314bd2243a4162d9433081339'
+PROTOCOL = 'llm_incremental_v3'
+PROTOCOL_FILE = 'audits/pr4-llm-protocol-v3.md'
+PROTOCOL_SHA256 = 'e3190be054c982c901dec00099ef2a433f43fc5103d82446a5b0846f361989a4'
 REGISTRY_FILE = 'data/hypotheses.json'
 TAU, SENSITIVITY, GROUP_MIN_GAMES = 0.85, (0.80, 0.90), 8
 K, K_MIN = 20, 5
 REPLICATES, SEED, ALPHA = 10_000, 20261115, 0.05
-MIN_GROUPS, MIN_GROUP_GAMES, MIN_GAMES, MIN_DAYS, MAX_DAY_SHARE, MIN_REPLICATES = 10, 10, 200, 14, 0.20, 9_000
+MIN_GROUPS, MIN_GROUP_GAMES, MIN_GAMES, MIN_DAYS, MAX_DAY_SHARE = 10, 10, 200, 14, 0.20
+HORIZON_DAYS, SETTLE_DAYS = 30, brain.OPEN_TIMEOUT_DAYS     # H = P + 30 dias; C = H + 3 dias (§0-B do protocolo v3)
 SECONDARY = ('S1_family_baseline', 'S2_mode_novas', 'S3_mode_refinar', 'S4_refinar_vs_parents', 'S5_evitar_vs_baseline',
              'S6_tau_0.80', 'S7_tau_0.90')
-VERDICTS = ('não verificada', 'evidência insuficiente', 'sem utilidade incremental demonstrada',
+VERDICTS = ('não verificada', 'exploratória — antes do instante confirmatório (sem conclusão)', 'evidência insuficiente',
+            'sem utilidade incremental demonstrada',
             'utilidade incremental estatisticamente significativa (não é prova de vantagem nem certificação)')
 UTC = timezone.utc
 
@@ -182,31 +187,31 @@ def _by_day(units):
 
 
 def compare(test_units, ctrl_units):
-    """D = média por jogo do lado em teste − média por jogo do lado de comparação; bootstrap por blocos de dia (H1: D > 0)."""
+    """Comparação do protocolo v3 (§6): D = média ponderada, sobre os dias emparelhados (com jogos dos dois lados), das
+    diferenças DENTRO do dia entre a média por jogo do lado em teste e a do lado de comparação; peso w_d = n_t·n_c/(n_t+n_c).
+    O efeito comum de cada dia cancela-se. Teste unilateral (H1: D > 0) por inversão aleatória de sinais por dia, exato sob
+    simetria das diferenças diárias; p = (1 + #{D* >= D}) / (1 + B), empates contados contra a hipótese em teste."""
     tx, nt = _by_day(test_units)
     cx, nc = _by_day(ctrl_units)
-    res = {'games_test': nt, 'games_control': nc, 'days_test': len(tx), 'days': len(set(tx) | set(cx)),
+    paired = sorted(set(tx) & set(cx))
+    res = {'games_test': nt, 'games_control': nc, 'days_test': len(tx), 'days_paired': len(paired),
            'max_day_share_test': round(max((v[1] for v in tx.values()), default=0) / nt, 6) if nt else None,
-           'd': None, 'lower_95': None, 'p': None, 'replicates': 0}
-    if not nt or not nc:
+           'd': None, 'd_games_descriptive': None, 'p': None, 'replicates': 0}
+    if nt and nc:
+        res['d_games_descriptive'] = round(sum(v[0] for v in tx.values()) / nt - sum(v[0] for v in cx.values()) / nc, 6)
+    if not paired:
         return res
-    d = sum(v[0] for v in tx.values()) / nt - sum(v[0] for v in cx.values()) / nc
-    days = sorted(set(tx) | set(cx))
-    rng, stats = random.Random(SEED), []
-    zero = (0.0, 0)
+    w = [tx[d][1] * cx[d][1] / (tx[d][1] + cx[d][1]) for d in paired]
+    diff = [tx[d][0] / tx[d][1] - cx[d][0] / cx[d][1] for d in paired]
+    total = sum(w)
+    terms = [a * b / total for a, b in zip(w, diff)]
+    d = sum(terms)
+    rng, ge, n = random.Random(SEED), 0, len(terms)
     for _ in range(REPLICATES):
-        st = sn = cs = cn = 0
-        for _ in days:
-            day = days[rng.randrange(len(days))]
-            a, b = tx.get(day, zero), cx.get(day, zero)
-            st, sn, cs, cn = st + a[0], sn + a[1], cs + b[0], cn + b[1]
-        if sn and cn:
-            stats.append(st / sn - cs / cn)
-    stats.sort()
-    res.update(d=round(d, 6), replicates=len(stats))
-    if stats:
-        res['lower_95'] = round(stats[max(0, math.ceil(0.05 * len(stats)) - 1)], 6)
-        res['p'] = round((1 + sum(1 for x in stats if x <= 0)) / (1 + len(stats)), 6)
+        bits = rng.getrandbits(n)
+        if sum(x if (bits >> i) & 1 else -x for i, x in enumerate(terms)) >= d - 1e-12:
+            ge += 1
+    res.update(d=round(d, 6), p=round((1 + ge) / (1 + REPLICATES), 6), replicates=REPLICATES)
     return res
 
 
@@ -232,10 +237,10 @@ def enough(primary, group_games=None):
         fails.append('control games < %d' % MIN_GAMES)
     if primary['days_test'] < MIN_DAYS:
         fails.append('days with llm games < %d' % MIN_DAYS)
+    if primary['days_paired'] < MIN_DAYS:
+        fails.append('paired days < %d' % MIN_DAYS)
     if primary['max_day_share_test'] is None or primary['max_day_share_test'] > MAX_DAY_SHARE:
         fails.append('one day holds more than %d %% of llm games' % round(MAX_DAY_SHARE * 100))
-    if primary['replicates'] < MIN_REPLICATES:
-        fails.append('valid replicates < %d' % MIN_REPLICATES)
     return fails
 
 
@@ -243,10 +248,36 @@ def _r(x):
     return None if x is None else round(x, 6)
 
 
+def windows(protocol_time):
+    """(H, C) do protocolo v3 (§0-B): horizonte da janela e instante confirmatório; (None, None) sem P."""
+    if protocol_time is None:
+        return None, None
+    horizon = protocol_time + timedelta(days=HORIZON_DAYS)
+    return horizon, horizon + timedelta(days=SETTLE_DAYS)
+
+
+def cutoff_of(as_of, protocol_time):
+    """Fecho da janela de uma avaliação: min(relógio efetivo, H)."""
+    horizon, confirm = windows(protocol_time)
+    clock = confirm if confirm is not None and as_of >= confirm else as_of
+    return min(clock, horizon) if horizon is not None else clock
+
+
 def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
-    """Avaliação completa (pura). signals: sinais do relatório (a vista `as_of` e a elegibilidade aplicam-se aqui).
-    born_eff: {id: datetime ou None} (births). protocol_time: P. problems: falhas de prova (histórico, protocolo)."""
-    view = [b for b in chronology.as_of_view(signals, as_of) if eligible(b)]
+    """Avaliação completa (pura). signals: sinais do relatório (a vista do relógio e a elegibilidade aplicam-se aqui).
+    born_eff: {id: datetime ou None} (births). protocol_time: P. problems: falhas de prova (histórico, protocolo).
+
+    Protocolo v3 (§0-B): o relógio efetivo é min(as_of, C). Com as_of >= C a avaliação é a confirmatória e é sempre a mesma
+    (nada depois de C existe para ela); antes de C é exploratória e nunca dá conclusão. Só contam jogos decididos até H e só
+    hipóteses nascidas até H."""
+    horizon, confirm = windows(protocol_time)
+    confirmatory = confirm is not None and as_of >= confirm
+    clock = confirm if confirmatory else as_of
+    cutoff = min(clock, horizon) if horizon is not None else clock
+    as_of = clock
+    # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
+    # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
+    view = [b for b in chronology.as_of_view(signals, as_of) if eligible(b) and chronology.decision_time(b) <= cutoff]
     multi, earlier = brain.multi_matches(view), brain.earlier_index(view)
     have = [(b, insights.family(b), frozenset(brain.atoms(b, multi, earlier))) for b in view]
     index = Index(view)
@@ -269,13 +300,16 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         key = (hid, start)
         if key not in cache:
             h = registry[hid] if hid in registry else {'family': hid[len('family:'):], 'conditions': []}
-            cache[key] = admitted(match(h['family'], h['conditions']), start)
+            cache[key] = {g: v for g, v in admitted(match(h['family'], h['conditions']), start).items()
+                          if horizon is None or v[2] <= horizon}   # janela fechada no horizonte H (§0-B)
         return cache[key]
 
-    llm_ids = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm')
-    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None and (born_eff[hid] <= as_of)]
-    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None),
-                'born_after_as_of': sum(1 for hid in llm_ids if born_eff.get(hid) is not None and born_eff[hid] > as_of)}
+    # Hipóteses registadas depois do fecho da janela não existem para esta avaliação (nem nas contagens): o resultado não
+    # depende do registo posterior. O script de auditoria indica quantas são, nas entradas.
+    llm_ids = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm'
+                     and (born_eff.get(hid) is None or born_eff[hid] <= cutoff))
+    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None]
+    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None)}
 
     # Duplicados à nascença (descrição): redundância extensional demonstrável no instante de registo de cada proposta.
     duplicates = []
@@ -384,18 +418,20 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     for res in sec.values():
         res['insufficient'] = enough(res, res.pop('group_games', None))
     adj = holm([None if sec[n]['insufficient'] else sec[n]['p'] for n in SECONDARY])
-    for name, a in zip(SECONDARY, adj):
-        sec[name]['p_holm'] = a
-        sec[name]['significant_holm'] = a <= ALPHA
+    for name, a in zip(SECONDARY, adj):   # antes de C são números sem teste (§9)
+        sec[name]['p_holm'] = a if confirmatory else None
+        sec[name]['significant_holm'] = (a <= ALPHA) if confirmatory else None
 
     if problems:
         verdict = VERDICTS[0]
-    elif fails:
+    elif not confirmatory:
         verdict = VERDICTS[1]
-    elif primary['p'] is None or primary['p'] > ALPHA:
+    elif fails:
         verdict = VERDICTS[2]
-    else:
+    elif primary['p'] is None or primary['p'] > ALPHA:
         verdict = VERDICTS[3]
+    else:
+        verdict = VERDICTS[4]
 
     # Janela pós-registo e pré-protocolo: só descrição (sem teste, sem p, sem intervalo); nunca sustenta conclusões.
     def before_p(u):
@@ -421,6 +457,9 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         hits = insights.Votes()
         for _, _, gr in brain.ordered_games(rows):
             if brain.game_category(gr, born_eff[hid]) == 'prospective':
+                bet = brain.committed_bet(brain.game_core(gr))
+                if horizon is not None and (bet is None or chronology.decision_time(bet) > horizon):
+                    continue   # mesma janela que a comparação: nada decidido depois de H (§0-B)
                 for b in brain.game_core(gr):
                     hits.add(b)
         hh, mm, be, n = hits.totals()
@@ -435,10 +474,12 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
 
     return {'protocol': PROTOCOL, 'protocol_sha256': PROTOCOL_SHA256, 'protocol_time_utc': chronology.iso(protocol_time),
             'as_of_utc': chronology.iso(as_of), 'verified': not problems, 'proof_problems': list(problems),
-            'verdict': verdict, 'insufficient': fails,
+            'phase': 'confirmatory' if confirmatory else 'exploratory', 'horizon_utc': chronology.iso(horizon),
+            'confirmation_utc': chronology.iso(confirm), 'verdict': verdict, 'insufficient': fails,
             'parameters': {'tau': TAU, 'sensitivity': list(SENSITIVITY), 'group_min_games': GROUP_MIN_GAMES, 'k': K, 'k_min': K_MIN,
                            'replicates': REPLICATES, 'seed': SEED, 'alpha': ALPHA, 'min_groups': MIN_GROUPS, 'min_group_games': MIN_GROUP_GAMES,
-                           'min_games': MIN_GAMES, 'min_days': MIN_DAYS, 'max_day_share': MAX_DAY_SHARE, 'min_replicates': MIN_REPLICATES,
+                           'min_games': MIN_GAMES, 'min_days': MIN_DAYS, 'max_day_share': MAX_DAY_SHARE, 'test': 'day-paired sign-flip',
+                           'horizon_days': HORIZON_DAYS, 'settle_days': SETTLE_DAYS,
                            'odds_loss': insights.ODDS_LOSS, 'holm_m': len(SECONDARY)},
             'population': {'eligible_signals': len(view), 'llm_hypotheses': len(llm_ids), 'evaluated': len(valid), 'excluded': excluded,
                            'groups': len(grp), 'groups_sensitivity': {str(t): len(grouping(t)) for t in SENSITIVITY},
@@ -452,7 +493,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
 
 
 def page_summary(signals, registry):
-    """Resumo para a página (sem git: nunca há conclusão científica no relatório de produção). Grupos como no protocolo v2."""
+    """Resumo para a página (sem git: nunca há conclusão científica no relatório de produção). Grupos como nos protocolos v2/v3."""
     llm = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm' and chronology.born(h) is not None)
     view, snaps = [b for b in signals if eligible(b)], {}
 
@@ -473,7 +514,10 @@ def render(res):
     fmt = lambda x: '—' if x is None else ('%.4f' % x)
     lines = ['# PR 4 — Avaliação incremental das hipóteses LLM (protocolo `%s`)' % res['protocol'], '',
              'Gerado por `scripts/audit_pr4_llm.py` a partir de dados de um commit fixo; reprodutível byte a byte.', '',
-             '## Veredicto', '', '**%s**' % res['verdict'], '']
+             '## Veredicto', '', '**%s**' % res['verdict'], '',
+             'Fase: **%s**. Horizonte da janela H = %s; instante confirmatório C = %s. Só a avaliação com relógio C é confirmatória'
+             % ('confirmatória' if res['phase'] == 'confirmatory' else 'exploratória', res['horizon_utc'], res['confirmation_utc']),
+             '(uma única vez; qualquer execução posterior dá o mesmo resultado). Antes de C, os números não sustentam conclusões.', '']
     if res['proof_problems']:
         lines += ['Falhas de prova (nenhuma conclusão científica):', ''] + ['- %s' % x for x in res['proof_problems']] + ['']
     if res['insufficient']:
@@ -484,7 +528,7 @@ def render(res):
               'mercado e não certifica nenhuma tática. Taxas de acerto, incluindo as superiores a 50 %, são só descrição.', '',
               '## Entradas', '',
               '- Protocolo: `%s`, sha256 `%s`, início P = %s' % (res['protocol'], res['protocol_sha256'], res['protocol_time_utc']),
-              '- Avaliado em: %s' % res['as_of_utc'],
+              '- Relógio efetivo da avaliação: %s (min(as_of pedido, C))' % res['as_of_utc'],
               '- P = max(hora do commit do protocolo, primeira publicação verificável no GitHub); ver `protocol_published_utc` e `protocol_publication_evidence` nas entradas.']
     for k, v in sorted((res.get('inputs') or {}).items()):
         lines.append('- %s: `%s`' % (k, v))
@@ -501,19 +545,20 @@ def render(res):
               '| Duplicados extensionais à nascença | %d |' % len(pop['duplicates_at_birth']),
               '| Por modo (novas / refinar / evitar) | %d / %d / %d |' % (pop['by_mode']['novas'], pop['by_mode']['refinar'], pop['by_mode']['evitar']),
               '', '## Comparação primária', '',
-              'D = lucro médio por jogo das hipóteses LLM − lucro médio por jogo dos controlos do gerador (pesos 1/K), jogos prospetivos',
-              'desde max(nascimento provado, P). Bootstrap por blocos de dia, %d réplicas, semente %d; H1: D > 0; α = %.2f.' % (p['replicates'], p['seed'], p['alpha']), '',
-              '| Jogos LLM | Jogos controlo | Dias LLM | Maior fração num dia | D | Limite inferior 95 % | p | Réplicas válidas |',
+              'D = média ponderada, sobre os dias com jogos dos dois lados, da diferença DENTRO do dia entre o lucro médio por jogo das',
+              'hipóteses LLM e o dos controlos do gerador (pesos 1/K); jogos prospetivos desde max(nascimento provado, P) e decididos até H.',
+              'Teste: inversão aleatória de sinais por dia, %d réplicas, semente %d; H1: D > 0; α = %.2f.' % (p['replicates'], p['seed'], p['alpha']), '',
+              '| Jogos LLM | Jogos controlo | Dias LLM | Dias emparelhados | Maior fração num dia | D | Diferença por jogo (descritiva) | p |',
               '|---|---|---|---|---|---|---|---|',
-              '| %d | %d | %d | %s | %s | %s | %s | %d |' % (prim['games_test'], prim['games_control'], prim['days_test'], fmt(prim['max_day_share_test']),
-                                                       fmt(prim['d']), fmt(prim['lower_95']), fmt(prim['p']), prim['replicates']),
+              '| %d | %d | %d | %d | %s | %s | %s | %s |' % (prim['games_test'], prim['games_control'], prim['days_test'], prim['days_paired'],
+                                                       fmt(prim['max_day_share_test']), fmt(prim['d']), fmt(prim['d_games_descriptive']), fmt(prim['p'])),
               '', '## Janela pós-registo e pré-protocolo (só descrição)', '',
               'Mesmos representantes e controlos, jogos prospetivos desde o nascimento provado e decididos antes de P. Não é um teste:',
               'foi observada antes de o protocolo existir e não tem p-valor nem intervalo.', '',
               '| Jogos LLM | Dias | Lucro médio por jogo LLM | Jogos controlo | Lucro médio por jogo controlo |', '|---|---|---|---|---|',
               '| %d | %d | %s | %d | %s |' % (res['pre_protocol']['games_test'], res['pre_protocol']['days_test'], fmt(res['pre_protocol']['mean_profit_test']),
                                           res['pre_protocol']['games_control'], fmt(res['pre_protocol']['mean_profit_control'])),
-              '', '## Análises adicionais (exploratórias, Holm m = %d)' % p['holm_m'], '',
+              '', '## Análises adicionais (exploratórias, Holm m = %d; p ajustado só em C)' % p['holm_m'], '',
               '| Análise | Jogos em teste | Jogos de comparação | D | p | p Holm |', '|---|---|---|---|---|---|']
     for name in SECONDARY:
         s = res['secondary'][name]

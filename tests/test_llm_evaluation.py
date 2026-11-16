@@ -57,12 +57,13 @@ def world(llm_outcomes, ctrl_outcomes, *, days=21, n_llm=10, n_ctrl=10, llm_odds
 
 
 def run(signals, registry, *, as_of=None, problems=(), born=None, protocol=P):
-    as_of = as_of or T0 + timedelta(days=30)
+    as_of = as_of or T0 + timedelta(days=40)   # depois de C: a avaliação confirmatória (relógio fixado em C)
     born_eff = born or {hid: brain.chronology.born(h) for hid, h in registry.items()}
     return llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born_eff, protocol_time=protocol, problems=list(problems))
 
 
-FAST = dict(REPLICATES=500, MIN_REPLICATES=450)
+FAST = dict(REPLICATES=500)
+CONFIRM = T0 + timedelta(days=33)          # C = P + 30 + 3 dias com P = T0 (protocolo v3, §0-B)
 
 
 class Leakage(unittest.TestCase):
@@ -104,8 +105,8 @@ class Leakage(unittest.TestCase):
         born['Jogo aberto | Liga = A1'] = T0 + timedelta(days=99)
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry, born=born)
-        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 1, 'born_after_as_of': 1})
-        self.assertEqual(res['population']['evaluated'], 1)
+        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 1})
+        self.assertEqual((res['population']['evaluated'], res['population']['llm_hypotheses']), (1, 2))   # a futura não existe para a avaliação
 
 
 class HitRateIsNotEvidence(unittest.TestCase):
@@ -300,7 +301,7 @@ class Verdicts(unittest.TestCase):
 
     def test_each_minimum_fails_on_its_own(self):
         with patch.multiple(llm_eval, **FAST):
-            few = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=45, n_llm=5), as_of=T0 + timedelta(days=50))               # 225 jogos em 45 dias, mas só 5 grupos
+            few = run(*world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=30, n_llm=8))   # 240 jogos em 30 dias (janela até H), mas só 8 grupos
             signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=14, n_ctrl=15)      # 14 dias, 10 grupos, 140 + 75 jogos LLM...
             signals += [sig('A%d-burst%d' % (i, k), 1.0, DAY + 600 + k * 15 + i, league='A%d' % i) for i in range(5) for k in range(15)]
             burst = run(signals, registry)                                                         # ...com 75 + 10 no 1.º dia (40 %)
@@ -308,13 +309,21 @@ class Verdicts(unittest.TestCase):
         self.assertEqual(few['insufficient'], ['groups with >= 10 games < 10'])
         self.assertEqual(burst['insufficient'], ['one day holds more than 20 % of llm games'])
         self.assertEqual(short['insufficient'], ['llm games < 200'])
+        # 210 jogos LLM em 21 dias, 200 de controlo mas só em 10 dias: faltam dias emparelhados
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=21, n_ctrl=0)
+        for i in range(20):
+            signals += league_signals('B%d' % i, 10 + i, [1.0, -1.0], 10)
+            registry['Jogo aberto | Liga = B%d' % i] = hyp('B%d' % i, 'gerador', GEN_BORN)
+        with patch.multiple(llm_eval, **FAST):
+            unpaired = run(signals, registry)
+        self.assertEqual(unpaired['insufficient'], ['paired days < 14'])
         self.assertEqual({few['verdict'], burst['verdict']}, {'evidência insuficiente'})
 
     def test_pre_protocol_evidence_never_supports_conclusions(self):
         signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=21)
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry, protocol=T0 + timedelta(days=40))                   # tudo anterior ao protocolo
-        self.assertEqual((res['primary']['games_test'], res['verdict']), (0, 'evidência insuficiente'))
+        self.assertEqual((res['primary']['games_test'], res['verdict']), (0, llm_eval.VERDICTS[1]))   # antes de C: exploratória
         self.assertEqual(sum(h['pre_protocol_games'] for h in res['hypotheses']), 210)
 
     def test_T13_T20_deterministic_and_never_claims_validation(self):
@@ -427,10 +436,12 @@ class GitProofs(unittest.TestCase):
         self.assertIn('protocol publication before its commit', llm_eval.protocol_proof(self.root, sha, '2026-11-20T09:00:00+00:00', ev)[1])
         # commit com data recuada, publicação real 3 dias depois: P é a publicação
         self.assertEqual(llm_eval.protocol_proof(self.root, sha, '2026-11-23T10:00:00+00:00', ev), (T0 + timedelta(days=3, hours=10), []))
-        # o protocolo v1 (commit 9f7b2aa) deixou de ser aceite
-        v1 = (Path(__file__).resolve().parents[1] / 'audits/pr4-llm-protocol.md').read_bytes()
-        old = self.commit('audits/old.md', v1.decode('utf-8'), '2026-11-20T11:00:00+00:00')
-        self.assertNotEqual(hashlib.sha256(v1).hexdigest(), llm_eval.PROTOCOL_SHA256)
+        # os protocolos v1 (9f7b2aa) e v2 (25cd2d2) ficam no repositório mas deixaram de ser aceites
+        for old in ('audits/pr4-llm-protocol.md', 'audits/pr4-llm-protocol-v2.md'):
+            text = (Path(__file__).resolve().parents[1] / old).read_bytes()
+            self.assertNotEqual(hashlib.sha256(text).hexdigest(), llm_eval.PROTOCOL_SHA256)
+            sha_old = self.commit(llm_eval.PROTOCOL_FILE, text.decode('utf-8'), '2026-11-21T10:00:00+00:00')
+            self.assertIn('protocol content differs from the registered one', llm_eval.protocol_proof(self.root, sha_old, '2026-11-21T11:00:00+00:00', ev)[1])
 
     def test_P2C_data_between_commit_and_publication_is_not_prospective(self):
         signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0], days=21)
@@ -495,6 +506,108 @@ class ReviewP1(unittest.TestCase):
             a, b = run(base, self.scenario()), run(base + unread, self.scenario())
         self.assertEqual(self.groups_of(a), self.groups_of(b))
         self.assertEqual(b['population']['groups'], 2)
+
+
+class RepeatedLooksP1D(unittest.TestCase):
+    """Auditoria #5916209217, P1-D: avaliações repetidas e paragem oportunista não podem produzir falsas significâncias."""
+
+    def test_P1D_before_C_every_look_is_exploratory_whatever_the_p(self):
+        signals, registry = world([1.0, 1.0, 1.0, -1.0], [1.0, -1.0])
+        with patch.multiple(llm_eval, **FAST):
+            looks = [run(signals, registry, as_of=T0 + timedelta(days=d)) for d in (15, 22, 29)] + [run(signals, registry, as_of=CONFIRM - timedelta(minutes=1))]
+            final = run(signals, registry, as_of=CONFIRM)
+        for r in looks:
+            self.assertEqual((r['verdict'], r['phase']), (llm_eval.VERDICTS[1], 'exploratory'))
+            self.assertTrue(all(x['significant_holm'] is None and x['p_holm'] is None for x in r['secondary'].values()))
+        self.assertLess(looks[-1]['primary']['p'], 0.05)                                       # o número existe, a conclusão não
+        self.assertEqual((final['phase'], final['verdict']), ('confirmatory', llm_eval.VERDICTS[4]))
+
+    def test_P1D_the_confirmatory_result_never_changes_after_C(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0])
+        # depois de H: dias 31 a 90 muito favoráveis à LLM, uma hipótese LLM nova e uma janela de liquidação longa
+        extra = [sig('A%d-late%d' % (i, d), 1.0, d * DAY + i * 30, league='A%d' % i) for i in range(10) for d in range(31, 91)]
+        later_reg = dict(registry, **{'Jogo aberto | Liga = A9 & Minuto = 31 a 60': hyp('A9', 'llm', T0 + timedelta(days=31), extra=[('Minuto', '31 a 60')])})
+        with patch.multiple(llm_eval, **FAST):
+            base = llm_eval.dumps(run(signals, registry, as_of=CONFIRM))
+            for as_of in (CONFIRM + timedelta(days=1), CONFIRM + timedelta(days=90)):
+                self.assertEqual(llm_eval.dumps(run(signals + extra, later_reg, as_of=as_of)), base)
+        self.assertIn('"phase": "confirmatory"', base)
+        self.assertIn('"verdict": "sem utilidade incremental demonstrada"', base)
+
+    def test_P1D_window_ends_at_the_horizon(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=40)
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry)
+        # dias 1 a 29 inteiros; no dia 30 só A0 (decidido exatamente em H); nada depois de H
+        self.assertEqual(res['primary']['games_test'], 10 * 29 + 1)
+        self.assertEqual(res['horizon_utc'], iso(T0 + timedelta(days=30)))
+        self.assertEqual(res['confirmation_utc'], iso(CONFIRM))
+
+    def test_P1D_hypotheses_born_after_the_horizon_are_not_evaluated(self):
+        signals, registry = world([1.0, -1.0], [1.0, -1.0], days=3, n_llm=2, n_ctrl=6)
+        registry['late'] = hyp('A7', 'llm', T0 + timedelta(days=30, minutes=1))
+        with patch.multiple(llm_eval, **FAST):
+            res = run(signals, registry)
+        self.assertEqual(res['population']['evaluated'], 2)
+        self.assertNotIn('late', [h['id'] for h in res['hypotheses']])
+
+    @staticmethod
+    def null_days(rng, days, n_llm, n_ctrl, day_sd=0.15, odds=(1.5, 1.8, 2.0, 2.5, 3.5, 5.0)):
+        """Sem utilidade incremental: os dois lados com a mesma distribuição e um efeito comum por dia (dependência)."""
+        test, ctrl = {}, {}
+        for d in range(days):
+            day, shift = (T0 + timedelta(days=d)).date().isoformat(), rng.gauss(0, day_sd)
+            for side, n, out in (('L', max(1, int(rng.expovariate(1 / n_llm))), test), ('C', max(1, int(rng.expovariate(1 / n_ctrl))), ctrl)):
+                for k in range(n):
+                    o = rng.choice(odds)
+                    win = rng.random() < min(0.97, max(0.01, (1 + 2 * shift) / o))
+                    out['%s%d-%d' % (side, d, k)] = (day, (o * 0.98 - 1) if win else -1.0, None)
+        return test, ctrl
+
+    @staticmethod
+    def upto(units, last_day):
+        return {g: v for g, v in units.items() if v[0] <= last_day}
+
+    def test_P1D_optional_stopping_inflates_alpha_and_the_single_look_does_not(self):
+        rng, S, looks = __import__('random').Random(2026), 150, range(14, 31, 2)
+        single = naive = 0
+        with patch.object(llm_eval, 'REPLICATES', 300):
+            for _ in range(S):
+                test, ctrl = self.null_days(rng, 30, 8, 12)
+                ps = [llm_eval.compare([(1.0, self.upto(test, (T0 + timedelta(days=k - 1)).date().isoformat()))],
+                                       [(1.0, self.upto(ctrl, (T0 + timedelta(days=k - 1)).date().isoformat()))])['p'] for k in looks]
+                single += ps[-1] <= 0.05                                   # o protocolo v3: só o olhar no horizonte
+                naive += any(p <= 0.05 for p in ps)                        # parar no primeiro olhar com p <= 0,05
+        self.assertLessEqual(single / S, 0.09)                             # α = 0,05 com 3 erros-padrão de Monte Carlo
+        self.assertGreater(naive, single)                                  # a paragem oportunista inflaciona o erro
+        self.assertGreater(naive / S, 0.06)
+
+    def test_sign_flip_is_calibrated_under_the_null(self):
+        rng, S = __import__('random').Random(5), 300
+        hits = {0.05: 0, 0.10: 0, 0.50: 0}
+        with patch.object(llm_eval, 'REPLICATES', 300):
+            for _ in range(S):
+                test, ctrl = self.null_days(rng, 21, 10, 15)
+                p = llm_eval.compare([(1.0, test)], [(1.0, ctrl)])['p']
+                for a in hits:
+                    hits[a] += p <= a
+        self.assertLessEqual(hits[0.05] / S, 0.05 + 3 * (0.05 * 0.95 / S) ** 0.5)
+        self.assertLessEqual(hits[0.10] / S, 0.10 + 3 * (0.10 * 0.90 / S) ** 0.5)
+        self.assertGreater(hits[0.50] / S, 0.35)                           # não é um teste que nunca rejeita
+        self.assertLess(hits[0.50] / S, 0.65)
+
+    def test_sign_flip_exact_small_case_and_common_day_effect_cancels(self):
+        day = lambda d: (T0 + timedelta(days=d)).date().isoformat()
+        test = {'t%d' % d: (day(d), 1.0, None) for d in range(3)}
+        ctrl = {'c%d' % d: (day(d), 0.0, None) for d in range(3)}
+        r = llm_eval.compare([(1.0, test)], [(1.0, ctrl)])
+        self.assertEqual((r['d'], r['days_paired']), (1.0, 3))
+        self.assertAlmostEqual(r['p'], 1 / 8, delta=0.01)                 # só a combinação (+,+,+) iguala D
+        shifted_t = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in test.items()}   # efeito de dia enorme nos dois lados
+        shifted_c = {g: (v[0], v[1] + 5 * int(v[0][-2:]), None) for g, v in ctrl.items()}
+        self.assertEqual(llm_eval.compare([(1.0, shifted_t)], [(1.0, shifted_c)])['d'], 1.0)
+        unpaired = llm_eval.compare([(1.0, test)], [(1.0, {'c': (day(9), 0.0, None)})])
+        self.assertEqual((unpaired['days_paired'], unpaired['p']), (0, None))
 
 
 if __name__ == '__main__':

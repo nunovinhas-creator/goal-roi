@@ -1,4 +1,4 @@
-"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v2.md).
+"""PR 4: avaliação científica reprodutível das hipóteses LLM (protocolo audits/pr4-llm-protocol-v3.md).
 
 Só leitura e sem rede: lê `data/` de um commit fixo por `git archive` para uma pasta temporária, constrói o relatório com o
 relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o protocolo pelo histórico git completo, e escreve
@@ -7,7 +7,8 @@ relógio `--as-of` (sem registar nada), prova o nascimento de cada hipótese e o
 Uso (na raiz de um clone completo, `git fetch --unshallow` se preciso):
     python3.11 scripts/audit_pr4_llm.py --ref <commit de main> --protocol-commit <sha do protocolo> \
         --protocol-published-utc <hora do servidor GitHub> --protocol-publication-evidence <ligação github.com> [--as-of <UTC>] [--out audits]
-Sem prova de publicação do protocolo (§0-A do protocolo v2) a avaliação sai "não verificada".
+Sem prova de publicação do protocolo (§0-A do protocolo v3) a avaliação sai "não verificada". Antes do instante confirmatório C
+(§0-B) sai "exploratória"; com --as-of em C ou depois, a avaliação é a confirmatória e é sempre a mesma.
 
 Códigos de saída: 0 = relatório escrito (qualquer veredicto); 2 = uso errado ou entradas ilegíveis.
 """
@@ -73,6 +74,9 @@ def main(argv=None):
         inputs['protocol_commit'] = args.protocol_commit
     inputs['protocol_published_utc'] = args.protocol_published_utc
     inputs['protocol_publication_evidence'] = args.protocol_publication_evidence
+    cut = llm_eval.cutoff_of(as_of, protocol_time)
+    inputs['llm_hypotheses_registered_after_window'] = sum(1 for hid, h in registry.items() if h.get('source') == 'llm'
+                                                          and born.get(hid) is not None and born[hid] > cut)
     res['inputs'] = inputs
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
