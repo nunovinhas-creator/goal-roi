@@ -1,5 +1,10 @@
 {
  "announced_changes": {
+  "Betfair | Dia = dia de semana": {
+   "at_utc": "2026-11-16T21:01:32+00:00",
+   "from": "abandonada",
+   "to": "em observação"
+  },
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": {
    "at_utc": "2026-11-16T18:31:13+00:00",
    "from": "em observação",
@@ -12,7 +17,6 @@
   }
  },
  "announced_statuses": {
-  "Betfair | Dia = dia de semana": "abandonada",
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
@@ -121,6 +125,18 @@
    "sha256": "44ad13fe6f2e35932f546a477dc10762acfb31ad449cea9a5fd821e2805c5488",
    "state": "delivered"
   },
+  "status|abandonada>em observação|465bacba5fa0|45@2026-11-16T20:59:59+00:00|3973e022e932": {
+   "attempt_utc": "2026-11-16T21:01:32+00:00",
+   "chars": 533,
+   "created_utc": "2026-11-16T21:01:32+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "status",
+   "sha256": "c6ae6f7dcbaf3fc7b263a9e0c0d2320a1b3a64e072c76b809bea2fd48e8f7e51",
+   "state": "in_flight"
+  },
   "status|em observação>abandonada|804b9a582d13|37@2026-11-16T18:29:37+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T18:31:13+00:00",
    "chars": 582,
@@ -135,6 +151,14 @@
    "sha256": "bc597a7a406c9a02e6c2f6231a9e6311d5b0e5d7ecb5c9163038f1c9f8b437b3",
    "state": "delivered"
   },
+  "status|em observação>abandonada|e53adf3f964f|31@2026-11-16T20:59:59+00:00|3973e022e932": {
+   "created_utc": "2026-11-16T21:01:32+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "status",
+   "state": "pending"
+  },
   "status|em observação>promissora|d2f3630cf125|31@2026-11-16T18:19:52+00:00|3973e022e932": {
    "attempt_utc": "2026-11-16T18:20:17+00:00",
    "chars": 597,
@@ -148,19 +172,27 @@
    "kind": "status",
    "sha256": "48b684fcef9240fdfa651c67aedd57c6a0bc2e5df9a1dede1149fe6a152f5112",
    "state": "delivered"
+  },
+  "summary|2026-11-16": {
+   "created_utc": "2026-11-16T21:01:32+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "summary",
+   "state": "pending"
   }
  },
  "delivery_counts": {
   "delivered": 9
  },
- "format_last_run_utc": "2026-11-16T20:55:16+00:00",
+ "format_last_run_utc": "2026-11-16T20:59:32+00:00",
  "health": {
   "reference": {
    "bsd_results": 21,
    "eligible": 652,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 63,
-   "hypotheses": 7045,
+   "hypotheses": 7056,
    "settled_bets": 504,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 9,
@@ -168,7 +200,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-16T20:55:16+00:00",
+ "last_run_utc": "2026-11-16T20:59:32+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -332,6 +364,7 @@
   }
  },
  "notice_games": {
+  "Betfair | Dia = dia de semana": 22,
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 5,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": 50,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 30,
@@ -381,7 +414,6 @@
  },
  "sent_total": 321,
  "statuses": {
-  "Betfair | Dia = dia de semana": "abandonada",
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Reforço = sem reforço": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
@@ -389,7 +421,8 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada"
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada"
  },
  "summary_day": "2026-11-15",
  "watch_sent": [
