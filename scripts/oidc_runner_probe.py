@@ -22,7 +22,9 @@ REPOSITORY = 'nunovinhas-creator/goal-roi'
 ISSUER = 'https://token.actions.githubusercontent.com'
 DISCOVERY = ISSUER+'/.well-known/openid-configuration'
 WORKFLOW_REF = REPOSITORY+'/.github/workflows/collect.yml@refs/heads/main'
-SUBJECT = 'repo:'+REPOSITORY+':ref:refs/heads/main'
+# Immutable default subject (repository created 2026-11-11, after 2026-07-15).
+OWNER_ID, REPOSITORY_ID = '278368112', '1454375710'
+SUBJECT = 'repo:nunovinhas-creator@'+OWNER_ID+'/goal-roi@'+REPOSITORY_ID+':ref:refs/heads/main'
 AUDIENCE = 'goal-roi-oidc-diagnostic-v1'
 TIMEOUT_S, MAX_BODY = 10, 256_000
 
@@ -59,6 +61,7 @@ def thumbprint(jwk):
 
 def check_claims(claims, environ):
     expected = {'iss':ISSUER, 'aud':AUDIENCE, 'sub':SUBJECT, 'repository':REPOSITORY,
+                'repository_id':REPOSITORY_ID, 'repository_owner_id':OWNER_ID,
                 'ref':'refs/heads/main', 'ref_type':'branch', 'workflow_ref':WORKFLOW_REF,
                 'runner_environment':'github-hosted',
                 'run_id':environ.get('GITHUB_RUN_ID'), 'run_attempt':environ.get('GITHUB_RUN_ATTEMPT')}
@@ -118,8 +121,10 @@ def probe(environ=None, opener=None):
             return report, secrets
         stage = 'claims'
         report['key_bits'] = key.key_size
-        report['claims'] = {k:claims.get(k) for k in ('iss', 'repository', 'ref', 'workflow_ref', 'event_name',
-                                                     'runner_environment', 'run_id', 'run_attempt')}
+        # Public identity claims, reported only after the signature verified.
+        report['claims'] = {k:claims.get(k) for k in ('iss', 'sub', 'repository', 'repository_id', 'repository_owner_id',
+                                                     'ref', 'workflow_ref', 'event_name', 'runner_environment',
+                                                     'run_id', 'run_attempt')}
         report['lifetime_s'] = claims.get('exp', 0)-claims.get('iat', 0)
         report['clock_skew_s'] = int(time.time())-claims.get('iat', 0)
         failed = check_claims(claims, environ)
