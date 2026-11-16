@@ -1,0 +1,333 @@
+{
+ "mutations": 36,
+ "killed": 36,
+ "ok": true,
+ "results": [
+  {
+   "mutation": "M01 no intent persisted before the send",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.U02_CrashBetweenSendAndRecord.test_in_flight_becomes_uncertain_and_is_never_resent"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M02 in-flight retried instead of uncertain",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.U02_CrashBetweenSendAndRecord.test_in_flight_becomes_uncertain_and_is_never_resent"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M03 uncertain counted as delivered",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_migration.NotifyMigration.test_send_failure_cannot_undo_migration_or_consume_delivery",
+    "test_telegram_presentation.U01_FailureInTheMiddle.test_uncertain_on_third_of_five"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M04 confirmed failures retried",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_an_attempted_key_is_never_sent_again_even_if_its_effects_were_lost"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M05 no event-key filter (effects only)",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_an_attempted_key_is_never_sent_again_even_if_its_effects_were_lost"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M06 keep sending after a failure",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U01_FailureInTheMiddle.test_confirmed_failure_on_third_of_five",
+    "test_telegram_presentation.U19_LateAlert.test_pending_alert_expires_when_it_is_no_longer_bettable"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M07 log not repaired from the state",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.CrashPoints.test_crash_between_state_and_log_never_loses_a_delivery",
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.U02_CrashBetweenSendAndRecord.test_in_flight_becomes_uncertain_and_is_never_resent"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M08 delivered keys of the log not restored",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M09 old key per signal (date|match|selection)",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
+    "test_telegram_presentation.U04_SelectionsOfOneGame.test_two_selections_one_message_and_a_later_selection_is_not_lost",
+    "test_telegram_presentation.X_LegacyAndHistory.test_signals_announced_in_the_old_format_are_not_resent",
+    "test_telegram_presentation.X_Presentation.test_new_evidence_since_the_last_notice"
+   ],
+   "failing_count": 6
+  },
+  {
+   "mutation": "M10 legacy keys ignored",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_rollback_and_roll_forward_never_resends_what_the_old_code_sent"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M11 grouping off",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U05_U06_Grouping.test_no_transitive_chain_and_no_incompatible_pair",
+    "test_telegram_presentation.U05_U06_Grouping.test_u05_three_equivalent_hypotheses_one_message",
+    "test_telegram_presentation.U05_U06_Grouping.test_watch_reasons_are_grouped_too"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M12 single linkage (transitive chains)",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U05_U06_Grouping.test_no_transitive_chain_and_no_incompatible_pair"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M13 absence means back to observation",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_absent_but_still_certified_is_unknown_not_a_loss"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M14 health gate off",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U07_DegradedReports.test_degradation_stable_for_24h_becomes_the_reference",
+    "test_telegram_presentation.U07_DegradedReports.test_eligible_universe_drop_and_rule_or_verification_change",
+    "test_telegram_presentation.U07_DegradedReports.test_results_source_failure_holds_a_real_change_until_healthy"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M15 pending status ignored",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U09_Pending.test_pending_status_is_never_announced"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M16 fixed change not required",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U09_Pending.test_pending_status_is_never_announced"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M17 anti-oscillation off",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U08_Oscillation.test_a_b_a_within_24h_is_one_notice_and_goes_to_the_summary"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M18 anti-oscillation hides critical changes",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U08_Oscillation.test_critical_changes_are_never_held"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M19 certification loss needs a healthy report",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U08_Oscillation.test_certification_loss_is_announced_even_with_a_degraded_report",
+    "test_telegram_presentation.U08_Oscillation.test_critical_changes_are_never_held"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M20 vanished validated tactic stays silent",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U08_Oscillation.test_certification_loss_is_announced_even_with_a_degraded_report"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M21 guard_claims skipped by the engine",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U12_U13_Claims.test_a_team_name_with_a_claim_word_blocks_the_notice"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M22 guard does not require the label",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U12_U13_Claims.test_claims_must_name_their_own_certified_hypothesis"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M23 claims not tied to their hypothesis",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U12_U13_Claims.test_claims_must_name_their_own_certified_hypothesis"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M24 \"forte\" not a claim word",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U12_U13_Claims.test_u13_every_inflection_is_blocked_without_certificate"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M25 negation anywhere in the line",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U08_Oscillation.test_certification_loss_is_announced_even_with_a_degraded_report",
+    "test_telegram_presentation.U08_Oscillation.test_critical_changes_are_never_held",
+    "test_telegram_presentation.U12_U13_Claims.test_u13_every_inflection_is_blocked_without_certificate"
+   ],
+   "failing_count": 4
+  },
+  {
+   "mutation": "M26 certificate without its own confirmation",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U10_U11_ForgedCertificates.test_never_validated_and_treated_as_promising"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M27 ledger validity not required",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U10_U11_ForgedCertificates.test_never_validated_and_treated_as_promising"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M28 late alerts allowed",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
+    "test_telegram_presentation.U19_LateAlert.test_alert_out_of_time_neither_sent_nor_pending",
+    "test_telegram_presentation.U19_LateAlert.test_pending_alert_expires_when_it_is_no_longer_bettable"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M29 silent migration not seeded",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_migration.NotifyMigration.test_genuine_subsequent_changes_are_not_silenced",
+    "test_notify_migration.NotifyMigration.test_offline_migration_persists_once_without_sender_or_counters",
+    "test_telegram_presentation.CrashPoints.test_crash_between_state_and_log_never_loses_a_delivery",
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
+    "test_telegram_presentation.LogAndStateRecovery.test_torn_log_line_is_isolated_and_never_rewritten"
+   ],
+   "failing_count": 35
+  },
+  {
+   "mutation": "M30 watch_sent truncated to 400",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_LegacyAndHistory.test_watch_sent_is_never_truncated"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M31 preview writes the state",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U17_Preview.test_preview_is_offline_and_writes_nothing"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M32 preview uses the real sender",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U17_Preview.test_preview_is_offline_and_writes_nothing"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M33 summary shows unverified counts",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_migration.NotifyMigration.test_watch_and_daily_summary_keep_working",
+    "test_scangoal.Notify.test_each_notice_is_sent_once_and_summary_waits_for_the_evening",
+    "test_telegram_presentation.U08_Oscillation.test_a_b_a_within_24h_is_one_notice_and_goes_to_the_summary",
+    "test_telegram_presentation.U10_U11_ForgedCertificates.test_never_validated_and_treated_as_promising",
+    "test_telegram_presentation.U12_U13_Claims.test_u12_language_model_text_never_reaches_a_message",
+    "test_telegram_presentation.U18_DailySummary.test_one_summary_per_day_after_21_utc"
+   ],
+   "failing_count": 8
+  },
+  {
+   "mutation": "M34 scientific state not on top",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.U08_Oscillation.test_certification_loss_is_announced_even_with_a_degraded_report",
+    "test_telegram_presentation.U10_U11_ForgedCertificates.test_a_real_certificate_is_announced_and_named",
+    "test_telegram_presentation.U16_LongMessages.test_forty_hypotheses_fit_and_keep_the_scientific_state",
+    "test_telegram_presentation.X_Presentation.test_every_kind_of_message_starts_with_the_scientific_state"
+   ],
+   "failing_count": 4
+  },
+  {
+   "mutation": "M35 log written without fsync of a newline separator",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.LogAndStateRecovery.test_torn_log_line_is_isolated_and_never_rewritten"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M36 sender HTTP 5xx counted as confirmed failure",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.X_Sender.test_classification"
+   ],
+   "failing_count": 1
+  }
+ ]
+}

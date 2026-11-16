@@ -783,6 +783,8 @@ class Notify(unittest.TestCase):
         rep = self.report()
         rep['brain']['status_list'] = {'h1': 'forte', 'h2': 'abandonada'}
         rep['operational']['regime'] = [{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}]
+        from pr5_fixtures import present
+        present(rep, certified=['h1'])   # PR 5: changes shown by the report itself; h1 with its own certificate
         changed = notify.messages(rep, state, noon)
         self.assertEqual(len(changed), 3)
         self.assertTrue(any('passou a forte' in m for m in changed) and any('Jogo aberto piorou' in m for m in changed))
@@ -793,6 +795,8 @@ class Notify(unittest.TestCase):
 
     def test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation(self):
         from scangoal import notify
+        from pr5_fixtures import body, present
+        cert = lambda rep: present(rep, certified=['h1', 'Jogo aberto | Minuto = 31 a 60'])   # PR 5: own certificates
         noon = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
         strong = {'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'forte', 'n': 120, 'hit_rate': 0.7, 'prob_above': 0.9999, 'break_even': 0.55,
                   'edge': 0.14, 'edge_ci': [0.07, 0.2], 'prudent_rate': 0.69, 'certified': True}
@@ -801,19 +805,23 @@ class Notify(unittest.TestCase):
         rep['brain']['watch'] = [game('2026-11-12T11:50:00+00:00'), game('2026-11-12T09:00:00+00:00'), game('2026-11-12T08:00:00+00:00', '2026-11-12T20:00')]
         rep['brain']['status_list'] = {'h1': 'forte'}
         state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {notify.STATUS_MIGRATION: {}}}
-        out = notify.messages(rep, state, noon)
-        alerts = [m for m in out if m.startswith('🟢 ALERTA')]
-        self.assertEqual(len(alerts), 2)                                               # o sinal de há 3 horas, com o jogo já a decorrer, não gera alerta
+        out = notify.messages(cert(rep), state, noon)
+        alerts = [m for m in out if body(m).startswith('🟢 ALERTA')]
+        # PR 5: the two bettable signals are the same game and selection (a reinforcement): ONE alert; the signal of 3 hours
+        # ago, with the game already under way, does not generate an alert.
+        self.assertEqual(len(alerts), 1)
         self.assertIn('Odd mínima para valer a pena: 1,45.', alerts[0])
         self.assertIn('Vantagem estimada: +14 pontos (entre +7 e +20).', alerts[0])
+        self.assertIn('Over 2.5 @ 1,9 (2 sinais)', alerts[0])
         self.assertTrue(any('Jogo às 20:00 de 12/11' in m for m in alerts))
-        self.assertTrue(any(m.startswith('✅ Tática validada, passou a forte') for m in out))
+        self.assertTrue(any(body(m).startswith('✅ Tática validada, passou a forte') for m in out))
         self.assertEqual(notify.messages(rep, state, noon), [])                        # cada alerta sai uma só vez
         rep['brain']['status_list'] = {'h1': 'promissora'}
-        self.assertTrue(notify.messages(rep, state, noon)[0].startswith('⛔ Tática deixou de estar validada, passou a promissora'))
+        self.assertTrue(body(notify.messages(cert(rep), state, noon)[0]).startswith('⛔ Tática deixou de estar validada, passou a promissora'))
         rep['brain']['status_list'] = {'h1': 'forte'}
-        notify.messages(rep, state, noon)
+        notify.messages(cert(rep), state, noon)
         rep['brain']['status_list'] = {}
+        present(rep)                                                                   # h1 vanishes without its certificate
         self.assertIn('voltou a "em observação"', notify.messages(rep, state, noon)[0])
 
     def test_run_needs_keys_never_prints_token_and_failure_is_hourly(self):

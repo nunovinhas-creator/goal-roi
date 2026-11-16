@@ -18,6 +18,13 @@ Verificações (todas obrigatórias):
 - no_validated_statuses: nenhuma tática `forte` ou `confirmada`;
 - statuses_follow_report: a referência Telegram (`statuses`, sem "em observação") é igual ao `status_list` do relatório.
 
+Verificações PR 5 (vazias e verdadeiras enquanto o estado não tiver a marca `telegram_format_v2`):
+- pr5_format_marker_stable: a marca `telegram_format_v2`, uma vez presente, nunca muda nem desaparece;
+- pr5_log_append_only: `data/notify_log.jsonl` em `antes` é um prefixo exato do de `depois` (só cresce);
+- pr5_at_most_one_attempt: no registo, nenhuma chave tem mais do que uma intenção de envio nem mais do que um resultado;
+- pr5_sent_total_matches_log: `sent_total` = valor na migração + chaves com entrega confirmada no registo;
+- pr5_nothing_in_flight: nenhuma entrega ficou "em curso" (queda do processo a meio de um envio: investigar).
+
 `status_list_changes` não é uma falha: lista as mudanças reais de estado entre os dois commits, que têm de corresponder
 uma a uma aos avisos de estado recebidos no Telegram nessa execução (verificação manual do proprietário).
 """
@@ -29,6 +36,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MARKERS = ('eligible_statuses_v1', 'status_rules:independent_games_hysteresis_v1', 'status_rules:chronological_eprocess_v3')
 RULES = 'chronological_eprocess_v3'
+FORMAT = 'telegram_format_v2'
+LOG = 'data/notify_log.jsonl'
+TERMINAL = ('delivered', 'failed', 'uncertain', 'blocked', 'expired')
 LEDGER = 'data/certification_ledger.json'
 VALIDATED = ('forte', 'confirmada')
 WATCHING = 'em observação'
@@ -46,6 +56,47 @@ def show(root, rev, path):
         return json.loads(r.stdout)
     except ValueError:
         raise Unreadable('%s is not valid JSON at %s' % (path, rev))
+
+
+def raw(root, rev, path):
+    r = subprocess.run(['git', '-C', str(root), 'show', '%s:%s' % (rev, path)], capture_output=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def log_entries(data):
+    out = []
+    for line in (data or b'').decode('utf-8', errors='replace').split('\n'):
+        try:
+            e = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(e, dict) and isinstance(e.get('key'), str):
+            out.append(e)
+    return out
+
+
+def pr5_checks(root, before, after, na, nb):
+    ma, mb = na.get('migrations') or {}, nb.get('migrations') or {}
+    if FORMAT not in ma and FORMAT not in mb:
+        return {}
+    la, lb = raw(root, before, LOG), raw(root, after, LOG)
+    entries = log_entries(lb)
+    intents, results, delivered = {}, {}, set()
+    for e in entries:
+        if e.get('event') == 'intent':
+            intents[e['key']] = intents.get(e['key'], 0) + 1
+        if e.get('event') in TERMINAL:
+            results[e['key']] = results.get(e['key'], 0) + 1
+        if e.get('event') == 'delivered':
+            delivered.add(e['key'])
+    base = (mb.get(FORMAT) or {}).get('sent_total')
+    return {
+        'pr5_format_marker_stable': FORMAT in mb and (FORMAT not in ma or ma[FORMAT] == mb[FORMAT]),
+        'pr5_log_append_only': (la or b'') == (lb or b'')[:len(la or b'')] and not (la and lb is None),
+        'pr5_at_most_one_attempt': all(v == 1 for v in intents.values()) and all(v == 1 for v in results.values()),
+        'pr5_sent_total_matches_log': isinstance(base, int) and nb.get('sent_total') == base + len(delivered),
+        'pr5_nothing_in_flight': not any(r.get('state') == 'in_flight' for r in (nb.get('deliveries') or {}).values()),
+    }
 
 
 def exists(root, rev, path):
@@ -72,6 +123,7 @@ def check(root, before, after):
         'no_validated_statuses': not any(s in VALIDATED for s in lb.values()),
         'statuses_follow_report': following == lb,
     }
+    checks.update(pr5_checks(root, before, after, na, nb))
     return {
         'before': before, 'after': after, 'checks': checks, 'ok': all(checks.values()),
         'migration_keys_after': sorted(mb),

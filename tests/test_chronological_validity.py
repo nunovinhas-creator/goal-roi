@@ -11,6 +11,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 
+from pr5_fixtures import body, present
 from scangoal import brain, certification, chronology, insights, notify, store
 
 UTC = timezone.utc
@@ -386,10 +387,17 @@ class TelegramNeverClaimsUncertifiedValidation(unittest.TestCase):
         self.assertTrue(any('promissora' in m and 'A seguir' in m for m in out))
 
     def test_certified_tactic_is_announced(self):
+        # PR 5: the certificate must belong to the hypothesis itself (its row carries the confirmation) and the scientific
+        # state comes first in every message.
         state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
-        out = notify.messages(self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, True), state, T0)
-        self.assertTrue(any(m.startswith('🟢 ALERTA') for m in out))
-        self.assertTrue(any(m.startswith('✅ Tática validada') for m in out))
+        rep = present(self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, True), certified=['h1'])
+        out = notify.messages(rep, state, T0)
+        self.assertTrue(any(body(m).startswith('🟢 ALERTA') for m in out))
+        self.assertTrue(any(body(m).startswith('✅ Tática validada') for m in out))
+        self.assertTrue(all(m.startswith('Estado científico: CERTIFICADA') for m in out if 'validada' in m))
+        state = {'hello': True, 'statuses': {'h1': 'promissora'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
+        rep = self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, True)
+        self.assertFalse(any('ALERTA' in m or 'validada' in m for m in notify.messages(rep, state, T0)))   # listed but no own certificate
 
 
 class PhysicalOrder(unittest.TestCase):
@@ -476,15 +484,17 @@ class TelegramRulesMigration(unittest.TestCase):
         out = notify.messages(self.report({'a': 'promissora'}), state, T0)        # b and c lose their status under PR 3 rules
         self.assertEqual([m for m in out if 'Hipótese' in m or 'Tática' in m], [])
         key = 'status_rules:chronological_eprocess_v3'
-        self.assertEqual(sorted(state['migrations']), sorted(list(before['migrations']) + [key]))
+        # PR 5 adds its own silent format marker in the same pass; the earlier markers are untouched.
+        self.assertEqual(sorted(state['migrations']), sorted(list(before['migrations']) + [key, notify.FORMAT_MIGRATION]))
         for k, v in before['migrations'].items():
             self.assertEqual(state['migrations'][k], v)
         self.assertEqual(state['migrations'][key]['previous_statuses'], before['statuses'])
         self.assertEqual((state['watch_sent'], state['sent_total']), (before['watch_sent'], before['sent_total']))
         again = notify.messages(self.report({'a': 'promissora'}), state, T0)       # no second migration, nothing to say
         self.assertEqual([m for m in again if 'Hipótese' in m], [])
-        later = notify.messages(self.report({}), state, T0)                        # a genuine later change is announced
-        self.assertEqual(sum('Hipótese' in m for m in later), 1)
+        self.assertEqual(notify.messages(self.report({}), state, T0), [])          # PR 5: absence is "unknown", not a return
+        later = notify.messages(present(self.report({}), observed=['a']), state, T0)   # a genuine later change is announced
+        self.assertEqual(sum('Hipótese voltou a "em observação"' in m for m in later), 1)
 
 
 class AsOfMembership(unittest.TestCase):

@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 from datetime import datetime
 
+from pr5_fixtures import body, present
 from scangoal import notify
 import test_scangoal as fixtures
 
@@ -60,6 +61,9 @@ class NotifyMigration(unittest.TestCase):
         new['h1'] = 'forte'
         new['h2'] = 'abandonada'
         new['new'] = 'promissora'
+        # PR 5: only what the report shows is announced; a bare absence is "unknown" and h1 needs its own certificate.
+        self.assertEqual(notify.messages(copy.deepcopy(rep), copy.deepcopy(state), NOW), [])
+        present(rep, certified=['h0', 'h1'], observed=['h0'])
         messages = notify.messages(rep, state, NOW)
         self.assertEqual(len(messages), 4)
         self.assertTrue(any('voltou a "em observação"' in m and 'h0' in m for m in messages))
@@ -75,8 +79,9 @@ class NotifyMigration(unittest.TestCase):
         evening = NOW.replace(hour=21)
         messages = notify.messages(rep, state, evening)
         self.assertEqual(len(messages), 2)
-        self.assertTrue(any(m.startswith('A seguir:') for m in messages))
-        self.assertTrue(any(m.startswith('Resumo de') for m in messages))
+        self.assertTrue(any(body(m).startswith('A seguir:') for m in messages))
+        self.assertTrue(any(body(m).startswith('Resumo de') for m in messages))
+        self.assertTrue(all(m.startswith('Estado científico:') for m in messages))   # PR 5: scientific state on top
         self.assertIn('already-sent', state['watch_sent'])
         self.assertEqual(notify.messages(rep, state, evening), [])
 
@@ -114,25 +119,28 @@ class NotifyMigration(unittest.TestCase):
                 self.assertEqual(state[k], legacy_state()[k])
             rep = eligible_report()
             rep['brain']['status_list']['h0'] = 'forte'
-            self.assertEqual(len(notify.messages(rep, state, NOW)), 1)
+            self.assertEqual(len(notify.messages(present(rep, certified=['h0', 'h1']), state, NOW)), 1)
 
     def test_send_failure_cannot_undo_migration_or_consume_delivery(self):
+        # PR 5 (at most once): the intent is persisted BEFORE the send; an unknown sender error makes the greeting UNCERTAIN,
+        # it is never resent and never counted as delivered. The migration persisted before the send stays.
         with tempfile.TemporaryDirectory() as d, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': d}):
             path = self.files(d)
             state = json.loads(path.read_text()); state['hello'] = False; path.write_text(json.dumps(state))
             def fail(*args):
                 persisted = json.loads(path.read_text())
                 self.assertIn(notify.STATUS_MIGRATION, persisted['migrations'])
-                self.assertFalse(persisted['hello'])
+                self.assertEqual(persisted['deliveries']['hello']['state'], 'in_flight')
                 raise RuntimeError('simulated sender failure')
             env = {'TG_BOT_TOKEN': 'fake', 'TG_CHAT_ID': 'fake'}
-            with self.assertRaises(RuntimeError):
-                notify.run(fail, NOW, env)
+            notify.run(fail, NOW, env)
+            persisted = json.loads(path.read_text())
+            self.assertEqual((persisted['deliveries']['hello']['state'], persisted['sent_total']), ('uncertain', 204))
             sent = []
             notify.run(lambda *args: sent.append(args[-1]), NOW, env)
-            self.assertEqual(len(sent), 1)  # Greeting retried, never 25 historical transitions.
+            self.assertEqual(sent, [])      # never the greeting again, never 25 historical transitions
             notify.run(lambda *args: sent.append(args[-1]), NOW, env)
-            self.assertEqual(len(sent), 1)
+            self.assertEqual(sent, [])
 
     def test_failed_atomic_save_leaves_state_and_sends_nothing(self):
         with tempfile.TemporaryDirectory() as d, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': d}):
