@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ALLOWED = {'/inputs'}
+ALLOWED = {'/inputs', '/run', '/result_sha256'}   # entradas e metadados diferem por construção (dois commits de dados); o resultado científico não
 
 
 def diff(x, y, p=''):

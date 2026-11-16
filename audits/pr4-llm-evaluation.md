@@ -1,4 +1,4 @@
-# PR 4 — Avaliação incremental das hipóteses LLM (protocolo `llm_incremental_v4`)
+# PR 4 — Avaliação incremental das hipóteses LLM (protocolo `llm_incremental_v5`)
 
 Gerado por `scripts/audit_pr4_llm.py` a partir de dados de um commit fixo; reprodutível byte a byte.
 
@@ -6,10 +6,15 @@ Gerado por `scripts/audit_pr4_llm.py` a partir de dados de um commit fixo; repro
 
 **em curso — sem conclusão (e-processo abaixo de 20)**
 
-Fase: **em curso**. Horizonte H = 2027-11-16T08:05:26+00:00; fim do v4 C = 2027-11-19T08:05:26+00:00. O e-processo é válido a qualquer momento (Ville): olhar repetidamente
+Fase: **em curso**. Horizonte H = 2027-11-16T08:56:55+00:00; fim do v4 C = 2027-11-19T08:56:55+00:00. O e-processo é válido a qualquer momento (Ville): olhar repetidamente
 não aumenta o erro de tipo I acima de α = 0,05 para H0 (§6-A do protocolo). Só dias fechados entram.
 
-**Suposição A-sel:** A garantia (§6-A) vale para H0 tal como definida; a leitura "por aposta" exige A-sel: a entrada de um jogo num dia não depende dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).
+**Suposição A-sel:** A garantia (§6-A) vale para H0 tal como definida. Com a regra do dia seguinte (v5), tudo o que o sistema escolhe para um dia existe antes de o dia começar; a leitura "por aposta" exige ainda A-sel quanto ao bot: a emissão de um sinal não depende dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).
+
+**Alcance da conclusão (§8 do protocolo v5):**
+
+- H0 condicional (§6-A), garantida pelo teorema: não rejeitada
+- Utilidade incremental por aposta: nenhuma afirmação
 
 Mínimos do protocolo ainda não cumpridos (sobre os dias fechados):
 
@@ -28,28 +33,26 @@ mercado e não certifica nenhuma tática. Taxas de acerto, incluindo as superior
 
 ## Entradas
 
-- Protocolo: `llm_incremental_v4`, sha256 `055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167`, início P = 2026-11-16T08:05:26+00:00
-- Relógio efetivo da avaliação: 2026-11-16T08:12:21+00:00 (min(as_of pedido, C))
+- Protocolo: `llm_incremental_v5`, sha256 `3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103`, início P = 2026-11-16T08:56:55+00:00
+- Relógio efetivo da avaliação: 2026-11-16T08:56:44+00:00 (min(as_of pedido, C))
 - P = max(hora do commit do protocolo, primeira publicação verificável no GitHub); ver `protocol_published_utc` e `protocol_publication_evidence` nas entradas.
 - llm_hypotheses_registered_after_window: `0`
-- protocol_commit: `d48e3b7638c56b435a6e7da9245a82cd6781c66d`
-- protocol_publication_evidence: `https://github.com/nunovinhas-creator/goal-roi/actions/runs/43828482856`
-- protocol_published_utc: `2026-11-16T08:05:26Z`
-- python: `3.11`
-- ref: `ab60140c914d386f3ae6e51d0ece0f6252aa7e35`
-- ref_commit_time_utc: `2026-11-16T08:12:21+00:00`
-- requested_ref: `ab60140c914d386f3ae6e51d0ece0f6252aa7e35`
+- protocol_commit: `bb1b07caae263f73cecbea0a918f6363e747554d`
+- protocol_publication_evidence: `https://github.com/nunovinhas-creator/goal-roi/actions/runs/43835421997`
+- protocol_published_utc: `2026-11-16T08:56:55Z`
+- ref: `31a7988716172c00ba76a008acd90676cfd87b6e`
+- ref_commit_time_utc: `2026-11-16T08:56:44+00:00`
 - sha256 data/.gitkeep: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
 - sha256 data/details_hl.json: `33f0469322347e06621cf27fbbd395f1a0191c2246d5606d6c7819d56be2c2ac`
-- sha256 data/hypotheses.json: `b0b341e67b9605348b44cdbab2520171cc9a52aef8cccc0e67142617c6e9553a`
+- sha256 data/hypotheses.json: `fe845909b12be15f12469a12baf95c848b9dd21cbf6c28e2da7a36999efb7833`
 - sha256 data/llm_notes.json: `f49731305f4c52b83318607e5c6f849e03aa4f4161aef833bd1713883d4cdb13`
-- sha256 data/llm_state.json: `25715e94e9e653d1b9777786ff785a588a19154313550cc7b8c79766bb7f2762`
+- sha256 data/llm_state.json: `ed2ad7728afe8e45591c398bc6776d71413046bd10386c0525dc293ba5812ec8`
 - sha256 data/messages.jsonl: `1eb358c6c78192120f80c3b6830ba3b8b63ae7cac89780e552f58a30ca419ef8`
-- sha256 data/notify_state.json: `343589e207d8e5e9fad2b931bdc42b97b7d0213e4c44b468b71b7acfd91a0bbf`
-- sha256 data/report.json: `3b52e7eb75b4219def421b5e285b6be6b946ff6a587f45c36965be67299bd3a9`
-- sha256 data/results_bsd.json: `5a790f98f0feee05a99d33cfac37834f5fe85725953d09cd4d6c1b3d1073dc4c`
-- sha256 data/results_hl.json: `c1685b78696344d9e73a827bac1ce84dc3d2ca38f0ed10d055701217ce51b37e`
-- sha256 data/state.json: `cb2855c3abde66836c4f820cef021de943cd2801894bf6d7d145b992f6c88529`
+- sha256 data/notify_state.json: `9f5a241e92837f250f04b36e2c50b6fe15a89adf76c456a4956d2de41f2ac2cb`
+- sha256 data/report.json: `1ecaa67f22560d4332172ba9198d3037cd1887d86940fecbf3d66063bcc1bfdc`
+- sha256 data/results_bsd.json: `6468b3158766e519c36be74e787f97878b0ded83144a6452fee7d8b7f1a16e56`
+- sha256 data/results_hl.json: `674a16e812e8e26b2cbe33147c4b3582dad51fa2788ed829b96030f0c8af609b`
+- sha256 data/state.json: `f634cf0e0ee37c53c1f2463ae4e71a20cfb36b0562e0a2a91a21caf79c38a255`
 - sha256 data/team_aliases.json: `05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5`
 
 ## População
@@ -57,15 +60,15 @@ mercado e não certifica nenhuma tática. Taxas de acerto, incluindo as superior
 | Medida | Valor |
 |---|---|
 | Sinais elegíveis na vista do instante | 576 |
-| Hipóteses LLM no registo | 56 |
-| Avaliadas (nascimento provado) | 56 |
+| Hipóteses LLM no registo | 57 |
+| Avaliadas (nascimento provado) | 57 |
 | Excluídas: sem nascimento provado | 0 |
-| Grupos de equivalência (τ = 0,85) | 56 |
-| Grupos com τ = 0,80 / 0,90 | 56 / 56 |
-| Representantes na análise primária | 34 |
+| Grupos de equivalência (τ = 0,85) | 57 |
+| Grupos com τ = 0,80 / 0,90 | 57 / 57 |
+| Representantes na análise primária | 35 |
 | Sem controlos suficientes (< 5) | 17 |
 | Duplicados extensionais à nascença | 27 |
-| Por modo (novas / refinar / evitar) | 16 / 35 / 5 |
+| Por modo (novas / refinar / evitar) | 16 / 36 / 5 |
 
 ## Comparação primária: e-processo
 
@@ -85,7 +88,7 @@ Mesmos representantes e controlos, apostas com resultado observado, decididas an
 
 | Apostas LLM | Lucro médio LLM | Apostas de controlo | Lucro médio controlo |
 |---|---|---|---|
-| 310 | -0.0042 | 5270 | 0.0345 |
+| 312 | -0.0105 | 5282 | 0.0321 |
 
 ## Análises adicionais (exploratórias; p_e = 1/K máx. com Holm, m = 7)
 
@@ -121,11 +124,11 @@ Nenhuma análise adicional sustenta sozinha um veredicto.
 | Betfair \| Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Tamanho do mercado = menos de 10 mil $ (repr.) | 13 | refinar | 0 | 0 | — | 6 | -0.0788 | 0 |
 | Jogo aberto \| Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 (repr.) | 14 | refinar | 0 | 0 | — | 32 | -0.0821 | 0 |
 | Forma de golos \| Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo (repr.) | 15 | novas | 0 | 0 | — | 0 | — | 0 |
-| Betfair \| Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais (repr.) | 16 | refinar | 0 | 0 | — | 10 | 0.0564 | 20 |
+| Betfair \| Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais (repr.) | 16 | refinar | 0 | 0 | — | 11 | -0.0396 | 20 |
 | Jogo aberto \| Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais (repr.) | 17 | refinar | 0 | 0 | — | 38 | 0.0735 | 8 |
 | Forma de golos \| Golos até ao sinal = nenhum & Marcador no momento = empatado & Minuto = 31 a 60 (repr.) | 18 | refinar | 0 | 0 | — | 12 | 0.2663 | 0 |
 | Betfair \| Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Volume na seleção = 10 mil $ ou mais (repr.) | 19 | refinar | 0 | 0 | — | 0 | — | 20 |
-| Betfair \| Quota de mercado = menos de 80 % & Seleção = equipa da casa & Tamanho do mercado = 10 mil $ ou mais (repr.) | 20 | refinar | 0 | 0 | — | 5 | 0.0584 | 20 |
+| Betfair \| Quota de mercado = menos de 80 % & Seleção = equipa da casa & Tamanho do mercado = 10 mil $ ou mais (repr.) | 20 | refinar | 0 | 0 | — | 6 | -0.1180 | 20 |
 | Jogo aberto \| Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não (repr.) | 21 | refinar | 0 | 0 | — | 54 | -0.0580 | 20 |
 | Jogo aberto \| Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Parte do jogo = 2.ª parte (repr.) | 22 | refinar | 0 | 0 | — | 48 | 0.0481 | 18 |
 | Forma de golos \| Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60 (repr.) | 23 | refinar | 0 | 0 | — | 0 | — | 0 |
@@ -161,6 +164,7 @@ Nenhuma análise adicional sustenta sozinha um veredicto.
 | Polymarket \| Dia = fim de semana & Mercado = outro mercado & Valor da aposta = 10 mil $ ou mais (repr.) | 53 | novas | 0 | 0 | — | 0 | — | 20 |
 | Stake \| Competição = seleções & Faixa de odd = odd 1,50 a 2,00 & Liga = UEFA Nations League (repr.) | 54 | novas | 0 | 0 | — | 0 | — | 20 |
 | Jogo aberto \| Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90 (repr.) | 55 | refinar | 0 | 0 | — | 0 | — | 20 |
+| Jogo aberto \| Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90 (repr.) | 56 | refinar | 0 | 0 | — | 0 | — | 20 |
 
 ## Duplicados extensionais à nascença
 

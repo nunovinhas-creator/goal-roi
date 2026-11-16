@@ -1,9 +1,13 @@
 {
- "as_of_utc": "2026-11-16T08:12:21+00:00",
- "assumption_a_sel": "A garantia (§6-A) vale para H0 tal como definida; a leitura \"por aposta\" exige A-sel: a entrada de um jogo num dia não depende dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).",
+ "as_of_utc": "2026-11-16T08:56:44+00:00",
+ "assumption_a_sel": "A garantia (§6-A) vale para H0 tal como definida. Com a regra do dia seguinte (v5), tudo o que o sistema escolhe para um dia existe antes de o dia começar; a leitura \"por aposta\" exige ainda A-sel quanto ao bot: a emissão de um sinal não depende dos resultados de outros jogos desse dia (plausível, não verificável pelos dados).",
+ "claim": {
+  "conditional_h0": "não rejeitada",
+  "per_bet_utility": "nenhuma afirmação"
+ },
  "concluded_on": null,
- "final_utc": "2027-11-19T08:05:26+00:00",
- "horizon_utc": "2027-11-16T08:05:26+00:00",
+ "final_utc": "2027-11-19T08:56:55+00:00",
+ "horizon_utc": "2027-11-16T08:56:55+00:00",
  "hypotheses": [
   {
    "born_eff": "2026-11-12T15:33:52+00:00",
@@ -321,8 +325,8 @@
    "membership_games_now": 25,
    "mode": "refinar",
    "parents": 2,
-   "pre_protocol_games": 10,
-   "pre_protocol_mean_profit": 0.05644,
+   "pre_protocol_games": 11,
+   "pre_protocol_mean_profit": -0.0396,
    "protocol_games": 0,
    "protocol_mean_profit_observed": null,
    "protocol_results_observed": 0,
@@ -397,8 +401,8 @@
    "membership_games_now": 14,
    "mode": "refinar",
    "parents": 3,
-   "pre_protocol_games": 5,
-   "pre_protocol_mean_profit": 0.0584,
+   "pre_protocol_games": 6,
+   "pre_protocol_mean_profit": -0.118,
    "protocol_games": 0,
    "protocol_mean_profit_observed": null,
    "protocol_results_observed": 0,
@@ -1068,28 +1072,45 @@
    "protocol_mean_profit_observed": null,
    "protocol_results_observed": 0,
    "representative": true
+  },
+  {
+   "born_eff": "2026-11-16T08:47:58+00:00",
+   "born_utc": "2026-11-16T08:47:09+00:00",
+   "controls": 20,
+   "controls_sha256": "2510355ab657215b",
+   "expect": "acima",
+   "group": 56,
+   "id": "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+   "membership_games_at_birth": 8,
+   "membership_games_now": 8,
+   "mode": "refinar",
+   "parents": 4,
+   "pre_protocol_games": 0,
+   "pre_protocol_mean_profit": null,
+   "protocol_games": 0,
+   "protocol_mean_profit_observed": null,
+   "protocol_results_observed": 0,
+   "representative": true
   }
  ],
  "inputs": {
   "llm_hypotheses_registered_after_window": 0,
-  "protocol_commit": "d48e3b7638c56b435a6e7da9245a82cd6781c66d",
-  "protocol_publication_evidence": "https://github.com/nunovinhas-creator/goal-roi/actions/runs/43828482856",
-  "protocol_published_utc": "2026-11-16T08:05:26Z",
-  "python": "3.11",
-  "ref": "ab60140c914d386f3ae6e51d0ece0f6252aa7e35",
-  "ref_commit_time_utc": "2026-11-16T08:12:21+00:00",
-  "requested_ref": "ab60140c914d386f3ae6e51d0ece0f6252aa7e35",
+  "protocol_commit": "bb1b07caae263f73cecbea0a918f6363e747554d",
+  "protocol_publication_evidence": "https://github.com/nunovinhas-creator/goal-roi/actions/runs/43835421997",
+  "protocol_published_utc": "2026-11-16T08:56:55Z",
+  "ref": "31a7988716172c00ba76a008acd90676cfd87b6e",
+  "ref_commit_time_utc": "2026-11-16T08:56:44+00:00",
   "sha256 data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "sha256 data/details_hl.json": "33f0469322347e06621cf27fbbd395f1a0191c2246d5606d6c7819d56be2c2ac",
-  "sha256 data/hypotheses.json": "b0b341e67b9605348b44cdbab2520171cc9a52aef8cccc0e67142617c6e9553a",
+  "sha256 data/hypotheses.json": "fe845909b12be15f12469a12baf95c848b9dd21cbf6c28e2da7a36999efb7833",
   "sha256 data/llm_notes.json": "f49731305f4c52b83318607e5c6f849e03aa4f4161aef833bd1713883d4cdb13",
-  "sha256 data/llm_state.json": "25715e94e9e653d1b9777786ff785a588a19154313550cc7b8c79766bb7f2762",
+  "sha256 data/llm_state.json": "ed2ad7728afe8e45591c398bc6776d71413046bd10386c0525dc293ba5812ec8",
   "sha256 data/messages.jsonl": "1eb358c6c78192120f80c3b6830ba3b8b63ae7cac89780e552f58a30ca419ef8",
-  "sha256 data/notify_state.json": "343589e207d8e5e9fad2b931bdc42b97b7d0213e4c44b468b71b7acfd91a0bbf",
-  "sha256 data/report.json": "3b52e7eb75b4219def421b5e285b6be6b946ff6a587f45c36965be67299bd3a9",
-  "sha256 data/results_bsd.json": "5a790f98f0feee05a99d33cfac37834f5fe85725953d09cd4d6c1b3d1073dc4c",
-  "sha256 data/results_hl.json": "c1685b78696344d9e73a827bac1ce84dc3d2ca38f0ed10d055701217ce51b37e",
-  "sha256 data/state.json": "cb2855c3abde66836c4f820cef021de943cd2801894bf6d7d145b992f6c88529",
+  "sha256 data/notify_state.json": "9f5a241e92837f250f04b36e2c50b6fe15a89adf76c456a4956d2de41f2ac2cb",
+  "sha256 data/report.json": "1ecaa67f22560d4332172ba9198d3037cd1887d86940fecbf3d66063bcc1bfdc",
+  "sha256 data/results_bsd.json": "6468b3158766e519c36be74e787f97878b0ded83144a6452fee7d8b7f1a16e56",
+  "sha256 data/results_hl.json": "674a16e812e8e26b2cbe33147c4b3582dad51fa2788ed829b96030f0c8af609b",
+  "sha256 data/state.json": "f634cf0e0ee37c53c1f2463ae4e71a20cfb36b0562e0a2a91a21caf79c38a255",
   "sha256 data/team_aliases.json": "05cd986e98ba1b5eadc5dbe88c24456c9e2406cf1362745cc23c0a06734074f5"
  },
  "insufficient": [
@@ -1137,7 +1158,7 @@
   "by_mode": {
    "evitar": 5,
    "novas": 16,
-   "refinar": 35
+   "refinar": 36
   },
   "duplicates_at_birth": [
    {
@@ -1277,24 +1298,24 @@
    }
   ],
   "eligible_signals": 576,
-  "evaluated": 56,
+  "evaluated": 57,
   "excluded": {
    "no_proven_birth": 0
   },
-  "groups": 56,
+  "groups": 57,
   "groups_sensitivity": {
-   "0.8": 56,
-   "0.9": 56
+   "0.8": 57,
+   "0.9": 57
   },
-  "llm_hypotheses": 56,
-  "primary_representatives": 34,
+  "llm_hypotheses": 57,
+  "primary_representatives": 35,
   "without_controls": 17
  },
  "pre_protocol": {
-  "bets_control": 5270,
-  "bets_test": 310,
-  "mean_profit_control": 0.034492,
-  "mean_profit_test": -0.004162,
+  "bets_control": 5282,
+  "bets_test": 312,
+  "mean_profit_control": 0.032142,
+  "mean_profit_test": -0.010546,
   "meaning": "descriptive only: post-registration bets with observed results decided before the protocol; control bets counted once per (hypothesis, control) pair; no test, no conclusion"
  },
  "primary": {
@@ -1321,9 +1342,14 @@
   "path": []
  },
  "proof_problems": [],
- "protocol": "llm_incremental_v4",
- "protocol_sha256": "055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167",
- "protocol_time_utc": "2026-11-16T08:05:26+00:00",
+ "protocol": "llm_incremental_v5",
+ "protocol_sha256": "3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103",
+ "protocol_time_utc": "2026-11-16T08:56:55+00:00",
+ "result_sha256": "6f2ffe5fbf8f18b555f9b24bfe09656f4971f174775ff68a6cca3cd7c75523c4",
+ "run": {
+  "python": "3.11",
+  "requested_ref": "31a7988716172c00ba76a008acd90676cfd87b6e"
+ },
  "secondary": {
   "S1_family_baseline": {
    "crossed_day": null,

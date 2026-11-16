@@ -251,3 +251,112 @@ As simulações não substituem o teorema: confirmam que a implementação respe
 - **Comparação com `main`:** estados, certificação desligada, mensagens Telegram (0) e dados idênticos.
 - **Truncagem em dados reais:** invariante.
 - **Conclusão científica:** exploratória; nenhuma validação de vantagem.
+
+---
+
+# Auditoria independente #5917252470 (SHA `a12a087`) — fecho da auditoria do v4
+
+A auditoria confirmou que a demonstração de Ville está correta para a H0 condicional do v4 e que o P1-E está resolvido nesse âmbito.
+
+## 1. Intervalos de confiança com zero rejeições
+
+O intervalo de Wald dava [0, 0] quando havia 0 rejeições, o que é errado. Passou a usar-se o **intervalo exato de Clopper-Pearson**
+(bilateral a 95 %) e o limite superior exato unilateral a 95 %, em `calibration_check.py` (fonte comum), `p1e_method_comparison.py`
+e `a_sel_analysis.py`. A função foi validada contra valores de referência (10 em 100 → [0,0490; 0,1762]; 0 em n → 1 − 0,025^(1/n)).
+
+| Nula adversarial (1 000 simulações, 120 dias) | Rejeições | IC 95 % exato | Limite superior unilateral |
+|---|---|---|---|
+| mistura igual, efeito de dia forte | 1 | [0,00003; 0,0056] | 0,0047 |
+| LLM curtas, controlos muito longas | 0 | [0; 0,0037] | 0,0030 |
+| LLM muito longas, controlos curtas | 1 | [0,00003; 0,0056] | 0,0047 |
+| poucos jogos por dia, cotações opostas | 0 | [0; 0,0037] | 0,0030 |
+| dependência total dentro do dia | 3 | [0,0006; 0,0087] | 0,0077 |
+| seleção adaptativa entre dias | 0 | [0; 0,0037] | 0,0030 |
+
+## 2. A-sel: o próprio sistema podia violá-la, o que é uma necessidade demonstrada
+
+`audits/pr4-evidence/a_sel_analysis.py` → `a_sel_analysis.json`.
+
+- **Mecanismo:** o modelo de linguagem propõe hipóteses de hora a hora, vendo os resultados já conhecidos, incluindo os do próprio
+  dia. No v4, uma hipótese nascida a meio do dia d (e os seus controlos) contribuía com jogos desse dia d.
+- **Dados reais** (`main` em `87a5bd8`): 107 de 616 jogos LLM admitidos (17,4 %) vinham de hipóteses nascidas no próprio dia, em 4 de
+  5 dias. Os nascimentos LLM espalham-se pelas 24 horas.
+- **Simulação** com apostas individualmente justas, 400 séries cada:
+
+  | Mecanismo de nascimento | 120 dias | 365 dias |
+  |---|---|---|
+  | independente dos resultados | 0 % | 1,75 % [0,7–3,6 %] |
+  | sobretudo depois de uma manhã má (A-sel violada pelo sistema) | 2,75 % | **61 %** [56–66 %] |
+  | idem, mas só contribui a partir do dia seguinte | 0 % | 0,75 % [0,2–2,2 %] |
+
+- **Protocolo v5** (`audits/pr4-llm-protocol-v5.md`, sha256 `3ca34e70…2103`, commit próprio `bb1b07c`), com uma única emenda
+  metodológica: **uma hipótese, e os seus controlos, mães e base, só contribui a partir do dia UTC seguinte ao seu nascimento**.
+  - Tudo o que o sistema escolhe para o dia d existe antes de d começar, por isso a seleção do sistema fica dentro da garantia.
+  - A A-sel reduz-se ao bot: a emissão de um sinal não depende de resultados de outros jogos do mesmo dia. Isto é externo, plausível
+    e não verificável.
+  - O v1 a v4 ficam intactos.
+- **Prova de publicação do v5:** Actions run [43835421997](https://github.com/nunovinhas-creator/goal-roi/actions/runs/43835421997),
+  `head_sha` = `bb1b07c`, `created_at` **2026-11-16T08:56:55Z** (commit às 08:56:44Z). Logo:
+  - P = 2026-11-16T08:56:55Z;
+  - H = 2027-11-16T08:56:55Z;
+  - C = 2027-11-19T08:56:55Z.
+- **Testes:** uma hipótese nascida a meio do dia 5 não contribui nem no dia 5 nem com jogos à meia-noite exata do dia 6, e os
+  controlos seguem o mesmo início. Mais duas mutações (o início no nascimento e não no dia seguinte; o cálculo da meia-noite seguinte).
+
+## 3. Validade sob H0 condicional versus utilidade por aposta
+
+- Cada resultado tem agora o campo `claim`, mostrado no relatório como "Alcance da conclusão", com dois níveis:
+  - `conditional_h0`: rejeitada ou não, garantido pelo teorema;
+  - `per_bet_utility`: "sugerida, mas só se A-sel valer quanto ao bot; … não é prova de vantagem nem certificação" quando há
+    conclusão, e "nenhuma afirmação" nos outros casos.
+- O protocolo v5 (§8) proíbe apresentar a afirmação por aposta sem a condicional e sem a ressalva.
+
+## 4. Resultado científico versus `requested_ref` depois de C
+
+- O commit pedido e a versão do Python saíram das entradas e passaram para uma secção `run`, fora do resultado científico.
+- O resultado inclui `result_sha256` (o `sha256` do resultado sem `run`). Depois de C, os dados são sempre os do commit fixado, por
+  isso `result_sha256` é igual em todas as execuções e só `run` difere.
+- Testes:
+  - o resumo ignora só `run`;
+  - o resultado final é idêntico com dados posteriores a C.
+- O verificador de truncagem passou a ignorar `run` e `result_sha256`, porque compara dois commits de dados diferentes por construção.
+
+## 5. Preflight de integração com o `main` atualizado
+
+`scripts/pr4_preflight.py` (só leitura; o merge é simulado num objeto de árvore solto e nenhuma ref muda) →
+`audits/pr4-integration-preflight.json`, sobre `main` `31a7988` e PR `cbeb57a`: **`ready: true`**.
+
+- merge sem conflitos;
+- a PR não toca em `data/`, `.github/`, `docs/report.json` nem `docs/bets.csv`, e na árvore resultante esses ficheiros são idênticos
+  aos do `main`;
+- nenhum registo de certificação;
+- 343 testes a passar na árvore resultante;
+- comparação com `main` sobre os dados atuais: 7 estados idênticos, certificação desligada, 0 mensagens Telegram, estado de
+  notificações e dados idênticos.
+
+O procedimento de integração está em `audits/pr4-integration-runbook.md`: merge commit (sem *squash* nem *rebase*, para preservar os
+SHA dos protocolos), sem migração e sem paragem da recolha, verificação pós-merge com `scripts/post_cutover_check.py`, reversão por
+`git revert -m 1`.
+
+## 6. Cobertura de resultados Betfair: separável, sem alterar a metodologia
+
+Confirmado. Melhorar a cobertura (aliases em `data/team_aliases.json`, correspondência com os fornecedores) é uma alteração da recolha
+de dados, fora da PR 4 e do protocolo:
+
+- **Efeito só para a frente:** um resultado só conta se for observado até 3 dias depois da decisão (§3). Um resultado encontrado mais
+  tarde para um dia já fechado continua imputado, e esse dia nunca muda. Teste: o resultado observado 4 dias depois continua com
+  X = −1.
+- **Sem reescritas:** a prova de observações (§0-C) exige que nenhuma entrada de resultados seja alterada ou removida, e que cada
+  resultado novo seja publicado até 30 min depois do seu carimbo. Uma melhoria de cobertura que só acrescente entradas novas,
+  observadas no momento, passa a prova. Uma que reescreva entradas antigas tornaria a avaliação "não verificada".
+- **Separação:** deve ser uma PR própria, com autorização própria, porque altera dados de produção (aliases). Não é necessário um v5
+  nem um v6 para isso, e não se aplica nenhuma suposição de resultados em falta aleatórios.
+
+## Resultado com o v5 (`main` congelado em `31a7988`)
+
+- **Veredicto:** `em curso — sem conclusão (e-processo abaixo de 20)`; ainda não há dias fechados depois de P.
+- 57 hipóteses LLM, 57 grupos.
+- `result_sha256` `6f2ffe5f…23c4`; relatório reprodutível byte a byte.
+- Sem prova de publicação, ou com o commit do protocolo v4, a avaliação sai "não verificada".
+- Taxa de resultados em falta inalterada: 23,5 %, Betfair 31 %.
+- **Conclusão científica:** exploratória; nenhuma validação de vantagem.
