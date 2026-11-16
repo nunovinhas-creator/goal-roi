@@ -4,6 +4,7 @@ import random
 import unittest
 from datetime import datetime, timedelta
 
+from pr5_fixtures import body, present
 from scangoal import brain, certification, insights, notify
 from scangoal.eligibility import eligible, exclusion_reasons
 
@@ -221,16 +222,27 @@ class KashiwaKawasakiCase(unittest.TestCase):
         if stateless:   # PR1 behaviour: entry thresholds only, no memory, no rules key
             st = {r['id']: brain.status_of(r['games'], r['prob_above'], bar, 300) for r in rows}
             return {'brain': {'evidence_scope': 'eligible_bets_only', 'status_list': {k: v for k, v in st.items() if v != 'em observação'}}}
+        # PR 5: the report carries the presentation block the brain publishes (status changes, game sets for grouping).
         return {'brain': {'evidence_scope': 'eligible_bets_only', 'status_rules': brain.STATUS_RULES,
-                          'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'}}}
+                          'status_list': {r['id']: r['status'] for r in rows if r['status'] != 'em observação'},
+                          'presentation': brain.presentation(rows)}}
 
     def notices(self, sequence, stateless):
+        """Status notices per new game. stateless: what the PR 1 notifier sent (one notice per raw change of the stateless
+        reference, no memory and no grouping); otherwise the current notifier on the PR 2+ brain."""
         state = {'hello': True, 'statuses': {}}
-        notify.messages(self.report(self.history, stateless), state, NOW)        # baseline (silent migration)
-        sent, signals = [], list(self.history)
+        first = self.report(self.history, stateless)
+        notify.messages(first, state, NOW)                                         # baseline (silent migration)
+        sent, signals, prev = [], list(self.history), first['brain']['status_list']
         for k, w in enumerate(sequence):
             signals.append(sig('next%d' % k, w, 100 + k))
-            sent.append(sum(m.startswith('Hipótese') for m in notify.messages(self.report(signals, stateless), state, NOW)))
+            rep = self.report(signals, stateless)
+            if stateless:
+                cur = rep['brain']['status_list']
+                sent.append(sum(1 for h in set(prev) | set(cur) if prev.get(h) != cur.get(h)))
+                prev = cur
+            else:
+                sent.append(sum(body(m).startswith('Hipótese') for m in notify.messages(rep, state, NOW)))
         return sent
 
     def test_one_win_at_the_edge_no_longer_announces_four_promotions(self):
@@ -242,7 +254,8 @@ class KashiwaKawasakiCase(unittest.TestCase):
     def test_win_then_loss_is_silent_and_win_then_win_promotes_once(self):
         self.assertEqual(self.notices([1.0, -1.0], stateless=True), [4, 4])     # promote four, then demote four
         self.assertEqual(self.notices([1.0, -1.0], stateless=False), [0, 0])
-        self.assertEqual(self.notices([1.0, 1.0, -1.0], stateless=False), [0, 4, 0])   # confirmed promotion; one loss keeps it
+        # Confirmed promotion; one loss keeps it. PR 5: the four hypotheses share the same games (Jaccard 1): ONE notice.
+        self.assertEqual(self.notices([1.0, 1.0, -1.0], stateless=False), [0, 1, 0])
 
     def test_redundant_hypotheses_are_still_four_notices_when_confirmed(self):
         # Redundancy (same games behind several hypotheses) is PR 3/5 scope: documented, not hidden.
@@ -274,8 +287,9 @@ class TelegramRulesMigration(unittest.TestCase):
         frozen = copy.deepcopy(state)
         self.assertEqual(notify.messages(self.pr2_report({'c': 'promissora', 'd': 'promissora'}), state, NOW), [])
         self.assertEqual(state, frozen)                                                                    # idempotent
-        self.assertEqual(notify.messages(self.pr2_report({'c': 'promissora'}), state, NOW),
-                         ['Hipótese voltou a "em observação":\nd'])                                         # genuine change still notified
+        self.assertEqual(notify.messages(self.pr2_report({'c': 'promissora'}), state, NOW), [])            # PR 5: absent = unknown
+        out = notify.messages(present(self.pr2_report({'c': 'promissora'}), observed=['d']), state, NOW)
+        self.assertEqual([body(m).split('\n')[0] for m in out], ['Hipótese voltou a "em observação" (antes: promissora): d'])   # genuine change still notified
 
     def test_pr1_reports_keep_the_original_key(self):
         pr1 = {'brain': {'evidence_scope': 'eligible_bets_only', 'status_list': {}}}

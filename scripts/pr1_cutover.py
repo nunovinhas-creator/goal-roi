@@ -138,6 +138,10 @@ def restore(root, original):
 
 
 def kind(text):
+    lines = text.split('\n')
+    while len(lines) > 1 and lines[0].startswith('Estado científico:'):   # PR 5: o estado científico vem no topo
+        lines.pop(0)
+    text = '\n'.join(lines)
     if text.startswith(TRANSITION_PREFIXES):
         return 'status_transition'
     if text.startswith('Mudança de comportamento'):

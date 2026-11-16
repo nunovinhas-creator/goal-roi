@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
+from pr5_fixtures import body, present
 from scangoal import brain, notify
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +80,11 @@ def write(root, rel, data):
 
 def kinds(messages):
     return {k: sum(1 for m in messages if cut.kind(m) == k) for k in {cut.kind(m) for m in messages}}
+
+
+def raw_transitions(old, new):
+    """What the pre-PR 5 notifier sent: one status notice per raw difference of the reference (absence = observation)."""
+    return sum(1 for h in set(old) | set(new) if old.get(h) != new.get(h))
 
 
 @unittest.skipUnless(shutil.which('git'), 'git required')
@@ -148,17 +154,19 @@ class PR3Cutover(unittest.TestCase):
         self.assertNotIn('grown-by-register-true', (self.root / 'data/hypotheses.json').read_text(encoding='utf-8'))
 
     def test_two_cycles_after_cutover_send_nothing_historical_and_later_changes_are_notified_once(self):
+        self.assertEqual(raw_transitions(PR2_STATUSES, PR3_STATUSES), 2)                   # what would be sent without the migration
         without = notify.messages(pr3_report(), dict(production_state(), migrations=dict(production_state()['migrations'], **{cut.PR3_KEY: {}})), NOW)
-        self.assertEqual(kinds(without), {'status_transition': 2})                       # what would be sent without the migration
+        self.assertEqual(kinds(without), {})            # PR 5: nothing the report does not show hypothesis by hypothesis
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
         state = self.state()
         self.assertEqual(notify.messages(pr3_report(), state, NOW), [])                  # cycle 1
         self.assertEqual(notify.messages(pr3_report(), state, NOW), [])                  # cycle 2
         later = dict(PR3_STATUSES, n2='promissora')
         later.pop('k0')
-        msgs = notify.messages(pr3_report(later), state, NOW)
-        self.assertEqual(sorted(msgs), sorted(['Hipótese passou a promissora:\nn2', 'Hipótese voltou a "em observação":\nk0']))
-        self.assertEqual(notify.messages(pr3_report(later), state, NOW), [])
+        msgs = notify.messages(present(pr3_report(later), observed=['k0']), state, NOW)   # PR 5: changes shown by the report
+        self.assertEqual(sorted(body(m).split('\n')[0] for m in msgs),
+                         sorted(['Hipótese passou a promissora (antes: em observação): n2', 'Hipótese voltou a "em observação" (antes: promissora): k0']))
+        self.assertEqual(notify.messages(present(pr3_report(later), observed=['k0']), state, NOW), [])
 
     def test_rerun_is_idempotent_after_the_committed_cutover(self):
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
@@ -368,10 +376,11 @@ class PR3Cutover(unittest.TestCase):
         """Why every pre-merge writer must be stopped: a PR2-format report after the cutover overwrites the reference."""
         self.assertTrue(cut.cutover(self.root, self.main, NOW, build_ok)['ok'])
         state = self.state()
+        self.assertEqual(raw_transitions(PR3_STATUSES, PR2_STATUSES), 2)   # what a pre-PR 5 writer would send (documented hazard)
         old_run = notify.messages(pr2_report(), state, NOW)                               # PR2 key present: no re-migration
-        self.assertEqual(kinds(old_run), {'status_transition': 2})
+        self.assertEqual(kinds(old_run), {})                                              # PR 5: unverifiable, never announced
         self.assertEqual(state['statuses'], PR2_STATUSES)
-        self.assertEqual(kinds(notify.messages(pr3_report(), state, NOW)), {'status_transition': 2})
+        self.assertEqual(kinds(notify.messages(pr3_report(), state, NOW)), {})            # PR 5: rules differ -> degraded, held
 
 
 if __name__ == '__main__':

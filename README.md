@@ -120,17 +120,33 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 
 ## Avisos pelo Telegram
 `scangoal/notify.py` envia avisos por um bot teu (segredos `TG_BOT_TOKEN` e `TG_CHAT_ID`; sem eles, o passo é ignorado). Não usa a conta que lê o ScanGoal.
-- Sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 por recolha).
-- Hipóteses que mudam de estado e tipos de sinal que mudam de comportamento.
-- Resumo diário depois das 21:00 UTC.
+- Avisos de jogos com sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 jogos por recolha). Contrato: cada **aposta** (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem numa só mensagem. Reforços (×2, ×4…, outra hora de sinal) e a passagem de indício a alerta da mesma aposta nunca geram outro aviso — a certificação da hipótese é anunciada à parte ("✅ Tática validada"). Uma seleção genuinamente nova num jogo já avisado sai como **atualização** ("A seguir (nova seleção num jogo já avisado)"), só com a aposta nova e a contagem das já avisadas.
+- Hipóteses que mudam de estado (uma mensagem por grupo de hipóteses equivalentes) e tipos de sinal que mudam de comportamento.
+- Resumo diário depois das 21:00 UTC (com entregas falhadas, incertas e bloqueadas, oscilações retidas e relatório degradado, quando os houver).
 - Aviso quando uma recolha falha (no máximo um por hora). Se a cadeia de recolha parar por completo, não há quem avise: a página mostra "Recolha parada".
 
+### O que cada mensagem mostra (PR 5)
+Pela ordem: o **estado científico** (sempre na primeira linha: "NÃO CERTIFICADA — certificação desligada" enquanto a certificação não estiver ativa), os jogos independentes, o ROI por jogo à odd anunciada e com 2 % de perda de odd, a probabilidade de estar acima do necessário (e com a perda de odd), a vantagem com o intervalo de 90 %, a evidência nova (jogos prospetivos desde o registo e desde o último aviso dessa hipótese) e, por fim, a aposta (seleções, odds, hora de Lisboa). Hipóteses equivalentes (partilham ≥ 85 % dos jogos, compatíveis, ligação completa: nunca cadeias A~B~C) aparecem como representante "e mais N equivalentes". O agrupamento é só de apresentação: não muda estados nem avaliação.
+
+### Entrega no máximo uma vez
+- Cada aviso tem uma chave do acontecimento (jogo e seleções, transição de estado, dia do resumo). Antes de enviar, grava-se a intenção em `data/notify_state.json` (atómico) e em `data/notify_log.jsonl` (registo só a crescer: chave, tipo, hora, `sha256` do texto; nunca o token nem o chat). Depois da resposta grava-se o resultado.
+- Estados: pendente, entregue (resposta positiva do Telegram), falha confirmada (o Telegram recusou, ou a ligação nunca se fez), incerta (não se sabe se saiu) e bloqueada (barreira de afirmações). Nenhum acontecimento é tentado duas vezes; uma entrega incerta nunca é reenviada nem contada em `sent_total`. Depois de uma falha ou incerteza, os avisos seguintes dessa recolha ficam pendentes e só saem na seguinte se ainda forem válidos.
+- Uma queda do processo em qualquer ponto é reparada na execução seguinte: a intenção sem resultado passa a incerta; o que o estado sabe e o registo não (ou o contrário) é reconstituído, sem reenvio e sem perder contadores.
+- Entre runners do GitHub Actions, a garantia vem da barreira de publicação (`NOTIFY_DURABLE=git`, ligada no workflow nos passos dos avisos e das leituras rápidas): antes de contactar o Telegram, a intenção é commitada e enviada para o GitHub (`notify: intent … [skip ci]`); se o push falhar, nada é enviado e o aviso fica pendente. Um runner novo, com checkout limpo, nunca reenvia o que outro já pode ter enviado (`audits/pr5-p0-durability-design.md`). O aviso de recolha falhada (`--failure`) fica fora da barreira e **fora da garantia "no máximo uma vez"** (no máximo um por hora, sem registo, como antes).
+- `data/notify_state.json` ausente nunca é tratado como instalação nova: o notificador recusa e não envia nada (`NOTIFY_STATE_MISSING`). Um estado vazio (`{}`) ou sem histórico (`sent_total`, `watch_sent`, `statuses` e a marca da PR 1) também é recusado, mesmo sem registo de entregas; ao lado de um registo, o estado tem ainda de ter a marca PR 5 e não pode ter menos entregas do que na migração. Só `python -m scangoal.notify --init-state` autoriza uma instalação nova, com a marca explícita `installation` (recusa se já houver estado ou registo).
+
+### Mudanças de estado sem falsos avisos
+- Só se anuncia uma mudança com relatório saudável (mesmas regras, âmbito e verificação da certificação; universo elegível, hipóteses e resultados sem quedas anómalas; fontes de resultados sem perdas), com a hipótese presente no relatório, sem estado pendente e com a mudança fixada pelo cérebro. Uma hipótese ausente é "desconhecida", nunca "voltou a em observação".
+- Uma degradação retém as mudanças; se durar 24 h, passa a ser a nova referência (atrasa, nunca descarta).
+- Uma reversão de uma mudança anunciada há menos de 24 h não é anunciada logo: aparece no resumo como oscilação e só sai se persistir 24 h. Entradas e saídas de "validada" nunca são retidas; a perda de certificação é anunciada mesmo com o relatório degradado.
+
 ### Alertas de táticas validadas
-- Uma tática está validada quando chega a "forte" (100 ou mais resultados e certificada pelo teste de confirmação da PR 3) ou "confirmada" (300 ou mais).
-- Cada jogo que encaixe numa tática validada gera um ALERTA com o jogo, a seleção, a odd, a hora, a vantagem estimada e a odd mínima para valer a pena (1 a dividir pela taxa de acerto prudente).
-- O alerta só sai enquanto dá para apostar: jogo ainda por começar, ou sinal com 30 minutos no máximo. Sai uma só vez por jogo.
-- O estado é recalculado em cada recolha. Se a tática deixar de estar validada, sai um aviso e deixa de gerar alertas; se outra passar a validada, começa a gerar.
-- Hipóteses "promissoras" continuam a sair como indício, com texto diferente.
+- Uma tática só é anunciada como validada com certificado ATIVO, VÁLIDO e da PRÓPRIA hipótese (método `eprocess_online_alpha_v1`, registo ativo e verificado, o id na lista de certificadas e a confirmação com seleção e instante na linha da hipótese). Com a certificação desligada (estado atual), nenhuma mensagem diz "validada", "certificada", "confirmada" ou "forte".
+- Cada jogo que encaixe numa tática validada gera um ALERTA com o jogo, as seleções, a odd, a hora, a vantagem estimada e a odd mínima para valer a pena (1 a dividir pela taxa de acerto prudente), enquanto dá para apostar (jogo por começar, ou sinal com 30 minutos no máximo).
+- Barreira final (`guard_claims`): qualquer texto com essas palavras (qualquer flexão, acentos ou maiúsculas) sem o rótulo verificado da hipótese citada na mesma linha é bloqueado e contado. "Não certificada" e "sem certificado" continuam permitidos. Textos vindos de dados (razões e notas do modelo de linguagem) nunca entram nas mensagens.
+
+### Pré-visualização sem envio
+`python -m scangoal.notify --preview [--state ficheiro] [--report ficheiro] [--now ISO] [--out ficheiro]` mostra os avisos que a próxima execução produziria. Não lê credenciais, recusa qualquer ligação de rede e nunca grava estado nem registo.
 
 ## Simulador de banca
 Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas liquidadas do saldo estrito, por ordem, com escolha de tipos de sinal e de corte na odd. Corre no navegador; não altera dados.
@@ -206,6 +222,9 @@ A primeira referência elegível é registada uma só vez em
 entrega. Transições futuras continuam a gerar avisos. O comando offline
 `python -m scangoal.notify --migrate-statuses` prepara exclusivamente essa referência,
 sem credenciais nem envios, e pode ser repetido sem efeitos adicionais.
+A PR 5 acrescenta a marca `telegram_format_v2` (`python -m scangoal.notify --migrate-format`, offline e idempotente): semeia
+a referência anunciada com a referência atual e marca como avisados os sinais já avisados no formato antigo, sem enviar
+nada e sem mexer em `sent_total`, `watch_sent`, nas três marcas anteriores nem em nenhum outro campo.
 Consultar o [procedimento de integração e reversão](audits/pr1-safe-integration.md)
 antes de qualquer integração autorizada. Não restaurar um estado de notificações
 antigo sobre um estado que já recebeu novas entregas.

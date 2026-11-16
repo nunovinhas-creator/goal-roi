@@ -1,0 +1,131 @@
+{
+ "ok": true,
+ "frozen_main_sha": "42acdf896c63b18627b3bedafd1c0d7ad71dbc9d",
+ "code_sha": "262373f04d83e83b6ce15552fa7001f7608cd1e6",
+ "instant_utc": "2026-11-16T14:28:50+00:00",
+ "checks": {
+  "migration_first_call": "NOTIFY_FORMAT_MIGRATED",
+  "migration_second_call": "NOTIFY_FORMAT_UNCHANGED",
+  "migration_second_call_byte_identical": true,
+  "zero_messages_first_runs": true,
+  "zero_messages_preview": true,
+  "no_network_attempt": true,
+  "sent_total_unchanged": true,
+  "watch_sent_unchanged": true,
+  "markers_byte_identical": true,
+  "format_marker_present": true,
+  "statuses_equal_report": true,
+  "announced_equal_previous_reference": true,
+  "other_fields_preserved": true,
+  "no_delivery_log_lines": true,
+  "no_deliveries": true,
+  "science_identical_to_production": true,
+  "certification_not_activated": true,
+  "post_cutover_check_ok": true,
+  "durable_durability_reported": true,
+  "durable_zero_messages": true,
+  "durable_zero_intent_commits": true,
+  "durable_migrated_in_run": true,
+  "durable_sent_total_unchanged": true,
+  "durable_watch_sent_unchanged": true,
+  "durable_markers_byte_identical": true,
+  "durable_post_cutover_check_ok": true
+ },
+ "changed_data_files": [
+  "data/notify_state.json",
+  "data/report.json"
+ ],
+ "new_data_files": [],
+ "post_cutover_check": {
+  "frozen_to_migrated": {
+   "ok": true,
+   "checks": {
+    "markers_unchanged": true,
+    "delivery_monotonic": true,
+    "status_rules": true,
+    "certification_off": true,
+    "no_validated_statuses": true,
+    "statuses_follow_report": true,
+    "pr5_format_marker_stable": true,
+    "pr5_log_append_only": true,
+    "pr5_at_most_one_attempt": true,
+    "pr5_sent_total_matches_log": true,
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
+   },
+   "sent_in_run": 0
+  },
+  "migrated_to_after": {
+   "ok": true,
+   "checks": {
+    "markers_unchanged": true,
+    "delivery_monotonic": true,
+    "status_rules": true,
+    "certification_off": true,
+    "no_validated_statuses": true,
+    "statuses_follow_report": true,
+    "pr5_format_marker_stable": true,
+    "pr5_log_append_only": true,
+    "pr5_at_most_one_attempt": true,
+    "pr5_sent_total_matches_log": true,
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
+   },
+   "sent_in_run": 0
+  },
+  "durable_frozen_to_after_two_runs": {
+   "ok": true,
+   "checks": {
+    "markers_unchanged": true,
+    "delivery_monotonic": true,
+    "status_rules": true,
+    "certification_off": true,
+    "no_validated_statuses": true,
+    "statuses_follow_report": true,
+    "pr5_format_marker_stable": true,
+    "pr5_log_append_only": true,
+    "pr5_at_most_one_attempt": true,
+    "pr5_sent_total_matches_log": true,
+    "pr5_nothing_in_flight": true,
+    "pr5_intent_published_before_outcome": true
+   },
+   "sent_in_run": 0
+  }
+ },
+ "before": {
+  "sent_total": 312,
+  "watch_sent": 117,
+  "statuses": {
+   "Betfair | Dia = dia de semana": "abandonada",
+   "Betfair | Reforço = sem reforço": "abandonada",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada"
+  },
+  "markers": [
+   "eligible_statuses_v1",
+   "status_rules:chronological_eprocess_v3",
+   "status_rules:independent_games_hysteresis_v1"
+  ]
+ },
+ "after": {
+  "sent_total": 312,
+  "watch_sent": 117,
+  "markers": [
+   "eligible_statuses_v1",
+   "status_rules:chronological_eprocess_v3",
+   "status_rules:independent_games_hysteresis_v1",
+   "telegram_format_v2"
+  ],
+  "new_fields": [
+   "announced_changes",
+   "announced_statuses",
+   "deliveries",
+   "format_last_run_utc",
+   "health",
+   "notified_items"
+  ]
+ }
+}

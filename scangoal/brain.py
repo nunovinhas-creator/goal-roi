@@ -527,6 +527,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if not exploratory:
             row['prospective'] = prospective_summary(ordered[hid], born)
             row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if row['prospective']['games'] >= PROSPECTIVE_MIN else 'exploratória')
+            row['_game_roi'] = game_roi(ordered[hid])   # só apresentação (PR 5); retirado antes de publicar
         rows.append(row)
     tested = len(matched)
     by_id = {r['id']: r for r in rows}
@@ -752,6 +753,44 @@ def validation(rows, ledger, problems, registry, history_unverified=False):
             'closest': [dict(r['confirmation'], id=r['id']) for r in sorted(sel, key=closeness, reverse=True)[:5]]}
 
 
+PRESENTATION = 'telegram_presentation_v1'
+
+
+def game_roi(ordered):
+    """ROI médio POR JOGO (apresentação, PR 5): a aposta comprometida de cada jogo decidido (committed_bet, a mesma regra da
+    certificação), à odd anunciada e com a perda de odd ODDS_LOSS. ordered = ordered_games(...). -> (roi, roi com perda)."""
+    plain, cut = [], []
+    for _, _, rows in ordered:
+        b = committed_bet(rows)
+        p = bet_profit(b) if b is not None else None
+        if p is None:
+            continue
+        plain.append(b['w'] * (b['odds'] - 1) if b['w'] > 0 else float(b['w']))
+        cut.append(p)
+    return (round(sum(plain) / len(plain), 4), round(sum(cut) / len(cut), 4)) if plain else (None, None)
+
+
+def presentation(rows, watched=()):
+    """Só apresentação (PR 5): nunca decide estados nem certificação. Para as hipóteses com estado, com mudanças de estado
+    ou citadas nos sinais em aberto: o que o aviso precisa de mostrar e de verificar (estado pendente, última mudança com o jogo
+    que a fixou, certificado da própria hipótese) e os jogos em que a hipótese está presente (para agrupar equivalentes por
+    Jaccard; pertença em jogos, nunca resultados)."""
+    out = {}
+    for r in rows:
+        if r['status'] == 'em observação' and not r['status_changes'] and r['id'] not in watched:
+            continue
+        roi, roi_cut = r.get('_game_roi') or (None, None)
+        out[r['id']] = {'status': r['status'], 'pending_status': r['pending_status'], 'changes': len(r['status_changes']),
+                        'last_change': r['status_changes'][-1] if r['status_changes'] else None,
+                        'family': r['family'], 'conditions': r['conditions'], 'expect': r.get('expect'),
+                        'games': r.get('games'), 'n': r.get('n'), 'roi': r.get('roi'), 'game_roi': roi, 'game_roi_cut': roi_cut,
+                        'prob_above': r.get('prob_above'), 'prob_above_cut': r.get('prob_above_cut'), 'edge': r.get('edge'),
+                        'edge_ci': r.get('edge_ci'), 'prospective_games': (r.get('prospective') or {}).get('games'),
+                        'born_utc': r.get('born_utc'), 'evidence_level': r.get('evidence_level'), 'confirmation': r.get('confirmation'),
+                        'game_ids': sorted(r['_games']) if r.get('_games') is not None else None}
+    return {'version': PRESENTATION, 'hypotheses': out}
+
+
 def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None):
     """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada.
 
@@ -789,16 +828,18 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     watch = {}
     for r in sorted(good, key=lambda r: -r['prob_above']):
         for b in r['open']:
-            w = watch.setdefault(b['key'], {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'type': b['type'], 'market': b['market'],
+            w = watch.setdefault(b['key'], {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': game_identity(b), 'type': b['type'], 'market': b['market'],
                                             'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'reasons': []})
             w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'games': r['games'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even'),
                                  'certified': bool(r.get('confirmation') and r['confirmation']['certified_utc'])})
     mult, valid = multiplicity(rows, tested), validation(rows, ledger, problems, registry, history_unverified)
+    shown = presentation(rows, {x['id'] for w in watch.values() for x in w['reasons']})
     for r in rows:
         r['open'] = len(r['open'])
         r.pop('_games', None)
+        r.pop('_game_roi', None)
     rows.sort(key=lambda r: (-(r['prob_above'] if r['prob_above'] is not None and r['n'] >= 5 else -1), -r['n']))
     return {'evidence_scope': 'eligible_bets_only', 'status_rules': STATUS_RULES,
             'eligibility': {'total': len(all_signals), 'eligible': len(signals), 'excluded': len(all_signals) - len(signals), 'reasons': excluded},
@@ -817,6 +858,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
             'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
+            'presentation': shown,
             'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled,
                       'unit': 'independent_games', 'status_rules': STATUS_RULES, 'promote_at': PROMOTE_AT, 'keep_promising': KEEP_PROMISING,
                       'abandon_at': ABANDON_AT, 'keep_abandoned': KEEP_ABANDONED, 'confirm_steps': CONFIRM_STEPS,
