@@ -305,7 +305,9 @@ class WorkflowActivation(unittest.TestCase):
         text, steps = self.steps()
         self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
         self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)   # single writer
-        self.assertIn('uses: actions/checkout@v4', text)                              # persisted credentials
+        # persisted credentials: v4 tag or its reviewed SHA (v4.4.0), never persist-credentials: false
+        self.assertRegex(text, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
+        self.assertNotIn('persist-credentials: false', text)
         self.assertTrue(any('scangoal.watch' in l for l in steps['Fast reads every 2 minutes until the next collection (read-only)']))
 
     def test_fast_reads_go_through_the_same_run(self):

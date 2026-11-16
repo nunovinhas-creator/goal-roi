@@ -11,16 +11,22 @@ on:
 permissions:
   contents: write
   actions: write
+  # BSD recovery tail only: OIDC attestation of journal events. Adds no repository access.
+  id-token: write
 concurrency:
   group: scangoal-write
   cancel-in-progress: false
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
+    # a run that fits 15 min without the tail can never be cut because of it.
+    timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
+      - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0 (= tag v5, 2026-11-16)
         with:
           python-version: '3.11'
           cache: pip
