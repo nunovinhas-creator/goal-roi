@@ -63647,6 +63647,33 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-16T00:40:08+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Combinação de condições que indicam um jogo aberto com uma diferença significativa no marcador e um ritmo lento",
+  "source": "llm"
+ },
  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T02:56:06+00:00",
   "conditions": [
@@ -74485,6 +74512,33 @@
   ],
   "family": "Polymarket",
   "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-16T00:40:08+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "reason": "Análise de mercado com foco em odd, quota e valor da aposta em competições de seleções",
+  "source": "llm"
  },
  "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T19:08:56+00:00",
