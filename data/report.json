@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-16T05:27:14+00:00",
- "messages": 1034,
+ "generated_at_utc": "2026-11-16T05:31:31+00:00",
+ "messages": 1035,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 37,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 10,
   "OPEN_GAME_NO_ODDS": 13,
   "FULL_TIME_NOTE": 12,
-  "POLYMARKET": 247,
+  "POLYMARKET": 248,
   "None": 29,
   "TOTALS_FORM_NO_ODDS": 58
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 1726,
+  "versions": 1727,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 14,
-  "last_collected_at_utc": "2026-11-16T05:05:36+00:00",
+  "last_collected_at_utc": "2026-11-16T05:31:31+00:00",
   "hl_results": 55,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 34,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 2,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T05:27:09+00:00",
+  "collector_last_run_utc": "2026-11-16T05:31:31+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 352,
   "goal_lists_consistent": 197
  },
- "unique_bets": 575,
+ "unique_bets": 576,
  "settled_bets": 463,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -891,7 +891,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 99,
+   "bets": 100,
    "settled": 92,
    "matches": 35,
    "wins": 42,
@@ -1410,7 +1410,7 @@
    "by_bot_mark": 0,
    "per_day": 0.6,
    "days_to_hint": 43,
-   "days_to_conclusion": 466,
+   "days_to_conclusion": 467,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1495,7 +1495,7 @@
    "prob_above_cut": 0.3906
   },
   "POLYMARKET": {
-   "signals": 121,
+   "signals": 122,
    "with_result": 113,
    "hits": 52,
    "misses": 61,
@@ -1630,7 +1630,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 22.8,
+   "per_day": 22.7,
    "days_to_hint": 0,
    "days_to_conclusion": 11,
    "prudent_rate": 0.825,
@@ -2831,7 +2831,7 @@
    },
    {
     "n": 10,
-    "signals": 18,
+    "signals": 17,
     "hits": 6,
     "misses": 4,
     "hit_rate": 0.6,
@@ -3025,7 +3025,7 @@
    },
    {
     "n": 270,
-    "signals": 343,
+    "signals": 344,
     "hits": 153,
     "misses": 117,
     "hit_rate": 0.553,
@@ -3129,8 +3129,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 731,
-   "eligible": 575,
+   "total": 732,
+   "eligible": 576,
    "excluded": 156,
    "reasons": {
     "no_valid_odds": 108,
@@ -4943,6 +4943,76 @@
       }
      ],
      "bad_total": 30
+    },
+    {
+     "match_id": "germany-vs-netherlands-20261116",
+     "match": "Germany — Netherlands",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-16T19:45+00:00",
+     "date_utc": "2026-11-16T05:31:18+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH1(-0.5)",
+     "odds": 1.92,
+     "odds_last": 1.92,
+     "max_mult": 1,
+     "share": 57,
+     "share_last": 57,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 53,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ]
+       ],
+       "n": 53,
+       "games": 31,
+       "hits": 25,
+       "break_even": 0.5847,
+       "prob_above": 0.0413,
+       "roi": -0.2055,
+       "edge": -0.1349,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 33,
+       "games": 24,
+       "hits": 14,
+       "break_even": 0.576,
+       "prob_above": 0.0561,
+       "roi": -0.2827,
+       "edge": -0.1355,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 25
     }
    ],
    "counts": {
@@ -4950,9 +5020,9 @@
     "misto": 3,
     "sem evidência": 0,
     "contraditório": 0,
-    "evitar": 1
+    "evitar": 2
    },
-   "generated_utc": "2026-11-16T05:27:28+00:00",
+   "generated_utc": "2026-11-16T05:31:44+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5112,7 +5182,7 @@
     "roi_cut": -0.0016
    },
    "skipped": {
-    "bets": 345,
+    "bets": 346,
     "settled": 255,
     "games": 127,
     "wins": 119,
@@ -15047,7 +15117,7 @@
    },
    {
     "n": 53,
-    "signals": 56,
+    "signals": 57,
     "hits": 25,
     "misses": 28,
     "hit_rate": 0.4717,
@@ -15083,7 +15153,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 3,
+    "open": 4,
     "born_verified": true,
     "game_set": "f56e20f6b8089159",
     "prospective": {
@@ -16835,7 +16905,7 @@
     "roi_announced_odds": -0.053,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 11.4,
+    "per_day": 11.3,
     "days_to_hint": 0,
     "days_to_conclusion": 22
    },
@@ -16898,7 +16968,7 @@
     "days_to_conclusion": 7
    },
    "POLYMARKET": {
-    "signals": 121,
+    "signals": 122,
     "with_result": 113,
     "hits": 52,
     "misses": 61,
@@ -17418,7 +17488,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 575,
+   "bets": 576,
    "settled": 463,
    "matches": 276,
    "wins": 218,
@@ -17453,6 +17523,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-16T05:31:18+00:00",
+   "match_id": "germany-vs-netherlands-20261116",
+   "group": "POLYMARKET/pre",
+   "match": "Germany — Netherlands",
+   "selection": "Polymarket: AH1(-0.5)",
+   "odds": 1.92,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-16T02:35:23+00:00",
    "match_id": "monterrey-women-vs-pachuca-women-20261116",
@@ -18379,22 +18462,6 @@
    "ft": [
     4,
     1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-15T19:31:18+00:00",
-   "match_id": "universidad-guadalajara-vs-atletico-morelia-20261115",
-   "group": "TOTALS_FORM",
-   "match": "Universidad Guadalajara — Atletico Morelia",
-   "selection": "Over 0.75",
-   "odds": 1.58,
-   "ft": [
-    0,
-    0
    ],
    "w": -1.0,
    "settled_by": "resultado",
@@ -19516,6 +19583,45 @@
     1
    ]
   },
+  "germany-vs-netherlands-20261116": {
+   "teams": [
+    "Germany",
+    "Netherlands"
+   ],
+   "events": [
+    {
+     "d": "2026-11-14T22:49:12+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Germany",
+     "odds": 1.85,
+     "market": "1x2",
+     "total": 9600.0
+    },
+    {
+     "d": "2026-11-15T22:08:11+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Germany",
+     "odds": 1.85,
+     "market": "1x2",
+     "total": 11000.0
+    },
+    {
+     "d": "2026-11-16T05:31:18+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH1(-0.5)",
+     "odds": 1.92,
+     "share": 57,
+     "market": "Polymarket",
+     "total": 15000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
   "belgium-vs-italy-20261115": {
    "teams": [
     "Belgium",
@@ -19905,33 +20011,6 @@
    "ft": [
     2,
     1
-   ]
-  },
-  "universidad-guadalajara-vs-atletico-morelia-20261115": {
-   "teams": [
-    "Universidad Guadalajara",
-    "Atletico Morelia"
-   ],
-   "events": [
-    {
-     "d": "2026-11-15T19:31:18+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 0.75",
-     "odds": 1.58,
-     "minute": 64,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    0,
-    0
    ]
   },
   "stal-stalowa-wola-vs-olimpia-grudziadz-20261115": {
@@ -25323,7 +25402,7 @@
    "day": "2026-11-15"
   },
   {
-   "bets": 10,
+   "bets": 11,
    "settled": 8,
    "wins": 4,
    "units": 0.08,
