@@ -1,7 +1,8 @@
 import hashlib
 import itertools
 from unittest.mock import patch
-import json, os, tempfile, unittest
+import io, json, os, tempfile, unittest
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -833,6 +834,8 @@ class Notify(unittest.TestCase):
             try:
                 (Path(d) / 'report.json').write_text(json.dumps(self.report()), encoding='utf-8')
                 self.assertIsNone(notify.run(sender, env={}))
+                with redirect_stdout(io.StringIO()):
+                    notify.init_state_file()     # PR 5 (P2): a new installation creates its state explicitly
                 st = notify.run(sender, datetime.fromisoformat('2026-11-12T12:00:00+00:00'), {'TG_BOT_TOKEN': 'SECRET', 'TG_CHAT_ID': '42'})
                 self.assertEqual((len(sent), st['sent_total'], sent[0][1]), (2, 2, '42'))
                 self.assertNotIn('SECRET', (Path(d) / 'notify_state.json').read_text(encoding='utf-8'))

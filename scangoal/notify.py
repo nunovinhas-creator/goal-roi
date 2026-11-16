@@ -18,7 +18,7 @@ PR 5 (formato `telegram_format_v2`):
 Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nunca é impresso nem gravado). Sem eles, não faz
 nada. `--preview` nunca os lê, nunca abre ligações e nunca grava estado.
 """
-import copy, hashlib, json, os, re, socket, sys, tempfile, unicodedata
+import copy, hashlib, json, os, re, socket, subprocess, sys, tempfile, unicodedata
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -62,6 +62,14 @@ UTC = timezone.utc
 
 class NotifyError(RuntimeError):
     pass
+
+
+class StateMissing(NotifyError):
+    """`notify_state.json` não existe: uma instalação com histórico nunca recomeça do zero (revisão #5920565094, P2)."""
+
+
+class StateRegressed(NotifyError):
+    """O estado é anterior ao registo de entregas (reposto ou reiniciado): recusar em vez de reenviar."""
 
 
 class DeliveryFailed(NotifyError):
@@ -322,7 +330,7 @@ def migrate_format(report, state, now):
     sent, items = set(state.get('watch_sent') or []), {}
     for w in (report.get('brain') or {}).get('watch') or []:
         if legacy_key(w) in sent:
-            items[item_key(w, item_level(report, w))] = {'at_utc': iso(now), 'key': 'migration:' + FORMAT_MIGRATION}
+            items[item_key(w)] = {'at_utc': iso(now), 'key': 'migration:' + FORMAT_MIGRATION}
     state.setdefault('migrations', {})[FORMAT_MIGRATION] = {
         'at_utc': iso(now), 'report_generated_at_utc': report.get('generated_at_utc'),
         'sent_total': state.get('sent_total', 0), 'watch_sent': len(state.get('watch_sent') or []),
@@ -573,8 +581,11 @@ def item_level(report, w):
     return 'alerta' if alert_reason(report, w) else 'indício'
 
 
-def item_key(w, level):
-    return 'item|%s|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '', level)
+def item_key(w):
+    """Identidade da APOSTA (jogo, mercado, seleção). O nível (indício ou alerta) não faz parte dela: a mesma aposta nunca é
+    avisada duas vezes, nem quando a hipótese que a sustenta passa a certificada (essa mudança é outro acontecimento, o aviso
+    de estado "✅ Tática validada"). Revisão #5920565094, P1."""
+    return 'item|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '')
 
 
 def legacy_pairs(watch_sent):
@@ -588,8 +599,16 @@ def legacy_pairs(watch_sent):
     return out
 
 
+def legacy_hit(pairs, w):
+    t = parse_time(w.get('date_utc'))
+    return bool(t) and any(abs(t - x) <= timedelta(days=LEGACY_PAIR_DAYS) for x in pairs.get((w.get('match'), w.get('selection')), ()))
+
+
 def game_notices(report, state, now):
-    """Um aviso por jogo, só com as seleções ainda não avisadas; reforços nunca geram novo aviso."""
+    """Contrato (revisão #5920565094): cada APOSTA (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas
+    de um mesmo jogo numa recolha saem numa só mensagem. Reforços (outra hora de sinal, outra multiplicidade) e a passagem de
+    indício a alerta da mesma aposta nunca geram outro aviso. Uma seleção genuinamente nova num jogo já avisado gera uma
+    atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
     notified, sent = state.get('notified_items') or {}, set(state.get('watch_sent') or [])
     pairs, games = legacy_pairs(sent), {}
     for w in (report.get('brain') or {}).get('watch') or []:
@@ -598,16 +617,20 @@ def game_notices(report, state, now):
         level = item_level(report, w)
         if level == 'alerta' and not still_bettable(w, now):
             continue          # fora de tempo: não serve de alerta nem de indício, e não fica pendente
-        ik, t = item_key(w, level), parse_time(w.get('date_utc'))
-        if ik in notified or legacy_key(w) in sent:
-            continue
-        if level == 'indício' and t and any(abs(t - x) <= timedelta(days=LEGACY_PAIR_DAYS) for x in pairs.get((w.get('match'), w.get('selection')), ())):
-            continue          # avisado no formato antigo (antes da PR 5) com outra hora de sinal: reforço
-        g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or ''})
-        it = g['items'].setdefault(ik, {'level': level, 'entries': []})
+        ik = item_key(w)
+        if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):
+            continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
+        g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or '', 'sample': w})
+        it = g['items'].setdefault(ik, {'level': 'indício', 'entries': []})
         it['entries'].append(w)
-        g['alert'] |= level == 'alerta'
+        if level == 'alerta':
+            it['level'] = 'alerta'
+            g['alert'] = True
         g['last'] = max(g['last'], w.get('date_utc') or '')
+    for gk, g in games.items():      # apostas deste jogo já avisadas antes: esta mensagem é uma atualização
+        own = {k for k in notified if k.startswith('item|%s|' % gk)}
+        old = {(m, sel) for (m, sel), ts in pairs.items() if m == g['sample'].get('match') and legacy_hit({(m, sel): ts}, dict(g['sample'], selection=sel))}
+        g['previous'] = max(len(own), len(old))
     ordered = sorted(games.items(), key=lambda kv: (not kv[1]['alert'], -_epoch(kv[1]['last']), kv[0]))
     return [game_notice(report, state, now, gk, g) for gk, g in ordered[:MAX_WATCH_PER_RUN]]
 
@@ -639,7 +662,10 @@ def game_notice(report, state, now, gk, g):
     shown = grouped[:MAX_GROUPS_PER_MESSAGE]
     head, claims = labels(report, [h for gr in shown for h in gr])
     match = first.get('match') or 'Jogo'
-    lines = head + [('🟢 ALERTA: %s' % match) if g['alert'] else ('A seguir: %s' % match)]
+    update = ' (nova seleção num jogo já avisado)' if g.get('previous') else ''
+    lines = head + [('🟢 ALERTA%s: %s' % (update, match)) if g['alert'] else ('A seguir%s: %s' % (update, match))]
+    if g.get('previous'):
+        lines.append('Apostas já avisadas neste jogo: %d (não repetidas).' % g['previous'])
     effects = []
     per_group = []
     for gr in shown:
@@ -907,8 +933,11 @@ class FileStore:
         self.state_path, self.log_path = Path(directory) / STATE_NAME, Path(directory) / LOG_NAME
 
     def load_state(self):
-        # Fail closed: a corrupt state raises instead of being replaced by an empty history.
-        return json.loads(self.state_path.read_text(encoding='utf-8')) if self.state_path.exists() else {}
+        # Fail closed: a missing or corrupt state raises instead of being replaced by an empty history. A new installation
+        # creates it explicitly (`--init-state`), never implicitly.
+        if not self.state_path.exists():
+            raise StateMissing('notify_state.json missing')
+        return json.loads(self.state_path.read_text(encoding='utf-8'))
 
     def save_state(self, state):
         save_state(self.state_path, state)
@@ -982,6 +1011,29 @@ def _bump(state, outcome):
     counts[outcome] = counts.get(outcome, 0) + 1
 
 
+def check_integrity(state, entries):
+    """Um estado sem a marca PR 5 (ou com menos entregas do que na migração) ao lado de um registo de entregas é um estado
+    reposto ou reiniciado: recusar (P2). Um estado mais antigo mas já PR 5 é reparado a partir do registo (`reconcile`)."""
+    if not isinstance(state, dict):
+        raise StateRegressed('state is not an object')
+    marker = (state.get('migrations') or {}).get(FORMAT_MIGRATION)
+    if entries and not marker:
+        raise StateRegressed('delivery log present but state has no %s marker' % FORMAT_MIGRATION)
+    if marker and isinstance(marker.get('sent_total'), int) and (state.get('sent_total') or 0) < marker['sent_total']:
+        raise StateRegressed('sent_total below the value recorded at migration')
+
+
+def init_state_file():
+    """`--init-state`: só para uma instalação NOVA (sem estado e sem registo de entregas). Nunca substitui nada."""
+    store = FileStore(data_dir())
+    if store.state_path.exists() or (store.log_path.exists() and store.log_path.stat().st_size):
+        raise NotifyError('refusing to initialise: state or delivery log already present')
+    store.state_path.parent.mkdir(parents=True, exist_ok=True)
+    save_state(store.state_path, {})
+    print('NOTIFY_STATE_INITIALISED')
+    return True
+
+
 def reconcile(store, state, now):
     """Recupera de uma queda em qualquer ponto, sem reenviar e sem perder contadores:
     1) uma intenção sem resultado (no estado ou no registo) passa a INCERTA (nunca é reenviada);
@@ -989,6 +1041,7 @@ def reconcile(store, state, now):
     3) o que o estado conhece e o registo não (queda entre as duas gravações) é acrescentado ao registo, marcado reconstruído.
     Ordem das gravações: estado primeiro, depois o registo; repetir a reconciliação é inofensivo."""
     entries, bad = store.read_log()
+    check_integrity(state, entries)
     recs = state.setdefault('deliveries', {})
     changed = False
     for key, r in recs.items():
@@ -1007,9 +1060,10 @@ def reconcile(store, state, now):
             continue
         names = [e['event'] for e in evs]
         terminal = [x for x in names if x in TERMINAL]
-        outcome = terminal[-1] if terminal else ('uncertain' if 'intent' in names else None)
-        if outcome is None:
-            continue
+        open_intent = 'intent' in names and names[::-1].index('intent') < (names[::-1].index('withdrawn') if 'withdrawn' in names else len(names))
+        outcome = terminal[-1] if terminal else ('uncertain' if open_intent else None)
+        if outcome is None or (r is not None and (r.get('events') or [''])[-1] == 'withdrawn' and not terminal):
+            continue                       # intenção retirada (não publicada, nada enviado): continua pendente
         intent = next((e for e in evs if e['event'] == 'intent'), {})
         r = recs.setdefault(key, {'kind': evs[0].get('kind'), 'created_utc': evs[0].get('at_utc')})
         r.update(state=outcome, reconstructed=True, events=[x for x in names if x != outcome] + [outcome], sha256=intent.get('sha256'))
@@ -1019,11 +1073,15 @@ def reconcile(store, state, now):
         if outcome == 'delivered':
             state['sent_total'] = state.get('sent_total', 0) + 1
         changed = True
-    missing = []
+    missing, logged = [], {}
+    for e in entries:
+        logged[(e['key'], e['event'])] = logged.get((e['key'], e['event']), 0) + 1
     for key, r in recs.items():
+        wanted = {}
         for ev in r.get('events') or []:
-            if (key, ev) not in seen:
-                seen.add((key, ev))
+            wanted[ev] = wanted.get(ev, 0) + 1
+            if wanted[ev] > logged.get((key, ev), 0):
+                logged[(key, ev)] = logged.get((key, ev), 0) + 1
                 missing.append(log_entry(now, key, ev, r, reconstructed=True, sha256=r.get('sha256') if ev in ('intent', 'delivered') else None))
     if changed:
         store.save_state(state)
@@ -1031,10 +1089,12 @@ def reconcile(store, state, now):
     return {'malformed_log_lines': bad, 'reconstructed_log_entries': len(missing), 'changed_state': changed}
 
 
-def deliver(store, report, state, now, sender, token, chat, checkpoint=None):
+def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None):
     """Planeia e envia. Para cada aviso: intenção (efeitos + `in_flight`) gravada no estado e no registo ANTES do envio;
     resultado gravado depois. Uma falha ou incerteza para os envios desta execução (os seguintes ficam pendentes e só saem
-    se ainda forem válidos na execução seguinte). -> (estado, entregues)."""
+    se ainda forem válidos na execução seguinte). publish (P0, `GitPublisher`): depois de gravar a intenção e ANTES de contactar
+    o Telegram, publica-a no repositório remoto; se não conseguir, a intenção é retirada (nada foi enviado, o aviso fica
+    pendente) e esta execução pára de enviar. -> (estado, entregues)."""
     cp = checkpoint or (lambda name: None)
     reconcile(store, state, now)
     recs = state.setdefault('deliveries', {})
@@ -1065,6 +1125,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None):
             store.save_state(state)
             store.append_log([log_entry(now, n.key, 'blocked', rec, sha256=rec['sha256'], reason='guard_claims')])
             continue
+        before = copy.deepcopy(state)
         apply_effects(state, n.effects, now)
         rec.update(state='in_flight', attempt_utc=iso(now), sha256=sha(n.text), chars=len(n.text))
         rec['events'].append('intent')
@@ -1072,6 +1133,20 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None):
         cp('after_intent_state')
         store.append_log([log_entry(now, n.key, 'intent', rec, sha256=rec['sha256'], effects=n.effects)])
         cp('after_intent')
+        if publish is not None:
+            published = publish(n.key)
+            cp('after_publish')
+            if not published:
+                # Nada foi enviado: desfaz os efeitos, o aviso volta a pendente (pode sair numa execução seguinte, uma vez).
+                state.clear()
+                state.update(before)
+                rec = state['deliveries'][n.key]
+                rec['events'] += ['intent', 'withdrawn']
+                _bump(state, 'withdrawn')
+                store.save_state(state)
+                store.append_log([log_entry(now, n.key, 'withdrawn', rec, reason='intent not published')])
+                print('NOTIFY_PUBLISH_FAILED')
+                break
         try:
             sender(token, chat, n.text)
             outcome = 'delivered'
@@ -1099,6 +1174,60 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None):
     return state, delivered
 
 
+class GitPublisher:
+    """Barreira P0 (revisão #5920565094): torna a intenção de envio visível a qualquer runner seguinte ANTES de contactar o
+    Telegram — commit só de `notify_state.json` e `notify_log.jsonl`, `pull --rebase --autostash` e `push` para o ramo do
+    workflow. Devolve True só quando o push foi aceite. Qualquer falha (comando, conflito, tempo esgotado) devolve False e o
+    aviso NÃO é enviado. Um push aceite mas dado como falhado (resposta perdida) também devolve False: no pior caso o
+    acontecimento fica `in_flight` no remoto e a execução seguinte marca-o como incerto — nunca é enviado duas vezes."""
+
+    def __init__(self, root, branch, paths, timeout=60, attempts=3, runner=subprocess.run):
+        self.root, self.branch, self.paths, self.timeout, self.attempts, self.runner = str(root), branch, list(paths), timeout, attempts, runner
+
+    @classmethod
+    def for_store(cls, store, branch, **kw):
+        top = subprocess.run(['git', '-C', str(store.state_path.parent), 'rev-parse', '--show-toplevel'], capture_output=True, text=True, timeout=30)
+        if top.returncode:
+            raise NotifyError('NOTIFY_DURABLE=git needs a git checkout')
+        root = Path(top.stdout.strip())
+        paths = [os.path.relpath(p.resolve(), root.resolve()) for p in (store.state_path, store.log_path)]
+        return cls(root, branch, paths, **kw)
+
+    def git(self, *args):
+        r = self.runner(['git', '-C', self.root, '-c', 'user.name=scangoal-collector', '-c', 'user.email=actions@users.noreply.github.com',
+                         '-c', 'commit.gpgsign=false', *args], capture_output=True, timeout=self.timeout)
+        return r.returncode == 0
+
+    def __call__(self, key):
+        try:
+            if not (self.git('add', '--', *self.paths)
+                    and self.git('commit', '-q', '-m', 'notify: intent %s [skip ci]' % sha(key)[:12], '--', *self.paths)):
+                return False
+            for _ in range(self.attempts):
+                if not self.git('pull', '-q', '--rebase', '--autostash', 'origin', self.branch):
+                    self.git('rebase', '--abort')
+                    return False
+                if self.git('push', '-q', 'origin', 'HEAD:%s' % self.branch):
+                    return True
+            return False
+        except (OSError, subprocess.SubprocessError):
+            return False
+
+
+def durability(env, store):
+    """NOTIFY_DURABLE=git (variável do workflow, a autorizar à parte): barreira de publicação remota antes de cada envio.
+    Sem ela, "no máximo uma vez" vale só dentro do mesmo armazenamento (o runner), não entre runners."""
+    mode = (env.get('NOTIFY_DURABLE') or '').strip()
+    if not mode:
+        print('NOTIFY_DURABILITY local')
+        return None
+    branch = (env.get('GITHUB_REF_NAME') or '').strip()
+    if mode != 'git' or not branch:
+        raise NotifyError('NOTIFY_DURABLE must be "git" with GITHUB_REF_NAME set')    # mal configurado: não envia nada
+    print('NOTIFY_DURABILITY git')
+    return GitPublisher.for_store(store, branch)
+
+
 def run(sender=send, now=None, env=None, checkpoint=None):
     env = os.environ if env is None else env
     token, chat = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip()
@@ -1111,8 +1240,13 @@ def run(sender=send, now=None, env=None, checkpoint=None):
         print('NOTIFY_NO_REPORT')
         return None
     store = FileStore(data_dir())
-    state = store.load_state()
-    state, done = deliver(store, report, state, now, sender, token, chat, checkpoint)
+    publish = durability(env, store)
+    try:
+        state = store.load_state()
+    except StateMissing:
+        print('NOTIFY_STATE_MISSING')        # nada é enviado; repor o estado do histórico git ou, só numa instalação nova, --init-state
+        raise
+    state, done = deliver(store, report, state, now, sender, token, chat, checkpoint, publish)
     print('NOTIFY_OK sent', done)
     return state
 
@@ -1150,7 +1284,9 @@ def preview(state_path=None, report_path=None, now=None, log_path=None):
         state_path = Path(state_path) if state_path else data_dir() / STATE_NAME
         log_path = Path(log_path) if log_path else state_path.parent / LOG_NAME
         report = json.loads(Path(report_path or data_dir() / 'report.json').read_text(encoding='utf-8'))
-        state = json.loads(state_path.read_text(encoding='utf-8')) if state_path.exists() else {}
+        if not state_path.exists():
+            raise StateMissing('notify_state.json missing')     # a pré-visualização segue a mesma regra que o envio
+        state = json.loads(state_path.read_text(encoding='utf-8'))
         store = MemoryStore(state, log_path.read_bytes() if log_path.exists() else b'')
         shown = []
 
@@ -1183,6 +1319,13 @@ def main():
             preview_main(sys.argv)
         except Exception as exc:
             print('NOTIFY_PREVIEW_FAILED', type(exc).__name__)
+            sys.exit(1)
+        return
+    if '--init-state' in sys.argv:
+        try:
+            init_state_file()
+        except Exception as exc:
+            print('NOTIFY_INIT_REFUSED', type(exc).__name__)
             sys.exit(1)
         return
     if '--migrate-format' in sys.argv:

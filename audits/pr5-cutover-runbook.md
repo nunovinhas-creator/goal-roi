@@ -13,6 +13,16 @@ O que muda nos dados de produção, sempre por acréscimo:
 - `data/report.json` e `docs/report.json` ganham `brain.presentation` e `match_id` nos sinais em aberto (aditivos; a página não
   os lê).
 
+## Revisão #5920565094 (segunda ronda)
+
+- P0: a barreira de publicação (`NOTIFY_DURABLE=git`) está no código mas **inativa**. Sem a alteração ao workflow (desenho e
+  diff em `audits/pr5-p0-durability-design.md`, autorização separada), "no máximo uma vez" vale só dentro de cada runner.
+- P1: a identidade de um aviso de jogo é a aposta (jogo, mercado, seleção), sem o nível; indício → alerta da mesma aposta não
+  repete a aposta.
+- P2: estado ausente ou regredido → recusa, nada enviado (`NOTIFY_STATE_MISSING`, `StateRegressed`). Em produção, a correção
+  é repor `data/notify_state.json` a partir do último commit do `main` (`git checkout origin/main -- data/notify_state.json`),
+  nunca `--init-state`.
+
 ## Pré-condições
 
 1. Auditoria independente aprovada sobre o SHA final da PR (resultado em `audits/pr5-independent-audit.md`).
@@ -32,7 +42,7 @@ O que muda nos dados de produção, sempre por acréscimo:
    `SCANGOAL_DATA_DIR=<cópia de data/ de M> python3.11 -m scangoal.notify --preview --out /tmp/pr5-preview.txt`
    (com o relatório de M gerado pelo código antigo não há `presentation`: zero avisos de estado é o resultado esperado).
 
-Último ensaio: `main` `60ba009`, ver `audits/pr5-evidence/cutover-rehearsal.json`.
+Último ensaio: `main` `4af4c95`, ver `audits/pr5-evidence/cutover-rehearsal.json`.
 
 ## Fase B — merge
 
@@ -79,10 +89,11 @@ O que muda nos dados de produção, sempre por acréscimo:
 | Risco | Situação |
 |---|---|
 | "No máximo uma vez" perde um aviso | Uma falha confirmada (p. ex. HTTP 429) ou uma entrega incerta nunca é repetida. Conta no resumo diário. Decisão do proprietário: preferir perder raramente a repetir. |
-| Perda do armazenamento antes do commit | O registo persistente é o commit do workflow. Se o runner morrer antes de qualquer commit (nem o passo "fast reads" grava), a intenção perde-se e o acontecimento pode sair outra vez. Não é evitável sem alterar workflows. |
 | Execução incompleta entre commits | Um commit pode conter várias execuções do notificador (leituras rápidas). Sem efeito na entrega; limita a reconstituição a nível de commit. |
 | Degradação longa | Uma degradação estável há 24 h passa a referência; mudanças ficam atrasadas até 24 h, nunca descartadas, e o resumo mostra-a. |
 | Regra "mesmo jogo em 3 dias" | Um aviso no formato antigo protege reforços com outra hora de sinal pela dupla (jogo, seleção) durante 3 dias. Dois jogos diferentes com as mesmas equipas e seleção em 3 dias não teriam o segundo indício. |
 | Nome de equipa com "validada", "certificado", "forte"… | O aviso desse jogo é bloqueado (fail-closed) e contado em "bloqueados". |
 | Crescimento | `deliveries` ≈ 250 bytes por aviso no estado e ≈ 300 bytes por aviso no registo; rever acima de 5 MB. |
 | `--failure` | O aviso de recolha falhada mantém o comportamento anterior (no máximo um por hora, sem registo). |
+| Entre runners sem a barreira | Um runner que envie e morra antes do commit, ou cujo push final falhe, deixa o runner seguinte reenviar (reproduzido em `test_notify_durability`). Fecha-se com a alteração ao workflow do desenho P0. |
+| Estado ausente | O notificador pára de enviar até o estado ser reposto (fail-closed). Visível nos registos (`NOTIFY_STATE_MISSING`) e por `post_cutover_check` (ficheiro ilegível). |

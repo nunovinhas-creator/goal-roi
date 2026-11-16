@@ -1,16 +1,18 @@
 {
- "mutations": 37,
- "killed": 37,
- "ok": true,
+ "mutations": 48,
+ "killed": 47,
+ "ok": false,
  "results": [
   {
    "mutation": "M01 no intent persisted before the send",
    "status": "KILLED",
    "failing_tests": [
+    "test_notify_durability.AcrossRunners.test_remote_moved_by_another_commit",
+    "test_notify_durability.AcrossRunners.test_runner_dies_after_sending",
     "test_telegram_presentation.CrashPoints.test_every_crash_point",
     "test_telegram_presentation.U02_CrashBetweenSendAndRecord.test_in_flight_becomes_uncertain_and_is_never_resent"
    ],
-   "failing_count": 2
+   "failing_count": 4
   },
   {
    "mutation": "M02 in-flight retried instead of uncertain",
@@ -59,11 +61,12 @@
    "mutation": "M07 log not repaired from the state",
    "status": "KILLED",
    "failing_tests": [
+    "test_notify_durability.WithdrawalCrash.test_withdrawn_in_state_but_not_in_log",
     "test_telegram_presentation.CrashPoints.test_crash_between_state_and_log_never_loses_a_delivery",
     "test_telegram_presentation.CrashPoints.test_every_crash_point",
     "test_telegram_presentation.U02_CrashBetweenSendAndRecord.test_in_flight_becomes_uncertain_and_is_never_resent"
    ],
-   "failing_count": 3
+   "failing_count": 4
   },
   {
    "mutation": "M08 delivered keys of the log not restored",
@@ -74,25 +77,23 @@
    "failing_count": 1
   },
   {
-   "mutation": "M09 old key per signal (date|match|selection)",
+   "mutation": "M09 old key per signal (date|market|selection)",
    "status": "KILLED",
    "failing_tests": [
     "test_scangoal.Notify.test_validated_tactic_alerts_each_bettable_match_and_stops_when_it_loses_validation",
     "test_telegram_presentation.CrashPoints.test_every_crash_point",
     "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
+    "test_telegram_presentation.P1_PromotionDoesNotRepeatTheBet.test_same_bet_is_not_repeated_and_the_certification_is_its_own_event",
     "test_telegram_presentation.U04_SelectionsOfOneGame.test_two_selections_one_message_and_a_later_selection_is_not_lost",
-    "test_telegram_presentation.X_LegacyAndHistory.test_signals_announced_in_the_old_format_are_not_resent",
-    "test_telegram_presentation.X_Presentation.test_new_evidence_since_the_last_notice"
+    "test_telegram_presentation.X_LegacyAndHistory.test_signals_announced_in_the_old_format_are_not_resent"
    ],
-   "failing_count": 6
+   "failing_count": 7
   },
   {
    "mutation": "M10 legacy keys ignored",
-   "status": "KILLED",
-   "failing_tests": [
-    "test_telegram_presentation.X_LegacyAndHistory.test_rollback_and_roll_forward_never_resends_what_the_old_code_sent"
-   ],
-   "failing_count": 1
+   "status": "SURVIVED",
+   "failing_tests": [],
+   "failing_count": 0
   },
   {
    "mutation": "M11 grouping off",
@@ -256,14 +257,14 @@
    "mutation": "M29 silent migration not seeded",
    "status": "KILLED",
    "failing_tests": [
-    "test_notify_migration.NotifyMigration.test_genuine_subsequent_changes_are_not_silenced",
-    "test_notify_migration.NotifyMigration.test_offline_migration_persists_once_without_sender_or_counters",
-    "test_telegram_presentation.CrashPoints.test_crash_between_state_and_log_never_loses_a_delivery",
-    "test_telegram_presentation.CrashPoints.test_every_crash_point",
-    "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
-    "test_telegram_presentation.LogAndStateRecovery.test_torn_log_line_is_isolated_and_never_rewritten"
+    "test_notify_durability.AcrossRunners.test_barrier_commits_only_the_notifier_files",
+    "test_notify_durability.AcrossRunners.test_fast_reads_several_runs_in_one_runner_then_death",
+    "test_notify_durability.AcrossRunners.test_push_rejected_and_runner_dies",
+    "test_notify_durability.AcrossRunners.test_push_rejected_nothing_is_sent_and_it_goes_out_once_later",
+    "test_notify_durability.AcrossRunners.test_remote_moved_by_another_commit",
+    "test_notify_durability.AcrossRunners.test_runner_dies_after_sending"
    ],
-   "failing_count": 36
+   "failing_count": 51
   },
   {
    "mutation": "M30 watch_sent truncated to 400",
@@ -326,6 +327,107 @@
    "status": "KILLED",
    "failing_tests": [
     "test_telegram_presentation.X_LegacyAndHistory.test_revert_then_roll_forward_does_not_repeat_what_the_old_code_announced"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M38 P1: level back in the bet identity",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.CrashPoints.test_every_crash_point",
+    "test_telegram_presentation.LogAndStateRecovery.test_restored_older_state_is_repaired_from_the_log",
+    "test_telegram_presentation.P1_PromotionDoesNotRepeatTheBet.test_same_bet_is_not_repeated_and_the_certification_is_its_own_event",
+    "test_telegram_presentation.X_LegacyAndHistory.test_signals_announced_in_the_old_format_are_not_resent"
+   ],
+   "failing_count": 4
+  },
+  {
+   "mutation": "M39 P1: legacy pairs only for hints",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.P1_PromotionDoesNotRepeatTheBet.test_legacy_hint_then_certified_alert_for_the_same_bet"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M40 P1: update not labelled",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.P1_PromotionDoesNotRepeatTheBet.test_a_new_selection_after_promotion_is_an_update_alert",
+    "test_telegram_presentation.U04_SelectionsOfOneGame.test_two_selections_one_message_and_a_later_selection_is_not_lost"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M41 P2: missing state = empty history",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.P2_StateLoss.test_cli_never_breaks_the_collection_and_sends_nothing",
+    "test_telegram_presentation.P2_StateLoss.test_missing_state_after_deliveries_is_refused",
+    "test_telegram_presentation.P2_StateLoss.test_missing_state_is_refused_even_without_a_delivery_log"
+   ],
+   "failing_count": 3
+  },
+  {
+   "mutation": "M42 P2: integrity check off",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.P2_StateLoss.test_counter_below_the_migration_value_is_refused",
+    "test_telegram_presentation.P2_StateLoss.test_empty_or_pre_pr5_state_next_to_a_delivery_log_is_refused"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M43 P2: init over an existing history",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_telegram_presentation.P2_StateLoss.test_init_state_only_for_a_new_installation"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M44 P0: send although the intent was not published",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_durability.AcrossRunners.test_ambiguous_push_accepted_but_reported_failed",
+    "test_notify_durability.AcrossRunners.test_conflicting_remote_state_blocks_the_send",
+    "test_notify_durability.AcrossRunners.test_push_rejected_and_runner_dies",
+    "test_notify_durability.AcrossRunners.test_push_rejected_nothing_is_sent_and_it_goes_out_once_later",
+    "test_notify_durability.WithdrawalCrash.test_withdrawn_in_state_but_not_in_log"
+   ],
+   "failing_count": 5
+  },
+  {
+   "mutation": "M45 P0: withdrawal keeps the effects",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_durability.AcrossRunners.test_push_rejected_nothing_is_sent_and_it_goes_out_once_later",
+    "test_notify_durability.WithdrawalCrash.test_withdrawn_in_state_but_not_in_log"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M46 P0: withdrawn intent treated as uncertain",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_durability.WithdrawalCrash.test_withdrawn_in_state_but_not_in_log"
+   ],
+   "failing_count": 1
+  },
+  {
+   "mutation": "M47 P0: push failure reported as success",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_durability.AcrossRunners.test_push_rejected_and_runner_dies",
+    "test_notify_durability.AcrossRunners.test_push_rejected_nothing_is_sent_and_it_goes_out_once_later"
+   ],
+   "failing_count": 2
+  },
+  {
+   "mutation": "M48 P0: misconfiguration falls back to local",
+   "status": "KILLED",
+   "failing_tests": [
+    "test_notify_durability.AcrossRunners.test_misconfiguration_sends_nothing"
    ],
    "failing_count": 1
   },

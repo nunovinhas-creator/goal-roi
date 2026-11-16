@@ -8,6 +8,20 @@ workflows ou secrets; coletor não interrompido; certificação continua `not_ac
   autorizado era `claude/pr5-telegram-presentation`).
 - Plano: `audits/pr5-telegram-plan.md`. Runbook: `audits/pr5-cutover-runbook.md`. Evidência: `audits/pr5-evidence/`.
 
+## 0. Segunda ronda — correções da auditoria independente (revisão #5920565094)
+
+Ramo atualizado com o `main` `4af4c95` por merge (sem force-push; o `main` só trouxe commits de dados).
+
+| Ponto | Correção | Testes | Mutações |
+|---|---|---|---|
+| **P0** persistência entre runners | Barreira `GitPublisher`: commit e push da intenção (só `notify_state.json` e `notify_log.jsonl`) **antes** de contactar o Telegram; se a publicação falhar, a intenção é retirada (`withdrawn`), nada é enviado e o aviso fica pendente. **Inativa** até `NOTIFY_DURABLE=git` no workflow, que NÃO foi alterado: desenho, diff proposto e riscos em `audits/pr5-p0-durability-design.md`, para autorização separada. Até lá, a garantia declarada é "no máximo uma vez dentro do mesmo runner". | `tests/test_notify_durability.py` (12, git real: remoto *bare* e um clone limpo por runner; inclui a reprodução do defeito sem barreira, morte em 6 pontos, push recusado, push aceite mas dado como falhado, conflito, leituras rápidas, queda durante a retirada) | M44–M48 |
+| **P1** duplicação após promoção | A identidade de um aviso de jogo é a **aposta** (jogo, mercado, seleção), sem o nível indício/alerta; a proteção das chaves antigas (mesmo jogo e seleção em 3 dias) vale para todos os níveis. A certificação da hipótese continua a ser um acontecimento separado ("✅ Tática validada"). | `P1_PromotionDoesNotRepeatTheBet` (3: indício → reforço com outra hora → certificada → mesma aposta: só o aviso de estado; seleção nova depois da promoção: alerta de atualização só com ela; indício enviado pelo código antigo → alerta da mesma aposta: nada) | M38, M39 |
+| **P2** perda de estado | `notify_state.json` ausente → `StateMissing`, nada enviado, nada criado (`NOTIFY_STATE_MISSING`; a recolha continua). Estado vazio, anterior à PR 5 ou com `sent_total` abaixo do da migração ao lado de um registo → `StateRegressed`. Instalação nova só com `--init-state`, que recusa se houver estado ou registo. A pré-visualização segue a mesma regra. | `P2_StateLoss` (7) | M41–M43 |
+| **Contrato** seleção nova num jogo avisado | Cada aposta é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem juntas. Uma seleção genuinamente nova num jogo já avisado sai como **atualização**: título "A seguir (nova seleção num jogo já avisado)" ou "🟢 ALERTA (nova seleção num jogo já avisado)", só com a aposta nova e a linha "Apostas já avisadas neste jogo: N (não repetidas)". O reforço dessa aposta nova também não se repete. Documentado no README e em `notify.game_notices`. | U4 (alargado), P1 | M40 |
+
+Resultados desta ronda: **420 testes OK** (343 anteriores + 65 + 12); mutações em `mutation_check.json`; ensaio de migração
+sobre `main` `4af4c95` `ok: true`; reconstituição das 24 h até `4af4c95` em `replay-24h.md`.
+
 ## 1. Objetivos obrigatórios → implementação → prova
 
 | # | Objetivo | Onde | Prova |

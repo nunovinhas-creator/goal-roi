@@ -105,6 +105,12 @@ def report(statuses=None, rows=None, watch=(), validation=None, *, eligible=600,
                       'llm_today': {'calls_today': 3, 'neurons_today': 700.4}}}
 
 
+def migrated(st, rep=None):
+    """The state after the silent PR 5 format migration (as the first PR 5 run leaves it)."""
+    notify.migrate_format(rep or report(), st, NOW - timedelta(hours=1))
+    return st
+
+
 def base_state(statuses=None):
     """A migrated production-like state (PR 1-3 markers, PR 5 format marker, delivery history)."""
     st = {'hello': True, 'sent_total': 312, 'watch_sent': ['2026-11-15T21:07:18+00:00|Belgium — Italy|Over 5'],
@@ -183,7 +189,7 @@ def consistent(test, data):
         test.assertNotEqual(r['state'], 'in_flight', key)
         for ev in r['events']:
             test.assertIn((key, ev), seen, (key, ev))
-        test.assertEqual(r['events'][-1], r['state'], key)
+        test.assertEqual(r['events'][-1], 'withdrawn' if r['state'] == 'pending' and r['events'][-1] == 'withdrawn' else r['state'], key)
     counts = st.get('delivery_counts') or {}
     for k in notify.COUNTERS:
         test.assertEqual(counts.get(k, 0), sum(1 for r in recs.values() if r['state'] == k), k)
@@ -307,7 +313,7 @@ class CrashPoints(unittest.TestCase):
                 self.assertEqual(len(st['deliveries']), 3, point)
                 self.assertEqual(len(d.sent), 3 - (1 if point in ('after_intent_state', 'after_intent', 'during_send',
                                                                      'during_intent_log') else 0), point)
-                self.assertEqual(sorted(st['notified_items']), sorted('item|id:m%d|Asian Total|Over 2.5|indício' % i for i in range(1, 4)))
+                self.assertEqual(sorted(st['notified_items']), sorted('item|id:m%d|Asian Total|Over 2.5' % i for i in range(1, 4)))
 
     def test_crash_between_state_and_log_never_loses_a_delivery(self):
         d, _ = self.scenario('after_record_state')
@@ -319,8 +325,8 @@ class CrashPoints(unittest.TestCase):
 
 class LogAndStateRecovery(unittest.TestCase):
     def test_restored_older_state_is_repaired_from_the_log(self):
-        d = Data(self, base_state(), report(watch=[entry('m1'), entry('m2', minutes=-2)]))
-        old = (d.path / 'notify_state.json').read_bytes()
+        d = Data(self, migrated(base_state()), report(watch=[entry('m1'), entry('m2', minutes=-2)]))
+        old = (d.path / 'notify_state.json').read_bytes()                # an older PR 5 state (already migrated)
         d.run()
         self.assertEqual(len(d.sent), 2)
         (d.path / 'notify_state.json').write_bytes(old)                  # forbidden by the runbook, survived anyway
@@ -329,7 +335,7 @@ class LogAndStateRecovery(unittest.TestCase):
         self.assertEqual(len(d.sent), 2)                                 # no resend
         self.assertEqual(st['sent_total'], 314)                          # counters rebuilt from the log
         self.assertTrue(all(r.get('reconstructed') for r in st['deliveries'].values()))
-        self.assertIn('item|id:m1|Asian Total|Over 2.5|indício', st['notified_items'])
+        self.assertIn('item|id:m1|Asian Total|Over 2.5', st['notified_items'])
 
     def test_torn_log_line_is_isolated_and_never_rewritten(self):
         d = Data(self, base_state(), report(watch=[entry('m1')]))
@@ -373,6 +379,58 @@ class U04_SelectionsOfOneGame(unittest.TestCase):
         self.assertEqual(len(d.sent), 2)
         self.assertIn('Aposta: BTTS Yes @ 1,8', d.sent[1])
         self.assertNotIn('Over 2.5', d.sent[1])
+        self.assertNotIn('Over 3.5', d.sent[1])
+        # Contract (review #5920565094): a genuinely new bet in a game already notified is an UPDATE of that game, labelled as such.
+        self.assertIn('A seguir (nova seleção num jogo já avisado): Home m1 — Away m1', d.sent[1])
+        self.assertIn('Apostas já avisadas neste jogo: 2 (não repetidas).', d.sent[1])
+        self.assertNotIn('nova seleção', d.sent[0])
+        d.write_report(report(watch=later + [entry('m1', 'BTTS Yes', minutes=0, market='BTTS', odds=1.9)]))   # its reinforcement
+        d.run(now=NOW + timedelta(minutes=4))
+        self.assertEqual(len(d.sent), 2)
+
+
+class P1_PromotionDoesNotRepeatTheBet(unittest.TestCase):
+    """Review #5920565094, P1: hint -> reinforcement at another time -> the hypothesis becomes certified -> same game, market
+    and selection. The bet is never notified twice; the certification is a separate event (status notice)."""
+
+    def scenario(self, reinforce_market='Asian Total', reinforce_selection='Over 2.5'):
+        d = Data(self, base_state({HA: 'promissora'}), report({HA: 'promissora'}, watch=[entry('m1', minutes=-20)]))
+        d.run()
+        self.assertEqual(len(d.sent), 1)
+        self.assertIn('A seguir: Home m1 — Away m1', d.sent[0])
+        rows = {HA: row('forte', confirmation=certificate())}
+        hint = entry('m1', minutes=-20, reasons=[reason(HA, 'forte', certified=True)])
+        again = entry('m1', reinforce_selection, minutes=-2, market=reinforce_market, odds=1.95, reasons=[reason(HA, 'forte', certified=True)])
+        d.write_report(report({HA: 'forte'}, rows=rows, watch=[again, hint], validation=active(HA)))
+        d.run(now=NOW + timedelta(minutes=10))
+        return d
+
+    def test_same_bet_is_not_repeated_and_the_certification_is_its_own_event(self):
+        d = self.scenario()
+        self.assertEqual(len(d.sent), 2)
+        self.assertTrue(body(d.sent[1]).startswith('✅ Tática validada, passou a forte: %s' % HA))
+        self.assertNotIn('Over 2.5', d.sent[1])
+        self.assertFalse(any('ALERTA' in m for m in d.sent))
+        self.assertEqual(list(consistent(self, d)['notified_items']), ['item|id:m1|Asian Total|Over 2.5'])
+
+    def test_a_new_selection_after_promotion_is_an_update_alert(self):
+        d = self.scenario('BTTS', 'BTTS Yes')
+        alerts = [m for m in d.sent if 'ALERTA' in m]
+        self.assertEqual(len(alerts), 1)
+        self.assertIn('🟢 ALERTA (nova seleção num jogo já avisado): Home m1 — Away m1', alerts[0])
+        self.assertIn('Aposta: BTTS Yes @ 1,95', alerts[0])
+        self.assertNotIn('Over 2.5', alerts[0])
+
+    def test_legacy_hint_then_certified_alert_for_the_same_bet(self):
+        # The hint was sent by the pre-PR 5 code (only its legacy key exists); the alert arrives later with another time.
+        rows = {HA: row('forte', confirmation=certificate())}
+        old = entry('m1', minutes=-30)
+        st = base_state({HA: 'forte'})
+        st['watch_sent'] = sorted(st['watch_sent'] + [notify.legacy_key(old)])
+        alert = entry('m1', minutes=-1, reasons=[reason(HA, 'forte', certified=True)])
+        d = Data(self, st, report({HA: 'forte'}, rows=rows, watch=[alert], validation=active(HA)))
+        d.run()
+        self.assertEqual(d.sent, [])
 
 
 def equivalent_rows(status='promissora', n=3, overlap=40, extra=3):
@@ -785,7 +843,7 @@ class U16_LongMessages(unittest.TestCase):
 
 class U17_Preview(unittest.TestCase):
     def test_preview_is_offline_and_writes_nothing(self):
-        d = Data(self, base_state(), report(watch=[entry('m1')]))
+        d = Data(self, migrated(base_state()), report(watch=[entry('m1')]))
         (d.path / notify.LOG_NAME).write_bytes(b'{"v": 1, "key": "k", "event": "pending"}\n')
         files = {p.name: p.read_bytes() for p in d.path.iterdir()}
         out = d.path.parent / ('preview-%s.txt' % d.path.name)
@@ -965,7 +1023,7 @@ class X_LegacyAndHistory(unittest.TestCase):
         d = Data(self, st, report(watch=[old]))
         d.run()
         self.assertEqual(d.sent, [])
-        self.assertEqual(d.state()['migrations'][notify.FORMAT_MIGRATION]['seeded_items'], ['item|id:m1|Asian Total|Over 2.5|indício'])
+        self.assertEqual(d.state()['migrations'][notify.FORMAT_MIGRATION]['seeded_items'], ['item|id:m1|Asian Total|Over 2.5'])
         later = entry('m1', minutes=-1)                                     # a reinforcement with another signal time
         d.write_report(report(watch=[later, old]))
         d.run(now=NOW + timedelta(minutes=2))
@@ -973,6 +1031,14 @@ class X_LegacyAndHistory(unittest.TestCase):
         st = base_state()
         st['watch_sent'] = sorted(st['watch_sent'] + [notify.legacy_key(old)])
         d = Data(self, st, report(watch=[later]))                            # the old signal already left the watch list
+        d.run()
+        self.assertEqual(d.sent, [])
+
+    def test_exact_legacy_key_protects_even_with_an_unreadable_signal_time(self):
+        odd = dict(entry('m1'), date_utc='15/11 21:07')                      # not ISO: the 3-day pair rule cannot apply
+        st = migrated(base_state())
+        st['watch_sent'] = sorted(st['watch_sent'] + [notify.legacy_key(odd)])
+        d = Data(self, st, report(watch=[odd]))
         d.run()
         self.assertEqual(d.sent, [])
 
@@ -988,7 +1054,7 @@ class X_LegacyAndHistory(unittest.TestCase):
     def test_an_attempted_key_is_never_sent_again_even_if_its_effects_were_lost(self):
         for outcome in ('uncertain', 'failed', 'blocked', 'delivered', 'expired'):
             with self.subTest(outcome):
-                st = base_state()
+                st = migrated(base_state())
                 st['hello'] = False
                 st['deliveries'] = {'hello': {'kind': 'hello', 'state': outcome, 'events': ['pending', 'intent', outcome]}}
                 st['delivery_counts'] = {outcome: 1}
@@ -1037,6 +1103,88 @@ class X_LegacyAndHistory(unittest.TestCase):
         d.run(now=NOW + timedelta(minutes=2))
         self.assertEqual(d.sent, [])
         self.assertEqual(d.state()['announced_statuses'], {HA: 'forte'})
+
+
+class P2_StateLoss(unittest.TestCase):
+    """Review #5920565094, P2: an installation with history never restarts silently from an empty state."""
+
+    def delivered_once(self):
+        d = Data(self, base_state(), report(watch=[entry('m1')]))
+        d.run()
+        self.assertEqual(len(d.sent), 1)
+        return d
+
+    def refused(self, d, error, now=NOW + timedelta(minutes=5)):
+        files = {p.name: p.read_bytes() for p in d.path.iterdir()}
+        with self.assertRaises(error):
+            d.run(now=now)
+        self.assertEqual({p.name: p.read_bytes() for p in d.path.iterdir()}, files)   # nothing created, nothing written
+        return files
+
+    def test_missing_state_after_deliveries_is_refused(self):
+        d = self.delivered_once()
+        (d.path / 'notify_state.json').unlink()
+        self.refused(d, notify.StateMissing)
+        self.assertEqual(len(d.sent), 1)                                 # neither the greeting nor m1 again
+        self.assertFalse((d.path / 'notify_state.json').exists())
+
+    def test_missing_state_is_refused_even_without_a_delivery_log(self):
+        d = Data(self, None, report(watch=[entry('m1')]))
+        with redirect_stdout(io.StringIO()) as out, self.assertRaises(notify.StateMissing):
+            notify.run(d.sender(), NOW, ENV)
+        self.assertIn('NOTIFY_STATE_MISSING', out.getvalue())
+        self.assertEqual((d.sent, sorted(p.name for p in d.path.iterdir())), ([], ['report.json']))
+
+    def test_cli_never_breaks_the_collection_and_sends_nothing(self):
+        d = self.delivered_once()
+        (d.path / 'notify_state.json').unlink()
+        with patch.dict(os.environ, ENV), patch.object(notify, 'send', side_effect=AssertionError('sent')) as real, \
+                patch.object(notify.sys, 'argv', ['notify']), redirect_stdout(io.StringIO()) as out:
+            with self.assertRaises(SystemExit) as code:
+                notify.main()
+        self.assertEqual(code.exception.code, 0)
+        real.assert_not_called()
+        self.assertIn('NOTIFY_STATE_MISSING', out.getvalue())
+        self.assertIn('NOTIFY_FAILED StateMissing', out.getvalue())
+
+    def test_empty_or_pre_pr5_state_next_to_a_delivery_log_is_refused(self):
+        for name, state in (('empty', {}), ('pre-PR 5 copy', base_state())):
+            with self.subTest(name):
+                d = self.delivered_once()
+                d.write_state(state)
+                self.refused(d, notify.StateRegressed)
+                self.assertEqual(len(d.sent), 1)
+
+    def test_counter_below_the_migration_value_is_refused(self):
+        d = self.delivered_once()
+        st = d.state()
+        st['sent_total'] = st['migrations'][notify.FORMAT_MIGRATION]['sent_total'] - 1
+        d.write_state(st)
+        self.refused(d, notify.StateRegressed)
+
+    def test_init_state_only_for_a_new_installation(self):
+        d = Data(self, None, report(watch=[entry('m1')]))
+        with redirect_stdout(io.StringIO()):
+            self.assertTrue(notify.init_state_file())
+        self.assertEqual(d.state(), {})
+        d.run()
+        self.assertEqual(len(d.sent), 2)                                 # greeting + m1 on a genuinely new installation
+        for setup in ('state exists', 'log only'):
+            with self.subTest(setup):
+                if setup == 'log only':
+                    (d.path / 'notify_state.json').unlink()
+                with redirect_stdout(io.StringIO()), self.assertRaises(notify.NotifyError):
+                    notify.init_state_file()
+        self.assertFalse((d.path / 'notify_state.json').exists())
+        with patch.object(notify.sys, 'argv', ['notify', '--init-state']), redirect_stdout(io.StringIO()) as out:
+            with self.assertRaises(SystemExit) as code:
+                notify.main()
+        self.assertEqual((code.exception.code, out.getvalue().split()[0]), (1, 'NOTIFY_INIT_REFUSED'))
+
+    def test_preview_follows_the_same_rule(self):
+        d = Data(self, None, report(watch=[entry('m1')]))
+        with self.assertRaises(notify.StateMissing):
+            notify.preview(d.path / 'notify_state.json', d.path / 'report.json', NOW)
 
 
 if __name__ == '__main__':

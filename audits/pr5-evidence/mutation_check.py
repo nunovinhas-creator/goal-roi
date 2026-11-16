@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = 'scangoal/notify.py'
-TESTS = ['test_telegram_presentation.py', 'test_notify_migration.py', 'test_scangoal.py']
+TESTS = ['test_telegram_presentation.py', 'test_notify_durability.py', 'test_notify_migration.py', 'test_scangoal.py']
 
 MUTATIONS = [
     ('M01 no intent persisted before the send',
@@ -31,10 +31,10 @@ MUTATIONS = [
      "                missing.append(log_entry(now, key, ev, r, reconstructed=True", "                0 and missing.append(log_entry(now, key, ev, r, reconstructed=True"),
     ('M08 delivered keys of the log not restored', "        if isinstance(intent.get('effects'), list):\n            apply_effects(state, intent['effects'], now)",
      "        if False:\n            pass"),
-    ('M09 old key per signal (date|match|selection)',
-     "    return 'item|%s|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '', level)",
-     "    return 'item|%s|%s|%s|%s' % (w.get('date_utc'), w.get('market') or '', w.get('selection') or '', level)"),
-    ('M10 legacy keys ignored', "        if ik in notified or legacy_key(w) in sent:", "        if ik in notified:"),
+    ('M09 old key per signal (date|market|selection)',
+     "    return 'item|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '')",
+     "    return 'item|%s|%s|%s' % (w.get('date_utc'), w.get('market') or '', w.get('selection') or '')"),
+    ('M10 legacy keys ignored', "        if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):", "        if ik in notified or legacy_hit(pairs, w):"),
     ('M11 grouping off', "    out = equivalence.groups(items, TAU, GROUP_MIN_GAMES) + alone", "    out = [[h] for h, _, _ in items] + alone"),
     ('M12 single linkage (transitive chains)', "    out = equivalence.groups(items, TAU, GROUP_MIN_GAMES) + alone",
      "    out = _single_linkage(items) + alone"),
@@ -71,6 +71,24 @@ MUTATIONS = [
      "    lines = [title] + head + evidence_lines(report, state, rep, None, gr[1:])"),
     ('M35 log written without fsync of a newline separator', "                        data = b'\\n' + data      # linha cortada", "                        data = data      # linha cortada"),
     ('M37 no resync after a foreign writer', "    resync_after_foreign_writer(state, now)\n    out = []", "    out = []"),
+    ('M38 P1: level back in the bet identity', "    return 'item|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '')",
+     "    return 'item|%s|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '', item_level({}, w))"),
+    ('M39 P1: legacy pairs only for hints', "        if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):",
+     "        if ik in notified or legacy_key(w) in sent or (level == 'indício' and legacy_hit(pairs, w)):"),
+    ('M40 P1: update not labelled', "    update = ' (nova seleção num jogo já avisado)' if g.get('previous') else ''", "    update = ''"),
+    ('M41 P2: missing state = empty history', "            raise StateMissing('notify_state.json missing')\n        return json.loads(self.state_path",
+     "            return {}\n        return json.loads(self.state_path"),
+    ('M42 P2: integrity check off', "    entries, bad = store.read_log()\n    check_integrity(state, entries)", "    entries, bad = store.read_log()"),
+    ('M43 P2: init over an existing history', "    if store.state_path.exists() or (store.log_path.exists() and store.log_path.stat().st_size):",
+     "    if False:"),
+    ('M44 P0: send although the intent was not published', "            if not published:\n", "            if False:\n"),
+    ('M45 P0: withdrawal keeps the effects', "                state.clear()\n                state.update(before)\n", ""),
+    ('M46 P0: withdrawn intent treated as uncertain', "        if outcome is None or (r is not None and (r.get('events') or [''])[-1] == 'withdrawn' and not terminal):",
+     "        if outcome is None:"),
+    ('M47 P0: push failure reported as success', "                if self.git('push', '-q', 'origin', 'HEAD:%s' % self.branch):\n                    return True",
+     "                self.git('push', '-q', 'origin', 'HEAD:%s' % self.branch)\n                return True"),
+    ('M48 P0: misconfiguration falls back to local', "    if mode != 'git' or not branch:\n        raise NotifyError(",
+     "    if mode != 'git' or not branch:\n        return None\n        raise NotifyError("),
     ('M36 sender HTTP 5xx counted as confirmed failure', "        if 400 <= exc.code < 500:", "        if 400 <= exc.code < 600:"),
 ]
 
@@ -107,6 +125,7 @@ def main(argv):
             count = original.count(old)
             if count != 1:
                 results.append({'mutation': name, 'status': 'NOT_APPLIED', 'occurrences': count})
+                print('%-58s NOT_APPLIED (%d occurrences)' % (name, count), flush=True)
                 ok = False
                 continue
             mutant = original.replace(old, new) + (SINGLE if '_single_linkage' in new else '')

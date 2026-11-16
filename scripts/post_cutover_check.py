@@ -21,7 +21,8 @@ Verificações (todas obrigatórias):
 Verificações PR 5 (vazias e verdadeiras enquanto o estado não tiver a marca `telegram_format_v2`):
 - pr5_format_marker_stable: a marca `telegram_format_v2`, uma vez presente, nunca muda nem desaparece;
 - pr5_log_append_only: `data/notify_log.jsonl` em `antes` é um prefixo exato do de `depois` (só cresce);
-- pr5_at_most_one_attempt: no registo, nenhuma chave tem mais do que uma intenção de envio nem mais do que um resultado;
+- pr5_at_most_one_attempt: no registo, nenhuma chave tem mais do que uma intenção de envio não retirada nem mais do que um
+  resultado (uma intenção retirada por falha de publicação não chegou ao Telegram);
 - pr5_sent_total_matches_log: `sent_total` = valor na migração + chaves com entrega confirmada no registo;
 - pr5_nothing_in_flight: nenhuma entrega ficou "em curso" (queda do processo a meio de um envio: investigar).
 
@@ -85,6 +86,8 @@ def pr5_checks(root, before, after, na, nb):
     for e in entries:
         if e.get('event') == 'intent':
             intents[e['key']] = intents.get(e['key'], 0) + 1
+        if e.get('event') == 'withdrawn':               # intenção não publicada: nada foi enviado, não conta como tentativa
+            intents[e['key']] = intents.get(e['key'], 0) - 1
         if e.get('event') in TERMINAL:
             results[e['key']] = results.get(e['key'], 0) + 1
         if e.get('event') == 'delivered':
@@ -93,7 +96,7 @@ def pr5_checks(root, before, after, na, nb):
     return {
         'pr5_format_marker_stable': FORMAT in mb and (FORMAT not in ma or ma[FORMAT] == mb[FORMAT]),
         'pr5_log_append_only': (la or b'') == (lb or b'')[:len(la or b'')] and not (la and lb is None),
-        'pr5_at_most_one_attempt': all(v == 1 for v in intents.values()) and all(v == 1 for v in results.values()),
+        'pr5_at_most_one_attempt': all(v <= 1 for v in intents.values()) and all(v == 1 for v in results.values()),
         'pr5_sent_total_matches_log': isinstance(base, int) and nb.get('sent_total') == base + len(delivered),
         'pr5_nothing_in_flight': not any(r.get('state') == 'in_flight' for r in (nb.get('deliveries') or {}).values()),
     }

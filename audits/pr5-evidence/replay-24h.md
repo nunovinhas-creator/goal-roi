@@ -2,8 +2,9 @@
 
 Script: `audits/pr5-evidence/replay_24h.py` (só leitura; sem rede, credenciais nem Telegram). Dados: `replay-24h.json`.
 
-- Janela: 2026-11-15T12:10:04Z → 2026-11-16T12:10:04Z (`main` congelado em `60ba009`).
-- 231 commits do coletor que mexeram em `data/notify_state.json`, por ordem. Para cada um: relatório refeito com o código da
+- Janela: 2026-11-15T13:17:44Z → 2026-11-16T13:17:44Z (`main` congelado em `4af4c95`, segunda ronda; a primeira, até `60ba009`,
+  deu os mesmos totais).
+- 237 commits do coletor que mexeram em `data/notify_state.json`, por ordem. Para cada um: relatório refeito com o código da
   PR 5 a partir dos dados desse commit, no instante do relatório de produção; notificador PR 5 corrido em cadeia a partir do
   estado real anterior à janela (`acec88e`, marcas PR 1 e PR 2).
 - Envios reais lidos do histórico de `notify_state.json` (`sent_total`, `watch_sent`, `statuses`, `summary_day`).
@@ -20,7 +21,7 @@ Script: `audits/pr5-evidence/replay_24h.py` (só leitura; sem rede, credenciais 
 | Palavras "validad…", "confirmad…", "forte" | — | 0 |
 | Avisos reais perdidos | — | **0** |
 
-Estados do relatório refeito iguais aos de produção: 131/131 commits depois do corte PR 3; 48/100 antes (antes do corte,
+Estados do relatório refeito iguais aos de produção: 137/137 commits depois do corte PR 3; 48/100 antes (antes do corte,
 produção usava as regras PR 2; a reconstituição usa as regras atuais em todos os relatórios e fez a re-referência silenciosa
 no primeiro commit da janela, como o corte PR 3 fez às 20:58).
 
