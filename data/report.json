@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-16T15:01:40+00:00",
+ "generated_at_utc": "2026-11-16T15:04:38+00:00",
  "messages": 1075,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 4,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-16T15:01:40+00:00",
+  "collector_last_run_utc": "2026-11-16T15:04:16+00:00",
   "name_review": [
    {
     "bot": [
@@ -6314,7 +6314,7 @@
     "contraditório": 7,
     "evitar": 4
    },
-   "generated_utc": "2026-11-16T15:01:59+00:00",
+   "generated_utc": "2026-11-16T15:04:49+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -19147,17 +19147,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 95,
-  "llm_last_run_utc": "2026-11-16T14:01:27+00:00",
+  "llm_runs": 96,
+  "llm_last_run_utc": "2026-11-16T15:04:19+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-16",
-   "calls_today": 14,
-   "neurons_today": 2930.1,
+   "calls_today": 15,
+   "neurons_today": 3109.5,
    "accepted_today": 8,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "note": "amostra razoável com acerto de 0.8889, mas precisa de mais dados para confirmação",
+    "at_utc": "2026-11-16T15:04:19+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 18,
+    "hits": 16,
+    "hit_rate": 0.8889,
+    "break_even": 0.5527,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite",
+    "note": "amostra pequena, mas acerto de 0.814 sugere potencial",
+    "at_utc": "2026-11-16T15:04:19+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 22,
+    "hits": 18,
+    "hit_rate": 0.814,
+    "break_even": 0.5873,
+    "status": "em observação"
+   },
+   {
+    "id": "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "note": "amostra muito pequena, não é possível tirar conclusões",
+    "at_utc": "2026-11-16T15:04:19+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 5,
+    "hits": 5,
+    "hit_rate": 1.0,
+    "break_even": 0.5181,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "note": "Acerto de 0.8889 com 18 resultados, amostra pequena.",
@@ -19255,39 +19288,6 @@
     "hits": 16,
     "hit_rate": 0.8889,
     "break_even": 0.5527,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90",
-    "note": "apresenta um acerto muito alto, mas a amostra é pequena",
-    "at_utc": "2026-11-15T22:38:16+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 12,
-    "hits": 11,
-    "hit_rate": 0.9167,
-    "break_even": 0.5793,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-    "note": "apresenta um acerto elevado, mas a amostra é pequena",
-    "at_utc": "2026-11-15T18:37:04+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 18,
-    "hits": 16,
-    "hit_rate": 0.8889,
-    "break_even": 0.5527,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
-    "note": "apresenta um alto acerto de 0.8261, o que sugere um potencial interesse para análise mais aprofundada",
-    "at_utc": "2026-11-15T14:34:10+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 30,
-    "hits": 24,
-    "hit_rate": 0.8,
-    "break_even": 0.5655,
     "status": "em observação"
    }
   ],
@@ -19498,7 +19498,7 @@
     "roi_announced_odds": 0.1113,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 27.7,
+    "per_day": 27.6,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
