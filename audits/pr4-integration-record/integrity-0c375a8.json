@@ -1,0 +1,103 @@
+{
+ "H": "9782e67e8ed29b17622aeca566c4bac03b4c1fa2",
+ "M": "0c375a8aab4453dbec031bb23ffa422e8874df32",
+ "code_pins_v5": true,
+ "operational": {
+  "certification_ledger_in_main": false,
+  "certified": [],
+  "counts": {
+   "abandonada": 3,
+   "em observação": 6309,
+   "promissora": 4
+  },
+  "ledger_valid": false,
+  "status_list": {
+   "Betfair | Dia = dia de semana": "abandonada",
+   "Betfair | Reforço = sem reforço": "abandonada",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada"
+  },
+  "status_list_count": 7,
+  "status_rules": "chronological_eprocess_v3",
+  "validated_statuses": [],
+  "validation_state": "not_activated"
+ },
+ "protocols": [
+  {
+   "ancestor_of_H": true,
+   "commit": "9f7b2aaffd74b703720d78c2652ba9d86d61cd50",
+   "file": "audits/pr4-llm-protocol.md",
+   "introduced_by_this_commit": true,
+   "later_commits_touching_file": [],
+   "ok": true,
+   "protocol": "v1",
+   "sha256_at_H": "8b108bf91effb6701bd38e4a582e840804b86e1075b8af55b7976872ff1a5cb0",
+   "sha256_at_commit": "8b108bf91effb6701bd38e4a582e840804b86e1075b8af55b7976872ff1a5cb0",
+   "sha256_expected": "8b108bf91effb6701bd38e4a582e840804b86e1075b8af55b7976872ff1a5cb0"
+  },
+  {
+   "ancestor_of_H": true,
+   "commit": "25cd2d24ca77c90d8de6e39acf69ecabe803a45f",
+   "file": "audits/pr4-llm-protocol-v2.md",
+   "introduced_by_this_commit": true,
+   "later_commits_touching_file": [],
+   "ok": true,
+   "protocol": "v2",
+   "sha256_at_H": "1f4a1001b5eefd90c9f6676a40bd63915900395314bd2243a4162d9433081339",
+   "sha256_at_commit": "1f4a1001b5eefd90c9f6676a40bd63915900395314bd2243a4162d9433081339",
+   "sha256_expected": "1f4a1001b5eefd90c9f6676a40bd63915900395314bd2243a4162d9433081339"
+  },
+  {
+   "ancestor_of_H": true,
+   "commit": "0766a13816a164c88b68488ee98091287438a8be",
+   "file": "audits/pr4-llm-protocol-v3.md",
+   "introduced_by_this_commit": true,
+   "later_commits_touching_file": [],
+   "ok": true,
+   "protocol": "v3",
+   "sha256_at_H": "e3190be054c982c901dec00099ef2a433f43fc5103d82446a5b0846f361989a4",
+   "sha256_at_commit": "e3190be054c982c901dec00099ef2a433f43fc5103d82446a5b0846f361989a4",
+   "sha256_expected": "e3190be054c982c901dec00099ef2a433f43fc5103d82446a5b0846f361989a4"
+  },
+  {
+   "ancestor_of_H": true,
+   "commit": "d48e3b7638c56b435a6e7da9245a82cd6781c66d",
+   "file": "audits/pr4-llm-protocol-v4.md",
+   "introduced_by_this_commit": true,
+   "later_commits_touching_file": [],
+   "ok": true,
+   "protocol": "v4",
+   "sha256_at_H": "055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167",
+   "sha256_at_commit": "055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167",
+   "sha256_expected": "055d7a62a2cb1a7edd6aae1880aa6be56d8a84f9090d85430b1ef932f21db167"
+  },
+  {
+   "ancestor_of_H": true,
+   "commit": "bb1b07caae263f73cecbea0a918f6363e747554d",
+   "file": "audits/pr4-llm-protocol-v5.md",
+   "introduced_by_this_commit": true,
+   "later_commits_touching_file": [],
+   "ok": true,
+   "protocol": "v5",
+   "sha256_at_H": "3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103",
+   "sha256_at_commit": "3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103",
+   "sha256_expected": "3ca34e70b955ae881658f3f0fa9823dda94aa90891f91bc749d4f1a04c6a2103"
+  }
+ ],
+ "protocols_ok": true,
+ "telegram": {
+  "hello": true,
+  "last_run_utc": "2026-11-16T09:49:29+00:00",
+  "migration_markers": [
+   "eligible_statuses_v1",
+   "status_rules:chronological_eprocess_v3",
+   "status_rules:independent_games_hysteresis_v1"
+  ],
+  "sent_total": 312,
+  "statuses_equal_report_status_list": true,
+  "watch_sent": 117
+ }
+}
