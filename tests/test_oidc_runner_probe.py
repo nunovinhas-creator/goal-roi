@@ -41,7 +41,8 @@ def jwk(name):
 def claims(**changes):
     now = int(time.time())
     c = dict(iss=probe.ISSUER, aud=probe.AUDIENCE, sub=probe.SUBJECT, repository=probe.REPOSITORY,
-             repository_owner='nunovinhas-creator', ref='refs/heads/main', ref_type='branch',
+             repository_owner='nunovinhas-creator', repository_id='1454375710', repository_owner_id='278368112',
+             ref='refs/heads/main', ref_type='branch',
              workflow_ref=probe.WORKFLOW_REF, event_name='workflow_dispatch', run_id='43954637606',
              run_attempt='1', runner_environment='github-hosted', iat=now, nbf=now, exp=now+300)
     c.update(changes)
@@ -97,6 +98,9 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(report['signing_kid'], 'gh')
         self.assertEqual(report['jwks'], [('gh', probe.thumbprint(jwk('gh')))])
         self.assertEqual(report['claims']['workflow_ref'], probe.WORKFLOW_REF)
+        self.assertEqual(probe.SUBJECT, 'repo:nunovinhas-creator@278368112/goal-roi@1454375710:ref:refs/heads/main')
+        self.assertEqual((report['claims']['sub'], report['claims']['repository_id'], report['claims']['repository_owner_id']),
+                         (probe.SUBJECT, '1454375710', '278368112'))   # public, after signature verification
         request = opener.requests[0]
         self.assertTrue(request.full_url.endswith('&audience='+probe.AUDIENCE))
         self.assertEqual(request.get_header('Authorization'), 'Bearer '+BEARER)
@@ -123,6 +127,9 @@ class ProbeTests(unittest.TestCase):
             ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(run_attempt='2')))),
             ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(aud='something-else')))),
             ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(environment='production')))),
+            ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(sub='repo:nunovinhas-creator/goal-roi:ref:refs/heads/main')))),
+            ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(repository_id='1')))),
+            ('OIDC_CLAIMS_MISMATCH', dict(jwt=token(claims(repository_owner_id='1')))),
             ('OIDC_ERROR', dict(jwt=token(), issuer='https://attacker.example')),
         ]
         for expected, kw in cases:
