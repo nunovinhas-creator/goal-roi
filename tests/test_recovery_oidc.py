@@ -405,5 +405,50 @@ class ProviderContractTests(unittest.TestCase):
                 oidc._public_key(key)
 
 
+class PinnedKeyEvidenceTests(unittest.TestCase):
+    def pin(self, name):
+        entry = dict(jwk(name)); entry.pop('kid')
+        return dict(entry, rfc7638_sha256=oidc.jwk_thumbprint(entry))
+
+    def test_pins_require_matching_rfc7638_thumbprint(self):
+        oidc.validate_pinned(oidc.PINNED_JWKS)          # module pins (empty now) must validate
+        oidc.Verifier()                                  # default construction validates them
+        good = {'gh-1':self.pin('gh-1')}
+        self.assertIs(oidc.validate_pinned(good), good)
+        swapped = {'gh-1':dict(self.pin('gh-1'), n=self.pin('evil')['n'])}   # key replaced, label kept
+        missing = {'gh-1':{k:v for k, v in self.pin('gh-1').items() if k != 'rfc7638_sha256'}}
+        for pins in (swapped, missing):
+            with self.assertRaisesRegex(TrialBlocked, 'pinned_key_corrupt'):
+                oidc.validate_pinned(pins)
+        with patch.object(oidc, 'PINNED_JWKS', swapped), self.assertRaisesRegex(TrialBlocked, 'pinned_key_corrupt'):
+            oidc.Verifier()
+
+    def test_evidence_collector_offline_produces_verifiable_pins(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('evidence', baseline.ROOT/'scripts/oidc_jwks_evidence.py')
+        evidence = importlib.util.module_from_spec(spec); spec.loader.exec_module(evidence)
+        def server(config, keys):
+            def get(url):
+                payload = config if url == oidc.DISCOVERY else {'keys':keys}
+                return 200, json.dumps(payload).encode(), {'leaf_sha256':'00'*32}
+            return get
+        good = {'issuer':oidc.ISSUER, 'jwks_uri':oidc.ISSUER+'/.well-known/jwks'}
+        record = evidence.collect(server(good, [jwk('gh-1')]))
+        self.assertEqual([k['kid'] for k in record['keys']], ['gh-1'])
+        self.assertEqual(len(record['documents']), 2)
+        aud = oidc.AUD_PREFIX+'2'*64
+        verifier = oidc.Verifier(oidc.validate_pinned(record['pinned_jwks_proposal']), offline_only)
+        self.assertEqual(verifier.verify(sign(claims(aud)), aud, datetime.now(timezone.utc), '100:1'), '100:1')
+        weak = rsa.generate_private_key(public_exponent=65537, key_size=1024).public_key().public_numbers()
+        for config, keys in ((dict(good, issuer='https://attacker.example'), [jwk('gh-1')]),
+                             (dict(good, jwks_uri='https://attacker.example/jwks'), [jwk('gh-1')]),
+                             (good, [{'kty':'RSA','kid':'w','n':b64(weak.n.to_bytes(128, 'big')),'e':'AQAB'}]),
+                             (good, [])):
+            with self.subTest(config=config), self.assertRaises(TrialBlocked):
+                evidence.collect(server(config, keys))
+        with self.assertRaisesRegex(TrialBlocked, 'outside_issuer'):
+            evidence.https_get('https://attacker.example/.well-known/jwks')
+
+
 if __name__ == '__main__':
     unittest.main()

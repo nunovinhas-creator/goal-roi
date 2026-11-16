@@ -224,3 +224,12 @@ do token; uma chave desconhecida torna o evento não verificável e pausa o ensa
 remoto GitHub exige um genesis atestado. 22 testes adversariais; 608 no total. Patches
 (não instalados): `id-token: write`, `cryptography==44.0.3`. Detalhe e riscos em
 `AUTHORIZATION.md`, secção D.
+
+## Auditoria independente (sobre `1af3c75`)
+
+Nenhuma vulnerabilidade OIDC demonstrada; o código de atestação não mudou. Acrescentado:
+thumbprint RFC 7638 obrigatório nas chaves fixadas e `scripts/oidc_jwks_evidence.py`
+(chaves reais por fixar: host inacessível desta sessão). Novo
+`actions-pin-proposal.patch` (SHAs confirmados nos repositórios oficiais), com o ajuste
+mínimo de um teste do `main` que exigia `checkout@v4`. Os quatro patches passam a suite
+do `main` `7e349c5`. 610 testes. Detalhe em `AUTHORIZATION.md`, secção H.

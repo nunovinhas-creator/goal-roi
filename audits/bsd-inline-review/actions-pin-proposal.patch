@@ -1,0 +1,30 @@
+diff --git a/.github/workflows/collect.yml b/.github/workflows/collect.yml
+index b78e05d..3f35dc2 100644
+--- a/.github/workflows/collect.yml
++++ b/.github/workflows/collect.yml
+@@ -25,8 +25,8 @@ jobs:
+     steps:
+       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
+       - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+-      - uses: actions/checkout@v4
+-      - uses: actions/setup-python@v5
++      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
++      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0 (= tag v5, 2026-11-16)
+         with:
+           python-version: '3.11'
+           cache: pip
+diff --git a/tests/test_notify_durability.py b/tests/test_notify_durability.py
+index 1b94b3e..aac6bc6 100644
+--- a/tests/test_notify_durability.py
++++ b/tests/test_notify_durability.py
+@@ -305,7 +305,9 @@ class WorkflowActivation(unittest.TestCase):
+         text, steps = self.steps()
+         self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
+         self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)   # single writer
+-        self.assertIn('uses: actions/checkout@v4', text)                              # persisted credentials
++        # persisted credentials: v4 tag or its reviewed SHA (v4.4.0), never persist-credentials: false
++        self.assertRegex(text, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
++        self.assertNotIn('persist-credentials: false', text)
+         self.assertTrue(any('scangoal.watch' in l for l in steps['Fast reads every 2 minutes until the next collection (read-only)']))
+ 
+     def test_fast_reads_go_through_the_same_run(self):

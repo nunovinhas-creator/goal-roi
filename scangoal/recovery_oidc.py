@@ -33,8 +33,10 @@ WORKFLOW_REF = REPOSITORY+'/.github/workflows/collect.yml@refs/heads/main'
 SUBJECT = 'repo:'+REPOSITORY+':ref:refs/heads/main'   # job without `environment:`
 TRIGGERS = ('schedule', 'workflow_dispatch')           # never pull_request*
 AUD_PREFIX = 'goal-roi-bsd-journal-v1:'
-# kid -> RSA JWK. Empty until a reviewed commit pins keys read from the official
-# JWKS (see AUTHORIZATION.md). Needed for replay after GitHub retires a key.
+# kid -> RSA JWK {kty, alg, use, n, e, rfc7638_sha256}. Empty until a reviewed
+# commit pins keys collected with scripts/oidc_jwks_evidence.py from the official
+# JWKS (AUTHORIZATION.md). Needed for replay after GitHub retires a key. Never
+# remove a key while journal events signed with it exist.
 PINNED_JWKS = {}
 MAX_LIFETIME_S = 3600      # GitHub issues ~5 min tokens; longer is rejected
 SKEW_S = 60
@@ -97,6 +99,24 @@ def fetch_official_jwks(not_after=None):
         raise TrialBlocked('oidc_keys_unavailable') from None
 
 
+def jwk_thumbprint(jwk):
+    """RFC 7638 SHA-256 thumbprint (base64url) of an RSA JWK: lexicographic e,kty,n."""
+    if not isinstance(jwk, dict) or not all(isinstance(jwk.get(k), str) for k in ('e', 'n')):
+        raise TrialBlocked('oidc_key_invalid')
+    digest = hashlib.sha256(canonical({'e':jwk['e'], 'kty':'RSA', 'n':jwk['n']})).digest()
+    return base64.urlsafe_b64encode(digest).rstrip(b'=').decode()
+
+
+def validate_pinned(pinned):
+    """Reviewed pins must be usable RS256 keys whose recorded thumbprint matches."""
+    for kid, jwk in pinned.items():
+        if (not isinstance(kid, str) or not isinstance(jwk, dict)
+                or jwk.get('rfc7638_sha256') != jwk_thumbprint(jwk)):
+            raise TrialBlocked('oidc_pinned_key_corrupt')
+        _public_key(jwk)
+    return pinned
+
+
 def _public_key(jwk):
     try:
         from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
@@ -114,7 +134,7 @@ def _public_key(jwk):
 class Verifier:
     """Verify one token for one event. Only RS256 with a trusted key is accepted."""
     def __init__(self, pinned=None, fetch=fetch_official_jwks):
-        self.pinned = dict(PINNED_JWKS if pinned is None else pinned)
+        self.pinned = dict(validate_pinned(PINNED_JWKS) if pinned is None else pinned)
         self._fetch, self._live, self._down = fetch, None, False
         self.not_after = None
 

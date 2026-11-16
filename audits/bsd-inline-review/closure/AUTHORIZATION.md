@@ -1,11 +1,12 @@
-# PR31 — Pacote de decisão administrativa (atualizado com OIDC, 2026-11-16)
+# PR31 — Pacote de decisão administrativa (auditoria OIDC e plano de instalação, 2026-11-16)
 
 Estado: PREPARADO, NADA EXECUTADO. Nenhuma ref, ruleset, ambiente, secret,
 permissão, workflow ou `main` alterado. Zero pedidos BSD/HL. Genesis NÃO construído
 (ver F). Repositório `nunovinhas-creator/goal-roi`: **público**, conta **pessoal**.
 
-**Parecer: GO para preparar a instalação (três patches, revistos). NO-GO para o
-primeiro pedido BSD real** (faltam G.1, G.3, G.4).
+**Parecer: GO para a instalação controlada dos quatro patches, depois de autorização
+expressa do titular (são inertes sem callback). NO-GO para o primeiro pedido BSD
+real.** As garantias em falta estão listadas em H.5.
 
 ## A. Orçamento temporal
 
@@ -220,9 +221,7 @@ Riscos residuais:
 5. **Permissões do job**: `id-token: write` acrescentado (patch `collect-yml`).
    `contents: write` e `actions: write` mantêm-se; `id-token` não dá acesso ao
    repositório, só a pedir tokens OIDC.
-6. **`PINNED_JWKS`**: o titular lê `https://token.actions.githubusercontent.com/.well-known/openid-configuration`,
-   confirma `issuer` e `jwks_uri`, lê o JWKS e fixa as chaves RSA num commit revisto
-   (kid, n, e). Repetir quando o GitHub publicar um `kid` novo, antes de o antigo sair.
+6. **`PINNED_JWKS`**: procedimento em H.2. Não há chaves reais nesta PR.
 
 ## F. Genesis — NÃO construído
 
@@ -264,11 +263,15 @@ git --git-dir="$W/j.git" push --force https://github.com/nunovinhas-creator/goal
 
 ## G. Patches e condições
 
-| Patch | Alteração | Aplica em `main` 58ba9fd |
+| Ordem | Patch | Alteração |
 |---|---|---|
-| `collect-yml-proposal.patch` | `id-token: write`; `timeout-minutes` 15 → 18; 1.º passo grava `GOAL_ROI_JOB_STARTED_UTC` | sim |
-| `requirements-proposal.patch` | `cryptography==44.0.3` | sim |
-| `collector-tail-proposal.patch` | `results_bsd.py` +18/−3: `request_json(observe=None)`, `run(after_bsd=None)` | sim |
+| 1 | `requirements-proposal.patch` | `cryptography==44.0.3` |
+| 2 | `collector-tail-proposal.patch` | `results_bsd.py` +18/−3: `request_json(observe=None)`, `run(after_bsd=None)` |
+| 3 | `collect-yml-proposal.patch` | `id-token: write`; `timeout-minutes` 15 → 18; 1.º passo grava `GOAL_ROI_JOB_STARTED_UTC` |
+| 4 | `actions-pin-proposal.patch` | `checkout`/`setup-python` fixados por SHA; ajuste mínimo de `tests/test_notify_durability.py` |
+
+Os quatro aplicam em sequência sobre `main` `7e349c5` e a suite do próprio `main`
+(433 testes) passa, com 1–3 e com 1–4 (detalhe em H.4).
 
 Zero linhas tocam em Telegram, notify, relatório, agendamento, encadeamento ou
 certificação. Sem callback, os hooks são inertes (testado byte a byte). Riscos de
@@ -305,3 +308,128 @@ sem queda inexplicada → saldo ≥ 100 + slots restantes → tail cabe nos 15 m
 → watchdog → reserva atestada e confirmada → UMA página → bytes/hash/UTC duráveis →
 `complete` atestado → staging com revisão manual. Qualquer incerteza gasta o slot, sem
 reenvio; reverter = remover o callback.
+
+## H. Auditoria independente e instalação controlada (sobre `1af3c75`)
+
+### H.1 Auditoria criptográfica
+
+Li `recovery_oidc.py`, `recovery_inline.py`, `recovery_remote.py`, `recovery_tail.py`
+e os testes. Procurei cada via pedida e mais sondagens adversariais (script
+descartável, não versionado):
+
+| Tentativa | Resultado |
+|---|---|
+| Evento adulterado depois do token | recusado (`aud` = digest do evento) |
+| Reutilizar um JWT noutro evento ou noutra posição | recusado (`aud` inclui o commit pai) |
+| Substituir uma chave confiável (`kid` genuíno com outra chave; `jwk`/`jku` no cabeçalho; chave no journal) | recusado |
+| Eventos de outra execução (`run_id`/`run_attempt`/workflow/branch/repositório) | recusado |
+| Resultados falsos em staging (`complete` forjado) | recusado; o replay não escreve `engine-state.json` |
+| Aumentar ou reiniciar os 5 débitos (genesis novo, `genesis` acrescentado, `abandon` forjado) | recusado; âncora fixa; `abandon` mantém o débito |
+| Contornar por exceções ou caches | sem bypass: a cache guarda só commits já verificados (o SHA liga conteúdo e pai); a falha do JWKS fica em cache como indisponível, nunca como válida; exceções propagam e param o journal |
+| JWT malformado (padding, ponto final, corpo re-serializado) | recusado |
+| Campo extra na atestação; `attested_utc` em falta | recusado |
+
+**Vulnerabilidades demonstradas: nenhuma.** Não alterei a lógica OIDC.
+
+Observações (não exploráveis):
+- um commit cujo JSON não é objeto termina em `AttributeError` em vez de
+  `TrialBlocked`. Continua fail-closed (o journal não carrega e o `PreparedTail` e o hook
+  apanham `Exception`);
+- `InlineSlots` aceita journals sem atestação quando o remoto não é o GitHub (fixtures
+  `file://`). O terceiro commit (wiring) TEM de construir o store com `GITHUB_REMOTE`;
+  caso contrário, um journal local daria 5 slots novos. Este é um requisito de auditoria
+  desse commit;
+- se o GitHub reutilizar um `kid` fixado com outra chave, os tokens novos falham como
+  `signature_invalid` (fail-closed). É improvável.
+
+### H.2 Chaves públicas oficiais (`PINNED_JWKS`)
+
+Estado: **não fixadas**. O host `token.actions.githubusercontent.com` está bloqueado
+tanto para o proxy desta sessão (CONNECT 403) como para o agente de leitura web (DNS).
+Não inventei chaves.
+
+Acrescentado nesta revisão:
+- cada chave fixada tem de trazer `rfc7638_sha256` (thumbprint RFC 7638), conferido no
+  arranque do `Verifier` (`validate_pinned`). Um `n` trocado ou um campo em falta dá
+  `oidc_pinned_key_corrupt` (testado);
+- `scripts/oidc_jwks_evidence.py` (só leitura, para o titular correr): obtém descoberta e
+  JWKS por TLS (CA do sistema, só o host do emissor), valida `issuer`/`jwks_uri` e cada
+  chave com as mesmas regras do verificador, e regista hora UTC, URL, SHA-256 de cada
+  resposta, certificado TLS folha (SHA-256, sujeito, emissor, validade) e, por chave,
+  `kid`, bits, thumbprint RFC 7638 e SHA-256 do SPKI. Imprime a proposta de
+  `PINNED_JWKS` mas não edita código (testado offline).
+
+Procedimento proposto:
+1. O titular corre o script em duas redes independentes (ex.: casa e rede móvel) e os
+   `kid`/thumbprints têm de coincidir.
+2. Commit revisto: `PINNED_JWKS` = proposta, mais os ficheiros de evidência em
+   `audits/bsd-inline-review/oidc-keys/<data>.json` (chaves públicas, sem segredos).
+   O revisor confere os thumbprints contra a evidência.
+3. Rotação: repetir o script antes de cada janela de ensaio e sempre que o verificador
+   reportar `oidc_key_unknown_unverifiable`; acrescentar o `kid` novo por commit revisto.
+4. Retenção: NUNCA remover uma chave fixada enquanto existirem eventos assinados com ela;
+   só depois de o ensaio ser encerrado e arquivado.
+5. Com o fornecedor inacessível: não fixar nada; o ensaio fica bloqueado.
+
+Alternativa: permitir esse host no ambiente desta sessão cloud deixaria o Claude
+recolher uma segunda observação independente. Não foi pedido nem feito.
+
+### H.3 Segurança dos workflows
+
+- Ações externas em `collect.yml`: `actions/checkout@v4` e `actions/setup-python@v5`
+  (tags móveis). Confirmado em 2026-11-16T19:48:42Z por `git ls-remote` e `git fetch`
+  nos repositórios oficiais: `v4` = `11d5960a326750d5838078e36cf38b85af677262`
+  (= v4.4.0, commit) e `v5` = `a26af69be951a213d495a4c3e4e4022e16d87065` (= v5.6.0,
+  commit). Evidência em `actions-pin-evidence.txt`. Fixar no SHA que as tags móveis já
+  usam hoje não muda o comportamento.
+- Achado: o `main` tem um teste (`test_notify_durability`) que exige o texto literal
+  `actions/checkout@v4`, porque a barreira de durabilidade do notify depende das
+  credenciais persistidas do checkout. Fixar a ação sem o ajustar partiria o CI do
+  `main`. O patch 4 inclui o ajuste mínimo: aceita a tag ou este SHA e passa a exigir
+  explicitamente que não exista `persist-credentials: false`, preservando a garantia
+  original.
+- `id-token: write` vale para o job inteiro; o GitHub não permite restringi-lo a um passo.
+  Fica ao alcance do leitor Telegram, do LLM, do notify, das duas ações e das
+  dependências pip. A fronteira já existia (o `GITHUB_TOKEN` de escrita persistido pelo
+  checkout está ao alcance de todos os passos). Os riscos novos ficam reduzidos ao fixar
+  as ações (patch 4). Isolar num job próprio seria uma mudança de arquitetura, fora de
+  âmbito. `tests.yml` (só CI de PR) continua com tags móveis.
+- Permissões necessárias à recolha preservadas: `contents: write` e `actions: write`.
+
+### H.4 Integração e impacto
+
+- `main` mais recente `7e349c5`. `results_bsd.py`, `requirements.txt`, `collect.yml` e
+  `test_notify_durability.py` têm blobs idênticos aos desta branch, por isso o teste de
+  neutralidade byte a byte vale para o `main` atual.
+- Patches 1–3 e 1–4 aplicados ao `main`: a suite do `main` passa (433/433 em ambos).
+  Sem os ajustes do patch 4, a fixação isolada falhava 1 teste (achado acima).
+- `cryptography==44.0.3` para CPython 3.11 em Linux x86_64 instala 3 wheels binárias:
+  `cryptography` (4,2 MB), `cffi` e `pycparser` (versões não fixadas: as mais recentes
+  compatíveis). Nenhuma dependência é partilhada com o Telethon (`pyaes`, `rsa`). A
+  importação só acontece dentro do tail.
+- Nenhum patch toca em Telegram, relatório, calendário/cron, cadeia de encadeamento ou
+  certificação; o ajuste de teste do patch 4 só muda a forma de verificar o checkout.
+
+### H.5 Pendentes (bloqueiam o primeiro pedido real)
+
+1. Declaração de exclusividade da conta BSD (C), por assinar.
+2. `prior_debits` por comprovar.
+3. Referência Git remota protegida (ruleset), por criar.
+4. `PROVISIONED_ANCHOR` = `None`.
+5. Chaves OIDC reais verificadas (H.2), por fixar.
+6. Autorização expressa dos 4 patches, por dar.
+7. Auditoria da ponte HTTP real (TLS, ≤ 20 s, sem redirects), por fazer.
+8. Namespace de evidência real separado de `synthetic_wire`/`prepared-fixture-trial`,
+   por implementar.
+
+### H.6 Instalação controlada (quando autorizada)
+
+1. PR separada a partir do `main`, com os patches 1–4 por esta ordem e sem nenhum código
+   do ensaio ativo (sem callback, sem `PreparedTail` no `main()`).
+2. CI verde no `main` patcheado (inclui os 433 testes atuais).
+3. Merge e observação de pelo menos 3 execuções do coletor: passos verdes, duração e
+   `results_bsd.json` sem diferenças de comportamento, `GOAL_ROI_JOB_STARTED_UTC` presente,
+   cadeia de encadeamento intacta.
+4. Reversão: revert do merge. Nada fica ativo, por isso não há estado a limpar.
+5. Só depois disso: genesis, ruleset, chaves e terceiro commit (H.5), cada um com
+   autorização própria.
