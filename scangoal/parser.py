@@ -202,6 +202,21 @@ def _side(token, teams):
     return hits[0] if len(hits) == 1 else None
 
 
+def selection_1x2(selection, teams=None):
+    """Canonical 1/X/2 or an exact unique full team name. Never guess a side."""
+    if not isinstance(selection, str):
+        return None
+    token = selection.strip()
+    if token.upper() in ('1', 'X', '2'):
+        return token.upper()
+    if token.casefold() == 'draw':
+        return 'X'
+    if not isinstance(teams, (list, tuple)) or len(teams) != 2 or any(not isinstance(t, str) or not t.strip() for t in teams):
+        return None
+    hits = [str(i + 1) for i, team in enumerate(teams) if team.strip().casefold() == token.casefold()]
+    return hits[0] if len(hits) == 1 else None
+
+
 def _quarter(diff, line):
     """Resultado de uma linha asiática (inteira, meia ou de quarto) para uma margem 'diff' a favor da seleção."""
     parts = [line] if (line * 2) % 1 == 0 else [line - .25, line + .25]
@@ -216,7 +231,10 @@ def settle(market, selection, ft, teams=None):
         side, line = selection.split()[0], float(selection.split()[1])
         return _quarter((h + a) if side == 'Over' else -(h + a), -line if side == 'Over' else line)
     if mk == '1x2':
-        return 1.0 if selection == ('1' if h > a else '2' if a > h else 'X') else -1.0
+        side = selection_1x2(selection, teams)
+        if side is None:
+            return None
+        return 1.0 if side == ('1' if h > a else '2' if a > h else 'X') else -1.0
     if mk == 'both teams to score':
         return 1.0 if (selection.strip().lower() == 'yes') == (h > 0 and a > 0) else -1.0
     if mk == 'double chance':
