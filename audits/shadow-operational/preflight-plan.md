@@ -1,34 +1,49 @@
-# GOAL ROI — preflight isolado do SHADOW (não instalado)
+# Goal ROI — pré-ensaio isolado SHADOW
 
-## Objetivo
+## Decisão
 
-Validar as condições necessárias à instalação futura de H1/H2 sem modificar a recolha produtiva, nem ativar os 30 dias.
+**PREFLIGHT TESTADO; INSTALAÇÃO INATIVA; CERTIFICAÇÃO INCONCLUSIVA.**
 
-Este ensaio **não equivale a ativação operacional** e não comprova a cobertura prospetiva real.
+A PR #47 não altera a recolha, o Telegram, as fontes de resultados, os ficheiros `data/`, o estado de certificação ou a `main`. Não cria qualquer workflow novo.
 
-### Conteúdo desta PR
+## Prova executada — 17/11/2026
 
-- \`scripts/shadow_preflight.py measure\`: lê, sem rede, \`data/messages.jsonl\` e mede a demora da primeira observação de mensagens OPEN_GAME pelo coletor. Conta versões por ID, erros de relógio e atrasos superiores a 120 segundos. Só mede a latência **sinal -> primeira recolha**.
-- \`scripts/shadow_preflight.py stage/restore\`: reproduz, apenas com sinais sintéticos, uma falha de push, exporta o outbox e restaura os mesmos eventos num checkout novo. Verifica um único sinal e um único recibo, com Git bare local.
-- \`.github/workflows/shadow-preflight.yml\`: workflow dedicado, sem agendamento nem acesso a secrets, com concorrência independente. A primeira job publica um artefacto de teste (retido 1 dia); a segunda job, num runner novo, transfere e restaura o outbox sintético.
-- \`tests/test_shadow_preflight.py\`: testes de deduplicação, janelas temporais, fail-closed, artefacto e integridade.
+Foi executado um workflow transitório exclusivamente no ramo de desenvolvimento, **SHADOW isolated preflight #1**, com duas jobs separadas, sem credenciais de produção e com permissões de leitura.
 
-## Limitações explícitas
+- Execução: https://github.com/nunovinhas-creator/goal-roi/actions/runs/44200210820
+- Job 1: testes locais, medição do primeiro avistamento e preparação de um outbox sintético; sucesso
+- Job 2: descarregamento do artefacto noutro runner, recuperação do registo sintético, confirmação de uma única decisão e um único recibo; sucesso
+- Amostra dos últimos 24h: 14 mensagens OPEN_GAME com primeiro avistamento válido, 14 recolhidas até 120s, 0 acima de 120s
+- O ensaio não mediu a disponibilização remota dos dados nem a captura pelo runner SHADOW
 
-1. O primeiro avistamento pelo coletor é o limite inferior da possibilidade de captura. **O código não mede** o instante em que o commit entrou no Git remoto, nem a hora em que o runner independente recebeu o snapshot. Sem estes dois atrasos, não se pode garantir captura em 120 segundos.
-2. O ensaio de outbox entre jobs usa um **remoto local sintético e um relógio de fixture**. Prova a transferência entre runners da Actions e integridade do formato, mas não prova recuperação de falha numa publicação real nem resistência a uma indisponibilidade de GitHub.
-3. A execução do workflow usa **apenas permissões contents:read**; não recebe segredos, não consulta APIs de resultados e não envia mensagens.
-4. \`shadow_ops.activate\` não é invocado com dados reais. A certificação científica fica \`not_activated\` e o ledger de produção não é tocado.
-5. Não se modifica o workflow \`Collect ScanGoal\`, o encadeamento de execuções, \`reader.py\`, \`watch.py\`, \`notify.py\`, os relatórios, \`data/\` ou \`docs/\`.
+**A suite completa detectou dois testes de proteção que proíbem acrescentar novos workflows.**
+Para respeitar essas salvaguardas, o workflow transitório foi retirado da árvore proposta nesta PR, preservando o histórico de execução e os scripts/testes para reprodução manual. **Não se modificaram nem enfraqueceram as proteções existentes.**
 
-## Critério de conclusão
+## Ficheiros propostos
 
-Não declarar SHADOW pronto para 30 dias enquanto não existir prova do atraso **sinal -> Git remoto -> observação no runner dedicado**, permissões de publicação no ramo SHADOW, restauro obrigatoriamente válido do último outbox real e ensaio operacional de falhas/liveness sem interferência com o coletor.
+- `scripts/shadow_preflight.py`: 
+  - `measure` mede a latência entre emissão e primeira recolha, por mensagem OPEN_GAME; não declara aprovação da ativação
+  - `stage` cria um outbox de falha de push exclusivamente sintético, com bundles de Git local
+  - `restore` verifica hashes e prova preservação de uma única decisão/recibo num checkout novo
+- `tests/test_shadow_preflight.py`: oito testes de deduplicação, limites temporais, evidência insuficiente e recuperação sintética
+- `audits/shadow-operational/preflight-evidence.json`: liga ao run transitório, com resultados e limites de interpretação
 
-Os resultados desta PR só podem ser **PREFLIGHT TESTADO** ou **INCONCLUSIVO / NÃO INSTALADO**, nunca «SHADOW ativado».
+## Reproduzir manualmente, sem rede externa
 
-## Operação manual (opcional, apenas após CI)
+```bash
+python -m unittest discover -s tests -p test_shadow_preflight.py -v
+python scripts/shadow_preflight.py measure --path data/messages.jsonl --output /tmp/shadow-delivery.json
+python scripts/shadow_preflight.py stage --dir /tmp/shadow-synthetic-new
+python scripts/shadow_preflight.py restore --dir /tmp/shadow-synthetic-new --output /tmp/shadow-restored.json
+```
 
-No GitHub Actions, executar \`SHADOW isolated preflight\` através de \`workflow_dispatch\`. O workflow não modifica a main nem credenciais. O trigger \`pull_request\` executa o mesmo ensaio automaticamente para revisão desta PR, quando o GitHub permitir workflows da branch em PR.
+Usar destinos novos. São criados apenas remotos Git `file://` locais e sinais sintéticos. Não executar `activate` nem editar instalação/autorização.
 
-Após testes verdes, rever métricas e cobertura real antes de aprovar qualquer alteração de produção.
+## P1 pendentes antes dos 30 dias
+
+1. Medir o percurso completo **sinal → primeira recolha → push para Git remoto → leitura no runner SHADOW**. Os 14/14 dentro de 120s provam apenas a primeira etapa.
+2. Demonstrar os atrasos de commit e entre runners e definir um canal isolado de entrega com cobertura suficiente, sem alterar a recolha principal até nova auditoria/autorização.
+3. Validar proteção contra falhas, garantia de retenção/restauro do último outbox real e liveness num runner dedicado.
+4. Preparar autorização operacional versionada, com ativação e início dos 30 dias como decisão separada.
+
+Nenhuma vantagem estatística é afirmada e o SHADOW continua `prepared_not_installed`, com zero observações reais.
