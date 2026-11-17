@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-17T15:21:17+00:00",
- "messages": 1309,
+ "generated_at_utc": "2026-11-17T15:25:36+00:00",
+ "messages": 1310,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 47,
   "BETFAIR": 259,
-  "STAKE_LOAD": 229,
+  "STAKE_LOAD": 230,
   "OPEN_GAME": 175,
   "TOTALS_FORM": 57,
   "WEAKENED_LINEUP": 13,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2149,
+  "versions": 2150,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T15:18:44+00:00",
+  "last_collected_at_utc": "2026-11-17T15:25:36+00:00",
   "hl_results": 76,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T15:21:14+00:00",
+  "collector_last_run_utc": "2026-11-17T15:25:36+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 3,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 164,
+  "stake_original_seen": 165,
   "stake_no_score_after_kickoff": 29,
   "stake_sent_45_after_kickoff": 51,
   "goal_lists": 386,
   "goal_lists_consistent": 222
  },
- "unique_bets": 726,
+ "unique_bets": 727,
  "settled_bets": 572,
  "unsettled_market": 59,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1190,7 +1190,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 102,
+   "bets": 103,
    "settled": 59,
    "matches": 29,
    "wins": 24,
@@ -1519,7 +1519,7 @@
    "by_bot_mark": 0,
    "per_day": 0.5,
    "days_to_hint": 56,
-   "days_to_conclusion": 606,
+   "days_to_conclusion": 607,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1641,7 +1641,7 @@
    "prob_above_cut": 0.1986
   },
   "STAKE_LOAD": {
-   "signals": 174,
+   "signals": 175,
    "with_result": 109,
    "hits": 49,
    "misses": 57,
@@ -2926,7 +2926,7 @@
    },
    {
     "n": 21,
-    "signals": 37,
+    "signals": 38,
     "hits": 12,
     "misses": 9,
     "hit_rate": 0.5854,
@@ -3172,7 +3172,7 @@
    },
    {
     "n": 152,
-    "signals": 210,
+    "signals": 211,
     "hits": 76,
     "misses": 76,
     "hit_rate": 0.5017,
@@ -3251,8 +3251,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 902,
-   "eligible": 726,
+   "total": 903,
+   "eligible": 727,
    "excluded": 176,
    "reasons": {
     "no_valid_odds": 128,
@@ -3267,7 +3267,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7658,
+    "em observação": 7666,
     "abandonada": 19,
     "promissora": 70
    },
@@ -4324,11 +4324,11 @@
     }
    ]
   },
-  "hypotheses": 7747,
+  "hypotheses": 7755,
   "tested": 595,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7725,
+   "em observação": 7733,
    "abandonada": 15,
    "promissora": 7
   },
@@ -7357,6 +7357,76 @@
      "bad_total": 41
     },
     {
+     "match_id": "saudi-arabia-vs-uzbekistan-20261117",
+     "match": "Saudi Arabia — Uzbekistan",
+     "league": "International Friendlies International Match",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T15:30+00:00",
+     "date_utc": "2026-11-17T15:23:50+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1x2",
+     "selection": "Saudi Arabia",
+     "odds": 2.32,
+     "odds_last": 2.32,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 20,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 36,
+       "games": 18,
+       "hits": 13,
+       "break_even": 0.5391,
+       "prob_above": 0.013,
+       "roi": -0.3347,
+       "edge": -0.2063,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Competição = seleções & Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 26,
+       "games": 13,
+       "hits": 8,
+       "break_even": 0.5406,
+       "prob_above": 0.0178,
+       "roi": -0.4586,
+       "edge": -0.214,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 33
+    },
+    {
      "match_id": "russia-vs-venezuela-20261117",
      "match": "Russia — Venezuela",
      "league": "International Friendlies International Match",
@@ -7888,9 +7958,9 @@
     "misto": 6,
     "sem evidência": 0,
     "contraditório": 17,
-    "evitar": 7
+    "evitar": 8
    },
-   "generated_utc": "2026-11-17T15:21:32+00:00",
+   "generated_utc": "2026-11-17T15:25:51+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7903,7 +7973,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7684,
+     "hypotheses": 7692,
      "with_prospective_evidence": 2061,
      "prospective_games": 40959
     },
@@ -8026,7 +8096,7 @@
     "roi_cut": -0.0058
    },
    "skipped": {
-    "bets": 398,
+    "bets": 399,
     "settled": 293,
     "games": 152,
     "wins": 138,
@@ -23271,7 +23341,7 @@
     "days_to_conclusion": 5
    },
    "STAKE_LOAD": {
-    "signals": 164,
+    "signals": 165,
     "with_result": 100,
     "hits": 46,
     "misses": 51,
@@ -23775,7 +23845,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 726,
+   "bets": 727,
    "settled": 572,
    "matches": 323,
    "wins": 269,
@@ -23810,6 +23880,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-17T15:23:50+00:00",
+   "match_id": "saudi-arabia-vs-uzbekistan-20261117",
+   "group": "STAKE_LOAD/pre",
+   "match": "Saudi Arabia — Uzbekistan",
+   "selection": "1x2: Saudi Arabia",
+   "odds": 2.32,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-17T15:16:48+00:00",
    "match_id": "qatar-vs-south-korea-20261117",
@@ -24648,22 +24731,18 @@
    "settled_by": null,
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-17T07:30:20+00:00",
-   "match_id": "israel-vs-austria-20261117",
-   "group": "POLYMARKET/pre",
-   "match": "Israel — Austria",
-   "selection": "Polymarket: AH2(-0.5)",
-   "odds": 1.89,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
+  {
+   "match_id": "fc-vion-zlate-moravce-women-vs-slovan-bratislava-women-20261117",
+   "match": "FC Vion Zlate Moravce Women — Slovan Bratislava Women",
+   "league": "Slovakian Cup Women",
+   "date_utc": "2026-11-17T13:24:23+00:00",
+   "kickoff_utc": null,
+   "why": "à espera dos minutos dos golos",
+   "signals": 1
+  },
   {
    "match_id": "hb-koge-u21-vs-brondby-reserves-20261117",
    "match": "HB Koge U21 — Brondby Reserves",
@@ -24680,7 +24759,7 @@
    "date_utc": "2026-11-17T13:12:14+00:00",
    "kickoff_utc": null,
    "why": "à espera da fonte de resultados",
-   "signals": 1
+   "signals": 2
   },
   {
    "match_id": "sheff-wed-u21-vs-hull-city-u21-20261117",
@@ -25193,15 +25272,6 @@
    "date_utc": "2026-11-15T05:52:36+00:00",
    "kickoff_utc": null,
    "why": "as fontes não cobrem este jogo",
-   "signals": 1
-  },
-  {
-   "match_id": "club-atletico-la-paz-vs-piratas-20261115",
-   "match": "Club Atletico La Paz — Piratas",
-   "league": "Mexican Mexico Liga de Expansion",
-   "date_utc": "2026-11-15T04:32:34+00:00",
-   "kickoff_utc": null,
-   "why": "à espera da fonte de resultados",
    "signals": 1
   }
  ],
@@ -26609,6 +26679,26 @@
      ],
      "market": "Asian Total",
      "total": 10000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "saudi-arabia-vs-uzbekistan-20261117": {
+   "teams": [
+    "Saudi Arabia",
+    "Uzbekistan"
+   ],
+   "events": [
+    {
+     "d": "2026-11-17T15:23:50+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Saudi Arabia",
+     "odds": 2.32,
+     "market": "1x2",
+     "total": 5800.0
     }
    ],
    "goals": null,
@@ -32382,7 +32472,7 @@
    "day": "2026-11-16"
   },
   {
-   "bets": 67,
+   "bets": 68,
    "settled": 27,
    "wins": 10,
    "units": -5.79,
