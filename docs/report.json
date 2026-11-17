@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T04:07:26+00:00",
+ "generated_at_utc": "2026-11-17T04:16:10+00:00",
  "messages": 1208,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T04:07:22+00:00",
+  "collector_last_run_utc": "2026-11-17T04:16:08+00:00",
   "name_review": [
    {
     "bot": [
@@ -1494,7 +1494,7 @@
    "by_bot_mark": 0,
    "per_day": 0.5,
    "days_to_hint": 51,
-   "days_to_conclusion": 560,
+   "days_to_conclusion": 561,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1603,7 +1603,7 @@
    "roi_announced_odds": -0.0679,
    "seen_late": 0,
    "by_bot_mark": 93,
-   "per_day": 35.6,
+   "per_day": 35.5,
    "days_to_hint": 0,
    "days_to_conclusion": 4,
    "prudent_rate": 0.4677,
@@ -3823,6 +3823,13 @@
      "status": "em observação"
     },
     {
+     "id": "Betfair | Momento = durante o jogo",
+     "n": 76,
+     "games": 75,
+     "roi": 0.2546,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 76,
      "games": 76,
@@ -3869,13 +3876,6 @@
      "n": 76,
      "games": 33,
      "roi": -0.0561,
-     "status": "em observação"
-    },
-    {
-     "id": "Betfair | Momento = durante o jogo",
-     "n": 75,
-     "games": 74,
-     "roi": 0.2713,
      "status": "em observação"
     },
     {
@@ -4096,6 +4096,13 @@
      "status": "em observação"
     },
     {
+     "id": "Betfair | Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 69,
+     "games": 67,
+     "roi": 0.0981,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 69,
      "games": 69,
@@ -4114,13 +4121,6 @@
      "n": 69,
      "games": 27,
      "roi": -0.029,
-     "status": "em observação"
-    },
-    {
-     "id": "Betfair | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 68,
-     "games": 66,
-     "roi": 0.1143,
      "status": "em observação"
     },
     {
@@ -4236,6 +4236,13 @@
      "status": "em observação"
     },
     {
+     "id": "Betfair | Dia = dia de semana",
+     "n": 66,
+     "games": 62,
+     "roi": 0.1264,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Competição = liga & Dia = fim de semana",
      "n": 66,
      "games": 66,
@@ -4276,18 +4283,11 @@
      "games": 42,
      "roi": -0.1148,
      "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 66,
-     "games": 24,
-     "roi": -0.1514,
-     "status": "em observação"
     }
    ]
   },
   "hypotheses": 7207,
-  "tested": 528,
+  "tested": 534,
   "corrected_bar": null,
   "counts": {
    "em observação": 7191,
@@ -4441,7 +4441,7 @@
       0.2974
      ],
      "prob_above_cut": 0.9682,
-     "prob_adds": 0.9804,
+     "prob_adds": 0.9827,
      "bets": 21,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4476,7 +4476,7 @@
       0.2515
      ],
      "prob_above_cut": 0.9583,
-     "prob_adds": 0.9818,
+     "prob_adds": 0.9844,
      "bets": 31,
      "pending_status": "promissora",
      "entry_status": "promissora",
@@ -4552,43 +4552,43 @@
      "missing": 15
     },
     {
-     "id": "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %",
-     "family": "Polymarket",
+     "id": "Betfair | Competição = seleções & Dia = dia de semana & Quota de mercado = menos de 80 %",
+     "family": "Betfair",
      "conditions": [
       [
-       "Dia",
-       "fim de semana"
+       "Competição",
+       "seleções"
       ],
       [
-       "Faixa de odd",
-       "odd 1,50 a 2,00"
+       "Dia",
+       "dia de semana"
       ],
       [
        "Quota de mercado",
        "menos de 80 %"
       ]
      ],
-     "n": 31,
-     "hits": 12,
-     "hit_rate": 0.3871,
-     "break_even": 0.5748,
-     "prob_above": 0.0268,
-     "roi": -0.3448,
+     "n": 16,
+     "hits": 2,
+     "hit_rate": 0.125,
+     "break_even": 0.4334,
+     "prob_above": 0.0256,
+     "roi": -0.6612,
      "source": "gerador",
      "reason": null,
-     "games": 22,
-     "edge": -0.1693,
+     "games": 15,
+     "edge": -0.1828,
      "edge_ci": [
-      -0.3064,
-      -0.0252
+      -0.3116,
+      -0.0314
      ],
-     "prob_above_cut": 0.0195,
-     "prob_adds": 0.0378,
-     "bets": 31,
+     "prob_above_cut": 0.0209,
+     "prob_adds": 0.0084,
+     "bets": 16,
      "pending_status": null,
      "entry_status": "em observação",
      "level": "indício inicial",
-     "missing": 8
+     "missing": 15
     }
    ],
    "open": [],
@@ -4620,7 +4620,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 33,
+     "odds_band_n": 34,
      "good": [
       {
        "id": "Betfair | Dia = fim de semana & Quota de mercado = menos de 80 %",
@@ -4682,13 +4682,13 @@
          "10 mil $ ou mais"
         ]
        ],
-       "n": 21,
-       "games": 21,
+       "n": 22,
+       "games": 22,
        "hits": 8,
-       "break_even": 0.2426,
-       "prob_above": 0.869,
-       "roi": 0.5686,
-       "edge": 0.0937,
+       "break_even": 0.2485,
+       "prob_above": 0.8296,
+       "roi": 0.4973,
+       "edge": 0.0791,
        "status": "em observação",
        "source": "llm"
       }
@@ -4707,13 +4707,13 @@
          "não"
         ]
        ],
-       "n": 22,
-       "games": 22,
+       "n": 23,
+       "games": 23,
        "hits": 5,
-       "break_even": 0.4235,
-       "prob_above": 0.0527,
-       "roi": -0.45,
-       "edge": -0.1349,
+       "break_even": 0.4213,
+       "prob_above": 0.0413,
+       "roi": -0.4739,
+       "edge": -0.1421,
        "status": "em observação",
        "source": "gerador"
       },
@@ -4729,18 +4729,18 @@
          "menos de 80 %"
         ]
        ],
-       "n": 17,
-       "games": 16,
+       "n": 18,
+       "games": 17,
        "hits": 3,
-       "break_even": 0.4054,
-       "prob_above": 0.0675,
-       "roi": -0.4959,
-       "edge": -0.1357,
+       "break_even": 0.4036,
+       "prob_above": 0.0521,
+       "roi": -0.5239,
+       "edge": -0.1445,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 9
+     "bad_total": 13
     },
     {
      "match_id": "botswana-vs-uganda-20261117",
@@ -4765,7 +4765,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 33,
+     "odds_band_n": 34,
      "good": [
       {
        "id": "Betfair | Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais",
@@ -4779,13 +4779,13 @@
          "10 mil $ ou mais"
         ]
        ],
-       "n": 21,
-       "games": 21,
+       "n": 22,
+       "games": 22,
        "hits": 8,
-       "break_even": 0.2426,
-       "prob_above": 0.869,
-       "roi": 0.5686,
-       "edge": 0.0937,
+       "break_even": 0.2485,
+       "prob_above": 0.8296,
+       "roi": 0.4973,
+       "edge": 0.0791,
        "status": "em observação",
        "source": "llm"
       }
@@ -4808,40 +4808,44 @@
          "menos de 80 %"
         ]
        ],
-       "n": 15,
-       "games": 14,
+       "n": 16,
+       "games": 15,
        "hits": 2,
-       "break_even": 0.4375,
-       "prob_above": 0.0343,
-       "roi": -0.6387,
-       "edge": -0.1749,
+       "break_even": 0.4334,
+       "prob_above": 0.0256,
+       "roi": -0.6612,
+       "edge": -0.1828,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Betfair | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+       "id": "Betfair | Competição = seleções & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não",
        "conditions": [
         [
-         "Faixa de odd",
-         "odd 2,00 a 3,00"
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Dia",
+         "dia de semana"
         ],
         [
          "Sinal anterior de outro tipo no mesmo jogo",
          "não"
         ]
        ],
-       "n": 22,
-       "games": 22,
-       "hits": 5,
-       "break_even": 0.4235,
-       "prob_above": 0.0527,
-       "roi": -0.45,
-       "edge": -0.1349,
+       "n": 14,
+       "games": 13,
+       "hits": 2,
+       "break_even": 0.4537,
+       "prob_above": 0.0402,
+       "roi": -0.7221,
+       "edge": -0.1734,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "bad_total": 15
+     "bad_total": 21
     }
    ],
    "counts": {
@@ -4851,7 +4855,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-17T04:07:48+00:00",
+   "generated_utc": "2026-11-17T04:16:31+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -4865,18 +4869,18 @@
    "by_source": {
     "gerador": {
      "hypotheses": 7145,
-     "with_prospective_evidence": 1934,
-     "prospective_games": 38238
+     "with_prospective_evidence": 1942,
+     "prospective_games": 38387
     },
     "llm/refinar": {
      "hypotheses": 40,
      "with_prospective_evidence": 13,
-     "prospective_games": 339
+     "prospective_games": 341
     },
     "llm/novas": {
      "hypotheses": 16,
      "with_prospective_evidence": 4,
-     "prospective_games": 69
+     "prospective_games": 70
     },
     "llm/evitar": {
      "hypotheses": 6,
@@ -4962,15 +4966,15 @@
     },
     {
      "id": "Betfair | Tamanho do mercado = 10 mil $ ou mais & Volume na seleção = 10 mil $ ou mais",
-     "games": 20,
-     "roi": 0.6655,
+     "games": 21,
+     "roi": 0.5862,
      "expect": "acima",
      "mode": null
     },
     {
      "id": "Betfair | Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais",
-     "games": 17,
-     "roi": 0.9376,
+     "games": 18,
+     "roi": 0.83,
      "expect": "acima",
      "mode": "refinar"
     }
@@ -4979,12 +4983,12 @@
   "walk_forward": {
    "followed": {
     "bets": 248,
-    "settled": 230,
-    "games": 180,
+    "settled": 231,
+    "games": 181,
     "wins": 111,
-    "units": 11.81,
-    "roi": 0.0513,
-    "roi_cut": 0.0331
+    "units": 10.81,
+    "roi": 0.0468,
+    "roi_cut": 0.0287
    },
    "skipped": {
     "bets": 377,
@@ -5234,13 +5238,14 @@
     10.24,
     10.24,
     9.24,
-    11.81
+    8.24,
+    10.81
    ],
-   "prob_followed_better": 0.6419,
+   "prob_followed_better": 0.6254,
    "first_followed_utc": "2026-11-12T19:27:25+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 510,
+    "results_verified": 511,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -5259,23 +5264,23 @@
    }
   },
   "multiplicity": {
-   "tested_now": 528,
-   "distinct_game_sets_tested": 466,
+   "tested_now": 534,
+   "distinct_game_sets_tested": 472,
    "distinct_game_sets_promising_or_better": 6,
    "promising_or_better": 6,
    "promising_sum_games": 275,
    "promising_union_games": 97,
    "evidence_levels": {
-    "exploratória": 262,
+    "exploratória": 268,
     "prospetiva": 266,
     "não verificável": 0
    },
    "prospective_categories_tested": {
-    "prospective": 17111,
+    "prospective": 17243,
     "mixed": 299,
-    "before_registration": 2985,
+    "before_registration": 3052,
     "after_registration_not_operational": 99,
-    "result_known_before_decision": 322,
+    "result_known_before_decision": 338,
     "result_time_unproven": 0
    },
    "note": "promissora/abandonada are uncorrected and exploratory; expected_by_chance is an expectation only (dependence widens its spread)"
@@ -5348,7 +5353,7 @@
    "newly_selected": [],
    "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
   },
-  "expected_by_chance": 26.4,
+  "expected_by_chance": 26.7,
   "top": [
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
@@ -7283,7 +7288,7 @@
      0.2974
     ],
     "prob_above_cut": 0.9682,
-    "prob_adds": 0.9804,
+    "prob_adds": 0.9827,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T20:27:02+00:00",
@@ -7981,7 +7986,7 @@
      0.2515
     ],
     "prob_above_cut": 0.9583,
-    "prob_adds": 0.9818,
+    "prob_adds": 0.9844,
     "pending_status": "promissora",
     "entry_status": "promissora",
     "born_utc": "2026-11-14T13:08:06+00:00",
@@ -8425,7 +8430,7 @@
      0.3786
     ],
     "prob_above_cut": 0.9561,
-    "prob_adds": 0.9642,
+    "prob_adds": 0.9669,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T21:41:06+00:00",
@@ -8669,7 +8674,7 @@
      0.3451
     ],
     "prob_above_cut": 0.9498,
-    "prob_adds": 0.9746,
+    "prob_adds": 0.9769,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-12T15:25:14+00:00",
@@ -9360,7 +9365,7 @@
      0.3538
     ],
     "prob_above_cut": 0.9454,
-    "prob_adds": 0.9705,
+    "prob_adds": 0.973,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-12T20:42:19+00:00",
@@ -9488,7 +9493,7 @@
      0.3519
     ],
     "prob_above_cut": 0.9438,
-    "prob_adds": 0.9694,
+    "prob_adds": 0.972,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T15:03:46+00:00",
@@ -9736,7 +9741,7 @@
      0.2666
     ],
     "prob_above_cut": 0.9433,
-    "prob_adds": 0.9678,
+    "prob_adds": 0.9714,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:32:11+00:00",
@@ -10112,7 +10117,7 @@
      0.3422
     ],
     "prob_above_cut": 0.9426,
-    "prob_adds": 0.9583,
+    "prob_adds": 0.9617,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T22:12:00+00:00",
@@ -10300,7 +10305,7 @@
      0.3465
     ],
     "prob_above_cut": 0.9388,
-    "prob_adds": 0.9672,
+    "prob_adds": 0.9698,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-12T15:16:56+00:00",
@@ -11132,7 +11137,7 @@
      0.2775
     ],
     "prob_above_cut": 0.9385,
-    "prob_adds": 0.9615,
+    "prob_adds": 0.9655,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T20:27:02+00:00",
@@ -11196,7 +11201,7 @@
      0.3678
     ],
     "prob_above_cut": 0.9368,
-    "prob_adds": 0.9642,
+    "prob_adds": 0.9668,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T18:16:34+00:00",
@@ -11260,7 +11265,7 @@
      0.3597
     ],
     "prob_above_cut": 0.9372,
-    "prob_adds": 0.9617,
+    "prob_adds": 0.9646,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T18:23:57+00:00",
@@ -11324,7 +11329,7 @@
      0.2914
     ],
     "prob_above_cut": 0.9382,
-    "prob_adds": 0.962,
+    "prob_adds": 0.9656,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:09:29+00:00",
@@ -11572,7 +11577,7 @@
      0.247
     ],
     "prob_above_cut": 0.9364,
-    "prob_adds": 0.9626,
+    "prob_adds": 0.967,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:57:28+00:00",
@@ -12080,7 +12085,7 @@
      0.3401
     ],
     "prob_above_cut": 0.9329,
-    "prob_adds": 0.9589,
+    "prob_adds": 0.9622,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T10:46:54+00:00",
@@ -12907,7 +12912,7 @@
      0.3714
     ],
     "prob_above_cut": 0.9315,
-    "prob_adds": 0.9561,
+    "prob_adds": 0.9592,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T13:56:46+00:00",
@@ -12971,7 +12976,7 @@
      0.3714
     ],
     "prob_above_cut": 0.9315,
-    "prob_adds": 0.9561,
+    "prob_adds": 0.9592,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T01:26:25+00:00",
@@ -13031,7 +13036,7 @@
      0.3714
     ],
     "prob_above_cut": 0.9315,
-    "prob_adds": 0.9561,
+    "prob_adds": 0.9592,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T12:18:55+00:00",
@@ -13415,7 +13420,7 @@
      0.3692
     ],
     "prob_above_cut": 0.9295,
-    "prob_adds": 0.9546,
+    "prob_adds": 0.9578,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T12:50:50+00:00",
@@ -13543,7 +13548,7 @@
      0.3119
     ],
     "prob_above_cut": 0.931,
-    "prob_adds": 0.9479,
+    "prob_adds": 0.9522,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T02:23:34+00:00",
@@ -13671,7 +13676,7 @@
      0.3502
     ],
     "prob_above_cut": 0.9273,
-    "prob_adds": 0.9546,
+    "prob_adds": 0.9579,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T15:03:46+00:00",
@@ -13731,7 +13736,7 @@
      0.3502
     ],
     "prob_above_cut": 0.9273,
-    "prob_adds": 0.9546,
+    "prob_adds": 0.9579,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-12T20:17:14+00:00",
@@ -14367,7 +14372,7 @@
      0.3099
     ],
     "prob_above_cut": 0.9269,
-    "prob_adds": 0.9417,
+    "prob_adds": 0.9465,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T07:40:02+00:00",
@@ -14803,7 +14808,7 @@
      0.2752
     ],
     "prob_above_cut": 0.9206,
-    "prob_adds": 0.9531,
+    "prob_adds": 0.9577,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:57:28+00:00",
@@ -14854,29 +14859,29 @@
   },
   "abandoned": [
    {
-    "n": 43,
+    "n": 44,
     "signals": 73,
     "hits": 15,
-    "misses": 28,
-    "hit_rate": 0.3488,
+    "misses": 29,
+    "hit_rate": 0.3409,
     "ci95": [
-     0.2242,
-     0.4983
+     0.2188,
+     0.4886
     ],
-    "break_even": 0.431,
-    "roi": -0.1419,
-    "games": 41,
-    "bets": 43,
+    "break_even": 0.4296,
+    "roi": -0.1614,
+    "games": 42,
+    "bets": 44,
     "unidentified": 0,
-    "prudent_rate": 0.3699,
-    "prob_above": 0.1616,
-    "edge": -0.0667,
+    "prudent_rate": 0.3625,
+    "prob_above": 0.1387,
+    "edge": -0.0726,
     "edge_ci": [
-     -0.174,
-     0.0464
+     -0.1782,
+     0.0391
     ],
-    "prob_above_cut": 0.1325,
-    "prob_adds": 0.0645,
+    "prob_above_cut": 0.1125,
+    "prob_adds": 0.0558,
     "id": "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Betfair",
     "conditions": [
@@ -14895,17 +14900,17 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 8,
+    "open": 7,
     "born_verified": true,
-    "game_set": "e6ca48b44a55a492",
+    "game_set": "d883754b1fad282e",
     "prospective": {
-     "games": 9,
+     "games": 10,
      "hits": 2.5,
-     "misses": 6.5,
-     "prob_above": 0.4894,
-     "roi": 0.361,
+     "misses": 7.5,
+     "prob_above": 0.4151,
+     "roi": 0.2373,
      "categories": {
-      "prospective": 9,
+      "prospective": 10,
       "mixed": 0,
       "before_registration": 28,
       "after_registration_not_operational": 0,
@@ -17103,19 +17108,19 @@
       ]
      ],
      "expect": null,
-     "games": 51,
-     "n": 55,
-     "roi": 0.0749,
-     "game_roi": 0.111,
-     "game_roi_cut": 0.0888,
-     "prob_above": 0.3546,
-     "prob_above_cut": 0.307,
-     "edge": -0.0222,
+     "games": 52,
+     "n": 56,
+     "roi": 0.0557,
+     "game_roi": 0.0896,
+     "game_roi_cut": 0.0678,
+     "prob_above": 0.32,
+     "prob_above_cut": 0.2743,
+     "edge": -0.0279,
      "edge_ci": [
-      -0.1219,
-      0.0817
+      -0.1264,
+      0.075
      ],
-     "prospective_games": 26,
+     "prospective_games": 27,
      "born_utc": "2026-11-12T15:16:56+00:00",
      "evidence_level": "exploratória",
      "confirmation": null,
@@ -17149,6 +17154,7 @@
       "kosovo-u21-vs-luxembourg-u21-20261116",
       "luxembourg-vs-estonia-20261113",
       "malmo-ff-women-vs-ajax-women-20261111",
+      "martinique-vs-aruba-20261117",
       "moldova-vs-kazakhstan-20261113",
       "monterrey-women-vs-pachuca-women-20261116",
       "portugal-u20-vs-england-u20-20261116",
@@ -17196,19 +17202,19 @@
       ]
      ],
      "expect": null,
-     "games": 41,
-     "n": 43,
-     "roi": -0.1419,
-     "game_roi": -0.1,
-     "game_roi_cut": -0.118,
-     "prob_above": 0.1616,
-     "prob_above_cut": 0.1325,
-     "edge": -0.0667,
+     "games": 42,
+     "n": 44,
+     "roi": -0.1614,
+     "game_roi": -0.1214,
+     "game_roi_cut": -0.139,
+     "prob_above": 0.1387,
+     "prob_above_cut": 0.1125,
+     "edge": -0.0726,
      "edge_ci": [
-      -0.174,
-      0.0464
+      -0.1782,
+      0.0391
      ],
-     "prospective_games": 9,
+     "prospective_games": 10,
      "born_utc": "2026-11-14T05:20:37+00:00",
      "evidence_level": "exploratória",
      "confirmation": null,
@@ -17235,6 +17241,7 @@
       "kosovo-u21-vs-luxembourg-u21-20261116",
       "luxembourg-vs-estonia-20261113",
       "malmo-ff-women-vs-ajax-women-20261111",
+      "martinique-vs-aruba-20261117",
       "moldova-vs-kazakhstan-20261113",
       "monterrey-women-vs-pachuca-women-20261116",
       "portugal-u20-vs-england-u20-20261116",
@@ -17275,19 +17282,19 @@
       ]
      ],
      "expect": null,
-     "games": 50,
-     "n": 50,
-     "roi": 0.0592,
-     "game_roi": 0.0592,
-     "game_roi_cut": 0.038,
-     "prob_above": 0.3031,
-     "prob_above_cut": 0.2675,
-     "edge": -0.0283,
+     "games": 51,
+     "n": 51,
+     "roi": 0.0384,
+     "game_roi": 0.0384,
+     "game_roi_cut": 0.0177,
+     "prob_above": 0.2689,
+     "prob_above_cut": 0.2351,
+     "edge": -0.034,
      "edge_ci": [
-      -0.1193,
-      0.0709
+      -0.1237,
+      0.064
      ],
-     "prospective_games": 37,
+     "prospective_games": 38,
      "born_utc": "2026-11-12T15:16:56+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -17320,6 +17327,7 @@
       "kosovo-u21-vs-luxembourg-u21-20261116",
       "lumezzane-vs-trento-calcio-1921-20261114",
       "luxembourg-vs-estonia-20261113",
+      "martinique-vs-aruba-20261117",
       "monterrey-women-vs-pachuca-women-20261116",
       "nacional-potosi-vs-real-potosi-20261116",
       "north-district-vs-hong-kong-fc-20261114",
@@ -19644,7 +19652,7 @@
     "roi_announced_odds": -0.0679,
     "seen_late": 0,
     "by_bot_mark": 93,
-    "per_day": 35.6,
+    "per_day": 35.5,
     "days_to_hint": 0,
     "days_to_conclusion": 4
    },
