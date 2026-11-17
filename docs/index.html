@@ -342,11 +342,11 @@ function answer(d){
     const s=el('span');s.append(el('b',{},String(v)),document.createTextNode(' '+l));$('facts').appendChild(s)});
 }
 
-function fresh(d){
+function fresh(d,failed){
   const last=d.audit&&(d.audit.collector_last_run_utc||d.audit.last_collected_at_utc), f=$('fresh'), age=last?(Date.now()-Date.parse(last))/60000:null;
   const when=last?new Date(last).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
-  f.lastElementChild.textContent=last?(age>45?`Recolha parada desde ${when}`:`Atualizado em ${when}`):'Sem recolhas ainda';
-  f.classList.toggle('stale',age==null||age>45);
+  f.lastElementChild.textContent=last?(failed?`Falha ao atualizar; dados de ${when}`:age>45?`Recolha parada desde ${when}`:`Atualizado em ${when}`):'Sem recolhas ainda';
+  f.classList.toggle('stale',!!failed||age==null||age>45);
 }
 
 function chart(d){
@@ -453,7 +453,21 @@ function agendaUI(d){
     const [k,txt]=AGV[a.verdict];r.appendChild(a.validated?chip('ok','Validada · alerta'):chip(k,txt));
     list.appendChild(r)}
 }
-function agendaRefresh(){fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{agendaUI(d);fresh(d)}).catch(()=>{})}
+// Uma só fotografia do relatório na página inteira: relatório novo -> todas as secções refeitas a partir do HTML original
+// (sem elementos nem listeners duplicados); o mesmo relatório -> só a agenda e o indicador (jogos que começaram, idade);
+// falha -> fica a última fotografia válida, assinalada como desatualizada.
+const PRISTINE=document.querySelector('main').innerHTML;
+let SNAP=null, CUR=null, ASKED=0, SHOWN=0;
+// Pedidos numerados: uma resposta (ou falha) de um pedido anterior ao último aplicado é ignorada, nunca recua a fotografia.
+function getReport(){const n=++ASKED;return fetch('report.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()})
+  .then(text=>{if(n<SHOWN)throw 'old';SHOWN=n;return text},e=>{if(n<SHOWN)throw 'old';SHOWN=n;throw e})}
+function render(text){
+  const d=JSON.parse(text);
+  if(SNAP!==null){const keep=['simbank','simmode','simval','simcut'].map(id=>[id,$(id).value]);document.querySelector('main').innerHTML=PRISTINE;keep.forEach(([id,v])=>{$(id).value=v})}
+  SNAP=text;CUR=d;
+  fresh(d);answer(d);agendaUI(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d);
+}
+function agendaRefresh(){getReport().then(text=>{if(text===SNAP){agendaUI(CUR);fresh(CUR)}else render(text)}).catch(e=>{if(e!=='old'&&CUR){agendaUI(CUR);fresh(CUR,true)}})}
 function boardUI(d){
   const B=d.brain&&d.brain.board; if(!B)return;
   const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
@@ -472,6 +486,7 @@ function boardUI(d){
   $('boardllm').textContent=n?`Última nota do modelo de linguagem, sobre "${n.id.replace(' | ',': ')}": ${n.note}`:'';
 }
 
+let sortCol=5, sortDir=-1, showAll=false;
 function brainUI(d){
   const B=d.brain; if(!B)return;
   $('brainnote').textContent=`O cérebro combina as características de cada sinal (odd, volume, quota, minuto, liga, hora, reforços) e regista cada combinação como hipótese quando há pelo menos ${B.rules.min_support} sinais. Estão registadas ${B.hypotheses}; ${B.tested} já têm ${B.rules.hint_at} jogos independentes. Com tantas em teste, cerca de ${num(B.expected_by_chance)} pareceriam promissoras só por acaso, por isso “forte” e “confirmada” exigem uma fasquia corrigida (${B.rules.strong_at} e ${B.rules.confirm_at} jogos).`+(B.validation?(B.validation.state==='active'?` “Forte” e “confirmada” só existem com certificado: cada tática promissora é registada uma única vez, em tempo real, e um teste sequencial com nível garantido (e-processo sobre o lucro por jogo, com a odd 2 % pior) tem de a confirmar em pelo menos ${B.validation.min_games} jogos decididos depois desse registo e antes de qualquer resultado do jogo, com uma só aposta por jogo (a primeira) e nunca com dois jogos em aberto ao mesmo tempo; o erro de ${pct(B.validation.alpha)} é repartido por todas as táticas registadas ao longo do tempo. Registadas: ${B.validation.selected}; certificadas: ${B.validation.certified.length}; anteriores à ativação (não certificáveis): ${B.validation.legacy}.`:` A validação científica (“forte”/“confirmada”) está desligada: o registo de seleções ainda não foi ativado${B.validation.state==='ledger_invalid'?' ou não passou a verificação':B.validation.state==='history_unverified'?' ou o seu histórico publicado não pôde ser provado':''}. Nenhuma tática é apresentada como validada; “promissora” é só um indício exploratório.`):'')+(B.multiplicity?` Muitas hipóteses assentam nos mesmos jogos: as ${B.multiplicity.promising_or_better} promissoras ou melhores somam ${B.multiplicity.promising_sum_games} jogos, mas são só ${B.multiplicity.promising_union_games} jogos diferentes. Promissora é um indício exploratório, não uma demonstração.`:'')+(B.rules.confirm_steps?` Para evitar mudanças por um único resultado, cada mudança de estado tem de se confirmar em ${B.rules.confirm_steps} jogos seguidos, e uma promissora só volta a “em observação” abaixo de ${pct(B.rules.keep_promising)}.`:'');
@@ -479,7 +494,6 @@ function brainUI(d){
   for(const k of ['em observação','promissora','forte','confirmada','abandonada']){const s=el('span');s.append(el('b',{},String(B.counts[k]||0)),document.createTextNode(' '+(k==='em observação'?'em observação':(B.counts[k]===1?k:k+'s'))));$('braincounts').appendChild(s)}
   const RANK={'confirmada':5,'forte':4,'promissora':3,'em observação':2,'abandonada':1};
   const COLS=[null,null,h=>h.games,h=>h.hit_rate,h=>h.break_even,h=>h.prob_above,h=>h.edge,h=>h.roi,h=>RANK[h.status]];
-  let sortCol=5, sortDir=-1, showAll=false;
   const ths=[...$('hyps').parentElement.querySelectorAll('thead th')];
   const drawH=()=>{const body=$('hyps');body.textContent='';
     const rows=B.top.slice().sort((x,y)=>{const a=COLS[sortCol](x),b=COLS[sortCol](y);return ((a==null)-(b==null))||sortDir*((a>b)-(a<b))||(y.n-x.n)});
@@ -520,9 +534,10 @@ function unsettledUI(d){
   if(!U.length){const tr=el('tr');td(tr,'Nada por liquidar.','mut').colSpan=5;$('uns').appendChild(tr)}
 }
 
+const simOff=new Set();
 function simulator(d){
-  const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-  for(const t of types){const l=el('label'),c=el('input',{type:'checkbox'});c.checked=true;c.addEventListener('change',()=>{c.checked?on.add(t):on.delete(t);run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));$('simtypes').appendChild(l)}
+  const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t))), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  for(const t of types){const l=el('label'),c=el('input',{type:'checkbox'});c.checked=on.has(t);c.addEventListener('change',()=>{c.checked?(on.add(t),simOff.delete(t)):(on.delete(t),simOff.add(t));run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));$('simtypes').appendChild(l)}
   const run=()=>{const start=Math.max(1,+$('simbank').value||0), mode=$('simmode').value, val=Math.max(0,+$('simval').value||0), cut=+$('simcut').value;
     $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
     let bank=start, peak=start, dd=0, low=start, staked=0, n=0, bust=false;const curve=[start];
@@ -590,9 +605,9 @@ function story(m){
   if(m.ft)box.appendChild(el('p',{},`Resultado final: ${m.ft[0]}-${m.ft[1]}.`));
   return box;
 }
+let limit=12, recentF=0;
 function recent(d){
   const all=d.recent_bets||[], box=$('recent'), F=[['todas','Todas',()=>true],['ganhas','Ganhas',b=>b.w>0],['perdidas','Perdidas',b=>b.w<0],['abertas','Em aberto',b=>b.w==null]];
-  let limit=12;
   const draw=fn=>{box.textContent='';const every=all.filter(fn), rows=every.slice(0,limit);
     if(!rows.length){box.appendChild(el('p',{class:'note'},'Nenhuma aposta neste filtro.'));return}
     for(const b of rows){const r=el('div',{class:'bet'}), t=new Date(b.date_utc);
@@ -604,13 +619,13 @@ function recent(d){
       const toggle=()=>{const open=r.nextElementSibling&&r.nextElementSibling.classList.contains('story');if(open){r.nextElementSibling.remove();r.setAttribute('aria-expanded','false')}else{r.after(story((d.matches||{})[b.match_id]));r.setAttribute('aria-expanded','true')}};
       r.addEventListener('click',toggle);r.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggle()}})}
     if(every.length>rows.length){const more=el('button',{type:'button',class:'more'},`Mostrar as ${every.length} apostas`);more.addEventListener('click',()=>{limit=1e9;draw(fn)});box.appendChild(more)}};
-  F.forEach(([id,label,fn],i)=>{const btn=el('button',{type:'button','aria-pressed':i===0?'true':'false'},`${label} (${all.filter(fn).length})`);
-    btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');limit=12;draw(fn)});$('filters').appendChild(btn)});
-  draw(F[0][2]);
+  F.forEach(([id,label,fn],i)=>{const btn=el('button',{type:'button','aria-pressed':i===recentF?'true':'false'},`${label} (${all.filter(fn).length})`);
+    btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');limit=12;recentF=i;draw(fn)});$('filters').appendChild(btn)});
+  draw(F[recentF][2]);
 }
 
-fetch('report.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{fresh(d);answer(d);agendaUI(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d)})
- .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
+getReport().then(render)
+ .catch(e=>{if(e==='old')return;$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 setInterval(agendaRefresh,3*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)agendaRefresh()});
 </script>
 </body></html>
