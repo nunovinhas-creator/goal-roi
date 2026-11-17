@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "main_sha": "02127fcd311f451148895cafdf065ef53e4d7266",
+  "frozen_utc": "2026-11-17T17:30:21+00:00",
+  "end_utc": "2026-12-17T17:30:21+00:00",
+  "stake_units": 1,
+  "rules": {
+    "H1": "OPEN_GAME; abs(home-away)>=2; minute in [46,90]",
+    "H2": "OPEN_GAME; abs(home-away)>=2; any match period"
+  },
+  "h1_period_policy": "46..90 proves regular second half; 45 or >90 ambiguous: H2 only, flagged; never infer from FT",
+  "eligibility": "eligible(); original unedited first version; market Asian Total; valid quarter line; odds>1; sent AND captured after freeze, within 120s of sending; no FT/mark/note known for game; actual capture is decision; no retrospective backfill",
+  "min_games": 100,
+  "alpha_each_direction": 0.008333333333333333,
+  "lambda": 0.25,
+  "tests": [
+    "H1 profit at odds*0.98",
+    "H2 profit at odds*0.98",
+    "H1 minus H2 policy per H2 game at odds*0.98"
+  ],
+  "sequential": "Common nonoverlapping H2 chain; next admission only after closure at first observed FT or 72h; e-products 1+0.25*x for positive and 1-0.25*x/B for negative; unresolved outcomes use lower bound for positive and upper bound for negative, never factual settlement; H1/H2 odds haircut 2%; paired clipped policy difference divided by 2; six directions alpha=0.05/6; terminal decision after 30d+72h with >=100 chain games and external publication proof; threshold=120; otherwise INCONCLUSIVO",
+  "paired_estimand": "profit(H1 first eligible, or 0 if none) minus profit(H2 first eligible); same game once; paired confirmatory contrast clips each policy profit to [-1,1]; uncapped difference descriptive; no causal attribution",
+  "failure": "Negative direction crosses 120 with >=100 chain games after window+72h and verified history: REJEITADO; neither direction or both: INCONCLUSIVO; no automatic extension",
+  "activation": "not_installed; requires separately authorized integration; existing certification unchanged"
+}
