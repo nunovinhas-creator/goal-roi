@@ -73524,6 +73524,39 @@
   "reason": "Adiciona condição de ritmo para refinar a hipótese",
   "source": "llm"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-17T01:29:03+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "b70dc23d4dc08d128b5fe7c7e23fc9aae6852759676a23b5728e71d63eb5133d",
+   "registry_size": 7165,
+   "report_generated_at_utc": "2026-11-17T01:29:03+00:00",
+   "response_sha256": "32dec92e154e6b54116eefbeb9d11275d0374109470cc6835d431284115665e4"
+  },
+  "reason": "Jogos com poucos gols em falta e noite tendem a ter mais estabilidade",
+  "source": "llm"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T19:15:02+00:00",
   "conditions": [
@@ -84292,6 +84325,39 @@
   ],
   "family": "Polymarket",
   "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-17T01:29:03+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "b70dc23d4dc08d128b5fe7c7e23fc9aae6852759676a23b5728e71d63eb5133d",
+   "registry_size": 7165,
+   "report_generated_at_utc": "2026-11-17T01:29:03+00:00",
+   "response_sha256": "32dec92e154e6b54116eefbeb9d11275d0374109470cc6835d431284115665e4"
+  },
+  "reason": "Apostas com odd moderada e valor baixo em seleções podem ser mais estáveis",
+  "source": "llm"
  },
  "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = sim": {
   "born_utc": "2026-11-15T13:33:53+00:00",
@@ -117288,6 +117354,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados & Número de apostas = uma & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-17T01:29:03+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "b70dc23d4dc08d128b5fe7c7e23fc9aae6852759676a23b5728e71d63eb5133d",
+   "registry_size": 7165,
+   "report_generated_at_utc": "2026-11-17T01:29:03+00:00",
+   "response_sha256": "32dec92e154e6b54116eefbeb9d11275d0374109470cc6835d431284115665e4"
+  },
+  "reason": "Apostas com valor baixo e odd baixa em mercados específicos podem ser mais seguras",
+  "source": "llm"
  },
  "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados & Número de apostas = várias": {
   "born_utc": "2026-11-14T17:25:09+00:00",
