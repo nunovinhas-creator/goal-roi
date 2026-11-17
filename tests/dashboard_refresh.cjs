@@ -16,14 +16,14 @@ function snapshot(minutesAgo,extra){
 (async()=>{
   const A=snapshot(5), tl=A.timeline||[];
   const B=snapshot(1,{messages:A.messages+7,settled_bets:A.settled_bets+1,timeline:tl.concat([Object.assign({},tl[tl.length-1]||{t:'OPEN_GAME',o:2,w:1,g:1,s:'x',m:'Novo'},{u:((tl[tl.length-1]||{}).u||0)+1})])});
-  let reply={status:200,body:JSON.stringify(A)}, requests=0;
+  let reply={status:200,body:JSON.stringify(A)}, requests=0;const held=[];
   const browser=await chromium.launch();
   try{
     const page=await browser.newPage();
     const errors=[];page.on('pageerror',e=>errors.push(String(e)));
     await page.route('**/*',route=>{const url=route.request().url();
       if(url==='http://goal-roi.test/')return route.fulfill({status:200,contentType:'text/html',body:html});
-      if(url.startsWith('http://goal-roi.test/report.json')){requests++;return reply.abort?route.abort('internetdisconnected'):route.fulfill({status:reply.status,contentType:'application/json',body:reply.body})}
+      if(url.startsWith('http://goal-roi.test/report.json')){requests++;if(reply.hold){held.push(route);return}return reply.abort?route.abort('internetdisconnected'):route.fulfill({status:reply.status,contentType:'application/json',body:reply.body})}
       return route.abort()});                                                 // fonts and anything else: offline
     await page.goto('http://goal-roi.test/');
     await page.waitForFunction(()=>document.getElementById('facts').children.length>0);
@@ -77,6 +77,22 @@ function snapshot(minutesAgo,extra){
       assert.deepEqual(await counts(),first);
       reply={status:200,body:JSON.stringify(B)};await page.evaluate(()=>agendaRefresh());
       await page.waitForFunction(()=>!document.getElementById('fresh').classList.contains('stale'));
+    }
+    // Out-of-order responses: two concurrent refreshes, the newer answer (C) arrives first, the older one afterwards.
+    // The older answer (a report or a failure) must never take the page back.
+    const C=snapshot(0,{messages:B.messages+2});
+    for(const late of [{status:200,body:JSON.stringify(A)},{abort:true}]){
+      reply={hold:true};held.length=0;
+      await page.evaluate(()=>{agendaRefresh();agendaRefresh()});
+      await page.waitForFunction(()=>true);while(held.length<2)await page.waitForTimeout(20);
+      await held[1].fulfill({status:200,contentType:'application/json',body:JSON.stringify(C)});
+      await page.waitForFunction(n=>document.getElementById('facts').textContent.startsWith(n+' mensagens'),C.messages);
+      await (late.abort?held[0].abort('internetdisconnected'):held[0].fulfill({status:200,contentType:'application/json',body:late.body}));
+      await page.waitForTimeout(500);
+      assert.match(await facts(),new RegExp(`^${C.messages} mensagens lidas`));
+      assert.deepEqual(await fresh().then(f=>f[1]),false);
+      assert.deepEqual(await counts(),first);
+      reply={status:200,body:JSON.stringify(C)};
     }
     assert.deepEqual(errors,[]);
     console.log('Dashboard refresh regressions passed');

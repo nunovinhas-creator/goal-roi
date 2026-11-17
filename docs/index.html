@@ -457,15 +457,17 @@ function agendaUI(d){
 // (sem elementos nem listeners duplicados); o mesmo relatório -> só a agenda e o indicador (jogos que começaram, idade);
 // falha -> fica a última fotografia válida, assinalada como desatualizada.
 const PRISTINE=document.querySelector('main').innerHTML;
-let SNAP=null, CUR=null;
-function getReport(){return fetch('report.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()})}
+let SNAP=null, CUR=null, ASKED=0, SHOWN=0;
+// Pedidos numerados: uma resposta (ou falha) de um pedido anterior ao último aplicado é ignorada, nunca recua a fotografia.
+function getReport(){const n=++ASKED;return fetch('report.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()})
+  .then(text=>{if(n<SHOWN)throw 'old';SHOWN=n;return text},e=>{if(n<SHOWN)throw 'old';SHOWN=n;throw e})}
 function render(text){
   const d=JSON.parse(text);
   if(SNAP!==null){const keep=['simbank','simmode','simval','simcut'].map(id=>[id,$(id).value]);document.querySelector('main').innerHTML=PRISTINE;keep.forEach(([id,v])=>{$(id).value=v})}
   SNAP=text;CUR=d;
   fresh(d);answer(d);agendaUI(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d);
 }
-function agendaRefresh(){getReport().then(text=>{if(text===SNAP){agendaUI(CUR);fresh(CUR)}else render(text)}).catch(()=>{if(CUR){agendaUI(CUR);fresh(CUR,true)}})}
+function agendaRefresh(){getReport().then(text=>{if(text===SNAP){agendaUI(CUR);fresh(CUR)}else render(text)}).catch(e=>{if(e!=='old'&&CUR){agendaUI(CUR);fresh(CUR,true)}})}
 function boardUI(d){
   const B=d.brain&&d.brain.board; if(!B)return;
   const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
@@ -623,7 +625,7 @@ function recent(d){
 }
 
 getReport().then(render)
- .catch(()=>{$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
+ .catch(e=>{if(e==='old')return;$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
 setInterval(agendaRefresh,3*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)agendaRefresh()});
 </script>
 </body></html>
