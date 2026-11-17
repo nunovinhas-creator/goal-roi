@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-17T06:27:56+00:00",
- "messages": 1209,
+ "generated_at_utc": "2026-11-17T06:36:24+00:00",
+ "messages": 1211,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 45,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 11,
   "OPEN_GAME_NO_ODDS": 13,
   "FULL_TIME_NOTE": 13,
-  "POLYMARKET": 352,
+  "POLYMARKET": 354,
   "None": 38,
   "TOTALS_FORM_NO_ODDS": 61
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2024,
+  "versions": 2026,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T05:51:05+00:00",
+  "last_collected_at_utc": "2026-11-17T06:36:23+00:00",
   "hl_results": 71,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 40,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T06:27:53+00:00",
+  "collector_last_run_utc": "2026-11-17T06:36:23+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 368,
   "goal_lists_consistent": 215
  },
- "unique_bets": 663,
+ "unique_bets": 665,
  "settled_bets": 548,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -932,7 +932,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 140,
+   "bets": 142,
    "settled": 132,
    "matches": 49,
    "wins": 63,
@@ -1530,7 +1530,7 @@
    "roi_announced_odds": 0.1592,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 24.6,
+   "per_day": 24.5,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
    "prudent_rate": 0.6391,
@@ -1580,7 +1580,7 @@
    "prob_above_cut": 0.3906
   },
   "POLYMARKET": {
-   "signals": 169,
+   "signals": 171,
    "with_result": 160,
    "hits": 76,
    "misses": 84,
@@ -1643,7 +1643,7 @@
    "by_bot_mark": 20,
    "per_day": 16.9,
    "days_to_hint": 0,
-   "days_to_conclusion": 12,
+   "days_to_conclusion": 13,
    "prudent_rate": 0.4225,
    "prob_above": 0.0301,
    "edge": -0.1218,
@@ -3110,7 +3110,7 @@
    },
    {
     "n": 306,
-    "signals": 380,
+    "signals": 382,
     "hits": 177,
     "misses": 129,
     "hit_rate": 0.5654,
@@ -3214,8 +3214,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 830,
-   "eligible": 663,
+   "total": 832,
+   "eligible": 665,
    "excluded": 167,
    "reasons": {
     "no_valid_odds": 119,
@@ -3230,7 +3230,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7138,
+    "em observação": 7152,
     "promissora": 60,
     "abandonada": 13
    },
@@ -4287,11 +4287,11 @@
     }
    ]
   },
-  "hypotheses": 7211,
+  "hypotheses": 7225,
   "tested": 537,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7195,
+   "em observação": 7209,
    "abandonada": 10,
    "promissora": 6
   },
@@ -4598,6 +4598,133 @@
   },
   "agenda": {
    "items": [
+    {
+     "match_id": "denmark-vs-norway-20261117",
+     "match": "Denmark — Norway",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T19:45+00:00",
+     "date_utc": "2026-11-17T06:30:15+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(+0.5)",
+     "odds": 1.67,
+     "odds_last": 1.67,
+     "max_mult": 1,
+     "share": 80,
+     "share_last": 80,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 76,
+     "good": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 11,
+       "games": 10,
+       "hits": 10,
+       "break_even": 0.5818,
+       "prob_above": 0.9644,
+       "roi": 0.59,
+       "edge": 0.185,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Valor da aposta",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 12,
+       "games": 11,
+       "hits": 10,
+       "break_even": 0.5776,
+       "prob_above": 0.9339,
+       "roi": 0.4592,
+       "edge": 0.1529,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 2,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ]
+       ],
+       "n": 76,
+       "games": 44,
+       "hits": 40,
+       "break_even": 0.5811,
+       "prob_above": 0.1192,
+       "roi": -0.0955,
+       "edge": -0.0801,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Momento = antes do jogo & Quota de mercado = 80 % ou mais & Valor da aposta = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Momento",
+         "antes do jogo"
+        ],
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ],
+        [
+         "Valor da aposta",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 18,
+       "games": 17,
+       "hits": 7,
+       "break_even": 0.5604,
+       "prob_above": 0.1274,
+       "roi": -0.3406,
+       "edge": -0.109,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 12
+    },
     {
      "match_id": "denmark-vs-norway-20261117",
      "match": "Denmark — Norway",
@@ -5000,16 +5127,125 @@
       }
      ],
      "bad_total": 24
+    },
+    {
+     "match_id": "china-pr-vs-bahrain-20261117",
+     "match": "China PR — Bahrain",
+     "league": "International Friendlies International Match",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T12:00+00:00",
+     "date_utc": "2026-11-17T06:35:05+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH1(-0.5)",
+     "odds": 1.88,
+     "odds_last": 1.88,
+     "max_mult": 1,
+     "share": 90,
+     "share_last": 90,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 76,
+     "good": [
+      {
+       "id": "Polymarket | Mercado = outro mercado & Quota de mercado = 80 % ou mais & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 10,
+       "games": 10,
+       "hits": 7,
+       "break_even": 0.5143,
+       "prob_above": 0.8043,
+       "roi": 0.345,
+       "edge": 0.0928,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 1,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 30,
+       "games": 28,
+       "hits": 12,
+       "break_even": 0.5815,
+       "prob_above": 0.0359,
+       "roi": -0.3097,
+       "edge": -0.1451,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 29,
+       "games": 26,
+       "hits": 12,
+       "break_even": 0.5792,
+       "prob_above": 0.0437,
+       "roi": -0.289,
+       "edge": -0.1417,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 14
     }
    ],
    "counts": {
     "favorável": 0,
-    "misto": 3,
+    "misto": 5,
     "sem evidência": 0,
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-17T06:28:19+00:00",
+   "generated_utc": "2026-11-17T06:36:47+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5022,7 +5258,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7148,
+     "hypotheses": 7162,
      "with_prospective_evidence": 1954,
      "prospective_games": 38573
     },
@@ -5136,7 +5372,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 249,
+    "bets": 251,
     "settled": 232,
     "games": 182,
     "wins": 111,
@@ -15095,7 +15331,7 @@
    },
    {
     "n": 76,
-    "signals": 79,
+    "signals": 81,
     "hits": 40,
     "misses": 36,
     "hit_rate": 0.5263,
@@ -15131,7 +15367,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 3,
+    "open": 5,
     "born_verified": true,
     "game_set": "bb3a955b910a5bd0",
     "prospective": {
@@ -15171,7 +15407,7 @@
    },
    {
     "n": 54,
-    "signals": 57,
+    "signals": 58,
     "hits": 26,
     "misses": 28,
     "hit_rate": 0.4815,
@@ -15215,7 +15451,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 3,
+    "open": 4,
     "born_verified": true,
     "game_set": "517ad506691936b4",
     "prospective": {
@@ -15335,7 +15571,7 @@
    },
    {
     "n": 63,
-    "signals": 66,
+    "signals": 67,
     "hits": 32,
     "misses": 31,
     "hit_rate": 0.5079,
@@ -15375,7 +15611,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 3,
+    "open": 4,
     "born_verified": true,
     "game_set": "c3ea72b9318dd25f",
     "prospective": {
@@ -15415,7 +15651,7 @@
    },
    {
     "n": 44,
-    "signals": 45,
+    "signals": 46,
     "hits": 21,
     "misses": 23,
     "hit_rate": 0.4773,
@@ -15459,7 +15695,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 1,
+    "open": 2,
     "born_verified": true,
     "game_set": "3d939365b7cf4c3b",
     "prospective": {
@@ -15575,7 +15811,7 @@
    },
    {
     "n": 45,
-    "signals": 46,
+    "signals": 47,
     "hits": 21,
     "misses": 24,
     "hit_rate": 0.4667,
@@ -15615,7 +15851,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 1,
+    "open": 2,
     "born_verified": true,
     "game_set": "bda4748617070a20",
     "prospective": {
@@ -19771,12 +20007,12 @@
     "roi_announced_odds": 0.1219,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 25.8,
+    "per_day": 25.7,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
    "POLYMARKET": {
-    "signals": 169,
+    "signals": 171,
     "with_result": 160,
     "hits": 76,
     "misses": 84,
@@ -20296,7 +20532,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 663,
+   "bets": 665,
    "settled": 548,
    "matches": 311,
    "wins": 260,
@@ -20331,6 +20567,32 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-17T06:35:05+00:00",
+   "match_id": "china-pr-vs-bahrain-20261117",
+   "group": "POLYMARKET/pre",
+   "match": "China PR — Bahrain",
+   "selection": "Polymarket: AH1(-0.5)",
+   "odds": 1.88,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-17T06:30:15+00:00",
+   "match_id": "denmark-vs-norway-20261117",
+   "group": "POLYMARKET/pre",
+   "match": "Denmark — Norway",
+   "selection": "Polymarket: AH2(+0.5)",
+   "odds": 1.67,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-17T05:49:40+00:00",
    "match_id": "singapore-vs-brazil-20261117",
@@ -21240,35 +21502,6 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T16:16:59+00:00",
-   "match_id": "botswana-vs-uganda-20261117",
-   "group": "BETFAIR/pre/mkt>=10K",
-   "match": "Botswana — Uganda",
-   "selection": "Botswana",
-   "odds": 2.82,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T15:42:38+00:00",
-   "match_id": "felgueiras-1932-u23-vs-leixoes-u23-20261116",
-   "group": "TOTALS_FORM",
-   "match": "Felgueiras 1932 U23 — Leixoes U23",
-   "selection": "Over 1.75",
-   "odds": 1.81,
-   "ft": [
-    3,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -22165,6 +22398,49 @@
     0
    ]
   },
+  "denmark-vs-norway-20261117": {
+   "teams": [
+    "Denmark",
+    "Norway"
+   ],
+   "events": [
+    {
+     "d": "2026-11-15T23:13:25+00:00",
+     "k": "BETFAIR",
+     "phase": "pre",
+     "selection": "2",
+     "odds": 2.78,
+     "mult": 1,
+     "share": 71,
+     "mkt_volume": 16000.0,
+     "market": "1X2"
+    },
+    {
+     "d": "2026-11-16T09:57:07+00:00",
+     "k": "BETFAIR",
+     "phase": "pre",
+     "selection": "2",
+     "odds": 2.82,
+     "mult": 4,
+     "share": 69,
+     "mkt_volume": 17000.0,
+     "market": "1X2"
+    },
+    {
+     "d": "2026-11-17T06:30:15+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(+0.5)",
+     "odds": 1.67,
+     "share": 80,
+     "market": "Polymarket",
+     "total": 15000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
   "switzerland-vs-scotland-20261116": {
    "teams": [
     "Switzerland",
@@ -22940,72 +23216,6 @@
     2,
     1
    ]
-  },
-  "felgueiras-1932-u23-vs-leixoes-u23-20261116": {
-   "teams": [
-    "Felgueiras 1932 U23",
-    "Leixoes U23"
-   ],
-   "events": [
-    {
-     "d": "2026-11-16T15:42:38+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 1.75",
-     "odds": 1.81,
-     "minute": 42,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     60,
-     "1-0"
-    ],
-    [
-     72,
-     "1-1"
-    ],
-    [
-     74,
-     "2-1"
-    ],
-    [
-     78,
-     "3-1"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    3,
-    1
-   ]
-  },
-  "botswana-vs-uganda-20261117": {
-   "teams": [
-    "Botswana",
-    "Uganda"
-   ],
-   "events": [
-    {
-     "d": "2026-11-16T16:16:59+00:00",
-     "k": "BETFAIR",
-     "phase": "pre",
-     "selection": "1",
-     "odds": 2.82,
-     "mult": 1,
-     "share": 66,
-     "mkt_volume": 56000.0,
-     "market": "1X2"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
   },
   "iceland-vs-luxembourg-20261116": {
    "teams": [
@@ -23937,6 +24147,27 @@
      "share": 80,
      "market": "Asian Total",
      "total": 15000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "china-pr-vs-bahrain-20261117": {
+   "teams": [
+    "China PR",
+    "Bahrain"
+   ],
+   "events": [
+    {
+     "d": "2026-11-17T06:35:05+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH1(-0.5)",
+     "odds": 1.88,
+     "share": 90,
+     "market": "Polymarket",
+     "total": 7600.0
     }
    ],
    "goals": null,
@@ -29470,7 +29701,7 @@
    "day": "2026-11-16"
   },
   {
-   "bets": 4,
+   "bets": 6,
    "settled": 3,
    "wins": 1,
    "units": 0.57,
