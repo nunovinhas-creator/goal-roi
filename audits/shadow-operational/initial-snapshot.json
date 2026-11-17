@@ -1,0 +1,59 @@
+{
+  "main_sha": "f03bda08878085a27f22735336012a7a4026d445",
+  "comparison_clock_utc": "2026-11-17T18:05:26+00:00",
+  "certification": "not_activated",
+  "prior_prs": {
+    "42": {
+      "sha": "641c23a7af9d89460c797465398c527cc03675e0",
+      "draft": true,
+      "merged": false,
+      "ci": "success"
+    },
+    "43": {
+      "sha": "f7d0a60ebe93212706d5fc34fccab352618523a7",
+      "draft": true,
+      "merged": false,
+      "ci": "success"
+    }
+  },
+  "production_changes_since_previous_snapshot": " data/details_hl.json   |    36 +-\n data/hypotheses.json   |  1418 +++++\n data/llm_state.json    |    24 +-\n data/messages.jsonl    |    20 +\n data/notify_log.jsonl  |    12 +\n data/notify_state.json |    95 +-\n data/report.json       | 15132 +++++++++++++++++++++++++----------------------\n data/state.json        |     2 +-\n docs/bets.csv          |    31 +-\n docs/report.json       | 15132 +++++++++++++++++++++++++----------------------\n 10 files changed, 17875 insertions(+), 14027 deletions(-)\n",
+  "sha256": {
+    ".github/workflows/collect.yml": "42131a83659d23e591400fa50c5403350b47aa459514a8df8f1ffb5d443abb4f",
+    ".github/workflows/tests.yml": "af4db3e81aacd7e826e949a2187e4f52b620c3f6d4653aa4cba78876eaeb1e07",
+    "data/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/details_hl.json": "073cbc78beaf134674a6df8a27f37c59074a8cd22fdbb0f2a0239568d5977386",
+    "data/hypotheses.json": "3556ac2ea8718fcf1b9d25818c00430986d63531d476f916c84d9d18a6759255",
+    "data/llm_notes.json": "eb36528a76a93d203fcbe150c34b874348e2e9a389f1e523e02dc7aba695a036",
+    "data/llm_state.json": "1a5ecf0a0d20a6954605c5006b40d7a615282f3bbcb8811343cbd7986dbfdd10",
+    "data/messages.jsonl": "98abc4f7f94f20b44227b445f555076c3e16646d22e3088adbef55a8d313a151",
+    "data/notify_log.jsonl": "0a1f63e45ceb58a98227f350cf7f0d59ed4dba4e76eb3b9c2953cfd1ee7bca12",
+    "data/notify_state.json": "83b05b9ffc08f402b01e98f28f059a0937728d332ccdcb5aab8d33ef0e3abc01",
+    "data/report.json": "49ae362e2e7b4f8b5f06581c0413671369bc4feec567cee00202ce3d973efef4",
+    "data/results_bsd.json": "280f26a94ab8c6a7198dd11738bc8ebd0806f57995d99a94ec46a8203e0b1c7a",
+    "data/results_hl.json": "819aa807ed716d02960fcb757c1c0b6ef96df341b83db6af2d077a5cec829064",
+    "data/state.json": "05e051519ad61aa22d3fe805dd5ddfb62d4fbc997692813a5358f003f72c47a3",
+    "data/team_aliases.json": "b75c11ae98d960103376b824692d710f48b8c47184690df035b0b9d6ee034f2a",
+    "docs/bets.csv": "207600dc9cd5092016b7f7a5ff1327e3e85d1d8bc7cc5b4aad74fc3a8d8438cf",
+    "docs/index.html": "645b8a7092ce2b98589362a1146daf4681078f8a8442cbae416e1211aecb095d",
+    "docs/report.json": "49ae362e2e7b4f8b5f06581c0413671369bc4feec567cee00202ce3d973efef4",
+    "scangoal/__init__.py": "bee251802a904cb04ef6208176fccc9bb75ebb6759b3c19b244832e871f98e02",
+    "scangoal/brain.py": "b2b23a1860e92f60f45706542baf5ccbd7c50b8b341a281bd456ff204729f3ac",
+    "scangoal/certification.py": "10e47edc30128bfc69ffbeb86af9be04577fc924756a2834b9198455b1e4d6d6",
+    "scangoal/chronology.py": "60ffabf54b5cea2b938616147cc3706b00416ad519f23ba18a5d43098fb3ca69",
+    "scangoal/details_hl.py": "c6443a56fef345affd93bb9c8580d6fbd6cf67dad1d94e457d0645571e4e296b",
+    "scangoal/eligibility.py": "2a08a3cd963cb0ee3d17bf35c2bd2d7e52fb8369b85741fd31b4563b2a624d1d",
+    "scangoal/equivalence.py": "3471617fa4488ee53ea65af3fe31f6e8e173d6c278751f63b49fee0e445d5d56",
+    "scangoal/freshness.py": "53cc81f94e79d296dc95e83ff3890a48522c3ef25660640e7101f55737f0ab22",
+    "scangoal/insights.py": "3d0f012a69a6198f02f9cbaaac1fca55f0eb941ab91049ce298915ed80a4c753",
+    "scangoal/llm.py": "a3cd6b7f280752ffce9500ef5cff7a497a37c4965be5c60b566b4ec6541d6959",
+    "scangoal/llm_eval.py": "3b8169bee9de859f0108b1022f729b3bfb5221cec479d8c322031c8c699dc5f7",
+    "scangoal/notify.py": "5ad290915f8bec2ca1c5015fc41345fea60828eec6efccaff1808eddbee13a64",
+    "scangoal/parser.py": "89fb4dacce3d31b000b60d1d086a89e7ac0ab3205cef8145844a32e545bc9679",
+    "scangoal/reader.py": "9372af115ea5d84a38e32e2b735b7ea7011f8603de15d4dff2ba9c53d0e1f489",
+    "scangoal/report.py": "9f455d440c0f8a66dcf278b9a1fcc2777e52471d237e1d7eeac1efaa71873ea3",
+    "scangoal/results_bsd.py": "ecda82251f05ff48319874cfc73fcde347ee0f4f53fadec17bbe42b5617afc69",
+    "scangoal/results_hl.py": "1e1cd2d48f0585dd80cf93d2f79aa1ed691f25a19abde5434383b234a5f5d4bb",
+    "scangoal/store.py": "b1937213569a45edafc6fe3541756097a43af80c2e284d372caa7cd270e88206",
+    "scangoal/watch.py": "315edfbe436c095245cc4b89a2f6e225b550df54d5b71e4d438536f2f88a59fa"
+  }
+}
