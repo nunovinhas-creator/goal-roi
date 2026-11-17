@@ -423,3 +423,48 @@ def audit(repo, now=None):
         "live_capture_proven": False,
         "git_to_runner_latency_measured": False,
     }
+
+
+def inspect_remote_delivery(repo, observed_utc):
+    """Read-only evidence from an independently cloned delivery branch.
+
+    A positive transport age requires the actual downstream runner observation,
+    NOT merely the producer's own reported capture time. This is deliberately
+    insufficient to certify SHADOW: no source authentication or result gate.
+    """
+    pub = DeliveryPublisher(repo)
+    seen = _utc(observed_utc)
+    remote = _git(pub.repo,"ls-remote","origin","refs/heads/"+BRANCH)
+    local_sha = _git(pub.repo,"rev-parse","HEAD")
+    if not remote or remote.split()[0] != local_sha:
+        raise DeliveryError("downstream checkout not identical to remote")
+    events, receipts = pub._journal()
+    reports=[]
+    for e in events:
+        covered = next((r for r in receipts if r["covers_sequence"]>=e["sequence"]),None)
+        sent = _utc(e["sent_utc"])
+        queued = _utc(e["bridge_queued_utc"])
+        source = _utc(e["source_seen_utc"])
+        receipt_at = _utc(covered["verified_utc"]) if covered else None
+        chronology_ok = (sent<=source<=queued<=seen and
+                         (receipt_at is None or source<=receipt_at<=seen))
+        age = (seen-sent).total_seconds() if chronology_ok else None
+        reports.append({
+            "sequence":e["sequence"],"event_hash":e["hash"],
+            "remote_receipt_present":bool(covered),
+            "end_to_end_age_seconds":age,
+            "within_120s_transport": bool(covered and chronology_ok and 0<=age<=120),
+            "runner_observed_utc":seen.isoformat(),
+            "scientifically_admitted":False,
+            "source_authenticated":False,
+        })
+    return {
+        "remote_head_sha":local_sha,
+        "events":len(events),
+        "with_receipt":sum(v["remote_receipt_present"] for v in reports),
+        "within_120s_transport":sum(v["within_120s_transport"] for v in reports),
+        "late_or_unproven":sum(not v["within_120s_transport"] for v in reports),
+        "observations":reports,
+        "real_live_delivery_coverage_proven":False,
+        "certification_activated":False,
+    }
