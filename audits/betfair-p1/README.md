@@ -97,3 +97,20 @@ APROVAR como ferramenta de reconciliação offline após CI verde. REJEITAR apli
 P0: nenhum identificado. P1: 67 pendências continuam sem prova suficiente; nenhum ganho fictício foi apresentado.
 P2: três casos de penalty/goal-details inconsistentes e 26 conjuntos de candidatos a aliases necessitam prova adicional; não há remendo por inferência.
 Certificação permanece not_activated. Nenhuma PR é integrada automaticamente.
+
+## Validação acrescentada após a auditoria de 17 de novembro
+
+O SHA completo dos dados é obrigatório. Os cinco inputs de referência têm de existir no
+commit e na cópia de entrada, com hashes iguais. A presença ou ausência de
+`manual_results.json` também é verificada. A análise lê cópias privadas dos blobs Git.
+O relatório separa o SHA dos dados, o SHA do checkout do auditor e os hashes dos módulos
+usados. A reconciliação reconstrói as linhas factuais dos dois commits e verifica o
+inventário e a ordem dos snapshots. O artefacto histórico da #43 serve como referência,
+com o seu formato original.
+
+No snapshot final indicado acima, a remoção de `results_hl.json` e a utilização dos
+dados da referência com o inventário final são erros antes de a CLI produzir um ficheiro.
+A execução íntegra mantém 183 apostas, 67 pendentes em 65 jogos, 27 pendentes LIVE
+acima de 3,00 e duas transições anteriores com prova. A divergência atual de Stake é
+zero. As 16 ocorrências anteriores à #44 constam do comparador histórico, que não é
+usado no inventário nem em propostas de liquidação.

@@ -1,8 +1,8 @@
 import copy
 import unittest
 from datetime import datetime,timezone
-from scangoal.betfair_audit import evidence_candidates,exact_1x2,factual_settle,sensitivity,age_bucket,snapshot,disagreement_cases,sha
-from scangoal.parser import settle
+from scangoal.betfair_audit import evidence_candidates,factual_settle,historical_literal_1x2,sensitivity,age_bucket,sha
+from scangoal.parser import selection_1x2, settle
 
 NOW=datetime(2026,11,17,18,tzinfo=timezone.utc)
 TARGET={'g':{'teams':['Alpha','Beta'],'date_utc':'2026-11-16T17:00:00+00:00','kickoff_utc':'2026-11-16T18:00:00+00:00'}}
@@ -46,10 +46,13 @@ class BetfairAudit(unittest.TestCase):
         self.assertFalse(evidence_candidates(TARGET,[e],NOW)[0])
     def test_team_name_1x2_bug_isolated_from_production(self):
         b={'market':'1x2','selection':'Beta','teams':['Alpha','Beta'],'phase':'pre'}
-        self.assertEqual(settle('1x2','Beta',[0,2],b['teams']),-1)
+        self.assertEqual(settle('1x2','Beta',[0,2],b['teams']),1)
         self.assertEqual(factual_settle(b,[0,2]),1)
-        self.assertIsNone(exact_1x2('Bet',['Alpha','Beta']))
-        self.assertIsNone(exact_1x2('Alpha',['Alpha','Alpha']))
+        self.assertEqual(historical_literal_1x2('Beta', [0,2]), -1)
+        self.assertEqual(selection_1x2(' x ', b['teams']), 'X')
+        self.assertIsNone(selection_1x2('Beta', ['Alpha', 'Beta', 'Gamma']))
+        self.assertIsNone(selection_1x2('Bet',['Alpha','Beta']))
+        self.assertIsNone(selection_1x2('Alpha',['Alpha','Alpha']))
     def test_live_handicap_requires_scope_evidence(self):
         self.assertIsNone(factual_settle({'market':'Asian Handicap','selection':'Alpha (-1)','teams':['Alpha','Beta'],'phase':'live'},[2,1]))
     def test_sensitivity_does_not_settle_pending(self):

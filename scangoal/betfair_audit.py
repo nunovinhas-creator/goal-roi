@@ -9,18 +9,84 @@ import csv
 import hashlib
 import json
 import math
+import os
+import re
 import subprocess
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory
 from datetime import datetime, timezone
 from pathlib import Path
 from . import report
 from .chronology import parse_utc
 from .eligibility import eligible
-from .parser import parse, settle
+from .parser import parse, selection_1x2, settle
 from .results_bsd import load_json, match_events
 from .results_hl import to_event
 from .store import data_dir
 
 UTC=timezone.utc
+
+
+REQUIRED_INPUTS = ('messages.jsonl', 'results_hl.json', 'results_bsd.json',
+                   'details_hl.json', 'team_aliases.json')
+OPTIONAL_INPUTS = ('manual_results.json',)
+
+
+def git(*args):
+    return subprocess.check_output(['git', '--no-replace-objects', *args])
+
+
+def commit_inputs(commit):
+    """Return bytes from an exact Git commit and its presence/absence manifest."""
+    if not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit):
+        raise ValueError('full snapshot commit SHA required')
+    if git('cat-file', '-t', commit).strip() != b'commit':
+        raise ValueError('snapshot SHA must identify a commit')
+    inputs = {}
+    manifest = {}
+    for name in REQUIRED_INPUTS + OPTIONAL_INPUTS:
+        path = 'data/' + name
+        entry = git('ls-tree', commit, '--', path)
+        if not entry:
+            if name in REQUIRED_INPUTS:
+                raise ValueError(f'required input missing from commit: {name}')
+            manifest[name] = None
+            continue
+        mode, kind, object_id = entry.split(b'\t', 1)[0].split()
+        if mode not in (b'100644', b'100755') or kind != b'blob':
+            raise ValueError(f'snapshot input must be a regular Git blob: {name}')
+        inputs[name] = git('cat-file', 'blob', object_id.decode('ascii'))
+        manifest[name] = hashlib.sha256(inputs[name]).hexdigest()
+    return inputs, manifest
+
+
+@contextmanager
+def frozen_inputs(commit, source=None):
+    """Validate any supplied copies, then read exclusively from private Git blob copies."""
+    inputs, manifest = commit_inputs(commit)
+    if source is not None:
+        for name, expected in manifest.items():
+            path = source / name
+            if expected is None and not path.exists() and not path.is_symlink():
+                continue
+            if expected is None or path.is_symlink() or not path.is_file():
+                raise ValueError(f'snapshot file presence differs from commit: {name}')
+            if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                raise ValueError(f'snapshot file differs from commit: {name}')
+    with TemporaryDirectory(prefix='betfair-snapshot-') as folder:
+        for name, data in inputs.items():
+            target = Path(folder) / name
+            target.write_bytes(data)
+            target.chmod(0o400)
+        previous = os.environ.get('SCANGOAL_DATA_DIR')
+        os.environ['SCANGOAL_DATA_DIR'] = folder
+        try:
+            yield manifest
+        finally:
+            if previous is None:
+                del os.environ['SCANGOAL_DATA_DIR']
+            else:
+                os.environ['SCANGOAL_DATA_DIR'] = previous
 
 
 def snapshot():
@@ -40,7 +106,6 @@ def snapshot():
             ext.setdefault(mid,dict(r,provider='manual',known_utc=r.get('observed_utc')))
             chron['external'].setdefault(mid,[]).append(r.get('observed_utc'))
     # Same regular-time reconstruction rule as production; raw late score is never used.
-    import re
     for mid,d in details.items():
         if mid not in ext and d.get('consistent') and d.get('score_90') and re.search(r'extra time|penalt',d.get('status') or '',re.I):
             ext[mid]={'ft':d['score_90'],'provider':'HL aos 90 min','known_utc':d.get('fetched_at_utc')}
@@ -48,19 +113,14 @@ def snapshot():
     return bets,states,audit
 
 
-def exact_1x2(selection,teams):
-    """A team name is accepted ONLY as an exact unique team name, never a substring/alias."""
-    if selection in ('1','X','2'): return selection
-    if not isinstance(selection,str): return None
-    if selection.strip().casefold()=='draw': return 'X'
-    hits=[str(i+1) for i,t in enumerate(teams or []) if t.strip().casefold()==selection.strip().casefold()]
-    return hits[0] if len(hits)==1 else None
+def historical_literal_1x2(selection, ft):
+    """Reproduce the pre-#44 comparison for historical diagnostics only."""
+    home, away = ft
+    winner = '1' if home > away else '2' if away > home else 'X'
+    return 1.0 if selection == winner else -1.0
 
 
 def factual_settle(b,ft):
-    if b['market'].casefold()=='1x2':
-        canonical=exact_1x2(b['selection'],b.get('teams'))
-        return settle('1X2',canonical,ft,b.get('teams')) if canonical else None
     # Existing production policy: live AH depends on settlement scope, not just FT.
     if b['market'].casefold()=='asian handicap' and b['phase']=='live': return None
     return settle(b['market'],b['selection'],ft,b.get('teams'))
@@ -138,21 +198,23 @@ def sensitivity(rows):
     return out
 
 
-def disagreement_cases():
+def disagreement_cases(*, historical=False):
     out=[]
     for line_no,line in enumerate((data_dir()/'messages.jsonl').read_text().splitlines(),1):
         if not line.strip():continue
         row=json.loads(line); p=parse(row['text'])
         if not (p.get('ft') and p.get('bet') and p.get('bot_mark') is not None):continue
         own=settle(p['market'],p['selection'],p['ft'],p.get('teams'))
+        if historical and p['market'].casefold() == '1x2':
+            own = historical_literal_1x2(p['selection'], p['ft'])
         if own in (None,0) or (own>0)==p['bot_mark']:continue
-        canonical=exact_1x2(p['selection'],p.get('teams')) if p['market'].casefold()=='1x2' else None
+        canonical=selection_1x2(p['selection'],p.get('teams')) if p['market'].casefold()=='1x2' else None
         corrected=settle('1X2',canonical,p['ft'],p.get('teams')) if canonical else None
         out.append({'line':line_no,'message_id':row['message_id'],'match_id':p.get('match_id'),'type':p['type'],
                     'market':p['market'],'selection':p['selection'],'teams':p.get('teams'),'ft':p['ft'],
-                    'bot_mark':p['bot_mark'],'production_w':own,'canonical_1x2':canonical,'audit_w':corrected,
+                    'bot_mark':p['bot_mark'],'historical_w' if historical else 'production_w':own,'canonical_1x2':canonical,'audit_w':corrected,
                     'source':'messages.jsonl:'+str(line_no),'observed_utc':row.get('collected_at_utc'),
-                    'evidence_sha256':sha(row),'decision':'parser 1X2 team-name mismatch; proposed fix only' if corrected is not None else 'quarantine; manual review'})
+                    'evidence_sha256':sha(row),'decision':'historical literal comparison; pre-#44' if historical and corrected is not None else 'quarantine; manual review'})
     return out
 
 
@@ -217,9 +279,7 @@ def make_audit(now,envelopes=()):
         new=dict(b)
         if b['w'] is None and b['match_id'] in proposals: new['w']=factual_settle(b,proposals[b['match_id']]['ft'])
         proposed_rows.append(new)
-    files=['messages.jsonl','results_hl.json','results_bsd.json','details_hl.json','team_aliases.json']
-    return {'as_of_utc':now.isoformat(),'main_snapshot_sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-            'source_file_sha256':{f:hashlib.sha256((data_dir()/f).read_bytes()).hexdigest() for f in files if (data_dir()/f).exists()},
+    return {'as_of_utc':now.isoformat(),
             'production_audit':production_audit,'inventory':inventory,'pending':pending,
             'pending_counts':{'all':len(pending),'eligible_roi':sum(r['eligible_roi'] for r in pending),
                 'phase':dict(collections.Counter(r['phase'] for r in pending)),
@@ -229,6 +289,7 @@ def make_audit(now,envelopes=()):
                 'cross_tab':[dict(phase=k[0],age=k[1],market=k[2],odds=k[3],n=n) for k,n in sorted(cross.items())]},
             'bf_gt3_live_eligible':sensitivity(filtered),'bf_gt3_live_all':sensitivity([b for b in bf if b['phase']=='live' and b['odds']>3]),
             'bf_gt3_live_proposed_only':sensitivity(proposed_rows),'disagreements':disagreement_cases(),
+            'historical_disagreements_pre_pr44':disagreement_cases(historical=True),
             'proposals':proposals,'quarantine':quarantine,'network_requests':0,
             'cache_reindex':{'pending_games':len(targets),'saved_records_scanned':cache_scanned,'exact_hits':cache_hits},
             'provider_quota_evidence':{name:{'last_run_utc':st.get('last_run_utc'),'stats':st.get('stats')} for name,st in states.items()},
@@ -239,18 +300,22 @@ def make_audit(now,envelopes=()):
 
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--output-dir',required=True);ap.add_argument('--evidence-jsonl');ap.add_argument('--as-of');ap.add_argument('--snapshot-sha')
+    ap=argparse.ArgumentParser();ap.add_argument('--output-dir',required=True);ap.add_argument('--evidence-jsonl');ap.add_argument('--as-of');ap.add_argument('--snapshot-sha',required=True)
     a=ap.parse_args();now=parse_utc(a.as_of) if a.as_of else datetime.now(UTC)
     if now is None:ap.error('timezone-aware --as-of required')
     envelopes=[json.loads(x) for x in Path(a.evidence_jsonl).read_text().splitlines() if x.strip()] if a.evidence_jsonl else []
-    result=make_audit(now,envelopes)
-    if a.snapshot_sha:
-        if len(a.snapshot_sha)!=40:ap.error('full snapshot SHA required')
-        for name,expected in result['source_file_sha256'].items():
-            original=subprocess.check_output(['git','show',a.snapshot_sha+':data/'+name])
-            if hashlib.sha256(original).hexdigest()!=expected:ap.error('snapshot data do not match the declared Git commit')
-        result['main_snapshot_sha']=a.snapshot_sha
-    result['auditor_modules_sha256']={name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in ('betfair_audit.py','parser.py','report.py')}
+    try:
+        with frozen_inputs(a.snapshot_sha, data_dir()) as manifest:
+            result = make_audit(now, envelopes)
+    except (ValueError, OSError, subprocess.CalledProcessError) as exc:
+        ap.error(str(exc))
+    result['data_snapshot_sha'] = a.snapshot_sha
+    result['source_file_sha256'] = manifest
+    result['auditor_checkout_sha'] = git('rev-parse', 'HEAD').decode().strip()
+    result['auditor_modules_sha256'] = {
+        name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+        for name in ('betfair_audit.py', 'parser.py', 'report.py')
+    }
     out=Path(a.output_dir).resolve()
     # A read-only auditor must never overwrite production data/report/notification state.
     if out==data_dir().resolve() or out==Path('docs').resolve() or data_dir().resolve() in out.parents or Path('docs').resolve() in out.parents:
