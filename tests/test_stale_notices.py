@@ -296,7 +296,7 @@ class BrainWatch(unittest.TestCase):
     def build(self, opened, as_of, barrier=True):
         settled = [self.sig(i, '2026-11-%02dT20:00:00+00:00' % (10 + i % 5), True) for i in range(40)]
         reg = {}
-        brain.update_registry(settled + opened, reg)
+        brain.update_registry(settled + opened, reg, now=as_of)
         if barrier:
             return brain.build(settled + opened, reg, 300, as_of=as_of)
         with patch.object(freshness, 'current', lambda w, now: True):          # a seleção anterior à correção, à mesma hora

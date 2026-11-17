@@ -54,3 +54,5 @@ APROVAR para integração técnica após CI verde e autorização expressa de me
 P1 conhecido: corrigido e reproduzido nas sete apostas. Risco residual: nomes que não coincidam exatamente permanecem pendentes.
 Os conteúdos e classificações exploratórias gerados após eventual integração refletirão a correção; o mecanismo Telegram não é modificado.
 Não há merge, envio de teste, edição de secrets, alteração de fontes externas ou certificação científica.
+
+O primeiro CI expôs uma corrida de relógio num teste preexistente: duas construções criavam hipóteses em segundos reais diferentes. O helper de teste passa agora o mesmo `as_of` a `update_registry`, mantendo todas as asserções e sem alterar lógica de produção/Telegram. O CI final deve validar esta correção determinística.
