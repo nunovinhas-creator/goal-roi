@@ -81,3 +81,24 @@ class Shadow(unittest.TestCase):
         capture(self.p,self.l,[self.bet()],T+timedelta(seconds=2))
         for when in ('invalid',(T+timedelta(hours=2)).isoformat()):
             with self.assertRaises(ValueError): record_result(self.p,self.l,'game',[3,0],'fixture',when,T+timedelta(hours=1))
+
+    def test_positive_roi_alone_never_confirms_second_half_advantage(self):
+        versions=[]
+        for i in range(100):
+            t=T+timedelta(hours=2*i,seconds=2)
+            capture(self.p,self.l,[self.bet(str(i),i+1,60,when=t)],t)
+            versions.append((t+timedelta(seconds=1),copy.deepcopy(self.l)))
+            record_result(self.p,self.l,str(i),[3,0],'fixture',(t+timedelta(hours=1)).isoformat(),t+timedelta(hours=1))
+            versions.append((t+timedelta(hours=1,seconds=1),copy.deepcopy(self.l)))
+        early=analyse(self.p,self.l,T+timedelta(days=15),versions)
+        self.assertEqual(early['scientific_state'],'INCONCLUSIVO')
+        final=analyse(self.p,self.l,T+timedelta(days=34),versions)
+        self.assertEqual(final['sequential']['statuses']['H1'],'CONFIRMADO')
+        self.assertEqual(final['sequential']['statuses']['H2'],'CONFIRMADO')
+        self.assertEqual(final['sequential']['statuses']['delta'],'INCONCLUSIVO')
+        self.assertEqual(final['sequential']['games']['delta'],100)
+    def test_same_score_new_source_is_corroboration_not_correction(self):
+        capture(self.p,self.l,[self.bet()],T+timedelta(seconds=2))
+        record_result(self.p,self.l,'game',[3,0],'one',(T+timedelta(hours=1)).isoformat(),T+timedelta(hours=1))
+        record_result(self.p,self.l,'game',[3,0],'two',(T+timedelta(hours=2)).isoformat(),T+timedelta(hours=2))
+        self.assertFalse(self.l['events'][-1]['correction'])

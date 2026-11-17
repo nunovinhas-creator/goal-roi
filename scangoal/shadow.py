@@ -140,7 +140,7 @@ def record_result(p, ledger, mid, ft, source, observed, now):
     if prev and prev[-1]['ft']==ft and prev[-1]['source']==source:
         return
     append(ledger, {'kind':'result','at':now.isoformat(),'match_id':mid,'ft':ft,'source':source,
-                    'observed_utc':observed, 'correction':bool(prev)})
+                    'observed_utc':observed, 'correction':bool(prev and prev[-1]['ft']!=ft)})
 
 
 def metrics(rows):

@@ -64,10 +64,24 @@ A aprovação técnica não constitui validação científica de H1/H2.
 
 ## Verificação executada
 
-Suite completa offline: 579 testes executados; 578 passaram e 1 teste de navegador ficou bloqueado por restrição de sockets Chromium deste ambiente.
-A mesma falha existe na base (569 testes, 568 passaram). Os 10 testes novos passam, incluindo corrupção, backfill, conhecimento futuro,
+Suite completa offline: 581 testes executados; 580 passaram e 1 teste de navegador ficou bloqueado por restrição de sockets Chromium deste ambiente.
+A mesma falha existe na base (569 testes, 568 passaram). Os 12 testes novos passam, incluindo corrupção, backfill, conhecimento futuro,
 resultados parciais, sobreposição, cadeia serial, falta de resultados em ambas as direções e publicação anterior ao resultado.
 O teste de navegador não foi alterado nem dispensado. Aprovação técnica final exige CI existente verde.
 Os ficheiros de produção, workflows, Telegram, ROI e certificação têm diff vazio contra a base.
-`historical-description.json` descreve apenas apostas já agregadas pela produção: é diagnóstico retrospetivo, sem valor prospetivo,
-e pode omitir mensagens de reforço posteriores com a mesma seleção; não é a amostra congelada.
+`historical-description.json` é diagnóstico retrospetivo, sem valor prospetivo; não é a amostra congelada.
+Revisão explícita do método: o primeiro diagnóstico usava apostas agregadas da produção; foi substituído no histórico git
+por uma reprodução a partir de CADA mensagem original, evitando ocultar entradas posteriores H1 pela agregação de mercado.
+Reproduzir: `python scripts/audit_open_game_shadow.py --output /tmp/goal-roi-descricao-nova.json` (novo destino).
+
+Revisão adicional: fixture de 100 jogos com lucro positivo idêntico H1/H2 confirma as duas rentabilidades, mas mantém o contraste INCONCLUSIVO. Não confunde ROI positivo com vantagem adicional da segunda parte. Corroboração do mesmo FT por outra fonte não é tratada como correção do resultado. CI GitHub do primeiro commit passou; o SHA final deve ter CI próprio verde.
+
+## Diagnóstico retrospetivo das regras
+
+43 jogos H1, todos liquidados, ROI 34,00%; H2 tem 67 jogos, 66 liquidados, um pendente, ROI 24,92%.
+Os 43 jogos H1 sobrepõem-se a H2 e, nesta amostra, todos entram na MESMA mensagem/linha/odd.
+Há 24 jogos exclusivos H2, dos quais 23 liquidados: lucro 1,83u e ROI 7,96%.
+Assim, o lucro bruto H1 é 14,62u e H2 16,45u; a maior taxa de ROI de H1 não implica maior lucro por oportunidade H2.
+O contraste de políticas (zero quando H1 se abstém) é -1,83u nos 66 pares conhecidos. Isto é apenas uma descrição retrospetiva:
+não rejeita nem confirma vantagem científica, não alimenta e-values e não integra o ledger prospetivo.
+O JSON inclui pares, distribuições, devoluções/resultados parciais, haircut, drawdown, intervalos e cenários.
