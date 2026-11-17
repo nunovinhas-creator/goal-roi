@@ -292,7 +292,7 @@ def history_check(p, ledger, versions):
             if result and (published is None or published>=result): problems.append('decision not published before result')
     return problems
 
-def collect_project(p, ledger, now):
+def collect_project(p, ledger, now, *, known_games=()):
     """Read existing project observations. No API requests, production writes or retrospective decisions."""
     from .store import data_dir
     chron={}; msgs,ft,marks,notes,_=report.load(chron)
@@ -307,6 +307,7 @@ def collect_project(p, ledger, now):
             scores.setdefault(mid,set()).add(tuple(r['ft']))
     signals=report.build_bets(msgs,ft,marks,notes,strict=False,bsd=ext,chronology=chron)
     known={b['match_id'] for b in signals if b.get('ft') or b.get('result_known_utc')}
+    known.update(known_games)
     known.update(chron.get('ft_any',{})); known.update(k[0] for k in marks)
     for m in msgs:
         if m.get('bot_mark') is not None or m.get('had_ft_at_first_sight'): known.add(m.get('match_id'))

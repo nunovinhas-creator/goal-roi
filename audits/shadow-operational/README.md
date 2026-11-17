@@ -39,8 +39,8 @@ Um bundle Git incremental e os ficheiros científicos permitem retomar num runne
 O outbox inclui diagnósticos, nunca Git config/credentials/secrets. Verifica hashes, prefixos, protocolos, caminhos e tamanho ao restaurar.
 Arquivos antigos só são ignorados se os ledgers já forem prefixos publicados. Divergências permanecem em quarentena, sem fusão científica automática.
 
-O consumidor faz ZERO chamadas a fornecedores. O supervisor termina dentro do limite existente de 18 minutos do job e consulta ficheiros a cada 10s.
-Outboxes de falha têm teto de 5 MB comprimidos e 25 MB expandidos; a instalação proposta exige retenção de um dia e armazenamento só em falha.
+O consumidor faz ZERO chamadas a fornecedores. O exemplo usa um orçamento de 480 segundos no job dedicado e consulta ficheiros a cada 10 s.
+Os outboxes têm teto de 5 MB comprimidos e 25 MB expandidos. O job dedicado tem de preservar a versão mais recente, mesmo em falha.
 O exemplo shell é inativo e não é chamado por workflows. Nenhum agendamento ou workflow de chamadas externas foi criado.
 A cadência do leitor existente pode deixar sinais acima de 120s; esses casos ficam contados como falhas de captura, nunca recuperados retrospetivamente.
 
@@ -65,9 +65,8 @@ Os doze testes herdados cobrem ainda cadeia serial, jogos sobrepostos, ausência
 1. Rever e autorizar expressamente os merges. Não integrar automaticamente #42/#43 nem esta PR.
 2. Rever o SHA composto que ficará em produção (incluindo a correção Stake, se integrada) e confirmar o respetivo CI.
 3. Provisionar o checkout separado e o ramo remoto SHADOW, com autorização Git de escrita existente, sem credenciais dentro de artefactos.
-4. Instalar o sidecar junto do coletor, iniciar antes das leituras e terminar/guardar outbox no final do job, sem atrasar ROI/Telegram.
-5. Instalar e testar a restauração do último outbox de falha e a sua preservação obrigatória por artefacto no runner efémero.
-   O exemplo shell e os comandos de export/import estão preparados; essa ligação ao ciclo real do job ainda não está aplicada nem autorizada.
+4. Provisionar a execução SHADOW num runner ou job dedicado, com grupo de concorrência independente e fonte só de leitura. Demonstrar a latência de entrega da fonte para a janela de 120 s.
+5. Restaurar o último outbox por consumir antes de iniciar um runner novo. Preservar o novo ZIP também em falha e verificar a sua disponibilidade no runner seguinte. Reservar tempo adicional no job dedicado para a transferência do artefacto. O exemplo continua inativo.
 6. Criar a autorização instalada com referência, hora UTC, SHA aprovado e identificação do runner. Executar activate UMA vez.
 7. Confirmar remotamente o novo génesis e o funcionamento de captura/publicação. Só então declarar o novo período operacional iniciado.
 
@@ -88,3 +87,22 @@ uma corrida de relógio observada no primeiro CI da frente Stake; nenhuma asser�
 O diff contra main é exclusivamente aditivo em módulos/scripts/auditorias SHADOW, mais essa fixture determinística.
 `data/`, `docs/`, `.github/`, reader/watch/notify/report/brain/certification de produção permanecem sem alterações neste ramo.
 O parecer final exige CI verde no SHA publicado. Não há autorização implícita de merge ou ativação.
+
+## Correções da auditoria de 17 de novembro
+
+A admissão lê primeiro o snapshot local, incluindo marcas, resultados externos,
+`manual_results.json` e FT90 de `details_hl.json`. Uma entrada associada a conhecimento
+já presente é excluída antes de criar uma decisão, mesmo com carimbo em falta ou
+contraditório. O ledger conserva a exclusão. O protocolo e os recibos continuam a
+exigir captura até 120 s e confirmação Git remota até 300 s.
+
+`supervise` requer um destino de outbox novo e externo aos dois checkouts. Usa um
+prazo monotónico absoluto, interrompe a fase de trabalho 15 s antes do prazo e limita
+cada processo Git ao menor valor entre 40 s e o tempo restante. Em timeout, cancela
+o grupo de processos Git. O outbox é criado e publicado atomicamente no tempo
+reservado. Quando há falha, o exit code pertence ao job SHADOW. Os ficheiros duráveis
+do checkout dedicado permitem retoma mesmo se a exportação do ZIP falhar.
+
+O exemplo destina-se a um job ou runner separado do Collect ScanGoal. A entrega
+atempada dos inputs e a transferência/restauração de artefactos entre runners reais
+continuam por demonstrar antes de qualquer instalação.

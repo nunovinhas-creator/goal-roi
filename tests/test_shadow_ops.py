@@ -174,3 +174,88 @@ class OperationalShadow(unittest.TestCase):
         with zipfile.ZipFile(path,'w') as z:z.writestr('manifest.json',json.dumps(manifest));z.writestr(name,body)
         with self.assertRaises(ops.OpsError):ops.restore_outbox(self.pub,path)
         self.assertFalse((self.root/'escape.json').exists())
+
+    def assert_result_excluded_on_remote(self):
+        self.message()
+        result = ops.tick(self.pub, self.source, self.auth)
+        self.assertEqual(result['observations'], 0)
+        self.assertEqual(self.ledger()['events'][0]['reason'], 'result_already_present')
+        remote_ledger = json.loads(ops.git(
+            self.remote, 'show',
+            f'refs/heads/{self.pub.branch}:{ops.ROOT}/ledgers/{self.ident}.json',
+        ))
+        self.assertEqual(remote_ledger, self.ledger())
+        self.assertFalse(any(event['kind'] == 'decision' for event in remote_ledger['events']))
+        self.assertEqual(ops.read(self.pub.state / 'receipts.json'), [])
+
+    def test_manual_result_already_known_never_reaches_remote_as_decision(self):
+        self.step()
+        mid = 'alpha-vs-beta-20261118'
+        (self.data / 'manual_results.json').write_text(json.dumps({
+            mid: {'ft': [3, 0], 'observed_utc': (self.time - timedelta(seconds=10)).isoformat()},
+        }))
+        self.assert_result_excluded_on_remote()
+
+    def test_existing_highlightly_ft90_is_checked_before_admission(self):
+        self.step()
+        mid = 'alpha-vs-beta-20261118'
+        (self.data / 'details_hl.json').write_text(json.dumps({'details': {
+            mid: {'score_90': [3, 0], 'status': 'Finished', 'consistent': True,
+                  'fetched_at_utc': (self.time - timedelta(seconds=10)).isoformat()},
+        }}))
+        self.assert_result_excluded_on_remote()
+
+    def test_unproven_manual_result_and_its_later_removal_cannot_enable_capture(self):
+        self.step()
+        path = self.data / 'manual_results.json'
+        path.write_text('{"alpha-vs-beta-20261118": {"ft": [3, 0]}}')
+        self.assert_result_excluded_on_remote()
+        path.unlink()
+        self.step()
+        self.message(i=2)
+        self.assertEqual(ops.tick(self.pub, self.source, self.auth)['observations'], 0)
+        self.assertEqual([e['reason'] for e in self.ledger()['events']],
+                         ['result_already_present', 'result_already_present'])
+
+    def test_deadline_kills_git_group_and_reserves_time_for_recoverable_outbox(self):
+        import time
+
+        self.step()
+        self.message()
+        self.pub.publish()  # first push is verified, so the slow hook runs on the decision push
+        hook = Path(ops.git(self.repo, 'rev-parse', '--absolute-git-dir')) / 'hooks' / 'pre-push'
+        hook.write_text('#!/bin/sh\nsleep 25\nexit 1\n')
+        hook.chmod(0o700)
+        archive = self.root / 'deadline-outbox.zip'
+        source_before = {p.name: p.read_bytes() for p in self.data.iterdir()}
+        started = time.monotonic()
+        # Scale the reserve for the local fixture while exercising a real slow Git child.
+        with patch.object(ops, 'OUTBOX_RESERVE', 0.5):
+            with self.assertRaises(ops.DeadlineExceeded):
+                ops.supervise(self.pub, self.source, self.auth, seconds=2, outbox=archive)
+        self.assertLess(time.monotonic() - started, 2.5)
+        self.assertTrue(archive.is_file())
+        self.assertEqual({p.name: p.read_bytes() for p in self.data.iterdir()}, source_before)
+        events = self.ledger()['events']
+        self.assertEqual(sum(e['kind'] == 'decision' for e in events), 1)
+        remote = self.root / 'deadline-fresh'
+        ops.git(self.root, 'clone', '--branch', self.pub.branch, str(self.remote), str(remote))
+        self.pub = ops.Publisher(remote, clock=lambda: self.time)
+        self.assertEqual(ops.restore_outbox(self.pub, archive)['state'], 'restored')
+        self.assertEqual(self.ledger()['events'], events)
+        self.assertFalse(ops.tick(self.pub, self.source, self.auth)['problems'])
+        self.assertEqual(self.ledger()['events'], events)
+        self.assertEqual(len(ops.read(self.pub.state / 'receipts.json')), 1)
+
+    def test_deadline_applies_to_python_work_and_keeps_export_available(self):
+        import time
+
+        archive = self.root / 'python-timeout.zip'
+        started = time.monotonic()
+        with patch.object(ops, 'OUTBOX_RESERVE', 0.5), patch.object(
+                ops, 'tick_locked', side_effect=lambda *args: time.sleep(10)):
+            with self.assertRaises(ops.DeadlineExceeded):
+                ops.supervise(self.pub, self.source, self.auth, seconds=1, outbox=archive)
+        self.assertLess(time.monotonic() - started, 1.5)
+        self.assertTrue(archive.is_file())
+        self.assertEqual(self.ledger()['events'], [])

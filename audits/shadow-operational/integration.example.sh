@@ -1,32 +1,17 @@
 #!/usr/bin/env bash
-# PREPARED EXAMPLE ONLY. Not called by any workflow; never run without approved installation.
-# The existing collector keeps writing data/messages.jsonl and existing result caches.
-# This sidecar consumes those local observations; no Telegram client/result API is added.
+# Dormant example for a dedicated SHADOW runner with its own concurrency group.
+# The source checkout is read-only. Run from the reviewed code checkout.
 set -euo pipefail
-: "${SHADOW_PUBLISHER_CHECKOUT:?dedicated full-history checkout on shadow/h1-h2-operational required}"
-: "${SHADOW_SOURCE_CHECKOUT:?existing collector checkout required}"
-: "${SHADOW_AUTHORIZATION_FILE:?reviewed explicit installed/authorized record required}"
-: "${SHADOW_FAILURE_OUTBOX:?new output ZIP outside production directories required}"
+: "${SHADOW_PUBLISHER_CHECKOUT:?dedicated full-history checkout required}"
+: "${SHADOW_SOURCE_CHECKOUT:?read-only collector source required}"
+: "${SHADOW_AUTHORIZATION_FILE:?reviewed authorization required}"
+: "${SHADOW_OUTBOX:?new ZIP outside both checkouts required}"
 
-# Before launching this command, restore the latest unconsumed failure artifact with:
-# python -m scangoal.shadow_ops restore-outbox --repo "$SHADOW_PUBLISHER_CHECKOUT" \
-#   --source "$SHADOW_SOURCE_CHECKOUT" --authorization "$SHADOW_AUTHORIZATION_FILE" --outbox "$archive"
-# On first authorized installation only, create/publish a NEW operational protocol with:
-# python -m scangoal.shadow_ops activate --repo "$SHADOW_PUBLISHER_CHECKOUT" \
-#   --source "$SHADOW_SOURCE_CHECKOUT" --authorization "$SHADOW_AUTHORIZATION_FILE"
-
-on_exit() {
-  code=$?
-  if [ "$code" -ne 0 ]; then
-    python -m scangoal.shadow_ops export-outbox --repo "$SHADOW_PUBLISHER_CHECKOUT" \
-      --source "$SHADOW_SOURCE_CHECKOUT" --authorization "$SHADOW_AUTHORIZATION_FILE" \
-      --outbox "$SHADOW_FAILURE_OUTBOX" || exit 3
-    # The authorized existing job must upload this capped ZIP as a failure artifact (retention 1 day).
-    # Missing/failed artifact preservation must fail the job, not be marked continue-on-error.
-  fi
-  exit "$code"
-}
-trap on_exit EXIT
-python -m scangoal.shadow_ops supervise --repo "$SHADOW_PUBLISHER_CHECKOUT" \
-  --source "$SHADOW_SOURCE_CHECKOUT" --authorization "$SHADOW_AUTHORIZATION_FILE" \
-  --seconds 1080 --poll-seconds 10
+# Restore the last unconsumed outbox before each fresh runner starts.
+# Retain the new outbox even on nonzero exit, within the SHADOW job's own budget.
+# The process keeps 15 of these 480 seconds for local outbox preservation.
+# The outer watchdog also bounds interpreter startup and abnormal teardown.
+timeout --signal=TERM --kill-after=5s 485s python -m scangoal.shadow_ops supervise \
+  --repo "$SHADOW_PUBLISHER_CHECKOUT" --source "$SHADOW_SOURCE_CHECKOUT" \
+  --authorization "$SHADOW_AUTHORIZATION_FILE" --outbox "$SHADOW_OUTBOX" \
+  --seconds 480 --poll-seconds 10
