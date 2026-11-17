@@ -94,9 +94,11 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NOTIFY_DURABLE: git
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
+      # Sem continue-on-error: uma falha de commit, rebase ou push deixa a execução vermelha (a recolha seguinte é lançada
+      # na mesma, `!cancelled()`). Push recusado: uma só nova tentativa, que reaplica o MESMO commit por cima do remoto, sem
+      # reler o bot nem recalcular avisos. Um conflito no rebase falha logo (bash -e), sem resolução automática; nunca force-push.
       - name: Commit data from the fast reads
         if: ${{ !cancelled() && github.ref_name == 'main' }}
-        continue-on-error: true
         run: |
           git add data docs/report.json docs/bets.csv
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
@@ -104,7 +106,12 @@ jobs:
           git config user.name "scangoal-collector"
           git config user.email "actions@users.noreply.github.com"
           git commit -q -m "data: collect [skip ci]"
-          git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+          git pull -q --rebase origin "${GITHUB_REF_NAME}"
+          if ! git push -q origin "HEAD:${GITHUB_REF_NAME}"; then
+            echo "::warning::push rejected; one more rebase and push of the same commit"
+            git pull -q --rebase origin "${GITHUB_REF_NAME}"
+            git push -q origin "HEAD:${GITHUB_REF_NAME}"
+          fi
       # O agendamento do GitHub não dispara neste repositório. Cada execução lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
       - name: Start the next collection
