@@ -186,5 +186,101 @@ class SignalDelivery(unittest.TestCase):
         self.assertEqual(bridge.audit(other)["queued_unreceipted"],0)
         self.assertFalse(bridge.audit(other)["live_capture_proven"])
 
+    def test_failed_push_outbox_roundtrip_on_fresh_checkout(self):
+        self.pub.append(self.row())
+        with patch.object(self.pub,"_push_confirm",
+                          side_effect=bridge.DeliveryError("synthetic push failed")):
+            with self.assertRaises(bridge.DeliveryError):
+                self.pub.publish()
+        archive=self.root/"pending.zip"
+        export=self.pub.export_outbox(archive)
+        self.assertEqual(export["status"],"exported")
+        fresh=self.root/"fresh_runner"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        receiver=bridge.DeliveryPublisher(fresh,clock=lambda:self.now)
+        restored=receiver.restore_outbox(archive)
+        self.assertEqual(restored["events"],1)
+        self.assertEqual(restored["receipts"],0)
+        self.assertEqual(receiver.publish()["status"],"published")
+        self.assertEqual(len(receiver._journal()[0]),1)
+        self.assertEqual(len(receiver._journal()[1]),1)
+        self.assertEqual(receiver.publish()["status"],"published")
+        self.assertEqual(len(receiver._journal()[1]),1)
+
+    def test_second_phase_failed_outbox_roundtrip(self):
+        self.pub.append(self.row())
+        orig=self.pub._push_confirm
+        calls=[0]
+        def outage():
+            calls[0]+=1
+            if calls[0]==2:
+                raise bridge.DeliveryError("synthetic receipt failure")
+            return orig()
+        with patch.object(self.pub,"_push_confirm",side_effect=outage):
+            with self.assertRaises(bridge.DeliveryError):
+                self.pub.publish()
+        self.assertEqual(len(self.pub._journal()[1]),1)
+        archive=self.root/"receipt_pending.zip"
+        self.pub.export_outbox(archive)
+        fresh=self.root/"runner_receipt"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        receiver=bridge.DeliveryPublisher(fresh,clock=lambda:self.now)
+        receiver.restore_outbox(archive)
+        receiver.publish()
+        self.assertEqual(len(receiver._journal()[1]),1)
+        self.assertEqual(bridge.audit(fresh)["queued_unreceipted"],0)
+
+    def test_corrupt_outbox_hash_rejected_before_changing_ledger(self):
+        import zipfile
+        self.pub.append(self.row())
+        archive=self.root/"valid.zip"
+        self.pub.export_outbox(archive)
+        fresh=self.root/"tampered"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        invalid=self.root/"changed.zip"
+        with zipfile.ZipFile(archive) as source, zipfile.ZipFile(invalid,"w") as dest:
+            for name in source.namelist():
+                body=source.read(name)
+                if name==str(bridge.EVENTS):
+                    body=body.replace(b"Alpha",b"Omega")
+                dest.writestr(name,body)
+        receiver=bridge.DeliveryPublisher(fresh)
+        with self.assertRaises(bridge.DeliveryError):
+            receiver.restore_outbox(invalid)
+        self.assertEqual(receiver._journal()[0],[])
+
+    def test_outbox_remote_divergence_quarantined(self):
+        self.pub.append(self.row())
+        archive=self.root/"pending.zip"
+        self.pub.export_outbox(archive)
+        other=self.root/"advanced"
+        ops.git(self.root,"clone",self.remote,other)
+        ops.git(other,"checkout",bridge.BRANCH)
+        (other/"advance").write_text("remote advanced")
+        ops.git(other,"add","advance")
+        ops.git(other,"-c","user.name=fixture","-c","user.email=fixture@example.test",
+                "commit","-m","advance")
+        ops.git(other,"push","origin","HEAD:refs/heads/"+bridge.BRANCH)
+        fresh=self.root/"fresh"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        receiver=bridge.DeliveryPublisher(fresh)
+        with self.assertRaises(bridge.DeliveryError):
+            receiver.restore_outbox(archive)
+        self.assertEqual(receiver._journal()[0],[])
+
+    def test_outbox_cannot_be_overwritten(self):
+        self.pub.append(self.row())
+        path=self.root/"outbox.zip"
+        self.pub.export_outbox(path)
+        old=path.read_bytes()
+        with self.assertRaises(bridge.DeliveryError):
+            self.pub.export_outbox(path)
+        self.assertEqual(path.read_bytes(),old)
+
+
 if __name__=="__main__":
     unittest.main()
