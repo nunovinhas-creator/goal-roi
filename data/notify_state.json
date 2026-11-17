@@ -155,13 +155,15 @@
    "attempt_utc": "2026-11-17T21:07:19+00:00",
    "chars": 182,
    "created_utc": "2026-11-17T21:07:19+00:00",
+   "done_utc": "2026-11-17T21:07:19+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "1c846ee6cd7fadc3e077c279c8d6c3b389da7ee82bd126ee6e6e62b87e8e6161",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:burnley-women-vs-southampton-wfc-women-20261115|33a362ec2ddc": {
    "attempt_utc": "2026-11-17T13:01:06+00:00",
@@ -640,12 +642,16 @@
    "state": "delivered"
   },
   "game|id:rep-of-ireland-vs-kosovo-20261117|e57f5fe64eb5": {
+   "attempt_utc": "2026-11-17T21:07:19+00:00",
+   "chars": 321,
    "created_utc": "2026-11-17T21:07:19+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "84f683b9e9188bc02342cad2e947525d8ea91b8f6eeb95177c9e8f76c71057d1",
+   "state": "in_flight"
   },
   "game|id:republic-of-ireland-u21-vs-finland-u21-20261117|e87f67444b36": {
    "attempt_utc": "2026-11-17T17:52:57+00:00",
@@ -957,7 +963,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 59,
+  "delivered": 60,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-17T21:06:26+00:00",
@@ -1143,7 +1149,7 @@
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 5,
   "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo": 33,
   "Jogo aberto | Hora (UTC) = noite": 36,
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": 52,
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": 53,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 31,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 44,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 65,
@@ -1277,6 +1283,9 @@
   "item|id:poland-vs-sweden-20261117|Asian Total|Over 3": {
    "at_utc": "2026-11-17T21:06:26+00:00"
   },
+  "item|id:rep-of-ireland-vs-kosovo-20261117|Asian Total|Over 3": {
+   "at_utc": "2026-11-17T21:07:19+00:00"
+  },
   "item|id:republic-of-ireland-u21-vs-finland-u21-20261117|1X2|1": {
    "at_utc": "2026-11-17T17:52:57+00:00"
   },
@@ -1327,7 +1336,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 371,
+ "sent_total": 372,
  "statuses": {
   "Betfair | Competição = seleções": "abandonada",
   "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 %": "abandonada",
@@ -1530,6 +1539,7 @@
   "2026-11-17T20:26:56+00:00|Israel — Austria|Over 2",
   "2026-11-17T20:27:13+00:00|Hungary — Northern Ireland|Over 2",
   "2026-11-17T21:05:54+00:00|Poland — Sweden|Over 3",
+  "2026-11-17T21:06:11+00:00|Rep of Ireland — Kosovo|Over 3",
   "2026-11-17T21:06:28+00:00|Bosnia — Romania|Over 3"
  ]
 }
