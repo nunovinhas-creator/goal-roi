@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-17T09:14:38+00:00",
- "messages": 1222,
+ "generated_at_utc": "2026-11-17T09:23:01+00:00",
+ "messages": 1223,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 45,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 11,
   "OPEN_GAME_NO_ODDS": 13,
   "FULL_TIME_NOTE": 13,
-  "POLYMARKET": 359,
+  "POLYMARKET": 360,
   "None": 38,
   "TOTALS_FORM_NO_ODDS": 61
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2037,
+  "versions": 2038,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T09:10:18+00:00",
+  "last_collected_at_utc": "2026-11-17T09:23:01+00:00",
   "hl_results": 71,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 40,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T09:14:34+00:00",
+  "collector_last_run_utc": "2026-11-17T09:23:01+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 368,
   "goal_lists_consistent": 215
  },
- "unique_bets": 675,
+ "unique_bets": 676,
  "settled_bets": 548,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -932,7 +932,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 146,
+   "bets": 147,
    "settled": 132,
    "matches": 49,
    "wins": 63,
@@ -1495,7 +1495,7 @@
    "by_bot_mark": 0,
    "per_day": 0.5,
    "days_to_hint": 53,
-   "days_to_conclusion": 581,
+   "days_to_conclusion": 582,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1530,7 +1530,7 @@
    "roi_announced_odds": 0.1592,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 24.1,
+   "per_day": 24.0,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
    "prudent_rate": 0.6391,
@@ -1580,7 +1580,7 @@
    "prob_above_cut": 0.3906
   },
   "POLYMARKET": {
-   "signals": 175,
+   "signals": 176,
    "with_result": 160,
    "hits": 76,
    "misses": 84,
@@ -3160,7 +3160,7 @@
    },
    {
     "n": 70,
-    "signals": 97,
+    "signals": 98,
     "hits": 17,
     "misses": 53,
     "hit_rate": 0.2446,
@@ -3214,8 +3214,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 842,
-   "eligible": 675,
+   "total": 843,
+   "eligible": 676,
    "excluded": 167,
    "reasons": {
     "no_valid_odds": 119,
@@ -3230,7 +3230,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7207,
+    "em observação": 7214,
     "promissora": 60,
     "abandonada": 13
    },
@@ -4287,11 +4287,11 @@
     }
    ]
   },
-  "hypotheses": 7280,
+  "hypotheses": 7287,
   "tested": 537,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7264,
+   "em observação": 7271,
    "abandonada": 10,
    "promissora": 6
   },
@@ -6297,6 +6297,88 @@
       }
      ],
      "bad_total": 37
+    },
+    {
+     "match_id": "wales-vs-portugal-20261117",
+     "match": "Wales — Portugal",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T19:45+00:00",
+     "date_utc": "2026-11-17T09:22:59+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "X",
+     "odds": 5.26,
+     "odds_last": 5.26,
+     "max_mult": 1,
+     "share": 38,
+     "share_last": 38,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 22,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Polymarket | Número de apostas = uma & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 13,
+       "games": 12,
+       "hits": 2,
+       "break_even": 0.4556,
+       "prob_above": 0.0355,
+       "roi": -0.7008,
+       "edge": -0.1825,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 40,
+       "games": 26,
+       "hits": 14,
+       "break_even": 0.484,
+       "prob_above": 0.0488,
+       "roi": -0.334,
+       "edge": -0.1357,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 26
     }
    ],
    "counts": {
@@ -6304,9 +6386,9 @@
     "misto": 8,
     "sem evidência": 0,
     "contraditório": 5,
-    "evitar": 2
+    "evitar": 3
    },
-   "generated_utc": "2026-11-17T09:14:57+00:00",
+   "generated_utc": "2026-11-17T09:23:20+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6319,7 +6401,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7217,
+     "hypotheses": 7224,
      "with_prospective_evidence": 1954,
      "prospective_games": 38573
     },
@@ -6442,7 +6524,7 @@
     "roi_cut": 0.0242
    },
    "skipped": {
-    "bets": 380,
+    "bets": 381,
     "settled": 288,
     "games": 149,
     "wins": 135,
@@ -21010,7 +21092,7 @@
     "roi_announced_odds": 0.2326,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 12.4,
+    "per_day": 12.3,
     "days_to_hint": 0,
     "days_to_conclusion": 19
    },
@@ -21073,7 +21155,7 @@
     "days_to_conclusion": 8
    },
    "POLYMARKET": {
-    "signals": 175,
+    "signals": 176,
     "with_result": 160,
     "hits": 76,
     "misses": 84,
@@ -21593,7 +21675,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 675,
+   "bets": 676,
    "settled": 548,
    "matches": 311,
    "wins": 260,
@@ -21628,6 +21710,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-17T09:22:59+00:00",
+   "match_id": "wales-vs-portugal-20261117",
+   "group": "POLYMARKET/pre",
+   "match": "Wales — Portugal",
+   "selection": "Polymarket: X",
+   "odds": 5.26,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-17T09:09:46+00:00",
    "match_id": "poland-vs-sweden-20261117",
@@ -22517,22 +22612,6 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T17:09:32+00:00",
-   "match_id": "estonia-vs-bulgaria-20261116",
-   "group": "BETFAIR/live/mkt>=10K",
-   "match": "Estonia — Bulgaria",
-   "selection": "Estonia",
-   "odds": 2.7,
-   "ft": [
-    2,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 2,
-   "max_mult": 128
   }
  ],
  "unsettled": [
@@ -25347,6 +25426,27 @@
      "share": 64,
      "market": "Polymarket",
      "total": 6900.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "wales-vs-portugal-20261117": {
+   "teams": [
+    "Wales",
+    "Portugal"
+   ],
+   "events": [
+    {
+     "d": "2026-11-17T09:22:59+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "X",
+     "odds": 5.26,
+     "share": 38,
+     "market": "Polymarket",
+     "total": 13000.0
     }
    ],
    "goals": null,
@@ -30880,7 +30980,7 @@
    "day": "2026-11-16"
   },
   {
-   "bets": 16,
+   "bets": 17,
    "settled": 3,
    "wins": 1,
    "units": 0.57,
