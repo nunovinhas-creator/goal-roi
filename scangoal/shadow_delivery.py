@@ -438,6 +438,8 @@ def inspect_remote_delivery(repo, observed_utc):
     local_sha = _git(pub.repo,"rev-parse","HEAD")
     if not remote or remote.split()[0] != local_sha:
         raise DeliveryError("downstream checkout not identical to remote")
+    if _git(pub.repo,"status","--porcelain","--",str(EVENTS.parent)):
+        raise DeliveryError("downstream checkout contains uncommitted delivery data")
     events, receipts = pub._journal()
     reports=[]
     for e in events:
