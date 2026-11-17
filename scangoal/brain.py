@@ -33,7 +33,7 @@ Disciplina (fixada a 12/11/2026):
 import hashlib, itertools, json, math
 from datetime import datetime, timedelta, timezone
 
-from . import certification, chronology, insights
+from . import certification, chronology, freshness, insights
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -825,11 +825,22 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     for r in rows:
         counts[r['status']] = counts.get(r['status'], 0) + 1
     good = [r for r in rows if r['status'] in ('promissora', 'forte', 'confirmada') and r['tradable']]
+    # Sinais em aberto que encaixam em táticas boas. P1 de 17/11/2026: "em aberto" (sem resultado liquidado) não quer dizer
+    # "ainda apostável". Com relógio (`as_of`, o do relatório), só entram as oportunidades atuais segundo `freshness`; os
+    # sinais antigos continuam intactos como dados históricos (contagens, estados, certificação não usam `watch`). Sem
+    # relógio (só análises offline) a lista fica como antes; a barreira final é sempre a do notificador, na hora do envio.
     watch = {}
     for r in sorted(good, key=lambda r: -r['prob_above']):
         for b in r['open']:
-            w = watch.setdefault(b['key'], {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': game_identity(b), 'type': b['type'], 'market': b['market'],
-                                            'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'reasons': []})
+            w = watch.get(b['key'])
+            if w is None:
+                w = {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': game_identity(b), 'type': b['type'], 'market': b['market'],
+                     'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'phase': b.get('phase'),
+                     'finished': bool(b.get('ft')) or bool(b.get('had_ft_at_first_sight')) or b.get('match_result_first_seen_utc') is not None,
+                     'reasons': []}
+                if as_of is not None and not freshness.current(w, as_of):
+                    continue
+                watch[b['key']] = w
             w['reasons'].append({'id': r['id'], 'status': r['status'], 'n': r['n'], 'games': r['games'], 'hit_rate': r['hit_rate'], 'prob_above': r['prob_above'],
                                  'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'),
                                  'prudent_rate': r.get('prudent_rate'), 'break_even': r.get('break_even'),

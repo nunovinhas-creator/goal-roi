@@ -1,0 +1,257 @@
+test_default_clock_expires_a_signal_when_real_time_passes (test_send_time_freshness.Delivery.test_default_clock_expires_a_signal_when_real_time_passes)
+Sem relógio injetado (como em produção): o tempo real decorrido conta. ... ERROR
+test_default_clock_is_the_run_start_plus_monotonic_elapsed_time (test_send_time_freshness.Delivery.test_default_clock_is_the_run_start_plus_monotonic_elapsed_time) ... ERROR
+test_expired_between_intent_and_send_without_publication (test_send_time_freshness.Delivery.test_expired_between_intent_and_send_without_publication) ... ERROR
+test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded (test_send_time_freshness.Delivery.test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded) ... 
+  test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded (test_send_time_freshness.Delivery.test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded) (phase='live') ... ERROR
+  test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded (test_send_time_freshness.Delivery.test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded) (phase='pre') ... ERROR
+test_expired_is_not_a_delivery_problem_for_the_exit_code (test_send_time_freshness.Delivery.test_expired_is_not_a_delivery_problem_for_the_exit_code) ... ok
+test_idempotent_across_runs (test_send_time_freshness.Delivery.test_idempotent_across_runs) ... ERROR
+test_multi_bet_notice_with_one_expired_bet_is_not_sent (test_send_time_freshness.Delivery.test_multi_bet_notice_with_one_expired_bet_is_not_sent) ... ERROR
+test_publication_failure_sends_nothing_and_an_expired_retry_never_sends (test_send_time_freshness.Delivery.test_publication_failure_sends_nothing_and_an_expired_retry_never_sends) ... ERROR
+test_publication_failure_then_valid_retry_sends_exactly_once (test_send_time_freshness.Delivery.test_publication_failure_then_valid_retry_sends_exactly_once) ... ERROR
+test_published_and_still_valid_is_sent (test_send_time_freshness.Delivery.test_published_and_still_valid_is_sent) ... ERROR
+test_reinforcement_keeps_a_bet_current (test_send_time_freshness.Delivery.test_reinforcement_keeps_a_bet_current) ... ERROR
+test_restart_after_expiry_was_decided (test_send_time_freshness.Delivery.test_restart_after_expiry_was_decided)
+Queda depois de gravar `expired` no estado mas antes do registo, e queda depois de ambos: consistente, sem envio. ... ERROR
+test_restart_after_published_intent_never_sends (test_send_time_freshness.Delivery.test_restart_after_published_intent_never_sends) ... 
+  test_restart_after_published_intent_never_sends (test_send_time_freshness.Delivery.test_restart_after_published_intent_never_sends) (crash='after_publish') ... ERROR
+  test_restart_after_published_intent_never_sends (test_send_time_freshness.Delivery.test_restart_after_published_intent_never_sends) (crash='before_send') ... ERROR
+test_state_lost_after_published_intent_and_expiry_is_rebuilt_from_the_log (test_send_time_freshness.Delivery.test_state_lost_after_published_intent_and_expiry_is_rebuilt_from_the_log)
+Estado reposto de antes da intenção (só o registo sabe): reconcile reconstrói `expired` e os efeitos; sem envio. ... ERROR
+test_summary_status_and_regime_notices_are_never_revalidated (test_send_time_freshness.Delivery.test_summary_status_and_regime_notices_are_never_revalidated) ... ERROR
+test_valid_at_plan_and_at_send_is_delivered_once (test_send_time_freshness.Delivery.test_valid_at_plan_and_at_send_is_delivered_once) ... ERROR
+test_valid_at_plan_but_expired_before_send_is_not_sent (test_send_time_freshness.Delivery.test_valid_at_plan_but_expired_before_send_is_not_sent) ... ERROR
+test_fast_real_push_still_delivers (test_send_time_freshness.RealGit.test_fast_real_push_still_delivers) ... ok
+test_slow_real_push_expires_the_signal_and_the_remote_records_it (test_send_time_freshness.RealGit.test_slow_real_push_expires_the_signal_and_the_remote_records_it) ... ERROR
+
+======================================================================
+ERROR: test_default_clock_expires_a_signal_when_real_time_passes (test_send_time_freshness.Delivery.test_default_clock_expires_a_signal_when_real_time_passes)
+Sem relógio injetado (como em produção): o tempo real decorrido conta.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 270, in test_default_clock_expires_a_signal_when_real_time_passes
+    with patch.object(notify.time, 'monotonic', side_effect=lambda: elapsed[0]):
+                      ^^^^^^^^^^^
+AttributeError: module 'scangoal.notify' has no attribute 'time'
+
+======================================================================
+ERROR: test_default_clock_is_the_run_start_plus_monotonic_elapsed_time (test_send_time_freshness.Delivery.test_default_clock_is_the_run_start_plus_monotonic_elapsed_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 257, in test_default_clock_is_the_run_start_plus_monotonic_elapsed_time
+    with patch.object(notify.time, 'monotonic', side_effect=[100.0, 100.0, 160.0, 1900.0]):
+                      ^^^^^^^^^^^
+AttributeError: module 'scangoal.notify' has no attribute 'time'
+
+======================================================================
+ERROR: test_expired_between_intent_and_send_without_publication (test_send_time_freshness.Delivery.test_expired_between_intent_and_send_without_publication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 92, in test_expired_between_intent_and_send_without_publication
+    store, st, done, sent, out = self.run_once([live('a', 29)], clock=clock, checkpoint=tick)
+                                 ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded (test_send_time_freshness.Delivery.test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded) (phase='live')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 109, in test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded
+    store, st, done, sent, _ = self.run_once([w], clock=clock, publish=slow_publish)
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded (test_send_time_freshness.Delivery.test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded) (phase='pre')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 109, in test_expired_during_git_publication_is_not_sent_and_terminal_is_recorded
+    store, st, done, sent, _ = self.run_once([w], clock=clock, publish=slow_publish)
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_idempotent_across_runs (test_send_time_freshness.Delivery.test_idempotent_across_runs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 206, in test_idempotent_across_runs
+    store, st, *_ = self.run_once([live('a', 29), live('b', 5)], clock=clock, publish=lambda key: clock.advance(1.5) or True)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_multi_bet_notice_with_one_expired_bet_is_not_sent (test_send_time_freshness.Delivery.test_multi_bet_notice_with_one_expired_bet_is_not_sent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 222, in test_multi_bet_notice_with_one_expired_bet_is_not_sent
+    store, st, done, sent, _ = self.run_once(watch, clock=clock, publish=lambda key: clock.advance(2) or True)
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_publication_failure_sends_nothing_and_an_expired_retry_never_sends (test_send_time_freshness.Delivery.test_publication_failure_sends_nothing_and_an_expired_retry_never_sends)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 127, in test_publication_failure_sends_nothing_and_an_expired_retry_never_sends
+    store, st, done, sent, out = self.run_once([live('a', 25)], publish=lambda key: False)
+                                 ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_publication_failure_then_valid_retry_sends_exactly_once (test_send_time_freshness.Delivery.test_publication_failure_then_valid_retry_sends_exactly_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 142, in test_publication_failure_then_valid_retry_sends_exactly_once
+    store, st, *_ = self.run_once([live('a', 10)], publish=lambda key: False)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_published_and_still_valid_is_sent (test_send_time_freshness.Delivery.test_published_and_still_valid_is_sent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 122, in test_published_and_still_valid_is_sent
+    store, st, done, sent, _ = self.run_once([live('a', 25)], clock=clock, publish=lambda key: clock.advance(2) or True)
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_reinforcement_keeps_a_bet_current (test_send_time_freshness.Delivery.test_reinforcement_keeps_a_bet_current)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 230, in test_reinforcement_keeps_a_bet_current
+    store, st, done, sent, _ = self.run_once(watch, clock=clock, publish=lambda key: clock.advance(2) or True)
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_restart_after_expiry_was_decided (test_send_time_freshness.Delivery.test_restart_after_expiry_was_decided)
+Queda depois de gravar `expired` no estado mas antes do registo, e queda depois de ambos: consistente, sem envio.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 179, in test_restart_after_expiry_was_decided
+    self.run_once([live('a', 29)], store=store, clock=clock, publish=lambda key: clock.advance(2) or True)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_restart_after_published_intent_never_sends (test_send_time_freshness.Delivery.test_restart_after_published_intent_never_sends) (crash='after_publish')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 158, in test_restart_after_published_intent_never_sends
+    self.run_once([live('a', 10)], store=store, publish=lambda key: True, checkpoint=crash)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_restart_after_published_intent_never_sends (test_send_time_freshness.Delivery.test_restart_after_published_intent_never_sends) (crash='before_send')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 158, in test_restart_after_published_intent_never_sends
+    self.run_once([live('a', 10)], store=store, publish=lambda key: True, checkpoint=crash)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_state_lost_after_published_intent_and_expiry_is_rebuilt_from_the_log (test_send_time_freshness.Delivery.test_state_lost_after_published_intent_and_expiry_is_rebuilt_from_the_log)
+Estado reposto de antes da intenção (só o registo sabe): reconcile reconstrói `expired` e os efeitos; sem envio.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 193, in test_state_lost_after_published_intent_and_expiry_is_rebuilt_from_the_log
+    self.run_once([live('a', 29)], store=store, clock=clock, publish=lambda key: clock.advance(2) or True)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_summary_status_and_regime_notices_are_never_revalidated (test_send_time_freshness.Delivery.test_summary_status_and_regime_notices_are_never_revalidated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 247, in test_summary_status_and_regime_notices_are_never_revalidated
+    st, done = notify.deliver(store, rep, store.load_state(), EVENING, slow, TOKEN, CHAT, None, lambda key: True, clock)
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_valid_at_plan_and_at_send_is_delivered_once (test_send_time_freshness.Delivery.test_valid_at_plan_and_at_send_is_delivered_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 59, in test_valid_at_plan_and_at_send_is_delivered_once
+    store, st, done, sent, _ = self.run_once([live('a', 29)])
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_valid_at_plan_but_expired_before_send_is_not_sent (test_send_time_freshness.Delivery.test_valid_at_plan_but_expired_before_send_is_not_sent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 75, in test_valid_at_plan_but_expired_before_send_is_not_sent
+    store, st, done, _, out = self.run_once([live('a', 29)], store=notify.MemoryStore(st0), clock=clock, sender=slow_hello)
+                              ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 54, in run_once
+    st, done = notify.deliver(store, rep or report(watch), st, now, sender, TOKEN, CHAT, checkpoint, publish, clock or Clock(now))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: deliver() takes from 7 to 9 positional arguments but 10 were given
+
+======================================================================
+ERROR: test_slow_real_push_expires_the_signal_and_the_remote_records_it (test_send_time_freshness.RealGit.test_slow_real_push_expires_the_signal_and_the_remote_records_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/goal-roi/tests/test_send_time_freshness.py", line 312, in test_slow_real_push_expires_the_signal_and_the_remote_records_it
+    with patch.object(notify.GitPublisher, '__call__', slow_push), patch.object(notify, 'run_clock', lambda now: clock):
+                                                                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'scangoal.notify' from '/home/user/goal-roi/scangoal/notify.py'> does not have the attribute 'run_clock'
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.444s
+
+FAILED (errors=19)

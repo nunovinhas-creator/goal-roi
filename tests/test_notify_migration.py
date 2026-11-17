@@ -77,6 +77,7 @@ class NotifyMigration(unittest.TestCase):
         rep['brain']['evidence_scope'] = 'eligible_bets_only'
         state = legacy_state()
         at = evening(NOW)
+        rep['brain']['watch'][0]['date_utc'] = (at - timedelta(minutes=5)).isoformat()   # P1 17/11/2026: só sinais atuais
         messages = notify.messages(rep, state, at)
         self.assertEqual(len(messages), 2)
         self.assertTrue(any(m.startswith('A seguir:') for m in messages))
