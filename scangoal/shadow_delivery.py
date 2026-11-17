@@ -218,7 +218,9 @@ class DeliveryPublisher:
 
     def _commit(self):
         allowed = {str(EVENTS), str(RECEIPTS)}
-        _git(self.repo, "add", "--", *sorted(allowed))
+        present = [path for path in sorted(allowed) if (self.repo/path).is_file()]
+        if present:
+            _git(self.repo, "add", "--", *present)
         staged = set(filter(None, _git(self.repo, "diff", "--cached", "--name-only").splitlines()))
         if staged - allowed:
             raise DeliveryError("unrelated staged files; refusing to commit")
