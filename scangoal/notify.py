@@ -29,7 +29,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from . import equivalence
+from . import equivalence, freshness
 from .eligibility import text_identity
 from .results_bsd import load_json
 from .store import data_dir
@@ -43,7 +43,7 @@ MAX_GROUPS_PER_MESSAGE = 8
 MAX_TEXT = 3900
 VALID = ('forte', 'confirmada')   # tática validada: só com certificado do teste de confirmação (PR 3)
 VALIDATION_METHOD = 'eprocess_online_alpha_v1'   # único método aceite para anunciar uma tática como validada (fail-closed)
-ALERT_MAX_AGE_MIN = 30            # alerta só se o jogo ainda não começou ou se o sinal tem no máximo 30 minutos
+ALERT_MAX_AGE_MIN = freshness.LIVE_MAX_AGE_MIN   # 30: idade máxima de um sinal ao vivo, para QUALQUER aviso de aposta
 TAU = 0.85                        # Jaccard mínimo entre os jogos de duas hipóteses para as agrupar (só apresentação)
 GROUP_MIN_GAMES = 8
 OSCILLATION_HOURS = 24            # só para mostrar registos antigos de oscilações (o resumo diário já as absorve)
@@ -146,11 +146,10 @@ def lisbon(v):
 
 
 def still_bettable(w, now):
-    ko = parse_time(w.get('kickoff_utc'))
-    if ko and ko > now:
-        return True
-    t = parse_time(w.get('date_utc'))
-    return t is not None and now - t <= timedelta(minutes=ALERT_MAX_AGE_MIN)
+    """Oportunidade ainda atual em `now` (P1 de 17/11/2026): a regra única de `freshness` (hora ORIGINAL do sinal; ao vivo
+    até 30 minutos; pré-jogo só antes de um início conhecido; jogo terminado, datas ausentes, inválidas ou incoerentes:
+    não). Vale para todos os avisos de aposta, indícios e alertas."""
+    return freshness.current(w, now)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -588,9 +587,10 @@ def game_notices(report, state, now):
     for w in (report.get('brain') or {}).get('watch') or []:
         if not isinstance(w, dict) or not isinstance(w.get('reasons'), list) or not w['reasons']:
             continue
+        if not still_bettable(w, now):
+            continue          # P1 17/11/2026: fora de tempo, em QUALQUER nível (indício ou alerta). Barreira final, independente
+            #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
-        if level == 'alerta' and not still_bettable(w, now):
-            continue          # fora de tempo: não serve de alerta nem de indício, e não fica pendente
         ik = item_key(w)
         if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
