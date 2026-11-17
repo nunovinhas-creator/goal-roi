@@ -6,22 +6,36 @@ Corre o código de cada versão num processo próprio sobre uma CÓPIA de data/ 
 Uso: python3 audits/stale-notices-evidence/compare_reports.py <commit_antes> <ISO now> [<ISO now> ...]
 """
 import json, os, shutil, subprocess, sys, tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from scangoal import freshness  # noqa: E402
 
-CODE = ('import json,sys;from datetime import datetime;from scangoal import report;'
-        'r=report.build(None,register=False,now=datetime.fromisoformat(sys.argv[1]));json.dump(r,open(sys.argv[2],"w"),ensure_ascii=False,sort_keys=True)')
+# O relógio real (`datetime.now`, usado por report.accuracy, brain.agenda e outros fora do `as_of`) fica congelado no MESMO
+# instante (sys.argv[3]) nas duas construções: sem isto, duas construções com segundos de diferença podem cair de lados
+# diferentes de um limiar (ex.: agenda "a decorrer" até 30 min) e a diferença não teria nada a ver com o código comparado.
+CODE = '''
+import json, sys
+from datetime import datetime as _dt
+from scangoal import report, brain, certification
+FROZEN = _dt.fromisoformat(sys.argv[3])
+class Frozen(_dt):
+    @classmethod
+    def now(cls, tz=None):
+        return FROZEN if tz is None else FROZEN.astimezone(tz)
+report.datetime = brain.datetime = certification.datetime = Frozen
+r = report.build(None, register=False, now=_dt.fromisoformat(sys.argv[1]))
+json.dump(r, open(sys.argv[2], 'w'), ensure_ascii=False, sort_keys=True)
+'''
 
 
-def build(src, data, now, out):
+def build(src, data, now, out, wall):
     d = Path(tempfile.mkdtemp())
     try:
         shutil.copytree(data, d / 'data')
-        subprocess.run([sys.executable, '-c', CODE, now, str(out)], cwd=src, env=dict(os.environ, SCANGOAL_DATA_DIR=str(d / 'data')), check=True)
+        subprocess.run([sys.executable, '-c', CODE, now, str(out), wall], cwd=src, env=dict(os.environ, SCANGOAL_DATA_DIR=str(d / 'data')), check=True)
     finally:
         shutil.rmtree(d)
     return json.loads(Path(out).read_text(encoding='utf-8'))
@@ -32,10 +46,12 @@ def main(before, nows):
     old_src = tmp / 'old'
     subprocess.run(['git', '-C', str(ROOT), 'worktree', 'add', '-q', '--detach', str(old_src), before], check=True)
     results = []
+    wall = datetime.now(timezone.utc).isoformat()          # um só relógio real congelado para todas as construções
+    print(json.dumps({'frozen_wall_clock_utc': wall, 'before': before}))
     try:
         for now in nows:
-            a = build(old_src, ROOT / 'data', now, tmp / 'a.json')
-            b = build(ROOT, ROOT / 'data', now, tmp / 'b.json')
+            a = build(old_src, ROOT / 'data', now, tmp / 'a.json', wall)
+            b = build(ROOT, ROOT / 'data', now, tmp / 'b.json', wall)
             wa, wb = a['brain'].pop('watch'), b['brain'].pop('watch')
             for x in (a, b):
                 x.pop('generated_at_utc', None)

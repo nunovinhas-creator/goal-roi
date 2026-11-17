@@ -37,7 +37,7 @@ Causas:
 | `full_suite_after_fix.txt` | Suite completa (revisão final). |
 | `send_time_tests_before_fix.txt` | `tests/test_send_time_freshness.py` contra o `notify.py` de 22f4d65: 17 dos 19 testes com erro (19 erros contando subtestes; sem relógio nem revalidação). Os 2 que passam verificam o que não muda (`expired` não é problema de entrega; push rápido real entrega). |
 | `send_time_demo.py` / `send_time_demo.txt` | Tempo real, sem relógio injetado: sinal com 29 min 59,5 s e publicação git de 1 s. 22f4d65 envia (`delivered`); a revisão final não (`expired`). |
-| `compare_reports.py` / `compare_reports.txt` | Relatório completo antes/depois, à mesma hora e com os mesmos dados (12:58:11 e 13:07): idêntico fora de `brain.watch`; o `watch` perde só os 12 sinais do incidente (`live_too_old`). |
-| `replay_history.py` / `replay_history.json` | Os 24 avisos de jogo do registo real reavaliados na hora real do envio: os 12 anteriores ao incidente continuam válidos; os 12 do incidente são rejeitados (10 `live_too_old`, 2 `finished`). |
+| `compare_reports.py` / `compare_reports.txt` | Relatório completo com o código do `main` e com a revisão final, à mesma hora `as_of`, com os mesmos dados e com o relógio real (`datetime.now`) congelado no mesmo instante nas duas construções, em 6 instantes de 12:58:11 a 13:40: idêntico fora de `brain.watch`; o `watch` perde só os 12 sinais do incidente (`live_too_old`) e mantém os sinais recentes. |
+| `replay_history.py` / `replay_history.json` | Os avisos de jogo do registo real reavaliados na hora real do envio: os 12 do incidente são rejeitados (10 `live_too_old`, 2 `finished`); os legítimos, antes e depois do incidente, continuam válidos. |
 
 Nenhum script escreve em `data/`; todos trabalham sobre cópias temporárias ou sobre o git.
