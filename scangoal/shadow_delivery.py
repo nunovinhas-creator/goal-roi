@@ -10,6 +10,7 @@ import json
 import math
 import os
 import tempfile
+import zipfile
 from contextlib import contextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -279,6 +280,129 @@ class DeliveryPublisher:
                 "scientifically_admitted": False,
                 "proves_runner_consumption": False,
             }
+
+
+    def export_outbox(self, destination, max_zip_bytes=5_000_000):
+        """Atomically export original unpushed Git commits and append-only journals.
+
+        Runner orchestration MUST save this ZIP even if a publish attempt failed,
+        and MUST restore it before reading fresh events. This module does not do
+        any GitHub Actions artifact upload by itself.
+        """
+        dest = Path(destination)
+        if dest.exists():
+            raise DeliveryError("outbox destination must be new")
+        if self.repo == dest.resolve() or self.repo in dest.resolve().parents:
+            raise DeliveryError("outbox must be outside publisher checkout")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with self.locked():
+            events, receipts = self._journal()
+            remote = _git(self.repo, "ls-remote", "origin", "refs/heads/"+BRANCH)
+            if not remote:
+                raise DeliveryError("remote branch missing")
+            remote_sha = remote.split()[0]
+            head = _git(self.repo, "rev-parse", "HEAD")
+            files = {}
+            for relative in (EVENTS, RECEIPTS):
+                path = self.repo/relative
+                if path.is_file():
+                    files[str(relative)] = path.read_bytes()
+            with tempfile.TemporaryDirectory(prefix="shadow-bridge-bundle-") as temp:
+                bundle = Path(temp)/"pending.bundle"
+                _git(self.repo, "bundle", "create", bundle, "refs/heads/"+BRANCH)
+                bundle_bytes = bundle.read_bytes()
+                payload = {"pending.bundle":bundle_bytes, **files}
+                manifest = {
+                    "version": 1, "branch": BRANCH,
+                    "remote_at_export_sha": remote_sha,
+                    "local_head_sha": head,
+                    "files_sha256": {key:hashlib.sha256(raw).hexdigest()
+                                     for key,raw in payload.items()},
+                    "events":len(events), "receipts":len(receipts),
+                    "synthetic_only_until_source_adapter_approved":True,
+                }
+                fd, tmp = tempfile.mkstemp(prefix=".shadow-bridge-",dir=str(dest.parent))
+                os.close(fd)
+                try:
+                    with zipfile.ZipFile(tmp,"w",compression=zipfile.ZIP_DEFLATED) as z:
+                        z.writestr("manifest.json",_canon(manifest))
+                        for name, raw in payload.items():
+                            z.writestr(name,raw)
+                    if Path(tmp).stat().st_size>max_zip_bytes:
+                        raise DeliveryError("outbox archive exceeds fixed free-storage budget")
+                    with open(tmp,"rb") as src:
+                        os.fsync(src.fileno())
+                    os.link(tmp,dest)
+                finally:
+                    Path(tmp).unlink(missing_ok=True)
+        return {"status":"exported","archive_sha256":hashlib.sha256(dest.read_bytes()).hexdigest(),
+                "events":len(events), "receipts":len(receipts),
+                "production_runner_recovery_verified":False}
+
+    def restore_outbox(self, archive, max_zip_bytes=5_000_000):
+        """Fail-closed restore into a fresh checkout before reading new signals."""
+        archive = Path(archive)
+        if archive.stat().st_size>max_zip_bytes:
+            raise DeliveryError("outbox ZIP too large")
+        with self.locked(), zipfile.ZipFile(archive) as z:
+            names = z.namelist()
+            expected_names = {"manifest.json","pending.bundle",str(EVENTS),str(RECEIPTS)}
+            if len(names)!=len(set(names)) or set(names)-expected_names:
+                raise DeliveryError("unexpected ZIP members")
+            if sum(i.file_size for i in z.infolist()) > MAX_BYTES*2:
+                raise DeliveryError("oversized expanded ZIP")
+            manifest = json.loads(z.read("manifest.json"))
+            if manifest.get("version")!=1 or manifest.get("branch")!=BRANCH:
+                raise DeliveryError("wrong delivery outbox schema/branch")
+            hashes = manifest.get("files_sha256")
+            if not isinstance(hashes,dict) or "pending.bundle" not in hashes:
+                raise DeliveryError("missing required bundle hash")
+            if set(hashes)!=(set(names)-{"manifest.json"}):
+                raise DeliveryError("missing or additional files")
+            payload = {name:z.read(name) for name in hashes}
+            if any(hashlib.sha256(raw).hexdigest()!=hashes[name]
+                   for name,raw in payload.items()):
+                raise DeliveryError("outbox file hashes do not match")
+            archived_events = [json.loads(line) for line in
+                               payload.get(str(EVENTS),b"").splitlines() if line]
+            archived_receipts = [json.loads(line) for line in
+                                 payload.get(str(RECEIPTS),b"").splitlines() if line]
+            _validate_events(archived_events)
+            _validate_receipts(archived_receipts,archived_events)
+            if (len(archived_events)!=manifest.get("events") or
+                    len(archived_receipts)!=manifest.get("receipts")):
+                raise DeliveryError("outbox count mismatch")
+            existing_events, existing_receipts = self._journal()
+            if (archived_events[:len(existing_events)]!=existing_events or
+                    archived_receipts[:len(existing_receipts)]!=existing_receipts):
+                raise DeliveryError("restore would rewrite existing journal prefix")
+            remote = _git(self.repo,"ls-remote","origin","refs/heads/"+BRANCH)
+            if not remote or remote.split()[0]!=manifest.get("remote_at_export_sha"):
+                raise DeliveryError("remote moved; quarantine archived outbox")
+            current = _git(self.repo,"rev-parse","HEAD")
+            if current != manifest.get("remote_at_export_sha"):
+                raise DeliveryError("restore checkout not at exporter remote base")
+            with tempfile.TemporaryDirectory(prefix="shadow-bridge-import-") as dirname:
+                bundle=Path(dirname)/"pending.bundle"
+                bundle.write_bytes(payload["pending.bundle"])
+                _git(self.repo,"bundle","verify",bundle)
+                _git(self.repo,"fetch",bundle,"refs/heads/"+BRANCH)
+                fetched=_git(self.repo,"rev-parse","FETCH_HEAD")
+                if fetched!=manifest.get("local_head_sha"):
+                    raise DeliveryError("bundle head does not match export")
+                if fetched!=current:
+                    _git(self.repo,"merge","--ff-only","FETCH_HEAD")
+            for relative, entries in ((EVENTS,archived_events),
+                                      (RECEIPTS,archived_receipts)):
+                if str(relative) in payload:
+                    _atomic(self.repo/relative,entries)
+            verified_events,verified_receipts=self._journal()
+            if verified_events!=archived_events or verified_receipts!=archived_receipts:
+                raise DeliveryError("restored data diverged")
+            return {"status":"restored","events":len(verified_events),
+                    "receipts":len(verified_receipts),
+                    "resumption_requires_publication":True,
+                    "production_runner_recovery_verified":False}
 
 
 def audit(repo, now=None):
