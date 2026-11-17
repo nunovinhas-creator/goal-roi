@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T12:49:32+00:00",
+ "generated_at_utc": "2026-11-17T12:51:54+00:00",
  "messages": 1254,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2079,
+  "versions": 2080,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T12:48:59+00:00",
+  "last_collected_at_utc": "2026-11-17T12:51:54+00:00",
   "hl_results": 71,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 40,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T12:48:59+00:00",
+  "collector_last_run_utc": "2026-11-17T12:51:54+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,43 +448,43 @@
   "stake_original_seen": 154,
   "stake_no_score_after_kickoff": 29,
   "stake_sent_45_after_kickoff": 49,
-  "goal_lists": 374,
+  "goal_lists": 375,
   "goal_lists_consistent": 218
  },
  "unique_bets": 696,
- "settled_bets": 552,
+ "settled_bets": 554,
  "unsettled_market": 59,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
   "BETFAIR/live/mkt<10K": {
    "bets": 72,
-   "settled": 31,
-   "matches": 31,
+   "settled": 32,
+   "matches": 32,
    "wins": 14,
    "pushes": 0,
-   "units": 6.67,
-   "avg_odds": 2.722,
+   "units": 5.67,
+   "avg_odds": 2.733,
    "roi": {
     "odd-0%": {
-     "roi": 0.2152,
+     "roi": 0.1772,
      "ci95": [
-      -0.2877,
-      0.718
+      -0.3153,
+      0.6697
      ]
     },
     "odd-2%": {
-     "roi": 0.1909,
+     "roi": 0.1536,
      "ci95": [
-      -0.3019,
-      0.6836
+      -0.329,
+      0.6363
      ]
     },
     "odd-5%": {
-     "roi": 0.1544,
+     "roi": 0.1183,
      "ci95": [
-      -0.3233,
-      0.6321
+      -0.3496,
+      0.5862
      ]
     }
    },
@@ -519,7 +519,8 @@
     6.91,
     8.67,
     7.67,
-    6.67
+    6.67,
+    5.67
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1104,32 +1105,32 @@
   },
   "STAKE_LOAD/live": {
    "bets": 59,
-   "settled": 38,
-   "matches": 27,
-   "wins": 20,
+   "settled": 39,
+   "matches": 28,
+   "wins": 21,
    "pushes": 0,
-   "units": -2.98,
+   "units": -2.13,
    "avg_odds": 1.857,
    "roi": {
     "odd-0%": {
-     "roi": -0.0784,
+     "roi": -0.0546,
      "ci95": [
-      -0.3701,
-      0.2133
+      -0.3431,
+      0.2339
      ]
     },
     "odd-2%": {
-     "roi": -0.0969,
+     "roi": -0.0735,
      "ci95": [
-      -0.3827,
-      0.189
+      -0.3562,
+      0.2092
      ]
     },
     "odd-5%": {
-     "roi": -0.1245,
+     "roi": -0.1019,
      "ci95": [
-      -0.4016,
-      0.1526
+      -0.3759,
+      0.1722
      ]
     }
    },
@@ -1171,7 +1172,8 @@
     -1.43,
     -2.43,
     -1.98,
-    -2.98
+    -1.13,
+    -2.13
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1400,40 +1402,40 @@
  "accuracy": {
   "BETFAIR/live": {
    "signals": 132,
-   "with_result": 76,
+   "with_result": 77,
    "hits": 31,
-   "misses": 45,
+   "misses": 46,
    "pushes": 0,
    "eff_hits": 31.0,
-   "eff_misses": 45.0,
+   "eff_misses": 46.0,
    "vote_hits": 30.5,
-   "vote_misses": 44.5,
-   "vote_break_even": 0.3642,
-   "games": 75,
+   "vote_misses": 45.5,
+   "vote_break_even": 0.3637,
+   "games": 76,
    "no_source": 37,
    "unsettleable": 0,
-   "hit_rate": 0.4079,
+   "hit_rate": 0.4026,
    "ci95": [
-    0.3044,
-    0.5202
+    0.3002,
+    0.5142
    ],
-   "avg_odds": 4.57,
-   "break_even": 0.3629,
+   "avg_odds": 4.551,
+   "break_even": 0.3624,
    "baseline": false,
-   "roi_announced_odds": 0.2546,
+   "roi_announced_odds": 0.2383,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 12.7,
+   "per_day": 12.8,
    "days_to_hint": 0,
    "days_to_conclusion": 18,
-   "prudent_rate": 0.4017,
-   "prob_above": 0.7569,
-   "edge": 0.0375,
+   "prudent_rate": 0.3969,
+   "prob_above": 0.7323,
+   "edge": 0.0332,
    "edge_ci": [
-    -0.0482,
-    0.1258
+    -0.0517,
+    0.1209
    ],
-   "prob_above_cut": 0.7102
+   "prob_above_cut": 0.6832
   },
   "BETFAIR/pre": {
    "signals": 26,
@@ -1622,40 +1624,40 @@
   },
   "STAKE_LOAD": {
    "signals": 164,
-   "with_result": 101,
-   "hits": 43,
+   "with_result": 102,
+   "hits": 44,
    "misses": 55,
    "pushes": 3,
-   "eff_hits": 42.5,
+   "eff_hits": 43.5,
    "eff_misses": 54.5,
-   "vote_hits": 19.45,
+   "vote_hits": 20.45,
    "vote_misses": 30.47,
-   "vote_break_even": 0.5455,
-   "games": 50,
+   "vote_break_even": 0.5454,
+   "games": 51,
    "no_source": 0,
    "unsettleable": 52,
-   "hit_rate": 0.4381,
+   "hit_rate": 0.4439,
    "ci95": [
-    0.3436,
-    0.5374
+    0.3495,
+    0.5425
    ],
-   "avg_odds": 1.944,
-   "break_even": 0.5452,
+   "avg_odds": 1.943,
+   "break_even": 0.5451,
    "baseline": false,
-   "roi_announced_odds": -0.2105,
+   "roi_announced_odds": -0.2001,
    "seen_late": 9,
    "by_bot_mark": 20,
-   "per_day": 16.3,
+   "per_day": 16.5,
    "days_to_hint": 0,
    "days_to_conclusion": 13,
-   "prudent_rate": 0.4156,
-   "prob_above": 0.0217,
-   "edge": -0.1299,
+   "prudent_rate": 0.4252,
+   "prob_above": 0.0298,
+   "edge": -0.1202,
    "edge_ci": [
-    -0.2322,
-    -0.0243
+    -0.2222,
+    -0.0153
    ],
-   "prob_above_cut": 0.0141
+   "prob_above_cut": 0.0197
   },
   "TOTALS_FORM": {
    "signals": 56,
@@ -1719,7 +1721,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 16.5,
+   "per_day": 16.4,
    "days_to_hint": 0,
    "days_to_conclusion": 15,
    "prudent_rate": 0.8395,
@@ -1773,7 +1775,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 76,
+    "n": 77,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -1823,22 +1825,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 98,
+    "n": 99,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 58,
-     "hit_rate": 0.4138,
-     "break_even": 0.5417,
-     "roi": -0.2717
+     "n": 59,
+     "hit_rate": 0.4068,
+     "break_even": 0.5421,
+     "roi": -0.2841
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.4744,
-     "break_even": 0.5501,
-     "roi": -0.1376
+     "hit_rate": 0.5,
+     "break_even": 0.5496,
+     "roi": -0.0914
     },
-    "z": 0.51
+    "z": 0.84
    },
    {
     "type": "TOTALS_FORM",
@@ -2379,33 +2381,6 @@
     "value": "feminino"
    },
    {
-    "n": 35,
-    "signals": 63,
-    "hits": 12,
-    "misses": 23,
-    "hit_rate": 0.3429,
-    "ci95": [
-     0.2083,
-     0.5085
-    ],
-    "break_even": 0.2279,
-    "roi": 0.4743,
-    "games": 35,
-    "bets": 35,
-    "unidentified": 0,
-    "prudent_rate": 0.3173,
-    "prob_above": 0.9078,
-    "edge": 0.0894,
-    "edge_ci": [
-     -0.0188,
-     0.2069
-    ],
-    "prob_above_cut": 0.8945,
-    "family": "Betfair",
-    "dimension": "Faixa de odd",
-    "value": "odd acima de 3,00"
-   },
-   {
     "n": 20,
     "signals": 28,
     "hits": 14,
@@ -2485,6 +2460,33 @@
     "family": "Forma de golos",
     "dimension": "Competição",
     "value": "feminino"
+   },
+   {
+    "n": 36,
+    "signals": 63,
+    "hits": 12,
+    "misses": 24,
+    "hit_rate": 0.3333,
+    "ci95": [
+     0.2021,
+     0.4967
+    ],
+    "break_even": 0.2306,
+    "roi": 0.4333,
+    "games": 36,
+    "bets": 36,
+    "unidentified": 0,
+    "prudent_rate": 0.311,
+    "prob_above": 0.8855,
+    "edge": 0.0804,
+    "edge_ci": [
+     -0.0259,
+     0.1962
+    ],
+    "prob_above_cut": 0.8697,
+    "family": "Betfair",
+    "dimension": "Faixa de odd",
+    "value": "odd acima de 3,00"
    },
    {
     "n": 98,
@@ -2649,33 +2651,6 @@
     "value": "2.ª parte"
    },
    {
-    "n": 16,
-    "signals": 25,
-    "hits": 9,
-    "misses": 7,
-    "hit_rate": 0.5625,
-    "ci95": [
-     0.3318,
-     0.769
-    ],
-    "break_even": 0.4337,
-    "roi": 0.58,
-    "games": 16,
-    "bets": 16,
-    "unidentified": 0,
-    "prudent_rate": 0.513,
-    "prob_above": 0.7902,
-    "edge": 0.0793,
-    "edge_ci": [
-     -0.0799,
-     0.2372
-    ],
-    "prob_above_cut": 0.7632,
-    "family": "Betfair",
-    "dimension": "Competição",
-    "value": "jovens"
-   },
-   {
     "n": 111,
     "signals": 136,
     "hits": 66,
@@ -2757,33 +2732,6 @@
     "value": "liga"
    },
    {
-    "n": 76,
-    "signals": 132,
-    "hits": 31,
-    "misses": 45,
-    "hit_rate": 0.4079,
-    "ci95": [
-     0.3044,
-     0.5202
-    ],
-    "break_even": 0.3629,
-    "roi": 0.2546,
-    "games": 75,
-    "bets": 76,
-    "unidentified": 0,
-    "prudent_rate": 0.4017,
-    "prob_above": 0.7569,
-    "edge": 0.0375,
-    "edge_ci": [
-     -0.0482,
-     0.1258
-    ],
-    "prob_above_cut": 0.7102,
-    "family": "Betfair",
-    "dimension": "Momento",
-    "value": "durante o jogo"
-   },
-   {
     "n": 45,
     "signals": 45,
     "hits": 32,
@@ -2811,31 +2759,58 @@
     "value": "odd 1,50 a 2,00"
    },
    {
-    "n": 51,
-    "signals": 95,
-    "hits": 24,
-    "misses": 27,
-    "hit_rate": 0.4706,
+    "n": 17,
+    "signals": 25,
+    "hits": 9,
+    "misses": 8,
+    "hit_rate": 0.5294,
     "ci95": [
-     0.3405,
-     0.6048
+     0.3096,
+     0.7384
     ],
-    "break_even": 0.4232,
-    "roi": 0.1233,
-    "games": 51,
-    "bets": 51,
+    "break_even": 0.4272,
+    "roi": 0.4871,
+    "games": 17,
+    "bets": 17,
     "unidentified": 0,
-    "prudent_rate": 0.4628,
-    "prob_above": 0.7306,
-    "edge": 0.0396,
+    "prudent_rate": 0.4915,
+    "prob_above": 0.7468,
+    "edge": 0.0644,
     "edge_ci": [
-     -0.064,
-     0.1445
+     -0.091,
+     0.2205
     ],
-    "prob_above_cut": 0.6838,
+    "prob_above_cut": 0.7168,
     "family": "Betfair",
-    "dimension": "Tamanho do mercado",
-    "value": "menos de 10 mil $"
+    "dimension": "Competição",
+    "value": "jovens"
+   },
+   {
+    "n": 77,
+    "signals": 132,
+    "hits": 31,
+    "misses": 46,
+    "hit_rate": 0.4026,
+    "ci95": [
+     0.3002,
+     0.5142
+    ],
+    "break_even": 0.3624,
+    "roi": 0.2383,
+    "games": 76,
+    "bets": 77,
+    "unidentified": 0,
+    "prudent_rate": 0.3969,
+    "prob_above": 0.7326,
+    "edge": 0.0333,
+    "edge_ci": [
+     -0.0517,
+     0.121
+    ],
+    "prob_above_cut": 0.6835,
+    "family": "Betfair",
+    "dimension": "Momento",
+    "value": "durante o jogo"
    },
    {
     "n": 59,
@@ -2917,6 +2892,33 @@
     "family": "Betfair",
     "dimension": "Quota de mercado",
     "value": "80 % ou mais"
+   },
+   {
+    "n": 34,
+    "signals": 53,
+    "hits": 21,
+    "misses": 13,
+    "hit_rate": 0.6176,
+    "ci95": [
+     0.4504,
+     0.761
+    ],
+    "break_even": 0.5351,
+    "roi": 0.1138,
+    "games": 29,
+    "bets": 34,
+    "unidentified": 0,
+    "prudent_rate": 0.571,
+    "prob_above": 0.7136,
+    "edge": 0.0441,
+    "edge_ci": [
+     -0.0869,
+     0.1708
+    ],
+    "prob_above_cut": 0.6666,
+    "family": "Stake",
+    "dimension": "Momento do aviso",
+    "value": "até 45 min depois do início"
    },
    {
     "n": 34,
@@ -3113,28 +3115,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 309,
+    "n": 310,
     "signals": 396,
-    "hits": 178,
+    "hits": 179,
     "misses": 131,
-    "hit_rate": 0.563,
+    "hit_rate": 0.5645,
     "ci95": [
-     0.5062,
-     0.6182
+     0.5078,
+     0.6196
     ],
-    "break_even": 0.5793,
-    "roi": -0.0189,
-    "games": 217,
-    "bets": 304,
+    "break_even": 0.5792,
+    "roi": -0.0164,
+    "games": 218,
+    "bets": 305,
     "unidentified": 0,
-    "prudent_rate": 0.576,
-    "prob_above": 0.5012,
-    "edge": -0.0001,
+    "prudent_rate": 0.5779,
+    "prob_above": 0.5263,
+    "edge": 0.002,
     "edge_ci": [
-     -0.0557,
-     0.0546
+     -0.0534,
+     0.0566
     ],
-    "prob_above_cut": 0.3641,
+    "prob_above_cut": 0.3878,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -3163,43 +3165,43 @@
     "band": "odd 2,00 a 3,00"
    },
    {
-    "n": 70,
+    "n": 71,
     "signals": 102,
     "hits": 17,
-    "misses": 53,
-    "hit_rate": 0.2446,
+    "misses": 54,
+    "hit_rate": 0.2411,
     "ci95": [
-     0.1587,
-     0.3573
+     0.1564,
+     0.3527
     ],
-    "break_even": 0.2509,
-    "roi": -0.021,
-    "games": 54,
-    "bets": 70,
+    "break_even": 0.2519,
+    "roi": -0.0348,
+    "games": 55,
+    "bets": 71,
     "unidentified": 0,
-    "prudent_rate": 0.2817,
-    "prob_above": 0.7297,
-    "edge": 0.0359,
+    "prudent_rate": 0.2776,
+    "prob_above": 0.6968,
+    "edge": 0.0304,
     "edge_ci": [
-     -0.0521,
-     0.1317
+     -0.0565,
+     0.1251
     ],
-    "prob_above_cut": 0.6978,
+    "prob_above_cut": 0.663,
     "band": "odd acima de 3,00"
    }
   ],
   "luck": {
-   "n": 552,
-   "units": 0.74,
-   "luck_sd": 27.49,
-   "z": 0.03,
+   "n": 554,
+   "units": 0.59,
+   "luck_sd": 27.54,
+   "z": 0.02,
    "max_drawdown": 25.98,
    "longest_losing_run": 7
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 90 em 140, precisa de 55 %, e a probabilidade de estar acima do mínimo é 98 %.",
-   "O mais fraco é aposta grande na Stake: 43 em 98, precisa de 55 %, probabilidade de estar acima do mínimo 2 %.",
-   "Saldo de +0,74 unidades em 552 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±55,0 unidades).",
+   "O mais fraco é aposta grande na Stake: 44 em 99, precisa de 55 %, probabilidade de estar acima do mínimo 3 %.",
+   "Saldo de +0,59 unidades em 554 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±55,1 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 18 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 43 em 47 (91 % contra 58 % necessários). Indício positivo.",
    "Jogo aberto, dia = dia de semana: 33 em 42 (79 % contra 55 % necessários). Indício positivo.",
@@ -7621,7 +7623,7 @@
     "contraditório": 13,
     "evitar": 4
    },
-   "generated_utc": "2026-11-17T12:49:49+00:00",
+   "generated_utc": "2026-11-17T12:52:12+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -22266,12 +22268,12 @@
     "phase": "live",
     "level": 1,
     "signals": 127,
-    "n": 72,
+    "n": 73,
     "hits": 28,
-    "hit_rate": 0.3889,
-    "break_even": 0.3523,
-    "roi": 0.2326,
-    "prob_above": 0.7038
+    "hit_rate": 0.3836,
+    "break_even": 0.3519,
+    "roi": 0.2158,
+    "prob_above": 0.6765
    },
    {
     "phase": "live",
@@ -22332,30 +22334,30 @@
   "accuracy": {
    "BETFAIR/live": {
     "signals": 127,
-    "with_result": 72,
+    "with_result": 73,
     "hits": 28,
-    "misses": 44,
+    "misses": 45,
     "pushes": 0,
     "eff_hits": 28.0,
-    "eff_misses": 44.0,
+    "eff_misses": 45.0,
     "vote_hits": 27.5,
-    "vote_misses": 43.5,
-    "vote_break_even": 0.3535,
-    "games": 71,
+    "vote_misses": 44.5,
+    "vote_break_even": 0.3531,
+    "games": 72,
     "no_source": 36,
     "unsettleable": 0,
-    "hit_rate": 0.3889,
+    "hit_rate": 0.3836,
     "ci95": [
-     0.2847,
-     0.5044
+     0.2805,
+     0.4983
     ],
-    "avg_odds": 4.714,
-    "break_even": 0.3523,
+    "avg_odds": 4.692,
+    "break_even": 0.3519,
     "baseline": false,
-    "roi_announced_odds": 0.2326,
+    "roi_announced_odds": 0.2158,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 12.1,
+    "per_day": 12.2,
     "days_to_hint": 0,
     "days_to_conclusion": 19
    },
@@ -22448,30 +22450,30 @@
    },
    "STAKE_LOAD": {
     "signals": 154,
-    "with_result": 92,
-    "hits": 40,
+    "with_result": 93,
+    "hits": 41,
     "misses": 49,
     "pushes": 3,
-    "eff_hits": 39.5,
+    "eff_hits": 40.5,
     "eff_misses": 48.5,
-    "vote_hits": 16.95,
+    "vote_hits": 17.95,
     "vote_misses": 25.97,
     "vote_break_even": 0.5399,
-    "games": 43,
+    "games": 44,
     "no_source": 0,
     "unsettleable": 51,
-    "hit_rate": 0.4489,
+    "hit_rate": 0.4551,
     "ci95": [
-     0.3493,
-     0.5527
+     0.3556,
+     0.5582
     ],
-    "avg_odds": 1.965,
+    "avg_odds": 1.964,
     "break_even": 0.5418,
     "baseline": false,
-    "roi_announced_odds": -0.1882,
+    "roi_announced_odds": -0.177,
     "seen_late": 0,
     "by_bot_mark": 19,
-    "per_day": 18.2,
+    "per_day": 18.4,
     "days_to_hint": 0,
     "days_to_conclusion": 12
    },
@@ -22537,7 +22539,7 @@
   "regime": [
    {
     "type": "BETFAIR/live",
-    "n": 72,
+    "n": 73,
     "needed": 80,
     "state": "poucos dados"
    },
@@ -22587,22 +22589,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 89,
+    "n": 90,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 49,
-     "hit_rate": 0.4286,
-     "break_even": 0.535,
-     "roi": -0.241
+     "n": 50,
+     "hit_rate": 0.42,
+     "break_even": 0.5356,
+     "roi": -0.2562
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.4744,
-     "break_even": 0.5501,
-     "roi": -0.1376
+     "hit_rate": 0.5,
+     "break_even": 0.5496,
+     "roi": -0.0914
     },
-    "z": 0.29
+    "z": 0.63
    },
    {
     "type": "TOTALS_FORM",
@@ -22655,32 +22657,32 @@
   },
   "Q2 Betfair: sem reforço (sinal único)": {
    "bets": 97,
-   "settled": 52,
-   "matches": 52,
+   "settled": 53,
+   "matches": 53,
    "wins": 14,
    "pushes": 0,
-   "units": 0.96,
-   "avg_odds": 5.599,
+   "units": -0.04,
+   "avg_odds": 5.552,
    "roi": {
     "odd-0%": {
-     "roi": 0.0185,
+     "roi": -0.0008,
      "ci95": [
-      -0.4986,
-      0.5356
+      -0.5094,
+      0.5079
      ]
     },
     "odd-2%": {
-     "roi": -0.0019,
+     "roi": -0.0207,
      "ci95": [
-      -0.5087,
-      0.5048
+      -0.5192,
+      0.4777
      ]
     },
     "odd-5%": {
-     "roi": -0.0325,
+     "roi": -0.0507,
      "ci95": [
-      -0.5237,
-      0.4588
+      -0.5339,
+      0.4325
      ]
     }
    },
@@ -22735,32 +22737,32 @@
   },
   "Q3 Betfair: odd [2.50; ∞)": {
    "bets": 102,
-   "settled": 56,
-   "matches": 55,
+   "settled": 57,
+   "matches": 56,
    "wins": 19,
    "pushes": 0,
-   "units": 15.3,
-   "avg_odds": 5.663,
+   "units": 14.3,
+   "avg_odds": 5.618,
    "roi": {
     "odd-0%": {
-     "roi": 0.2732,
+     "roi": 0.2509,
      "ci95": [
-      -0.2365,
-      0.7829
+      -0.2517,
+      0.7535
      ]
     },
     "odd-2%": {
-     "roi": 0.2477,
+     "roi": 0.2259,
      "ci95": [
-      -0.2518,
-      0.7473
+      -0.2667,
+      0.7184
      ]
     },
     "odd-5%": {
-     "roi": 0.2096,
+     "roi": 0.1883,
      "ci95": [
-      -0.2747,
-      0.6938
+      -0.2891,
+      0.6658
      ]
     }
    },
@@ -22939,32 +22941,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 696,
-   "settled": 552,
-   "matches": 314,
-   "wins": 262,
+   "settled": 554,
+   "matches": 315,
+   "wins": 263,
    "pushes": 36,
-   "units": 0.74,
+   "units": 0.59,
    "avg_odds": 2.369,
    "roi": {
     "odd-0%": {
-     "roi": 0.0013,
+     "roi": 0.0011,
      "ci95": [
       -0.0875,
-      0.0902
+      0.0896
      ]
     },
     "odd-2%": {
-     "roi": -0.0169,
+     "roi": -0.0172,
      "ci95": [
-      -0.1041,
-      0.0702
+      -0.104,
+      0.0696
      ]
     },
     "odd-5%": {
-     "roi": -0.0443,
+     "roi": -0.0446,
      "ci95": [
       -0.1288,
-      0.0402
+      0.0396
      ]
     }
    },
@@ -22993,9 +22995,12 @@
    "match": "Netherlands U19 — Croatia U19",
    "selection": "Netherlands U19",
    "odds": 3.1,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    3
+   ],
+   "w": -1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -23126,9 +23131,12 @@
    "match": "Netherlands U19 — Croatia U19",
    "selection": "Over 2.5",
    "odds": 1.85,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    3
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -26407,9 +26415,33 @@
      "market": "1X2"
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     19,
+     "0-1"
+    ],
+    [
+     49,
+     "1-1"
+    ],
+    [
+     57,
+     "2-1"
+    ],
+    [
+     65,
+     "2-2"
+    ],
+    [
+     80,
+     "2-3"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    2,
+    3
+   ]
   },
   "sheff-wed-u21-vs-hull-city-u21-20261117": {
    "teams": [
@@ -31968,14 +32000,34 @@
    "o": 1.65
   },
   {
+   "d": "2026-11-17T11:08:05+00:00",
+   "u": 2.59,
+   "g": 0.85,
+   "w": 1.0,
+   "t": "STAKE_LOAD",
+   "m": "Netherlands U19 — Croatia U19",
+   "s": "Over 2.5",
+   "o": 1.85
+  },
+  {
    "d": "2026-11-17T11:27:05+00:00",
-   "u": 0.74,
+   "u": 1.59,
    "g": -1.0,
    "w": -1.0,
    "t": "STAKE_LOAD",
    "m": "Singapore — Brazil",
    "s": "Over 7.75",
    "o": 1.65
+  },
+  {
+   "d": "2026-11-17T12:24:33+00:00",
+   "u": 0.59,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "BETFAIR/live",
+   "m": "Netherlands U19 — Croatia U19",
+   "s": "Netherlands U19",
+   "o": 3.1
   }
  ],
  "daily": [
@@ -32023,9 +32075,9 @@
   },
   {
    "bets": 37,
-   "settled": 7,
-   "wins": 3,
-   "units": 0.22,
+   "settled": 9,
+   "wins": 4,
+   "units": 0.07,
    "day": "2026-11-17"
   }
  ]
