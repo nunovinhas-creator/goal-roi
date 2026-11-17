@@ -38,7 +38,9 @@ jobs:
           TG_SESSION: ${{ secrets.TG_SESSION }}
           TG_SCANGOAL: ${{ secrets.TG_SCANGOAL }}
         run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
+      # Fontes complementares: uma falha da API sai com código 3 e fica assinalada no passo, sem parar a recolha.
       - name: Results from Highlightly (every 90 minutes at most; skipped without key)
+        continue-on-error: true
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           HL_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '90' }}
@@ -48,6 +50,7 @@ jobs:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
         run: python -u -m scangoal.details_hl
       - name: Results from BSD (hourly at most; skipped without key)
+        continue-on-error: true
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
           BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
@@ -59,7 +62,9 @@ jobs:
         run: python -u -m scangoal.llm
       - name: Report (fixed rules)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      # Entrega falhada, incerta ou não publicada: código 3 (já gravada, nunca reenviada); o commit de dados continua.
       - name: Telegram notices through the user's bot (skipped without keys)
+        continue-on-error: true
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
@@ -71,12 +76,6 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
-      - name: Tell the user when a collection fails (at most once an hour)
-        if: ${{ failure() }}
-        env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python -u -m scangoal.notify --failure
       # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
       # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
       - name: Fast reads every 2 minutes until the next collection (read-only)
@@ -103,9 +102,18 @@ jobs:
       # O agendamento do GitHub não dispara neste repositório. Cada execução lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
       - name: Start the next collection
+        id: next
         if: ${{ !cancelled() && github.ref_name == 'main' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ steps.fast.outcome }}" = "skipped" ]; then sleep 480; fi
           gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main
+      # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
+      - name: Tell the user when a collection fails (at most once an hour)
+        if: ${{ failure() }}
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}
+        run: python -u -m scangoal.notify --failure

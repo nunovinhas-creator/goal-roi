@@ -82,6 +82,15 @@ class DeliveryUncertain(NotifyError):
     """Não se sabe se a mensagem foi publicada (tempo esgotado, ligação cortada, resposta ilegível, erro 5xx)."""
 
 
+class DeliveryIncomplete(NotifyError):
+    """A execução terminou com avisos falhados, incertos ou retirados. Já estão gravados no estado e no registo; nada é
+    reenviado por causa disto. Serve só para a falha não passar por sucesso (código de saída do passo)."""
+
+
+FAILED_EXIT = 3     # falha efetiva: o passo fica assinalado (continue-on-error no workflow), a recolha continua
+PROBLEMS = ('failed', 'uncertain', 'withdrawn')
+
+
 def send(token, chat, text):
     """Um só pedido. Devolve só com confirmação positiva (`ok: true`); senão DeliveryFailed ou DeliveryUncertain."""
     req = Request('https://api.telegram.org/bot%s/sendMessage' % token,
@@ -1274,11 +1283,29 @@ def run(sender=send, now=None, env=None, checkpoint=None):
     return state
 
 
+def run_checked():
+    """run() dos pontos de entrada (CLI e leituras rápidas). Igual a run(), mas, depois de tudo gravado, levanta
+    DeliveryIncomplete se esta execução acrescentou entregas falhadas, incertas ou retiradas. Nunca reenvia nada."""
+    saved = load_json(data_dir() / STATE_NAME, None)
+    before = saved.get('delivery_counts') if isinstance(saved, dict) else None
+    before = before if isinstance(before, dict) else {}
+    state = run()
+    after = state.get('delivery_counts') if isinstance(state, dict) else None
+    after = after if isinstance(after, dict) else {}
+    count = lambda counts, k: counts[k] if _int(counts.get(k)) else 0
+    added = {k: count(after, k) - count(before, k) for k in PROBLEMS if count(after, k) > count(before, k)}
+    if added:
+        print('NOTIFY_INCOMPLETE', json.dumps(added, sort_keys=True))
+        raise DeliveryIncomplete(', '.join(sorted(added)))
+    return state
+
+
 def failure(sender=send, now=None, env=None):
-    """Chamado só quando a recolha falha. No máximo um aviso por hora (primeiros 10 minutos de cada hora)."""
+    """Chamado só quando a recolha falha. No máximo um aviso por hora (primeiros 10 minutos de cada hora), exceto quando
+    falhou o lançamento da execução seguinte (NEXT_COLLECTION_FAILED=1): aí a cadeia parou e não haverá outra oportunidade."""
     env = os.environ if env is None else env
     token, chat, now = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip(), now or datetime.now(UTC)
-    if token and chat and now.minute < 10:
+    if token and chat and (now.minute < 10 or env.get('NEXT_COLLECTION_FAILED', '').strip() == '1'):
         sender(token, chat, 'A recolha do goal-roi falhou às %s UTC. Vê as execuções em https://github.com/nunovinhas-creator/goal-roi/actions' % now.strftime('%H:%M'))
         return True
     return False
@@ -1366,10 +1393,11 @@ def main():
             sys.exit(1)
         return
     try:
-        failure() if '--failure' in sys.argv else run()
+        failure() if '--failure' in sys.argv else run_checked()
     except Exception as exc:      # só o tipo do erro; nunca o token
         print('NOTIFY_FAILED', type(exc).__name__)
-    sys.exit(0)
+        sys.exit(FAILED_EXIT)     # o estado e o registo já estão gravados; o commit de dados continua (continue-on-error)
+    sys.exit(0)                   # avisos enviados, nada a enviar ou sem chaves
 
 
 if __name__ == '__main__':

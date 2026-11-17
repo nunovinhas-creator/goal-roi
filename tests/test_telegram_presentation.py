@@ -1407,7 +1407,8 @@ class P2_StateLoss(unittest.TestCase):
                 patch.object(notify.sys, 'argv', ['notify']), redirect_stdout(io.StringIO()) as out:
             with self.assertRaises(SystemExit) as code:
                 notify.main()
-        self.assertEqual(code.exception.code, 0)
+        self.assertEqual(code.exception.code, notify.FAILED_EXIT)   # visible failure; the workflow step tolerates it
+        assert_notify_step_tolerated(self)
         real.assert_not_called()
         self.assertIn('NOTIFY_STATE_MISSING', out.getvalue())
         self.assertIn('NOTIFY_FAILED StateMissing', out.getvalue())
@@ -1450,6 +1451,14 @@ class P2_StateLoss(unittest.TestCase):
         d = Data(self, None, report(watch=[entry('m1')]))
         with self.assertRaises(notify.StateMissing):
             notify.preview(d.path / 'notify_state.json', d.path / 'report.json', NOW)
+
+
+def assert_notify_step_tolerated(test):
+    """A failing notify step never breaks the collection: `continue-on-error`, so "Commit data" still runs."""
+    wf = (Path(__file__).resolve().parents[1] / '.github' / 'workflows' / 'collect.yml').read_text(encoding='utf-8')
+    step = wf.split("      - name: Telegram notices through the user's bot (skipped without keys)\n", 1)[1].split('      - name: ', 1)[0]
+    test.assertIn('        continue-on-error: true\n', step)
+    test.assertIn('run: python -u -m scangoal.notify\n', step)
 
 
 class P2R_ResetStateWithoutLog(unittest.TestCase):
@@ -1510,7 +1519,8 @@ class P2R_ResetStateWithoutLog(unittest.TestCase):
                 patch.object(notify.sys, 'argv', ['notify']), redirect_stdout(io.StringIO()) as out:
             with self.assertRaises(SystemExit) as code:
                 notify.main()
-        self.assertEqual(code.exception.code, 0)
+        self.assertEqual(code.exception.code, notify.FAILED_EXIT)   # visible failure; the workflow step tolerates it
+        assert_notify_step_tolerated(self)
         real.assert_not_called()
         self.assertIn('NOTIFY_FAILED StateRegressed', out.getvalue())
 

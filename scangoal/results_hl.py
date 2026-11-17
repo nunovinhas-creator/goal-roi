@@ -118,12 +118,16 @@ def run(fetch=request_json, now=None, token=None):
     return state
 
 
+FAILED_EXIT = 3     # falha efetiva da API: o passo fica assinalado (continue-on-error no workflow), a recolha continua
+
+
 def main():
     try:
         run()
     except HLError as exc:
         print('HL_FAILED', exc)      # a recolha e o relatório continuam sem a Highlightly
-    sys.exit(0)
+        sys.exit(FAILED_EXIT)
+    sys.exit(0)                      # consulta feita, omitida pelo intervalo mínimo ou sem chave
 
 
 if __name__ == '__main__':
