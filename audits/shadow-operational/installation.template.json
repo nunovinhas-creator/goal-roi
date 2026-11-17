@@ -12,8 +12,9 @@
   "maximum_capture_age_seconds": 120,
   "maximum_publication_delay_seconds": 300,
   "poll_seconds": 10,
-  "maximum_existing_job_seconds": 1080,
-  "maximum_failure_outbox_bytes": 5000000,
-  "maximum_failure_artifact_retention_days": 1,
+  "requires_independent_runner_concurrency": true,
+  "example_supervisor_seconds": 480,
+  "outbox_reserve_seconds": 15,
+  "maximum_outbox_bytes": 5000000,
   "production_observations": 0
 }
