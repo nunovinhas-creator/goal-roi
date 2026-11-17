@@ -21,6 +21,11 @@ Causas:
 - Barreira 1: `brain.build(..., as_of=now)` só põe em `watch` oportunidades atuais (e marca `phase` e `finished`).
 - Barreira 2: `notify.game_notices` aplica a mesma regra, na hora do envio, a TODOS os níveis, antes de qualquer
   marcação; um sinal rejeitado nunca é marcado como avisado e nunca fica em fila.
+- Barreira 3 (ressalva da auditoria): `notify.deliver` revalida cada aviso de aposta com o relógio real da execução
+  (`run_clock`: início + tempo monótono decorrido) antes de gravar a intenção (`pending -> expired`, sem efeitos) e depois
+  de a intenção estar publicada no git, imediatamente antes do Telegram (`intent -> expired`, sem envio, efeitos da
+  intenção publicada mantidos para coincidir com o que `reconcile` reconstrói). Resumos, estados, regimes e boas-vindas
+  não são revalidados.
 
 ## Ficheiros
 
@@ -29,7 +34,9 @@ Causas:
 | `make_fixture.py` | Gera `tests/fixtures/incident_2026_11_17/` a partir do git (relatório 66d7fcb, estado e06c1f2, registo 18488a2). |
 | `tests_before_fix.txt` | `tests/test_stale_notices.py` com `notify.py`/`brain.py` originais: 18 falhas + 1 erro em 26. |
 | `tests_after_fix.txt` | O mesmo ficheiro depois da correção: 26/26 OK. |
-| `full_suite_after_fix.txt` | Suite completa: 529/529 OK. |
+| `full_suite_after_fix.txt` | Suite completa (revisão final). |
+| `send_time_tests_before_fix.txt` | `tests/test_send_time_freshness.py` contra o `notify.py` de 22f4d65: 17 dos 19 testes com erro (19 erros contando subtestes; sem relógio nem revalidação). Os 2 que passam verificam o que não muda (`expired` não é problema de entrega; push rápido real entrega). |
+| `send_time_demo.py` / `send_time_demo.txt` | Tempo real, sem relógio injetado: sinal com 29 min 59,5 s e publicação git de 1 s. 22f4d65 envia (`delivered`); a revisão final não (`expired`). |
 | `compare_reports.py` / `compare_reports.txt` | Relatório completo antes/depois, à mesma hora e com os mesmos dados (12:58:11 e 13:07): idêntico fora de `brain.watch`; o `watch` perde só os 12 sinais do incidente (`live_too_old`). |
 | `replay_history.py` / `replay_history.json` | Os 24 avisos de jogo do registo real reavaliados na hora real do envio: os 12 anteriores ao incidente continuam válidos; os 12 do incidente são rejeitados (10 `live_too_old`, 2 `finished`). |
 
