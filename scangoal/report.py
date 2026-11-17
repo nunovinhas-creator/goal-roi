@@ -188,7 +188,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if own is not None:
             b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
             b['result_known_utc'], b['result_known_source'] = known, source
-        elif marks and b['key'] in marks:  # mercado que o resultado final não decide: vale a marca do bot
+        elif marks and b['key'] in marks and b['market'].strip().lower() != '1x2':  # unknown 1X2 selection stays pending; other unsupported markets may use the bot mark
             b['w'], b['settled_by'] = (1.0 if marks[b['key']] else -1.0), 'marca do bot'
             b['result_known_utc'], b['result_known_source'] = (chronology.get('marks') or {}).get(b['key']), 'bot_mark'
     return bets
