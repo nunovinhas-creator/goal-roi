@@ -85305,6 +85305,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-17T18:04:42+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "0d420daa353c136a126d453231898d4e39f68b5549bb8abffbacf344f3a0d0e3",
+   "registry_size": 7967,
+   "report_generated_at_utc": "2026-11-17T18:04:42+00:00",
+   "response_sha256": "070282b41eafb208270943a54f851461c8a79ec08a4b66cbc9fa71b03bdbc0d3"
+  },
+  "reason": "Jogo noturno com ritmo baixo e sem sinais anteriores",
+  "source": "llm"
+ },
  "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-13T20:44:43+00:00",
   "conditions": [
