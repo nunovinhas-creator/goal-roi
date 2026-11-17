@@ -119264,6 +119264,35 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde & Número de apostas = uma": {
+  "born_utc": "2026-11-17T04:33:36+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "c8f46ce297f4c866fa6870e40e7f30e4e9425f9bb2094c5a32de6acd73c466b9",
+   "registry_size": 7207,
+   "report_generated_at_utc": "2026-11-17T04:33:36+00:00",
+   "response_sha256": "923ee8540e49a76fe823c52ed27730f3f943a5e2ca69416574a1328dbc347b3c"
+  },
+  "reason": "Apostas com odd moderada e apenas uma aposta",
+  "source": "llm"
+ },
  "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
   "born_utc": "2026-11-15T17:36:30+00:00",
   "conditions": [
