@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T20:11:27+00:00",
+ "generated_at_utc": "2026-11-17T20:12:44+00:00",
  "messages": 1451,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T20:11:27+00:00",
+  "collector_last_run_utc": "2026-11-17T20:12:10+00:00",
   "name_review": [
    {
     "bot": [
@@ -6685,7 +6685,7 @@
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-17T20:11:49+00:00",
+   "generated_utc": "2026-11-17T20:13:06+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -22449,17 +22449,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 123,
-  "llm_last_run_utc": "2026-11-17T19:08:24+00:00",
+  "llm_runs": 124,
+  "llm_last_run_utc": "2026-11-17T20:12:13+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-17",
-   "calls_today": 19,
-   "neurons_today": 4069.3,
+   "calls_today": 20,
+   "neurons_today": 4262.7,
    "accepted_today": 5,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
+    "note": "A taxa de acerto de 0.8947 sugere um desempenho superior à odd exigida, mas a amostra é pequena.",
+    "at_utc": "2026-11-17T20:12:13+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 19,
+    "hits": 17,
+    "hit_rate": 0.8947,
+    "break_even": 0.5555,
+    "status": "em observação"
+   },
+   {
+    "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "note": "A taxa de acerto de 0.7647 é razoável, mas a amostra é pequena e mais dados são necessários para confirmação.",
+    "at_utc": "2026-11-17T20:12:13+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 17,
+    "hits": 13,
+    "hit_rate": 0.7647,
+    "break_even": 0.4447,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Reforço = sem reforço",
+    "note": "A taxa de acerto de 0.359 é baixa, mas a amostra é razoável e sugere que esta hipótese pode não ser promissora.",
+    "at_utc": "2026-11-17T20:12:13+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 39,
+    "hits": 14,
+    "hit_rate": 0.359,
+    "break_even": 0.2111,
+    "status": "promissora"
+   },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "note": "apresenta um acerto alto, mas a amostra é pequena",
@@ -22552,39 +22585,6 @@
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "note": "amostra razoável, acerto de 0.8947 sugere potencial",
     "at_utc": "2026-11-17T03:32:25+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 19,
-    "hits": 17,
-    "hit_rate": 0.8947,
-    "break_even": 0.5555,
-    "status": "em observação"
-   },
-   {
-    "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "note": "amostra pequena, acerto de 0.7647 pode não ser representativo",
-    "at_utc": "2026-11-17T03:32:25+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 17,
-    "hits": 13,
-    "hit_rate": 0.7647,
-    "break_even": 0.4447,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
-    "note": "amostra pequena, acerto de 1.0 pode ser coincidência",
-    "at_utc": "2026-11-17T03:32:25+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 11,
-    "hits": 11,
-    "hit_rate": 1.0,
-    "break_even": 0.5756,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-    "note": "apresenta um acerto de 0.8947, mas a amostra é pequena com apenas 19 resultados",
-    "at_utc": "2026-11-16T23:25:44+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "n": 19,
     "hits": 17,
@@ -22887,7 +22887,7 @@
     "roi_announced_odds": 0.044,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 9.3,
+    "per_day": 9.2,
     "days_to_hint": 0,
     "days_to_conclusion": 28
    },
