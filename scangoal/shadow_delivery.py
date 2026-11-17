@@ -167,8 +167,10 @@ class DeliveryPublisher:
 
     def append(self, row, *, origin="synthetic"):
         """Append a unique original or edited OPEN_GAME version, without publishing."""
-        if origin not in ("synthetic", "dedicated-readonly-source"):
-            raise DeliveryError("unrecognized producer provenance")
+        # Never publish raw Telegram content into a repository branch before
+        # a separate data-protection and live-source authorization review.
+        if origin != "synthetic":
+            raise DeliveryError("live source publication is not authorized")
         if not isinstance(row, dict):
             raise DeliveryError("source row must be a dictionary")
         text = row.get("text")
