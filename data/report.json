@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-17T18:22:41+00:00",
- "messages": 1364,
+ "generated_at_utc": "2026-11-17T18:23:17+00:00",
+ "messages": 1365,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 48,
   "BETFAIR": 274,
-  "STAKE_LOAD": 237,
+  "STAKE_LOAD": 238,
   "OPEN_GAME": 179,
   "TOTALS_FORM": 57,
   "WEAKENED_LINEUP": 13,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2217,
+  "versions": 2218,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T18:22:41+00:00",
+  "last_collected_at_utc": "2026-11-17T18:23:15+00:00",
   "hl_results": 84,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T18:22:41+00:00",
+  "collector_last_run_utc": "2026-11-17T18:23:15+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 3,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 172,
+  "stake_original_seen": 173,
   "stake_no_score_after_kickoff": 30,
   "stake_sent_45_after_kickoff": 52,
   "goal_lists": 393,
   "goal_lists_consistent": 223
  },
- "unique_bets": 763,
+ "unique_bets": 764,
  "settled_bets": 594,
  "unsettled_market": 61,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1209,7 +1209,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 106,
+   "bets": 107,
    "settled": 61,
    "matches": 31,
    "wins": 25,
@@ -1663,7 +1663,7 @@
    "prob_above_cut": 0.246
   },
   "STAKE_LOAD": {
-   "signals": 182,
+   "signals": 183,
    "with_result": 113,
    "hits": 51,
    "misses": 59,
@@ -3194,7 +3194,7 @@
    },
    {
     "n": 157,
-    "signals": 220,
+    "signals": 221,
     "hits": 78,
     "misses": 79,
     "hit_rate": 0.4984,
@@ -3273,8 +3273,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 941,
-   "eligible": 763,
+   "total": 942,
+   "eligible": 764,
    "excluded": 178,
    "reasons": {
     "no_valid_odds": 130,
@@ -3289,7 +3289,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7895,
+    "em observação": 7904,
     "abandonada": 23,
     "promissora": 73
    },
@@ -4346,11 +4346,11 @@
     }
    ]
   },
-  "hypotheses": 7991,
+  "hypotheses": 8000,
   "tested": 641,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7963,
+   "em observação": 7972,
    "abandonada": 21,
    "promissora": 7
   },
@@ -8049,6 +8049,125 @@
      "match_id": "denmark-vs-norway-20261117",
      "match": "Denmark — Norway",
      "league": "UEFA Nations League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T19:45+00:00",
+     "date_utc": "2026-11-17T18:23:15+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Under 3.25",
+     "odds": 2.03,
+     "odds_last": 2.03,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 22,
+     "good": [
+      {
+       "id": "Stake | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Faixa de odd",
+         "odd 2,00 a 3,00"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 11,
+       "games": 8,
+       "hits": 8,
+       "break_even": 0.4481,
+       "prob_above": 0.8557,
+       "roi": 0.5917,
+       "edge": 0.1246,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 2,00 a 3,00"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 19,
+       "games": 14,
+       "hits": 12,
+       "break_even": 0.4436,
+       "prob_above": 0.8187,
+       "roi": 0.398,
+       "edge": 0.093,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 2,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 37,
+       "games": 19,
+       "hits": 13,
+       "break_even": 0.5362,
+       "prob_above": 0.0092,
+       "roi": -0.3518,
+       "edge": -0.2141,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Competição = seleções & Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Competição",
+         "seleções"
+        ],
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 27,
+       "games": 14,
+       "hits": 8,
+       "break_even": 0.5366,
+       "prob_above": 0.0124,
+       "roi": -0.4772,
+       "edge": -0.2231,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 14
+    },
+    {
+     "match_id": "denmark-vs-norway-20261117",
+     "match": "Denmark — Norway",
+     "league": "UEFA Nations League",
      "family": "Polymarket",
      "type": "POLYMARKET",
      "phase": "pre",
@@ -9549,98 +9668,16 @@
       }
      ],
      "bad_total": 51
-    },
-    {
-     "match_id": "st-kitts-and-nevis-vs-bonaire-20261117",
-     "match": "St. Kitts and Nevis — Bonaire",
-     "league": "America CONCACAF Nations League",
-     "family": "Betfair",
-     "type": "BETFAIR",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-17T19:00+00:00",
-     "date_utc": "2026-11-17T14:13:53+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "1X2",
-     "selection": "Bonaire",
-     "odds": 2.84,
-     "odds_last": 2.84,
-     "max_mult": 2,
-     "share": 61,
-     "share_last": 60,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 38,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Betfair | Competição = seleções & Dia = dia de semana & Quota de mercado = menos de 80 %",
-       "conditions": [
-        [
-         "Competição",
-         "seleções"
-        ],
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ]
-       ],
-       "n": 21,
-       "games": 19,
-       "hits": 2,
-       "break_even": 0.3922,
-       "prob_above": 0.0105,
-       "roi": -0.7419,
-       "edge": -0.1955,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Betfair | Competição = seleções & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Competição",
-         "seleções"
-        ],
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 17,
-       "games": 16,
-       "hits": 2,
-       "break_even": 0.4179,
-       "prob_above": 0.0224,
-       "roi": -0.7712,
-       "edge": -0.1823,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 37
     }
    ],
    "counts": {
     "favorável": 0,
     "misto": 10,
     "sem evidência": 0,
-    "contraditório": 29,
+    "contraditório": 30,
     "evitar": 5
    },
-   "generated_utc": "2026-11-17T18:22:56+00:00",
+   "generated_utc": "2026-11-17T18:23:41+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -9653,7 +9690,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7927,
+     "hypotheses": 7936,
      "with_prospective_evidence": 2230,
      "prospective_games": 44107
     },
@@ -9767,7 +9804,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 323,
+    "bets": 324,
     "settled": 269,
     "games": 205,
     "wins": 125,
@@ -25642,7 +25679,7 @@
     "days_to_conclusion": 5
    },
    "STAKE_LOAD": {
-    "signals": 172,
+    "signals": 173,
     "with_result": 104,
     "hits": 48,
     "misses": 53,
@@ -26146,7 +26183,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 763,
+   "bets": 764,
    "settled": 594,
    "matches": 337,
    "wins": 279,
@@ -26181,6 +26218,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-17T18:23:15+00:00",
+   "match_id": "denmark-vs-norway-20261117",
+   "group": "STAKE_LOAD/pre",
+   "match": "Denmark — Norway",
+   "selection": "Under 3.25",
+   "odds": 2.03,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-17T18:21:17+00:00",
    "match_id": "independiente-women-vs-newell-s-old-boys-women-20261117",
@@ -27040,19 +27090,6 @@
    "settled_by": "resultado HL",
    "n_signals": 2,
    "max_mult": 2
-  },
-  {
-   "date_utc": "2026-11-17T13:20:06+00:00",
-   "match_id": "hb-koge-u21-vs-brondby-reserves-20261117",
-   "group": "BETFAIR/live/mkt<10K",
-   "match": "HB Koge U21 — Brondby Reserves",
-   "selection": "Brondby Reserves",
-   "odds": 2.7,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -28253,28 +28290,6 @@
     1,
     4
    ]
-  },
-  "hb-koge-u21-vs-brondby-reserves-20261117": {
-   "teams": [
-    "HB Koge U21",
-    "Brondby Reserves"
-   ],
-   "events": [
-    {
-     "d": "2026-11-17T13:20:06+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "selection": "2",
-     "odds": 2.7,
-     "mult": 1,
-     "share": 75,
-     "mkt_volume": 5200.0,
-     "market": "1X2"
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
   },
   "cyprus-u19-vs-armenia-u19-20261117": {
    "teams": [
@@ -35368,7 +35383,7 @@
    "day": "2026-11-16"
   },
   {
-   "bets": 104,
+   "bets": 105,
    "settled": 49,
    "wins": 20,
    "units": 3.91,
