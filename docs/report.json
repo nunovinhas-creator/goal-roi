@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-17T10:08:41+00:00",
- "messages": 1230,
+ "generated_at_utc": "2026-11-17T10:13:02+00:00",
+ "messages": 1231,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 45,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 11,
   "OPEN_GAME_NO_ODDS": 13,
   "FULL_TIME_NOTE": 13,
-  "POLYMARKET": 362,
+  "POLYMARKET": 363,
   "None": 38,
   "TOTALS_FORM_NO_ODDS": 63
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2045,
+  "versions": 2046,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 16,
-  "last_collected_at_utc": "2026-11-17T10:04:20+00:00",
+  "last_collected_at_utc": "2026-11-17T10:13:02+00:00",
   "hl_results": 71,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 40,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-17T10:08:38+00:00",
+  "collector_last_run_utc": "2026-11-17T10:13:02+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 368,
   "goal_lists_consistent": 215
  },
- "unique_bets": 679,
+ "unique_bets": 680,
  "settled_bets": 548,
  "unsettled_market": 57,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -932,7 +932,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 147,
+   "bets": 148,
    "settled": 132,
    "matches": 49,
    "wins": 63,
@@ -1580,7 +1580,7 @@
    "prob_above_cut": 0.3906
   },
   "POLYMARKET": {
-   "signals": 176,
+   "signals": 177,
    "with_result": 160,
    "hits": 76,
    "misses": 84,
@@ -3085,7 +3085,7 @@
   "calibration": [
    {
     "n": 35,
-    "signals": 43,
+    "signals": 44,
     "hits": 24,
     "misses": 11,
     "hit_rate": 0.6716,
@@ -3214,8 +3214,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 848,
-   "eligible": 679,
+   "total": 849,
+   "eligible": 680,
    "excluded": 169,
    "reasons": {
     "no_valid_odds": 121,
@@ -3230,7 +3230,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 7235,
+    "em observação": 7240,
     "promissora": 60,
     "abandonada": 13
    },
@@ -4287,11 +4287,11 @@
     }
    ]
   },
-  "hypotheses": 7308,
+  "hypotheses": 7313,
   "tested": 537,
   "corrected_bar": null,
   "counts": {
-   "em observação": 7292,
+   "em observação": 7297,
    "abandonada": 10,
    "promissora": 6
   },
@@ -5331,6 +5331,111 @@
       }
      ],
      "bad_total": 26
+    },
+    {
+     "match_id": "poland-vs-sweden-20261117",
+     "match": "Poland — Sweden",
+     "league": "UEFA Nations League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-17T19:45+00:00",
+     "date_utc": "2026-11-17T10:12:56+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH1(+0.5)",
+     "odds": 1.45,
+     "odds_last": 1.45,
+     "max_mult": 1,
+     "share": 50,
+     "share_last": 50,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd até 1,50",
+     "odds_band_n": 4,
+     "good": [
+      {
+       "id": "Polymarket | Dia = dia de semana & Número de apostas = várias & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Número de apostas",
+         "várias"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 32,
+       "games": 13,
+       "hits": 18,
+       "break_even": 0.4852,
+       "prob_above": 0.8125,
+       "roi": 0.1378,
+       "edge": 0.0906,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 1,
+     "bad": [
+      {
+       "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 73,
+       "games": 36,
+       "hits": 29,
+       "break_even": 0.4629,
+       "prob_above": 0.1521,
+       "roi": -0.2208,
+       "edge": -0.0748,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 56,
+       "games": 33,
+       "hits": 21,
+       "break_even": 0.458,
+       "prob_above": 0.1533,
+       "roi": -0.2566,
+       "edge": -0.0768,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 5
     },
     {
      "match_id": "china-pr-vs-bahrain-20261117",
@@ -6478,12 +6583,12 @@
    ],
    "counts": {
     "favorável": 1,
-    "misto": 7,
+    "misto": 8,
     "sem evidência": 0,
     "contraditório": 7,
     "evitar": 2
    },
-   "generated_utc": "2026-11-17T10:08:58+00:00",
+   "generated_utc": "2026-11-17T10:13:20+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6496,7 +6601,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 7245,
+     "hypotheses": 7250,
      "with_prospective_evidence": 1954,
      "prospective_games": 38573
     },
@@ -6610,7 +6715,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 260,
+    "bets": 261,
     "settled": 232,
     "games": 182,
     "wins": 111,
@@ -17206,7 +17311,7 @@
    },
    {
     "n": 78,
-    "signals": 126,
+    "signals": 128,
     "hits": 33,
     "misses": 45,
     "hit_rate": 0.4221,
@@ -17242,7 +17347,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 45,
+    "open": 47,
     "born_verified": true,
     "game_set": "ea91c95743e607db",
     "prospective": {
@@ -21280,7 +21385,7 @@
     "days_to_conclusion": 8
    },
    "POLYMARKET": {
-    "signals": 176,
+    "signals": 177,
     "with_result": 160,
     "hits": 76,
     "misses": 84,
@@ -21800,7 +21905,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 679,
+   "bets": 680,
    "settled": 548,
    "matches": 311,
    "wins": 260,
@@ -21835,6 +21940,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-17T10:12:56+00:00",
+   "match_id": "poland-vs-sweden-20261117",
+   "group": "POLYMARKET/pre",
+   "match": "Poland — Sweden",
+   "selection": "Polymarket: AH1(+0.5)",
+   "odds": 1.45,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-17T09:52:39+00:00",
    "match_id": "persipa-pati-vs-persiba-bantul-20261117",
@@ -22714,22 +22832,6 @@
    "w": 1.0,
    "settled_by": "resultado",
    "n_signals": 6,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-16T17:26:17+00:00",
-   "match_id": "tatran-presov-vs-lokomotiva-zvolen-20261116",
-   "group": "TOTALS_FORM",
-   "match": "Tatran Presov — Lokomotiva Zvolen",
-   "selection": "Over 0.75",
-   "odds": 1.7,
-   "ft": [
-    1,
-    0
-   ],
-   "w": 0.5,
-   "settled_by": "resultado",
-   "n_signals": 1,
    "max_mult": 1
   }
  ],
@@ -24643,38 +24745,6 @@
     1
    ]
   },
-  "tatran-presov-vs-lokomotiva-zvolen-20261116": {
-   "teams": [
-    "Tatran Presov",
-    "Lokomotiva Zvolen"
-   ],
-   "events": [
-    {
-     "d": "2026-11-16T17:26:17+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 0.75",
-     "odds": 1.7,
-     "minute": 70,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     81,
-     "1-0"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    1,
-    0
-   ]
-  },
   "greece-u21-vs-iceland-u21-20261116": {
    "teams": [
     "Greece U21",
@@ -25404,6 +25474,16 @@
      "odds": 2.11,
      "market": "1x2",
      "total": 42000.0
+    },
+    {
+     "d": "2026-11-17T10:12:56+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH1(+0.5)",
+     "odds": 1.45,
+     "share": 50,
+     "market": "Polymarket",
+     "total": 5700.0
     }
    ],
    "goals": null,
@@ -31064,7 +31144,7 @@
    "day": "2026-11-16"
   },
   {
-   "bets": 20,
+   "bets": 21,
    "settled": 3,
    "wins": 1,
    "units": 0.57,
