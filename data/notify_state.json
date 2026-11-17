@@ -982,22 +982,22 @@
   "delivered": 62,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-17T21:44:14+00:00",
+ "format_last_run_utc": "2026-11-17T21:52:36+00:00",
  "health": {
   "reference": {
    "bsd_results": 33,
-   "eligible": 823,
+   "eligible": 825,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 95,
-   "hypotheses": 8468,
-   "settled_bets": 648,
+   "hypotheses": 8473,
+   "settled_bets": 666,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 29,
+   "statuses": 41,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-17T21:44:14+00:00",
+ "last_run_utc": "2026-11-17T21:52:36+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -1369,6 +1369,7 @@
   "Betfair | Hora (UTC) = tarde & Momento = durante o jogo & Reforço = sem reforço": "abandonada",
   "Betfair | Hora (UTC) = tarde & Reforço = sem reforço": "abandonada",
   "Betfair | Reforço = sem reforço & Seleção = equipa da casa": "abandonada",
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite": "promissora",
   "Jogo aberto | Hora (UTC) = noite": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -1376,16 +1377,27 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00": "abandonada",
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Mercado = outros mercados": "abandonada",
-  "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada"
+  "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada"
  },
  "summary_counts": {
   "delivered": 11
