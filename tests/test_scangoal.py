@@ -762,7 +762,8 @@ class RegimeAndStories(Hardening):
 
 class Notify(unittest.TestCase):
     def report(self, **over):
-        base = {'brain': {'evidence_scope': 'eligible_bets_only', 'watch': [{'date_utc': '2026-11-12T10:00:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
+        # P1 17/11/2026: o sinal tem de estar atual ao meio-dia dos testes (era 10:00, um sinal ao vivo já expirado às 12:00).
+        base = {'brain': {'evidence_scope': 'eligible_bets_only', 'watch': [{'date_utc': '2026-11-12T11:50:00+00:00', 'match': 'A — B', 'selection': 'Over 2.5', 'odds': 1.9,
                                      'reasons': [{'id': 'Jogo aberto | Minuto = 31 a 60', 'status': 'promissora', 'n': 40, 'hit_rate': 0.7, 'prob_above': 0.97}]}],
                           'status_list': {'h1': 'promissora'}, 'counts': {'promissora': 1}, 'hypotheses': 10, 'llm_today': {'calls_today': 3, 'neurons_today': 700.4},
                           # PR 3: validated statuses need a certificate of the accepted method (fixture declares it).

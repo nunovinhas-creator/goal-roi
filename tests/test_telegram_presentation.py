@@ -714,7 +714,7 @@ class U08_DailyConsolidation(unittest.TestCase):
         statuses = {HA: 'promissora', HB: 'promissora'}
         d = Data(self, base_state(statuses), report(statuses))
         d.run()
-        d.write_report(report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1')]))
+        d.write_report(report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1', minutes=600, kickoff=660)]))   # atual às 22:05
         d.run(now=EVENING, sender=d.sender(fail_at=1, error=notify.DeliveryFailed('HTTP 429')))   # the bet fails: summary stays pending
         st = d.state()
         self.assertEqual(st['deliveries']['summary|2026-11-16']['state'], 'pending')
@@ -1004,7 +1004,7 @@ class U15_PostCutoverCheck(unittest.TestCase):
             revs.append(git(clone, 'rev-parse', 'HEAD'))
         cycle(datetime.fromisoformat(rep['generated_at_utc']), rep)
         rep2 = copy.deepcopy(rep)
-        rep2['brain']['watch'] = [entry('m1'), entry('m2', minutes=-3)]
+        rep2['brain']['watch'] = [entry('m1', minutes=55, kickoff=120), entry('m2', minutes=57, kickoff=120)]   # atuais às 13:00 (P1 17/11)
         cycle(NOW + timedelta(hours=1), rep2)
         return pcc, clone, revs, git
 
@@ -1257,7 +1257,7 @@ class X_Presentation(unittest.TestCase):
     def test_every_non_bet_message_carries_the_scientific_state(self):
         st = base_state()
         st['hello'] = False
-        rep = report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1')],
+        rep = report({HA: 'abandonada', HB: 'promissora'}, watch=[entry('m1', minutes=600, kickoff=660)],   # atual às 22:05 (P1 17/11)
                      regime=[{'type': 'OPEN_GAME', 'state': 'piorou', 'recent': {'hit_rate': 0.3}, 'before': {'hit_rate': 0.8}}])
         out = notify.messages(rep, st, EVENING)
         self.assertEqual(len(out), 4)            # hello, game, regime, ONE summary with both status changes

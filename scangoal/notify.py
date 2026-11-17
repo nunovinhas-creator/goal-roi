@@ -20,7 +20,7 @@ PR 5 (formato `telegram_format_v2`):
 Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nunca é impresso nem gravado). Sem eles, não faz
 nada. `--preview` nunca os lê, nunca abre ligações e nunca grava estado.
 """
-import copy, hashlib, json, os, re, socket, subprocess, sys, tempfile, unicodedata
+import copy, hashlib, json, os, re, socket, subprocess, sys, tempfile, time, unicodedata
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -29,7 +29,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from . import equivalence
+from . import equivalence, freshness
 from .eligibility import text_identity
 from .results_bsd import load_json
 from .store import data_dir
@@ -43,7 +43,7 @@ MAX_GROUPS_PER_MESSAGE = 8
 MAX_TEXT = 3900
 VALID = ('forte', 'confirmada')   # tática validada: só com certificado do teste de confirmação (PR 3)
 VALIDATION_METHOD = 'eprocess_online_alpha_v1'   # único método aceite para anunciar uma tática como validada (fail-closed)
-ALERT_MAX_AGE_MIN = 30            # alerta só se o jogo ainda não começou ou se o sinal tem no máximo 30 minutos
+ALERT_MAX_AGE_MIN = freshness.LIVE_MAX_AGE_MIN   # 30: idade máxima de um sinal ao vivo, para QUALQUER aviso de aposta
 TAU = 0.85                        # Jaccard mínimo entre os jogos de duas hipóteses para as agrupar (só apresentação)
 GROUP_MIN_GAMES = 8
 OSCILLATION_HOURS = 24            # só para mostrar registos antigos de oscilações (o resumo diário já as absorve)
@@ -146,11 +146,10 @@ def lisbon(v):
 
 
 def still_bettable(w, now):
-    ko = parse_time(w.get('kickoff_utc'))
-    if ko and ko > now:
-        return True
-    t = parse_time(w.get('date_utc'))
-    return t is not None and now - t <= timedelta(minutes=ALERT_MAX_AGE_MIN)
+    """Oportunidade ainda atual em `now` (P1 de 17/11/2026): a regra única de `freshness` (hora ORIGINAL do sinal; ao vivo
+    até 30 minutos; pré-jogo só antes de um início conhecido; jogo terminado, datas ausentes, inválidas ou incoerentes:
+    não). Vale para todos os avisos de aposta, indícios e alertas."""
+    return freshness.current(w, now)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -504,9 +503,19 @@ def groups_of(report, hids):
 # Avisos
 
 class Notice:
-    def __init__(self, key, kind, lines, effects, claims=(), hids=()):
+    """bets: só nos avisos de aposta, uma lista por aposta (jogo, mercado, seleção) com os sinais que a sustentam; serve para
+    revalidar a oportunidade com o relógio real imediatamente antes do envio (`still_current`). Vazio nos outros avisos."""
+
+    def __init__(self, key, kind, lines, effects, claims=(), hids=(), bets=()):
         self.key, self.kind, self.effects, self.claims, self.hids = key, kind, effects, list(claims), list(hids)
+        self.bets = [list(b) for b in bets]
         self.text = fit(lines)
+
+    def still_current(self, t):
+        """Todas as apostas do aviso continuam a ser oportunidades atuais em `t` (cada uma por pelo menos um dos seus
+        sinais). Conservador: basta uma aposta expirada para o aviso inteiro não sair, porque o texto já fixado na intenção
+        a apresentaria como atual. Avisos sem apostas (resumo, estado, regime, boas-vindas): sempre True."""
+        return all(any(still_bettable(w, t) for w in bet) for bet in self.bets)
 
 
 def fit(lines):
@@ -588,9 +597,10 @@ def game_notices(report, state, now):
     for w in (report.get('brain') or {}).get('watch') or []:
         if not isinstance(w, dict) or not isinstance(w.get('reasons'), list) or not w['reasons']:
             continue
+        if not still_bettable(w, now):
+            continue          # P1 17/11/2026: fora de tempo, em QUALQUER nível (indício ou alerta). Barreira final, independente
+            #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
-        if level == 'alerta' and not still_bettable(w, now):
-            continue          # fora de tempo: não serve de alerta nem de indício, e não fica pendente
         ik = item_key(w)
         if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
@@ -683,7 +693,7 @@ def game_notice(report, state, now, gk, g):
         for w in it['entries']:
             effects.append(['watch_sent', legacy_key(w)])
     key = 'game|%s|%s' % (gk, sha('\n'.join(k for k, _ in items))[:12])
-    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, list(reasons))
+    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, list(reasons), bets=[it['entries'] for _, it in items])
 
 
 def explicit_status(report, hid, current):
@@ -1121,13 +1131,40 @@ def reconcile(store, state, now):
     return {'malformed_log_lines': bad, 'reconstructed_log_entries': len(missing), 'changed_state': changed}
 
 
-def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None):
+def run_clock(now):
+    """Relógio real da execução: `now` mais o tempo decorrido (monótono, imune a acertos do relógio do sistema). Em produção
+    `now` é a hora real do início, por isso isto é a hora real; nos testes avança a partir do `now` simulado."""
+    start = time.monotonic()
+    return lambda: now + timedelta(seconds=time.monotonic() - start)
+
+
+def _expire(store, state, now, n, rec, t, reason):
+    """Estado terminal `expired` de um aviso de aposta cuja oportunidade expirou antes do envio. Nunca é uma entrega: não
+    conta em `sent_total` nem é problema de entrega (`PROBLEMS`). Não mexe nos efeitos: antes da intenção não há nenhum; depois
+    da intenção ficam os já gravados e publicados com ela (como em `failed`/`uncertain`/`blocked`), coerentes com o que
+    `reconcile` reconstrói a partir do registo — a mesma aposta nunca volta a ser planeada nem enviada."""
+    rec.update(state='expired', done_utc=iso(now), expired_check_utc=iso(t), reason=reason)
+    rec['events'].append('expired')
+    _bump(state, 'expired')
+    store.save_state(state)
+    store.append_log([log_entry(now, n.key, 'expired', rec, reason=reason, checked_utc=iso(t))])
+    print('NOTIFY_EXPIRED_BEFORE_SEND' if reason == 'signal_expired_before_send' else 'NOTIFY_EXPIRED_BEFORE_INTENT')
+
+
+def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None, clock=None):
     """Planeia e envia. Para cada aviso: intenção (efeitos + `in_flight`) gravada no estado e no registo ANTES do envio;
     resultado gravado depois. Uma falha ou incerteza para os envios desta execução (os seguintes ficam pendentes e só saem
     se ainda forem válidos na execução seguinte). publish (P0, `GitPublisher`): depois de gravar a intenção e ANTES de contactar
     o Telegram, publica-a no repositório remoto; se não conseguir, a intenção é retirada (nada foi enviado, o aviso fica
-    pendente) e esta execução pára de enviar. -> (estado, entregues)."""
+    pendente) e esta execução pára de enviar. -> (estado, entregues).
+
+    Validade temporal (P1 17/11/2026, ressalva da auditoria da #41): o plano usa `now`, mas entre o plano e o envio passam
+    os envios anteriores e a publicação git (até 3 × pull/push). Por isso cada aviso de aposta é revalidado com o relógio real
+    (`clock`, por omissão `run_clock(now)`) (1) antes de gravar a intenção — expirado: `pending -> expired`, sem efeitos, sem
+    publicação, sem envio — e (2) depois de a intenção estar publicada, imediatamente antes de contactar o Telegram —
+    expirado: `intent -> expired`, sem envio. A barreira de publicação mantém-se: nada é enviado sem intenção publicada."""
     cp = checkpoint or (lambda name: None)
+    clock = clock or run_clock(now)
     reconcile(store, state, now)
     recs = state.setdefault('deliveries', {})
     notices = [n for n in plan(report, state, now) if recs.get(n.key, {}).get('state') in (None, 'pending')]
@@ -1149,6 +1186,10 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
     for n in notices:
         rec = recs[n.key]
         cp('before_intent')
+        t = clock()
+        if not n.still_current(t):
+            _expire(store, state, now, n, rec, t, 'signal_expired_before_intent')
+            continue
         if not guard_claims(n.text, report, n.claims):
             apply_effects(state, n.effects, now)
             rec.update(state='blocked', done_utc=iso(now), sha256=sha(n.text))
@@ -1179,6 +1220,12 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
                 store.append_log([log_entry(now, n.key, 'withdrawn', rec, reason='intent not published')])
                 print('NOTIFY_PUBLISH_FAILED')
                 break
+        t = clock()                        # imediatamente antes da tentativa efetiva de envio
+        if not n.still_current(t):
+            _expire(store, state, now, n, rec, t, 'signal_expired_before_send')
+            cp('after_expired')
+            continue
+        cp('before_send')
         try:
             sender(token, chat, n.text)
             outcome = 'delivered'
