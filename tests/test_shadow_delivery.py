@@ -282,5 +282,35 @@ class SignalDelivery(unittest.TestCase):
         self.assertEqual(path.read_bytes(),old)
 
 
+    def test_consumer_measures_end_to_end_age_after_remote_publication(self):
+        self.pub.append(self.row())
+        self.pub.publish()
+        fresh=self.root/"downstream"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        early=bridge.inspect_remote_delivery(fresh,self.now+timedelta(seconds=50))
+        self.assertEqual(early["within_120s_transport"],1)
+        self.assertTrue(early["observations"][0]["remote_receipt_present"])
+        self.assertFalse(early["observations"][0]["scientifically_admitted"])
+        late=bridge.inspect_remote_delivery(fresh,self.now+timedelta(seconds=150))
+        self.assertEqual(late["late_or_unproven"],1)
+        self.assertEqual(late["within_120s_transport"],0)
+
+    def test_consumer_unpublished_checkout_cannot_claim_remote_capture(self):
+        self.pub.append(self.row())
+        with self.assertRaises(bridge.DeliveryError):
+            bridge.inspect_remote_delivery(self.repo,self.now+timedelta(seconds=10))
+
+    def test_consumer_receipt_time_after_observation_is_not_proof(self):
+        self.pub.append(self.row())
+        self.pub.publish()
+        fresh=self.root/"clock_mismatch"
+        ops.git(self.root,"clone",self.remote,fresh)
+        ops.git(fresh,"checkout",bridge.BRANCH)
+        result=bridge.inspect_remote_delivery(fresh,self.now-timedelta(seconds=20))
+        self.assertEqual(result["within_120s_transport"],0)
+        self.assertEqual(result["late_or_unproven"],1)
+
+
 if __name__=="__main__":
     unittest.main()
