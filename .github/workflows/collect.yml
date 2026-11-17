@@ -74,7 +74,10 @@ jobs:
         run: |
           git add data docs/report.json docs/bets.csv
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
+          # Identidade local do repositório (não global): o `pull --rebase` também cria commits quando o remoto avançou.
+          git config user.name "scangoal-collector"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
       # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
       # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
@@ -97,7 +100,10 @@ jobs:
         run: |
           git add data docs/report.json docs/bets.csv
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git -c user.name="scangoal-collector" -c user.email="actions@users.noreply.github.com" commit -q -m "data: collect [skip ci]"
+          # Identidade local do repositório (não global): o `pull --rebase` também cria commits quando o remoto avançou.
+          git config user.name "scangoal-collector"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -q -m "data: collect [skip ci]"
           git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
       # O agendamento do GitHub não dispara neste repositório. Cada execução lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
