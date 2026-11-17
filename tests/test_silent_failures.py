@@ -410,8 +410,8 @@ class Dashboard(unittest.TestCase):
 class Steps(unittest.TestCase):
     def test_only_complementary_steps_are_tolerated(self):
         tolerated = sorted(n for n, lines in steps().items() if '        continue-on-error: true' in lines)
-        self.assertEqual(tolerated, ['Commit data from the fast reads',
-                                     'Fast reads every 2 minutes until the next collection (read-only)',
+        # P2: `Commit data from the fast reads` deixou de ser tolerado (uma falha de persistência deixa a execução vermelha).
+        self.assertEqual(tolerated, ['Fast reads every 2 minutes until the next collection (read-only)',
                                      'Results from BSD (hourly at most; skipped without key)',
                                      'Results from Highlightly (every 90 minutes at most; skipped without key)',
                                      "Telegram notices through the user's bot (skipped without keys)"])
