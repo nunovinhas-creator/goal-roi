@@ -82,7 +82,7 @@ def _valid_res_pq(payload, nonce):
     """Validate unencrypted resPQ structure, request nonce, vector bounds."""
     if len(payload) < 20 + 4 + 16 + 16 + 4 + 8 + 8:
         return False
-    if payload[:8] != b"\\x00" * 8:
+    if payload[:8] != b"\x00" * 8:
         return False
     length = struct.unpack_from("<I", payload, 16)[0]
     if length != len(payload) - 20 or length % 4:
@@ -125,13 +125,13 @@ def _mtproto_req_pq(address="149.154.167.51", timeout=5):
     sec, fraction = divmod(timestamp_ns, 1_000_000_000)
     message_id = (sec << 32) | (((fraction << 32) // 1_000_000_000) & ~3)
     body = struct.pack("<I", 0xBE7E8EF1) + nonce
-    request = (b"\\x00" * 8 + struct.pack("<Q", message_id) +
+    request = (b"\x00" * 8 + struct.pack("<Q", message_id) +
                struct.pack("<I", len(body)) + body)
     try:
         with socket.create_connection((address, 443), timeout=timeout) as sock:
             sock.settimeout(timeout)
             # Abridged transport: 0xef marker, length in four-byte words.
-            sock.sendall(b"\\xef" + bytes([len(request) // 4]) + request)
+            sock.sendall(b"\xef" + bytes([len(request) // 4]) + request)
             first = _recv_exact(sock, 1)[0]
             if first == 127:
                 size = int.from_bytes(_recv_exact(sock, 3), "little") * 4
