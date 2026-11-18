@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-18T21:54:04+00:00",
- "messages": 1607,
+ "generated_at_utc": "2026-11-18T21:56:43+00:00",
+ "messages": 1608,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 52,
-  "BETFAIR": 316,
+  "BETFAIR": 317,
   "STAKE_LOAD": 309,
   "OPEN_GAME": 196,
   "TOTALS_FORM": 65,
@@ -15,15 +15,15 @@
   "None": 53,
   "TOTALS_FORM_NO_ODDS": 77
  },
- "unparsed": 88,
+ "unparsed": 89,
  "unparsed_samples": [
-  "💷 🟨 Betfair · LIVE",
   "📊 🟩 Kalshi · LIVE 44' 0:0",
   "💷💷 🟨 Betfair ×32 · LIVE",
   "💷 🟨 Betfair · LIVE",
   "📊 🟩 Kalshi · LIVE 71' 0:0",
   "📊 🟩 Kalshi · LIVE 75' 0:0",
   "📊 🟩 Kalshi · LIVE 75' 0:0",
+  "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE"
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2680,
+  "versions": 2681,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T21:53:09+00:00",
+  "last_collected_at_utc": "2026-11-18T21:56:43+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 44,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T21:54:02+00:00",
+  "collector_last_run_utc": "2026-11-18T21:56:43+00:00",
   "name_review": [
    {
     "bot": [
@@ -5044,6 +5044,121 @@
      "bad_total": 1
     },
     {
+     "match_id": "chelsea-women-vs-paris-saint-germain-women-20261118",
+     "match": "Chelsea Women — Paris Saint Germain Women",
+     "league": "UEFA Champions League Women",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-18T20:00+00:00",
+     "date_utc": "2026-11-18T21:47:54+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Total",
+     "selection": "Over 1.5",
+     "odds": 3.5,
+     "odds_last": 3.5,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 14,
+     "good": [
+      {
+       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 37,
+       "games": 30,
+       "hits": 27,
+       "break_even": 0.5649,
+       "prob_above": 0.9722,
+       "roi": 0.2984,
+       "edge": 0.144,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "noite"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 13,
+       "games": 12,
+       "hits": 11,
+       "break_even": 0.5304,
+       "prob_above": 0.97,
+       "roi": 0.685,
+       "edge": 0.1916,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "noite"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 46,
+       "games": 22,
+       "hits": 32,
+       "break_even": 0.5388,
+       "prob_above": 0.9628,
+       "roi": 0.2628,
+       "edge": 0.1513,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 14,
+     "bad": [
+      {
+       "id": "Stake | Faixa de odd = odd acima de 3,00",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd acima de 3,00"
+        ]
+       ],
+       "n": 14,
+       "games": 9,
+       "hits": 1,
+       "break_even": 0.2219,
+       "prob_above": 0.1037,
+       "roi": -0.7071,
+       "edge": -0.1095,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 1
+    },
+    {
      "match_id": "remo-vs-chapecoense-20261119",
      "match": "Remo — Chapecoense",
      "league": "Brazilian BRAZIL SERIE A",
@@ -5635,114 +5750,6 @@
      "bad_total": 26
     },
     {
-     "match_id": "chelsea-women-vs-paris-saint-germain-women-20261118",
-     "match": "Chelsea Women — Paris Saint Germain Women",
-     "league": "UEFA Champions League Women",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-18T20:00+00:00",
-     "date_utc": "2026-11-18T21:25:44+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Total",
-     "selection": "Over 0.5",
-     "odds": 1.55,
-     "odds_last": 1.55,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 78,
-     "good": [
-      {
-       "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 10,
-       "games": 10,
-       "hits": 10,
-       "break_even": 0.5082,
-       "prob_above": 0.9896,
-       "roi": 0.9945,
-       "edge": 0.2459,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 19,
-       "games": 18,
-       "hits": 16,
-       "break_even": 0.5659,
-       "prob_above": 0.9829,
-       "roi": 0.496,
-       "edge": 0.1869,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 22,
-       "games": 17,
-       "hits": 17,
-       "break_even": 0.5372,
-       "prob_above": 0.9759,
-       "roi": 0.3771,
-       "edge": 0.1809,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 34,
-     "bad": [],
-     "bad_total": 0
-    },
-    {
      "match_id": "flamengo-vs-atletico-paranaense-20261119",
      "match": "Flamengo — Atletico Paranaense",
      "league": "Brazilian BRAZIL SERIE A",
@@ -6120,121 +6127,6 @@
      "bad_total": 1
     },
     {
-     "match_id": "chelsea-women-vs-paris-saint-germain-women-20261118",
-     "match": "Chelsea Women — Paris Saint Germain Women",
-     "league": "UEFA Champions League Women",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-18T20:00+00:00",
-     "date_utc": "2026-11-18T21:47:54+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Total",
-     "selection": "Over 1.5",
-     "odds": 3.5,
-     "odds_last": 3.5,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd acima de 3,00",
-     "odds_band_n": 14,
-     "good": [
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 37,
-       "games": 30,
-       "hits": 27,
-       "break_even": 0.5649,
-       "prob_above": 0.9722,
-       "roi": 0.2984,
-       "edge": 0.144,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 13,
-       "games": 12,
-       "hits": 11,
-       "break_even": 0.5304,
-       "prob_above": 0.97,
-       "roi": 0.685,
-       "edge": 0.1916,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ]
-       ],
-       "n": 46,
-       "games": 22,
-       "hits": 32,
-       "break_even": 0.5388,
-       "prob_above": 0.9628,
-       "roi": 0.2628,
-       "edge": 0.1513,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 14,
-     "bad": [
-      {
-       "id": "Stake | Faixa de odd = odd acima de 3,00",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd acima de 3,00"
-        ]
-       ],
-       "n": 14,
-       "games": 9,
-       "hits": 1,
-       "break_even": 0.2219,
-       "prob_above": 0.1037,
-       "roi": -0.7071,
-       "edge": -0.1095,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 1
-    },
-    {
      "match_id": "remo-vs-chapecoense-20261119",
      "match": "Remo — Chapecoense",
      "league": "Brazilian BRAZIL SERIE A",
@@ -6549,12 +6441,12 @@
    ],
    "counts": {
     "favorável": 1,
-    "misto": 5,
+    "misto": 6,
     "sem evidência": 0,
-    "contraditório": 7,
+    "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T21:54:37+00:00",
+   "generated_utc": "2026-11-18T21:57:16+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -28248,6 +28140,12 @@
      "k": "BETFAIR",
      "phase": "live",
      "mult": 32
+    },
+    {
+     "d": "2026-11-18T21:54:53+00:00",
+     "k": "BETFAIR",
+     "phase": "live",
+     "mult": 1
     }
    ],
    "goals": null,
