@@ -8,9 +8,11 @@ import argparse
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scangoal.parser import parse
 
 UTC = timezone.utc
