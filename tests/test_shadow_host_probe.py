@@ -4,8 +4,10 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.shadow_host_probe import heartbeat
+from scripts import shadow_host_probe as probe
 
 NOW = datetime(2026, 11, 18, 12, tzinfo=timezone.utc)
 
@@ -58,6 +60,47 @@ class ZeroSecretProbeTests(unittest.TestCase):
         self.assertEqual(result["scientific_state"], "not_activated")
         for needle in ("telegram", "TG_SESSION", "message_id", "token", "Alpha", "scangoal"):
             self.assertNotIn(needle, data)
+
+
+
+class OneTimeTCPTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name) / "shadow_tcp_probe.json"
+
+    def test_tcp_report_is_single_shot_and_does_not_authenticate(self):
+        with patch.object(probe, "_tcp_connect", side_effect=[True, False]) as connect:
+            result = probe.network_once(self.path)
+        self.assertEqual(connect.call_count, 2)
+        self.assertTrue(result["tcp443_ipv4"])
+        self.assertFalse(result["tcp443_ipv6"])
+        self.assertFalse(result["credentials_used"])
+        self.assertFalse(result["telegram_authenticated"])
+        self.assertFalse(result["messages_read"])
+        self.assertFalse(result["mtproto_verified"])
+        self.assertEqual(result["scientific_state"], "not_activated")
+        self.assertEqual(json.loads(self.path.read_text()), result)
+        previous = self.path.read_bytes()
+        with patch.object(probe, "_tcp_connect", side_effect=AssertionError("no second network run")):
+            self.assertIsNone(probe.network_once(self.path))
+        self.assertEqual(self.path.read_bytes(), previous)
+
+    def test_both_connections_fail_without_impeding_report(self):
+        with patch.object(probe, "_tcp_connect", return_value=False):
+            result = probe.network_once(self.path)
+        self.assertFalse(result["tcp443_ipv4"])
+        self.assertFalse(result["tcp443_ipv6"])
+        self.assertEqual(json.loads(self.path.read_text())["mtproto_verified"], False)
+
+    def test_report_does_not_mutate_heartbeat_or_expose_identifiers(self):
+        uptime = self.path.with_name("shadow_probe_state.json")
+        previous = heartbeat(uptime, NOW, startup=True)
+        with patch.object(probe, "_tcp_connect", return_value=True):
+            result = probe.network_once(self.path)
+        self.assertEqual(json.loads(uptime.read_text()), previous)
+        for forbidden in ("TG_SESSION", "API_HASH", "message_id", "bot_token", "source_text"):
+            self.assertNotIn(forbidden, json.dumps(result))
 
 
 if __name__ == "__main__":
