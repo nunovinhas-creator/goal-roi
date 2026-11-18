@@ -63,7 +63,7 @@ class GitLatency(unittest.TestCase):
         # Reports have no message IDs, raw text, teams or private strings.
         rendered=json.dumps(result)
         self.assertNotIn("Alpha",rendered)
-        self.assertNotIn("OPEN",rendered)
+        self.assertNotIn("scangoal.com/match",rendered)
         self.assertNotIn("message_id",rendered)
 
     def test_versions_are_deduplicated_by_first_capture(self):
