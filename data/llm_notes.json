@@ -1,5 +1,23 @@
 [
  {
+  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
+  "note": "apresenta um alto acerto de 0.8148, mas a amostra é pequena com apenas 27 resultados",
+  "at_utc": "2026-11-18T20:59:14+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+  "note": "tem um acerto de 1.0, mas a amostra é muito pequena com apenas 10 resultados",
+  "at_utc": "2026-11-18T20:59:14+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
+  "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 8 resultados",
+  "at_utc": "2026-11-18T20:59:14+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
   "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
   "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 12 resultados",
   "at_utc": "2026-11-18T16:53:38+00:00",
@@ -219,24 +237,6 @@
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
   "note": "amostra razoável com acerto de 0.8889, mas precisa de mais dados para confirmação",
   "at_utc": "2026-11-16T15:04:19+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite",
-  "note": "amostra pequena, mas acerto de 0.814 sugere potencial",
-  "at_utc": "2026-11-16T15:04:19+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-  "note": "amostra muito pequena, não é possível tirar conclusões",
-  "at_utc": "2026-11-16T15:04:19+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-  "note": "Acerto de 0.8889 com 18 resultados, amostra pequena.",
-  "at_utc": "2026-11-16T10:48:10+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
  }
 ]
