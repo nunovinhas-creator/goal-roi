@@ -1,12 +1,14 @@
 """Zero-secret uptime probe for untrusted free Python hosts.
 
-No Telegram, network requests, Git operations, dependencies, or credentials.
-Records only aggregate UTC heartbeat gaps in a local JSON file.
+No Telegram authentication, messages, Git operations, dependencies, or credentials.
+One optional TCP connectivity measurement runs once at startup, without login.
+Records UTC heartbeat gaps in a separate local JSON file.
 Never use this as evidence of live signal delivery or scientific admission.
 """
 import argparse
 import json
 import os
+import socket
 import tempfile
 import time
 from datetime import datetime, timezone
@@ -14,6 +16,46 @@ from pathlib import Path
 
 VERSION = 1
 UTC = timezone.utc
+
+
+# One-shot TCP connect check: NO Telegram login, secrets, requests or messages.
+# Uses documented DC2 reference IPs; reachability of one DC alone is not an MTProto test.
+NETWORK_REPORT = "shadow_tcp_probe.json"
+
+
+def _tcp_connect(address, family, timeout=4):
+    try:
+        with socket.socket(family, socket.SOCK_STREAM) as sock:
+            sock.settimeout(timeout)
+            sock.connect((address, 443))
+        return True
+    except OSError:
+        return False
+
+
+def network_once(path=NETWORK_REPORT):
+    """Run at most once per report filename; never overwrite previous evidence."""
+    destination = Path(path)
+    if destination.exists():
+        return None
+    report = {
+        "schema": 1,
+        "test": "telegram_dc2_tcp_443_only",
+        "observed_utc": datetime.now(UTC).isoformat(),
+        "tcp443_ipv4": _tcp_connect("149.154.167.51", socket.AF_INET),
+        "tcp443_ipv6": _tcp_connect("2001:67c:4e8:f002::a", socket.AF_INET6),
+        "credentials_used": False,
+        "telegram_authenticated": False,
+        "messages_read": False,
+        "mtproto_verified": False,
+        "scientific_state": "not_activated",
+    }
+    with destination.open("x", encoding="utf-8") as file:
+        json.dump(report, file, sort_keys=True)
+        file.write("\\n")
+        file.flush()
+        os.fsync(file.fileno())
+    return report
 
 
 def _iso(now):
@@ -94,6 +136,18 @@ def main():
     try:
         while True:
             result = heartbeat(args.state, datetime.now(UTC), startup=first)
+            if first:
+                try:
+                    network = network_once()
+                    if network is not None:
+                        print(json.dumps({"network_probe": "tcp_only",
+                                          "tcp443_ipv4": network["tcp443_ipv4"],
+                                          "tcp443_ipv6": network["tcp443_ipv6"],
+                                          "mtproto_verified": False,
+                                          "credentials_used": False}), flush=True)
+                except (OSError, ValueError) as exc:
+                    print(json.dumps({"network_probe": "failed",
+                                      "error_type": type(exc).__name__}), flush=True)
             first = False
             if result["heartbeats"] % 3 == 1 or result["gaps_over_120_seconds"]:
                 # Only aggregate statistics. No account, host, IP, message, URL or secrets.
