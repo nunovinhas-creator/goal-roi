@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T20:03:13+00:00",
+ "generated_at_utc": "2026-11-18T20:04:29+00:00",
  "messages": 1584,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T20:03:13+00:00",
+  "collector_last_run_utc": "2026-11-18T20:03:48+00:00",
   "name_review": [
    {
     "bot": [
@@ -3411,7 +3411,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8657,
+    "em observação": 8658,
     "abandonada": 29,
     "promissora": 88
    },
@@ -4468,11 +4468,11 @@
     }
    ]
   },
-  "hypotheses": 8774,
+  "hypotheses": 8775,
   "tested": 877,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8732,
+   "em observação": 8733,
    "abandonada": 30,
    "promissora": 12
   },
@@ -6077,7 +6077,7 @@
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T20:03:30+00:00",
+   "generated_utc": "2026-11-18T20:04:53+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6105,7 +6105,7 @@
      "prospective_games": 438
     },
     "llm/evitar": {
-     "hypotheses": 6,
+     "hypotheses": 7,
      "with_prospective_evidence": 1,
      "prospective_games": 32
     }
@@ -17109,6 +17109,67 @@
   "llm": [
    {
     "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Stake | Faixa de odd = odd até 1,50 & Valor da aposta = 10 mil $ ou mais",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd até 1,50"
+     ],
+     [
+      "Valor da aposta",
+      "10 mil $ ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-18T20:03:51+00:00",
+    "reason": "apostas altas em odds baixas",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
     "signals": 1,
     "hits": 0,
     "misses": 0,
@@ -18459,80 +18520,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 8,
-    "signals": 16,
-    "hits": 7,
-    "misses": 1,
-    "hit_rate": 0.875,
-    "ci95": [
-     0.5291,
-     0.9776
-    ],
-    "break_even": 0.5981,
-    "roi": 0.4688,
-    "games": 5,
-    "bets": 8,
-    "unidentified": 0,
-    "prudent_rate": 0.6642,
-    "prob_above": 0.7233,
-    "edge": 0.0679,
-    "edge_ci": [
-     -0.139,
-     0.2491
-    ],
-    "prob_above_cut": 0.6912,
-    "prob_adds": 0.5068,
-    "id": "Stake | Competição = seleções & Faixa de odd = odd 1,50 a 2,00 & Liga = UEFA Nations League",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Competição",
-      "seleções"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Liga",
-      "UEFA Nations League"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-16T03:42:30+00:00",
-    "reason": "Seleções com odd baixa em ligas fortes",
-    "expect": "acima",
-    "mode": "novas",
-    "tradable": true,
-    "open": 8,
-    "born_verified": true,
-    "game_set": "a49810801cc954fe",
-    "prospective": {
-     "games": 5,
-     "hits": 4.0,
-     "misses": 1.0,
-     "prob_above": null,
-     "roi": 0.4688,
-     "categories": {
-      "prospective": 5,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 74,
+  "llm_total": 75,
   "watch": [],
   "presentation": {
    "version": "telegram_presentation_v1",
@@ -23202,15 +23192,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 146,
-  "llm_last_run_utc": "2026-11-18T19:00:31+00:00",
+  "llm_runs": 147,
+  "llm_last_run_utc": "2026-11-18T20:03:51+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-18",
-   "calls_today": 19,
-   "neurons_today": 4007.6,
-   "accepted_today": 10,
-   "last_mode": "refinar"
+   "calls_today": 20,
+   "neurons_today": 4206.0,
+   "accepted_today": 11,
+   "last_mode": "evitar"
   },
   "notes": [
    {
@@ -23461,8 +23451,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 74,
-   "groups": 74,
+   "llm_hypotheses": 75,
+   "groups": 75,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }

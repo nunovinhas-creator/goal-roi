@@ -146000,6 +146000,31 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Faixa de odd = odd até 1,50 & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-18T20:03:51+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd até 1,50"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Stake",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "03b98077656657047909de2eb7723edee144d272d0d230d37c938cbab31540b8",
+   "registry_size": 8774,
+   "report_generated_at_utc": "2026-11-18T20:03:51+00:00",
+   "response_sha256": "0490b93ad572942ccd4fce447401c15412a55f54519c761b4ba9069ab24b0ada"
+  },
+  "reason": "apostas altas em odds baixas",
+  "source": "llm"
+ },
  "Stake | Faixa de odd = odd até 1,50 & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-16T02:35:49+00:00",
   "conditions": [
