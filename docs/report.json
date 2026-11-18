@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-18T10:14:55+00:00",
- "messages": 1530,
+ "generated_at_utc": "2026-11-18T10:17:24+00:00",
+ "messages": 1531,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 50,
-  "BETFAIR": 293,
+  "BETFAIR": 294,
   "STAKE_LOAD": 289,
   "OPEN_GAME": 189,
   "TOTALS_FORM": 63,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2574,
+  "versions": 2575,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T09:47:28+00:00",
+  "last_collected_at_utc": "2026-11-18T10:17:24+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T10:14:53+00:00",
+  "collector_last_run_utc": "2026-11-18T10:17:24+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 452,
   "goal_lists_consistent": 241
  },
- "unique_bets": 841,
+ "unique_bets": 842,
  "settled_bets": 693,
  "unsettled_market": 79,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -678,7 +678,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/pre/mkt>=10K": {
-   "bets": 4,
+   "bets": 5,
    "settled": 3,
    "matches": 3,
    "wins": 1,
@@ -1586,7 +1586,7 @@
    "prob_above_cut": 0.7453
   },
   "BETFAIR/pre": {
-   "signals": 27,
+   "signals": 28,
    "with_result": 23,
    "hits": 9,
    "misses": 14,
@@ -2759,7 +2759,7 @@
    },
    {
     "n": 28,
-    "signals": 61,
+    "signals": 62,
     "hits": 12,
     "misses": 16,
     "hit_rate": 0.4286,
@@ -3302,7 +3302,7 @@
    },
    {
     "n": 190,
-    "signals": 245,
+    "signals": 246,
     "hits": 94,
     "misses": 96,
     "hit_rate": 0.496,
@@ -3381,8 +3381,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1025,
-   "eligible": 841,
+   "total": 1026,
+   "eligible": 842,
    "excluded": 184,
    "reasons": {
     "no_valid_odds": 136,
@@ -3397,7 +3397,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8490,
+    "em observação": 8499,
     "abandonada": 29,
     "promissora": 80
    },
@@ -4454,11 +4454,11 @@
     }
    ]
   },
-  "hypotheses": 8599,
+  "hypotheses": 8608,
   "tested": 850,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8558,
+   "em observação": 8567,
    "abandonada": 30,
    "promissora": 11
   },
@@ -4913,6 +4913,151 @@
       }
      ],
      "bad_total": 1
+    },
+    {
+     "match_id": "cruzeiro-vs-palmeiras-20261119",
+     "match": "Cruzeiro — Palmeiras",
+     "league": "Brazilian BRAZIL SERIE A",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-18T23:30+00:00",
+     "date_utc": "2026-11-18T10:16:13+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Cruzeiro",
+     "odds": 2.74,
+     "odds_last": 2.74,
+     "max_mult": 1,
+     "share": 61,
+     "share_last": 61,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 2,00 a 3,00",
+     "odds_band_n": 44,
+     "good": [
+      {
+       "id": "Betfair | Quota de mercado = menos de 80 % & Tamanho do mercado = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Tamanho do mercado",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 33,
+       "games": 32,
+       "hits": 12,
+       "break_even": 0.2622,
+       "prob_above": 0.8782,
+       "roi": 0.4603,
+       "edge": 0.0845,
+       "status": "em observação",
+       "source": "llm"
+      },
+      {
+       "id": "Betfair | Competição = liga & Quota de mercado = menos de 80 %",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ]
+       ],
+       "n": 17,
+       "games": 17,
+       "hits": 7,
+       "break_even": 0.2729,
+       "prob_above": 0.8274,
+       "roi": 0.4406,
+       "edge": 0.0874,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Dia = dia de semana & Seleção = equipa da casa & Tamanho do mercado = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Seleção",
+         "equipa da casa"
+        ],
+        [
+         "Tamanho do mercado",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 26,
+       "games": 26,
+       "hits": 12,
+       "break_even": 0.3542,
+       "prob_above": 0.8256,
+       "roi": 0.6346,
+       "edge": 0.0775,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 3,
+     "bad": [
+      {
+       "id": "Betfair | Antecedência = mais de 60 min & Volume na seleção = menos de 10 mil $",
+       "conditions": [
+        [
+         "Antecedência",
+         "mais de 60 min"
+        ],
+        [
+         "Volume na seleção",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 12,
+       "games": 11,
+       "hits": 1,
+       "break_even": 0.4104,
+       "prob_above": 0.0452,
+       "roi": -0.8592,
+       "edge": -0.1696,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Antecedência = mais de 60 min & Dia = dia de semana",
+       "conditions": [
+        [
+         "Antecedência",
+         "mais de 60 min"
+        ],
+        [
+         "Dia",
+         "dia de semana"
+        ]
+       ],
+       "n": 11,
+       "games": 10,
+       "hits": 1,
+       "break_even": 0.4177,
+       "prob_above": 0.059,
+       "roi": -0.8464,
+       "edge": -0.1615,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 26
     },
     {
      "match_id": "flamengo-vs-atletico-paranaense-20261119",
@@ -5532,12 +5677,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 1,
+    "misto": 2,
     "sem evidência": 0,
     "contraditório": 5,
     "evitar": 0
    },
-   "generated_utc": "2026-11-18T10:15:18+00:00",
+   "generated_utc": "2026-11-18T10:17:47+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5550,7 +5695,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 8529,
+     "hypotheses": 8538,
      "with_prospective_evidence": 2756,
      "prospective_games": 55552
     },
@@ -5664,7 +5809,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 414,
+    "bets": 415,
     "settled": 363,
     "games": 237,
     "wins": 176,
@@ -15768,7 +15913,7 @@
   "abandoned": [
    {
     "n": 62,
-    "signals": 93,
+    "signals": 94,
     "hits": 21,
     "misses": 41,
     "hit_rate": 0.3387,
@@ -15808,7 +15953,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 6,
+    "open": 7,
     "born_verified": true,
     "game_set": "69e4034c395fb835",
     "prospective": {
@@ -15848,7 +15993,7 @@
    },
    {
     "n": 42,
-    "signals": 67,
+    "signals": 68,
     "hits": 11,
     "misses": 31,
     "hit_rate": 0.2619,
@@ -15888,7 +16033,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 4,
+    "open": 5,
     "born_verified": true,
     "game_set": "0851f9d8b35ee2b2",
     "prospective": {
@@ -15928,7 +16073,7 @@
    },
    {
     "n": 54,
-    "signals": 69,
+    "signals": 70,
     "hits": 16,
     "misses": 38,
     "hit_rate": 0.2963,
@@ -15968,7 +16113,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 4,
+    "open": 5,
     "born_verified": true,
     "game_set": "0ca2ef8673004a12",
     "prospective": {
@@ -16172,7 +16317,7 @@
    },
    {
     "n": 40,
-    "signals": 55,
+    "signals": 56,
     "hits": 12,
     "misses": 28,
     "hit_rate": 0.3,
@@ -16216,7 +16361,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 4,
+    "open": 5,
     "born_verified": true,
     "game_set": "e36f6414b78ed260",
     "prospective": {
@@ -16336,7 +16481,7 @@
    },
    {
     "n": 35,
-    "signals": 47,
+    "signals": 48,
     "hits": 10,
     "misses": 25,
     "hit_rate": 0.2857,
@@ -16380,7 +16525,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 2,
+    "open": 3,
     "born_verified": true,
     "game_set": "c62a610e71f9a0b6",
     "prospective": {
@@ -22711,7 +22856,7 @@
    {
     "phase": "pre",
     "level": 1,
-    "signals": 21,
+    "signals": 22,
     "n": 17,
     "hits": 4,
     "hit_rate": 0.2353,
@@ -22861,7 +23006,7 @@
     "days_to_conclusion": 15
    },
    "BETFAIR/pre": {
-    "signals": 21,
+    "signals": 22,
     "with_result": 17,
     "hits": 4,
     "misses": 13,
@@ -23168,7 +23313,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 111,
+   "bets": 112,
    "settled": 68,
    "matches": 67,
    "wins": 19,
@@ -23248,7 +23393,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 128,
+   "bets": 129,
    "settled": 85,
    "matches": 82,
    "wins": 28,
@@ -23316,7 +23461,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q5 Betfair pré-jogo: sinal a mais de 60 min do início": {
-   "bets": 15,
+   "bets": 16,
    "settled": 14,
    "matches": 13,
    "wins": 2,
@@ -23452,7 +23597,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 841,
+   "bets": 842,
    "settled": 693,
    "matches": 370,
    "wins": 334,
@@ -23487,6 +23632,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-18T10:16:13+00:00",
+   "match_id": "cruzeiro-vs-palmeiras-20261119",
+   "group": "BETFAIR/pre/mkt>=10K",
+   "match": "Cruzeiro — Palmeiras",
+   "selection": "Cruzeiro",
+   "odds": 2.74,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-18T08:16:27+00:00",
    "match_id": "flamengo-vs-atletico-paranaense-20261119",
@@ -24411,22 +24569,6 @@
    "w": 0.5,
    "settled_by": "resultado",
    "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-17T19:28:10+00:00",
-   "match_id": "poland-vs-sweden-20261117",
-   "group": "POLYMARKET/pre",
-   "match": "Poland — Sweden",
-   "selection": "Polymarket: AH2(+0.5)",
-   "odds": 1.85,
-   "ft": [
-    1,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "marca do bot",
-   "n_signals": 2,
    "max_mult": 1
   }
  ],
@@ -27201,6 +27343,28 @@
      "odds": 2.43,
      "market": "Asian Handicap",
      "total": 15000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "cruzeiro-vs-palmeiras-20261119": {
+   "teams": [
+    "Cruzeiro",
+    "Palmeiras"
+   ],
+   "events": [
+    {
+     "d": "2026-11-18T10:16:13+00:00",
+     "k": "BETFAIR",
+     "phase": "pre",
+     "selection": "1",
+     "odds": 2.74,
+     "mult": 1,
+     "share": 61,
+     "mkt_volume": 16000.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -33261,7 +33425,7 @@
    "day": "2026-11-17"
   },
   {
-   "bets": 11,
+   "bets": 12,
    "settled": 6,
    "wins": 3,
    "units": -0.31,
