@@ -63,3 +63,33 @@ Fontes oficiais:
 - **Condição externa a confirmar:** disponibilidade efetiva de VM Always Free e elegibilidade de conta, sem converter para serviço pago.
 
 **Próximo passo seguro:** preparar um manifesto de configuração para VM com modo simulado e um contrato de adaptador de fonte autenticada, mantendo tudo desligado. Nenhuma instalação ou ligação a Telegram deve ocorrer sem aprovação expressa.
+
+## Controlo financeiro obrigatório — Google Cloud (atualização de 18/11/2026)
+
+O proprietário confirmou ter conta Google Cloud, mas definiu uma restrição **absoluta de 0 € de faturação**. Isto altera a decisão: **não provisionar a VM nem qualquer recurso faturável** apenas por constar do Free Tier.
+
+### Risco confirmado em documentação oficial
+
+- Compute Engine Free Tier cobre **uma e2-micro** nas regiões `us-west1`, `us-central1` ou `us-east1`, **30 GB-mês de Persistent Disk standard** e **1 GB/mês de saída para destinos elegíveis**. Créditos/quotas não equivalem a bloqueio de cobrança.
+- O **IPv4 externo utilizado por uma VM normal** custa **US$ 0,005/hora**, com apenas **uma hora por mês por conta** gratuita segundo a tabela atual (cerca de US$ 3,60 por 30 dias). IP estático não atribuído também pode gerar encargos. **É proibida** a configuração habitual de VM com IPv4 externo sob esta restrição.
+- Sem IPv4 público, um NAT IPv4 Cloud NAT também tem custos de instância, IP e tráfego; **não o criar**.
+- Google Cloud Budgets com *alerts only* não são teto de despesa. Os novos *spend caps* são atualmente elegíveis apenas para serviços específicos (Gemini API, Agent Platform, Cloud Run e Cloud Run functions); não protegem utilização contínua de **Compute Engine**, armazenamento ou tráfego de rede. Mesmo os spend caps não suspendem recursos persistentes que continuem a acumular custos.
+- O **IPv6 externo atribuído à VM não tem custo de endereço**. Telegram/MTProto fornece endpoints IPv6 e Telethon suporta `use_ipv6=True`. Uma VM `e2-micro` com **IPv6 externo sem IPv4 público e sem NAT** é uma **hipótese de estudo**, ainda não certificada: confirmar suporte da rede, arranque, atualização de dependências e todas as ligações exclusivamente IPv6, e que o tráfego mensal permanece dentro da quota. Uma falha IPv6 não autoriza criar IPv4/NAT.
+- Um alerta de faturação ou um script que desative o projeto **não é garantia de despesa zero**, devido a atrasos de medição e possíveis encargos já incorridos.
+
+### Decisão vinculativa do projeto
+
+**NO-GO para criar recursos Google Cloud enquanto não houver um mecanismo efetivo e verificado que impeça faturação**, incluindo IP, rede e armazenamento. A investigação offline, manifestos sem segredos e testes sintéticos no repo são autorizáveis; **nenhuma operação de criação/ativação** é abrangida.
+
+Não presumir que a conta existente é de teste, que tem créditos, que a faturação está desligada, nem que já existem VMs elegíveis. O estado da conta deve ser confirmado de forma de leitura apenas pelo proprietário. Não introduzir scripts que abram serviços ou façam upgrade de faturação.
+
+### Referências oficiais verificadas em 18/11/2026
+
+- https://docs.cloud.google.com/free/docs/free-cloud-features
+- https://cloud.google.com/vpc/network-pricing
+- https://docs.cloud.google.com/billing/docs/how-to/budgets
+- https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps
+- https://docs.cloud.google.com/billing/docs/how-to/budget-api-spend-cap
+- https://docs.cloud.google.com/compute/docs/instances/create-ipv6-instance
+- https://docs.telethon.dev/en/stable/modules/client.html
+- https://core.telegram.org/api/datacenter
