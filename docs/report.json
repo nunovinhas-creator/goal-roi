@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T10:32:39+00:00",
+ "generated_at_utc": "2026-11-18T10:42:13+00:00",
  "messages": 1532,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T10:32:36+00:00",
+  "collector_last_run_utc": "2026-11-18T10:41:27+00:00",
   "name_review": [
    {
     "bot": [
@@ -1573,7 +1573,7 @@
    "roi_announced_odds": 0.2279,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 14.8,
+   "per_day": 14.7,
    "days_to_hint": 0,
    "days_to_conclusion": 14,
    "prudent_rate": 0.38,
@@ -1649,7 +1649,7 @@
    "by_bot_mark": 0,
    "per_day": 0.4,
    "days_to_hint": 63,
-   "days_to_conclusion": 685,
+   "days_to_conclusion": 686,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1684,7 +1684,7 @@
    "roi_announced_odds": 0.1354,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 21.7,
+   "per_day": 21.6,
    "days_to_hint": 0,
    "days_to_conclusion": 8,
    "prudent_rate": 0.6277,
@@ -3397,7 +3397,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8499,
+    "em observação": 8501,
     "abandonada": 29,
     "promissora": 80
    },
@@ -4454,11 +4454,11 @@
     }
    ]
   },
-  "hypotheses": 8608,
+  "hypotheses": 8610,
   "tested": 850,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8567,
+   "em observação": 8569,
    "abandonada": 30,
    "promissora": 11
   },
@@ -5682,7 +5682,7 @@
     "contraditório": 5,
     "evitar": 0
    },
-   "generated_utc": "2026-11-18T10:33:04+00:00",
+   "generated_utc": "2026-11-18T10:42:44+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5700,7 +5700,7 @@
      "prospective_games": 55552
     },
     "llm/refinar": {
-     "hypotheses": 45,
+     "hypotheses": 47,
      "with_prospective_evidence": 15,
      "prospective_games": 405
     },
@@ -16743,6 +16743,144 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Dia",
+      "dia de semana"
+     ],
+     [
+      "Golos até ao sinal",
+      "1 ou 2"
+     ],
+     [
+      "Parte do jogo",
+      "2.ª parte"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-18T10:41:29+00:00",
+    "reason": "Jogos de dia de semana na 2ª parte sem sinais anteriores com 1 ou 2 golos",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Stake | Hora (UTC) = noite & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Mercado",
+      "outros mercados"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-18T10:41:29+00:00",
+    "reason": "Apostas à noite sem sinais anteriores com valor baixo em outros mercados",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
     "family": "Polymarket",
     "conditions": [
@@ -17992,153 +18130,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 1,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": 0.0,
-    "games": 0,
-    "bets": 0,
-    "unidentified": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "3 ou mais"
-     ],
-     [
-      "Marcador no momento",
-      "diferença de 2 ou mais golos"
-     ],
-     [
-      "Parte do jogo",
-      "2.ª parte"
-     ],
-     [
-      "Ritmo indicado pelo bot",
-      "menos de 90"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-16T00:40:08+00:00",
-    "reason": "Combinação de condições que indicam um jogo aberto com uma diferença significativa no marcador e um ritmo lento",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": null,
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
-   },
-   {
-    "n": 3,
-    "signals": 4,
-    "hits": 3,
-    "misses": 0,
-    "hit_rate": 1.0,
-    "ci95": [
-     0.4385,
-     1.0
-    ],
-    "break_even": 0.5909,
-    "roi": 0.52,
-    "games": 3,
-    "bets": 3,
-    "unidentified": 0,
-    "prudent_rate": 0.6853,
-    "prob_above": 0.7774,
-    "edge": 0.0944,
-    "edge_ci": [
-     -0.126,
-     0.2812
-    ],
-    "prob_above_cut": 0.751,
-    "prob_adds": null,
-    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Golos em falta para ganhar",
-      "até 1 golo"
-     ],
-     [
-      "Marcador no momento",
-      "diferença de 2 ou mais golos"
-     ],
-     [
-      "Parte do jogo",
-      "2.ª parte"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-15T20:39:51+00:00",
-    "reason": "Jogos com diferença de 2 ou mais golos, na 2ª parte, com poucos golos em falta para ganhar e sem sinais anteriores tendem a ter um desfecho previsível",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": "62b8f35a65234eb9",
-    "prospective": {
-     "games": 3,
-     "hits": 3.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.6933,
-     "categories": {
-      "prospective": 3,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 70,
+  "llm_total": 72,
   "watch": [],
   "presentation": {
    "version": "telegram_presentation_v1",
@@ -22708,15 +22702,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 137,
-  "llm_last_run_utc": "2026-11-18T09:38:24+00:00",
+  "llm_runs": 138,
+  "llm_last_run_utc": "2026-11-18T10:41:29+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-18",
-   "calls_today": 10,
-   "neurons_today": 2081.0,
-   "accepted_today": 6,
-   "last_mode": "novas"
+   "calls_today": 11,
+   "neurons_today": 2322.2,
+   "accepted_today": 8,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -22967,8 +22961,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 70,
-   "groups": 70,
+   "llm_hypotheses": 72,
+   "groups": 72,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }

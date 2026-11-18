@@ -69216,6 +69216,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-18T10:41:29+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "d7b20f234db6151f2ef2ef9160678ec66a36e0d28a47a4ef6f7c25ccf1cffa48",
+   "registry_size": 8608,
+   "report_generated_at_utc": "2026-11-18T10:41:29+00:00",
+   "response_sha256": "355c8c750a7dbd1c096c1baaf559327cd0ea56db9e98d08ba20ed970d4e61ac9"
+  },
+  "reason": "Jogos de dia de semana na 2ª parte sem sinais anteriores com 1 ou 2 golos",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = dia de semana & Golos até ao sinal = 1 ou 2 & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T01:59:37+00:00",
   "conditions": [
@@ -147060,6 +147093,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Hora (UTC) = noite & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-18T10:41:29+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "d7b20f234db6151f2ef2ef9160678ec66a36e0d28a47a4ef6f7c25ccf1cffa48",
+   "registry_size": 8608,
+   "report_generated_at_utc": "2026-11-18T10:41:29+00:00",
+   "response_sha256": "355c8c750a7dbd1c096c1baaf559327cd0ea56db9e98d08ba20ed970d4e61ac9"
+  },
+  "reason": "Apostas à noite sem sinais anteriores com valor baixo em outros mercados",
+  "source": "llm"
  },
  "Stake | Hora (UTC) = noite & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": {
   "born_utc": "2026-11-14T19:17:02+00:00",
