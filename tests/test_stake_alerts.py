@@ -63,6 +63,12 @@ class StakeText(unittest.TestCase):
         self.assertIn('Over 2.5', inline)
         self.assertNotIn('Under 2.5', inline)
 
+    def test_unknown_brand_and_generic_stake(self):
+        new = PRE.replace(HEADER, '💸 🟦 Stake unusual header')
+        alert, = payloads(row(1, new))
+        self.assertIn(new, alert)
+        self.assertEqual(list(payloads(row(1, 'stake management advice'))), [])
+
     def test_missing_and_cutoff_odds_are_not_invented(self):
         for suffix in ('', ' @ ', ' @ 1.'):
             text = PRE.replace(' @ 1.85', suffix)
@@ -90,8 +96,9 @@ class StakeText(unittest.TestCase):
     def test_multiple_distinct_markets_and_multiple_blocks(self):
         second = '📊 Both Teams To Score → Yes @ 0.97'
         text = OTHER + '\n' + PRE + '\n' + PICK + ' | ' + second + '\n' + LIVE
-        first, middle, last = payloads(row(1, text, date='17:55'))
+        first, repeated, middle, last = payloads(row(1, text, date='17:55'))
         self.assertIn('Over 2.5', first)
+        self.assertEqual(first, repeated)
         self.assertIn('0.97', middle)
         self.assertIn('Both Teams To Score', middle)
         self.assertIn('LIVE', last)
@@ -189,6 +196,19 @@ class DurableOutbox(unittest.TestCase):
             self.assertEqual(status(db), [])
             self.assertEqual(alerts.ingest(db, baseline + blob(row(3))), 1)
 
+    def test_uncertain_replay_is_bounded_and_following_message_has_priority(self):
+        with closing(sqlite3.connect(':memory:')) as db:
+            alerts.initialize(db, b'', ACTIVATION)
+            alerts.ingest(db, blob(row(1), row(2)))
+            ambiguous = Mock(return_value=('uncertain', 300))
+            alerts.send_next(db, ambiguous, lambda: 100)
+            self.assertTrue(db.execute('SELECT text FROM outbox WHERE id=1').fetchone()[0])
+            alerts.send_next(db, Mock(return_value=('sent', 0)), lambda: 104, True)
+            self.assertEqual(status(db)[1][-1], 'sent')
+            alerts.send_next(db, ambiguous, lambda: 20000, True)
+            self.assertIsNone(alerts.send_next(db, ambiguous, lambda: 30000, True))
+            self.assertEqual(ambiguous.call_count, 2)
+
     def test_multiple_alerts_per_message_are_enqueued_once(self):
         text = PRE + '\n📊 Both Teams To Score → Yes'
         source = blob(row(12, text))
@@ -197,6 +217,20 @@ class DurableOutbox(unittest.TestCase):
             self.assertEqual(alerts.ingest(db, source), 2)
             self.assertEqual(alerts.ingest(db, source + blob(row(12, text + '\n🏁 FT 2:1'))), 0)
             self.assertEqual(status(db), [(12, 1, 'pending'), (12, 2, 'pending')])
+
+    def test_hours_offline_and_retry_budget(self):
+        with tempfile.TemporaryDirectory() as folder:
+            state = Path(folder) / 'state.sqlite3'
+            initial = blob(row(1))
+            with alerts.locked_db(state, create=True) as db:
+                alerts.initialize(db, initial, ACTIVATION)
+            with alerts.locked_db(state) as db:
+                alerts.ingest(db, initial + blob(row(2), row(3, date='22:30', collected='23:00')))
+                for attempt in range(5):
+                    alerts.send_next(db, Mock(return_value=('pending', 42)), lambda: 100 + 43 * attempt)
+                self.assertEqual(status(db), [(2, 1, 'exhausted'), (3, 1, 'pending')])
+                alerts.send_next(db, Mock(return_value=('sent', 0)), lambda: 10000)
+                self.assertEqual(status(db)[1][-1], 'sent')
 
     def test_same_state_is_exclusive_and_missing_state_cannot_enable(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -217,6 +251,7 @@ class TelegramTransport(unittest.TestCase):
             (429, b'{}', ('pending', alerts.RETRY_SECONDS)),
             (403, b'{}', ('pending', alerts.RETRY_SECONDS)),
             (400, b'{}', ('rejected', 0)),
+            (500, b'{}', ('uncertain', alerts.RETRY_SECONDS)),
             (503, b'{}', ('uncertain', alerts.RETRY_SECONDS)),
         ):
             with self.subTest(http=http, content=content):
@@ -230,6 +265,12 @@ class TelegramTransport(unittest.TestCase):
                 self.assertEqual((method, endpoint), ('POST', '/botfixture/sendMessage'))
                 self.assertEqual(parse_qs(body)['text'], ['alert'])
                 conn.request.assert_called_once()
+
+    def test_timeout_before_request(self):
+        conn = Mock()
+        conn.connect.side_effect = TimeoutError()
+        self.assertEqual(alerts.telegram_send('fixture', 'chat', 'alert', Mock(return_value=conn))[0], 'pending')
+        conn.request.assert_not_called()
 
     def test_transport_errors_do_not_retry_ambiguous_delivery(self):
         for exc, status_name in ((ConnectionRefusedError(), 'pending'), (TimeoutError(), 'uncertain')):

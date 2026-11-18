@@ -26,6 +26,7 @@ SCHEMA = (
     ' size INTEGER NOT NULL, digest TEXT NOT NULL, send_after REAL NOT NULL)',
     'CREATE TABLE seen (message_id INTEGER PRIMARY KEY)',
     'CREATE TABLE outbox (id INTEGER PRIMARY KEY, message_id INTEGER NOT NULL, part INTEGER NOT NULL,'
+    ' attempts INTEGER NOT NULL DEFAULT 0, replayed INTEGER NOT NULL DEFAULT 0,'
     ' status TEXT NOT NULL, text TEXT, UNIQUE (message_id, part))',
 )
 
@@ -108,6 +109,10 @@ def telegram_send(token, chat, text, connect=http.client.HTTPSConnection):
     body = urlencode({'chat_id': chat, 'text': text, 'link_preview_options': '{"is_disabled":true}'})
     with closing(connect('api.telegram.org', timeout=15)) as conn:
         try:
+            conn.connect()
+        except (OSError, http.client.HTTPException):
+            return 'pending', RETRY_SECONDS
+        try:
             conn.request('POST', f'/bot{token}/sendMessage', body, {'Content-Type': 'application/x-www-form-urlencoded'})
             response = conn.getresponse()
         except (socket.gaierror, ConnectionRefusedError):
@@ -138,15 +143,20 @@ def telegram_send(token, chat, text, connect=http.client.HTTPSConnection):
 
 def recover(db):
     with db:
-        return db.execute("UPDATE outbox SET status = 'uncertain', text = NULL WHERE status = 'sending'").rowcount
+        return db.execute("UPDATE outbox SET status = 'uncertain' WHERE status = 'sending'").rowcount
 
 
 def next_pending(db):
     return db.execute("SELECT id, text FROM outbox WHERE status = 'pending' ORDER BY id LIMIT 1").fetchone()
 
 
-def send_next(db, sender, clock=time.time):
+def send_next(db, sender, clock=time.time, retry_uncertain=False):
     pending = next_pending(db)
+    replay = False
+    if pending is None and retry_uncertain:
+        pending = db.execute("SELECT id, text FROM outbox WHERE status = 'uncertain' AND replayed = 0 "
+                             "AND text IS NOT NULL ORDER BY id LIMIT 1").fetchone()
+        replay = True
     if pending is None:
         return None
     now = clock()
@@ -155,14 +165,17 @@ def send_next(db, sender, clock=time.time):
         return None
     item, text = pending
     with db:
-        db.execute("UPDATE outbox SET status = 'sending' WHERE id = ?", (item,))
+        db.execute("UPDATE outbox SET status = 'sending', attempts = attempts + 1, replayed = MAX(replayed, ?) WHERE id = ?", (int(replay), item))
         db.execute('UPDATE cursor SET send_after = ?', (now + SEND_SPACING,))
     # A crash after this durable intent leaves this request uncertain and forbids automatic replay.
     outcome, delay = sender(text)
     with db:
+        attempts, = db.execute('SELECT attempts FROM outbox WHERE id = ?', (item,)).fetchone()
+        if outcome == 'pending' and attempts >= 5:
+            outcome = 'exhausted'
         db.execute('UPDATE outbox SET status = ?, text = ? WHERE id = ?',
-                   (outcome, text if outcome == 'pending' else None, item))
-        if delay:
+                   (outcome, None if outcome == 'sent' else text, item))
+        if delay and outcome != 'uncertain':
             db.execute('UPDATE cursor SET send_after = MAX(send_after, ?)', (clock() + delay,))
     return outcome
 
@@ -179,7 +192,12 @@ def locked_db(path, create=False):
             yield db
 
 
-def supervise(db, load, sender):
+def supervise(db, load, sender, retry_uncertain=False):
+    with db:
+        columns = {r[1] for r in db.execute('PRAGMA table_info(outbox)')}
+        for field in ('attempts', 'replayed'):
+            if field not in columns:
+                db.execute(f'ALTER TABLE outbox ADD COLUMN {field} INTEGER NOT NULL DEFAULT 0')
     interrupted = recover(db)
     if interrupted:
         print('STAKE_INTERRUPTED_UNCERTAIN', interrupted, flush=True)
@@ -195,7 +213,7 @@ def supervise(db, load, sender):
                 queued = ingest(db, snapshot)
                 if queued:
                     print('STAKE_QUEUED', queued, flush=True)
-        outcome = send_next(db, sender)
+        outcome = send_next(db, sender, retry_uncertain=retry_uncertain)
         if outcome:
             print('STAKE_DELIVERY', outcome.upper(), flush=True)
         wait = next_poll - time.monotonic()
@@ -212,6 +230,7 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument('--initialize', action='store_true', help='record a baseline without sending')
     mode.add_argument('--enable-send', action='store_true', help='start sending new Stake occurrences')
+    parser.add_argument('--retry-uncertain-once', action='store_true')
     args = parser.parse_args(argv)
     os.umask(0o077)
     try:
@@ -225,7 +244,7 @@ def main(argv=None):
             if not re.fullmatch(r'\d+:[A-Za-z0-9_-]+', token) or not chat:
                 raise ValueError('bot credentials unavailable')
             with locked_db(args.state) as db:
-                supervise(db, lambda: published_snapshot(args.source_repo), lambda text: telegram_send(token, chat, text))
+                supervise(db, lambda: published_snapshot(args.source_repo), lambda text: telegram_send(token, chat, text), args.retry_uncertain_once)
     except KeyboardInterrupt:
         return 0
     except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError) as error:

@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 from .parser import HEAD, kickoff_utc
 
 STAKE_HEADER = re.compile(r'^(?:💸\s*)+\s*(?:🟦\s*)?Stake(?:\s+money load\b|\s*:\s*load growing\b)', re.I)
+BRANDED = re.compile(r'^(?:💸\s*)*🟦\s*Stake\b', re.I)
 OTHER_HOUSE = r'(?:Betfair|Polymarket|Kalshi|Bet365|Pinnacle)(?:\s*:|\s+money load\b|\s+LIVE\b|\s*$)'
 OTHER_HEADER = re.compile(rf'^\W*{OTHER_HOUSE}', re.I)
 INLINE_OTHER = re.compile(rf'\s*\|\s*📊\s*{OTHER_HOUSE}', re.I)
@@ -31,7 +32,7 @@ def stake_blocks(text):
     lines = text.splitlines(keepends=True)
     for i, line in enumerate(lines):
         heading = line.strip()
-        stake = STAKE_HEADER.match(heading)
+        stake = STAKE_HEADER.match(heading) or BRANDED.match(heading)
         if stake or HEAD.match(heading) or OTHER_HEADER.match(heading):
             if start is not None:
                 yield ''.join(lines[start:i])
@@ -79,7 +80,7 @@ def match_context(row, lines):
 def block_bodies(row, block):
     lines = block.splitlines()
     teams, phase = match_context(row, lines)
-    market_lines = dict.fromkeys(
+    market_lines = list(
         part.strip() for line in lines if line.lstrip().startswith('📊')
         for part in re.split(r'\s*\|\s*(?=📊)', line)
     )
@@ -129,5 +130,11 @@ def payloads(row):
         header += f'🕒 Hora da mensagem: {when.astimezone(LISBON):%H:%M de %d/%m}\n'
     header += f'Origem: ScanGoal · mensagem #{row["message_id"]}\n\n'
     for block in stake_blocks(row['text']):
+        if not STAKE_HEADER.match(block.lstrip()):
+            print('STAKE_FORMAT_REVIEW')
+            if not any(MARKET_LINE.fullmatch(line.strip()) for line in block.splitlines()):
+                continue
+            yield from telegram_chunks(header, '📍 Tipo: NÃO DETERMINADO\nMensagem original\n' + block)
+            continue
         for body in block_bodies(row, block):
             yield from telegram_chunks(header, body)
