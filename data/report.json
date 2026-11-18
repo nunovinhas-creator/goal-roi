@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-18T19:45:59+00:00",
- "messages": 1583,
+ "generated_at_utc": "2026-11-18T19:54:18+00:00",
+ "messages": 1584,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 52,
-  "BETFAIR": 308,
+  "BETFAIR": 309,
   "STAKE_LOAD": 303,
   "OPEN_GAME": 194,
   "TOTALS_FORM": 65,
@@ -15,9 +15,8 @@
   "None": 49,
   "TOTALS_FORM_NO_ODDS": 76
  },
- "unparsed": 76,
+ "unparsed": 77,
  "unparsed_samples": [
-  "🏁 Signal result",
   "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE",
   "🏁 Signal result",
@@ -26,6 +25,7 @@
   "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE",
   "💷💷 🟨 Betfair ×2 · LIVE",
+  "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE"
  ],
  "excluded_first_seen_with_result": 37,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2640,
+  "versions": 2646,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T19:43:41+00:00",
+  "last_collected_at_utc": "2026-11-18T19:54:18+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T19:45:56+00:00",
+  "collector_last_run_utc": "2026-11-18T19:54:18+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,12 +448,12 @@
   "stake_original_seen": 218,
   "stake_no_score_after_kickoff": 39,
   "stake_sent_45_after_kickoff": 66,
-  "goal_lists": 462,
+  "goal_lists": 465,
   "goal_lists_consistent": 246
  },
  "unique_bets": 865,
- "settled_bets": 703,
- "unsettled_market": 80,
+ "settled_bets": 706,
+ "unsettled_market": 82,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
@@ -1208,32 +1208,32 @@
   },
   "STAKE_LOAD/live": {
    "bets": 83,
-   "settled": 49,
-   "matches": 36,
-   "wins": 31,
-   "pushes": 0,
-   "units": 4.42,
-   "avg_odds": 1.849,
+   "settled": 52,
+   "matches": 37,
+   "wins": 32,
+   "pushes": 1,
+   "units": 4.22,
+   "avg_odds": 1.833,
    "roi": {
     "odd-0%": {
-     "roi": 0.0902,
+     "roi": 0.0812,
      "ci95": [
-      -0.1463,
-      0.3267
+      -0.142,
+      0.3043
      ]
     },
     "odd-2%": {
-     "roi": 0.0684,
+     "roi": 0.0599,
      "ci95": [
-      -0.1634,
-      0.3002
+      -0.1588,
+      0.2786
      ]
     },
     "odd-5%": {
-     "roi": 0.0357,
+     "roi": 0.0281,
      "ci95": [
-      -0.189,
-      0.2604
+      -0.1839,
+      0.24
      ]
     }
    },
@@ -1286,7 +1286,10 @@
     1.97,
     3.07,
     3.77,
-    4.42
+    4.42,
+    4.42,
+    5.22,
+    4.22
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1620,7 +1623,7 @@
    "roi_announced_odds": -0.2617,
    "seen_late": 6,
    "by_bot_mark": 0,
-   "per_day": 3.2,
+   "per_day": 3.1,
    "days_to_hint": 3,
    "days_to_conclusion": 88,
    "prudent_rate": 0.4273,
@@ -1659,7 +1662,7 @@
    "by_bot_mark": 0,
    "per_day": 0.4,
    "days_to_hint": 66,
-   "days_to_conclusion": 723,
+   "days_to_conclusion": 724,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1768,7 +1771,7 @@
    "roi_announced_odds": -0.0561,
    "seen_late": 0,
    "by_bot_mark": 120,
-   "per_day": 34.0,
+   "per_day": 33.9,
    "days_to_hint": 0,
    "days_to_conclusion": 3,
    "prudent_rate": 0.4806,
@@ -1782,40 +1785,40 @@
   },
   "STAKE_LOAD": {
    "signals": 228,
-   "with_result": 145,
-   "hits": 78,
-   "misses": 63,
-   "pushes": 4,
-   "eff_hits": 77.5,
-   "eff_misses": 62.5,
-   "vote_hits": 37.55,
-   "vote_misses": 31.37,
-   "vote_break_even": 0.5446,
-   "games": 69,
+   "with_result": 148,
+   "hits": 79,
+   "misses": 64,
+   "pushes": 5,
+   "eff_hits": 78.5,
+   "eff_misses": 63.5,
+   "vote_hits": 38.05,
+   "vote_misses": 31.87,
+   "vote_break_even": 0.5456,
+   "games": 70,
    "no_source": 0,
-   "unsettleable": 71,
-   "hit_rate": 0.5536,
+   "unsettleable": 73,
+   "hit_rate": 0.5528,
    "ci95": [
-    0.4709,
-    0.6334
+    0.4707,
+    0.6321
    ],
-   "avg_odds": 3.948,
-   "break_even": 0.5264,
+   "avg_odds": 3.916,
+   "break_even": 0.5276,
    "baseline": false,
-   "roi_announced_odds": 0.0148,
+   "roi_announced_odds": 0.0131,
    "seen_late": 9,
    "by_bot_mark": 28,
-   "per_day": 19.4,
+   "per_day": 19.6,
    "days_to_hint": 0,
    "days_to_conclusion": 9,
-   "prudent_rate": 0.5448,
-   "prob_above": 0.5042,
-   "edge": 0.0002,
+   "prudent_rate": 0.5444,
+   "prob_above": 0.4939,
+   "edge": -0.0012,
    "edge_ci": [
-    -0.0921,
-    0.0913
+    -0.093,
+    0.0893
    ],
-   "prob_above_cut": 0.4256
+   "prob_above_cut": 0.4149
   },
   "TOTALS_FORM": {
    "signals": 65,
@@ -1856,40 +1859,40 @@
   },
   "TOTALS_FORM_NO_ODDS": {
    "signals": 76,
-   "with_result": 71,
+   "with_result": 72,
    "hits": 61,
-   "misses": 10,
+   "misses": 11,
    "pushes": 0,
    "eff_hits": 61.0,
-   "eff_misses": 10.0,
+   "eff_misses": 11.0,
    "vote_hits": 61.0,
-   "vote_misses": 10.0,
+   "vote_misses": 11.0,
    "vote_break_even": null,
-   "games": 71,
+   "games": 72,
    "no_source": 2,
    "unsettleable": 0,
-   "hit_rate": 0.8592,
+   "hit_rate": 0.8472,
    "ci95": [
-    0.7598,
-    0.9217
+    0.7468,
+    0.9125
    ],
    "avg_odds": null,
-   "break_even": 0.7311,
+   "break_even": 0.7319,
    "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 14.0,
+   "per_day": 14.2,
    "days_to_hint": 0,
    "days_to_conclusion": 17,
-   "prudent_rate": 0.8433,
-   "prob_above": 0.9932,
-   "edge": 0.1122,
+   "prudent_rate": 0.8332,
+   "prob_above": 0.9872,
+   "edge": 0.1013,
    "edge_ci": [
-    0.0417,
-    0.1731
+    0.0296,
+    0.1637
    ],
-   "prob_above_cut": 0.9854
+   "prob_above_cut": 0.9737
   },
   "WEAKENED_LINEUP": {
    "signals": 14,
@@ -1996,22 +1999,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 141,
+    "n": 143,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 101,
-     "hit_rate": 0.535,
-     "break_even": 0.5428,
-     "roi": -0.0129
+     "n": 103,
+     "hit_rate": 0.5343,
+     "break_even": 0.5411,
+     "roi": -0.0102
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.6,
-     "break_even": 0.4852,
-     "roi": 0.0862
+     "break_even": 0.4927,
+     "roi": 0.075
     },
-    "z": 1.33
+    "z": 1.24
    },
    {
     "type": "TOTALS_FORM",
@@ -2066,26 +2069,26 @@
   },
   "segments": [
    {
-    "n": 53,
+    "n": 54,
     "signals": 56,
     "hits": 48,
-    "misses": 5,
-    "hit_rate": 0.902,
+    "misses": 6,
+    "hit_rate": 0.8846,
     "ci95": [
-     0.7902,
-     0.9574
+     0.7703,
+     0.946
     ],
     "break_even": 0.5937,
     "roi": 0.244,
-    "games": 53,
-    "bets": 53,
+    "games": 54,
+    "bets": 54,
     "unidentified": 0,
-    "prudent_rate": 0.8514,
+    "prudent_rate": 0.8377,
     "prob_above": 1.0,
-    "edge": 0.2577,
+    "edge": 0.244,
     "edge_ci": [
-     0.1773,
-     0.325
+     0.1618,
+     0.3138
     ],
     "prob_above_cut": 1.0,
     "family": "Forma de golos",
@@ -2120,33 +2123,6 @@
     "value": "fim de semana"
    },
    {
-    "n": 103,
-    "signals": 107,
-    "hits": 78,
-    "misses": 25,
-    "hit_rate": 0.7368,
-    "ci95": [
-     0.6403,
-     0.8149
-    ],
-    "break_even": 0.6056,
-    "roi": 0.0296,
-    "games": 103,
-    "bets": 103,
-    "unidentified": 0,
-    "prudent_rate": 0.7243,
-    "prob_above": 0.995,
-    "edge": 0.1187,
-    "edge_ci": [
-     0.045,
-     0.1877
-    ],
-    "prob_above_cut": 0.9899,
-    "family": "Forma de golos",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com um só tipo de sinal"
-   },
-   {
     "n": 53,
     "signals": 72,
     "hits": 39,
@@ -2172,6 +2148,33 @@
     "family": "Jogo aberto",
     "dimension": "Dia",
     "value": "dia de semana"
+   },
+   {
+    "n": 104,
+    "signals": 107,
+    "hits": 78,
+    "misses": 26,
+    "hit_rate": 0.7292,
+    "ci95": [
+     0.6327,
+     0.808
+    ],
+    "break_even": 0.6056,
+    "roi": 0.0296,
+    "games": 104,
+    "bets": 104,
+    "unidentified": 0,
+    "prudent_rate": 0.7175,
+    "prob_above": 0.9926,
+    "edge": 0.1119,
+    "edge_ci": [
+     0.038,
+     0.1811
+    ],
+    "prob_above_cut": 0.9854,
+    "family": "Forma de golos",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 74,
@@ -2390,33 +2393,6 @@
     "value": "jovens"
    },
    {
-    "n": 46,
-    "signals": 49,
-    "hits": 34,
-    "misses": 12,
-    "hit_rate": 0.7241,
-    "ci95": [
-     0.5773,
-     0.8346
-    ],
-    "break_even": 0.5985,
-    "roi": -0.1705,
-    "games": 46,
-    "bets": 46,
-    "unidentified": 0,
-    "prudent_rate": 0.7007,
-    "prob_above": 0.9435,
-    "edge": 0.1022,
-    "edge_ci": [
-     -0.0041,
-     0.1998
-    ],
-    "prob_above_cut": 0.9202,
-    "family": "Forma de golos",
-    "dimension": "Dia",
-    "value": "dia de semana"
-   },
-   {
     "n": 107,
     "signals": 144,
     "hits": 70,
@@ -2471,6 +2447,33 @@
     "value": "odd acima de 3,00"
    },
    {
+    "n": 47,
+    "signals": 49,
+    "hits": 34,
+    "misses": 13,
+    "hit_rate": 0.7079,
+    "ci95": [
+     0.5621,
+     0.8206
+    ],
+    "break_even": 0.5985,
+    "roi": -0.1705,
+    "games": 47,
+    "bets": 47,
+    "unidentified": 0,
+    "prudent_rate": 0.6878,
+    "prob_above": 0.9186,
+    "edge": 0.0893,
+    "edge_ci": [
+     -0.0169,
+     0.1876
+    ],
+    "prob_above_cut": 0.8878,
+    "family": "Forma de golos",
+    "dimension": "Dia",
+    "value": "dia de semana"
+   },
+   {
     "n": 34,
     "signals": 39,
     "hits": 23,
@@ -2496,33 +2499,6 @@
     "family": "Jogo aberto",
     "dimension": "Competição",
     "value": "feminino"
-   },
-   {
-    "n": 16,
-    "signals": 35,
-    "hits": 12,
-    "misses": 4,
-    "hit_rate": 0.75,
-    "ci95": [
-     0.505,
-     0.8982
-    ],
-    "break_even": 0.5536,
-    "roi": 0.3138,
-    "games": 16,
-    "bets": 16,
-    "unidentified": 0,
-    "prudent_rate": 0.6745,
-    "prob_above": 0.9021,
-    "edge": 0.1208,
-    "edge_ci": [
-     -0.0352,
-     0.2613
-    ],
-    "prob_above_cut": 0.881,
-    "family": "Stake",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 41,
@@ -2631,6 +2607,33 @@
     "family": "Betfair",
     "dimension": "Odd depois do sinal",
     "value": "subiu"
+   },
+   {
+    "n": 18,
+    "signals": 35,
+    "hits": 13,
+    "misses": 5,
+    "hit_rate": 0.7222,
+    "ci95": [
+     0.4913,
+     0.875
+    ],
+    "break_even": 0.56,
+    "roi": 0.2537,
+    "games": 17,
+    "bets": 18,
+    "unidentified": 0,
+    "prudent_rate": 0.6693,
+    "prob_above": 0.8897,
+    "edge": 0.1123,
+    "edge_ci": [
+     -0.0412,
+     0.2512
+    ],
+    "prob_above_cut": 0.8662,
+    "family": "Stake",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 70,
@@ -2822,33 +2825,6 @@
     "value": "liga"
    },
    {
-    "n": 17,
-    "signals": 18,
-    "hits": 13,
-    "misses": 4,
-    "hit_rate": 0.75,
-    "ci95": [
-     0.505,
-     0.8982
-    ],
-    "break_even": 0.6157,
-    "roi": -0.01,
-    "games": 17,
-    "bets": 17,
-    "unidentified": 0,
-    "prudent_rate": 0.6984,
-    "prob_above": 0.8233,
-    "edge": 0.0826,
-    "edge_ci": [
-     -0.0713,
-     0.2189
-    ],
-    "prob_above_cut": 0.788,
-    "family": "Forma de golos",
-    "dimension": "Competição",
-    "value": "taça"
-   },
-   {
     "n": 46,
     "signals": 64,
     "hits": 29,
@@ -3036,6 +3012,33 @@
     "family": "Betfair",
     "dimension": "Quota de mercado",
     "value": "80 % ou mais"
+   },
+   {
+    "n": 18,
+    "signals": 18,
+    "hits": 13,
+    "misses": 5,
+    "hit_rate": 0.7059,
+    "ci95": [
+     0.4687,
+     0.8672
+    ],
+    "break_even": 0.6157,
+    "roi": -0.01,
+    "games": 18,
+    "bets": 18,
+    "unidentified": 0,
+    "prudent_rate": 0.6725,
+    "prob_above": 0.7435,
+    "edge": 0.0568,
+    "edge_ci": [
+     -0.0965,
+     0.1952
+    ],
+    "prob_above_cut": 0.6992,
+    "family": "Forma de golos",
+    "dimension": "Competição",
+    "value": "taça"
    },
    {
     "n": 83,
@@ -3271,7 +3274,7 @@
      0.8206
     ],
     "break_even": 0.7033,
-    "roi": 0.0071,
+    "roi": 0.0069,
     "games": 44,
     "bets": 46,
     "unidentified": 0,
@@ -3286,28 +3289,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 366,
+    "n": 368,
     "signals": 475,
-    "hits": 219,
-    "misses": 147,
-    "hit_rate": 0.587,
+    "hits": 220,
+    "misses": 148,
+    "hit_rate": 0.5865,
     "ci95": [
-     0.535,
-     0.6371
+     0.5346,
+     0.6365
     ],
-    "break_even": 0.5802,
-    "roi": 0.0155,
-    "games": 250,
-    "bets": 361,
+    "break_even": 0.5804,
+    "roi": 0.0149,
+    "games": 251,
+    "bets": 363,
     "unidentified": 0,
-    "prudent_rate": 0.5961,
-    "prob_above": 0.7379,
-    "edge": 0.0197,
+    "prudent_rate": 0.5957,
+    "prob_above": 0.7328,
+    "edge": 0.0192,
     "edge_ci": [
-     -0.0319,
-     0.0704
+     -0.0323,
+     0.0698
     ],
-    "prob_above_cut": 0.6033,
+    "prob_above_cut": 0.597,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -3362,9 +3365,9 @@
    }
   ],
   "luck": {
-   "n": 703,
-   "units": 22.51,
-   "luck_sd": 35.47,
+   "n": 706,
+   "units": 22.31,
+   "luck_sd": 35.49,
    "z": 0.63,
    "max_drawdown": 21.61,
    "longest_losing_run": 7
@@ -3372,11 +3375,11 @@
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 95 em 150, precisa de 55 %, e a probabilidade de estar acima do mínimo é 97 %.",
    "O mais fraco é dinheiro na Polymarket: 101 em 209, precisa de 50 %, probabilidade de estar acima do mínimo 29 %.",
-   "Saldo de +22,51 unidades em 703 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±70,9 unidades).",
+   "Saldo de +22,31 unidades em 706 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±71,0 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 21 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
-   "Forma de golos, parte do jogo = 1.ª parte: 48 em 53 (90 % contra 59 % necessários). Indício positivo.",
+   "Forma de golos, parte do jogo = 1.ª parte: 48 em 54 (88 % contra 59 % necessários). Indício positivo.",
    "Forma de golos, dia = fim de semana: 70 em 90 (76 % contra 61 % necessários). Indício positivo.",
-   "Forma de golos, outros sinais no mesmo jogo = jogo com um só tipo de sinal: 78 em 103 (74 % contra 61 % necessários). Indício positivo.",
+   "Jogo aberto, dia = dia de semana: 39 em 53 (74 % contra 55 % necessários). Indício positivo.",
    "Foram comparados 87 segmentos; com tantos cortes, alguns parecem bons ou maus só por acaso. Um segmento só conta depois de se repetir em dados novos e de chegar a 300 resultados."
   ],
   "method": {
@@ -3742,6 +3745,13 @@
      "status": "em observação"
     },
     {
+     "id": "Stake | Número de apostas = uma",
+     "n": 106,
+     "games": 59,
+     "roi": 0.037,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00",
      "n": 105,
      "games": 105,
@@ -3781,13 +3791,6 @@
      "n": 103,
      "games": 50,
      "roi": -0.1504,
-     "status": "em observação"
-    },
-    {
-     "id": "Stake | Número de apostas = uma",
-     "n": 103,
-     "games": 57,
-     "roi": 0.0342,
      "status": "em observação"
     },
     {
@@ -4204,6 +4207,13 @@
      "status": "em observação"
     },
     {
+     "id": "Stake | Faixa de odd = odd 1,50 a 2,00",
+     "n": 85,
+     "games": 55,
+     "roi": 0.0469,
+     "status": "em observação"
+    },
+    {
      "id": "Stake | Mercado = outros mercados",
      "n": 85,
      "games": 45,
@@ -4351,13 +4361,6 @@
      "status": "em observação"
     },
     {
-     "id": "Stake | Faixa de odd = odd 1,50 a 2,00",
-     "n": 82,
-     "games": 53,
-     "roi": 0.0431,
-     "status": "em observação"
-    },
-    {
      "id": "Betfair | Quota de mercado = menos de 80 %",
      "n": 81,
      "games": 78,
@@ -4465,7 +4468,7 @@
    ]
   },
   "hypotheses": 8774,
-  "tested": 873,
+  "tested": 875,
   "corrected_bar": null,
   "counts": {
    "em observação": 8733,
@@ -4549,6 +4552,45 @@
      "missing": 3
     },
     {
+     "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+     "family": "Stake",
+     "conditions": [
+      [
+       "Hora (UTC)",
+       "noite"
+      ],
+      [
+       "Sinal anterior de outro tipo no mesmo jogo",
+       "não"
+      ],
+      [
+       "Valor da aposta",
+       "menos de 10 mil $"
+      ]
+     ],
+     "n": 10,
+     "hits": 10,
+     "hit_rate": 1.0,
+     "break_even": 0.5082,
+     "prob_above": 0.9896,
+     "roi": 0.9945,
+     "source": "gerador",
+     "reason": null,
+     "games": 10,
+     "edge": 0.2459,
+     "edge_ci": [
+      0.0774,
+      0.3848
+     ],
+     "prob_above_cut": 0.9869,
+     "prob_adds": 0.9951,
+     "bets": 10,
+     "pending_status": null,
+     "entry_status": "em observação",
+     "level": "indício inicial",
+     "missing": 20
+    },
+    {
      "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
      "family": "Stake",
      "conditions": [
@@ -4561,66 +4603,27 @@
        "não"
       ]
      ],
-     "n": 9,
-     "hits": 9,
-     "hit_rate": 1.0,
-     "break_even": 0.503,
-     "prob_above": 0.9842,
-     "roi": 1.1267,
+     "n": 12,
+     "hits": 11,
+     "hit_rate": 0.9167,
+     "break_even": 0.5296,
+     "prob_above": 0.9856,
+     "roi": 0.8146,
      "source": "gerador",
      "reason": null,
-     "games": 9,
-     "edge": 0.2354,
+     "games": 11,
+     "edge": 0.2265,
      "edge_ci": [
-      0.0599,
-      0.3817
+      0.0614,
+      0.3641
      ],
-     "prob_above_cut": 0.9804,
-     "prob_adds": 0.9912,
-     "bets": 9,
+     "prob_above_cut": 0.9818,
+     "prob_adds": 0.9918,
+     "bets": 12,
      "pending_status": null,
      "entry_status": "em observação",
      "level": "indício inicial",
-     "missing": 21
-    },
-    {
-     "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-     "family": "Stake",
-     "conditions": [
-      [
-       "Faixa de odd",
-       "odd 1,50 a 2,00"
-      ],
-      [
-       "Número de apostas",
-       "uma"
-      ],
-      [
-       "Sinal anterior de outro tipo no mesmo jogo",
-       "não"
-      ]
-     ],
-     "n": 24,
-     "hits": 19,
-     "hit_rate": 0.7917,
-     "break_even": 0.5796,
-     "prob_above": 0.9835,
-     "roi": 0.3825,
-     "source": "gerador",
-     "reason": null,
-     "games": 21,
-     "edge": 0.1786,
-     "edge_ci": [
-      0.0447,
-      0.2935
-     ],
-     "prob_above_cut": 0.9775,
-     "prob_adds": 0.9946,
-     "bets": 24,
-     "pending_status": null,
-     "entry_status": "em observação",
-     "level": "indício inicial",
-     "missing": 9
+     "missing": 19
     },
     {
      "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
@@ -4801,58 +4804,22 @@
      "tactic": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante"
     },
     {
-     "date_utc": "2026-11-18T19:22:30+00:00",
-     "kickoff_utc": "2026-11-18T17:45+00:00",
-     "match": "CD Tacon Women — Inter Milan Women",
-     "selection": "Under 3.5",
-     "market": "Asian Total",
-     "odds": 1.5,
-     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
      "date_utc": "2026-11-18T19:01:13+00:00",
      "kickoff_utc": "2026-11-18T20:00+00:00",
      "match": "Alianza Atletico — Melgar",
      "selection": "Alianza Atletico",
      "market": "1x2",
      "odds": 1.7,
-     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
+     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $"
     },
     {
-     "date_utc": "2026-11-18T18:57:49+00:00",
-     "kickoff_utc": "2026-11-18T17:45+00:00",
-     "match": "CD Tacon Women — Inter Milan Women",
-     "selection": "Under 4.5",
-     "market": "Asian Total",
-     "odds": 1.8,
-     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
-     "date_utc": "2026-11-18T18:48:27+00:00",
-     "kickoff_utc": "2026-11-18T17:45+00:00",
-     "match": "CD Tacon Women — Inter Milan Women",
-     "selection": "Over 4",
-     "market": "Asian Total",
-     "odds": 1.4,
-     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
-     "date_utc": "2026-11-18T08:16:27+00:00",
+     "date_utc": "2026-11-17T22:49:35+00:00",
      "kickoff_utc": "2026-11-18T23:30+00:00",
      "match": "Flamengo — Atletico Paranaense",
-     "selection": "Over 3",
-     "market": "Asian Total",
-     "odds": 1.81,
-     "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
-     "date_utc": "2026-11-18T08:09:30+00:00",
-     "kickoff_utc": "2026-11-18T23:30+00:00",
-     "match": "Flamengo — Atletico Paranaense",
-     "selection": "Flamengo (-1.75)",
+     "selection": "Flamengo (-2)",
      "market": "Asian Handicap",
-     "odds": 1.9,
-     "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
+     "odds": 2.1,
+     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
     }
    ],
    "min_results": 8,
@@ -4860,109 +4827,6 @@
   },
   "agenda": {
    "items": [
-    {
-     "match_id": "cd-tacon-women-vs-inter-milan-women-20261118",
-     "match": "CD Tacon Women — Inter Milan Women",
-     "league": "UEFA Champions League Women",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-18T17:45+00:00",
-     "date_utc": "2026-11-18T19:22:30+00:00",
-     "minute": null,
-     "score_at_signal": [
-      1,
-      1
-     ],
-     "market": "Asian Total",
-     "selection": "Under 3.5",
-     "odds": 1.5,
-     "odds_last": 1.5,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "favorável",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 74,
-     "good": [
-      {
-       "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 9,
-       "games": 9,
-       "hits": 9,
-       "break_even": 0.503,
-       "prob_above": 0.9842,
-       "roi": 1.1267,
-       "edge": 0.2354,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 24,
-       "games": 21,
-       "hits": 19,
-       "break_even": 0.5796,
-       "prob_above": 0.9835,
-       "roi": 0.3825,
-       "edge": 0.1786,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 30,
-     "bad": [],
-     "bad_total": 0
-    },
     {
      "match_id": "cd-tacon-women-vs-inter-milan-women-20261118",
      "match": "CD Tacon Women — Inter Milan Women",
@@ -5003,13 +4867,13 @@
          "não"
         ]
        ],
-       "n": 9,
-       "games": 9,
-       "hits": 9,
-       "break_even": 0.503,
-       "prob_above": 0.9842,
-       "roi": 1.1267,
-       "edge": 0.2354,
+       "n": 12,
+       "games": 11,
+       "hits": 11,
+       "break_even": 0.5296,
+       "prob_above": 0.9856,
+       "roi": 0.8146,
+       "edge": 0.2265,
        "status": "em observação",
        "source": "gerador"
       },
@@ -5025,180 +4889,42 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Stake | Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = uma",
+       "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
        "conditions": [
         [
          "Hora (UTC)",
          "noite"
-        ],
-        [
-         "Mercado",
-         "outros mercados"
         ],
         [
          "Número de apostas",
          "uma"
         ]
        ],
-       "n": 22,
-       "games": 13,
-       "hits": 17,
-       "break_even": 0.495,
+       "n": 45,
+       "games": 21,
+       "hits": 32,
+       "break_even": 0.5388,
        "prob_above": 0.9786,
-       "roi": 0.4844,
-       "edge": 0.2041,
+       "roi": 0.2891,
+       "edge": 0.1737,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "good_total": 26,
+     "good_total": 31,
      "bad": [],
      "bad_total": 0
-    },
-    {
-     "match_id": "newells-old-boys-reserves-vs-ferro-carril-oeste-reserves-20261118",
-     "match": "Newells Old Boys Reserves — Ferro Carril Oeste Reserves",
-     "league": "Argentinian Argentina Reserve League",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-18T19:24:26+00:00",
-     "minute": 63,
-     "score_at_signal": [
-      2,
-      2
-     ],
-     "market": "Asian Total",
-     "selection": "Over 4.5",
-     "odds": 1.4,
-     "odds_last": 1.4,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd até 1,50",
-     "odds_band_n": 11,
-     "good": [
-      {
-       "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Minuto",
-         "61 em diante"
-        ]
-       ],
-       "n": 12,
-       "games": 12,
-       "hits": 12,
-       "break_even": 0.5797,
-       "prob_above": 0.991,
-       "roi": 0.5544,
-       "edge": 0.2293,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 17,
-       "games": 17,
-       "hits": 15,
-       "break_even": 0.5547,
-       "prob_above": 0.9865,
-       "roi": 0.3743,
-       "edge": 0.2018,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Minuto = 61 em diante",
-       "conditions": [
-        [
-         "Golos em falta para ganhar",
-         "até 1 golo"
-        ],
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Minuto",
-         "61 em diante"
-        ]
-       ],
-       "n": 11,
-       "games": 11,
-       "hits": 11,
-       "break_even": 0.5891,
-       "prob_above": 0.9855,
-       "roi": 0.518,
-       "edge": 0.2152,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 68,
-     "bad": [
-      {
-       "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado & Ritmo indicado pelo bot = menos de 90",
-       "conditions": [
-        [
-         "Golos em falta para ganhar",
-         "até 1 golo"
-        ],
-        [
-         "Marcador no momento",
-         "empatado"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "menos de 90"
-        ]
-       ],
-       "n": 22,
-       "games": 22,
-       "hits": 10,
-       "break_even": 0.5902,
-       "prob_above": 0.1491,
-       "roi": -0.1583,
-       "edge": -0.0934,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 1
     },
     {
      "match_id": "alianza-atletico-vs-melgar-20261118",
@@ -5223,8 +4949,34 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 74,
+     "odds_band_n": 77,
      "good": [
+      {
+       "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "noite"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 10,
+       "games": 10,
+       "hits": 10,
+       "break_even": 0.5082,
+       "prob_above": 0.9896,
+       "roi": 0.9945,
+       "edge": 0.2459,
+       "status": "em observação",
+       "source": "gerador"
+      },
       {
        "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
        "conditions": [
@@ -5237,13 +4989,13 @@
          "não"
         ]
        ],
-       "n": 9,
-       "games": 9,
-       "hits": 9,
-       "break_even": 0.503,
-       "prob_above": 0.9842,
-       "roi": 1.1267,
-       "edge": 0.2354,
+       "n": 12,
+       "games": 11,
+       "hits": 11,
+       "break_even": 0.5296,
+       "prob_above": 0.9856,
+       "roi": 0.8146,
+       "edge": 0.2265,
        "status": "em observação",
        "source": "gerador"
       },
@@ -5263,40 +5015,18 @@
          "não"
         ]
        ],
-       "n": 12,
-       "games": 10,
-       "hits": 11,
-       "break_even": 0.5855,
-       "prob_above": 0.9695,
-       "roi": 0.5758,
-       "edge": 0.191,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 27,
-       "games": 24,
-       "hits": 20,
-       "break_even": 0.5452,
-       "prob_above": 0.9609,
-       "roi": 0.423,
-       "edge": 0.1445,
+       "n": 15,
+       "games": 12,
+       "hits": 13,
+       "break_even": 0.5903,
+       "prob_above": 0.9723,
+       "roi": 0.4907,
+       "edge": 0.1865,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "good_total": 20,
+     "good_total": 23,
      "bad": [
       {
        "id": "Stake | Número de apostas = várias",
@@ -5342,7 +5072,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 74,
+     "odds_band_n": 77,
      "good": [
       {
        "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -5360,13 +5090,13 @@
          "não"
         ]
        ],
-       "n": 24,
-       "games": 21,
-       "hits": 19,
-       "break_even": 0.5796,
-       "prob_above": 0.9835,
-       "roi": 0.3825,
-       "edge": 0.1786,
+       "n": 27,
+       "games": 23,
+       "hits": 21,
+       "break_even": 0.5829,
+       "prob_above": 0.9851,
+       "roi": 0.3567,
+       "edge": 0.1764,
        "status": "em observação",
        "source": "gerador"
       },
@@ -5382,13 +5112,13 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
@@ -5408,13 +5138,13 @@
          "não"
         ]
        ],
-       "n": 12,
-       "games": 10,
-       "hits": 11,
-       "break_even": 0.5855,
-       "prob_above": 0.9695,
-       "roi": 0.5758,
-       "edge": 0.191,
+       "n": 15,
+       "games": 12,
+       "hits": 13,
+       "break_even": 0.5903,
+       "prob_above": 0.9723,
+       "roi": 0.4907,
+       "edge": 0.1865,
        "status": "em observação",
        "source": "gerador"
       }
@@ -5918,13 +5648,13 @@
          "não"
         ]
        ],
-       "n": 9,
-       "games": 9,
-       "hits": 9,
-       "break_even": 0.503,
-       "prob_above": 0.9842,
-       "roi": 1.1267,
-       "edge": 0.2354,
+       "n": 12,
+       "games": 11,
+       "hits": 11,
+       "break_even": 0.5296,
+       "prob_above": 0.9856,
+       "roi": 0.8146,
+       "edge": 0.2265,
        "status": "em observação",
        "source": "gerador"
       },
@@ -5940,44 +5670,40 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
       {
-       "id": "Stake | Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = uma",
+       "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
        "conditions": [
         [
          "Hora (UTC)",
          "noite"
         ],
         [
-         "Mercado",
-         "outros mercados"
-        ],
-        [
          "Número de apostas",
          "uma"
         ]
        ],
-       "n": 22,
-       "games": 13,
-       "hits": 17,
-       "break_even": 0.495,
+       "n": 45,
+       "games": 21,
+       "hits": 32,
+       "break_even": 0.5388,
        "prob_above": 0.9786,
-       "roi": 0.4844,
-       "edge": 0.2041,
+       "roi": 0.2891,
+       "edge": 0.1737,
        "status": "em observação",
        "source": "gerador"
       }
      ],
-     "good_total": 22,
+     "good_total": 24,
      "bad": [
       {
        "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
@@ -6027,7 +5753,7 @@
      "conflict": true,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 74,
+     "odds_band_n": 77,
      "good": [
       {
        "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -6045,13 +5771,13 @@
          "não"
         ]
        ],
-       "n": 24,
-       "games": 21,
-       "hits": 19,
-       "break_even": 0.5796,
-       "prob_above": 0.9835,
-       "roi": 0.3825,
-       "edge": 0.1786,
+       "n": 27,
+       "games": 23,
+       "hits": 21,
+       "break_even": 0.5829,
+       "prob_above": 0.9851,
+       "roi": 0.3567,
+       "edge": 0.1764,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6067,13 +5793,13 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6093,13 +5819,13 @@
          "não"
         ]
        ],
-       "n": 12,
-       "games": 10,
-       "hits": 11,
-       "break_even": 0.5855,
-       "prob_above": 0.9695,
-       "roi": 0.5758,
-       "edge": 0.191,
+       "n": 15,
+       "games": 12,
+       "hits": 13,
+       "break_even": 0.5903,
+       "prob_above": 0.9723,
+       "roi": 0.4907,
+       "edge": 0.1865,
        "status": "em observação",
        "source": "gerador"
       }
@@ -6154,7 +5880,7 @@
      "conflict": true,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 74,
+     "odds_band_n": 77,
      "good": [
       {
        "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
@@ -6172,13 +5898,13 @@
          "não"
         ]
        ],
-       "n": 24,
-       "games": 21,
-       "hits": 19,
-       "break_even": 0.5796,
-       "prob_above": 0.9835,
-       "roi": 0.3825,
-       "edge": 0.1786,
+       "n": 27,
+       "games": 23,
+       "hits": 21,
+       "break_even": 0.5829,
+       "prob_above": 0.9851,
+       "roi": 0.3567,
+       "edge": 0.1764,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6194,13 +5920,13 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6220,13 +5946,13 @@
          "não"
         ]
        ],
-       "n": 12,
-       "games": 10,
-       "hits": 11,
-       "break_even": 0.5855,
-       "prob_above": 0.9695,
-       "roi": 0.5758,
-       "edge": 0.191,
+       "n": 15,
+       "games": 12,
+       "hits": 13,
+       "break_even": 0.5903,
+       "prob_above": 0.9723,
+       "roi": 0.4907,
+       "edge": 0.1865,
        "status": "em observação",
        "source": "gerador"
       }
@@ -6295,13 +6021,13 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6313,13 +6039,13 @@
          "não"
         ]
        ],
-       "n": 44,
-       "games": 35,
-       "hits": 30,
-       "break_even": 0.5483,
-       "prob_above": 0.9428,
-       "roi": 0.277,
-       "edge": 0.1136,
+       "n": 47,
+       "games": 37,
+       "hits": 32,
+       "break_even": 0.5522,
+       "prob_above": 0.9487,
+       "roi": 0.2633,
+       "edge": 0.1148,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6339,13 +6065,13 @@
          "não"
         ]
        ],
-       "n": 17,
-       "games": 12,
-       "hits": 14,
-       "break_even": 0.5653,
-       "prob_above": 0.9376,
-       "roi": 0.4594,
-       "edge": 0.1516,
+       "n": 20,
+       "games": 14,
+       "hits": 16,
+       "break_even": 0.572,
+       "prob_above": 0.9446,
+       "roi": 0.3933,
+       "edge": 0.1507,
        "status": "em observação",
        "source": "gerador"
       }
@@ -6414,13 +6140,13 @@
          "não"
         ]
        ],
-       "n": 33,
-       "games": 27,
-       "hits": 25,
-       "break_even": 0.5616,
-       "prob_above": 0.9816,
-       "roi": 0.3603,
-       "edge": 0.1626,
+       "n": 36,
+       "games": 29,
+       "hits": 27,
+       "break_even": 0.5656,
+       "prob_above": 0.9834,
+       "roi": 0.3335,
+       "edge": 0.1615,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6432,13 +6158,13 @@
          "não"
         ]
        ],
-       "n": 44,
-       "games": 35,
-       "hits": 30,
-       "break_even": 0.5483,
-       "prob_above": 0.9428,
-       "roi": 0.277,
-       "edge": 0.1136,
+       "n": 47,
+       "games": 37,
+       "hits": 32,
+       "break_even": 0.5522,
+       "prob_above": 0.9487,
+       "roi": 0.2633,
+       "edge": 0.1148,
        "status": "em observação",
        "source": "gerador"
       },
@@ -6458,13 +6184,13 @@
          "não"
         ]
        ],
-       "n": 17,
-       "games": 12,
-       "hits": 14,
-       "break_even": 0.5653,
-       "prob_above": 0.9376,
-       "roi": 0.4594,
-       "edge": 0.1516,
+       "n": 20,
+       "games": 14,
+       "hits": 16,
+       "break_even": 0.572,
+       "prob_above": 0.9446,
+       "roi": 0.3933,
+       "edge": 0.1507,
        "status": "em observação",
        "source": "gerador"
       }
@@ -6580,13 +6306,13 @@
     }
    ],
    "counts": {
-    "favorável": 2,
-    "misto": 6,
+    "favorável": 1,
+    "misto": 5,
     "sem evidência": 0,
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T19:46:15+00:00",
+   "generated_utc": "2026-11-18T19:54:35+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6600,13 +6326,13 @@
    "by_source": {
     "gerador": {
      "hypotheses": 8700,
-     "with_prospective_evidence": 2794,
-     "prospective_games": 56873
+     "with_prospective_evidence": 2803,
+     "prospective_games": 57059
     },
     "llm/novas": {
      "hypotheses": 20,
      "with_prospective_evidence": 6,
-     "prospective_games": 129
+     "prospective_games": 131
     },
     "llm/refinar": {
      "hypotheses": 48,
@@ -6714,12 +6440,12 @@
   "walk_forward": {
    "followed": {
     "bets": 435,
-    "settled": 371,
-    "games": 245,
-    "wins": 181,
-    "units": 24.2,
-    "roi": 0.0652,
-    "roi_cut": 0.0462
+    "settled": 375,
+    "games": 247,
+    "wins": 183,
+    "units": 24.65,
+    "roi": 0.0657,
+    "roi_cut": 0.0467
    },
    "skipped": {
     "bets": 393,
@@ -7110,13 +6836,17 @@
     22.29,
     22.99,
     23.6,
-    24.2
+    24.2,
+    24.85,
+    24.85,
+    25.65,
+    24.65
    ],
-   "prob_followed_better": 0.7047,
+   "prob_followed_better": 0.7114,
    "first_followed_utc": "2026-11-12T19:27:25+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 657,
+    "results_verified": 660,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -7135,21 +6865,21 @@
    }
   },
   "multiplicity": {
-   "tested_now": 873,
-   "distinct_game_sets_tested": 803,
+   "tested_now": 875,
+   "distinct_game_sets_tested": 805,
    "distinct_game_sets_promising_or_better": 11,
    "promising_or_better": 11,
    "promising_sum_games": 473,
    "promising_union_games": 175,
    "evidence_levels": {
-    "exploratória": 428,
-    "prospetiva": 445,
+    "exploratória": 429,
+    "prospetiva": 446,
     "não verificável": 0
    },
    "prospective_categories_tested": {
-    "prospective": 28460,
-    "mixed": 619,
-    "before_registration": 5089,
+    "prospective": 28528,
+    "mixed": 621,
+    "before_registration": 5093,
     "after_registration_not_operational": 186,
     "result_known_before_decision": 804,
     "result_time_unproven": 0
@@ -7224,7 +6954,7 @@
    "newly_selected": [],
    "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
   },
-  "expected_by_chance": 43.7,
+  "expected_by_chance": 43.8,
   "top": [
    {
     "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
@@ -7408,6 +7138,70 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "dd1d8639b490e405",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 10,
+    "hits": 10,
+    "hit_rate": 1.0,
+    "break_even": 0.5082,
+    "prob_above": 0.9896,
+    "roi": 0.9945,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 10,
+    "bets": 10,
+    "edge": 0.2459,
+    "edge_ci": [
+     0.0774,
+     0.3848
+    ],
+    "prob_above_cut": 0.9869,
+    "prob_adds": 0.9951,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T22:48:36+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 7,
+     "hits": 7.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": 0.8557,
+     "categories": {
+      "prospective": 7,
+      "mixed": 0,
+      "before_registration": 3,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "8e7e2d6b3cb57828",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -7794,6 +7588,66 @@
     "last_change": null
    },
    {
+    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 12,
+    "hits": 11,
+    "hit_rate": 0.9167,
+    "break_even": 0.5296,
+    "prob_above": 0.9856,
+    "roi": 0.8146,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 11,
+    "bets": 12,
+    "edge": 0.2265,
+    "edge_ci": [
+     0.0614,
+     0.3641
+    ],
+    "prob_above_cut": 0.9818,
+    "prob_adds": 0.9918,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T21:53:43+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 9,
+     "hits": 8.5,
+     "misses": 0.5,
+     "prob_above": 0.9666,
+     "roi": 0.874,
+     "categories": {
+      "prospective": 9,
+      "mixed": 0,
+      "before_registration": 2,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "e03a504c25d51910",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Minuto = 61 em diante",
     "family": "Jogo aberto",
     "conditions": [
@@ -7858,113 +7712,53 @@
     "last_change": null
    },
    {
-    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
      [
-      "Hora (UTC)",
-      "noite"
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Número de apostas",
+      "uma"
      ],
      [
       "Sinal anterior de outro tipo no mesmo jogo",
       "não"
      ]
     ],
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
-    "prob_above": 0.9842,
-    "roi": 1.1267,
+    "n": 27,
+    "hits": 21,
+    "hit_rate": 0.7778,
+    "break_even": 0.5829,
+    "prob_above": 0.9851,
+    "roi": 0.3567,
     "status": "em observação",
     "tradable": true,
     "expect": null,
-    "games": 9,
-    "bets": 9,
-    "edge": 0.2354,
+    "games": 23,
+    "bets": 27,
+    "edge": 0.1764,
     "edge_ci": [
-     0.0599,
-     0.3817
+     0.0468,
+     0.2881
     ],
-    "prob_above_cut": 0.9804,
-    "prob_adds": 0.9912,
+    "prob_above_cut": 0.9793,
+    "prob_adds": 0.995,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-14T21:53:43+00:00",
+    "born_utc": "2026-11-14T15:16:13+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
-     "games": 7,
-     "hits": 7.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 1.1843,
+     "games": 20,
+     "hits": 17.17,
+     "misses": 2.83,
+     "prob_above": 0.9837,
+     "roi": 0.3721,
      "categories": {
-      "prospective": 7,
-      "mixed": 0,
-      "before_registration": 2,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "e63641fc682dd6eb",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
-    "prob_above": 0.9842,
-    "roi": 1.1267,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 9,
-    "bets": 9,
-    "edge": 0.2354,
-    "edge_ci": [
-     0.0599,
-     0.3817
-    ],
-    "prob_above_cut": 0.9804,
-    "prob_adds": 0.9912,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T22:48:36+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 6,
-     "hits": 6.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.865,
-     "categories": {
-      "prospective": 6,
+      "prospective": 20,
       "mixed": 0,
       "before_registration": 3,
       "after_registration_not_operational": 0,
@@ -7974,7 +7768,7 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "e63641fc682dd6eb",
+    "game_set": "cd76b61870b54108",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -8174,13 +7968,9 @@
     "last_change": null
    },
    {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
      [
       "Número de apostas",
       "uma"
@@ -8190,37 +7980,37 @@
       "não"
      ]
     ],
-    "n": 24,
-    "hits": 19,
-    "hit_rate": 0.7917,
-    "break_even": 0.5796,
-    "prob_above": 0.9835,
-    "roi": 0.3825,
+    "n": 36,
+    "hits": 27,
+    "hit_rate": 0.75,
+    "break_even": 0.5656,
+    "prob_above": 0.9834,
+    "roi": 0.3335,
     "status": "em observação",
     "tradable": true,
     "expect": null,
-    "games": 21,
-    "bets": 24,
-    "edge": 0.1786,
+    "games": 29,
+    "bets": 36,
+    "edge": 0.1615,
     "edge_ci": [
-     0.0447,
-     0.2935
+     0.0395,
+     0.2699
     ],
-    "prob_above_cut": 0.9775,
-    "prob_adds": 0.9946,
+    "prob_above_cut": 0.9766,
+    "prob_adds": 0.9959,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-14T15:16:13+00:00",
+    "born_utc": "2026-11-14T14:06:49+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
-     "games": 18,
-     "hits": 15.67,
-     "misses": 2.33,
-     "prob_above": 0.982,
-     "roi": 0.4038,
+     "games": 26,
+     "hits": 20.8,
+     "misses": 5.2,
+     "prob_above": 0.9814,
+     "roi": 0.3527,
      "categories": {
-      "prospective": 18,
+      "prospective": 26,
       "mixed": 0,
       "before_registration": 3,
       "after_registration_not_operational": 0,
@@ -8230,7 +8020,71 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "1dcff3ddd873410d",
+    "game_set": "f23c8e80449a1a40",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 19,
+    "hits": 16,
+    "hit_rate": 0.8421,
+    "break_even": 0.5659,
+    "prob_above": 0.9829,
+    "roi": 0.496,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 18,
+    "bets": 19,
+    "edge": 0.1869,
+    "edge_ci": [
+     0.0458,
+     0.3067
+    ],
+    "prob_above_cut": 0.9772,
+    "prob_adds": 0.9931,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T20:47:54+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 15,
+     "hits": 13.5,
+     "misses": 1.5,
+     "prob_above": 0.9806,
+     "roi": 0.5669,
+     "categories": {
+      "prospective": 15,
+      "mixed": 0,
+      "before_registration": 3,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "7f640364f7f1a912",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -8428,66 +8282,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "a0cea93d1123310f",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 33,
-    "hits": 25,
-    "hit_rate": 0.7576,
-    "break_even": 0.5616,
-    "prob_above": 0.9816,
-    "roi": 0.3603,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 27,
-    "bets": 33,
-    "edge": 0.1626,
-    "edge_ci": [
-     0.037,
-     0.2739
-    ],
-    "prob_above_cut": 0.9744,
-    "prob_adds": 0.9955,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T14:06:49+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 24,
-     "hits": 19.3,
-     "misses": 4.7,
-     "prob_above": 0.9793,
-     "roi": 0.373,
-     "categories": {
-      "prospective": 24,
-      "mixed": 0,
-      "before_registration": 3,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "da8ca9ed536a506b",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -8747,6 +8541,66 @@
     "last_change": null
    },
    {
+    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ]
+    ],
+    "n": 45,
+    "hits": 32,
+    "hit_rate": 0.7159,
+    "break_even": 0.5388,
+    "prob_above": 0.9786,
+    "roi": 0.2891,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 21,
+    "bets": 45,
+    "edge": 0.1737,
+    "edge_ci": [
+     0.0351,
+     0.2958
+    ],
+    "prob_above_cut": 0.9716,
+    "prob_adds": 0.9853,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T19:44:56+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 18,
+     "hits": 15.38,
+     "misses": 2.62,
+     "prob_above": 0.9834,
+     "roi": 0.479,
+     "categories": {
+      "prospective": 18,
+      "mixed": 2,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "e1811baa22f53f08",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Stake | Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = uma",
     "family": "Stake",
     "conditions": [
@@ -8780,7 +8634,7 @@
      0.3459
     ],
     "prob_above_cut": 0.9731,
-    "prob_adds": 0.9842,
+    "prob_adds": 0.9826,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T19:57:22+00:00",
@@ -9008,7 +8862,7 @@
     "last_change": null
    },
    {
-    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma",
+    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
     "family": "Stake",
     "conditions": [
      [
@@ -9018,40 +8872,44 @@
      [
       "Número de apostas",
       "uma"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
      ]
     ],
-    "n": 42,
-    "hits": 30,
-    "hit_rate": 0.7195,
-    "break_even": 0.5337,
-    "prob_above": 0.9761,
-    "roi": 0.3051,
+    "n": 22,
+    "hits": 17,
+    "hit_rate": 0.7907,
+    "break_even": 0.5372,
+    "prob_above": 0.9759,
+    "roi": 0.3771,
     "status": "em observação",
     "tradable": true,
     "expect": null,
-    "games": 19,
-    "bets": 42,
-    "edge": 0.1759,
+    "games": 17,
+    "bets": 22,
+    "edge": 0.1809,
     "edge_ci": [
-     0.0319,
-     0.3025
+     0.0328,
+     0.3095
     ],
     "prob_above_cut": 0.9688,
-    "prob_adds": 0.9842,
+    "prob_adds": 0.9831,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-14T19:44:56+00:00",
+    "born_utc": "2026-11-14T20:01:52+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
      "games": 16,
-     "hits": 13.88,
-     "misses": 2.12,
-     "prob_above": 0.9816,
-     "roi": 0.5143,
+     "hits": 14.0,
+     "misses": 2.0,
+     "prob_above": 0.9842,
+     "roi": 0.6194,
      "categories": {
       "prospective": 16,
-      "mixed": 2,
+      "mixed": 0,
       "before_registration": 1,
       "after_registration_not_operational": 0,
       "result_known_before_decision": 0,
@@ -9060,71 +8918,7 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "ec8a5ebd83e81639",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 18,
-    "hits": 15,
-    "hit_rate": 0.8333,
-    "break_even": 0.5665,
-    "prob_above": 0.9757,
-    "roi": 0.5067,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 17,
-    "bets": 18,
-    "edge": 0.1773,
-    "edge_ci": [
-     0.0323,
-     0.301
-    ],
-    "prob_above_cut": 0.9682,
-    "prob_adds": 0.989,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:47:54+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 14,
-     "hits": 12.5,
-     "misses": 1.5,
-     "prob_above": 0.9721,
-     "roi": 0.5513,
-     "categories": {
-      "prospective": 14,
-      "mixed": 0,
-      "before_registration": 3,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "7f85a5026f22e151",
+    "game_set": "b3ed882008a41036",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -9530,6 +9324,66 @@
     }
    },
    {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ]
+    ],
+    "n": 15,
+    "hits": 13,
+    "hit_rate": 0.8667,
+    "break_even": 0.5797,
+    "prob_above": 0.9743,
+    "roi": 0.5047,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 14,
+    "bets": 15,
+    "edge": 0.184,
+    "edge_ci": [
+     0.0319,
+     0.3109
+    ],
+    "prob_above_cut": 0.9669,
+    "prob_adds": 0.9857,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T20:54:24+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 11,
+     "hits": 10.5,
+     "misses": 0.5,
+     "prob_above": 0.9731,
+     "roi": 0.5767,
+     "categories": {
+      "prospective": 11,
+      "mixed": 0,
+      "before_registration": 3,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "f8aaa90690031c84",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Hora (UTC) = noite & Ritmo indicado pelo bot = menos de 90",
     "family": "Jogo aberto",
     "conditions": [
@@ -9724,6 +9578,70 @@
      "prob_above": 0.9737,
      "known_utc": "2026-11-17T21:57:52+00:00"
     }
+   },
+   {
+    "id": "Stake | Golos até ao sinal = nenhum & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Golos até ao sinal",
+      "nenhum"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 9,
+    "hits": 9,
+    "hit_rate": 1.0,
+    "break_even": 0.5721,
+    "prob_above": 0.9729,
+    "roi": 0.7611,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 9,
+    "bets": 9,
+    "edge": 0.2027,
+    "edge_ci": [
+     0.0335,
+     0.3383
+    ],
+    "prob_above_cut": 0.9662,
+    "prob_adds": 0.984,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-18T16:11:34+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 1,
+     "hits": 1.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": 0.65,
+     "categories": {
+      "prospective": 1,
+      "mixed": 0,
+      "before_registration": 8,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "e37205b1c869ae8b",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
    },
    {
     "id": "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte",
@@ -9991,7 +9909,71 @@
     "last_change": null
    },
    {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Dia",
+      "dia de semana"
+     ],
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 15,
+    "hits": 13,
+    "hit_rate": 0.8667,
+    "break_even": 0.5903,
+    "prob_above": 0.9723,
+    "roi": 0.4907,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 12,
+    "bets": 15,
+    "edge": 0.1865,
+    "edge_ci": [
+     0.0298,
+     0.3142
+    ],
+    "prob_above_cut": 0.9646,
+    "prob_adds": 0.9827,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-17T15:10:05+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 7,
+     "hits": 6.5,
+     "misses": 0.5,
+     "prob_above": null,
+     "roi": 0.4862,
+     "categories": {
+      "prospective": 7,
+      "mixed": 0,
+      "before_registration": 5,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "ab7d8a3a9b8806d8",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
     "family": "Stake",
     "conditions": [
      [
@@ -10001,41 +9983,45 @@
      [
       "Outros sinais no mesmo jogo",
       "jogo com um só tipo de sinal"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
      ]
     ],
-    "n": 12,
-    "hits": 11,
-    "hit_rate": 0.9167,
-    "break_even": 0.5722,
+    "n": 9,
+    "hits": 9,
+    "hit_rate": 1.0,
+    "break_even": 0.5792,
     "prob_above": 0.9716,
-    "roi": 0.5933,
+    "roi": 0.7356,
     "status": "em observação",
     "tradable": false,
     "expect": null,
-    "games": 12,
-    "bets": 12,
-    "edge": 0.1879,
+    "games": 9,
+    "bets": 9,
+    "edge": 0.1993,
     "edge_ci": [
-     0.0285,
-     0.3198
+     0.0309,
+     0.3337
     ],
-    "prob_above_cut": 0.9639,
-    "prob_adds": 0.9848,
+    "prob_above_cut": 0.9645,
+    "prob_adds": 0.9832,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:54:24+00:00",
+    "born_utc": "2026-11-14T22:51:03+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
-     "games": 9,
-     "hits": 9.0,
+     "games": 8,
+     "hits": 8.0,
      "misses": 0.0,
-     "prob_above": 0.9704,
-     "roi": 0.7189,
+     "prob_above": 0.9586,
+     "roi": 0.7338,
      "categories": {
-      "prospective": 9,
+      "prospective": 8,
       "mixed": 0,
-      "before_registration": 3,
+      "before_registration": 1,
       "after_registration_not_operational": 0,
       "result_known_before_decision": 0,
       "result_time_unproven": 0
@@ -10043,7 +10029,67 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "51149deb7f74d35a",
+    "game_set": "c620bb8644ebbb5a",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 28,
+    "hits": 21,
+    "hit_rate": 0.75,
+    "break_even": 0.5455,
+    "prob_above": 0.9709,
+    "roi": 0.4214,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 25,
+    "bets": 28,
+    "edge": 0.1531,
+    "edge_ci": [
+     0.0215,
+     0.2712
+    ],
+    "prob_above_cut": 0.9611,
+    "prob_adds": 0.9879,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T14:06:49+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 24,
+     "hits": 19.17,
+     "misses": 4.83,
+     "prob_above": 0.9822,
+     "roi": 0.4896,
+     "categories": {
+      "prospective": 24,
+      "mixed": 0,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "2bd95f5eb45daf14",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -10172,70 +10218,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "027b696ea390ea1d",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Dia",
-      "dia de semana"
-     ],
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 12,
-    "hits": 11,
-    "hit_rate": 0.9167,
-    "break_even": 0.5855,
-    "prob_above": 0.9695,
-    "roi": 0.5758,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 10,
-    "bets": 12,
-    "edge": 0.191,
-    "edge_ci": [
-     0.0264,
-     0.3236
-    ],
-    "prob_above_cut": 0.9617,
-    "prob_adds": 0.9817,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-17T15:10:05+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 5,
-     "hits": 5.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.688,
-     "categories": {
-      "prospective": 5,
-      "mixed": 0,
-      "before_registration": 5,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "3818ac0538587a39",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -10565,70 +10547,6 @@
     }
    },
    {
-    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 21,
-    "hits": 16,
-    "hit_rate": 0.7805,
-    "break_even": 0.5363,
-    "prob_above": 0.9662,
-    "roi": 0.375,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 16,
-    "bets": 21,
-    "edge": 0.1708,
-    "edge_ci": [
-     0.0185,
-     0.3037
-    ],
-    "prob_above_cut": 0.9571,
-    "prob_adds": 0.9742,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:01:52+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 15,
-     "hits": 13.0,
-     "misses": 2.0,
-     "prob_above": 0.9773,
-     "roi": 0.6088,
-     "categories": {
-      "prospective": 15,
-      "mixed": 0,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "e21606efb1e3d2c8",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Betfair | Faixa de odd = odd acima de 3,00 & Reforço = sem reforço",
     "family": "Betfair",
     "conditions": [
@@ -10789,7 +10707,7 @@
      0.378
     ],
     "prob_above_cut": 0.9592,
-    "prob_adds": 0.973,
+    "prob_adds": 0.9708,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:48:36+00:00",
@@ -10813,6 +10731,70 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "52dc1bd58bbc1361",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Marcador no momento = empatado & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "empatado"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 11,
+    "hits": 10,
+    "hit_rate": 0.9091,
+    "break_even": 0.5792,
+    "prob_above": 0.9655,
+    "roi": 0.5542,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 10,
+    "bets": 11,
+    "edge": 0.187,
+    "edge_ci": [
+     0.0201,
+     0.3234
+    ],
+    "prob_above_cut": 0.957,
+    "prob_adds": 0.9772,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-18T16:11:34+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 2,
+     "hits": 1.5,
+     "misses": 0.5,
+     "prob_above": null,
+     "roi": 0.15,
+     "categories": {
+      "prospective": 2,
+      "mixed": 0,
+      "before_registration": 8,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "5ed2473a4ea7c938",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -11012,6 +10994,66 @@
     "last_change": null
    },
    {
+    "id": "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 34,
+    "hits": 24,
+    "hit_rate": 0.7164,
+    "break_even": 0.5249,
+    "prob_above": 0.9643,
+    "roi": 0.3228,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 23,
+    "bets": 34,
+    "edge": 0.1519,
+    "edge_ci": [
+     0.0141,
+     0.2769
+    ],
+    "prob_above_cut": 0.9537,
+    "prob_adds": 0.9643,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T19:13:02+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 21,
+     "hits": 17.33,
+     "misses": 3.67,
+     "prob_above": 0.9888,
+     "roi": 0.5596,
+     "categories": {
+      "prospective": 21,
+      "mixed": 1,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "09f92da206961491",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
@@ -11045,7 +11087,7 @@
      0.3055
     ],
     "prob_above_cut": 0.9541,
-    "prob_adds": 0.9792,
+    "prob_adds": 0.9766,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T23:20:28+00:00",
@@ -11139,6 +11181,66 @@
      "prob_above": 0.977,
      "known_utc": "2026-11-14T18:23:15+00:00"
     }
+   },
+   {
+    "id": "Stake | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 11,
+    "hits": 10,
+    "hit_rate": 0.9091,
+    "break_even": 0.5627,
+    "prob_above": 0.9628,
+    "roi": 0.5517,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 11,
+    "bets": 11,
+    "edge": 0.1815,
+    "edge_ci": [
+     0.0156,
+     0.3203
+    ],
+    "prob_above_cut": 0.9537,
+    "prob_adds": 0.9754,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T20:54:24+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 9,
+     "hits": 9.0,
+     "misses": 0.0,
+     "prob_above": 0.9731,
+     "roi": 0.7633,
+     "categories": {
+      "prospective": 9,
+      "mixed": 0,
+      "before_registration": 2,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "0ac5992e4ebf4ab7",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
    },
    {
     "id": "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = 10 mil $ ou mais",
@@ -11265,6 +11367,134 @@
     "last_change": null
    },
    {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ]
+    ],
+    "n": 14,
+    "hits": 12,
+    "hit_rate": 0.8571,
+    "break_even": 0.584,
+    "prob_above": 0.9622,
+    "roi": 0.4743,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 13,
+    "bets": 14,
+    "edge": 0.1711,
+    "edge_ci": [
+     0.0142,
+     0.3024
+    ],
+    "prob_above_cut": 0.9522,
+    "prob_adds": 0.9744,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-15T00:20:02+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 10,
+     "hits": 9.5,
+     "misses": 0.5,
+     "prob_above": 0.9597,
+     "roi": 0.5445,
+     "categories": {
+      "prospective": 10,
+      "mixed": 0,
+      "before_registration": 3,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "61e0cb45a68c993b",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático) & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Mercado",
+      "golos (total asiático)"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ]
+    ],
+    "n": 11,
+    "hits": 10,
+    "hit_rate": 0.9091,
+    "break_even": 0.5904,
+    "prob_above": 0.9621,
+    "roi": 0.5673,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 10,
+    "bets": 11,
+    "edge": 0.1809,
+    "edge_ci": [
+     0.015,
+     0.3154
+    ],
+    "prob_above_cut": 0.9527,
+    "prob_adds": 0.9734,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-18T16:11:34+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 3,
+     "hits": 2.5,
+     "misses": 0.5,
+     "prob_above": null,
+     "roi": 0.2625,
+     "categories": {
+      "prospective": 3,
+      "mixed": 0,
+      "before_registration": 7,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "df14e7445faa7bfb",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma",
     "family": "Stake",
     "conditions": [
@@ -11298,7 +11528,7 @@
      0.3703
     ],
     "prob_above_cut": 0.955,
-    "prob_adds": 0.9599,
+    "prob_adds": 0.9573,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T23:20:28+00:00",
@@ -11386,134 +11616,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "a0df713ff01ed123",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Golos até ao sinal = nenhum & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "nenhum"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.5679,
-    "prob_above": 0.9615,
-    "roi": 0.775,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 8,
-    "bets": 8,
-    "edge": 0.192,
-    "edge_ci": [
-     0.0152,
-     0.3353
-    ],
-    "prob_above_cut": 0.953,
-    "prob_adds": 0.9755,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-18T16:11:34+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 8,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "91a7944b84b454e3",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Marcador no momento = empatado & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Marcador no momento",
-      "empatado"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.5679,
-    "prob_above": 0.9615,
-    "roi": 0.775,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 8,
-    "bets": 8,
-    "edge": 0.192,
-    "edge_ci": [
-     0.0152,
-     0.3353
-    ],
-    "prob_above_cut": 0.953,
-    "prob_adds": 0.9755,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-18T16:11:34+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 8,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "91a7944b84b454e3",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -11770,66 +11872,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "f46977c69a438999",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 27,
-    "hits": 20,
-    "hit_rate": 0.7407,
-    "break_even": 0.5452,
-    "prob_above": 0.9609,
-    "roi": 0.423,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 24,
-    "bets": 27,
-    "edge": 0.1445,
-    "edge_ci": [
-     0.0102,
-     0.2656
-    ],
-    "prob_above_cut": 0.9487,
-    "prob_adds": 0.9823,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T14:06:49+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 23,
-     "hits": 18.17,
-     "misses": 4.83,
-     "prob_above": 0.9754,
-     "roi": 0.4777,
-     "categories": {
-      "prospective": 23,
-      "mixed": 0,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "2b6129c13857c382",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -12253,7 +12295,7 @@
      0.3235
     ],
     "prob_above_cut": 0.949,
-    "prob_adds": 0.9716,
+    "prob_adds": 0.9688,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T20:47:54+00:00",
@@ -12348,70 +12390,6 @@
     "last_change": null
    },
    {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.5822,
-    "prob_above": 0.9581,
-    "roi": 0.7275,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 8,
-    "bets": 8,
-    "edge": 0.1857,
-    "edge_ci": [
-     0.0103,
-     0.3265
-    ],
-    "prob_above_cut": 0.9487,
-    "prob_adds": 0.9718,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T22:51:03+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 7,
-     "hits": 7.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.7243,
-     "categories": {
-      "prospective": 7,
-      "mixed": 0,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "349a0e247e854ca3",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Stake | Hora (UTC) = noite & Liga = UEFA Nations League & Momento do aviso = mais de 45 min depois do início",
     "family": "Stake",
     "conditions": [
@@ -12445,7 +12423,7 @@
      0.3309
     ],
     "prob_above_cut": 0.9489,
-    "prob_adds": 0.9485,
+    "prob_adds": 0.9453,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T21:28:26+00:00",
@@ -12469,70 +12447,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "46c8179e5bf29046",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (total asiático) & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Mercado",
-      "golos (total asiático)"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ]
-    ],
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.5832,
-    "prob_above": 0.9579,
-    "roi": 0.7238,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 8,
-    "bets": 8,
-    "edge": 0.1852,
-    "edge_ci": [
-     0.01,
-     0.3258
-    ],
-    "prob_above_cut": 0.9483,
-    "prob_adds": 0.9716,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-18T16:11:34+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 1,
-     "hits": 1.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.6,
-     "categories": {
-      "prospective": 1,
-      "mixed": 0,
-      "before_registration": 7,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "bf5b174cd352fef0",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -12604,7 +12518,7 @@
     "last_change": null
    },
    {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
      [
@@ -12612,47 +12526,43 @@
       "odd 1,50 a 2,00"
      ],
      [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
      ]
     ],
-    "n": 11,
-    "hits": 10,
-    "hit_rate": 0.9091,
-    "break_even": 0.5771,
-    "prob_above": 0.9578,
-    "roi": 0.5627,
+    "n": 34,
+    "hits": 24,
+    "hit_rate": 0.7059,
+    "break_even": 0.5792,
+    "prob_above": 0.9574,
+    "roi": 0.2303,
     "status": "em observação",
-    "tradable": false,
+    "tradable": true,
     "expect": null,
-    "games": 11,
-    "bets": 11,
-    "edge": 0.1739,
+    "games": 28,
+    "bets": 34,
+    "edge": 0.1321,
     "edge_ci": [
-     0.0091,
-     0.3109
+     0.0063,
+     0.2454
     ],
-    "prob_above_cut": 0.9475,
-    "prob_adds": 0.9723,
+    "prob_above_cut": 0.9427,
+    "prob_adds": 0.9838,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-15T00:20:02+00:00",
+    "born_utc": "2026-11-14T10:43:06+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
-     "games": 8,
-     "hits": 8.0,
-     "misses": 0.0,
-     "prob_above": 0.9553,
-     "roi": 0.6925,
+     "games": 26,
+     "hits": 19.67,
+     "misses": 6.33,
+     "prob_above": 0.9474,
+     "roi": 0.23,
      "categories": {
-      "prospective": 8,
+      "prospective": 26,
       "mixed": 0,
-      "before_registration": 3,
+      "before_registration": 2,
       "after_registration_not_operational": 0,
       "result_known_before_decision": 0,
       "result_time_unproven": 0
@@ -12660,7 +12570,7 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "4e6cc6af13b24080",
+    "game_set": "4182fc8d11ce4004",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -12721,6 +12631,198 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "7999050f335c6e20",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 10,
+    "hits": 9,
+    "hit_rate": 0.9,
+    "break_even": 0.5611,
+    "prob_above": 0.9573,
+    "roi": 0.59,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 9,
+    "bets": 10,
+    "edge": 0.1842,
+    "edge_ci": [
+     0.0089,
+     0.3302
+    ],
+    "prob_above_cut": 0.9479,
+    "prob_adds": 0.9686,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T22:48:36+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 7,
+     "hits": 6.5,
+     "misses": 0.5,
+     "prob_above": null,
+     "roi": 0.58,
+     "categories": {
+      "prospective": 7,
+      "mixed": 0,
+      "before_registration": 2,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "df66f96e4df0bddc",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Momento do aviso",
+      "mais de 45 min depois do início"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ]
+    ],
+    "n": 26,
+    "hits": 18,
+    "hit_rate": 0.7,
+    "break_even": 0.532,
+    "prob_above": 0.956,
+    "roi": 0.2647,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 16,
+    "bets": 26,
+    "edge": 0.16,
+    "edge_ci": [
+     0.0062,
+     0.2956
+    ],
+    "prob_above_cut": 0.9447,
+    "prob_adds": 0.9441,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T22:06:13+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 10,
+     "hits": 8.5,
+     "misses": 1.5,
+     "prob_above": 0.9253,
+     "roi": 0.5545,
+     "categories": {
+      "prospective": 10,
+      "mixed": 1,
+      "before_registration": 5,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "275a9aba463f07e8",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Mercado",
+      "golos (total asiático)"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 20,
+    "hits": 16,
+    "hit_rate": 0.8,
+    "break_even": 0.5925,
+    "prob_above": 0.956,
+    "roi": 0.3286,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 19,
+    "bets": 20,
+    "edge": 0.1469,
+    "edge_ci": [
+     0.0058,
+     0.2691
+    ],
+    "prob_above_cut": 0.9428,
+    "prob_adds": 0.9675,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-16T00:16:24+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 11,
+     "hits": 9.5,
+     "misses": 1.5,
+     "prob_above": 0.9203,
+     "roi": 0.3875,
+     "categories": {
+      "prospective": 11,
+      "mixed": 0,
+      "before_registration": 8,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "4c9bc2d4b5cd5958",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -13072,7 +13174,7 @@
      0.3475
     ],
     "prob_above_cut": 0.9451,
-    "prob_adds": 0.9488,
+    "prob_adds": 0.9455,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T21:34:53+00:00",
@@ -13132,7 +13234,7 @@
      0.2529
     ],
     "prob_above_cut": 0.9386,
-    "prob_adds": 0.9564,
+    "prob_adds": 0.9515,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T10:43:06+00:00",
@@ -13163,51 +13265,51 @@
     "last_change": null
    },
    {
-    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+    "id": "Stake | Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
      [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
+      "Golos até ao sinal",
+      "nenhum"
      ],
      [
       "Sinal anterior de outro tipo no mesmo jogo",
       "não"
      ]
     ],
-    "n": 31,
-    "hits": 22,
-    "hit_rate": 0.7097,
-    "break_even": 0.5763,
-    "prob_above": 0.9523,
-    "roi": 0.2381,
+    "n": 10,
+    "hits": 9,
+    "hit_rate": 0.9,
+    "break_even": 0.5676,
+    "prob_above": 0.9526,
+    "roi": 0.585,
     "status": "em observação",
     "tradable": true,
     "expect": null,
-    "games": 26,
-    "bets": 31,
-    "edge": 0.1316,
+    "games": 9,
+    "bets": 10,
+    "edge": 0.1771,
     "edge_ci": [
-     0.0019,
-     0.2481
+     0.0031,
+     0.3209
     ],
-    "prob_above_cut": 0.9369,
-    "prob_adds": 0.9822,
+    "prob_above_cut": 0.9421,
+    "prob_adds": 0.9636,
     "pending_status": null,
     "entry_status": "em observação",
-    "born_utc": "2026-11-14T10:43:06+00:00",
+    "born_utc": "2026-11-16T00:16:24+00:00",
     "born_verified": true,
     "evidence_level": "exploratória",
     "prospective": {
-     "games": 24,
-     "hits": 18.17,
-     "misses": 5.83,
-     "prob_above": 0.9411,
-     "roi": 0.2386,
+     "games": 3,
+     "hits": 3.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": 0.7333,
      "categories": {
-      "prospective": 24,
+      "prospective": 3,
       "mixed": 0,
-      "before_registration": 2,
+      "before_registration": 6,
       "after_registration_not_operational": 0,
       "result_known_before_decision": 0,
       "result_time_unproven": 0
@@ -13215,67 +13317,7 @@
     },
     "at_birth": null,
     "result_time_unknown": null,
-    "game_set": "f82f876bbca62f16",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 33,
-    "hits": 23,
-    "hit_rate": 0.7077,
-    "break_even": 0.524,
-    "prob_above": 0.9522,
-    "roi": 0.3182,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 22,
-    "bets": 33,
-    "edge": 0.1427,
-    "edge_ci": [
-     0.002,
-     0.271
-    ],
-    "prob_above_cut": 0.939,
-    "prob_adds": 0.9499,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T19:13:02+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 20,
-     "hits": 16.33,
-     "misses": 3.67,
-     "prob_above": 0.9842,
-     "roi": 0.5507,
-     "categories": {
-      "prospective": 20,
-      "mixed": 1,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "86e6e5d7decad31a",
+    "game_set": "e37205b1c869ae8b",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -13347,70 +13389,6 @@
     "last_change": null
    },
    {
-    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5404,
-    "prob_above": 0.9517,
-    "roi": 0.8629,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 7,
-    "bets": 7,
-    "edge": 0.1892,
-    "edge_ci": [
-     0.0021,
-     0.3449
-    ],
-    "prob_above_cut": 0.9422,
-    "prob_adds": 0.9654,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T22:48:36+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 5,
-     "hits": 5.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.838,
-     "categories": {
-      "prospective": 5,
-      "mixed": 0,
-      "before_registration": 2,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "a2ae269e3c0c374c",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Polymarket | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim",
     "family": "Polymarket",
     "conditions": [
@@ -13464,134 +13442,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "16235df6146acef6",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Mercado",
-      "golos (total asiático)"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 17,
-    "hits": 14,
-    "hit_rate": 0.8235,
-    "break_even": 0.5895,
-    "prob_above": 0.9508,
-    "roi": 0.3794,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 17,
-    "bets": 17,
-    "edge": 0.1474,
-    "edge_ci": [
-     0.0007,
-     0.2737
-    ],
-    "prob_above_cut": 0.937,
-    "prob_adds": 0.9648,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-16T00:16:24+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 9,
-     "hits": 8.0,
-     "misses": 1.0,
-     "prob_above": 0.9099,
-     "roi": 0.4667,
-     "categories": {
-      "prospective": 9,
-      "mixed": 0,
-      "before_registration": 8,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "c7113faab1c18b76",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Momento do aviso",
-      "mais de 45 min depois do início"
-     ],
-     [
-      "Número de apostas",
-      "uma"
-     ]
-    ],
-    "n": 23,
-    "hits": 16,
-    "hit_rate": 0.7045,
-    "break_even": 0.5219,
-    "prob_above": 0.9504,
-    "roi": 0.289,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 14,
-    "bets": 23,
-    "edge": 0.1615,
-    "edge_ci": [
-     0.0004,
-     0.3035
-    ],
-    "prob_above_cut": 0.9388,
-    "prob_adds": 0.9399,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T22:06:13+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 8,
-     "hits": 7.0,
-     "misses": 1.0,
-     "prob_above": 0.9147,
-     "roi": 0.7063,
-     "categories": {
-      "prospective": 8,
-      "mixed": 1,
-      "before_registration": 5,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "46fa9161879ecd28",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -13692,7 +13542,7 @@
      0.2608
     ],
     "prob_above_cut": 0.9341,
-    "prob_adds": 0.9493,
+    "prob_adds": 0.9444,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T10:43:06+00:00",
@@ -13851,6 +13701,65 @@
     "last_change": null
    },
    {
+    "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 47,
+    "hits": 32,
+    "hit_rate": 0.6809,
+    "break_even": 0.5522,
+    "prob_above": 0.9487,
+    "roi": 0.2633,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 37,
+    "bets": 47,
+    "edge": 0.1148,
+    "edge_ci": [
+     -0.0009,
+     0.2222
+    ],
+    "prob_above_cut": 0.9304,
+    "prob_adds": 0.9851,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-13T13:28:37+00:00",
+    "born_verified": true,
+    "evidence_level": "prospetiva",
+    "prospective": {
+     "games": 35,
+     "hits": 24.97,
+     "misses": 10.03,
+     "prob_above": 0.9525,
+     "roi": 0.2831,
+     "categories": {
+      "prospective": 35,
+      "mixed": 0,
+      "before_registration": 2,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": {
+     "games": 1,
+     "prob_above": 0.3794
+    },
+    "result_time_unknown": 0,
+    "game_set": "b77e5a6b6ecc7ba8",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Betfair | Faixa de odd = odd acima de 3,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota de mercado = menos de 80 %",
     "family": "Betfair",
     "conditions": [
@@ -13908,6 +13817,70 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "22c62303d7dd957a",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 19,
+    "hits": 15,
+    "hit_rate": 0.7895,
+    "break_even": 0.5835,
+    "prob_above": 0.9485,
+    "roi": 0.3695,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 18,
+    "bets": 19,
+    "edge": 0.1439,
+    "edge_ci": [
+     -0.0014,
+     0.2706
+    ],
+    "prob_above_cut": 0.9341,
+    "prob_adds": 0.9733,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T20:47:54+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 17,
+     "hits": 13.5,
+     "misses": 3.5,
+     "prob_above": 0.9311,
+     "roi": 0.3483,
+     "categories": {
+      "prospective": 17,
+      "mixed": 0,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "9fed7ae866d4701b",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -14235,6 +14208,62 @@
     "last_change": null
    },
    {
+    "id": "Stake | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ]
+    ],
+    "n": 18,
+    "hits": 14,
+    "hit_rate": 0.7778,
+    "break_even": 0.562,
+    "prob_above": 0.9477,
+    "roi": 0.3458,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 17,
+    "bets": 18,
+    "edge": 0.148,
+    "edge_ci": [
+     -0.0021,
+     0.2804
+    ],
+    "prob_above_cut": 0.9341,
+    "prob_adds": 0.9624,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T11:31:14+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 16,
+     "hits": 12.5,
+     "misses": 3.5,
+     "prob_above": 0.9277,
+     "roi": 0.3335,
+     "categories": {
+      "prospective": 16,
+      "mixed": 0,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "0e417d97f9245bca",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Ritmo indicado pelo bot = menos de 90",
     "family": "Jogo aberto",
     "conditions": [
@@ -14363,66 +14392,6 @@
     "last_change": null
    },
    {
-    "id": "Stake | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "n": 10,
-    "hits": 9,
-    "hit_rate": 0.9,
-    "break_even": 0.5634,
-    "prob_above": 0.9467,
-    "roi": 0.582,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 10,
-    "bets": 10,
-    "edge": 0.1683,
-    "edge_ci": [
-     -0.0036,
-     0.3133
-    ],
-    "prob_above_cut": 0.935,
-    "prob_adds": 0.9612,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:54:24+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 8,
-     "hits": 8.0,
-     "misses": 0.0,
-     "prob_above": 0.9603,
-     "roi": 0.7588,
-     "categories": {
-      "prospective": 8,
-      "mixed": 0,
-      "before_registration": 2,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "9df47b0cd31f8012",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Stake | Dia = fim de semana & Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
@@ -14456,7 +14425,7 @@
      0.3694
     ],
     "prob_above_cut": 0.9379,
-    "prob_adds": 0.9517,
+    "prob_adds": 0.9485,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:51:03+00:00",
@@ -14544,6 +14513,62 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "1e7f5a29af8cbd47",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Hora (UTC) = noite",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Hora (UTC)",
+      "noite"
+     ]
+    ],
+    "n": 61,
+    "hits": 42,
+    "hit_rate": 0.6917,
+    "break_even": 0.5311,
+    "prob_above": 0.9458,
+    "roi": 0.2755,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 26,
+    "bets": 61,
+    "edge": 0.1293,
+    "edge_ci": [
+     -0.0033,
+     0.251
+    ],
+    "prob_above_cut": 0.9299,
+    "prob_adds": 0.9618,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T18:41:16+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 23,
+     "hits": 17.22,
+     "misses": 5.78,
+     "prob_above": 0.955,
+     "roi": 0.4294,
+     "categories": {
+      "prospective": 23,
+      "mixed": 2,
+      "before_registration": 1,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "2a1c26be631439f2",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -14708,7 +14733,7 @@
      0.3114
     ],
     "prob_above_cut": 0.9334,
-    "prob_adds": 0.9378,
+    "prob_adds": 0.9337,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T20:01:52+00:00",
@@ -14732,6 +14757,134 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "17c62806a3d15c64",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Número de apostas = uma & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Outros sinais no mesmo jogo",
+      "jogo com um só tipo de sinal"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 10,
+    "hits": 9,
+    "hit_rate": 0.9,
+    "break_even": 0.5671,
+    "prob_above": 0.9452,
+    "roi": 0.5173,
+    "status": "em observação",
+    "tradable": false,
+    "expect": null,
+    "games": 10,
+    "bets": 10,
+    "edge": 0.1664,
+    "edge_ci": [
+     -0.0052,
+     0.3109
+    ],
+    "prob_above_cut": 0.9331,
+    "prob_adds": 0.9573,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T22:48:36+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 8,
+     "hits": 8.0,
+     "misses": 0.0,
+     "prob_above": 0.9591,
+     "roi": 0.7425,
+     "categories": {
+      "prospective": 8,
+      "mixed": 0,
+      "before_registration": 2,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "db4fb2aac950f94b",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Dia = dia de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Dia",
+      "dia de semana"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 20,
+    "hits": 16,
+    "hit_rate": 0.8,
+    "break_even": 0.572,
+    "prob_above": 0.9446,
+    "roi": 0.3933,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 14,
+    "bets": 20,
+    "edge": 0.1507,
+    "edge_ci": [
+     -0.0053,
+     0.2841
+    ],
+    "prob_above_cut": 0.9306,
+    "prob_adds": 0.955,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-17T11:08:40+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 9,
+     "hits": 7.5,
+     "misses": 1.5,
+     "prob_above": 0.8601,
+     "roi": 0.329,
+     "categories": {
+      "prospective": 9,
+      "mixed": 1,
+      "before_registration": 4,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "6330052eae420d8c",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -14831,7 +14984,7 @@
      0.3066
     ],
     "prob_above_cut": 0.9322,
-    "prob_adds": 0.9271,
+    "prob_adds": 0.9227,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T21:28:26+00:00",
@@ -15023,7 +15176,7 @@
      0.3494
     ],
     "prob_above_cut": 0.9346,
-    "prob_adds": 0.9381,
+    "prob_adds": 0.9343,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:06:13+00:00",
@@ -15182,6 +15335,70 @@
     "last_change": null
    },
    {
+    "id": "Stake | Marcador no momento = empatado & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "empatado"
+     ],
+     [
+      "Número de apostas",
+      "uma"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "n": 10,
+    "hits": 9,
+    "hit_rate": 0.9,
+    "break_even": 0.5707,
+    "prob_above": 0.9437,
+    "roi": 0.5773,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 10,
+    "bets": 10,
+    "edge": 0.1646,
+    "edge_ci": [
+     -0.0067,
+     0.3086
+    ],
+    "prob_above_cut": 0.9313,
+    "prob_adds": 0.9463,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-15T16:02:55+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 6,
+     "hits": 6.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": 0.8667,
+     "categories": {
+      "prospective": 6,
+      "mixed": 0,
+      "before_registration": 4,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "d504fa047ff51191",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = até 45 min depois do início & Número de apostas = uma",
     "family": "Stake",
     "conditions": [
@@ -15215,7 +15432,7 @@
      0.2654
     ],
     "prob_above_cut": 0.9279,
-    "prob_adds": 0.9487,
+    "prob_adds": 0.9439,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T19:57:22+00:00",
@@ -15310,65 +15527,6 @@
     "last_change": null
    },
    {
-    "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ]
-    ],
-    "n": 44,
-    "hits": 30,
-    "hit_rate": 0.6818,
-    "break_even": 0.5483,
-    "prob_above": 0.9428,
-    "roi": 0.277,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 35,
-    "bets": 44,
-    "edge": 0.1136,
-    "edge_ci": [
-     -0.005,
-     0.2237
-    ],
-    "prob_above_cut": 0.9236,
-    "prob_adds": 0.9837,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-13T13:28:37+00:00",
-    "born_verified": true,
-    "evidence_level": "prospetiva",
-    "prospective": {
-     "games": 33,
-     "hits": 23.47,
-     "misses": 9.53,
-     "prob_above": 0.9471,
-     "roi": 0.2926,
-     "categories": {
-      "prospective": 33,
-      "mixed": 0,
-      "before_registration": 2,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": {
-     "games": 1,
-     "prob_above": 0.3794
-    },
-    "result_time_unknown": 0,
-    "game_set": "54013d36f164e86a",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Stake | Momento do aviso = até 45 min depois do início & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Stake",
     "conditions": [
@@ -15398,7 +15556,7 @@
      0.2899
     ],
     "prob_above_cut": 0.9289,
-    "prob_adds": 0.9594,
+    "prob_adds": 0.9551,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T20:05:51+00:00",
@@ -15654,7 +15812,7 @@
      0.3044
     ],
     "prob_above_cut": 0.9294,
-    "prob_adds": 0.9495,
+    "prob_adds": 0.9455,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T19:57:22+00:00",
@@ -15678,6 +15836,66 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "8d5d8026c3e70ad6",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
+    "id": "Stake | Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Marcador no momento",
+      "empatado"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "n": 12,
+    "hits": 10,
+    "hit_rate": 0.8333,
+    "break_even": 0.5748,
+    "prob_above": 0.9421,
+    "roi": 0.4346,
+    "status": "em observação",
+    "tradable": true,
+    "expect": null,
+    "games": 10,
+    "bets": 12,
+    "edge": 0.1627,
+    "edge_ci": [
+     -0.0084,
+     0.3062
+    ],
+    "prob_above_cut": 0.9293,
+    "prob_adds": 0.9523,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-16T00:16:24+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 4,
+     "hits": 3.5,
+     "misses": 0.5,
+     "prob_above": null,
+     "roi": 0.4,
+     "categories": {
+      "prospective": 4,
+      "mixed": 0,
+      "before_registration": 6,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "5ed2473a4ea7c938",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -15997,62 +16215,6 @@
     "last_change": null
    },
    {
-    "id": "Stake | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ]
-    ],
-    "n": 15,
-    "hits": 12,
-    "hit_rate": 0.8,
-    "break_even": 0.5525,
-    "prob_above": 0.9411,
-    "roi": 0.408,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 15,
-    "bets": 15,
-    "edge": 0.1485,
-    "edge_ci": [
-     -0.0083,
-     0.2867
-    ],
-    "prob_above_cut": 0.927,
-    "prob_adds": 0.9587,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T11:31:14+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 14,
-     "hits": 11.0,
-     "misses": 3.0,
-     "prob_above": 0.9183,
-     "roi": 0.3729,
-     "categories": {
-      "prospective": 14,
-      "mixed": 0,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "bee48729ff1299ff",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
     "id": "Jogo aberto | Competição = liga & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90",
     "family": "Jogo aberto",
     "conditions": [
@@ -16302,442 +16464,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "27ca4e9cbbc077fd",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Betfair | Momento = durante o jogo & Odd depois do sinal = subiu",
-    "family": "Betfair",
-    "conditions": [
-     [
-      "Momento",
-      "durante o jogo"
-     ],
-     [
-      "Odd depois do sinal",
-      "subiu"
-     ]
-    ],
-    "n": 26,
-    "hits": 15,
-    "hit_rate": 0.5769,
-    "break_even": 0.3985,
-    "prob_above": 0.94,
-    "roi": 0.5158,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 26,
-    "bets": 26,
-    "edge": 0.1288,
-    "edge_ci": [
-     -0.0073,
-     0.2632
-    ],
-    "prob_above_cut": 0.9272,
-    "prob_adds": 0.9588,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-12T15:16:56+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 17,
-     "hits": 10.0,
-     "misses": 7.0,
-     "prob_above": 0.9434,
-     "roi": 0.7224,
-     "categories": {
-      "prospective": 17,
-      "mixed": 0,
-      "before_registration": 7,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 2,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "37c32d0bf572c60a",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Faixa de odd = odd 2,00 a 3,00 & Liga = UEFA Nations League & Sinal anterior de outro tipo no mesmo jogo = sim",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 2,00 a 3,00"
-     ],
-     [
-      "Liga",
-      "UEFA Nations League"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "sim"
-     ]
-    ],
-    "n": 19,
-    "hits": 14,
-    "hit_rate": 0.7568,
-    "break_even": 0.4544,
-    "prob_above": 0.94,
-    "roi": 0.5559,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 9,
-    "bets": 19,
-    "edge": 0.1762,
-    "edge_ci": [
-     -0.0104,
-     0.3473
-    ],
-    "prob_above_cut": 0.93,
-    "prob_adds": 0.9182,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T21:34:53+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 8,
-     "hits": 6.62,
-     "misses": 1.38,
-     "prob_above": 0.9259,
-     "roi": 0.6269,
-     "categories": {
-      "prospective": 8,
-      "mixed": 0,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "3b1c0486c523b2a4",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Jogo aberto | Dia = fim de semana & Hora (UTC) = noite & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Dia",
-      "fim de semana"
-     ],
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ]
-    ],
-    "n": 16,
-    "hits": 13,
-    "hit_rate": 0.8125,
-    "break_even": 0.5815,
-    "prob_above": 0.94,
-    "roi": 0.3275,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 16,
-    "bets": 16,
-    "edge": 0.1421,
-    "edge_ci": [
-     -0.009,
-     0.2734
-    ],
-    "prob_above_cut": 0.9245,
-    "prob_adds": 0.8797,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T19:40:34+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 10,
-     "hits": 10.0,
-     "misses": 0.0,
-     "prob_above": 0.9765,
-     "roi": 0.666,
-     "categories": {
-      "prospective": 10,
-      "mixed": 0,
-      "before_registration": 6,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "a585e1ed648386c3",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Hora (UTC) = noite & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Confiança indicada pelo bot",
-      "menos de 95 %"
-     ],
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ]
-    ],
-    "n": 13,
-    "hits": 11,
-    "hit_rate": 0.8462,
-    "break_even": 0.5802,
-    "prob_above": 0.9398,
-    "roi": 0.3268,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 13,
-    "bets": 13,
-    "edge": 0.1503,
-    "edge_ci": [
-     -0.0098,
-     0.2872
-    ],
-    "prob_above_cut": 0.9254,
-    "prob_adds": 0.8846,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:18:35+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 8,
-     "hits": 8.0,
-     "misses": 0.0,
-     "prob_above": 0.9519,
-     "roi": 0.6562,
-     "categories": {
-      "prospective": 8,
-      "mixed": 0,
-      "before_registration": 5,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "bc4dff62f0a59756",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Hora (UTC) = noite & Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "1 ou 2"
-     ],
-     [
-      "Hora (UTC)",
-      "noite"
-     ],
-     [
-      "Outros sinais no mesmo jogo",
-      "jogo com um só tipo de sinal"
-     ]
-    ],
-    "n": 13,
-    "hits": 11,
-    "hit_rate": 0.8462,
-    "break_even": 0.5802,
-    "prob_above": 0.9398,
-    "roi": 0.3268,
-    "status": "em observação",
-    "tradable": false,
-    "expect": null,
-    "games": 13,
-    "bets": 13,
-    "edge": 0.1503,
-    "edge_ci": [
-     -0.0098,
-     0.2872
-    ],
-    "prob_above_cut": 0.9254,
-    "prob_adds": 0.8846,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T20:18:35+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 8,
-     "hits": 8.0,
-     "misses": 0.0,
-     "prob_above": 0.9519,
-     "roi": 0.6562,
-     "categories": {
-      "prospective": 8,
-      "mixed": 0,
-      "before_registration": 5,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "bc4dff62f0a59756",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 61 em diante & Sinal anterior de outro tipo no mesmo jogo = sim",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Faixa de odd",
-      "odd 1,50 a 2,00"
-     ],
-     [
-      "Minuto",
-      "61 em diante"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "sim"
-     ]
-    ],
-    "n": 7,
-    "hits": 7,
-    "hit_rate": 1.0,
-    "break_even": 0.5847,
-    "prob_above": 0.9394,
-    "roi": 0.5567,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 7,
-    "bets": 7,
-    "edge": 0.171,
-    "edge_ci": [
-     -0.0119,
-     0.3189
-    ],
-    "prob_above_cut": 0.9271,
-    "prob_adds": 0.896,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-17T21:06:47+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 1,
-     "hits": 1.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": 0.6,
-     "categories": {
-      "prospective": 1,
-      "mixed": 0,
-      "before_registration": 6,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "ed08d21df748e198",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Hora (UTC) = noite",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "noite"
-     ]
-    ],
-    "n": 58,
-    "hits": 40,
-    "hit_rate": 0.693,
-    "break_even": 0.527,
-    "prob_above": 0.9393,
-    "roi": 0.2864,
-    "status": "em observação",
-    "tradable": true,
-    "expect": null,
-    "games": 24,
-    "bets": 58,
-    "edge": 0.1286,
-    "edge_ci": [
-     -0.0084,
-     0.2544
-    ],
-    "prob_above_cut": 0.9227,
-    "prob_adds": 0.9584,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-14T18:41:16+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 21,
-     "hits": 15.72,
-     "misses": 5.28,
-     "prob_above": 0.9495,
-     "roi": 0.448,
-     "categories": {
-      "prospective": 21,
-      "mixed": 2,
-      "before_registration": 1,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "78bd87f7d9acca5f",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -18961,7 +18687,7 @@
      0.2491
     ],
     "prob_above_cut": 0.6912,
-    "prob_adds": 0.5216,
+    "prob_adds": 0.5068,
     "id": "Stake | Competição = seleções & Faixa de odd = odd 1,50 a 2,00 & Liga = UEFA Nations League",
     "family": "Stake",
     "conditions": [
@@ -23707,10 +23433,10 @@
     "note": "tem um acerto de 1.0, mas também tem uma amostra pequena de apenas 9 resultados",
     "at_utc": "2026-11-18T16:53:38+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
+    "n": 12,
+    "hits": 11,
+    "hit_rate": 0.9167,
+    "break_even": 0.5296,
     "status": "em observação"
    },
    {
@@ -23729,10 +23455,10 @@
     "note": "tem uma taxa de acerto de 100%, mas com apenas 9 resultados",
     "at_utc": "2026-11-18T12:48:34+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
+    "n": 12,
+    "hits": 11,
+    "hit_rate": 0.9167,
+    "break_even": 0.5296,
     "status": "em observação"
    },
    {
@@ -23762,10 +23488,10 @@
     "note": "mostra um desempenho perfeito com 9 resultados e acerto de 1.0, mas a amostra é muito pequena",
     "at_utc": "2026-11-18T08:35:59+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
+    "n": 12,
+    "hits": 11,
+    "hit_rate": 0.9167,
+    "break_even": 0.5296,
     "status": "em observação"
    },
    {
@@ -23795,10 +23521,10 @@
     "note": "apresenta uma taxa de acerto de 1.0 com 9 resultados, o que é promissor, mas ainda assim uma amostra pequena",
     "at_utc": "2026-11-18T04:26:48+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 9,
-    "hits": 9,
-    "hit_rate": 1.0,
-    "break_even": 0.503,
+    "n": 12,
+    "hits": 11,
+    "hit_rate": 0.9167,
+    "break_even": 0.5296,
     "status": "em observação"
    },
    {
@@ -24031,7 +23757,7 @@
     "roi_announced_odds": 0.0986,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 21.3,
+    "per_day": 21.2,
     "days_to_hint": 0,
     "days_to_conclusion": 8
    },
@@ -24060,36 +23786,36 @@
     "roi_announced_odds": -0.0561,
     "seen_late": 0,
     "by_bot_mark": 120,
-    "per_day": 34.0,
+    "per_day": 33.9,
     "days_to_hint": 0,
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
     "signals": 218,
-    "with_result": 136,
-    "hits": 75,
-    "misses": 57,
-    "pushes": 4,
-    "eff_hits": 74.5,
-    "eff_misses": 56.5,
-    "vote_hits": 35.05,
-    "vote_misses": 26.87,
-    "vote_break_even": 0.5406,
-    "games": 62,
+    "with_result": 139,
+    "hits": 76,
+    "misses": 58,
+    "pushes": 5,
+    "eff_hits": 75.5,
+    "eff_misses": 57.5,
+    "vote_hits": 35.55,
+    "vote_misses": 27.37,
+    "vote_break_even": 0.5417,
+    "games": 63,
     "no_source": 0,
-    "unsettleable": 70,
-    "hit_rate": 0.5687,
+    "unsettleable": 72,
+    "hit_rate": 0.5677,
     "ci95": [
-     0.4831,
-     0.6504
+     0.4827,
+     0.6488
     ],
-    "avg_odds": 4.098,
-    "break_even": 0.5229,
+    "avg_odds": 4.062,
+    "break_even": 0.5242,
     "baseline": false,
-    "roi_announced_odds": 0.0448,
+    "roi_announced_odds": 0.0424,
     "seen_late": 0,
     "by_bot_mark": 27,
-    "per_day": 21.3,
+    "per_day": 21.6,
     "days_to_hint": 0,
     "days_to_conclusion": 8
    },
@@ -24218,22 +23944,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 132,
+    "n": 134,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 92,
-     "hit_rate": 0.5549,
-     "break_even": 0.5393,
-     "roi": 0.0287
+     "n": 94,
+     "hit_rate": 0.5538,
+     "break_even": 0.5376,
+     "roi": 0.0308
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.6,
-     "break_even": 0.4852,
-     "roi": 0.0862
+     "break_even": 0.4927,
+     "roi": 0.075
     },
-    "z": 1.06
+    "z": 0.98
    },
    {
     "type": "TOTALS_FORM",
@@ -24570,32 +24296,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 865,
-   "settled": 703,
-   "matches": 380,
-   "wins": 341,
-   "pushes": 45,
-   "units": 22.51,
-   "avg_odds": 2.789,
+   "settled": 706,
+   "matches": 381,
+   "wins": 342,
+   "pushes": 46,
+   "units": 22.31,
+   "avg_odds": 2.784,
    "roi": {
     "odd-0%": {
-     "roi": 0.032,
+     "roi": 0.0316,
      "ci95": [
-      -0.0446,
-      0.1086
+      -0.0447,
+      0.1079
      ]
     },
     "odd-2%": {
-     "roi": 0.013,
+     "roi": 0.0127,
      "ci95": [
-      -0.062,
-      0.0881
+      -0.0621,
+      0.0874
      ]
     },
     "odd-5%": {
-     "roi": -0.0154,
+     "roi": -0.0158,
      "ci95": [
-      -0.0882,
-      0.0574
+      -0.0883,
+      0.0567
      ]
     }
    },
@@ -24611,7 +24337,10 @@
    "match": "CD Tacon Women — Inter Milan Women",
    "selection": "Asian Handicap: Inter Milan (0.5)",
    "odds": 2.0,
-   "ft": null,
+   "ft": [
+    3,
+    1
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 1,
@@ -24637,9 +24366,12 @@
    "match": "CD Tacon Women — Inter Milan Women",
    "selection": "Under 3.5",
    "odds": 1.5,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    3,
+    1
+   ],
+   "w": -1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -24676,9 +24408,12 @@
    "match": "CD Tacon Women — Inter Milan Women",
    "selection": "Under 4.5",
    "odds": 1.8,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    3,
+    1
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -24689,9 +24424,12 @@
    "match": "CD Tacon Women — Inter Milan Women",
    "selection": "Over 4",
    "odds": 1.4,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    3,
+    1
+   ],
+   "w": 0.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -24731,7 +24469,10 @@
    "match": "CD Tacon Women — Inter Milan Women",
    "selection": "1st Half - Asian Total: Over 1.5",
    "odds": 1.95,
-   "ft": null,
+   "ft": [
+    3,
+    1
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 2,
@@ -25515,8 +25256,8 @@
    "league": "UEFA Champions League Women",
    "date_utc": "2026-11-18T18:00:31+00:00",
    "kickoff_utc": "2026-11-18T17:45+00:00",
-   "why": "à espera da fonte de resultados",
-   "signals": 5
+   "why": "mercado que o resultado final não decide",
+   "signals": 2
   },
   {
    "match_id": "zimamoto-sc-vs-fufuni-20261118",
@@ -28584,9 +28325,29 @@
      "total": 50000.0
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     28,
+     "1-0"
+    ],
+    [
+     45,
+     "1-1"
+    ],
+    [
+     85,
+     "2-1"
+    ],
+    [
+     94,
+     "3-1"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    3,
+    1
+   ]
   },
   "wl-nottm-forest-women-vs-liverpool-women-2026-11-18": {
    "teams": [
@@ -28749,36 +28510,6 @@
   }
  },
  "timeline": [
-  {
-   "d": "2026-11-14T11:37:52+00:00",
-   "u": -6.76,
-   "g": 0.69,
-   "w": 1.0,
-   "t": "OPEN_GAME",
-   "m": "Japan — Brazil",
-   "s": "Over 4",
-   "o": 1.69
-  },
-  {
-   "d": "2026-11-14T11:49:37+00:00",
-   "u": -6.76,
-   "g": 0.0,
-   "w": 0.0,
-   "t": "OPEN_GAME",
-   "m": "FC Bengaluru United — Real Kashmir",
-   "s": "Over 4",
-   "o": 1.72
-  },
-  {
-   "d": "2026-11-14T11:57:57+00:00",
-   "u": -5.76,
-   "g": 1.0,
-   "w": 1.0,
-   "t": "POLYMARKET",
-   "m": "Kosovo — Israel",
-   "s": "Under 2.5",
-   "o": 2.0
-  },
   {
    "d": "2026-11-14T11:57:58+00:00",
    "u": -5.16,
@@ -34748,6 +34479,36 @@
    "m": "BK Hacken Women — Manchester City Women",
    "s": "Over 1.5",
    "o": 1.65
+  },
+  {
+   "d": "2026-11-18T18:48:27+00:00",
+   "u": 22.51,
+   "g": 0.0,
+   "w": 0.0,
+   "t": "STAKE_LOAD",
+   "m": "CD Tacon Women — Inter Milan Women",
+   "s": "Over 4",
+   "o": 1.4
+  },
+  {
+   "d": "2026-11-18T18:57:49+00:00",
+   "u": 23.31,
+   "g": 0.8,
+   "w": 1.0,
+   "t": "STAKE_LOAD",
+   "m": "CD Tacon Women — Inter Milan Women",
+   "s": "Under 4.5",
+   "o": 1.8
+  },
+  {
+   "d": "2026-11-18T19:22:30+00:00",
+   "u": 22.31,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "STAKE_LOAD",
+   "m": "CD Tacon Women — Inter Milan Women",
+   "s": "Under 3.5",
+   "o": 1.5
   }
  ],
  "daily": [
@@ -34802,9 +34563,9 @@
   },
   {
    "bets": 35,
-   "settled": 16,
-   "wins": 10,
-   "units": 2.56,
+   "settled": 19,
+   "wins": 11,
+   "units": 2.36,
    "day": "2026-11-18"
   }
  ]
