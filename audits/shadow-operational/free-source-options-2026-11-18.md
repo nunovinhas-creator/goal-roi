@@ -124,3 +124,13 @@ Foi adicionado `scripts/shadow_host_probe.py`, com testes isolados `tests/test_s
 **Alternativa segura** se o Enzonic não for realmente 24/7: executar exatamente a mesma sonda num PC Windows próprio através do Python, e mais tarde experimentar Task Scheduler, sem serviços de terceiros. Enquanto não houver autorização para nova sessão, manter somente a sonda sintética. Um computador desligado ou em suspensão não constitui uma fonte 24/7.
 
 **Estado:** código de teste não importado pelo coletor, sem workflows, sem execução em alojamento externo e sem consumo de recursos até o utilizador decidir executar a sonda.
+
+## Terceiro ensaio (preparado, NÃO executado) — TCP Telegram sem sessão
+
+Em 18/11/2026, o Enzonic **Gratuito 512 MB sem cartão** foi criado manualmente pelo proprietário; a sonda `scripts/shadow_host_probe.py` iniciou e persistiu o estado após um reinício. Registos fornecidos: `heartbeats=12`, `process_starts=2`, `gaps_over_120_seconds=0`, entre 10:53:57 e 10:57:28 UTC. Isto prova só minutos, não uptime de 24 horas.
+
+Foi acrescentado `scripts/shadow_mtproto_tcp_probe.py` e `tests/test_shadow_mtproto_tcp_probe.py`. O script faz **uma só tentativa TCP IPv4 e IPv6** para o Telegram DC2 na porta 443, fecha imediatamente o socket, grava apenas dois booleanos e as salvaguardas negativas. Sem Telethon, login, conta, mensagens, sessão, tokens ou Telegram API. O teste tem entre 0,5 e 10 s de timeout por endereço. Fontes dos endereços de referência: Telethon `DEFAULT_IPV4_IP` (https://github.com/LonamiWebs/Telethon/blob/v1/telethon/client/telegrambaseclient.py) e documentação Pyrogram (https://docs.pyrogram.org/faq/what-are-the-ip-addresses-of-telegram-data-centers). Endereços podem mudar; resultados negativos de um único DC não excluem outros DC.
+
+Enzonic tem consola de entrada da aplicação, **não shell**, portanto não assumir que se executa outro ficheiro escrevendo comandos ali. Antes de correr a sonda de rede, inspecionar se **Agendamentos** no plano gratuito permite uma tarefa Python separada, sem prejudicar o heartbeat em curso. Se não, aguardar/guardar o primeiro baseline de uptime, mudar temporariamente o ficheiro principal na Inicialização e reiniciar com controlo explícito. Não interromper silenciosamente o teste de 24 h. O novo módulo foi preparado no GitHub mas não foi enviado nem executado no Enzonic.
+
+Mesmo TCP IPv4/IPv6 verde só prova conectividade socket. Não prova MTProto autenticado, autorização de sessão, subscrição do bot ScanGoal, atualizações em tempo real, segurança do alojamento, persistência de 30 dias ou SLA de 120s. Não introduzir segredos de Telegram num fornecedor não auditado.
