@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T12:47:39+00:00",
+ "generated_at_utc": "2026-11-18T12:49:12+00:00",
  "messages": 1543,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T12:47:39+00:00",
+  "collector_last_run_utc": "2026-11-18T12:48:31+00:00",
   "name_review": [
    {
     "bot": [
@@ -5868,7 +5868,7 @@
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T12:48:10+00:00",
+   "generated_utc": "2026-11-18T12:49:43+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -22907,17 +22907,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 139,
-  "llm_last_run_utc": "2026-11-18T11:45:29+00:00",
+  "llm_runs": 140,
+  "llm_last_run_utc": "2026-11-18T12:48:34+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-18",
-   "calls_today": 12,
-   "neurons_today": 2546.7,
+   "calls_today": 13,
+   "neurons_today": 2726.3,
    "accepted_today": 8,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "apresenta uma taxa de acerto alta, mas a amostra é pequena",
+    "at_utc": "2026-11-18T12:48:34+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 15,
+    "hits": 14,
+    "hit_rate": 0.931,
+    "break_even": 0.551,
+    "status": "em observação"
+   },
+   {
+    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "tem uma taxa de acerto de 100%, mas com apenas 9 resultados",
+    "at_utc": "2026-11-18T12:48:34+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 9,
+    "hits": 9,
+    "hit_rate": 1.0,
+    "break_even": 0.503,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
+    "note": "apresenta uma taxa de acerto de 100%, mas a amostra é muito pequena, com apenas 8 resultados",
+    "at_utc": "2026-11-18T12:48:34+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 8,
+    "hits": 8,
+    "hit_rate": 1.0,
+    "break_even": 0.4455,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
     "note": "apresenta um desempenho notável com 12 resultados e acerto de 1.0, mas a amostra é pequena",
@@ -23010,39 +23043,6 @@
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "note": "A taxa de acerto de 0.8947 sugere um desempenho superior à odd exigida, mas a amostra é pequena.",
     "at_utc": "2026-11-17T20:12:13+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 20,
-    "hits": 17,
-    "hit_rate": 0.85,
-    "break_even": 0.5573,
-    "status": "em observação"
-   },
-   {
-    "id": "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Reforço = sem reforço",
-    "note": "A taxa de acerto de 0.359 é baixa, mas a amostra é razoável e sugere que esta hipótese pode não ser promissora.",
-    "at_utc": "2026-11-17T20:12:13+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 39,
-    "hits": 14,
-    "hit_rate": 0.359,
-    "break_even": 0.2111,
-    "status": "promissora"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-    "note": "apresenta um acerto alto, mas a amostra é pequena",
-    "at_utc": "2026-11-17T15:56:51+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 20,
-    "hits": 17,
-    "hit_rate": 0.85,
-    "break_even": 0.5573,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-    "note": "apresenta um acerto de 0.8947, mas a amostra é pequena, com apenas 19 resultados",
-    "at_utc": "2026-11-17T11:46:53+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "n": 20,
     "hits": 17,
@@ -23287,7 +23287,7 @@
     "roi_announced_odds": -0.0561,
     "seen_late": 0,
     "by_bot_mark": 120,
-    "per_day": 35.7,
+    "per_day": 35.6,
     "days_to_hint": 0,
     "days_to_conclusion": 3
    },
