@@ -1,14 +1,16 @@
 """Zero-secret uptime probe for untrusted free Python hosts.
 
 No Telegram authentication, messages, Git operations, dependencies, or credentials.
-One TCP connectivity measurement runs once at startup, without login.
+One TCP connectivity check and a public req_pq_multi handshake run once at startup.
 Records UTC heartbeat gaps in a separate local JSON file.
 Never use this as evidence of live signal delivery or scientific admission.
 """
 import argparse
 import json
 import os
+import secrets
 import socket
+import struct
 import tempfile
 import time
 from datetime import datetime, timezone
@@ -18,7 +20,7 @@ VERSION = 1
 UTC = timezone.utc
 
 
-# One-shot TCP connect check: NO Telegram login, secrets, requests or messages.
+# One-shot network checks: no account login, API credentials or message access.
 # Uses documented DC2 reference IPs; reachability of one DC alone is not an MTProto test.
 NETWORK_REPORT = "shadow_tcp_probe.json"
 
@@ -56,6 +58,117 @@ def network_once(path=NETWORK_REPORT):
         file.flush()
         os.fsync(file.fileno())
     return report
+
+
+# The Telegram MTProto specification allows a public, unauthenticated req_pq_multi
+# exchange while creating an auth key. This probe stops immediately at resPQ.
+# No auth key is generated, and no application/API calls are made.
+MTPROTO_REPORT = "shadow_mtproto_probe.json"
+
+
+def _recv_exact(sock, amount):
+    if not isinstance(amount, int) or not 0 <= amount <= 4096:
+        raise ValueError("unbounded MTProto response")
+    result = bytearray()
+    while len(result) < amount:
+        chunk = sock.recv(amount - len(result))
+        if not chunk:
+            raise OSError("MTProto response ended early")
+        result.extend(chunk)
+    return bytes(result)
+
+
+def _valid_res_pq(payload, nonce):
+    """Validate unencrypted resPQ structure, request nonce, vector bounds."""
+    if len(payload) < 20 + 4 + 16 + 16 + 4 + 8 + 8:
+        return False
+    if payload[:8] != b"\\x00" * 8:
+        return False
+    length = struct.unpack_from("<I", payload, 16)[0]
+    if length != len(payload) - 20 or length % 4:
+        return False
+    body = payload[20:]
+    if struct.unpack_from("<I", body, 0)[0] != 0x05162463:
+        return False
+    if body[4:20] != nonce:
+        return False
+    pos = 36  # constructor + nonce + server_nonce
+    first = body[pos]
+    if first == 254:
+        if len(body) < pos + 4:
+            return False
+        size = int.from_bytes(body[pos+1:pos+4], "little")
+        prefix = 4
+    elif first < 254:
+        size = first
+        prefix = 1
+    else:
+        return False
+    if not 1 <= size <= 32:
+        return False
+    pos += prefix + size
+    pos += (-pos) % 4
+    if len(body) < pos + 8:
+        return False
+    if struct.unpack_from("<I", body, pos)[0] != 0x1CB5C415:
+        return False
+    count = struct.unpack_from("<I", body, pos+4)[0]
+    return 1 <= count <= 32 and len(body) == pos + 8 + count * 8
+
+
+def _mtproto_req_pq(address="149.154.167.51", timeout=5):
+    """One single abridged MTProto req_pq_multi roundtrip, no authentication."""
+    if not 0.5 <= timeout <= 10:
+        raise ValueError("invalid timeout")
+    nonce = secrets.token_bytes(16)
+    timestamp_ns = time.time_ns()
+    sec, fraction = divmod(timestamp_ns, 1_000_000_000)
+    message_id = (sec << 32) | (((fraction << 32) // 1_000_000_000) & ~3)
+    body = struct.pack("<I", 0xBE7E8EF1) + nonce
+    request = (b"\\x00" * 8 + struct.pack("<Q", message_id) +
+               struct.pack("<I", len(body)) + body)
+    try:
+        with socket.create_connection((address, 443), timeout=timeout) as sock:
+            sock.settimeout(timeout)
+            # Abridged transport: 0xef marker, length in four-byte words.
+            sock.sendall(b"\\xef" + bytes([len(request) // 4]) + request)
+            first = _recv_exact(sock, 1)[0]
+            if first == 127:
+                size = int.from_bytes(_recv_exact(sock, 3), "little") * 4
+            elif 1 <= first < 127:
+                size = first * 4
+            else:
+                return False
+            if not 40 <= size <= 4096:
+                return False
+            return _valid_res_pq(_recv_exact(sock, size), nonce)
+    except OSError:
+        return False
+
+
+def mtproto_once(path=MTPROTO_REPORT):
+    """Persist aggregate result only; do not rerun if a report already exists."""
+    dest = Path(path)
+    if dest.exists():
+        return None
+    result = {
+        "schema": 1,
+        "test": "one_shot_public_req_pq_multi",
+        "observed_utc": datetime.now(UTC).isoformat(),
+        "res_pq_nonce_valid": _mtproto_req_pq(),
+        "session_created": False,
+        "auth_key_created": False,
+        "account_authenticated": False,
+        "messages_read": False,
+        "credentials_used": False,
+        "scientific_state": "not_activated",
+    }
+    with dest.open("x", encoding="utf-8") as out:
+        json.dump(result, out, sort_keys=True)
+        out.write("\n")
+        out.flush()
+        os.fsync(out.fileno())
+    return result
 
 
 def _iso(now):
@@ -147,6 +260,16 @@ def main():
                                           "credentials_used": False}), flush=True)
                 except (OSError, ValueError) as exc:
                     print(json.dumps({"network_probe": "failed",
+                                      "error_type": type(exc).__name__}), flush=True)
+                try:
+                    mtproto = mtproto_once()
+                    if mtproto is not None:
+                        print(json.dumps({"mtproto_probe": "unauthenticated_req_pq",
+                                          "res_pq_nonce_valid": mtproto["res_pq_nonce_valid"],
+                                          "account_authenticated": False,
+                                          "credentials_used": False}), flush=True)
+                except (OSError, ValueError) as exc:
+                    print(json.dumps({"mtproto_probe": "failed",
                                       "error_type": type(exc).__name__}), flush=True)
             first = False
             if result["heartbeats"] % 3 == 1 or result["gaps_over_120_seconds"]:
