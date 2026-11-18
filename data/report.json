@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-18T13:16:36+00:00",
- "messages": 1547,
+ "generated_at_utc": "2026-11-18T13:21:09+00:00",
+ "messages": 1548,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 51,
   "BETFAIR": 300,
-  "STAKE_LOAD": 289,
+  "STAKE_LOAD": 290,
   "OPEN_GAME": 190,
   "TOTALS_FORM": 64,
   "WEAKENED_LINEUP": 14,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2592,
+  "versions": 2593,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T13:15:40+00:00",
+  "last_collected_at_utc": "2026-11-18T13:21:09+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T13:16:34+00:00",
+  "collector_last_run_utc": "2026-11-18T13:21:09+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 4,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 208,
-  "stake_no_score_after_kickoff": 37,
+  "stake_original_seen": 209,
+  "stake_no_score_after_kickoff": 38,
   "stake_sent_45_after_kickoff": 61,
   "goal_lists": 453,
   "goal_lists_consistent": 242
  },
- "unique_bets": 847,
+ "unique_bets": 848,
  "settled_bets": 694,
  "unsettled_market": 79,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1287,7 +1287,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 132,
+   "bets": 133,
    "settled": 86,
    "matches": 41,
    "wins": 43,
@@ -1772,7 +1772,7 @@
    "prob_above_cut": 0.2256
   },
   "STAKE_LOAD": {
-   "signals": 218,
+   "signals": 219,
    "with_result": 142,
    "hits": 75,
    "misses": 63,
@@ -2706,7 +2706,7 @@
    },
    {
     "n": 39,
-    "signals": 66,
+    "signals": 67,
     "hits": 26,
     "misses": 13,
     "hit_rate": 0.6667,
@@ -2868,7 +2868,7 @@
    },
    {
     "n": 13,
-    "signals": 28,
+    "signals": 29,
     "hits": 9,
     "misses": 4,
     "hit_rate": 0.6923,
@@ -3278,7 +3278,7 @@
    },
    {
     "n": 358,
-    "signals": 462,
+    "signals": 463,
     "hits": 213,
     "misses": 145,
     "hit_rate": 0.5832,
@@ -3382,8 +3382,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1033,
-   "eligible": 847,
+   "total": 1034,
+   "eligible": 848,
    "excluded": 186,
    "reasons": {
     "no_valid_odds": 138,
@@ -3398,7 +3398,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8525,
+    "em observação": 8530,
     "abandonada": 29,
     "promissora": 84
    },
@@ -4455,11 +4455,11 @@
     }
    ]
   },
-  "hypotheses": 8638,
+  "hypotheses": 8643,
   "tested": 858,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8597,
+   "em observação": 8602,
    "abandonada": 30,
    "promissora": 11
   },
@@ -4788,6 +4788,159 @@
   },
   "agenda": {
    "items": [
+    {
+     "match_id": "zimamoto-sc-vs-fufuni-20261118",
+     "match": "Zimamoto SC — Fufuni",
+     "league": "Zanzibar Premier League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-18T13:00+00:00",
+     "date_utc": "2026-11-18T13:19:41+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1x2",
+     "selection": "Zimamoto",
+     "odds": 1.5,
+     "odds_last": 1.5,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 72,
+     "good": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 22,
+       "games": 19,
+       "hits": 17,
+       "break_even": 0.5772,
+       "prob_above": 0.9702,
+       "roi": 0.3582,
+       "edge": 0.1638,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 31,
+       "games": 25,
+       "hits": 23,
+       "break_even": 0.5587,
+       "prob_above": 0.9685,
+       "roi": 0.3416,
+       "edge": 0.1494,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Mercado",
+         "outros mercados"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 15,
+       "games": 12,
+       "hits": 12,
+       "break_even": 0.5159,
+       "prob_above": 0.9584,
+       "roi": 0.6687,
+       "edge": 0.1771,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 27,
+     "bad": [
+      {
+       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "tarde"
+        ],
+        [
+         "Mercado",
+         "outros mercados"
+        ]
+       ],
+       "n": 27,
+       "games": 17,
+       "hits": 7,
+       "break_even": 0.4379,
+       "prob_above": 0.0372,
+       "roi": -0.5043,
+       "edge": -0.1658,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados & Número de apostas = uma",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "tarde"
+        ],
+        [
+         "Mercado",
+         "outros mercados"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 18,
+       "games": 12,
+       "hits": 3,
+       "break_even": 0.3895,
+       "prob_above": 0.0492,
+       "roi": -0.6368,
+       "edge": -0.1674,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 11
+    },
     {
      "match_id": "flamengo-vs-atletico-paranaense-20261119",
      "match": "Flamengo — Atletico Paranaense",
@@ -5917,12 +6070,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 3,
+    "misto": 4,
     "sem evidência": 0,
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T13:17:04+00:00",
+   "generated_utc": "2026-11-18T13:21:37+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5935,7 +6088,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 8566,
+     "hypotheses": 8571,
      "with_prospective_evidence": 2762,
      "prospective_games": 55826
     },
@@ -6049,7 +6202,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 418,
+    "bets": 419,
     "settled": 364,
     "games": 238,
     "wins": 177,
@@ -17746,7 +17899,7 @@
    },
    {
     "n": 2,
-    "signals": 7,
+    "signals": 8,
     "hits": 1,
     "misses": 1,
     "hit_rate": 0.5,
@@ -17794,7 +17947,7 @@
     "expect": "acima",
     "mode": "refinar",
     "tradable": true,
-    "open": 5,
+    "open": 6,
     "born_verified": true,
     "game_set": "d521c168ae593c20",
     "prospective": {
@@ -23346,7 +23499,7 @@
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
-    "signals": 208,
+    "signals": 209,
     "with_result": 133,
     "hits": 72,
     "misses": 57,
@@ -23399,7 +23552,7 @@
     "roi_announced_odds": 0.0065,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 9.2,
+    "per_day": 9.1,
     "days_to_hint": 0,
     "days_to_conclusion": 27
    },
@@ -23850,7 +24003,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 847,
+   "bets": 848,
    "settled": 694,
    "matches": 371,
    "wins": 335,
@@ -23885,6 +24038,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-18T13:19:41+00:00",
+   "match_id": "zimamoto-sc-vs-fufuni-20261118",
+   "group": "STAKE_LOAD/pre",
+   "match": "Zimamoto SC — Fufuni",
+   "selection": "1x2: Zimamoto",
+   "odds": 1.5,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-18T12:53:23+00:00",
    "match_id": "peterborough-u21-vs-bolton-u21-20261118",
@@ -24793,22 +24959,6 @@
    ],
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-17T19:44:01+00:00",
-   "match_id": "poland-vs-sweden-20261117",
-   "group": "POLYMARKET/pre",
-   "match": "Poland — Sweden",
-   "selection": "Over 2.5",
-   "odds": 1.57,
-   "ft": [
-    1,
-    1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   }
@@ -27653,6 +27803,26 @@
      "k": "BETFAIR",
      "phase": "live",
      "mult": 1
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "zimamoto-sc-vs-fufuni-20261118": {
+   "teams": [
+    "Zimamoto SC",
+    "Fufuni"
+   ],
+   "events": [
+    {
+     "d": "2026-11-18T13:19:41+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Zimamoto",
+     "odds": 1.5,
+     "market": "1x2",
+     "total": 6200.0
     }
    ],
    "goals": null,
@@ -33713,7 +33883,7 @@
    "day": "2026-11-17"
   },
   {
-   "bets": 17,
+   "bets": 18,
    "settled": 7,
    "wins": 4,
    "units": 0.44,
