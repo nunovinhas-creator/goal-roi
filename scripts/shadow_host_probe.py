@@ -1,7 +1,7 @@
 """Zero-secret uptime probe for untrusted free Python hosts.
 
 No Telegram authentication, messages, Git operations, dependencies, or credentials.
-One optional TCP connectivity measurement runs once at startup, without login.
+One TCP connectivity measurement runs once at startup, without login.
 Records UTC heartbeat gaps in a separate local JSON file.
 Never use this as evidence of live signal delivery or scientific admission.
 """
@@ -52,7 +52,7 @@ def network_once(path=NETWORK_REPORT):
     }
     with destination.open("x", encoding="utf-8") as file:
         json.dump(report, file, sort_keys=True)
-        file.write("\\n")
+        file.write("\n")
         file.flush()
         os.fsync(file.fileno())
     return report
