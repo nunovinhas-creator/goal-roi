@@ -48,7 +48,7 @@ class GitLatency(unittest.TestCase):
 
     def test_commit_lower_bound_distinguishes_feasible_and_impossible(self):
         a=self.row(1,T-timedelta(seconds=60),T-timedelta(seconds=40))
-        b=self.row(2,T-timedelta(seconds=300),T-timedelta(seconds=250))
+        b=self.row(2,T-timedelta(seconds=300),T-timedelta(seconds=100))
         self.commit([a],T-timedelta(seconds=20))
         self.commit([a,b],T-timedelta(seconds=10))
         result=audit.study(self.repo,T)
