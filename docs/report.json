@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-18T17:20:41+00:00",
- "messages": 1562,
+ "generated_at_utc": "2026-11-18T17:27:18+00:00",
+ "messages": 1563,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 52,
   "BETFAIR": 303,
-  "STAKE_LOAD": 292,
+  "STAKE_LOAD": 293,
   "OPEN_GAME": 193,
   "TOTALS_FORM": 65,
   "WEAKENED_LINEUP": 14,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2613,
+  "versions": 2615,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T17:18:21+00:00",
+  "last_collected_at_utc": "2026-11-18T17:27:18+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T17:20:38+00:00",
+  "collector_last_run_utc": "2026-11-18T17:27:18+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,11 +448,11 @@
   "stake_original_seen": 211,
   "stake_no_score_after_kickoff": 39,
   "stake_sent_45_after_kickoff": 61,
-  "goal_lists": 458,
+  "goal_lists": 459,
   "goal_lists_consistent": 246
  },
  "unique_bets": 855,
- "settled_bets": 699,
+ "settled_bets": 700,
  "unsettled_market": 80,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
@@ -718,32 +718,32 @@
   },
   "OPEN_GAME": {
    "bets": 173,
-   "settled": 172,
-   "matches": 172,
-   "wins": 80,
+   "settled": 173,
+   "matches": 173,
+   "wins": 81,
    "pushes": 41,
-   "units": 16.45,
-   "avg_odds": 1.846,
+   "units": 17.06,
+   "avg_odds": 1.845,
    "roi": {
     "odd-0%": {
-     "roi": 0.0957,
+     "roi": 0.0986,
      "ci95": [
-      -0.0254,
-      0.2167
+      -0.0218,
+      0.2191
      ]
     },
     "odd-2%": {
-     "roi": 0.0789,
+     "roi": 0.0818,
      "ci95": [
-      -0.0396,
-      0.1974
+      -0.0362,
+      0.1997
      ]
     },
     "odd-5%": {
-     "roi": 0.0537,
+     "roi": 0.0564,
      "ci95": [
-      -0.0611,
-      0.1685
+      -0.0578,
+      0.1707
      ]
     }
    },
@@ -919,7 +919,8 @@
     16.7,
     17.45,
     17.45,
-    16.45
+    16.45,
+    17.06
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -1667,40 +1668,40 @@
   },
   "OPEN_GAME": {
    "signals": 193,
-   "with_result": 192,
-   "hits": 94,
+   "with_result": 193,
+   "hits": 95,
    "misses": 55,
    "pushes": 43,
-   "eff_hits": 91.5,
+   "eff_hits": 92.5,
    "eff_misses": 53.5,
-   "vote_hits": 91.5,
+   "vote_hits": 92.5,
    "vote_misses": 53.5,
-   "vote_break_even": 0.5543,
-   "games": 149,
+   "vote_break_even": 0.5548,
+   "games": 150,
    "no_source": 0,
    "unsettleable": 0,
-   "hit_rate": 0.631,
+   "hit_rate": 0.6336,
    "ci95": [
-    0.5501,
-    0.7052
+    0.5529,
+    0.7074
    ],
-   "avg_odds": 1.848,
-   "break_even": 0.5543,
+   "avg_odds": 1.847,
+   "break_even": 0.5548,
    "baseline": false,
-   "roi_announced_odds": 0.132,
+   "roi_announced_odds": 0.1344,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 21.1,
+   "per_day": 21.2,
    "days_to_hint": 0,
    "days_to_conclusion": 8,
-   "prudent_rate": 0.6261,
-   "prob_above": 0.9658,
-   "edge": 0.0718,
+   "prudent_rate": 0.6285,
+   "prob_above": 0.9698,
+   "edge": 0.0737,
    "edge_ci": [
-    0.0071,
-    0.1346
+    0.0093,
+    0.1362
    ],
-   "prob_above_cut": 0.9383
+   "prob_above_cut": 0.9446
   },
   "OPEN_GAME_NO_ODDS": {
    "signals": 14,
@@ -1877,7 +1878,7 @@
    "by_bot_mark": 0,
    "per_day": 14.3,
    "days_to_hint": 0,
-   "days_to_conclusion": 16,
+   "days_to_conclusion": 17,
    "prudent_rate": 0.8433,
    "prob_above": 0.9932,
    "edge": 0.1122,
@@ -1954,22 +1955,22 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 149,
+    "n": 150,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 109,
-     "hit_rate": 0.654,
-     "break_even": 0.5426,
-     "roi": 0.2383
+     "n": 110,
+     "hit_rate": 0.6479,
+     "break_even": 0.544,
+     "roi": 0.227
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.5696,
-     "break_even": 0.5864,
-     "roi": -0.0159
+     "hit_rate": 0.5949,
+     "break_even": 0.5844,
+     "roi": 0.0244
     },
-    "z": -1.42
+    "z": -1.04
    },
    {
     "type": "POLYMARKET",
@@ -2025,11 +2026,11 @@
   "bot_confidence": [
    {
     "band": "menos de 85 %",
-    "n": 46,
-    "hits": 27,
-    "hit_rate": 0.5795,
-    "break_even": 0.5822,
-    "stated": 0.772
+    "n": 47,
+    "hits": 28,
+    "hit_rate": 0.5889,
+    "break_even": 0.583,
+    "stated": 0.7723
    },
    {
     "band": "85 a 94 %",
@@ -2143,28 +2144,28 @@
     "value": "jogo com um só tipo de sinal"
    },
    {
-    "n": 52,
+    "n": 53,
     "signals": 71,
-    "hits": 38,
+    "hits": 39,
     "misses": 14,
-    "hit_rate": 0.7327,
+    "hit_rate": 0.7379,
     "ci95": [
-     0.5974,
-     0.835
+     0.6043,
+     0.8384
     ],
-    "break_even": 0.5512,
-    "roi": 0.2378,
-    "games": 52,
-    "bets": 52,
+    "break_even": 0.5526,
+    "roi": 0.2433,
+    "games": 53,
+    "bets": 53,
     "unidentified": 0,
-    "prudent_rate": 0.7027,
-    "prob_above": 0.9927,
-    "edge": 0.1515,
+    "prudent_rate": 0.7077,
+    "prob_above": 0.9942,
+    "edge": 0.1551,
     "edge_ci": [
-     0.0518,
-     0.2434
+     0.0567,
+     0.2458
     ],
-    "prob_above_cut": 0.9884,
+    "prob_above_cut": 0.9906,
     "family": "Jogo aberto",
     "dimension": "Dia",
     "value": "dia de semana"
@@ -2224,6 +2225,33 @@
     "value": "jogo com vários tipos de sinal"
    },
    {
+    "n": 118,
+    "signals": 144,
+    "hits": 76,
+    "misses": 42,
+    "hit_rate": 0.6466,
+    "ci95": [
+     0.5561,
+     0.7276
+    ],
+    "break_even": 0.5561,
+    "roi": 0.1428,
+    "games": 118,
+    "bets": 118,
+    "unidentified": 0,
+    "prudent_rate": 0.6394,
+    "prob_above": 0.972,
+    "edge": 0.0833,
+    "edge_ci": [
+     0.0119,
+     0.1521
+    ],
+    "prob_above_cut": 0.9512,
+    "family": "Jogo aberto",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com um só tipo de sinal"
+   },
+   {
     "n": 84,
     "signals": 102,
     "hits": 56,
@@ -2249,33 +2277,6 @@
     "family": "Jogo aberto",
     "dimension": "Ritmo indicado pelo bot",
     "value": "menos de 90"
-   },
-   {
-    "n": 117,
-    "signals": 144,
-    "hits": 75,
-    "misses": 42,
-    "hit_rate": 0.6435,
-    "ci95": [
-     0.5526,
-     0.7251
-    ],
-    "break_even": 0.5555,
-    "roi": 0.1393,
-    "games": 117,
-    "bets": 117,
-    "unidentified": 0,
-    "prudent_rate": 0.6364,
-    "prob_above": 0.9678,
-    "edge": 0.0809,
-    "edge_ci": [
-     0.0092,
-     0.1502
-    ],
-    "prob_above_cut": 0.9449,
-    "family": "Jogo aberto",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 29,
@@ -2305,6 +2306,33 @@
     "value": "odd 2,00 a 3,00"
    },
    {
+    "n": 113,
+    "signals": 147,
+    "hits": 74,
+    "misses": 39,
+    "hit_rate": 0.653,
+    "ci95": [
+     0.56,
+     0.7356
+    ],
+    "break_even": 0.5669,
+    "roi": 0.1346,
+    "games": 113,
+    "bets": 113,
+    "unidentified": 0,
+    "prudent_rate": 0.6458,
+    "prob_above": 0.9617,
+    "edge": 0.0789,
+    "edge_ci": [
+     0.0058,
+     0.1492
+    ],
+    "prob_above_cut": 0.9356,
+    "family": "Jogo aberto",
+    "dimension": "Parte do jogo",
+    "value": "2.ª parte"
+   },
+   {
     "n": 94,
     "signals": 121,
     "hits": 60,
@@ -2330,33 +2358,6 @@
     "family": "Jogo aberto",
     "dimension": "Confiança indicada pelo bot",
     "value": "95 % ou mais"
-   },
-   {
-    "n": 112,
-    "signals": 147,
-    "hits": 73,
-    "misses": 39,
-    "hit_rate": 0.6498,
-    "ci95": [
-     0.5563,
-     0.733
-    ],
-    "break_even": 0.5664,
-    "roi": 0.1312,
-    "games": 112,
-    "bets": 112,
-    "unidentified": 0,
-    "prudent_rate": 0.6427,
-    "prob_above": 0.9561,
-    "edge": 0.0763,
-    "edge_ci": [
-     0.0029,
-     0.1471
-    ],
-    "prob_above_cut": 0.9272,
-    "family": "Jogo aberto",
-    "dimension": "Parte do jogo",
-    "value": "2.ª parte"
    },
    {
     "n": 17,
@@ -2413,6 +2414,33 @@
     "value": "dia de semana"
    },
    {
+    "n": 107,
+    "signals": 143,
+    "hits": 70,
+    "misses": 37,
+    "hit_rate": 0.649,
+    "ci95": [
+     0.5535,
+     0.734
+    ],
+    "break_even": 0.5753,
+    "roi": 0.1109,
+    "games": 107,
+    "bets": 107,
+    "unidentified": 0,
+    "prudent_rate": 0.6426,
+    "prob_above": 0.9306,
+    "edge": 0.0672,
+    "edge_ci": [
+     -0.0077,
+     0.1393
+    ],
+    "prob_above_cut": 0.8904,
+    "family": "Jogo aberto",
+    "dimension": "Golos em falta para ganhar",
+    "value": "até 1 golo"
+   },
+   {
     "n": 55,
     "signals": 81,
     "hits": 18,
@@ -2438,33 +2466,6 @@
     "family": "Betfair",
     "dimension": "Faixa de odd",
     "value": "odd acima de 3,00"
-   },
-   {
-    "n": 106,
-    "signals": 143,
-    "hits": 69,
-    "misses": 37,
-    "hit_rate": 0.6456,
-    "ci95": [
-     0.5495,
-     0.7312
-    ],
-    "break_even": 0.5749,
-    "roi": 0.1074,
-    "games": 106,
-    "bets": 106,
-    "unidentified": 0,
-    "prudent_rate": 0.6394,
-    "prob_above": 0.9211,
-    "edge": 0.0645,
-    "edge_ci": [
-     -0.0109,
-     0.137
-    ],
-    "prob_above_cut": 0.8774,
-    "family": "Jogo aberto",
-    "dimension": "Golos em falta para ganhar",
-    "value": "até 1 golo"
    },
    {
     "n": 34,
@@ -2575,6 +2576,33 @@
     "value": "subiu"
    },
    {
+    "n": 70,
+    "signals": 86,
+    "hits": 45,
+    "misses": 25,
+    "hit_rate": 0.6397,
+    "ci95": [
+     0.521,
+     0.7435
+    ],
+    "break_even": 0.5624,
+    "roi": 0.1534,
+    "games": 70,
+    "bets": 70,
+    "unidentified": 0,
+    "prudent_rate": 0.6298,
+    "prob_above": 0.8896,
+    "edge": 0.0674,
+    "edge_ci": [
+     -0.0239,
+     0.1549
+    ],
+    "prob_above_cut": 0.8466,
+    "family": "Jogo aberto",
+    "dimension": "Confiança indicada pelo bot",
+    "value": "menos de 95 %"
+   },
+   {
     "n": 51,
     "signals": 60,
     "hits": 31,
@@ -2629,58 +2657,58 @@
     "value": "jovens"
    },
    {
-    "n": 69,
-    "signals": 86,
-    "hits": 44,
-    "misses": 25,
-    "hit_rate": 0.6343,
-    "ci95": [
-     0.5147,
-     0.7394
-    ],
-    "break_even": 0.5616,
-    "roi": 0.148,
-    "games": 69,
-    "bets": 69,
-    "unidentified": 0,
-    "prudent_rate": 0.6249,
-    "prob_above": 0.8735,
-    "edge": 0.0633,
-    "edge_ci": [
-     -0.0288,
-     0.1517
-    ],
-    "prob_above_cut": 0.8269,
-    "family": "Jogo aberto",
-    "dimension": "Confiança indicada pelo bot",
-    "value": "menos de 95 %"
-   },
-   {
-    "n": 104,
+    "n": 105,
     "signals": 138,
-    "hits": 65,
+    "hits": 66,
     "misses": 39,
-    "hit_rate": 0.6256,
+    "hit_rate": 0.6293,
     "ci95": [
-     0.5285,
-     0.7136
+     0.5327,
+     0.7165
     ],
-    "break_even": 0.5716,
-    "roi": 0.0813,
-    "games": 104,
-    "bets": 104,
+    "break_even": 0.5721,
+    "roi": 0.0851,
+    "games": 105,
+    "bets": 105,
     "unidentified": 0,
-    "prudent_rate": 0.6208,
-    "prob_above": 0.8572,
-    "edge": 0.0491,
+    "prudent_rate": 0.6242,
+    "prob_above": 0.8722,
+    "edge": 0.0521,
     "edge_ci": [
-     -0.0274,
-     0.1232
+     -0.024,
+     0.1256
     ],
-    "prob_above_cut": 0.794,
+    "prob_above_cut": 0.8127,
     "family": "Jogo aberto",
     "dimension": "Faixa de odd",
     "value": "odd 1,50 a 2,00"
+   },
+   {
+    "n": 80,
+    "signals": 105,
+    "hits": 49,
+    "misses": 31,
+    "hit_rate": 0.6115,
+    "ci95": [
+     0.5009,
+     0.7117
+    ],
+    "break_even": 0.5484,
+    "roi": 0.0847,
+    "games": 80,
+    "bets": 80,
+    "unidentified": 0,
+    "prudent_rate": 0.6043,
+    "prob_above": 0.8587,
+    "edge": 0.0559,
+    "edge_ci": [
+     -0.0305,
+     0.1397
+    ],
+    "prob_above_cut": 0.8063,
+    "family": "Jogo aberto",
+    "dimension": "Ritmo indicado pelo bot",
+    "value": "90 ou mais"
    },
    {
     "n": 39,
@@ -2710,31 +2738,31 @@
     "value": "até 45 min depois do início"
    },
    {
-    "n": 79,
-    "signals": 105,
-    "hits": 48,
+    "n": 81,
+    "signals": 101,
+    "hits": 50,
     "misses": 31,
-    "hit_rate": 0.6065,
+    "hit_rate": 0.6139,
     "ci95": [
-     0.4951,
-     0.7077
+     0.5037,
+     0.7136
     ],
-    "break_even": 0.5474,
-    "roi": 0.0793,
-    "games": 79,
-    "bets": 79,
+    "break_even": 0.5575,
+    "roi": 0.1079,
+    "games": 81,
+    "bets": 81,
     "unidentified": 0,
-    "prudent_rate": 0.5997,
-    "prob_above": 0.8411,
-    "edge": 0.0523,
+    "prudent_rate": 0.6076,
+    "prob_above": 0.8336,
+    "edge": 0.0501,
     "edge_ci": [
-     -0.0347,
-     0.1367
+     -0.036,
+     0.1334
     ],
-    "prob_above_cut": 0.7853,
+    "prob_above_cut": 0.7745,
     "family": "Jogo aberto",
-    "dimension": "Ritmo indicado pelo bot",
-    "value": "90 ou mais"
+    "dimension": "Competição",
+    "value": "liga"
    },
    {
     "n": 28,
@@ -2816,33 +2844,6 @@
     "family": "Jogo aberto",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com vários tipos de sinal"
-   },
-   {
-    "n": 80,
-    "signals": 101,
-    "hits": 49,
-    "misses": 31,
-    "hit_rate": 0.609,
-    "ci95": [
-     0.498,
-     0.7097
-    ],
-    "break_even": 0.5567,
-    "roi": 0.1028,
-    "games": 80,
-    "bets": 80,
-    "unidentified": 0,
-    "prudent_rate": 0.603,
-    "prob_above": 0.8136,
-    "edge": 0.0463,
-    "edge_ci": [
-     -0.0404,
-     0.1303
-    ],
-    "prob_above_cut": 0.7511,
-    "family": "Jogo aberto",
-    "dimension": "Competição",
-    "value": "liga"
    },
    {
     "n": 12,
@@ -3282,28 +3283,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 362,
+    "n": 363,
     "signals": 470,
-    "hits": 215,
+    "hits": 216,
     "misses": 147,
-    "hit_rate": 0.5823,
+    "hit_rate": 0.5835,
     "ci95": [
-     0.5299,
-     0.6328
+     0.5312,
+     0.6339
     ],
-    "break_even": 0.5799,
-    "roi": 0.0092,
-    "games": 246,
-    "bets": 357,
+    "break_even": 0.58,
+    "roi": 0.0107,
+    "games": 247,
+    "bets": 358,
     "unidentified": 0,
-    "prudent_rate": 0.5894,
-    "prob_above": 0.6693,
-    "edge": 0.0136,
+    "prudent_rate": 0.5911,
+    "prob_above": 0.6867,
+    "edge": 0.0151,
     "edge_ci": [
-     -0.0385,
-     0.0649
+     -0.0369,
+     0.0662
     ],
-    "prob_above_cut": 0.5264,
+    "prob_above_cut": 0.5454,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -3358,17 +3359,17 @@
    }
   ],
   "luck": {
-   "n": 699,
-   "units": 19.95,
-   "luck_sd": 35.43,
-   "z": 0.56,
+   "n": 700,
+   "units": 20.56,
+   "luck_sd": 35.44,
+   "z": 0.58,
    "max_drawdown": 21.61,
    "longest_losing_run": 7
   },
   "narrative": [
-   "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 94 em 149, precisa de 55 %, e a probabilidade de estar acima do mínimo é 97 %.",
+   "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 95 em 150, precisa de 55 %, e a probabilidade de estar acima do mínimo é 97 %.",
    "O mais fraco é dinheiro na Polymarket: 101 em 209, precisa de 50 %, probabilidade de estar acima do mínimo 29 %.",
-   "Saldo de +19,95 unidades em 699 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±70,9 unidades).",
+   "Saldo de +20,56 unidades em 700 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±70,9 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 2 de 21 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 48 em 53 (90 % contra 59 % necessários). Indício positivo.",
    "Forma de golos, dia = fim de semana: 70 em 90 (76 % contra 61 % necessários). Indício positivo.",
@@ -6064,7 +6065,7 @@
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T17:21:12+00:00",
+   "generated_utc": "2026-11-18T17:27:50+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -23426,30 +23427,30 @@
    },
    "OPEN_GAME": {
     "signals": 173,
-    "with_result": 172,
-    "hits": 80,
+    "with_result": 173,
+    "hits": 81,
     "misses": 51,
     "pushes": 41,
-    "eff_hits": 78.0,
+    "eff_hits": 79.0,
     "eff_misses": 50.0,
-    "vote_hits": 78.0,
+    "vote_hits": 79.0,
     "vote_misses": 50.0,
-    "vote_break_even": 0.556,
-    "games": 131,
+    "vote_break_even": 0.5565,
+    "games": 132,
     "no_source": 0,
     "unsettleable": 0,
-    "hit_rate": 0.6094,
+    "hit_rate": 0.6124,
     "ci95": [
-     0.5228,
-     0.6895
+     0.5262,
+     0.6921
     ],
-    "avg_odds": 1.846,
-    "break_even": 0.556,
+    "avg_odds": 1.844,
+    "break_even": 0.5565,
     "baseline": false,
-    "roi_announced_odds": 0.0957,
+    "roi_announced_odds": 0.0986,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 21.4,
+    "per_day": 21.6,
     "days_to_hint": 0,
     "days_to_conclusion": 8
    },
@@ -23598,22 +23599,22 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 131,
+    "n": 132,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 91,
-     "hit_rate": 0.6271,
-     "break_even": 0.5426,
-     "roi": 0.1878
+     "n": 92,
+     "hit_rate": 0.6201,
+     "break_even": 0.5443,
+     "roi": 0.1749
     },
     "recent": {
      "n": 40,
-     "hit_rate": 0.5696,
-     "break_even": 0.5864,
-     "roi": -0.0159
+     "hit_rate": 0.5949,
+     "break_even": 0.5844,
+     "roi": 0.0244
     },
-    "z": -1.09
+    "z": -0.7
    },
    {
     "type": "POLYMARKET",
@@ -23954,32 +23955,32 @@
   },
   "Q6 Open game: sinal do minuto 46 em diante": {
    "bets": 123,
-   "settled": 122,
-   "matches": 122,
-   "wins": 57,
+   "settled": 123,
+   "matches": 123,
+   "wins": 58,
    "pushes": 32,
-   "units": 12.49,
-   "avg_odds": 1.804,
+   "units": 13.1,
+   "avg_odds": 1.803,
    "roi": {
     "odd-0%": {
-     "roi": 0.1024,
+     "roi": 0.1065,
      "ci95": [
-      -0.0344,
-      0.2392
+      -0.0294,
+      0.2425
      ]
     },
     "odd-2%": {
-     "roi": 0.086,
+     "roi": 0.09,
      "ci95": [
-      -0.0479,
-      0.22
+      -0.0431,
+      0.2231
      ]
     },
     "odd-5%": {
-     "roi": 0.0614,
+     "roi": 0.0652,
      "ci95": [
-      -0.0683,
-      0.1911
+      -0.0636,
+      0.1941
      ]
     }
    },
@@ -23988,32 +23989,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 855,
-   "settled": 699,
-   "matches": 376,
-   "wins": 337,
+   "settled": 700,
+   "matches": 377,
+   "wins": 338,
    "pushes": 45,
-   "units": 19.95,
-   "avg_odds": 2.796,
+   "units": 20.56,
+   "avg_odds": 2.794,
    "roi": {
     "odd-0%": {
-     "roi": 0.0285,
+     "roi": 0.0294,
      "ci95": [
-      -0.0485,
-      0.1055
+      -0.0475,
+      0.1063
      ]
     },
     "odd-2%": {
-     "roi": 0.0096,
+     "roi": 0.0105,
      "ci95": [
-      -0.0658,
-      0.0851
+      -0.0649,
+      0.0858
      ]
     },
     "odd-5%": {
-     "roi": -0.0187,
+     "roi": -0.0179,
      "ci95": [
-      -0.0919,
-      0.0545
+      -0.091,
+      0.0551
      ]
     }
    },
@@ -24042,9 +24043,12 @@
    "match": "Ranchers Bees — Doma United FC",
    "selection": "Over 2.5",
    "odds": 1.61,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    1
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -24058,7 +24062,7 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
+   "n_signals": 2,
    "max_mult": 1
   },
   {
@@ -27860,6 +27864,19 @@
      ],
      "market": "Asian Total",
      "total": 6600.0
+    },
+    {
+     "d": "2026-11-18T17:26:29+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "live",
+     "selection": "Over 2.5",
+     "odds": 1.5,
+     "score_at_signal": [
+      0,
+      2
+     ],
+     "market": "Asian Total",
+     "total": 11000.0
     }
    ],
    "goals": null,
@@ -27888,9 +27905,21 @@
      "market": "Asian Total"
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     59,
+     "1-1"
+    ],
+    [
+     72,
+     "2-1"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    2,
+    1
+   ]
   },
   "cd-roda-vs-athletic-torrellano-20261118": {
    "teams": [
@@ -27914,16 +27943,6 @@
   }
  },
  "timeline": [
-  {
-   "d": "2026-11-14T11:25:03+00:00",
-   "u": -6.22,
-   "g": 0.69,
-   "w": 1.0,
-   "t": "OPEN_GAME",
-   "m": "Kahramanmaras Istiklalspor — Fethiyespor",
-   "s": "Over 4",
-   "o": 1.69
-  },
   {
    "d": "2026-11-14T11:25:20+00:00",
    "u": -7.22,
@@ -33913,6 +33932,16 @@
    "m": "FC Bengaluru United — Sreenidi Deccan",
    "s": "Over 5",
    "o": 1.84
+  },
+  {
+   "d": "2026-11-18T16:24:42+00:00",
+   "u": 20.56,
+   "g": 0.61,
+   "w": 1.0,
+   "t": "OPEN_GAME",
+   "m": "Ranchers Bees — Doma United FC",
+   "s": "Over 2.5",
+   "o": 1.61
   }
  ],
  "daily": [
@@ -33967,9 +33996,9 @@
   },
   {
    "bets": 25,
-   "settled": 12,
-   "wins": 6,
-   "units": 0.0,
+   "settled": 13,
+   "wins": 7,
+   "units": 0.61,
    "day": "2026-11-18"
   }
  ]
