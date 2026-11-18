@@ -93,3 +93,18 @@ Não presumir que a conta existente é de teste, que tem créditos, que a fatura
 - https://docs.cloud.google.com/compute/docs/instances/create-ipv6-instance
 - https://docs.telethon.dev/en/stable/modules/client.html
 - https://core.telegram.org/api/datacenter
+
+## Ecrã da conta Google Cloud — 18/11/2026
+
+O proprietário apresentou a página **Gerenciamento da conta de faturamento > Suas contas de faturamento**, sem qualquer conta listada e com botão «Adicionar conta de faturamento». Não assumir que nunca existiu conta noutros perfis/permissões, mas neste perfil não está visível uma conta ativa.
+
+A documentação oficial estabelece que o Free Tier do Compute Engine **exige uma conta Cloud Billing**: https://docs.cloud.google.com/free/docs/free-cloud-features. Assim, **Google Cloud fica fora da seleção operacional sob a política de não criar/associar conta de faturação**, independentemente da ideia IPv6-only. Google Cloud Shell é apenas uma sessão interativa: termina após uma hora de inatividade e não substitui um daemon 24/7 (https://docs.cloud.google.com/shell/docs/how-cloud-shell-works).
+
+### Candidatos de alojamento sem cartão — avaliação preliminar, não recomendação de confiança
+
+- **Enzonic Python** (https://enzonic.com/python): anuncia 1 servidor gratuito sem cartão, 512 MB RAM, 10 GB de armazenamento e execução 24/7, sujeito a capacidade. Verificar termos e comportamento real com fixture sintética antes de qualquer credencial.
+- **Lunafy** (https://lunafy.run/en/telegram-bot-hosting): anuncia primeiro servidor Python gratuito, sem cartão, 256 MB RAM/512 MB disco, mas exige **renovação manual a cada 7 dias**; logo não satisfaz continuidade autónoma de 30 dias sem procedimento adicional.
+- **Silly Development** (https://sillydev.co.uk): anuncia worker Python grátis sem cartão e sem dormência, mas reputação e controlo de credenciais devem ser auditados; **não enviar sessão Telegram** a serviço não validado.
+- Estes sítios têm evidência sobretudo **autodeclarada** e nenhum deles foi testado ou provou MTProto, uptime 30 dias, proteção de segredo, autenticação de origem ou SLA <=120 segundos.
+
+**Critério mínimo:** no máximo ensaios com fixtures sintéticas e sem sessão real, token ou credencial. Nunca fornecer a `TG_SESSION` produtiva a um operador terceiro; mesmo uma sessão nova de conta pessoal tem privilégios amplos. Não instalar nem contratar nada sem nova autorização.
