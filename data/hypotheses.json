@@ -85438,6 +85438,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-18T23:06:28+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "4da4f69871e52783bbc1c9cced4fd1c9800a1662e4c79d882295ade00c20cf74",
+   "registry_size": 8950,
+   "report_generated_at_utc": "2026-11-18T23:06:28+00:00",
+   "response_sha256": "40d22a5a68b337c05cff88e777cec94492f70672869e4903474b59f51287b5fc"
+  },
+  "reason": "Jogos com muitos gols e diferença grande na 2ª parte podem ter um ritmo alto",
+  "source": "llm"
+ },
  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-16T00:40:08+00:00",
   "conditions": [
@@ -145975,6 +146008,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-18T23:06:28+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "4da4f69871e52783bbc1c9cced4fd1c9800a1662e4c79d882295ade00c20cf74",
+   "registry_size": 8950,
+   "report_generated_at_utc": "2026-11-18T23:06:28+00:00",
+   "response_sha256": "40d22a5a68b337c05cff88e777cec94492f70672869e4903474b59f51287b5fc"
+  },
+  "reason": "Apostas únicas com valor baixo em odds moderadas podem ser mais precisas",
+  "source": "llm"
  },
  "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": {
   "born_utc": "2026-11-14T16:23:50+00:00",
