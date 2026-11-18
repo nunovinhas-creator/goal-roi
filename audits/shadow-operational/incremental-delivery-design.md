@@ -41,3 +41,37 @@ O teste do pré-ensaio em dois jobs GitHub Actions, já concluído na mesma PR, 
 - A PR deve continuar Draft, sem merge nem ativação.
 
 **Parecer: ponte incremental prototipada para auditoria; não autorizar ainda os 30 dias científicos.**
+
+
+## Reforços de segurança e medição — continuação
+
+### Proteção da privacidade
+
+A função de escrita da ponte recusa expressamente qualquer origem diferente de `synthetic`: `dedicated-readonly-source` e outros valores falham antes de criar eventos. Isto impede que um simples chamador da biblioteca publique conteúdo real de mensagens num ramo público. Requer alteração do código, revisão de privacidade e autorização operacional explícita antes de trabalhar com texto vivo.
+
+Os testes verificam que a tentativa de ingestão com origem real termina em erro e que o ledger permanece vazio.
+
+### Medição histórica sem copiar mensagens
+
+`scripts/shadow_commit_latency.py` lê um **clone Git local com histórico completo**, pesquisa a primeira presença de cada versão OPEN_GAME em `data/messages.jsonl` e mede apenas agregados:
+
+- atraso emissão → primeira leitura pelo coletor
+- atraso emissão → timestamp do primeiro commit Git contendo a versão
+- atraso primeira recolha → primeiro commit, percentis 50 e 95
+- dados ausentes, relógios inconsistentes e commits que excedem os 120 s
+
+Não escreve IDs, textos, URLs dos jogos, identificadores de mensagens, hashes de conteúdo ou nomes de equipas no relatório. Rejeita clones superficiais e ficheiros fonte não commitados. O comando exige um destino novo para não reescrever relatórios anteriores.
+
+Exemplo para um clone com histórico completo e ficheiros locais de dados:
+
+```bash
+python scripts/shadow_commit_latency.py --repo . --hours 24 --output /tmp/shadow-git-latency-new.json
+```
+
+**Limite de prova fundamental:** a hora do commit é apenas um limite inferior da disponibilidade remota. Um commit feito aos 90 segundos não comprova push Git nem leitura pelo SHADOW nos 120 segundos. Um commit feito depois dos 120 segundos exclui a entrega atempada por essa via, sujeito à correção dos relógios. Ainda falta medir push remoto e observação real do segundo runner.
+
+### Bloqueadores que permanecem
+
+Não existe fonte Telegram independente instalada, nem persistência de artefactos reais em armazenamento externo garantido, nem integração dos dados entregues com os filtros de resultados prévios da ciência SHADOW.
+
+**Não ativar os 30 dias. Certificação: `not_activated`.**
