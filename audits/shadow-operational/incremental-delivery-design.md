@@ -75,3 +75,18 @@ python scripts/shadow_commit_latency.py --repo . --hours 24 --output /tmp/shadow
 Não existe fonte Telegram independente instalada, nem persistência de artefactos reais em armazenamento externo garantido, nem integração dos dados entregues com os filtros de resultados prévios da ciência SHADOW.
 
 **Não ativar os 30 dias. Certificação: `not_activated`.**
+
+## Piloto sintético de ponta a ponta — 18/11/2026
+
+Foi acrescentado `scripts/shadow_synthetic_pilot.py` e a suite `tests/test_shadow_synthetic_pilot.py`. O ensaio cria exclusivamente um remoto Git bare temporário, emite uma mensagem OPEN_GAME sintética, injeta uma falha no primeiro push, exporta o outbox, restaura-o noutro checkout, publica dados e recibo e verifica-os num terceiro checkout consumidor.
+
+O ensaio compara uma observação simulada aos 45 segundos (entrega dentro de 120 s) com outra aos 150 segundos (entrega tardia). Os tempos são controlados por fixtures, não por um serviço real; não demonstram SLA, disponibilidade, cobertura ou acesso Telegram. Os relatórios contêm apenas agregados e não guardam textos, IDs nem URLs.
+
+Execução offline (destino de saída novo):
+
+```bash
+python -m unittest discover -s tests -p test_shadow_synthetic_pilot.py -v
+python -m scripts.shadow_synthetic_pilot --observe-after-seconds 45 --output /tmp/shadow-synthetic-pilot-NEW.json
+```
+
+**Barreira mantida:** não há agendador autónomo nem armazenamento persistente real entre runners; o módulo continua a recusar a origem `dedicated-readonly-source`. A ligação a mensagens reais e a ativação científica exigem revisão e autorização separadas.
