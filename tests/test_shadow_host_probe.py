@@ -114,11 +114,11 @@ class MTProtoHandshakeProbeTests(unittest.TestCase):
 
     def response(self, nonce=None):
         nonce = self.nonce if nonce is None else nonce
-        pq = b"\\x08" + b"\\x01" * 8 + b"\\x00" * 3
+        pq = b"\x08" + b"\x01" * 8 + b"\x00" * 3
         vector = struct.pack("<IIQ", 0x1CB5C415, 1, 123456789)
         body = (struct.pack("<I", 0x05162463) + nonce +
                 b"Z" * 16 + pq + vector)
-        payload = (b"\\x00" * 8 + struct.pack("<Q", 1000000001) +
+        payload = (b"\x00" * 8 + struct.pack("<Q", 1000000001) +
                    struct.pack("<I", len(body)) + body)
         return bytes([len(payload)//4]) + payload
 
@@ -146,8 +146,8 @@ class MTProtoHandshakeProbeTests(unittest.TestCase):
                 probe.socket, "create_connection", return_value=fake):
             self.assertTrue(probe._mtproto_req_pq())
         self.assertTrue(fake.closed)
-        self.assertEqual(fake.outgoing[:2], b"\\xef\\x0a")
-        self.assertEqual(fake.outgoing[2:10], b"\\x00" * 8)
+        self.assertEqual(fake.outgoing[:2], b"\xef\x0a")
+        self.assertEqual(fake.outgoing[2:10], b"\x00" * 8)
         self.assertEqual(fake.outgoing[22:26], struct.pack("<I", 0xBE7E8EF1))
         self.assertEqual(fake.outgoing[-16:], self.nonce)
 
