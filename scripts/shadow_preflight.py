@@ -19,6 +19,8 @@ sys.path.insert(0, str(ROOT))
 UTC = timezone.utc
 FILES = ("messages.jsonl", "results_hl.json", "results_bsd.json",
          "details_hl.json", "manual_results.json")
+ARTIFACTS = ("outbox.zip", "remote.bundle", "source.bundle", "synthetic-data.zip")
+MAX_FIXTURE_BYTES = 5_000_000
 
 
 def parse_time(raw):
@@ -34,7 +36,11 @@ def parse_time(raw):
 def measure(rows, now, *, hours=24, capture_seconds=120):
     """Earliest collector observation is a necessary, NOT sufficient, condition."""
     from scangoal.parser import parse
+    if (not isinstance(now, datetime) or now.tzinfo is None or
+            not 1 <= hours <= 72 or not 1 <= capture_seconds <= 120):
+        raise ValueError("invalid preflight observation window")
     first = {}
+    inconsistent = set()
     invalid = 0
     for row in rows:
         if not isinstance(row, dict):
@@ -49,17 +55,21 @@ def measure(rows, now, *, hours=24, capture_seconds=120):
             continue
         mid = row.get("message_id")
         sent, seen = parse_time(row.get("date_utc")), parse_time(row.get("collected_at_utc"))
-        if not isinstance(mid, int) or not sent or not seen:
+        if type(mid) is not int or mid < 1 or not sent or not seen:
             invalid += 1
             continue
         if not (now - timedelta(hours=hours) <= sent <= now):
             continue
         old = first.get(mid)
+        record = (sent, seen, row.get("edit_date_utc"), row["text"])
+        if old is not None and (sent != old[0] or (seen == old[1] and record != old)):
+            inconsistent.add(mid)
         if old is None or seen < old[1]:
-            first[mid] = (sent, seen, row.get("edit_date_utc"))
-    ages = [(seen - sent).total_seconds() for sent, seen, _ in first.values()]
-    valid = [x for x in ages if x >= 0]
-    invalid += len(ages) - len(valid)
+            first[mid] = record
+    valid = [(seen - sent).total_seconds()
+             for mid, (sent, seen, edit, _) in first.items()
+             if mid not in inconsistent and sent <= seen <= now and edit is None]
+    invalid += len(first) - len(valid)
     on_time = sum(x <= capture_seconds for x in valid)
     delays = sorted(valid)
     result = {
@@ -72,9 +82,9 @@ def measure(rows, now, *, hours=24, capture_seconds=120):
         "first_observed_within_limit": on_time,
         "first_observed_over_limit": len(valid) - on_time,
         "invalid_or_unproven_timestamp": invalid,
-        "first_observation_p50_seconds": delays[len(delays)//2] if delays else None,
+        "first_observation_p50_seconds": delays[(len(delays)-1)//2] if delays else None,
         "first_observation_max_seconds": max(delays) if delays else None,
-        "edited_at_first_observation": sum(bool(v[2]) for v in first.values()),
+        "edited_at_first_observation": sum(v[2] is not None for v in first.values()),
         "remote_git_delivery_measured": False,
         "dedicated_runner_capture_measured": False,
         "outbox_production_recovery_measured": False,
@@ -158,7 +168,6 @@ def stage(directory):
                 f = case.data / name
                 if f.is_file():
                     z.write(f, arcname=name)
-        names = ("outbox.zip", "remote.bundle", "source.bundle", "synthetic-data.zip")
         write_new(target / "manifest.json", {
             "fixture_only": True,
             "production_data": False,
@@ -168,7 +177,7 @@ def stage(directory):
             "protocol_ident": case.ident,
             "expected_ledger_digest": ops.shadow.digest(events),
             "decision_hash": decisions[0]["hash"],
-            "file_sha256": {n: sha256(target/n) for n in names},
+            "file_sha256": {n: sha256(target/n) for n in ARTIFACTS},
         })
         print("SHADOW_SYNTHETIC_OUTBOX_STAGED")
     finally:
@@ -182,11 +191,13 @@ def restore(directory, output):
     manifest = json.loads((target / "manifest.json").read_text(encoding="utf-8"))
     if manifest.get("fixture_only") is not True or manifest.get("production_data") is not False:
         raise ValueError("only the synthetic test bundle is accepted")
-    for name, expected in manifest["file_sha256"].items():
-        if name not in ("outbox.zip", "remote.bundle", "source.bundle", "synthetic-data.zip"):
-            raise ValueError("unexpected artifact")
-        if sha256(target/name) != expected:
-            raise ValueError("artifact checksum mismatch")
+    hashes = manifest["file_sha256"]
+    if not isinstance(hashes, dict) or set(hashes) != set(ARTIFACTS):
+        raise ValueError("missing or unexpected synthetic artifacts")
+    for name, expected in hashes.items():
+        path = target / name
+        if path.is_symlink() or path.stat().st_size > MAX_FIXTURE_BYTES or sha256(path) != expected:
+            raise ValueError("artifact checksum or size mismatch")
     with tempfile.TemporaryDirectory(prefix="goal-shadow-runner-") as dirname:
         tmp = Path(dirname)
         remote, source, publisher = tmp/"remote.git", tmp/"source", tmp/"publisher"
@@ -197,9 +208,11 @@ def restore(directory, output):
         data = source / "data"
         data.mkdir()
         with zipfile.ZipFile(target/"synthetic-data.zip") as z:
-            if any(name not in FILES for name in z.namelist()):
-                raise ValueError("unexpected source data path")
-            for name in z.namelist():
+            names = z.namelist()
+            if (set(names) - set(FILES) or len(names) != len(set(names)) or
+                    sum(entry.file_size for entry in z.infolist()) > MAX_FIXTURE_BYTES):
+                raise ValueError("unexpected synthetic data archive")
+            for name in names:
                 (data / name).write_bytes(z.read(name))
         auth = tmp/"synthetic-authorization.json"
         synthetic_clock = parse_time(manifest["simulated_clock_utc"])

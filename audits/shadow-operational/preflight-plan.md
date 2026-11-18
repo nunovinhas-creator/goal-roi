@@ -25,7 +25,7 @@ Para respeitar essas salvaguardas, o workflow transitório foi retirado da árvo
   - `measure` mede a latência entre emissão e primeira recolha, por mensagem OPEN_GAME; não declara aprovação da ativação
   - `stage` cria um outbox de falha de push exclusivamente sintético, com bundles de Git local
   - `restore` verifica hashes e prova preservação de uma única decisão/recibo num checkout novo
-- `tests/test_shadow_preflight.py`: oito testes de deduplicação, limites temporais, evidência insuficiente e recuperação sintética
+- `tests/test_shadow_preflight.py`: testes de deduplicação, limites temporais, evidência insuficiente e recuperação sintética
 - `audits/shadow-operational/preflight-evidence.json`: liga ao run transitório, com resultados e limites de interpretação
 
 ## Reproduzir manualmente, sem rede externa
@@ -41,7 +41,7 @@ Usar destinos novos. São criados apenas remotos Git `file://` locais e sinais s
 
 ## P1 pendentes antes dos 30 dias
 
-1. Medir o percurso completo **sinal → primeira recolha → push para Git remoto → leitura no runner SHADOW**. Os 14/14 dentro de 120s provam apenas a primeira etapa.
+1. Medir o percurso completo **sinal → primeira recolha → push para Git remoto → leitura no runner SHADOW**. Os 14/14 são o resultado histórico do ensaio original para a primeira etapa. O código auditado exclui primeiras observações editadas, contraditórias ou posteriores ao instante da análise.
 2. Demonstrar os atrasos de commit e entre runners e definir um canal isolado de entrega com cobertura suficiente, sem alterar a recolha principal até nova auditoria/autorização.
 3. Validar proteção contra falhas, garantia de retenção/restauro do último outbox real e liveness num runner dedicado.
 4. Preparar autorização operacional versionada, com ativação e início dos 30 dias como decisão separada.

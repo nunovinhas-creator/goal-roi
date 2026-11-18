@@ -57,6 +57,16 @@ class ShadowPreflight(unittest.TestCase):
         self.assertEqual(result["valid_first_observations"], 0)
         self.assertEqual(result["invalid_or_unproven_timestamp"], 1)
 
+    def test_future_capture_and_edit_only_are_unproven(self):
+        rows = [row(1, 30, 60), row(2, 60, 45, edit=(NOW-timedelta(seconds=20)).isoformat())]
+        result = pre.measure(rows, NOW)
+        self.assertEqual(result["first_observed_within_limit"], 0)
+        self.assertEqual(result["invalid_or_unproven_timestamp"], 2)
+
+    def test_conflicting_first_observation_is_unproven(self):
+        report = pre.measure([row(1, 60, 30), row(1, 60, 30, text=OPEN+" updated")], NOW)
+        self.assertEqual(report["first_observed_within_limit"], 0)
+
     def test_non_open_game_is_ignored(self):
         result = pre.measure([row(1, 1000, 45, text="random text")], NOW)
         self.assertEqual(result["open_game_messages"], 0)
@@ -80,6 +90,17 @@ class ShadowPreflight(unittest.TestCase):
             self.assertTrue(result["exactly_one_receipt"])
             self.assertFalse(result["real_production_recovery_verified"])
             self.assertFalse(result["activation_approved"])
+
+    def test_restore_requires_checksums_for_every_artifact(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)/"stage"
+            pre.stage(folder)
+            manifest = folder/"manifest.json"
+            data = json.loads(manifest.read_text())
+            data["file_sha256"].pop("source.bundle")
+            manifest.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, "missing or unexpected"):
+                pre.restore(folder, Path(tmp)/"report.json")
 
 
 if __name__ == "__main__":

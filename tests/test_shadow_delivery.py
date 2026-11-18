@@ -1,5 +1,6 @@
 """Independent bridge tests. All Git remotes are local disposable bare repositories."""
-import copy
+import hashlib
+import zipfile
 import json
 import tempfile
 import unittest
@@ -72,7 +73,7 @@ class SignalDelivery(unittest.TestCase):
 
     def test_edited_version_preserved_as_separate_event(self):
         self.pub.append(self.row())
-        self.pub.append(self.row(text=OPEN+" updated",edit=self.now.isoformat()))
+        self.pub.append(self.row(text=OPEN+" updated",seen=0,edit=self.now.isoformat()))
         ev=self.pub._journal()[0]
         self.assertEqual(len(ev),2)
         self.assertEqual(ev[1]["previous_hash"],ev[0]["hash"])
@@ -235,7 +236,6 @@ class SignalDelivery(unittest.TestCase):
         self.assertEqual(bridge.audit(fresh)["queued_unreceipted"],0)
 
     def test_corrupt_outbox_hash_rejected_before_changing_ledger(self):
-        import zipfile
         self.pub.append(self.row())
         archive=self.root/"valid.zip"
         self.pub.export_outbox(archive)
@@ -247,7 +247,7 @@ class SignalDelivery(unittest.TestCase):
             for name in source.namelist():
                 body=source.read(name)
                 if name==str(bridge.EVENTS):
-                    body=body.replace(b"Alpha",b"Omega")
+                    body=body+b"invalid"
                 dest.writestr(name,body)
         receiver=bridge.DeliveryPublisher(fresh)
         with self.assertRaises(bridge.DeliveryError):
@@ -312,6 +312,113 @@ class SignalDelivery(unittest.TestCase):
         result=bridge.inspect_remote_delivery(fresh,self.now-timedelta(seconds=20))
         self.assertEqual(result["within_120s_transport"],0)
         self.assertEqual(result["late_or_unproven"],1)
+
+    def test_raw_payload_is_not_persisted_even_when_labelled_synthetic(self):
+        marker = "private-fixture-marker"
+        self.pub.append(self.row(text=OPEN+" "+marker))
+        self.pub.publish()
+        raw = ops.git(self.remote, "show", f"refs/heads/{bridge.BRANCH}:{bridge.EVENTS}")
+        self.assertNotIn(marker, raw)
+        self.assertNotIn("scangoal.com/match", raw)
+        self.assertNotIn("text", json.loads(raw))
+
+    def test_nonlocal_push_url_is_refused(self):
+        ops.git(self.repo, "remote", "set-url", "--push", "origin", "https://example.invalid/repo")
+        self.pub.append(self.row())
+        with self.assertRaisesRegex(bridge.DeliveryError, "local bare Git"):
+            self.pub.publish()
+
+    def test_consumer_rejects_receipt_with_unrelated_commit_even_if_rehashed(self):
+        self.pub.append(self.row())
+        self.pub.publish()
+        receipts = self.pub._journal()[1]
+        receipts[0]["remote_data_commit_sha"] = ops.git(self.repo, "rev-list", "--max-parents=0", "HEAD")
+        del receipts[0]["hash"]
+        receipts[0]["hash"] = bridge._hash(receipts[0])
+        bridge._atomic(self.repo/bridge.RECEIPTS, receipts)
+        self.pub._commit()
+        ops.git(self.repo, "push", "origin", f"HEAD:refs/heads/{bridge.BRANCH}")
+        with self.assertRaisesRegex(bridge.DeliveryError, "does not match"):
+            bridge.inspect_remote_delivery(self.repo, self.now)
+
+    def test_committed_prefix_cannot_be_replaced_by_valid_rehashed_journal(self):
+        self.pub.append(self.row())
+        self.pub.publish()
+        events, _ = self.pub._journal()
+        events[0]["message_id"] = 42
+        del events[0]["hash"]
+        events[0]["hash"] = bridge._hash(events[0])
+        bridge._atomic(self.repo/bridge.EVENTS, events)
+        (self.repo/bridge.RECEIPTS).unlink()
+        with self.assertRaisesRegex(bridge.DeliveryError, "prefix"):
+            self.pub.publish()
+
+    def test_outbox_bundle_and_rehashed_journal_must_match_before_checkout_changes(self):
+        self.pub.append(self.row())
+        archive = self.root/"original.zip"
+        self.pub.export_outbox(archive)
+        invalid = self.root/"mismatch.zip"
+        with zipfile.ZipFile(archive) as src, zipfile.ZipFile(invalid, "w") as dst:
+            payload = {name: src.read(name) for name in src.namelist()}
+            path = str(bridge.EVENTS)
+            event = json.loads(payload[path])
+            event["message_id"] = 42
+            del event["hash"]
+            event["hash"] = bridge._hash(event)
+            payload[path] = bridge._canon(event)+b"\n"
+            manifest = json.loads(payload["manifest.json"])
+            manifest["files_sha256"][path] = hashlib.sha256(payload[path]).hexdigest()
+            payload["manifest.json"] = bridge._canon(manifest)
+            for name, raw in payload.items():
+                dst.writestr(name, raw)
+        fresh = self.root/"fresh"
+        ops.git(self.root, "clone", "--branch", bridge.BRANCH, self.remote, fresh)
+        head = ops.git(fresh, "rev-parse", "HEAD")
+        receiver = bridge.DeliveryPublisher(fresh)
+        with self.assertRaisesRegex(bridge.DeliveryError, "do not match"):
+            receiver.restore_outbox(invalid)
+        self.assertEqual(ops.git(fresh, "rev-parse", "HEAD"), head)
+        self.assertEqual(ops.git(fresh, "status", "--porcelain"), "")
+        self.assertEqual(receiver.restore_outbox(archive)["events"], 1)
+        self.assertEqual(receiver.restore_outbox(archive)["events"], 1)
+
+    def test_actual_first_push_followed_by_lost_confirmation_recovers_once(self):
+        self.pub.append(self.row())
+        original = self.pub._remote_head
+        calls = 0
+        def lose_confirmation():
+            nonlocal calls
+            calls += 1
+            if calls == 3:
+                raise bridge.DeliveryError("confirmation response lost")
+            return original()
+        with patch.object(self.pub, "_remote_head", side_effect=lose_confirmation):
+            with self.assertRaisesRegex(bridge.DeliveryError, "response lost"):
+                self.pub.publish()
+        archive = self.root/"ambiguous-push.zip"
+        self.pub.export_outbox(archive)
+        fresh = self.root/"fresh"
+        ops.git(self.root, "clone", "--branch", bridge.BRANCH, self.remote, fresh)
+        receiver = bridge.DeliveryPublisher(fresh, clock=lambda: self.now)
+        receiver.restore_outbox(archive)
+        receiver.publish()
+        self.assertEqual(tuple(map(len, receiver._journal())), (1, 1))
+
+    def test_exact_boundary_and_edited_event_within_boundary(self):
+        self.pub.append(self.row())
+        self.pub.append(self.row(mid=2, seen=0, edit=self.now.isoformat()))
+        self.pub.publish()
+        exact = bridge.inspect_remote_delivery(self.repo, self.now+timedelta(seconds=90))
+        self.assertEqual(exact["within_120s_transport"], 1)
+        self.assertEqual(exact["timing_basis"], "synthetic_clock_assumptions")
+        self.assertFalse(exact["real_live_delivery_coverage_proven"])
+        late = bridge.inspect_remote_delivery(self.repo, self.now+timedelta(seconds=90, microseconds=1))
+        self.assertEqual(late["within_120s_transport"], 0)
+
+    def test_concurrent_same_checkout_publisher_is_refused(self):
+        with self.pub.locked():
+            with self.assertRaisesRegex(bridge.DeliveryError, "concurrent"):
+                self.pub.append(self.row())
 
 
 if __name__=="__main__":

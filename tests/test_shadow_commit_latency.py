@@ -113,5 +113,31 @@ class GitLatency(unittest.TestCase):
         self.assertEqual(result["open_game_first_versions"],0)
         self.assertNotIn("confidential",json.dumps(result))
 
+    def test_old_clock_cannot_hide_first_occurrence_before_window(self):
+        signal = self.row(1, T-timedelta(seconds=100), T-timedelta(seconds=80))
+        self.commit([signal], T-timedelta(days=2))
+        self.commit([], T-timedelta(seconds=50))
+        self.commit([signal], T-timedelta(seconds=20))
+        report = audit.study(self.repo, T)
+        self.assertEqual(report["commit_timestamp_within_120_seconds"], 0)
+        self.assertEqual(report["invalid_or_inconsistent_clock"], 1)
+
+    def test_current_row_cannot_substitute_an_earlier_version_removed_from_head(self):
+        original = self.row(1, T-timedelta(seconds=100), T-timedelta(seconds=80))
+        changed = self.row(1, T-timedelta(seconds=100), T-timedelta(seconds=50), OPEN+" changed")
+        self.commit([original], T-timedelta(seconds=60))
+        self.commit([changed], T-timedelta(seconds=20))
+        report = audit.study(self.repo, T)
+        self.assertEqual(report["collector_within_120_seconds"], 0)
+        self.assertEqual(report["commit_timestamp_within_120_seconds"], 0)
+
+    def test_edit_only_row_is_not_counted_as_original(self):
+        edited = self.row(1, T-timedelta(seconds=100), T-timedelta(seconds=60))
+        edited["edit_date_utc"] = (T-timedelta(seconds=65)).isoformat()
+        self.commit([edited], T-timedelta(seconds=50))
+        report = audit.study(self.repo, T)
+        self.assertEqual(report["collector_within_120_seconds"], 0)
+        self.assertEqual(report["commit_timestamp_within_120_seconds"], 0)
+
 if __name__=="__main__":
     unittest.main()

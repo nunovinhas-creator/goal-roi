@@ -13,10 +13,10 @@ Isto não mede o atraso posterior até à publicação no Git remoto nem à obse
 O módulo scangoal/shadow_delivery.py NÃO é importado por workflows nem pelo coletor; não lê Telegram e não envia notificações.
 
 - Fonte autónoma: a instalar apenas com autorização específica, separada da sessão Telegram do coletor. A origem registada no protótipo não substitui autenticação.
-- Fila append-only: apenas mensagens OPEN_GAME, original e edições por ID e hash do texto, relógios UTC, encadeamento SHA-256, fsync e substituição atómica.
-- Publicação Git: num checkout próprio, no ramo shadow/signal-delivery; nunca na main. Primeiro commit/push/ls-remote, depois recibo durável com segunda publicação e confirmação remota. Sem force-push, merge ou rebase.
-- Recuperação: exportação ZIP com manifesto SHA-256 e bundle Git; restauração num checkout novo com validação dos hashes, integridade do diário e base remota. Falha em caso de divergência, sem reescrever o histórico.
-- Consumidor: checkout independente verifica que o HEAD local corresponde ao remoto e que não há ficheiros locais por publicar; mede emissão → receção nesse runner. Nunca declara aprovação científica.
+- Fila append-only: apenas mensagens OPEN_GAME, original e edições por ID e hash do texto, sem guardar o texto, relógios UTC, encadeamento SHA-256, fsync e substituição atómica.
+- Publicação Git: num checkout próprio e num remoto Git bare local, no ramo shadow/signal-delivery. Primeiro commit/push/ls-remote, depois recibo durável com segunda publicação e confirmação remota. Sem force-push, merge ou rebase.
+- Recuperação: exportação ZIP com manifesto SHA-256 e bundle Git; restauração num checkout novo com validação dos hashes, correspondência exata entre o diário e o bundle incremental e verificação da base remota. Falha em caso de divergência, sem reescrever o histórico.
+- Consumidor: checkout independente verifica que o HEAD local corresponde ao remoto e que não há ficheiros locais por publicar; calcula emissão → observação com um relógio de ensaio fornecido pelo chamador. A admissão científica permanece desativada.
 
 ## Provas técnicas
 
@@ -47,7 +47,7 @@ O teste do pré-ensaio em dois jobs GitHub Actions, já concluído na mesma PR, 
 
 ### Proteção da privacidade
 
-A função de escrita da ponte recusa expressamente qualquer origem diferente de `synthetic`: `dedicated-readonly-source` e outros valores falham antes de criar eventos. Isto impede que um simples chamador da biblioteca publique conteúdo real de mensagens num ramo público. Requer alteração do código, revisão de privacidade e autorização operacional explícita antes de trabalhar com texto vivo.
+A ponte recusa origens diferentes de `synthetic`. Como o chamador controla essa etiqueta, o texto é usado apenas em memória para classificar a mensagem e calcular o hash. O diário local conserva ID, hash e metadados temporais. A publicação aceita exclusivamente um remoto Git bare local e exige que os endereços de leitura e escrita apontem para o mesmo repositório. Relatórios de auditoria omitem texto, IDs de mensagens e hashes de eventos.
 
 Os testes verificam que a tentativa de ingestão com origem real termina em erro e que o ledger permanece vazio.
 
@@ -56,7 +56,7 @@ Os testes verificam que a tentativa de ingestão com origem real termina em erro
 `scripts/shadow_commit_latency.py` lê um **clone Git local com histórico completo**, pesquisa a primeira presença de cada versão OPEN_GAME em `data/messages.jsonl` e mede apenas agregados:
 
 - atraso emissão → primeira leitura pelo coletor
-- atraso emissão → timestamp do primeiro commit Git contendo a versão
+- atraso emissão → timestamp do primeiro commit do percurso first-parent do HEAD fixado que contém a mensagem e comprova a versão avaliada
 - atraso primeira recolha → primeiro commit, percentis 50 e 95
 - dados ausentes, relógios inconsistentes e commits que excedem os 120 s
 
@@ -68,7 +68,7 @@ Exemplo para um clone com histórico completo e ficheiros locais de dados:
 python scripts/shadow_commit_latency.py --repo . --hours 24 --output /tmp/shadow-git-latency-new.json
 ```
 
-**Limite de prova fundamental:** a hora do commit é apenas um limite inferior da disponibilidade remota. Um commit feito aos 90 segundos não comprova push Git nem leitura pelo SHADOW nos 120 segundos. Um commit feito depois dos 120 segundos exclui a entrega atempada por essa via, sujeito à correção dos relógios. Ainda falta medir push remoto e observação real do segundo runner.
+**Limite de prova.** A pesquisa percorre o histórico por ordem topológica, sem cortar com datas de commit. A amostra parte das mensagens presentes no HEAD fixado. Edições, substituição de versões e cronologias incompatíveis ficam sem confirmação. O timestamp Git serve como limite inferior apenas para o percurso estudado e sob a hipótese de relógios corretos. O push remoto e a observação pelo segundo runner continuam por medir.
 
 ### Bloqueadores que permanecem
 
@@ -90,3 +90,9 @@ python -m scripts.shadow_synthetic_pilot --observe-after-seconds 45 --output /tm
 ```
 
 **Barreira mantida:** não há agendador autónomo nem armazenamento persistente real entre runners; o módulo continua a recusar a origem `dedicated-readonly-source`. A ligação a mensagens reais e a ativação científica exigem revisão e autorização separadas.
+
+## Verificações de recuperação
+
+O outbox da ponte usa a versão 2. A exportação cria um commit local quando há dados pendentes e inclui só os objetos posteriores ao HEAD remoto. No restauro, o recetor verifica o manifesto, os hashes, a cadeia append-only, os commits referidos pelos recibos e a correspondência do diário com o bundle antes de avançar o checkout. O mesmo ZIP pode voltar a ser aplicado ao checkout restaurado enquanto a base remota se mantiver. Uma base que avance exige quarentena. Artefactos v1 ficam incompatíveis porque podiam conter texto e divergir do bundle.
+
+As verificações SHA-256 internas detetam corrupção. A autenticidade do ZIP depende da cadeia de custódia externa e da comparação com um digest obtido por um canal de confiança. A prova dos dois jobs do pré-ensaio abrange o outbox do publicador operacional anterior em modo sintético. Os testes da ponte incremental usam novos checkouts e um Git bare local.
