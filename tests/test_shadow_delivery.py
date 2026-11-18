@@ -94,6 +94,8 @@ class SignalDelivery(unittest.TestCase):
     def test_unknown_provenance_and_invalid_chronology_fail_closed(self):
         with self.assertRaises(bridge.DeliveryError):
             self.pub.append(self.row(),origin="user-message")
+        with self.assertRaisesRegex(bridge.DeliveryError, "live source publication is not authorized"):
+            self.pub.append(self.row(),origin="dedicated-readonly-source")
         with self.assertRaises(bridge.DeliveryError):
             self.pub.append(self.row(age=2,seen=30))
         with self.assertRaises(bridge.DeliveryError):
