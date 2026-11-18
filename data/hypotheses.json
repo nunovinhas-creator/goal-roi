@@ -140711,6 +140711,39 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-18T19:00:31+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "e56a38dffb4f3809aacecbc3ab7d6db48b6333d4684b218460369126b4854497",
+   "registry_size": 8716,
+   "report_generated_at_utc": "2026-11-18T19:00:31+00:00",
+   "response_sha256": "1cad8d293909d7c23a6e8119a63a81ae9b999b4983b3c380523a5fdf73467a0f"
+  },
+  "reason": "Noite, sem sinais anteriores e mercado específico",
+  "source": "llm"
+ },
  "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Momento do aviso = antes do início": {
   "born_utc": "2026-11-14T22:51:03+00:00",
   "conditions": [

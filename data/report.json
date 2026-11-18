@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T18:59:37+00:00",
+ "generated_at_utc": "2026-11-18T19:01:12+00:00",
  "messages": 1575,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T18:59:37+00:00",
+  "collector_last_run_utc": "2026-11-18T19:00:28+00:00",
   "name_review": [
    {
     "bot": [
@@ -1767,7 +1767,7 @@
    "roi_announced_odds": -0.0561,
    "seen_late": 0,
    "by_bot_mark": 120,
-   "per_day": 34.2,
+   "per_day": 34.1,
    "days_to_hint": 0,
    "days_to_conclusion": 3,
    "prudent_rate": 0.4806,
@@ -3406,7 +3406,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8601,
+    "em observação": 8602,
     "abandonada": 29,
     "promissora": 86
    },
@@ -4463,11 +4463,11 @@
     }
    ]
   },
-  "hypotheses": 8716,
+  "hypotheses": 8717,
   "tested": 872,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8675,
+   "em observação": 8676,
    "abandonada": 30,
    "promissora": 11
   },
@@ -4806,15 +4806,6 @@
      "selection": "Over 1.5",
      "market": "Asian Total",
      "odds": 1.65,
-     "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
-     "date_utc": "2026-11-18T18:00:31+00:00",
-     "kickoff_utc": "2026-11-18T17:45+00:00",
-     "match": "CD Tacon Women — Inter Milan Women",
-     "selection": "Over 1.5",
-     "market": "1st Half - Asian Total",
-     "odds": 1.95,
      "tactic": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não"
     },
     {
@@ -6263,7 +6254,7 @@
     "contraditório": 7,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T19:00:08+00:00",
+   "generated_utc": "2026-11-18T19:01:36+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6286,7 +6277,7 @@
      "prospective_games": 128
     },
     "llm/refinar": {
-     "hypotheses": 47,
+     "hypotheses": 48,
      "with_prospective_evidence": 16,
      "prospective_games": 435
     },
@@ -17322,6 +17313,75 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = não",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
+     ],
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Mercado",
+      "outros mercados"
+     ],
+     [
+      "Sinal anterior de outro tipo no mesmo jogo",
+      "não"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-18T19:00:31+00:00",
+    "reason": "Noite, sem sinais anteriores e mercado específico",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Polymarket | Mercado = golos (mais/menos) & Minuto = 31 a 60 & Quota de mercado = menos de 80 %",
     "family": "Polymarket",
     "conditions": [
@@ -18640,74 +18700,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "bets": 0,
-    "unidentified": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Polymarket | Dia = fim de semana & Mercado = outro mercado & Valor da aposta = 10 mil $ ou mais",
-    "family": "Polymarket",
-    "conditions": [
-     [
-      "Dia",
-      "fim de semana"
-     ],
-     [
-      "Mercado",
-      "outro mercado"
-     ],
-     [
-      "Valor da aposta",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-16T03:42:30+00:00",
-    "reason": "Mercados com volume alto em fins de semana",
-    "expect": "acima",
-    "mode": "novas",
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": null,
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 73,
+  "llm_total": 74,
   "watch": [],
   "presentation": {
    "version": "telegram_presentation_v1",
@@ -23294,15 +23289,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 145,
-  "llm_last_run_utc": "2026-11-18T17:56:37+00:00",
+  "llm_runs": 146,
+  "llm_last_run_utc": "2026-11-18T19:00:31+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-18",
-   "calls_today": 18,
-   "neurons_today": 3772.7,
-   "accepted_today": 9,
-   "last_mode": "novas"
+   "calls_today": 19,
+   "neurons_today": 4007.6,
+   "accepted_today": 10,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -23553,8 +23548,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 73,
-   "groups": 73,
+   "llm_hypotheses": 74,
+   "groups": 74,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }
@@ -23587,7 +23582,7 @@
     "roi_announced_odds": 0.2107,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 13.6,
+    "per_day": 13.5,
     "days_to_hint": 0,
     "days_to_conclusion": 15
    },
@@ -23618,7 +23613,7 @@
     "by_bot_mark": 0,
     "per_day": 2.4,
     "days_to_hint": 6,
-    "days_to_conclusion": 120
+    "days_to_conclusion": 121
    },
    "OPEN_GAME": {
     "signals": 173,
