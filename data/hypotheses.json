@@ -84836,6 +84836,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Minuto = 61 em diante & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-18T02:22:57+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "7ac43c1f691a1cbc68d59aaa5f045a3dacacec0ce8a1d72ee7556b5e2efa5914",
+   "registry_size": 8553,
+   "report_generated_at_utc": "2026-11-18T02:22:57+00:00",
+   "response_sha256": "7fb0df5bb2090de5f719098abffd9bce8bf146a1c4ba4f0c28b8e5a05c3318ac"
+  },
+  "reason": "Jogo com poucos golos em falta e noite, pode indicar um jogo mais fechado",
+  "source": "llm"
+ },
  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T19:15:02+00:00",
   "conditions": [
@@ -91873,6 +91906,39 @@
   ],
   "family": "Jogo aberto",
   "source": "gerador"
+ },
+ "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-18T02:22:57+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "7ac43c1f691a1cbc68d59aaa5f045a3dacacec0ce8a1d72ee7556b5e2efa5914",
+   "registry_size": 8553,
+   "report_generated_at_utc": "2026-11-18T02:22:57+00:00",
+   "response_sha256": "7fb0df5bb2090de5f719098abffd9bce8bf146a1c4ba4f0c28b8e5a05c3318ac"
+  },
+  "reason": "Jogo com diferença de golos e ritmo lento pode indicar um jogo mais controlado",
+  "source": "llm"
  },
  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-13T18:57:02+00:00",
@@ -99755,6 +99821,39 @@
   ],
   "family": "Polymarket",
   "source": "gerador"
+ },
+ "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-18T02:22:57+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "7ac43c1f691a1cbc68d59aaa5f045a3dacacec0ce8a1d72ee7556b5e2efa5914",
+   "registry_size": 8553,
+   "report_generated_at_utc": "2026-11-18T02:22:57+00:00",
+   "response_sha256": "7fb0df5bb2090de5f719098abffd9bce8bf146a1c4ba4f0c28b8e5a05c3318ac"
+  },
+  "reason": "Apostas em dias de semana com valor alto podem indicar uma estratégia mais agressiva",
+  "source": "llm"
  },
  "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado": {
   "born_utc": "2026-11-16T16:34:56+00:00",
@@ -146012,6 +146111,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = uma & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-18T02:22:57+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "7ac43c1f691a1cbc68d59aaa5f045a3dacacec0ce8a1d72ee7556b5e2efa5914",
+   "registry_size": 8553,
+   "report_generated_at_utc": "2026-11-18T02:22:57+00:00",
+   "response_sha256": "7fb0df5bb2090de5f719098abffd9bce8bf146a1c4ba4f0c28b8e5a05c3318ac"
+  },
+  "reason": "Apostas noturnas com valor baixo podem indicar uma estratégia mais conservadora",
+  "source": "llm"
  },
  "Stake | Hora (UTC) = noite & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T23:20:28+00:00",
