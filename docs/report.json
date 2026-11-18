@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T17:55:56+00:00",
+ "generated_at_utc": "2026-11-18T17:57:10+00:00",
  "messages": 1564,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T17:55:56+00:00",
+  "collector_last_run_utc": "2026-11-18T17:56:35+00:00",
   "name_review": [
    {
     "bot": [
@@ -3405,7 +3405,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8559,
+    "em observação": 8560,
     "abandonada": 29,
     "promissora": 86
    },
@@ -4462,11 +4462,11 @@
     }
    ]
   },
-  "hypotheses": 8674,
+  "hypotheses": 8675,
   "tested": 871,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8633,
+   "em observação": 8634,
    "abandonada": 30,
    "promissora": 11
   },
@@ -5921,7 +5921,7 @@
     "contraditório": 5,
     "evitar": 1
    },
-   "generated_utc": "2026-11-18T17:56:16+00:00",
+   "generated_utc": "2026-11-18T17:57:34+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5939,7 +5939,7 @@
      "prospective_games": 56687
     },
     "llm/novas": {
-     "hypotheses": 19,
+     "hypotheses": 20,
      "with_prospective_evidence": 6,
      "prospective_games": 127
     },
@@ -16970,6 +16970,71 @@
   ],
   "llm": [
    {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Polymarket | Mercado = golos (mais/menos) & Minuto = 31 a 60 & Quota de mercado = menos de 80 %",
+    "family": "Polymarket",
+    "conditions": [
+     [
+      "Mercado",
+      "golos (mais/menos)"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ],
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-18T17:56:37+00:00",
+    "reason": "Golos em jogo equilibrado",
+    "expect": "acima",
+    "mode": "novas",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
     "n": 1,
     "signals": 1,
     "hits": 1,
@@ -18305,84 +18370,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 16,
-    "signals": 17,
-    "hits": 9,
-    "misses": 7,
-    "hit_rate": 0.5625,
-    "ci95": [
-     0.3318,
-     0.769
-    ],
-    "break_even": 0.462,
-    "roi": 0.2206,
-    "games": 13,
-    "bets": 16,
-    "unidentified": 0,
-    "prudent_rate": 0.5497,
-    "prob_above": 0.7952,
-    "edge": 0.0854,
-    "edge_ci": [
-     -0.0846,
-     0.2502
-    ],
-    "prob_above_cut": 0.7686,
-    "prob_adds": 0.7324,
-    "id": "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-    "family": "Polymarket",
-    "conditions": [
-     [
-      "Competição",
-      "seleções"
-     ],
-     [
-      "Faixa de odd",
-      "odd 2,00 a 3,00"
-     ],
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-16T00:40:08+00:00",
-    "reason": "Análise de mercado com foco em odd, quota e valor da aposta em competições de seleções",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 1,
-    "born_verified": true,
-    "game_set": "d923d99311f14c6c",
-    "prospective": {
-     "games": 13,
-     "hits": 8.0,
-     "misses": 5.0,
-     "prob_above": 0.7952,
-     "roi": 0.2206,
-     "categories": {
-      "prospective": 13,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 72,
+  "llm_total": 73,
   "watch": [],
   "presentation": {
    "version": "telegram_presentation_v1",
@@ -22969,15 +22959,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 144,
-  "llm_last_run_utc": "2026-11-18T16:53:38+00:00",
+  "llm_runs": 145,
+  "llm_last_run_utc": "2026-11-18T17:56:37+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-18",
-   "calls_today": 17,
-   "neurons_today": 3560.5,
-   "accepted_today": 8,
-   "last_mode": "notas"
+   "calls_today": 18,
+   "neurons_today": 3772.7,
+   "accepted_today": 9,
+   "last_mode": "novas"
   },
   "notes": [
    {
@@ -23228,8 +23218,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 72,
-   "groups": 72,
+   "llm_hypotheses": 73,
+   "groups": 73,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }

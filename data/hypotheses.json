@@ -122091,6 +122091,35 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Mercado = golos (mais/menos) & Minuto = 31 a 60 & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-18T17:56:37+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "1cbf24c8490f06b206dc9d1e298fa0c3d59956d87663dec570f0a83ceafd3b4b",
+   "registry_size": 8674,
+   "report_generated_at_utc": "2026-11-18T17:56:37+00:00",
+   "response_sha256": "85110c4f235a315e317a96ec44d9b768068f31927fabafa158e68585c6da5ee6"
+  },
+  "reason": "Golos em jogo equilibrado",
+  "source": "llm"
+ },
  "Polymarket | Mercado = golos (mais/menos) & Minuto = até ao 30": {
   "born_utc": "2026-11-18T00:05:51+00:00",
   "conditions": [
