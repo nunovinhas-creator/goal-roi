@@ -1,5 +1,7 @@
 """Regression tests for credential-free heartbeat probe; no external services."""
 import json
+import socket
+import struct
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -101,6 +103,78 @@ class OneTimeTCPTests(unittest.TestCase):
         self.assertEqual(json.loads(uptime.read_text()), previous)
         for forbidden in ("TG_SESSION", "API_HASH", "message_id", "bot_token", "source_text"):
             self.assertNotIn(forbidden, json.dumps(result))
+
+
+class MTProtoHandshakeProbeTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.report = Path(self.tmp.name)/"mtproto.json"
+        self.nonce = bytes(range(16))
+
+    def response(self, nonce=None):
+        nonce = self.nonce if nonce is None else nonce
+        pq = b"\\x08" + b"\\x01" * 8 + b"\\x00" * 3
+        vector = struct.pack("<IIQ", 0x1CB5C415, 1, 123456789)
+        body = (struct.pack("<I", 0x05162463) + nonce +
+                b"Z" * 16 + pq + vector)
+        payload = (b"\\x00" * 8 + struct.pack("<Q", 1000000001) +
+                   struct.pack("<I", len(body)) + body)
+        return bytes([len(payload)//4]) + payload
+
+    def test_valid_res_pq_no_auth_key_or_api_key(self):
+        response = self.response()
+        class FakeSocket:
+            def __init__(self):
+                self.incoming = response
+                self.outgoing = None
+                self.closed = False
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                self.closed = True
+            def settimeout(self, t):
+                pass
+            def sendall(self, data):
+                self.outgoing = data
+            def recv(self, n):
+                chunk = self.incoming[:n]
+                self.incoming = self.incoming[n:]
+                return chunk
+        fake = FakeSocket()
+        with patch.object(probe.secrets, "token_bytes", return_value=self.nonce), patch.object(
+                probe.socket, "create_connection", return_value=fake):
+            self.assertTrue(probe._mtproto_req_pq())
+        self.assertTrue(fake.closed)
+        self.assertEqual(fake.outgoing[:2], b"\\xef\\x0a")
+        self.assertEqual(fake.outgoing[2:10], b"\\x00" * 8)
+        self.assertEqual(fake.outgoing[22:26], struct.pack("<I", 0xBE7E8EF1))
+        self.assertEqual(fake.outgoing[-16:], self.nonce)
+
+    def test_forged_nonce_is_rejected(self):
+        response = self.response(bytes([99])*16)[1:]
+        self.assertFalse(probe._valid_res_pq(response, self.nonce))
+        self.assertFalse(probe._valid_res_pq(response[:-4], self.nonce))
+        self.assertFalse(probe._valid_res_pq(b"", self.nonce))
+
+    def test_only_one_handshake_is_saved_and_no_sensitive_content(self):
+        with patch.object(probe, "_mtproto_req_pq", return_value=True) as fn:
+            result = probe.mtproto_once(self.report)
+            self.assertIsNone(probe.mtproto_once(self.report))
+        self.assertEqual(fn.call_count, 1)
+        self.assertTrue(result["res_pq_nonce_valid"])
+        self.assertFalse(result["credentials_used"])
+        self.assertFalse(result["account_authenticated"])
+        self.assertFalse(result["auth_key_created"])
+        self.assertEqual(json.loads(self.report.read_text()), result)
+        for secret in ("api_hash", "TG_SESSION", "phone", "nonce", "message_id"):
+            self.assertNotIn('"' + secret + '"', self.report.read_text())
+
+    def test_network_failure_is_not_a_valid_protocol_exchange(self):
+        with patch.object(probe.socket, "create_connection", side_effect=OSError("unreachable")):
+            self.assertFalse(probe._mtproto_req_pq())
+        with self.assertRaises(ValueError):
+            probe._mtproto_req_pq(timeout=30)
 
 
 if __name__ == "__main__":
