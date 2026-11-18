@@ -6,7 +6,9 @@ from zoneinfo import ZoneInfo
 from .parser import HEAD, kickoff_utc
 
 STAKE_HEADER = re.compile(r'^(?:💸\s*)+\s*(?:🟦\s*)?Stake(?:\s+money load\b|\s*:\s*load growing\b)', re.I)
-OTHER_HEADER = re.compile(r'^\W*(?:Betfair|Polymarket|Kalshi|Bet365|Pinnacle)(?:\s*:|\s+money load\b|\s+LIVE\b|\s*$)', re.I)
+OTHER_HOUSE = r'(?:Betfair|Polymarket|Kalshi|Bet365|Pinnacle)(?:\s*:|\s+money load\b|\s+LIVE\b|\s*$)'
+OTHER_HEADER = re.compile(rf'^\W*{OTHER_HOUSE}', re.I)
+INLINE_OTHER = re.compile(rf'\s*\|\s*📊\s*{OTHER_HOUSE}', re.I)
 MARKET_LINE = re.compile(r'^📊\s+(.+?)\s+→\s+(.+)$')
 SCORE_LINE = re.compile(r'(.+?)\s+(\d+)\s*')
 ODD = r'[+−-]?\d+(?:[.,/]\d+)?'
@@ -34,6 +36,9 @@ def stake_blocks(text):
             if start is not None:
                 yield ''.join(lines[start:i])
             start = i if stake else None
+        if start is not None and (other := INLINE_OTHER.search(line)):
+            yield ''.join(lines[start:i]) + line[:other.start()]
+            start = None
     if start is not None:
         yield ''.join(lines[start:])
 
@@ -74,25 +79,30 @@ def match_context(row, lines):
 def block_bodies(row, block):
     lines = block.splitlines()
     teams, phase = match_context(row, lines)
-    market_lines = [part.strip() for line in lines if line.lstrip().startswith('📊')
-                    for part in re.split(r'\s*\|\s*(?=📊)', line)]
-    selections = [MARKET_LINE.fullmatch(line) for line in dict.fromkeys(market_lines)]
+    market_lines = dict.fromkeys(
+        part.strip() for line in lines if line.lstrip().startswith('📊')
+        for part in re.split(r'\s*\|\s*(?=📊)', line)
+    )
     fields = [f'⚽ Jogo: {teams}'] if teams else []
     fields.append(f'📍 Tipo: {phase}')
-    if not selections or not all(selections):
+    bets = []
+    for line in market_lines:
+        selection = MARKET_LINE.fullmatch(line)
+        if selection is None:
+            break
+        pick, _, price = selection[2].partition('@')
+        if not pick.strip():
+            break
+        bets.append((selection[1], pick.strip(), price.strip(), line))
+    if not bets or len(bets) != len(market_lines):
         yield '\n'.join([*fields, '', 'Mensagem original', block])
         return
-    for selection in selections:
-        price_parts = re.split(r'\s+@\s*', selection[2], maxsplit=1)
-        pick, price = (price_parts + [''])[:2]
-        price = price.strip()
-        details = [*fields, f'🎯 Mercado: {selection[1]}']
-        if pick.strip():
-            details.append(f'Seleção: {pick.strip()}')
+    for market, pick, price, line in bets:
+        details = [*fields, f'🎯 Mercado: {market}', f'Seleção: {pick}']
         if ODDS.fullmatch(price):
             details.append(f'💰 Odd: {price}')
         elif price:
-            details.append(f'Linha original: {selection[0]}')
+            details.append(f'Linha original: {line}')
         yield '\n'.join(details)
 
 

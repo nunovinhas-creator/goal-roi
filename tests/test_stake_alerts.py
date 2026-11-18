@@ -59,6 +59,9 @@ class StakeText(unittest.TestCase):
             self.assertEqual(list(payloads(row(1, text))), [])
         alert, = payloads(row(1, PRE + '\n' + OTHER))
         self.assertNotIn('Under 2.5', alert)
+        inline, = payloads(row(2, PRE + ' | 📊 Kalshi: Asian Total → Under 2.5 @ 2'))
+        self.assertIn('Over 2.5', inline)
+        self.assertNotIn('Under 2.5', inline)
 
     def test_missing_and_cutoff_odds_are_not_invented(self):
         for suffix in ('', ' @ ', ' @ 1.'):
@@ -75,6 +78,10 @@ class StakeText(unittest.TestCase):
         self.assertIn('NÃO DETERMINADO', alert)
         for field in ('Mercado:', 'Seleção:', 'Odd:', 'Jogo:'):
             self.assertNotIn(field, alert)
+        missing_selection = PRE.replace(PICK, '📊 Asian Total → @ 1.85')
+        preserved, = payloads(row(4, missing_selection))
+        self.assertIn(missing_selection, preserved)
+        self.assertNotIn('Seleção:', preserved)
         edited, = payloads(row(2, LIVE, date='17:55', edited='2026-11-18T18:05:00+00:00'))
         self.assertIn('NÃO DETERMINADO', edited)
         conflict, = payloads(row(3, LIVE, date='17:30'))
