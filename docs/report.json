@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-18T12:12:35+00:00",
- "messages": 1540,
+ "generated_at_utc": "2026-11-18T12:17:11+00:00",
+ "messages": 1541,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 51,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 14,
   "OPEN_GAME_NO_ODDS": 14,
   "FULL_TIME_NOTE": 18,
-  "POLYMARKET": 475,
+  "POLYMARKET": 476,
   "None": 47,
   "TOTALS_FORM_NO_ODDS": 72
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2585,
+  "versions": 2586,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-18T12:06:13+00:00",
+  "last_collected_at_utc": "2026-11-18T12:17:11+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 43,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-18T12:12:31+00:00",
+  "collector_last_run_utc": "2026-11-18T12:17:11+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 453,
   "goal_lists_consistent": 242
  },
- "unique_bets": 844,
+ "unique_bets": 845,
  "settled_bets": 694,
  "unsettled_market": 79,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -997,7 +997,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 184,
+   "bets": 185,
    "settled": 171,
    "matches": 64,
    "wins": 82,
@@ -1650,7 +1650,7 @@
    "by_bot_mark": 0,
    "per_day": 0.4,
    "days_to_hint": 63,
-   "days_to_conclusion": 692,
+   "days_to_conclusion": 693,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1735,7 +1735,7 @@
    "prob_above_cut": 0.4559
   },
   "POLYMARKET": {
-   "signals": 223,
+   "signals": 224,
    "with_result": 209,
    "hits": 101,
    "misses": 108,
@@ -1870,7 +1870,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 14.8,
+   "per_day": 14.7,
    "days_to_hint": 0,
    "days_to_conclusion": 16,
    "prudent_rate": 0.8415,
@@ -3278,7 +3278,7 @@
    },
    {
     "n": 358,
-    "signals": 460,
+    "signals": 461,
     "hits": 213,
     "misses": 145,
     "hit_rate": 0.5832,
@@ -3382,8 +3382,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1029,
-   "eligible": 844,
+   "total": 1030,
+   "eligible": 845,
    "excluded": 185,
    "reasons": {
     "no_valid_odds": 137,
@@ -3398,7 +3398,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8502,
+    "em observação": 8505,
     "abandonada": 29,
     "promissora": 84
    },
@@ -4455,11 +4455,11 @@
     }
    ]
   },
-  "hypotheses": 8615,
+  "hypotheses": 8618,
   "tested": 858,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8574,
+   "em observação": 8577,
    "abandonada": 30,
    "promissora": 11
   },
@@ -5674,6 +5674,88 @@
       }
      ],
      "bad_total": 1
+    },
+    {
+     "match_id": "newcastle-united-vs-arsenal-20261121",
+     "match": "Newcastle United — Arsenal",
+     "league": "England Premier League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-21T17:30+00:00",
+     "date_utc": "2026-11-18T12:15:47+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(-0.5)",
+     "odds": 1.59,
+     "odds_last": 1.59,
+     "max_mult": 1,
+     "share": 100,
+     "share_last": 100,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 99,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 37,
+       "games": 33,
+       "hits": 14,
+       "break_even": 0.576,
+       "prob_above": 0.0102,
+       "roi": -0.3489,
+       "edge": -0.1757,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Momento",
+         "antes do jogo"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 52,
+       "games": 39,
+       "hits": 22,
+       "break_even": 0.5788,
+       "prob_above": 0.0106,
+       "roi": -0.271,
+       "edge": -0.1637,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 42
     }
    ],
    "counts": {
@@ -5681,9 +5763,9 @@
     "misto": 2,
     "sem evidência": 0,
     "contraditório": 5,
-    "evitar": 0
+    "evitar": 1
    },
-   "generated_utc": "2026-11-18T12:13:06+00:00",
+   "generated_utc": "2026-11-18T12:17:42+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5696,7 +5778,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 8543,
+     "hypotheses": 8546,
      "with_prospective_evidence": 2762,
      "prospective_games": 55826
     },
@@ -5819,7 +5901,7 @@
     "roi_cut": 0.0461
    },
    "skipped": {
-    "bets": 391,
+    "bets": 392,
     "settled": 302,
     "games": 159,
     "wins": 144,
@@ -23078,7 +23160,7 @@
     "days_to_conclusion": 8
    },
    "POLYMARKET": {
-    "signals": 223,
+    "signals": 224,
     "with_result": 209,
     "hits": 101,
     "misses": 108,
@@ -23131,7 +23213,7 @@
     "roi_announced_odds": 0.0312,
     "seen_late": 0,
     "by_bot_mark": 27,
-    "per_day": 22.0,
+    "per_day": 21.9,
     "days_to_hint": 0,
     "days_to_conclusion": 8
    },
@@ -23611,7 +23693,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 844,
+   "bets": 845,
    "settled": 694,
    "matches": 371,
    "wins": 335,
@@ -23646,6 +23728,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-18T12:15:47+00:00",
+   "match_id": "newcastle-united-vs-arsenal-20261121",
+   "group": "POLYMARKET/pre",
+   "match": "Newcastle United — Arsenal",
+   "selection": "Polymarket: AH2(-0.5)",
+   "odds": 1.59,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-18T11:23:20+00:00",
    "match_id": "corluspor-1947-vs-mus-spor-20261118",
@@ -24564,22 +24659,6 @@
    "w": 1.0,
    "settled_by": "resultado",
    "n_signals": 2,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-17T19:36:08+00:00",
-   "match_id": "albania-u21-vs-spain-u21-20261117",
-   "group": "TOTALS_FORM",
-   "match": "Albania U21 — Spain U21",
-   "selection": "Over 1",
-   "odds": 2.51,
-   "ft": [
-    0,
-    0
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
    "max_mult": 1
   }
  ],
@@ -26746,39 +26825,6 @@
     0
    ]
   },
-  "albania-u21-vs-spain-u21-20261117": {
-   "teams": [
-    "Albania U21",
-    "Spain U21"
-   ],
-   "events": [
-    {
-     "d": "2026-11-17T19:36:08+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 1",
-     "odds": 2.51,
-     "minute": 74,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    },
-    {
-     "d": "2026-11-17T19:50:22+00:00",
-     "k": "BETFAIR",
-     "phase": "live",
-     "mult": 1
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    0,
-    0
-   ]
-  },
   "mauritania-vs-burkina-faso-20261117": {
    "teams": [
     "Mauritania",
@@ -27377,6 +27423,27 @@
     1,
     4
    ]
+  },
+  "newcastle-united-vs-arsenal-20261121": {
+   "teams": [
+    "Newcastle United",
+    "Arsenal"
+   ],
+   "events": [
+    {
+     "d": "2026-11-18T12:15:47+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(-0.5)",
+     "odds": 1.59,
+     "share": 100,
+     "market": "Polymarket",
+     "total": 7100.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
   }
  },
  "timeline": [
@@ -33432,7 +33499,7 @@
    "day": "2026-11-17"
   },
   {
-   "bets": 14,
+   "bets": 15,
    "settled": 7,
    "wins": 4,
    "units": 0.44,
