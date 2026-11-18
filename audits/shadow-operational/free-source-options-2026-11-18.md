@@ -108,3 +108,19 @@ A documentação oficial estabelece que o Free Tier do Compute Engine **exige um
 - Estes sítios têm evidência sobretudo **autodeclarada** e nenhum deles foi testado ou provou MTProto, uptime 30 dias, proteção de segredo, autenticação de origem ou SLA <=120 segundos.
 
 **Critério mínimo:** no máximo ensaios com fixtures sintéticas e sem sessão real, token ou credencial. Nunca fornecer a `TG_SESSION` produtiva a um operador terceiro; mesmo uma sessão nova de conta pessoal tem privilégios amplos. Não instalar nem contratar nada sem nova autorização.
+
+## Ensaio operacional zero segredos — instruções concretas (18/11/2026)
+
+**Atenção:** a página oficial https://enzonic.com/python afirma Python Free Forever 512 MB, 10 GB e 24/7 sem cartão; a ficha oficial da aplicação Android https://play.google.com/store/apps/details?id=com.enzonic.app refere que *free servers sleep* e contrasta planos pagos *always on*. A divergência exige verificação pelo painel real. Não assumir 24/7 nem colocar sessões Telegram neste serviço.
+
+Foi adicionado `scripts/shadow_host_probe.py`, com testes isolados `tests/test_shadow_host_probe.py`. É uma sonda **sintética e sem dependências externas**, que não acede à rede, não recolhe sinais nem lê credenciais. Cria `shadow_probe_state.json` com agregados de pulsos de 20 segundos; regista interrupções >120 s, relógio inconsistente e reinícios. O ficheiro é escrito com fsync e rename atómico.
+
+**Fluxo para o proprietário (sem cartão):**
+1. Aceder a https://enzonic.com/python > `Deploy your app`, iniciar sessão, tentar um servidor `Python Generic / Free Forever`. **Se exigir dados de pagamento ou saldo, cancelar.** Se não houver capacidade gratuita, não comprar upgrade.
+2. No gestor de ficheiros do servidor, criar `shadow_host_probe.py` com o conteúdo do ficheiro da PR (sem segredos). Configurar o comando de arranque `python3 shadow_host_probe.py --interval 20`. Não adicionar `TG_SESSION`, chaves, tokens, número de telefone ou `.env`; não associar o repositório inteiro.
+3. Confirmar saída de pulsos, manter ligado em piloto, reler os contadores e testar reinício manual. Consultar `shadow_probe_state.json`; `process_starts` deve aumentar e `heartbeats` não deve reiniciar. O ficheiro não deve conter dados identificáveis.
+4. Após pelo menos 24 h, avaliar `gaps_over_120_seconds`, `largest_gap_seconds` e persistência. Um resultado positivo **não prova** acesso MTProto, SLA de entrega, fiabilidade por 30 dias, proteção de segredos nem certificação científica.
+
+**Alternativa segura** se o Enzonic não for realmente 24/7: executar exatamente a mesma sonda num PC Windows próprio através do Python, e mais tarde experimentar Task Scheduler, sem serviços de terceiros. Enquanto não houver autorização para nova sessão, manter somente a sonda sintética. Um computador desligado ou em suspensão não constitui uma fonte 24/7.
+
+**Estado:** código de teste não importado pelo coletor, sem workflows, sem execução em alojamento externo e sem consumo de recursos até o utilizador decidir executar a sonda.
