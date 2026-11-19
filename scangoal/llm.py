@@ -97,6 +97,8 @@ def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None):
     lines += ['', 'Já existem %d hipóteses; não repitas nenhuma das listadas.' % existing, task,
               'Usa APENAS famílias, características e valores exatamente como escritos acima.',
               'Prefere combinações com lógica de futebol ou de mercado (ex.: volume forte num empate em jogo empatado) e com pelo menos %d sinais.' % MIN_SUPPORT,
+              'Se existir Seleção exata, distingue linhas concretas como Over 2.5 de Over 3.5 ou Under 2.5; não as confundas com Mercado genérico.',
+              'ROI ou acertos históricos só servem para propor testes prospetivos; não declares lucro comprovado nem sugiras alertas automáticos.',
               'Responde só com JSON neste formato:',
               '{"hypotheses":[{"family":"Betfair","conditions":[["Seleção","empate"],["Minuto","61 em diante"]],"reason":"frase curta"}]}']
     return '\n'.join(lines)
