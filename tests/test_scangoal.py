@@ -660,7 +660,7 @@ class LanguageModel(Hardening):
         self.assertEqual(([g[0] for g in good], bad), (['Betfair | Seleção = empate', 'Betfair | Minuto = 61 em diante & Seleção = equipa da casa'], 5))
         self.assertNotIn('<', good[0][1]['reason'])
         self.assertEqual(good[0][1]['source'], 'llm')
-        self.assertEqual(llm.accept('sem json', vocab, {}), ([], 0))
+        self.assertEqual(llm.accept('sem json', vocab, {}), ([], 1))
         self.assertEqual(llm.accept(raw, vocab, {'Betfair | Seleção = empate': {}})[1], 6)               # já existe no registo
 
     def test_run_registers_with_birth_date_and_respects_daily_limit(self):
@@ -699,7 +699,7 @@ class LanguageModel(Hardening):
                 self.assertEqual(len(calls), 2)                                                          # no máximo de hora a hora
                 r = report.build()
                 self.assertEqual((r['brain']['llm_total'], r['brain']['llm'][0]['n'], r['brain']['llm_runs']), (1, 0, 1))   # sinais anteriores não contam
-                self.assertEqual((st['last_mode'], st['calls_today'], st['neurons_today'] > 0), ('novas', 1, True))
+                self.assertEqual((st['last_mode'], st['calls_today'], st['neurons_today'] > 0), ('novas', 2, True))
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
 
@@ -727,7 +727,7 @@ class LanguageModel(Hardening):
                     st = llm.run(call, t0 + timedelta(hours=k), self.ENV)
                     modes.append(st['last_mode'])
                 self.assertEqual(modes, ['novas', 'refinar', 'evitar', 'notas'])
-                self.assertEqual((st['accepted'], st['rejected']), (0, 3))                              # nenhum sinal na equipa da casa: rejeitadas
+                self.assertEqual((st['accepted'], st['rejected']), (0, 4))                              # nenhum sinal na equipa da casa: rejeitadas
                 self.assertIn('ABAIXO', prompts[2])
                 notes = json.loads((Path(d) / 'llm_notes.json').read_text(encoding='utf-8'))
                 self.assertEqual([(n['id'], n['note']) for n in notes], [('Betfair | Seleção = empate', 'Amostra pequena bainda/b')])   # só a nota ancorada, texto limpo
@@ -1054,8 +1054,8 @@ class EvidencePerMatch(unittest.TestCase):
         from scangoal import llm
         track = {'min_results': 10, 'llm': [{'id': 'Betfair | Seleção = empate', 'games': 12, 'roi': 0.25, 'expect': 'acima'}]}
         text = llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), track)
-        self.assertIn('Betfair | Seleção = empate -> 12 jogos, lucro médio por jogo +0.25', text)
-        self.assertIn('nenhuma está', text)
+        self.assertIn('Betfair | Seleção = empate -> 12 resultados confirmados, 0 perdas imputadas, ROI exploratório +0.25', text)
+        self.assertIn('Nenhuma está', text)
         for word in ('Confirmaram-se', 'Falharam', 'sentido esperado', 'Aprende com este balanço'):
             self.assertNotIn(word, text)
         self.assertNotIn('Propostas anteriores', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm': []}))

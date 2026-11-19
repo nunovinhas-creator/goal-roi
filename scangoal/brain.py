@@ -53,9 +53,15 @@ PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / mant
 ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
 CONFIRM_STEPS = 2        # jogos seguidos em que a nova condição se tem de manter para o estado mudar
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
-# Apenas para hipóteses explicitamente propostas pela LLM: não multiplicar o gerador histórico.
+# Características dos contratos experimentais, fora do gerador histórico.
 POLYMARKET_EXACT_SELECTION = 'Seleção exata'
 POLYMARKET_PERIOD = 'Período do mercado'
+POLYMARKET_CONTRACT = 'Mercado e seleção exatos'
+POLYMARKET_EXPERIMENTAL_DIMENSIONS = frozenset({
+    POLYMARKET_EXACT_SELECTION, POLYMARKET_PERIOD, POLYMARKET_CONTRACT,
+})
+POLYMARKET_TOTALS = {'Asian Total', '1st Half - Asian Total', '2nd Half - Asian Total', 'Total Corners'}
+MAX_EXPERIMENTAL_PROFILES = 64
 
 
 def earlier_index(signals):
@@ -83,13 +89,17 @@ def atoms(b, multi, earlier=None):
                 ('Golos até ao sinal', 'nenhum' if sum(s) == 0 else '1 ou 2' if sum(s) <= 2 else '3 ou mais')]
     if b.get('minute') is not None:
         out.append(('Minuto', 'até ao 30' if b['minute'] <= 30 else '31 a 60' if b['minute'] <= 60 else '61 em diante'))
-    if b['type'] == 'POLYMARKET' and b.get('period'):
-        out.append((POLYMARKET_PERIOD, b['period']))
-    if b['type'] == 'POLYMARKET' and b.get('market') == 'Asian Total':
-        selection = b.get('selection')
-        if isinstance(selection, str) and re.fullmatch(r'(?:Over|Under) [0-9]+(?:\.[0-9]{1,2})?', selection):
-            # A linha exata vem da versão original do sinal, antes do resultado.
+    if b['type'] == 'POLYMARKET':
+        period, market, selection = b.get('period'), b.get('market'), b.get('selection')
+        if period:
+            out.append((POLYMARKET_PERIOD, period))
+        if isinstance(selection, str) and (
+            (market in POLYMARKET_TOTALS and re.fullmatch(r'(?:Over|Under) [0-9]+(?:\.[0-9]{1,2})?', selection))
+            or (market == '1X2' and selection in ('1', 'X', '2'))
+        ):
             out.append((POLYMARKET_EXACT_SELECTION, selection))
+            if period in ('regulation', 'first_half', 'second_half'):
+                out.append((POLYMARKET_CONTRACT, ' / '.join((market, selection, period))))
     if b['type'] == 'BETFAIR':
         out.append(('Seleção', {'1': 'equipa da casa', 'X': 'empate', '2': 'equipa de fora'}.get(b.get('selection'))))
         if b.get('sel_volume') is not None:
@@ -129,13 +139,54 @@ def candidates(signals):
         # A linha exata é avaliável em propostas LLM, mas não entra no gerador
         # combinatório retrospetivo de 3 dimensões (controlo de multiplicidade).
         fam, at = insights.family(b), sorted(
-            (d, v) for d, v in set(atoms(b, multi, earlier)) if d not in (POLYMARKET_EXACT_SELECTION, POLYMARKET_PERIOD)
+            (d, v) for d, v in set(atoms(b, multi, earlier)) if d not in POLYMARKET_EXPERIMENTAL_DIMENSIONS
         )
         for k in range(1, MAX_CONDITIONS + 1):
             for c in itertools.combinations(at, k):
                 if len({x[0] for x in c}) == k:   # uma característica só entra uma vez
                     support[(fam, c)] = support.get((fam, c), 0) + 1
     return support
+
+
+def experimental_candidates(signals):
+    """Search verified Polymarket contract profiles with support in distinct games."""
+    support = {}
+    for b in match_identity.annotate(signals):
+        if b.get('type') != 'POLYMARKET' or b.get('phase') not in ('pre', 'live') or not eligible(b):
+            continue
+        at = dict(atoms(b, set()))
+        if POLYMARKET_CONTRACT not in at:
+            continue
+        anchor = [(POLYMARKET_CONTRACT, at[POLYMARKET_CONTRACT]), ('Momento', at['Momento'])]
+        optional = [(d, at[d]) for d in ('Quota de mercado', 'Valor da aposta', 'Faixa de odd') if d in at]
+        for size in range(len(optional) + 1):
+            for subset in itertools.combinations(optional, size):
+                conditions = tuple(sorted((*anchor, *subset)))
+                support.setdefault(conditions, set()).add(game_identity(b))
+    return support
+
+
+def add_experimental_profiles(signals, registry, born):
+    limit = MAX_EXPERIMENTAL_PROFILES - sum(h.get('experimental_profile') is True for h in registry.values())
+    if limit <= 0:
+        return 0
+    candidates = experimental_candidates(signals)
+    ordered = sorted(candidates, key=lambda conds: (len(conds), -len(candidates[conds]), conds))
+    seen, added = set(), 0
+    for conditions in ordered:
+        games = frozenset(candidates[conditions])
+        if len(games) < MIN_SUPPORT or games in seen:
+            continue
+        seen.add(games)
+        hid = hyp_id('Polymarket', conditions)
+        if hid in registry:
+            continue
+        registry[hid] = {'family': 'Polymarket', 'conditions': [list(c) for c in conditions],
+                         'born_utc': born, 'source': 'gerador', 'experimental_profile': True}
+        added += 1
+        if added >= limit:
+            break
+    return added
 
 
 def update_registry(signals, registry, now=None):
@@ -152,7 +203,7 @@ def update_registry(signals, registry, now=None):
             continue   # apanha exatamente os mesmos sinais que uma combinação mais simples: não acrescenta nada
         registry[hid] = {'family': fam, 'conditions': [list(c) for c in sorted(conds)], 'born_utc': now, 'source': 'gerador'}
         added += 1
-    return added
+    return added + add_experimental_profiles(signals, registry, now)
 
 
 def alpha_for_rank(j):
@@ -247,11 +298,15 @@ AS_OF_DIMENSIONS = frozenset({
     'Valor da aposta', 'Número de apostas'})
 
 
-RESEARCH_DIMENSIONS = AS_OF_DIMENSIONS | {POLYMARKET_EXACT_SELECTION, POLYMARKET_PERIOD}
+RESEARCH_DIMENSIONS = AS_OF_DIMENSIONS | POLYMARKET_EXPERIMENTAL_DIMENSIONS
 
 
 def research_conditions(h):
     return all(d in RESEARCH_DIMENSIONS for d, _ in h['conditions'])
+
+
+def experimental_conditions(h):
+    return any(d in POLYMARKET_EXPERIMENTAL_DIMENSIONS for d, _ in h['conditions'])
 
 
 def certifiable(h):
@@ -604,6 +659,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         born_of[hid] = born
         gen = h.get('source') == 'gerador'
         research_safe = h.get('source') != 'llm' or research_conditions(h)
+        experimental = experimental_conditions(h)
         # Propostas de quem já viu resultados (llm/manual) só contam sinais posteriores ao registo; sem registo válido, nenhum.
         pool = [(b, at) for b, fam, at in have if fam == h['family'] and (gen or (born is not None and (chronology.signal_time(b) or born) > born))]
         match = [b for b, at in pool if conds <= at]
@@ -616,7 +672,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if s['games'] >= HINT_AT:
             matched[hid] = match
         row = dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h.get('born_utc'), reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
-                   tradable=research_safe and not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')], born_verified=born is not None,
+                   experimental=experimental, tradable=research_safe and not experimental and not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')], born_verified=born is not None,
                    game_set=None if exploratory else game_set(match), _games=None if exploratory else game_ids(match))
         if not exploratory or hid in matched:
             ordered[hid] = ordered_games(match)
@@ -645,7 +701,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
             by_id[hid]['certification'] = 'legado: não certificável'
     for hid in matched:
         born = born_of[hid]
-        if born is None:           # sem registo válido: nunca toma decisões (fail-closed)
+        if born is None or by_id[hid]['experimental']:  # os perfis experimentais não entram nos estados operacionais: nunca toma decisões (fail-closed)
             continue
         steps = game_steps(matched[hid], born, prospective_from=born, ordered=ordered[hid])
         r = by_id[hid]
@@ -670,7 +726,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
             r['result_time_unknown'] = sum(1 for g in ordered[r['id']] if g[0] is None)
         # Transparency: the status the entry thresholds alone would give now. Different from `status` when the status is held
         # by hysteresis (inside the keep band) or a change is still waiting for confirmation (`pending_status`).
-        r['entry_status'] = status_of(r['games'], r['prob_above'], None, min_settled, certified) if born is not None else 'em observação'
+        r['entry_status'] = status_of(r['games'], r['prob_above'], None, min_settled, certified) if born is not None and not r['experimental'] else 'em observação'
     return rows, tested, 1 - FWER_ALPHA / max(1, tested)
 
 
@@ -961,7 +1017,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
                             'hypotheses': [{k: r[k] for k in ('id', 'n', 'games', 'roi', 'status')} for r in sorted(exploratory_rows, key=lambda r: (-r['n'], r['id']))[:150]]},
             'hypotheses': len(rows), 'tested': tested, 'corrected_bar': None, 'counts': counts, 'board': brd, 'agenda': agd,
             'track': track_record(rows), 'walk_forward': walk_forward(signals, registry), 'multiplicity': mult, 'validation': valid,
-            'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'expect',
+            'expected_by_chance': round(0.05 * tested, 1), 'top': [{k: r.get(k) for k in ('id', 'family', 'conditions', 'n', 'hits', 'hit_rate', 'break_even', 'prob_above', 'roi', 'status', 'tradable', 'experimental', 'expect',
                                                                                                     'games', 'bets', 'edge', 'edge_ci', 'prob_above_cut', 'prob_adds', 'pending_status', 'entry_status',
                                                                                                     'born_utc', 'born_verified', 'evidence_level', 'prospective', 'at_birth', 'result_time_unknown', 'game_set',
                                                                                                     'confirmation', 'validation_blocked', 'certification')}

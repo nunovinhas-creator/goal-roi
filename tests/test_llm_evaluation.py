@@ -213,7 +213,7 @@ class Duplicates(unittest.TestCase):
         good, bad = llm.accept('lixo antes ' + json.dumps({'hypotheses': items}) + ' lixo depois', vocab, {}, None, 'acima', equivalence.Redundancy(self.signals(), {}))
         self.assertEqual(sorted(h for h, _ in good), ['Jogo aberto | Liga = A0', 'Jogo aberto | Liga = A1'])
         self.assertTrue(all(len(e['reason']) <= 200 and '<' not in e['reason'] for _, e in good))
-        self.assertEqual(llm.accept('x' * 3_000_000, vocab, {}), ([], 0))
+        self.assertEqual(llm.accept('x' * 3_000_000, vocab, {}), ([], 1))
 
 
 class Grouping(unittest.TestCase):

@@ -15,7 +15,7 @@ RANKING = {
     "certification": "not_activated",
     "statistical_claim": "none",
     "ranking": [{
-        "rule_id": ID, "settled": 5, "forward_games": 8,
+        "rule_id": ID, "settled": 5, "ft_confirmed": 5, "forward_games": 40,
         "roi_odds_minus_2pct": 0.79, "certified": False,
         "match": "PRIVATE SHOULD NEVER LEAK",
     }],
@@ -33,7 +33,7 @@ def prompt_with(report):
 class OpportunityPromptTests(unittest.TestCase):
     def test_small_sample_hides_roi_and_avoids_winner_bias(self):
         prompt = prompt_with(RANKING)
-        self.assertIn("5 jogos futuros liquidados", prompt)
+        self.assertIn("5 jogos futuros com FT confirmado", prompt)
         self.assertIn("amostra insuficiente", prompt)
         self.assertNotIn("0.790", prompt)
         self.assertNotIn("-0.230", prompt)
@@ -44,6 +44,7 @@ class OpportunityPromptTests(unittest.TestCase):
     def test_thirty_forward_games_get_descriptive_only_metrics(self):
         report = copy.deepcopy(RANKING)
         report["ranking"][0]["settled"] = 30
+        report["ranking"][0]["ft_confirmed"] = 30
         prompt = prompt_with(report)
         self.assertIn("30 jogos futuros", prompt)
         self.assertIn("+0.790", prompt)
@@ -51,6 +52,14 @@ class OpportunityPromptTests(unittest.TestCase):
         self.assertIn("não independente", prompt)
         self.assertIn("nenhuma vantagem certificada", prompt)
         self.assertNotIn("PRIVATE", prompt)
+
+    def test_imputed_or_concentrated_sample_does_not_reveal_roi(self):
+        report = copy.deepcopy(RANKING)
+        report["ranking"][0].update(settled=30, ft_confirmed=5)
+        self.assertNotIn("+0.790", prompt_with(report))
+        report["ranking"][0].update(ft_confirmed=30, evidence_status="amostra_concentrada")
+        self.assertNotIn("+0.790", prompt_with(report))
+        self.assertIn("amostra concentrada", prompt_with(report))
 
     def test_unverified_forged_and_non_numeric_reports_fail_closed(self):
         reports = [
@@ -65,11 +74,11 @@ class OpportunityPromptTests(unittest.TestCase):
         r["ranking"][0]["rule_id"] = "some-other-rule"
         reports.append(r)
         r = copy.deepcopy(RANKING)
-        r["ranking"][0]["settled"] = 30
+        r["ranking"][0].update(settled=30, ft_confirmed=30)
         r["baseline"]["roi_odds_minus_2pct"] = float("nan")
         reports.append(r)
         r = copy.deepcopy(RANKING)
-        r["ranking"][0]["settled"] = 30
+        r["ranking"][0].update(settled=30, ft_confirmed=30)
         r["ranking"][0]["roi_odds_minus_2pct"] = "lucrativo"
         reports.append(r)
         for report in reports:
