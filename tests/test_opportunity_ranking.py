@@ -1,5 +1,6 @@
 """Phase 3 opportunity ranking: no retrospective leak, no ranking with short samples."""
 import json
+from datetime import datetime, timedelta
 import unittest
 from pathlib import Path
 
@@ -37,6 +38,19 @@ def run(signals, results=None, activation=ACTIVATION, now=NOW, protocol=PROTOCOL
     )
 
 
+def distributed_games(winning):
+    rows, outcomes = [], {}
+    for i in range(30):
+        row = signal("distributed-%02d" % i)
+        shift = timedelta(days=i % 10)
+        for field in ("date_utc", "collected_at_utc", "kickoff_utc"):
+            row[field] = (datetime.fromisoformat(row[field]) + shift).isoformat()
+        known = datetime.fromisoformat(row["kickoff_utc"]) + timedelta(hours=2)
+        outcomes[row["match_id"]] = result(ft=[2, 1] if winning(i) else [1, 0], time=known.isoformat())
+        rows.append(row)
+    return rows, outcomes
+
+
 class OpportunityRankingTests(unittest.TestCase):
     def test_zero_games_and_unactivated_never_rank(self):
         without = run([signal()], {"match-1": result()}, activation=None)
@@ -49,9 +63,8 @@ class OpportunityRankingTests(unittest.TestCase):
         self.assertIsNone(out["baseline"]["roi_odds_minus_2pct"])
 
     def test_no_inference_or_alert_even_on_all_wins(self):
-        records = [signal("g-%02d" % i) for i in range(30)]
-        ft = {s["match_id"]: result() for s in records}
-        out = run(records, ft)
+        records, ft = distributed_games(lambda i: True)
+        out = run(records, ft, now="2026-11-30T12:00:00Z")
         c = out["ranking"][0]
         self.assertEqual(c["forward_games"], 30)
         self.assertEqual((c["wins"], c["losses"], c["settled"]), (30, 0, 30))
@@ -126,10 +139,8 @@ class OpportunityRankingTests(unittest.TestCase):
             run([signal()], {}, now="2026-11-19T15:01:00+00:00")
 
     def test_exploratory_score_penalizes_variance(self):
-        rows = [signal("game-%02d" % i) for i in range(30)]
-        scores = {r["match_id"]: result(ft=[2, 1] if i % 2 == 0 else [1, 0])
-                  for i, r in enumerate(rows)}
-        out = run(rows, scores)
+        rows, scores = distributed_games(lambda i: i % 2 == 0)
+        out = run(rows, scores, now="2026-11-30T12:00:00Z")
         c = out["ranking"][0]
         self.assertEqual((c["wins"], c["losses"], c["settled"]), (15, 15, 30))
         self.assertLess(c["descriptive_two_se_score"], c["roi_odds_minus_2pct"])
@@ -197,6 +208,31 @@ class OpportunityRankingTests(unittest.TestCase):
         altered = dict(PROTOCOL, conditions={**PROTOCOL["conditions"], "share_market_exclusive_upper": 25})
         with self.assertRaisesRegex(ValueError, "changed preregistration"):
             run([signal()], protocol=altered)
+
+    def test_concentration_and_missing_ft_cannot_trigger_ranking(self):
+        rows = [signal("same-day-%02d" % i) for i in range(30)]
+        outcomes = {s["match_id"]: result() for s in rows}
+        actual = run(rows, outcomes)["ranking"][0]
+        missing = run(rows, now="2026-11-30T12:00:00Z")["ranking"][0]
+        self.assertEqual(actual["ft_confirmed"], 30)
+        self.assertEqual(actual["evidence_status"], "amostra_concentrada")
+        self.assertEqual(actual["concentration"]["collection_batch"]["largest_share"], 1.0)
+        self.assertEqual(missing["timeouts_counted_as_losses"], 30)
+        self.assertEqual(missing["ft_confirmed"], 0)
+        for row in (actual, missing):
+            self.assertIsNone(row["rank_exploratory"])
+            self.assertIsNone(row["descriptive_two_se_score"])
+            self.assertIsNone(row["expected_profit"])
+
+    def test_shared_fixture_comparison_reports_distinct_quotes(self):
+        early = signal(share=80, odds=2.1)
+        late = signal(date_utc="2026-11-19T15:40:00Z", collected_at_utc="2026-11-19T15:41:00Z")
+        out = run([early, late], {"match-1": result()})
+        self.assertEqual(out["overlap"], {"shared_fixtures": 1, "candidate_only": 0, "baseline_only": 0,
+                                          "shared_same_quote": 0, "shared_different_quote": 1})
+        self.assertEqual(out["ranking"][0]["resolved_stake_units"], 1)
+        self.assertEqual(out["ranking"][0]["profit_advertised"], 0.85)
+        self.assertEqual(out["ranking"][0]["confirmed_hit_rate"], 1.0)
 
 
 if __name__ == "__main__":

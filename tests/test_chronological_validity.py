@@ -77,6 +77,27 @@ def follows(wf):
     return wf['followed']['bets']
 
 
+class EconomicEvidence(unittest.TestCase):
+    def test_high_hit_rate_and_negative_roi_is_not_favorable(self):
+        rows = [sig(str(i), 1.0 if i < 80 else -1.0, i,
+                    odds=1.10 if i < 80 else 20.0) for i in range(100)]
+        hypothesis = rows_by_id(rows, {'h': hyp()})[0]['h']
+        self.assertGreater(hypothesis['prob_above'], brain.BOARD_GOOD)
+        economy = hypothesis['prospective']['economics']
+        self.assertEqual((economy['confirmed_hit_rate'], economy['roi_advertised']), (0.8, -0.12))
+        self.assertEqual(economy['status'], 'nonpositive_exploratory')
+        self.assertIsNone(economy['expected_profit'])
+        self.assertEqual(brain.board([hypothesis], T0)['best'], [])
+
+    def test_first_committed_bet_and_timeout_define_one_unit_per_game(self):
+        rows = [sig('m1', None, 0), sig('m1', 1.0, 1, market='1X2', selection='1', odds=7.0),
+                sig('m2', 1.0, 20)]
+        summary = brain.economic_summary(rows, chronology.parse_utc(EARLY), T0 + timedelta(days=4))
+        self.assertEqual((summary['admitted'], summary['results_confirmed'], summary['imputed_losses']), (2, 1, 1))
+        self.assertEqual((summary['resolved_stake_units'], summary['profit_advertised'], summary['roi_advertised']), (2, 0.0, 0.0))
+        self.assertEqual(summary['roi_odds_minus_2pct'], -0.02)
+
+
 class ResultTiming(unittest.TestCase):
     def test_result_observed_after_the_decision_cannot_influence_it(self):
         reg = {'h': hyp()}

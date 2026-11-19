@@ -513,7 +513,8 @@ class Brain(Hardening):
         from scangoal import brain
         row = lambda hid, fam, n, hits, prob, open_=(), tradable=True, status='em observação': {
             'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'games': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
-            'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
+            'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_),
+            'prospective': {'economics': {'status': 'positive_exploratory', 'roi_odds_minus_2pct': 0.1}}}
         now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
         sig = lambda key, date, ko=None: {'in_roi': True, 'match_id': 'jogo-' + key, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
         rows = [row('a', 'Jogo aberto', 12, 11, 0.97, [sig('k1', '2026-11-12T19:40:00+00:00'), sig('k2', '2026-11-12T10:00:00+00:00'), sig('k3', '2026-11-12T12:00:00+00:00', '2026-11-12T22:00:00+00:00')]),
@@ -543,7 +544,8 @@ class Brain(Hardening):
         settled = s('done', '1', '2026-11-13T22:00+00:00', w=1.0)
         hist = [s('h%d' % i, '1', odds=1.8, w=1.0) for i in range(3)]          # resultados do tipo na faixa 1,50 a 2,00
         row = lambda hid, n, hits, prob, open_, status='em observação', tradable=True: {'id': hid, 'family': 'Betfair', 'conditions': [['Seleção', hid]], 'n': n, 'games': n, 'hits': hits,
-            'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_}
+            'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_,
+            'prospective': {'economics': {'status': 'positive_exploratory', 'roi_odds_minus_2pct': 0.2}}}
         rows = [row('boa', 12, 11, 0.95, [good, both, conflict1, fresh_live, started]), row('boa-igual', 12, 11, 0.94, [good]),   # mesma amostra: conta uma vez
                 row('ma', 12, 3, 0.05, [both, avoid]), row('neutra', 12, 7, 0.5, [none]), row('poucos', 5, 5, 0.99, [none]),
                 row('depois', 20, 18, 0.99, [none], tradable=False), row('forte', 120, 90, 0.999, [conflict2], status='forte')]

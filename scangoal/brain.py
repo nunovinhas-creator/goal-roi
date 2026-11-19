@@ -261,6 +261,13 @@ def certifiable(h):
             and all(isinstance(c, (list, tuple)) and len(c) == 2 and c[0] in AS_OF_DIMENSIONS for c in conds))
 
 
+def operational_signal(b, t):
+    sent = chronology.signal_time(b)
+    stamp = chronology.parse_utc(b.get('signal_seen_utc'))
+    return (t is not None and sent is not None and stamp is not None
+            and sent > t and stamp > t and chronology.decidable(b))
+
+
 def operational_bet(b, t):
     """Aposta que é evidência OPERACIONAL posterior ao instante t (registo ou seleção da hipótese). Definição única (PR 3,
     revisões #5911487915 e #5911603577), usada pelo relatório, pela máquina de estados e pelo teste de confirmação:
@@ -270,12 +277,7 @@ def operational_bet(b, t):
     - resultado com hora de observação provada (chronology.result_check == verified).
     A condição "decidida antes de qualquer resultado do jogo ser conhecido" é do jogo (game_core).
     """
-    if t is None:
-        return False
-    sent, stamp = chronology.signal_time(b), chronology.parse_utc(b.get('signal_seen_utc'))
-    if sent is None or stamp is None or sent <= t or stamp <= t or not chronology.decidable(b):
-        return False
-    return chronology.result_check(b)[1] == 'verified'
+    return operational_signal(b, t) and chronology.result_check(b)[1] == 'verified'
 
 
 def latest_decision(b):
@@ -327,23 +329,24 @@ CATEGORIES = ('prospective', 'mixed', 'before_registration', 'after_registration
               'result_time_unproven')
 
 
-def prospective_summary(ordered, born):
+def prospective_summary(ordered, born, *, bets=None, as_of=None):
     """Evidência PROSPETIVA de uma hipótese (None sem registo válido): só jogos operacionais posteriores ao registo, com as
     apostas decididas antes do resultado (game_core). Mesma regra e mesmos jogos que a máquina de estados."""
     if born is None:
         return None
-    v, cats, pls = insights.Votes(), dict.fromkeys(CATEGORIES, 0), []
+    v, cats = insights.Votes(), dict.fromkeys(CATEGORIES, 0)
     for _, _, rows in ordered:
         cat = game_category(rows, born)
         cats[cat] += 1
         if cat == 'prospective':
             for b in game_core(rows):
                 v.add(b)
-                pls.append(b['w'] * (b['odds'] - 1) if b['w'] > 0 else b['w'])
     h, m, be, n = v.totals()
+    economy = economic_summary(bets if bets is not None else
+                               (b for _, _, rows in ordered for b in rows), born, as_of)
     return {'games': n, 'hits': round(h, 2), 'misses': round(m, 2),
             'prob_above': insights.evidence(h, m, be)['prob_above'] if n >= BOARD_MIN else None,
-            'roi': round(sum(pls) / len(pls), 4) if pls else None, 'categories': cats}
+            'roi': economy['roi_advertised'], 'economics': economy, 'categories': cats}
 
 
 def bet_profit(b):
@@ -364,6 +367,64 @@ def committed_bet(rows):
     if not timed:
         return None
     return min(timed, key=lambda b: (chronology.decision_time(b), chronology.signal_time(b) or _LAST, str(b.get('key'))))
+
+
+def economic_summary(rows, born, as_of=None):
+    """One unit committed per game, including unresolved bets in population counts."""
+    by_game = {}
+    for b in rows:
+        mid = game_identity(b)
+        if mid is not None:
+            by_game.setdefault(mid, []).append(b)
+
+    counts = dict(admitted=0, results_confirmed=0, wins=0, losses=0, voids=0, imputed_losses=0, pending=0)
+    advertised, stressed = [], []
+    for group in by_game.values():
+        bet = committed_bet(group)
+        if bet is None or not operational_signal(bet, born):
+            continue
+        first_result = chronology.parse_utc(bet.get('match_result_first_seen_utc'))
+        if first_result is not None and latest_decision(bet) >= first_result and (
+                as_of is None or first_result <= as_of):
+            continue
+        decision = chronology.decision_time(bet)
+        if as_of is not None and latest_decision(bet) > as_of:
+            continue
+
+        counts['admitted'] += 1
+        deadline = decision + timedelta(days=OPEN_TIMEOUT_DAYS)
+        known = chronology.result_known(bet)
+        result_proven = (first_result is not None and known is not None and known <= deadline
+                         and (as_of is None or known <= as_of))
+        profit = bet_profit(bet) if result_proven else None
+        if profit is not None:
+            w = bet['w']
+            counts['results_confirmed'] += 1
+            counts['wins' if w > 0 else 'losses' if w < 0 else 'voids'] += 1
+            advertised.append(w * (bet['odds'] - 1) if w > 0 else float(w))
+            stressed.append(profit)
+        elif as_of is not None and as_of >= deadline:
+            counts['imputed_losses'] += 1
+            advertised.append(-1.0)
+            stressed.append(-1.0)
+        else:
+            counts['pending'] += 1
+
+    resolved = len(stressed)
+    cut = sum(stressed)
+    roi = round(cut / resolved, 4) if resolved else None
+    status = ('insufficient' if not counts['results_confirmed']
+              else 'positive_exploratory' if roi > 0 else 'nonpositive_exploratory')
+    decided = counts['wins'] + counts['losses']
+    return dict(counts, scope='prospective_exploratory', status=status, stake_per_game=1,
+                resolved_stake_units=resolved, profit_advertised=round(sum(advertised), 4),
+                profit_odds_minus_2pct=round(cut, 4), roi_advertised=round(sum(advertised) / resolved, 4) if resolved else None,
+                roi_odds_minus_2pct=roi, confirmed_hit_rate=round(counts['wins'] / decided, 4) if decided else None,
+                expected_profit=None)
+
+
+def positive_economics(row):
+    return ((row.get('prospective') or {}).get('economics') or {}).get('status') == 'positive_exploratory'
 
 
 def _log_mean_exp(logs):
@@ -551,7 +612,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if not exploratory:
             matches[hid] = match
         if not exploratory:
-            row['prospective'] = prospective_summary(ordered[hid], born) if research_safe else None
+            row['prospective'] = prospective_summary(ordered[hid], born, bets=match, as_of=as_of) if research_safe else None
             row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if (row['prospective'] or {}).get('games', 0) >= PROSPECTIVE_MIN else 'exploratória')
             row['_game_roi'] = game_roi(ordered[hid])   # só apresentação (PR 5); retirado antes de publicar
         rows.append(row)
@@ -630,9 +691,12 @@ def board(rows, now=None, family_n=None):
                 'break_even': r['break_even'], 'prob_above': r['prob_above'], 'roi': r['roi'], 'source': r['source'], 'reason': r.get('reason'),
                 'games': r.get('games'), 'edge': r.get('edge'), 'edge_ci': r.get('edge_ci'), 'prob_above_cut': r.get('prob_above_cut'), 'prob_adds': None if r.get('whole') else r.get('prob_adds'),
                 'bets': r.get('bets'), 'pending_status': r.get('pending_status'), 'entry_status': r.get('entry_status'),
+                'economics': (r.get('prospective') or {}).get('economics'),
                 'level': r['status'] if r['status'] != 'em observação' else 'indício inicial', 'missing': max(0, HINT_AT - r['games'])}
 
-    best = pick(sorted((r for r in cand if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada'), key=lambda r: (-r['prob_above'], -r['games'])), 5)
+    best = pick(sorted((r for r in cand if positive_economics(r) and r['prob_above'] >= BOARD_GOOD
+                        and r['status'] != 'abandonada'),
+                       key=lambda r: (-r['prospective']['economics']['roi_odds_minus_2pct'], -r['games'])), 5)
     avoid = pick(sorted((r for r in cand if r['prob_above'] <= BOARD_BAD), key=lambda r: (r['prob_above'], -r['games'])), 3)
     live = {}
     for r in best:
@@ -668,7 +732,7 @@ def agenda(rows, signals, now=None):
     signals = [b for b in signals if eligible(b)]
     good, bad = {}, {}
     for r in sorted(cand, key=lambda r: (-r['prob_above'], -r['games'])):
-        bucket = good if r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada' else bad if r['prob_above'] <= BOARD_BAD or r['status'] == 'abandonada' else None
+        bucket = good if positive_economics(r) and r['prob_above'] >= BOARD_GOOD and r['status'] != 'abandonada' else bad if r['prob_above'] <= BOARD_BAD or r['status'] == 'abandonada' else None
         if bucket is not None:
             for b in r['open']:
                 bucket.setdefault(b['key'], []).append(r)
@@ -698,7 +762,8 @@ def agenda(rows, signals, now=None):
 
     def card(r):
         return {'id': r['id'], 'conditions': r['conditions'], 'n': r['n'], 'games': r['games'], 'hits': r['hits'], 'break_even': r['break_even'], 'prob_above': r['prob_above'],
-                'roi': r['roi'], 'edge': r.get('edge'), 'status': r['status'], 'source': r['source']}
+                'roi': r['roi'], 'economics': (r.get('prospective') or {}).get('economics'),
+                'edge': r.get('edge'), 'status': r['status'], 'source': r['source']}
 
     open_ = [(b, live(b)) for b in signals if b['w'] is None and not b.get('no_source') and b.get('market') is not None and b.get('odds')]
     open_ = [(b, when) for b, when in open_ if when]
@@ -925,7 +990,7 @@ def track_record(rows):
         g['with_prospective_evidence'] += 1
         g['prospective_games'] += p['games']
         if r['source'] == 'llm':
-            llm.append({'id': r['id'], 'games': p['games'], 'roi': p.get('roi'), 'expect': r.get('expect') or 'acima', 'mode': r.get('mode')})
+            llm.append({'id': r['id'], 'games': p['games'], 'roi': p.get('roi'), 'economics': p.get('economics'), 'expect': r.get('expect') or 'acima', 'mode': r.get('mode')})
     return {'by_source': groups, 'min_results': TRACK_MIN, 'unit': 'prospective_independent_games', 'criterion': None,
             'meaning': 'descriptive only: no hypothesis is confirmed or refuted here; see audits/pr4-llm-protocol-v5.md',
             'llm_with_prospective_evidence': len(llm), 'llm': sorted(llm, key=lambda h: (-h['games'], h['id']))[:12]}

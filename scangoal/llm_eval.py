@@ -261,14 +261,6 @@ def births(registry, first_seen, verified):
 
 # --------------------------------------------------------------------------------------------- evidência e comparação
 
-def _operational_pre(b, t):
-    """Aposta emitida e lida depois de t e decidível (brain.operational_bet sem a exigência do resultado: protocolo v4, §3)."""
-    if t is None:
-        return False
-    sent, stamp = chronology.signal_time(b), chronology.parse_utc(b.get('signal_seen_utc'))
-    return sent is not None and stamp is not None and sent > t and stamp > t and chronology.decidable(b)
-
-
 def admitted(match, start):
     """Protocolo v4 (§3): {jogo: (dia, valor ou None, hora da decisão, ganho máximo)} dos jogos admitidos depois de `start`.
 
@@ -285,7 +277,7 @@ def admitted(match, start):
             games.setdefault(key, []).append(b)
     for key, rows in games.items():
         bet = brain.committed_bet(rows)
-        if bet is None or not _operational_pre(bet, start) or bet.get('result_quarantined'):
+        if bet is None or not brain.operational_signal(bet, start) or bet.get('result_quarantined'):
             continue
         seen = [s for s in (chronology.parse_utc(b.get('match_result_first_seen_utc')) for b in rows) if s is not None]
         if seen and brain.latest_decision(bet) >= min(seen):

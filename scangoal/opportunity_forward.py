@@ -160,7 +160,7 @@ def settled_statistics(first, results, now):
     counts = dict(forward_games=len(first), settled=0, ft_confirmed=0, wins=0, losses=0,
                   pending=0, quarantined=0, timeouts_counted_as_losses=0,
                   late_ft_confirmed=0, late_quarantined=0)
-    profits, cut = [], []
+    profits, cut = [], {}
     for mid, (_, signal) in sorted(first.items()):
         status, profit, reduced, late = payoff(signal, results.get(mid), now)
         if late is not None:
@@ -172,9 +172,16 @@ def settled_statistics(first, results, now):
         counts["wins" if status == "win" else "losses"] += 1
         counts["timeouts_counted_as_losses" if status == "timeout_loss" else "ft_confirmed"] += 1
         profits.append(profit)
-        cut.append(reduced)
+        cut[mid] = (reduced, status)
     counts["roi_advertised"] = round(sum(profits) / len(profits), 4) if profits else None
-    counts["roi_odds_minus_2pct"] = round(sum(cut) / len(cut), 4) if cut else None
+    reduced_profit = sum(profit for profit, _ in cut.values())
+    counts["roi_odds_minus_2pct"] = round(reduced_profit / len(cut), 4) if cut else None
+    counts["stake_per_fixture"] = 1
+    counts["resolved_stake_units"] = len(cut)
+    counts["profit_advertised"] = round(sum(profits), 4)
+    counts["profit_odds_minus_2pct"] = round(reduced_profit, 4)
+    counts["confirmed_hit_rate"] = round(counts["wins"] / counts["ft_confirmed"], 4) if counts["ft_confirmed"] else None
+    counts["expected_profit"] = None
     return counts, cut
 
 
