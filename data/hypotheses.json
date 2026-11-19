@@ -131964,6 +131964,31 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Quota de mercado = 80 % ou mais & Seleção exata = Under 2.5": {
+  "born_utc": "2026-11-19T16:16:30+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ],
+   [
+    "Seleção exata",
+    "Under 2.5"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Polymarket",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "a39fdc7680fa3990a76ee680dd2503f8eebff3bb76eb679c7b72c03813f25c5d",
+   "registry_size": 9241,
+   "report_generated_at_utc": "2026-11-19T16:16:30+00:00",
+   "response_sha256": "3c756d180da47b2ca8662073bf24f922957825acf77a94e60fafb57f79f2d1c9"
+  },
+  "reason": "mercado com quota alta e under 2.5",
+  "source": "llm"
+ },
  "Polymarket | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T12:23:38+00:00",
   "conditions": [
