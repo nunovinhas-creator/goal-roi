@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-19T11:21:22+00:00",
+ "generated_at_utc": "2026-11-19T11:26:33+00:00",
  "messages": 1665,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T11:21:21+00:00",
+  "collector_last_run_utc": "2026-11-19T11:25:44+00:00",
   "name_review": [
    {
     "bot": [
@@ -3449,7 +3449,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8981,
+    "em observação": 8982,
     "abandonada": 29,
     "promissora": 94
    },
@@ -4506,11 +4506,11 @@
     }
    ]
   },
-  "hypotheses": 9104,
+  "hypotheses": 9105,
   "tested": 928,
   "corrected_bar": null,
   "counts": {
-   "em observação": 9056,
+   "em observação": 9057,
    "abandonada": 30,
    "promissora": 18
   },
@@ -5728,7 +5728,7 @@
     "contraditório": 4,
     "evitar": 2
    },
-   "generated_utc": "2026-11-19T11:21:41+00:00",
+   "generated_utc": "2026-11-19T11:27:08+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5751,7 +5751,7 @@
      "prospective_games": 146
     },
     "llm/refinar": {
-     "hypotheses": 53,
+     "hypotheses": 54,
      "with_prospective_evidence": 17,
      "prospective_games": 469
     },
@@ -16866,6 +16866,75 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+    "family": "Polymarket",
+    "conditions": [
+     [
+      "Mercado",
+      "golos (mais/menos)"
+     ],
+     [
+      "Número de apostas",
+      "várias"
+     ],
+     [
+      "Quota de mercado",
+      "menos de 80 %"
+     ],
+     [
+      "Valor da aposta",
+      "menos de 10 mil $"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-19T11:25:46+00:00",
+    "reason": "Mercado de golos com quota baixa e valor de aposta baixo",
+    "expect": "acima",
+    "mode": "refinar",
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Jogo aberto | Faixa de odd = odd até 1,50 & Ritmo indicado pelo bot = 90 ou mais",
     "family": "Jogo aberto",
     "conditions": [
@@ -18182,84 +18251,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 4,
-    "signals": 4,
-    "hits": 1,
-    "misses": 3,
-    "hit_rate": 0.25,
-    "ci95": [
-     0.0456,
-     0.6994
-    ],
-    "break_even": 0.4624,
-    "roi": -0.5,
-    "games": 4,
-    "bets": 4,
-    "unidentified": 0,
-    "prudent_rate": 0.4017,
-    "prob_above": 0.3137,
-    "edge": -0.0607,
-    "edge_ci": [
-     -0.261,
-     0.1561
-    ],
-    "prob_above_cut": 0.2896,
-    "prob_adds": null,
-    "id": "Polymarket | Competição = seleções & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "family": "Polymarket",
-    "conditions": [
-     [
-      "Competição",
-      "seleções"
-     ],
-     [
-      "Faixa de odd",
-      "odd 2,00 a 3,00"
-     ],
-     [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-17T01:29:03+00:00",
-    "reason": "Apostas com odd moderada e valor baixo em seleções podem ser mais estáveis",
-    "expect": "acima",
-    "mode": "refinar",
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": "466dd6a2d65ddee3",
-    "prospective": {
-     "games": 4,
-     "hits": 1.0,
-     "misses": 3.0,
-     "prob_above": null,
-     "roi": -0.5,
-     "categories": {
-      "prospective": 4,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 81,
+  "llm_total": 82,
   "watch": [
    {
     "date_utc": "2026-11-19T10:51:11+00:00",
@@ -23678,15 +23672,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 157,
-  "llm_last_run_utc": "2026-11-19T10:22:40+00:00",
+  "llm_runs": 158,
+  "llm_last_run_utc": "2026-11-19T11:25:46+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-19",
-   "calls_today": 7,
-   "neurons_today": 1451.6,
-   "accepted_today": 4,
-   "last_mode": "novas"
+   "calls_today": 8,
+   "neurons_today": 1693.4,
+   "accepted_today": 5,
+   "last_mode": "refinar"
   },
   "notes": [
    {
@@ -23937,8 +23931,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 81,
-   "groups": 81,
+   "llm_hypotheses": 82,
+   "groups": 82,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }

@@ -125922,6 +125922,39 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-19T11:25:46+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "bf197d80b6f2a1c5cb4b96e3ac6db028f55cf2eabfb58d73e2381839181f9a8f",
+   "registry_size": 9104,
+   "report_generated_at_utc": "2026-11-19T11:25:46+00:00",
+   "response_sha256": "d0ef6551a2d11fe5cad5a2437a6c34feabdde8c0fa3aa7c70a6cdba2b252ddc3"
+  },
+  "reason": "Mercado de golos com quota baixa e valor de aposta baixo",
+  "source": "llm"
+ },
  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-15T13:33:53+00:00",
   "conditions": [
