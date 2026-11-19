@@ -1,53 +1,64 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {check} from './watchdog.mjs';
+import worker, {inspect,RecoveryGuard} from './watchdog.mjs';
+import {DatabaseSync} from 'node:sqlite';
 
-const now = Date.UTC(2026, 10, 19, 9);
+const now = Date.now();
 const ago = minutes => new Date(now - minutes * 60000).toISOString();
-function run(status, minutes, id = 1) {
-  return {id, status, created_at:ago(minutes), updated_at:ago(minutes), run_started_at:ago(minutes)};
-}
-function fixture(runs, jobs = [], loseReply = false) {
+function fixture(status='completed', readMinutes=40, jobMinutes=40) {
   let posts = 0;
-  async function request(url, options) {
-    if (options.method === 'POST') {
-      assert.ok(url.endsWith('/collect.yml/dispatches'));
-      assert.deepEqual(JSON.parse(options.body), {ref:'main'});
-      posts++;
-      runs.unshift(run('queued', 0, 2));
-      if (loseReply) throw Error('lost response');
-      return {ok:true};
-    }
-    return {ok:true, json:async () => url.includes('/jobs?') ? {jobs} : {workflow_runs:runs}};
-  }
-  return {tick:(at = now) => check('fixture', at, request), posts:() => posts};
+  const request = async (url, options) => {
+    if (options.method === 'POST') { posts++; throw Error('lost reply'); }
+    if (url.includes('/contents/')) return Response.json({last_run_utc:ago(readMinutes)});
+    if (url.includes('/jobs?')) return Response.json({jobs:[{started_at:ago(jobMinutes)}]});
+    return Response.json({workflow_runs:[{id:123,status,created_at:ago(40),updated_at:ago(40)}]});
+  };
+  return {request, posts:()=>posts};
 }
-
-for (const status of ['completed', 'queued', 'in_progress']) {
-  test(status + ' at threshold, accepted dispatch with lost reply', async () => {
-    const runs = [run(status, 30)];
-    const f = fixture(runs, [{started_at:ago(30)}], true);
-    await f.tick(now - 1);
-    assert.equal(f.posts(), 0);
-    await assert.rejects(f.tick(), /lost response/);
-    await f.tick(now + 15 * 60000);
-    runs[0] = run('completed', 0, 2);
-    await f.tick(now + 15 * 60000);
-    assert.equal(f.posts(), 1);
+for (const status of ['queued','in_progress','completed']) {
+  test(status + ' 30 minute threshold', async () => {
+    const f=fixture(status,30);
+    assert.equal((await inspect(null,now-1,f.request)).decision,'wait');
+    assert.equal((await inspect(null,now,f.request)).decision,'would_recover');
+    assert.equal(f.posts(),0);
   });
 }
-test('old workflow acquired its runner recently', async () => {
-  const f = fixture([run('in_progress', 70)], [{started_at:ago(5)}]);
-  await f.tick();
-  assert.equal(f.posts(), 0);
+test('recent job protects a run after a long queue', async () => {
+  assert.equal((await inspect(null,now,fixture('in_progress',40,5).request)).reason,'recent_job');
 });
-test('recent successor protects old queued and running executions', async () => {
-  const f = fixture([run('queued', 3, 3), run('queued', 75, 2), run('in_progress', 60)]);
-  await f.tick();
-  assert.equal(f.posts(), 0);
+test('observation stays read only even with stale data and a secret', async t => {
+  const f=fixture();
+  const calls = t.mock.method(globalThis, 'fetch', f.request);
+  for (const value of ['false', undefined, 'TRUE', true]) {
+    const env = {GITHUB_ACTIONS_TOKEN:'fixture', RECOVERY_ENABLED:value};
+    await worker.scheduled({scheduledTime:now}, env);
+    const guard = new RecoveryGuard({storage:{}}, env);
+    assert.equal((await (await guard.fetch()).json()).decision, 'disabled');
+  }
+  assert.equal(calls.mock.calls.length, 8);
+  assert.ok(calls.mock.calls.every(call => call.arguments[1].method === 'GET'));
+  assert.equal(f.posts(),0);
 });
-test('ambiguous metadata prevents a dispatch', async () => {
-  const f = fixture([run('in_progress', 60)], [{}]);
-  await assert.rejects(f.tick(), /timestamp/);
-  assert.equal(f.posts(), 0);
+test('healthy collector never invokes the active guard', async t => {
+  const f=fixture('queued',2);
+  t.mock.method(globalThis,'fetch',f.request);
+  await worker.scheduled({scheduledTime:now},{RECOVERY_ENABLED:'true'});
+  assert.equal(f.posts(),0);
+});
+test('concurrent ticks and eviction after lost reply use one durable claim', async t => {
+  const db=new DatabaseSync(':memory:');
+  t.after(()=>db.close());
+  const sql = {exec(statement, ...args) {
+    const rows = db.prepare(statement).all(...args);
+    return {toArray: () => rows};
+  }};
+  const ctx = {storage:{sql}};
+  const f=fixture(); const calls=t.mock.method(globalThis,'fetch',f.request);
+  const env={RECOVERY_ENABLED:'true',GITHUB_ACTIONS_TOKEN:'fixture'};
+  const guard=new RecoveryGuard(ctx,env);
+  const results=await Promise.allSettled([guard.fetch(),guard.fetch()]);
+  assert.equal(results.filter(r=>r.status==='rejected').length,1);
+  assert.equal((await (await new RecoveryGuard(ctx,env).fetch()).json()).decision,'already_requested');
+  assert.equal(f.posts(),1);
+  assert.equal(calls.mock.calls.filter(c=>String(c.arguments[0]).includes('/runs?')).length,3);
 });
