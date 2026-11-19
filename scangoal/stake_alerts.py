@@ -1,4 +1,6 @@
-"""Avisos Stake das linhas 1, 6 e 9, só LIVE e no máximo 30 minutos após o sinal.
+"""Avisos Stake só quando a MESMA aposta cumprir simultaneamente as linhas 1, 6 e 9.
+
+Apenas LIVE e no máximo 30 minutos após o sinal.
 
 Um aviso por aposta (jogo, mercado, seleção). A intenção é registada em dois ficheiros
 auditáveis e PUBLICADA em main antes de contactar o Telegram. Falta, corrupção,
@@ -39,7 +41,7 @@ def key_of(b):
 
 
 def matches(signals, now):
-    """Sinais Stake LIVE atuais, com uma entrada por aposta e indicação das linhas."""
+    """Apostas Stake LIVE atuais que satisfazem TODAS as linhas 1, 6 e 9 no mesmo sinal."""
     multi, earlier = brain.multi_matches(signals), brain.earlier_index(signals)
     out, seen = [], set()
     for b in sorted(signals, key=lambda s: s['date_utc']):
@@ -52,7 +54,8 @@ def matches(signals, now):
             continue
         at = set(brain.atoms(b, multi, earlier))
         hit = [n for n, (_, conds) in LINES.items() if all(c in at for c in conds)]
-        if hit:
+        # AND (não OR): sinais que apenas cumprem 1, 6 ou 9 isoladamente não geram Telegram.
+        if len(hit) == len(LINES):
             seen.add(k)
             out.append({'key': k, 'lines': hit, 'b': b})
     return out
