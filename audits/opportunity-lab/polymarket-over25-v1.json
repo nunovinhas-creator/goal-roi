@@ -1,0 +1,33 @@
+{
+  "schema": "goal_roi_exploratory_opportunity_v1",
+  "id": "polymarket_pre_over25_share_lt80_total_lt10000_v1",
+  "source": "Polymarket ScanGoal original first-read signals",
+  "declared_before_forward_samples_at_utc": "2026-11-19T15:16:22Z",
+  "born_evidence_url": "https://github.com/nunovinhas-creator/goal-roi/pull/55",
+  "born_merge_sha": "b7c7ba6720e37ec7a38c28c49e2223101fc45f9a",
+  "activation_source": "data/notify_state.json migrations.polymarket_over25_v1.at_utc",
+  "conditions": {
+    "type": "POLYMARKET",
+    "phase": "pre",
+    "market": "Asian Total",
+    "selection": "Over 2.5",
+    "share_market_exclusive_upper": 80,
+    "signal_amount_usd_exclusive_upper": 10000,
+    "min_original_odd": 1.1
+  },
+  "guards": {
+    "original_unedited_only": true,
+    "first_eligible_per_match": true,
+    "both_sent_and_first_seen_after_activation": true,
+    "seen_before_kickoff_with_min_lead_minutes": 15,
+    "proven_result_timestamp_after_kickoff": true,
+    "unresolved_after_days_count_as_loss": 3,
+    "source_disagreement_quarantine": true
+  },
+  "odds_scenario_reduction_percent": 2,
+  "status": "exploratory_only",
+  "scientific_certification": "not_activated",
+  "automatic_alerts_created": false,
+  "baseline_historical_nine_games_used_for_confirmation": false,
+  "notes": "Frozen rule published by PR #55. Retrospective 8/9 is discovery only; forward evidence starts after GitHub merge AND actual notifier activation. This diagnostic cannot certify edge or change betting alerts."
+}
