@@ -10,7 +10,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scangoal import opportunity_forward, report
+from scangoal import chronology, opportunity_forward, report
 from scangoal.store import data_dir
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,10 +48,10 @@ def sourced_results(bot_ft, observed, directory):
         if len(different) != 1:
             out[mid] = {"conflict": True}
             continue
-        known = sorted((t for _, t in rows if isinstance(t, str)
-                        and t.endswith(("+00:00", "Z"))))
+        known = sorted(t for _, stamp in rows
+                       if (t := chronology.parse_utc(stamp)) is not None)
         if known:
-            out[mid] = {"ft": list(next(iter(different))), "known_utc": known[0]}
+            out[mid] = {"ft": list(next(iter(different))), "known_utc": chronology.iso(known[0])}
         else:
             out[mid] = {"ft": list(next(iter(different))), "known_utc": None}
     return out
