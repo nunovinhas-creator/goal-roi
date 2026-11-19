@@ -38,6 +38,34 @@ test('healthy collector never invokes the active guard', async t => {
   await worker.scheduled({scheduledTime:now},{RECOVERY_MODE:'active'});
   assert.equal(f.posts(),0);
 });
+test('active mode with disabled recovery flag stays read only at both entry points', async t => {
+  const f=fixture();
+  t.mock.method(globalThis,'fetch',f.request);
+  const env={RECOVERY_MODE:'active',RECOVERY_ENABLED:'false',GITHUB_ACTIONS_TOKEN:'fixture',
+    GUARD:{get(){throw Error('guard must remain disabled');}}};
+  await worker.scheduled({scheduledTime:now},env);
+  const guard=new RecoveryGuard({storage:{sql:{exec(){throw Error('must not touch storage');}}}},env);
+  assert.equal((await (await guard.fetch()).json()).decision,'disabled');
+  assert.equal(f.posts(),0);
+});
+test('missing explicit recovery flag is also read only', async t => {
+  const f=fixture();
+  t.mock.method(globalThis,'fetch',f.request);
+  const env={RECOVERY_MODE:'active',GITHUB_ACTIONS_TOKEN:'fixture',
+    GUARD:{get(){throw Error('guard must remain disabled');}}};
+  await worker.scheduled({scheduledTime:now},env);
+  assert.equal((await (await new RecoveryGuard({storage:{sql:{}}},env).fetch()).json()).decision,'disabled');
+  assert.equal(f.posts(),0);
+});
+test('observe mode overrides even an explicitly true recovery flag', async t => {
+  const f=fixture();
+  t.mock.method(globalThis,'fetch',f.request);
+  const env={RECOVERY_MODE:'observe',RECOVERY_ENABLED:'true',GITHUB_ACTIONS_TOKEN:'fixture',
+    GUARD:{get(){throw Error('guard must remain disabled');}}};
+  await worker.scheduled({scheduledTime:now},env);
+  assert.equal((await (await new RecoveryGuard({storage:{sql:{}}},env).fetch()).json()).decision,'disabled');
+  assert.equal(f.posts(),0);
+});
 test('concurrent ticks and eviction after lost reply use one durable claim', async t => {
   const db=new DatabaseSync(':memory:');
   t.after(()=>db.close());
@@ -47,7 +75,7 @@ test('concurrent ticks and eviction after lost reply use one durable claim', asy
   }};
   const ctx = {storage:{sql}};
   const f=fixture(); const calls=t.mock.method(globalThis,'fetch',f.request);
-  const env={RECOVERY_MODE:'active',GITHUB_ACTIONS_TOKEN:'fixture'};
+  const env={RECOVERY_MODE:'active',RECOVERY_ENABLED:'true',GITHUB_ACTIONS_TOKEN:'fixture'};
   const guard=new RecoveryGuard(ctx,env);
   const results=await Promise.allSettled([guard.fetch(),guard.fetch()]);
   assert.equal(results.filter(r=>r.status==='rejected').length,1);
