@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-19T10:50:22+00:00",
- "messages": 1662,
+ "generated_at_utc": "2026-11-19T10:56:52+00:00",
+ "messages": 1664,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 54,
   "BETFAIR": 322,
-  "STAKE_LOAD": 323,
+  "STAKE_LOAD": 325,
   "OPEN_GAME": 200,
   "TOTALS_FORM": 67,
   "WEAKENED_LINEUP": 17,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2787,
+  "versions": 2790,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-19T10:49:37+00:00",
+  "last_collected_at_utc": "2026-11-19T10:56:52+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T10:50:18+00:00",
+  "collector_last_run_utc": "2026-11-19T10:56:52+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 4,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 236,
+  "stake_original_seen": 238,
   "stake_no_score_after_kickoff": 43,
   "stake_sent_45_after_kickoff": 72,
   "goal_lists": 495,
   "goal_lists_consistent": 252
  },
- "unique_bets": 900,
+ "unique_bets": 902,
  "settled_bets": 744,
  "unsettled_market": 88,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1317,7 +1317,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 143,
+   "bets": 145,
    "settled": 98,
    "matches": 47,
    "wins": 50,
@@ -1822,7 +1822,7 @@
    "prob_above_cut": 0.2102
   },
   "STAKE_LOAD": {
-   "signals": 246,
+   "signals": 248,
    "with_result": 165,
    "hits": 89,
    "misses": 70,
@@ -2756,7 +2756,7 @@
    },
    {
     "n": 27,
-    "signals": 47,
+    "signals": 49,
     "hits": 17,
     "misses": 10,
     "hit_rate": 0.6296,
@@ -2783,7 +2783,7 @@
    },
    {
     "n": 31,
-    "signals": 50,
+    "signals": 52,
     "hits": 20,
     "misses": 11,
     "hit_rate": 0.6452,
@@ -3303,7 +3303,7 @@
   "calibration": [
    {
     "n": 50,
-    "signals": 61,
+    "signals": 62,
     "hits": 35,
     "misses": 15,
     "hit_rate": 0.6907,
@@ -3328,7 +3328,7 @@
    },
    {
     "n": 388,
-    "signals": 495,
+    "signals": 496,
     "hits": 230,
     "misses": 158,
     "hit_rate": 0.5819,
@@ -3433,8 +3433,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1094,
-   "eligible": 900,
+   "total": 1096,
+   "eligible": 902,
    "excluded": 194,
    "reasons": {
     "no_valid_odds": 146,
@@ -3449,7 +3449,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8973,
+    "em observação": 8977,
     "abandonada": 29,
     "promissora": 94
    },
@@ -4506,11 +4506,11 @@
     }
    ]
   },
-  "hypotheses": 9096,
+  "hypotheses": 9100,
   "tested": 928,
   "corrected_bar": null,
   "counts": {
-   "em observação": 9048,
+   "em observação": 9052,
    "abandonada": 30,
    "promissora": 18
   },
@@ -4829,6 +4829,15 @@
    ],
    "open": [
     {
+     "date_utc": "2026-11-19T10:51:11+00:00",
+     "kickoff_utc": "2026-11-21T12:30+00:00",
+     "match": "Manchester City — Fulham",
+     "selection": "Fulham (1.75)",
+     "market": "Asian Handicap",
+     "odds": 1.68,
+     "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
+    },
+    {
      "date_utc": "2026-11-19T10:44:22+00:00",
      "kickoff_utc": "2026-11-20T03:00+00:00",
      "match": "Seattle Sounders — Salt Lake",
@@ -5134,6 +5143,151 @@
      "bad_total": 2
     },
     {
+     "match_id": "manchester-city-vs-fulham-20261121",
+     "match": "Manchester City — Fulham",
+     "league": "England Premier League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-21T12:30+00:00",
+     "date_utc": "2026-11-19T10:51:11+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Handicap",
+     "selection": "Fulham (1.75)",
+     "odds": 1.68,
+     "odds_last": 1.68,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 86,
+     "good": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 35,
+       "games": 30,
+       "hits": 27,
+       "break_even": 0.5852,
+       "prob_above": 0.9924,
+       "roi": 0.3203,
+       "edge": 0.1793,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 49,
+       "games": 36,
+       "hits": 35,
+       "break_even": 0.5508,
+       "prob_above": 0.9866,
+       "roi": 0.2716,
+       "edge": 0.1558,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 24,
+       "games": 20,
+       "hits": 19,
+       "break_even": 0.5911,
+       "prob_above": 0.9725,
+       "roi": 0.3304,
+       "edge": 0.1622,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 30,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ],
+        [
+         "Valor da aposta",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 33,
+       "games": 14,
+       "hits": 15,
+       "break_even": 0.4696,
+       "prob_above": 0.1796,
+       "roi": -0.116,
+       "edge": -0.0921,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 61,
+       "games": 27,
+       "hits": 30,
+       "break_even": 0.4941,
+       "prob_above": 0.1943,
+       "roi": -0.0363,
+       "edge": -0.0704,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 2
+    },
+    {
      "match_id": "seattle-sounders-vs-salt-lake-20261120",
      "match": "Seattle Sounders — Salt Lake",
      "league": "US Major League Soccer",
@@ -5271,6 +5425,143 @@
      "bad_total": 2
     },
     {
+     "match_id": "manchester-city-vs-fulham-20261121",
+     "match": "Manchester City — Fulham",
+     "league": "England Premier League",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-21T12:30+00:00",
+     "date_utc": "2026-11-19T10:51:07+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Asian Handicap",
+     "selection": "Fulham (2)",
+     "odds": 1.49,
+     "odds_last": 1.49,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "contraditório",
+     "conflict": true,
+     "validated": false,
+     "odds_band": "odd até 1,50",
+     "odds_band_n": 10,
+     "good": [
+      {
+       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 49,
+       "games": 36,
+       "hits": 35,
+       "break_even": 0.5508,
+       "prob_above": 0.9866,
+       "roi": 0.2716,
+       "edge": 0.1558,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Dia = dia de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 33,
+       "games": 21,
+       "hits": 24,
+       "break_even": 0.5475,
+       "prob_above": 0.956,
+       "roi": 0.2791,
+       "edge": 0.1447,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 62,
+       "games": 46,
+       "hits": 41,
+       "break_even": 0.5431,
+       "prob_above": 0.9558,
+       "roi": 0.2211,
+       "edge": 0.1103,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 19,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ],
+        [
+         "Valor da aposta",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 33,
+       "games": 14,
+       "hits": 15,
+       "break_even": 0.4696,
+       "prob_above": 0.1796,
+       "roi": -0.116,
+       "edge": -0.0921,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 61,
+       "games": 27,
+       "hits": 30,
+       "break_even": 0.4941,
+       "prob_above": 0.1943,
+       "roi": -0.0363,
+       "edge": -0.0704,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 2
+    },
+    {
      "match_id": "newcastle-united-vs-arsenal-20261121",
      "match": "Newcastle United — Arsenal",
      "league": "England Premier League",
@@ -5353,10 +5644,10 @@
     "favorável": 0,
     "misto": 1,
     "sem evidência": 0,
-    "contraditório": 2,
+    "contraditório": 4,
     "evitar": 1
    },
-   "generated_utc": "2026-11-19T10:50:47+00:00",
+   "generated_utc": "2026-11-19T10:57:19+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5369,7 +5660,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 9015,
+     "hypotheses": 9019,
      "with_prospective_evidence": 2976,
      "prospective_games": 61306
     },
@@ -5483,7 +5774,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 466,
+    "bets": 468,
     "settled": 408,
     "games": 264,
     "wins": 201,
@@ -16890,7 +17181,7 @@
    },
    {
     "n": 0,
-    "signals": 2,
+    "signals": 3,
     "hits": 0,
     "misses": 0,
     "hit_rate": null,
@@ -16924,7 +17215,7 @@
     "expect": "abaixo",
     "mode": "evitar",
     "tradable": true,
-    "open": 2,
+    "open": 3,
     "born_verified": true,
     "game_set": null,
     "prospective": {
@@ -17889,6 +18180,85 @@
   ],
   "llm_total": 81,
   "watch": [
+   {
+    "date_utc": "2026-11-19T10:51:11+00:00",
+    "match": "Manchester City — Fulham",
+    "match_id": "manchester-city-vs-fulham-20261121",
+    "type": "STAKE_LOAD",
+    "market": "Asian Handicap",
+    "selection": "Fulham (1.75)",
+    "odds": 1.68,
+    "kickoff_utc": "2026-11-21T12:30+00:00",
+    "phase": "pre",
+    "finished": false,
+    "reasons": [
+     {
+      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 49,
+      "games": 36,
+      "hit_rate": 0.7143,
+      "prob_above": 0.9866,
+      "edge": 0.1558,
+      "edge_ci": [
+       0.0427,
+       0.258
+      ],
+      "prob_above_cut": 0.9804,
+      "prudent_rate": 0.7197,
+      "break_even": 0.5508,
+      "certified": false
+     },
+     {
+      "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 43,
+      "games": 36,
+      "hit_rate": 0.6977,
+      "prob_above": 0.9639,
+      "edge": 0.1258,
+      "edge_ci": [
+       0.0114,
+       0.2299
+      ],
+      "prob_above_cut": 0.9494,
+      "prudent_rate": 0.7058,
+      "break_even": 0.582,
+      "certified": false
+     }
+    ]
+   },
+   {
+    "date_utc": "2026-11-19T10:51:07+00:00",
+    "match": "Manchester City — Fulham",
+    "match_id": "manchester-city-vs-fulham-20261121",
+    "type": "STAKE_LOAD",
+    "market": "Asian Handicap",
+    "selection": "Fulham (2)",
+    "odds": 1.49,
+    "kickoff_utc": "2026-11-21T12:30+00:00",
+    "phase": "pre",
+    "finished": false,
+    "reasons": [
+     {
+      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 49,
+      "games": 36,
+      "hit_rate": 0.7143,
+      "prob_above": 0.9866,
+      "edge": 0.1558,
+      "edge_ci": [
+       0.0427,
+       0.258
+      ],
+      "prob_above_cut": 0.9804,
+      "prudent_rate": 0.7197,
+      "break_even": 0.5508,
+      "certified": false
+     }
+    ]
+   },
    {
     "date_utc": "2026-11-19T10:49:19+00:00",
     "match": "Seattle Sounders — Salt Lake",
@@ -23612,7 +23982,7 @@
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
-    "signals": 236,
+    "signals": 238,
     "with_result": 156,
     "hits": 86,
     "misses": 64,
@@ -23665,7 +24035,7 @@
     "roi_announced_odds": -0.0344,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 8.6,
+    "per_day": 8.5,
     "days_to_hint": 0,
     "days_to_conclusion": 29
    },
@@ -24116,7 +24486,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 900,
+   "bets": 902,
    "settled": 744,
    "matches": 403,
    "wins": 362,
@@ -24151,6 +24521,32 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-19T10:51:11+00:00",
+   "match_id": "manchester-city-vs-fulham-20261121",
+   "group": "STAKE_LOAD/pre",
+   "match": "Manchester City — Fulham",
+   "selection": "Asian Handicap: Fulham (1.75)",
+   "odds": 1.68,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
+  {
+   "date_utc": "2026-11-19T10:51:07+00:00",
+   "match_id": "manchester-city-vs-fulham-20261121",
+   "group": "STAKE_LOAD/pre",
+   "match": "Manchester City — Fulham",
+   "selection": "Asian Handicap: Fulham (2)",
+   "odds": 1.49,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-19T10:49:19+00:00",
    "match_id": "seattle-sounders-vs-salt-lake-20261120",
@@ -25060,38 +25456,6 @@
     2
    ],
    "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-18T10:16:13+00:00",
-   "match_id": "cruzeiro-vs-palmeiras-20261119",
-   "group": "BETFAIR/pre/mkt>=10K",
-   "match": "Cruzeiro — Palmeiras",
-   "selection": "Cruzeiro",
-   "odds": 2.74,
-   "ft": [
-    2,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 2,
-   "max_mult": 4
-  },
-  {
-   "date_utc": "2026-11-18T08:16:27+00:00",
-   "match_id": "flamengo-vs-atletico-paranaense-20261119",
-   "group": "STAKE_LOAD/pre",
-   "match": "Flamengo — Atletico Paranaense",
-   "selection": "Over 3",
-   "odds": 1.81,
-   "ft": [
-    2,
-    1
-   ],
-   "w": 0.0,
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
@@ -27551,6 +27915,35 @@
      "odds": 2.18,
      "market": "Asian Total",
      "total": 17000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "manchester-city-vs-fulham-20261121": {
+   "teams": [
+    "Manchester City",
+    "Fulham"
+   ],
+   "events": [
+    {
+     "d": "2026-11-19T10:51:07+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Fulham (2)",
+     "odds": 1.49,
+     "market": "Asian Handicap",
+     "total": 82000.0
+    },
+    {
+     "d": "2026-11-19T10:51:11+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Fulham (1.75)",
+     "odds": 1.68,
+     "market": "Asian Handicap",
+     "total": 51000.0
     }
    ],
    "goals": null,
@@ -33618,7 +34011,7 @@
    "day": "2026-11-18"
   },
   {
-   "bets": 14,
+   "bets": 16,
    "settled": 10,
    "wins": 6,
    "units": 2.18,
