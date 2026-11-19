@@ -90,7 +90,7 @@ class ProspectiveOpportunityTests(unittest.TestCase):
         self.assertEqual(out["roi_odds_minus_2pct"], 0.813)
 
     def test_loss_and_reduced_odds_and_no_scientific_claims(self):
-        a, b = signal(), signal("game-2", odds=2.0)
+        a, b = signal(), signal("game-2", odds=2.0, teams=["Gamma", "Delta"])
         o = run([a, b], {"game-1": result(), "game-2": result((1, 1))})
         self.assertEqual(o["settled"], 2)
         self.assertEqual((o["wins"], o["losses"]), (1, 1))

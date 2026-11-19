@@ -8,8 +8,8 @@ import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
 from . import brain, certification, insights, llm_eval, polymarket_alerts
-from .eligibility import eligible, exclusion_reasons
-from . import chronology, opportunity_results
+from .eligibility import eligible, exclusion_reasons, game_identity
+from . import chronology, match_identity, opportunity_forward, opportunity_results
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -496,9 +496,10 @@ def publish_ledger_state(validation, ledger, ledger_path, registry, now, registe
 def research_bets(signals, observations, now):
     """Settle FT-dependent research rows from the same versioned evidence as the opportunity audit."""
     snapshot_sources = {'bot_message', 'HL', 'BSD'}
-    for b in signals:
-        match_id = b['match_id']
-        versions = observations.get(match_id, ())
+    mapping = match_identity.aliases(signals, now)
+    evidence = opportunity_forward.fixture_evidence(observations, mapping)
+    for b in match_identity.annotate(signals, mapping=mapping):
+        versions = evidence.get(game_identity(b), ())
         if not eligible(b) or (b['result_known_source'] not in snapshot_sources and b['w'] is not None):
             yield b
             continue

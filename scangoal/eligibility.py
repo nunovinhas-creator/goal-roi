@@ -13,7 +13,7 @@ def text_identity(value):
 
 def game_identity(signal):
     """Game a signal belongs to, or None when it cannot be proven (no match_id: no independent observation)."""
-    return text_identity(signal.get('match_id'))
+    return text_identity(signal.get('canonical_match_id', signal.get('match_id')))
 
 
 def bet_identity(signal):

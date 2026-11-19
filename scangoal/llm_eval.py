@@ -24,7 +24,7 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import brain, chronology, insights
+from . import brain, chronology, insights, match_identity
 from .eligibility import eligible, game_identity
 from .equivalence import Index, Redundancy, expectation, groups_at_birth
 
@@ -271,7 +271,7 @@ def admitted(match, start):
     if start is None:
         return out
     games = {}
-    for b in match:
+    for b in match_identity.annotate(match):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
@@ -480,7 +480,9 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     as_of = clock
     # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
-    view = [b for b in chronology.as_of_view(signals, as_of) if eligible(b) and chronology.decision_time(b) <= cutoff]
+    visible = [b for b in chronology.as_of_view(signals, as_of)
+               if chronology.decision_time(b) <= cutoff]
+    view = [b for b in match_identity.annotate(visible, mapping=match_identity.aliases(visible, cutoff)) if eligible(b)]
     have = [(b, insights.family(b), frozenset((d, v) for d, v in brain.atoms(b, set())
                                                if d in brain.RESEARCH_DIMENSIONS)) for b in view]
     index = Index(view)
@@ -494,7 +496,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     def snap(t):
         """Índice dos sinais elegíveis já LIDOS em t (hora de leitura provada): o que o sistema sabia nesse instante."""
         if t not in snaps:
-            snaps[t] = Index(chronology.as_of_view(view, t))
+            at_birth = chronology.as_of_view(view, t)
+            snaps[t] = Index(match_identity.annotate(at_birth, mapping=match_identity.aliases(at_birth, t)))
         return snaps[t]
 
     cache = {}
@@ -542,17 +545,17 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         h, t = registry[hid], born_eff[hid]
         ix = snap(t)
         size = min(len(h['conditions']), brain.MAX_CONDITIONS)
-        own = ix.mask(h['family'], h['conditions'])
-        s = own.bit_count()
+        own = ix.games(h['family'], h['conditions'])
+        s = len(own)
         cands = []
         for c in gens:
             g = registry[c]
             if g['family'] != h['family'] or len(g['conditions']) != size or born_eff[c] >= t:
                 continue
-            m = ix.mask(g['family'], g['conditions'])
+            m = ix.games(g['family'], g['conditions'])
             if m == own:
                 continue
-            if s and s / 2 <= m.bit_count() <= 2 * s:
+            if s and s / 2 <= len(m) <= 2 * s:
                 cands.append(c)
         cands.sort(key=lambda c: hashlib.sha256(('%s\n%s' % (hid, c)).encode('utf-8')).hexdigest())
         return cands[:K]
@@ -704,7 +707,8 @@ def page_summary(signals, registry):
 
     def games_at(hid, t):
         if t not in snaps:
-            snaps[t] = Index(chronology.as_of_view(view, t))
+            at_birth = chronology.as_of_view(view, t)
+            snaps[t] = Index(match_identity.annotate(at_birth, mapping=match_identity.aliases(at_birth, t)))
         return snaps[t].games(registry[hid]['family'], registry[hid]['conditions'])
     order = sorted(llm, key=lambda hid: (chronology.born(registry[hid]), hid))
     grp = groups_at_birth([(hid, registry[hid], chronology.born(registry[hid])) for hid in order], TAU, games_at, GROUP_MIN_GAMES)

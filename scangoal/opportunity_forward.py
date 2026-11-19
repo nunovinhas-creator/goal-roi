@@ -8,9 +8,8 @@ from datetime import datetime, timedelta
 import hashlib
 import json
 import math
-import unicodedata
 
-from . import chronology, opportunity_results
+from . import chronology, match_identity, opportunity_results
 from .eligibility import eligible, game_identity
 
 MIN_LEAD = timedelta(minutes=15)
@@ -72,40 +71,30 @@ def eligible_signal(m, cutoff, now):
     return baseline_signal(m, cutoff, now)
 
 
-def fixture_key(message, kickoff):
-    teams = message.get("teams")
-    league = message.get("league")
-    if (not isinstance(teams, (list, tuple)) or len(teams) != 2
-            or not all(isinstance(v, str) and v.strip() for v in (*teams, league))):
-        return None
-    fields = tuple(" ".join(unicodedata.normalize("NFKC", v).casefold().split()) for v in (*teams, league))
-    return (kickoff, *fields)
-
-
 def select_signals(messages, cutoff, now):
-    """Pick the first eligible quote per fixture using only known, eligible signals."""
+    """Pick one first quote per fixture using only proof visible at the evaluation cutoff."""
+    rows = [m for m in messages if isinstance(m, dict)]
+    mapping = match_identity.aliases(rows, now)
     ordered = []
-    for message in messages:
+    for message in match_identity.annotate(rows, mapping=mapping):
         times = baseline_signal(message, cutoff, now)
         if times is not None:
             order = (times.collected, times.emitted, str(message.get("message_id")), game_identity(message))
             ordered.append((order, times, message))
-    candidate, baseline, aliases, fixtures = {}, {}, {}, {}
+    candidate, baseline = {}, {}
     for order, times, message in sorted(ordered, key=lambda row: row[0]):
         mid = game_identity(message)
-        fixture = fixture_key(message, times.kickoff)
-        canonical_id = aliases.setdefault(mid, fixtures.get(fixture, mid))
-        if fixture is not None:
-            fixtures.setdefault(fixture, canonical_id)
-        baseline.setdefault(canonical_id, (order, message))
+        baseline.setdefault(mid, (order, message))
         if eligible_signal(message, cutoff, now) is not None:
-            candidate.setdefault(canonical_id, (order, message))
-    return candidate, baseline, aliases
+            candidate.setdefault(mid, (order, message))
+    return candidate, baseline, mapping
 
 
 def fixture_evidence(results, aliases):
     grouped = {}
     for mid, canonical in aliases.items():
+        if canonical is None:
+            continue
         rows = results.get(mid) if isinstance(results, dict) else None
         if isinstance(rows, dict):
             grouped.setdefault(canonical, []).append(rows)

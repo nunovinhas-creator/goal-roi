@@ -33,7 +33,7 @@ Disciplina (fixada a 12/11/2026):
 import hashlib, itertools, json, math, re
 from datetime import datetime, timedelta, timezone
 
-from . import certification, chronology, freshness, insights
+from . import certification, chronology, freshness, insights, match_identity
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -62,7 +62,7 @@ def earlier_index(signals):
     """Por jogo: (hora, família) de cada sinal, para saber se já havia outro tipo de sinal antes."""
     idx = {}
     for b in signals:
-        idx.setdefault(b['match_id'], []).append((b['date_utc'], insights.family(b)))
+        idx.setdefault(game_identity(b), []).append((b['date_utc'], insights.family(b)))
     return idx
 
 
@@ -74,7 +74,7 @@ def atoms(b, multi, earlier=None):
     if b.get('league'):
         out.append(('Liga', b['league']))
     if earlier is not None:
-        before = any(d < b['date_utc'] and f != fam for d, f in earlier.get(b['match_id'], ()))
+        before = any(d < b['date_utc'] and f != fam for d, f in earlier.get(game_identity(b), ()))
         out.append(('Sinal anterior de outro tipo no mesmo jogo', 'sim' if before else 'não'))
     s = b.get('score_at_signal')
     if s:
@@ -117,7 +117,7 @@ def hyp_id(family, conds):
 def multi_matches(signals):
     by = {}
     for b in signals:
-        by.setdefault(b['match_id'], set()).add(insights.family(b))
+        by.setdefault(game_identity(b), set()).add(insights.family(b))
     return {m for m, t in by.items() if len(t) > 1}
 
 
@@ -211,7 +211,7 @@ def ordered_games(match):
     sinal) e depois pela identidade. A ordem física dos dados nunca conta. Fail-closed: sem jogo comprovável não há observação.
     """
     games = {}
-    for b in match:
+    for b in match_identity.annotate(match):
         key = game_identity(b)
         if b['w'] is not None and b['w'] != 0 and key is not None:
             games.setdefault(key, []).append(b)
@@ -226,7 +226,7 @@ def ordered_games(match):
 
 
 def game_ids(match):
-    return {game_identity(b) for b in match if b['w'] is not None and b['w'] != 0 and game_identity(b) is not None}
+    return {game_identity(b) for b in match_identity.annotate(match) if b['w'] is not None and b['w'] != 0 and game_identity(b) is not None}
 
 
 def game_set(match):
@@ -369,19 +369,21 @@ def committed_bet(rows):
     return min(timed, key=lambda b: (chronology.decision_time(b), chronology.signal_time(b) or _LAST, str(b.get('key'))))
 
 
-def economic_summary(rows, born, as_of=None):
-    """One unit committed per game, including unresolved bets in population counts."""
-    by_game = {}
-    for b in rows:
+def committed_fixtures(rows, as_of=None):
+    grouped = {}
+    for b in match_identity.annotate(rows, as_of):
         mid = game_identity(b)
         if mid is not None:
-            by_game.setdefault(mid, []).append(b)
+            grouped.setdefault(mid, []).append(b)
+    return [bet for group in grouped.values() if (bet := committed_bet(group)) is not None]
 
+
+def economic_summary(rows, born, as_of=None):
+    """One unit committed per game, including unresolved bets in population counts."""
     counts = dict(admitted=0, results_confirmed=0, wins=0, losses=0, voids=0, imputed_losses=0, pending=0)
     advertised, stressed = [], []
-    for group in by_game.values():
-        bet = committed_bet(group)
-        if bet is None or not operational_signal(bet, born):
+    for bet in committed_fixtures(rows, as_of):
+        if not operational_signal(bet, born):
             continue
         first_result = chronology.parse_utc(bet.get('match_result_first_seen_utc'))
         if first_result is not None and latest_decision(bet) >= first_result and (
@@ -454,7 +456,7 @@ def confirmation(match, since, alpha, as_of=None):
     P(algum n com E_n >= 1/α) <= α, sob qualquer dependência entre jogos. Tudo em domínio logarítmico.
     """
     games = {}
-    for b in match:
+    for b in match_identity.annotate(match):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
@@ -585,6 +587,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
     ativada ou registo inválido: nenhuma certificação, nenhuma forte/confirmada (fail-closed). legacy: ids legados (nunca
     certificáveis). A avaliação exploratória nunca certifica.
     """
+    signals = match_identity.annotate(signals, as_of)
     if not exploratory:
         signals = [b for b in signals if eligible(b)]
     multi, earlier = multi_matches(signals), earlier_index(signals)
@@ -601,6 +604,10 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         pool = [(b, at) for b, fam, at in have if fam == h['family'] and (gen or (born is not None and (chronology.signal_time(b) or born) > born))]
         match = [b for b, at in pool if conds <= at]
         s = insights.summarize(match)
+        # Hit metrics remain descriptive while monetary returns use one commitment per fixture.
+        committed = committed_fixtures(match, as_of)
+        game_roi_values = game_roi([(None, None, [bet]) for bet in committed])
+        s['roi'] = game_roi_values[0]
         s['prob_adds'] = insights.prob_better(match, [b for b, at in pool if not conds <= at]) if conds else None
         if s['games'] >= HINT_AT:
             matched[hid] = match
@@ -614,7 +621,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if not exploratory:
             row['prospective'] = prospective_summary(ordered[hid], born, bets=match, as_of=as_of) if research_safe else None
             row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if (row['prospective'] or {}).get('games', 0) >= PROSPECTIVE_MIN else 'exploratória')
-            row['_game_roi'] = game_roi(ordered[hid])   # só apresentação (PR 5); retirado antes de publicar
+            row['_game_roi'] = game_roi_values   # só apresentação (PR 5); retirado antes de publicar
         rows.append(row)
     tested = len(matched)
     by_id = {r['id']: r for r in rows}
@@ -890,7 +897,8 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     desliga tudo (fail-closed). as_of: relógio do relatório, para fechar como perda os jogos pendentes além do prazo.
     """
     # Relógio explícito: só o que o sistema sabia em `as_of` (sinais ainda não lidos e resultados ainda não vistos não contam).
-    all_signals = chronology.as_of_view(signals, as_of) if as_of is not None else signals
+    view = chronology.as_of_view(signals, as_of) if as_of is not None else signals
+    all_signals = match_identity.annotate(view, as_of)
     signals = [b for b in all_signals if eligible(b)]
     excluded = {}
     for b in all_signals:
@@ -925,7 +933,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
         for b in r['open']:
             w = watch.get(b['key'])
             if w is None:
-                w = {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': game_identity(b), 'type': b['type'], 'market': b['market'],
+                w = {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': b['match_id'], 'type': b['type'], 'market': b['market'],
                      'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'phase': b.get('phase'),
                      'finished': bool(b.get('ft')) or bool(b.get('had_ft_at_first_sight')) or b.get('match_result_first_seen_utc') is not None,
                      'reasons': []}
@@ -1016,12 +1024,11 @@ def walk_forward(signals, registry):
     - segue-se o sinal se alguma tática apostável tinha pelo menos BOARD_MIN jogos e probabilidade >= BOARD_GOOD.
     Compara os sinais seguidos com os não seguidos: se o cérebro acrescenta alguma coisa, os seguidos têm de render mais.
     """
-    signals = [b for b in signals if eligible(b)]
-    multi, earlier = multi_matches(signals), earlier_index(signals)
+    signals = [b for b in match_identity.annotate(signals) if eligible(b)]
     hyps, invalid_birth = [], 0
     for hid in sorted(registry):
         h = registry[hid]
-        if not h.get('conditions') or any(c[0] in POST for c in h['conditions']):
+        if not h.get('conditions') or not research_conditions(h):
             continue
         born = chronology.born(h)
         if born is None:
@@ -1030,7 +1037,7 @@ def walk_forward(signals, registry):
         hyps.append((hid, h['family'], {tuple(c) for c in h['conditions']}, born, h.get('source') == 'gerador'))
     fits = {}
     for b in signals:
-        fam, at = insights.family(b), set(atoms(b, multi, earlier))
+        fam, at = insights.family(b), set(atoms(b, set()))
         fits[id(b)] = [i for i, (_, f, conds, _, _) in enumerate(hyps) if f == fam and conds <= at]
     settled = [b for b in signals if b['w'] is not None and b['w'] != 0]
     timed = sorted(((known_at(b), b) for b in settled if known_at(b) is not None),
@@ -1039,7 +1046,12 @@ def walk_forward(signals, registry):
     sides, unknown = {True: [], False: []}, []
     order = sorted((b for b in signals if b.get('odds') and b.get('market') is not None),
                    key=lambda b: (chronology.decision_time(b) or chronology.signal_time(b), chronology.signal_time(b), str(b.get('key'))))
+    seen = set()
     for b in order:
+        game = game_identity(b)
+        if game in seen:
+            continue
+        seen.add(game)
         if not chronology.decidable(b):
             unknown.append(b)
             continue
@@ -1063,7 +1075,7 @@ def walk_forward(signals, registry):
         done = [b for b in rows if b['w'] is not None]
         pl = lambda b, cut: b['w'] * (b['odds'] * (1 - cut) - 1) if b['w'] > 0 else b['w']
         units = sum(pl(b, 0.0) for b in done)
-        return {'bets': len(rows), 'settled': len(done), 'games': len({b['match_id'] for b in done}), 'wins': sum(1 for b in done if b['w'] > 0),
+        return {'bets': len(rows), 'settled': len(done), 'games': len({game_identity(b) for b in done}), 'wins': sum(1 for b in done if b['w'] > 0),
                 'units': round(units, 2), 'roi': round(units / len(done), 4) if done else None,
                 'roi_cut': round(sum(pl(b, insights.ODDS_LOSS) for b in done) / len(done), 4) if done else None}
 
