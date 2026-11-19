@@ -190,12 +190,15 @@ def observation_proof(root, ref, since):
             problems.append('observations: cannot read %s' % rel)
             continue
         commits = [tuple(x.split()) for x in log if x.strip()]
-        prev = {}
+        prev, archived = {}, {}
         for sha, stamp, body in _versions(root, rel, commits) if commits else ():
             t = chronology.parse_utc(stamp)
             try:
-                cur = json.loads(body) if body is not None else {}
-                cur = (cur.get(key) or {}) if key else cur
+                doc = json.loads(body) if body is not None else {}
+                cur = (doc.get(key) or {}) if key else doc
+                versions = doc.get('ft_versions', {}) if key == 'results' else {}
+                if not isinstance(versions, dict):
+                    raise ValueError('invalid FT versions')
             except (ValueError, AttributeError):
                 problems.append('unreadable %s at %s' % (rel, sha[:12]))
                 continue
@@ -208,7 +211,18 @@ def observation_proof(root, ref, since):
                 if k not in prev and t is not None and since is not None and t >= since:
                     if not _coherent(chronology.parse_utc(v.get(field) if isinstance(v, dict) else None), t):
                         problems.append('%s entry published out of time at %s: %s' % (rel, sha[:12], k))
-            prev = cur
+            for mid in archived.keys() | versions.keys():
+                before, after = archived.get(mid, []), versions.get(mid, [])
+                if not isinstance(before, list) or not isinstance(after, list) or after[:len(before)] != before:
+                    problems.append('%s FT history rewritten at %s: %s' % (rel, sha[:12], mid))
+                    continue
+                for row in after[len(before):]:
+                    observed = chronology.parse_utc(row.get('observed_at')) if isinstance(row, dict) else None
+                    available = chronology.parse_utc(row.get('available_at')) if isinstance(row, dict) else None
+                    if (observed is None or available is None or available < observed
+                            or not _coherent(available, t)):
+                        problems.append('%s FT version published out of time at %s: %s' % (rel, sha[:12], mid))
+            prev, archived = cur, versions
     return problems[:50]
 
 

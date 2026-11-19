@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import brain, certification, insights, llm_eval, polymarket_alerts
 from .eligibility import eligible, exclusion_reasons
-from .opportunity_results import collected as result_observation
+from . import chronology, opportunity_results
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -57,7 +57,7 @@ def load(chronology=None, *, result_observations=None):
             seen_note.setdefault((r['date_utc'], tuple(t.lower() for t in p['teams']), tuple(p['ft'])), got)
         elif p.get('ft') and p.get('match_id'):
             if result_observations is not None:
-                observation = result_observation(
+                observation = opportunity_results.collected(
                     'telegram', r['message_id'], p['ft'], got,
                     published=r.get('edit_date_utc') or r.get('date_utc'),
                 )
@@ -493,17 +493,49 @@ def publish_ledger_state(validation, ledger, ledger_path, registry, now, registe
                                         'registers them (see newly_selected)')
 
 
+def research_bets(signals, observations, now):
+    """Settle FT-dependent research rows from the same versioned evidence as the opportunity audit."""
+    snapshot_sources = {'bot_message', 'HL', 'BSD'}
+    for b in signals:
+        match_id = b['match_id']
+        versions = observations.get(match_id, ())
+        if not eligible(b) or (b['result_known_source'] not in snapshot_sources and b['w'] is not None):
+            yield b
+            continue
+
+        kickoff = chronology.kickoff_time(b)
+        if kickoff is None:
+            visible = {v.kickoff for v in versions if v.kickoff is not None and v.available_at is not None
+                       and v.available_at <= now}
+            kickoff = next(iter(visible)) if len(visible) == 1 else None
+        result = opportunity_results.resolve(versions, kickoff=kickoff, as_of=now)
+        if result.score is None:
+            yield dict(b, ft=None, w=None, result_known_utc=None, result_known_source=None, settled_by=None,
+                       match_result_first_seen_utc=chronology.iso(result.first_available_at))
+            continue
+
+        market, won = b['market'], None
+        if market and not (b['phase'] == 'live' and market.strip().lower() == 'asian handicap'):
+            won = settle(market, b['selection'], result.score, b['teams'])
+        yield dict(b, ft=list(result.score), w=won, result_known_utc=None,
+                   result_available_utc=result.available_at.isoformat(),
+                   result_known_source='versioned_ft', settled_by='versioned_ft' if won is not None else None,
+                   match_result_first_seen_utc=result.first_available_at.isoformat())
+
+
 def build(csv_path=None, register=False, now=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = now or datetime.now(timezone.utc)
     chron = {}
-    msgs, ft, marks, notes, audit = load(chron)
+    bot_observations, providers = {}, {}
+    msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations)
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
     for name in ('hl', 'bsd'):
         try:
             st = json.loads((data_dir() / ('results_%s.json' % name)).read_text(encoding='utf-8'))
         except (OSError, ValueError):
             st = {}
+        providers['highlightly' if name == 'hl' else name] = st
         res = st.get('results') or {}
         audit[name + '_results'] = len(res)
         audit[name + '_vs_bot_disagreements'] = sum(1 for m, r in res.items() if m in ft and ft[m] != r['ft'])
@@ -572,12 +604,15 @@ def build(csv_path=None, register=False, now=None):
     if register and brain.update_registry(signals, registry):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     LAST['signals'] = [b for b in signals if eligible(b)]
+    observations = opportunity_results.merge_sources(bot_observations, providers)
+    research = list(research_bets(signals, observations, now))
+    LAST['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     # Integridade histórica no percurso real (revisão #5911845265, P1-H): o registo tem de prolongar o que foi publicado no
     # git, com horas coerentes. Sem prova possível (sem git, histórico shallow, nunca publicado): nenhuma certificação.
     history = certification.history_proof(ledger_path, ledger, as_of=now) if isinstance(ledger, dict) and 'invalid' not in ledger else None
-    brn = brain.build(signals, registry, MIN_SETTLED, ledger, history_problems=history, as_of=now)
+    brn = brain.build(research, registry, MIN_SETTLED, ledger, history_problems=history, as_of=now)
     publish_ledger_state(brn['validation'], ledger, ledger_path, registry, now, register)
     llm_state = brain.load_registry(data_dir() / 'llm_state.json')
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
@@ -590,7 +625,7 @@ def build(csv_path=None, register=False, now=None):
     brn['notes'] = [dict(n, n=by_id[n['id']]['n'], hits=by_id[n['id']]['hits'], hit_rate=by_id[n['id']]['hit_rate'], break_even=by_id[n['id']]['break_even'],
                          status=by_id[n['id']]['status']) for n in notes if n.get('id') in by_id][:12]
     brn['entry_points'] = brain.entry_points(signals)
-    brn['llm_evaluation'] = llm_eval.page_summary(signals, registry)   # PR 4: sem histórico git, nunca uma conclusão científica
+    brn['llm_evaluation'] = llm_eval.page_summary(research, registry)   # PR 4: sem histórico git, nunca uma conclusão científica
     return {
         'generated_at_utc': now.isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),

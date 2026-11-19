@@ -6,6 +6,7 @@ Usage (from repository root):
 Never sends Telegram, reads credentials, writes data/, or certifies a strategy.
 Output contains only aggregated statistics; no message texts or match identifiers.
 """
+import argparse
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,22 +27,23 @@ def read_json(path, default):
 
 def sourced_results(observed, directory):
     """Collect independent, timestamped versions without choosing a score yet."""
-    found = {mid: list(rows) for mid, rows in observed.items()}
-    for filename, source in (("results_hl.json", "highlightly"), ("results_bsd.json", "bsd")):
-        doc = read_json(directory / filename, {})
-        if not isinstance(doc, dict) or not isinstance(doc.get("results"), dict):
-            continue
-        for mid, info in doc["results"].items():
-            if isinstance(info, dict):
-                row = opportunity_results.collected(
-                    source, mid, info.get("ft"), info.get("matched_at_utc"),
-                    period=info.get("period", "regulation"),
-                )
-                found.setdefault(mid, []).append(row)
-    return {mid: tuple(rows) for mid, rows in found.items()}
+    providers = {"highlightly": read_json(directory / "results_hl.json", {}),
+                 "bsd": read_json(directory / "results_bsd.json", {})}
+    return opportunity_results.merge_sources(observed, providers)
+
+
+def audit_clock():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--as-of", help="ISO 8601 cutoff with explicit UTC offset")
+    args = parser.parse_args()
+    now = opportunity_results.utc(args.as_of) if args.as_of is not None else datetime.now(timezone.utc)
+    if now is None:
+        parser.error("--as-of requires a valid explicit UTC offset")
+    return now
 
 
 def main():
+    now = audit_clock()
     directory = data_dir()
     protocol = read_json(PROTOCOL, {})
     state = read_json(directory / "notify_state.json", {})
@@ -52,7 +54,7 @@ def main():
     result = opportunity_forward.evaluate(
         messages, results, protocol,
         activation_utc=activation,
-        now=datetime.now(timezone.utc),
+        now=now,
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
 

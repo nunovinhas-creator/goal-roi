@@ -5,14 +5,14 @@ Requires only repository-local public data; does not call the network or modify
 notifications, reports, the hypothesis registry, CI, or production.
 """
 import json
-from datetime import datetime, timezone
 
 from scangoal import opportunity_ranking, report
 from scangoal.store import data_dir
-from scripts.opportunity_forward_audit import PROTOCOL, read_json, sourced_results
+from scripts.opportunity_forward_audit import PROTOCOL, audit_clock, read_json, sourced_results
 
 
 def main():
+    now = audit_clock()
     directory = data_dir()
     protocol = read_json(PROTOCOL, {})
     state = read_json(directory / "notify_state.json", {})
@@ -23,7 +23,7 @@ def main():
     ranking = opportunity_ranking.build(
         messages, evidence, protocol,
         activation_utc=activation,
-        now=datetime.now(timezone.utc),
+        now=now,
     )
     print(json.dumps(ranking, ensure_ascii=False, sort_keys=True, indent=2))
 

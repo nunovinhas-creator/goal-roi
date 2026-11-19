@@ -5,6 +5,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from datetime import timedelta
 from unittest.mock import patch
 
 from scripts.opportunity_forward_audit import sourced_results
@@ -148,9 +149,12 @@ class ResultSourceTests(unittest.TestCase):
         self.enterContext(patch.dict(os.environ, {"SCANGOAL_DATA_DIR": folder}))
 
     def write_provider(self, name, score, stamp, **extra):
-        (self.directory / ("results_" + name + ".json")).write_text(json.dumps(
-            {"results": {self.MATCH: {"ft": score, "matched_at_utc": stamp, **extra}}},
-        ), encoding="utf-8")
+        observed = chronology.parse_utc(stamp)
+        available = (observed + timedelta(minutes=5)).isoformat() if observed else None
+        row = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": available, **extra}
+        (self.directory / ("results_" + name + ".json")).write_text(
+            json.dumps({"ft_versions": {self.MATCH: [row]}}), encoding="utf-8",
+        )
 
     def telegram(self, score, stamp):
         return opportunity_results.collected("telegram", 42, score, stamp, published=stamp)
@@ -251,6 +255,47 @@ class ResultSourceTests(unittest.TestCase):
         rows = (self.telegram([2, 1], stamp), self.telegram([1, 1], stamp))
         self.assertEqual(self.assess({self.MATCH: rows})[0]["quarantined"], 1)
         self.assertEqual(self.assess({self.MATCH: rows[::-1]})[0]["quarantined"], 1)
+
+    def test_external_correction_preserves_published_history_for_all_consumers(self):
+        text = "\n".join((
+            "📈 🔷 Polymarket · 19 nov 2026 21:00", "A — B · Example",
+            "Over 2.5 @1.85 · $9.9K", "🧾 2 trades · market share 79%",
+            "https://scangoal.com/match/game-1?lang=en",
+        ))
+        row = {"message_id": 42, "date_utc": "2026-11-19T15:35:00Z",
+               "collected_at_utc": "2026-11-19T15:36:00Z", "text": text}
+        (self.directory / "messages.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+        path = self.directory / "results_hl.json"
+        info = {"bsd_id": 17, "home": "A", "away": "B", "event_date": "2026-11-19T18:00+00:00"}
+        state = {"results": {}}
+        cutoff = chronology.parse_utc("2026-11-19T21:00:00Z")
+        opportunity_results.remember_provider_results(state, {self.MATCH: dict(info, ft=[2, 1])},
+                                                     chronology.parse_utc("2026-11-19T20:00:00Z"))
+        path.write_text(json.dumps(state), encoding="utf-8")
+        before = self.assess(sourced_results({}, self.directory), now=cutoff)
+        from scangoal.results_bsd import capture_result_versions, save_result_state
+        capture_result_versions(state, {}, [
+            {"id": 17, "status": "finished", "home_score": 1, "away_score": 1, "home_team": "A",
+             "away_team": "B", "event_date": "2026-11-19T18:00:00Z"},
+        ], chronology.parse_utc("2026-11-19T22:00:00Z"))
+        save_result_state(path, state)
+        self.assertEqual(state["results"][self.MATCH]["ft"], [2, 1])
+        self.assertEqual([r["ft"] for r in state["ft_versions"][self.MATCH]], [[2, 1], [1, 1]])
+        updated = sourced_results({}, self.directory)
+        self.assertEqual(before, self.assess(updated, now=cutoff))
+        self.assertEqual(before[0]["wins"], 1)
+        self.assertEqual(self.assess(updated, now="2026-11-19T22:01:00Z")[0]["losses"], 1)
+        report.build(now=cutoff)
+        self.assertEqual(report.LAST["research_signals"][0]["ft"], [2, 1])
+        report.build(now=chronology.parse_utc("2026-11-19T22:01:00Z"))
+        self.assertEqual(report.LAST["research_signals"][0]["ft"], [1, 1])
+        self.assertEqual(report.LAST["signals"][0]["ft"], [2, 1])
+
+    def test_current_only_external_result_cannot_backfill_history(self):
+        (self.directory / "results_hl.json").write_text(json.dumps(
+            {"results": {self.MATCH: {"ft": [1, 1], "matched_at_utc": "2026-11-19T20:00:00Z"}}}
+        ), encoding="utf-8")
+        self.assertEqual(self.assess(sourced_results({}, self.directory), now="2026-11-19T21:00:00Z")[0]["pending"], 1)
 
     def test_legacy_conflict_requires_cutoff_evidence(self):
         for known in (None, "2026-11-21T20:00:00Z"):

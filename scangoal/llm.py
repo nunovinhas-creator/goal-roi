@@ -255,7 +255,7 @@ def run(call=request, now=None, env=None):
         return state
     from . import report
     rep = report.build()
-    signals, registry = report.LAST['signals'], brain.load_registry(rpath)
+    signals, registry = report.LAST['research_signals'], brain.load_registry(rpath)
     vocab = vocabulary(signals)
     mode = MODES[state.get('runs', 0) % len(MODES)]
     multi, earlier = brain.multi_matches(signals), brain.earlier_index(signals)
