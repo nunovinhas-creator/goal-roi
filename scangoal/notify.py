@@ -1444,6 +1444,13 @@ def main():
     except Exception as exc:      # só o tipo do erro; nunca o token
         print('NOTIFY_FAILED', type(exc).__name__)
         sys.exit(FAILED_EXIT)     # o estado e o registo já estão gravados; o commit de dados continua (continue-on-error)
+    if '--failure' not in sys.argv and (os.environ.get('TG_BOT_TOKEN') or '').strip() and (os.environ.get('TG_CHAT_ID') or '').strip():
+        try:                      # avisos das linhas 1, 6 e 9 (Stake): independentes dos de cima; nunca mudam o código de saída
+            from . import report, stake_alerts
+            report.build(None, register=False)
+            stake_alerts.deliver(report.LAST.get('signals') or [])
+        except Exception as exc:
+            print('STAKE_ALERTS_FAILED', type(exc).__name__)
     sys.exit(0)                   # avisos enviados, nada a enviar ou sem chaves
 
 

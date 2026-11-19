@@ -64,6 +64,11 @@ def refresh():
     if docs.is_dir():
         shutil.copyfile(out, docs / 'report.json')
     notify.run_checked()          # entregas falhadas/incertas/retiradas -> WATCH_REPORT_FAILED (nunca reenvia)
+    try:
+        from . import stake_alerts
+        stake_alerts.deliver(report.LAST.get('signals') or [])   # linhas 1, 6 e 9; um erro aqui nunca pára a leitura
+    except Exception as exc:
+        print('STAKE_ALERTS_FAILED', type(exc).__name__)
 
 
 async def watch():
