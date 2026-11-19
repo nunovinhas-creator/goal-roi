@@ -117,7 +117,7 @@ def opportunity_digest(now):
         return opportunity_ranking.build(
             messages, results, protocol, activation_utc=activation, now=now,
         )
-    except (OSError, ValueError, TypeError, KeyError, ArithmeticError):
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, IndexError, ArithmeticError):
         print('LLM_OPPORTUNITY_CONTEXT_SKIPPED')
         return None
 
