@@ -94775,6 +94775,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60 & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-19T23:50:52+00:00",
+  "conditions": [
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "1e706b8c61a21c3b472d1ec6ae5dce3ab59d441ba293021ccde7b59db5fb3cb2",
+   "registry_size": 9489,
+   "report_generated_at_utc": "2026-11-19T23:50:52+00:00",
+   "response_sha256": "28b83a963b5fc876bffbe62f14fdcd6cfb6ae72f6438357adf07cc1184fa8ae2"
+  },
+  "reason": "Jogo com diferença significativa, ritmo baixo e segunda parte pode indicar estabilidade no placar",
+  "source": "llm"
+ },
  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-13T20:44:43+00:00",
   "conditions": [
