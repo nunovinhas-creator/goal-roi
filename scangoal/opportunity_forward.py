@@ -12,6 +12,10 @@ from .eligibility import eligible, game_identity
 MIN_LEAD = timedelta(minutes=15)
 MAX_UNRESOLVED = timedelta(days=3)
 BORN_KEY = "declared_before_forward_samples_at_utc"
+EXPECTED_RULE_ID = "polymarket_pre_over25_share_lt80_total_lt10000_v1"
+EXPECTED_BORN = "2026-11-19T15:16:22Z"  # GitHub PR #55 merge time.
+EXPECTED_SHA = "b7c7ba6720e37ec7a38c28c49e2223101fc45f9a"
+
 
 
 def _number(value, lower=0):
@@ -57,6 +61,10 @@ def evaluate(messages, results, protocol, *, activation_utc, now):
     A no-result match older than 3 days is *lost*, not silently dropped.
     Conflicting/invalid known scores are quarantined, never promoted as wins.
     """
+    if (not isinstance(protocol, dict) or protocol.get("id") != EXPECTED_RULE_ID
+            or protocol.get(BORN_KEY) != EXPECTED_BORN
+            or protocol.get("born_merge_sha") != EXPECTED_SHA):
+        raise ValueError("Unrecognized or changed preregistration")
     born = chronology.parse_utc(protocol.get(BORN_KEY))
     activated = chronology.parse_utc(activation_utc)
     as_of = chronology.parse_utc(now) if isinstance(now, str) else now
