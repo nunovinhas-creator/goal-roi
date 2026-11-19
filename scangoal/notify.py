@@ -1439,19 +1439,23 @@ def main():
             print('NOTIFY_MIGRATION_FAILED', type(exc).__name__)
             sys.exit(1)
         return
+    failed = False
     try:
         failure() if '--failure' in sys.argv else run_checked()
     except Exception as exc:      # só o tipo do erro; nunca o token
         print('NOTIFY_FAILED', type(exc).__name__)
-        sys.exit(FAILED_EXIT)     # o estado e o registo já estão gravados; o commit de dados continua (continue-on-error)
+        failed = True             # o commit de dados continua (continue-on-error)
+    # O aviso Stake é independente: mesmo que um aviso normal falhe, a intenção
+    # Stake pode ser publicada e o erro ficará visível no estado do passo.
     if '--failure' not in sys.argv and (os.environ.get('TG_BOT_TOKEN') or '').strip() and (os.environ.get('TG_CHAT_ID') or '').strip():
-        try:                      # avisos das linhas 1, 6 e 9 (Stake): independentes dos de cima; nunca mudam o código de saída
+        try:
             from . import report, stake_alerts
             report.build(None, register=False)
             stake_alerts.deliver(report.LAST.get('signals') or [])
         except Exception as exc:
             print('STAKE_ALERTS_FAILED', type(exc).__name__)
-    sys.exit(0)                   # avisos enviados, nada a enviar ou sem chaves
+            failed = True
+    sys.exit(FAILED_EXIT if failed else 0)
 
 
 if __name__ == '__main__':
