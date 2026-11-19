@@ -126,7 +126,7 @@ class ThresholdsUseIndependentGames(unittest.TestCase):
         self.assertEqual(brain.agenda([r_open], signals + [open_], NOW)['counts']['favorável'], 0)
         later = [sig('z%d' % i, -1.0, 40 + i, typ='POLYMARKET', market='1X2', selection='y') for i in range(3)]
         wf = brain.walk_forward(signals + later, reg)
-        self.assertEqual((wf['followed']['bets'], wf['skipped']['bets']), (0, 15))   # 4 known games < BOARD_MIN = 8 games
+        self.assertEqual((wf['followed']['bets'], wf['skipped']['bets']), (0, 7))   # One commitment per fixture, even with three markets
 
 
 class Stability(unittest.TestCase):
