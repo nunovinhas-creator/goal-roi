@@ -9,7 +9,7 @@ export async function inspect(token, now = Date.now(), request = fetch) {
   if (token) headers.Authorization = 'Bearer ' + token;
   async function read(url, accept = 'application/vnd.github+json') {
     const response = await request(url, {method:'GET', headers:{...headers, Accept:accept},
-      redirect:'error', cache:'no-store', signal:AbortSignal.timeout(8000)});
+      redirect:'manual', cache:'no-store', signal:AbortSignal.timeout(8000)});
     if (!response.ok) throw Error('GitHub lookup HTTP ' + response.status);
     return response.json();
   }
@@ -52,7 +52,7 @@ export class RecoveryGuard {
     this.sql.exec('CREATE TABLE IF NOT EXISTS intent (collector INTEGER PRIMARY KEY)');
     const claimed = this.sql.exec('INSERT OR IGNORE INTO intent VALUES (?) RETURNING collector', report.collector_id).toArray();
     if (!claimed.length) return Response.json({...report, decision:'already_requested'});
-    const response = await fetch(workflow + '/dispatches', {method:'POST', redirect:'error',
+    const response = await fetch(workflow + '/dispatches', {method:'POST', redirect:'manual',
       headers:{Authorization:'Bearer ' + this.env.GITHUB_ACTIONS_TOKEN, 'User-Agent':'goal-roi-continuity',
         'Content-Type':'application/json'}, body:JSON.stringify({ref:'main'}), signal:AbortSignal.timeout(8000)});
     if (response.status === 429) this.sql.exec('DELETE FROM intent WHERE collector=?', report.collector_id);
