@@ -1,5 +1,23 @@
 [
  {
+  "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+  "note": "apresenta um acerto alto, mas a amostra é pequena com apenas 21 resultados",
+  "at_utc": "2026-11-19T09:20:21+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+  "note": "tem um acerto significativo, mas é necessário mais dados para confirmar a tendência",
+  "at_utc": "2026-11-19T09:20:21+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
+  "note": "apresenta um acerto perfeito, mas a amostra é muito pequena com apenas 8 resultados",
+  "at_utc": "2026-11-19T09:20:21+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
   "note": "apresenta uma taxa de acerto alta, mas é necessário mais dados para confirmar a tendência",
   "at_utc": "2026-11-19T01:04:07+00:00",
@@ -219,24 +237,6 @@
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
   "note": "apresenta um acerto de 0.8947, mas a amostra é pequena com apenas 19 resultados",
   "at_utc": "2026-11-16T23:25:44+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-  "note": "tem um acerto de 0.7647, mas também é baseado em uma amostra pequena de 17 resultados",
-  "at_utc": "2026-11-16T23:25:44+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-  "note": "mostra um acerto de 1.0, mas com apenas 12 resultados, a amostra é muito pequena para tirar conclusões",
-  "at_utc": "2026-11-16T23:25:44+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-  "note": "apresenta uma taxa de acerto alta, mas a amostra não é muito grande",
-  "at_utc": "2026-11-16T19:17:34+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
  }
 ]

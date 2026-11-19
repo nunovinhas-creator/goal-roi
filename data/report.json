@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-19T09:11:24+00:00",
+ "generated_at_utc": "2026-11-19T09:21:02+00:00",
  "messages": 1656,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T09:11:21+00:00",
+  "collector_last_run_utc": "2026-11-19T09:20:19+00:00",
   "name_review": [
    {
     "bot": [
@@ -1698,7 +1698,7 @@
    "by_bot_mark": 0,
    "per_day": 0.4,
    "days_to_hint": 71,
-   "days_to_conclusion": 779,
+   "days_to_conclusion": 780,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1918,7 +1918,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 13.4,
+   "per_day": 13.3,
    "days_to_hint": 0,
    "days_to_conclusion": 17,
    "prudent_rate": 0.8276,
@@ -1957,7 +1957,7 @@
    "by_bot_mark": 0,
    "per_day": 2.0,
    "days_to_hint": 8,
-   "days_to_conclusion": 145,
+   "days_to_conclusion": 146,
    "prudent_rate": 0.5181,
    "prob_above": 0.5042,
    "edge": 0.0006,
@@ -5277,7 +5277,7 @@
     "contraditório": 0,
     "evitar": 1
    },
-   "generated_utc": "2026-11-19T09:11:58+00:00",
+   "generated_utc": "2026-11-19T09:21:36+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -23028,17 +23028,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 155,
-  "llm_last_run_utc": "2026-11-19T08:16:34+00:00",
+  "llm_runs": 156,
+  "llm_last_run_utc": "2026-11-19T09:20:21+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-19",
-   "calls_today": 5,
-   "neurons_today": 1068.9,
+   "calls_today": 6,
+   "neurons_today": 1250.9,
    "accepted_today": 4,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+    "note": "apresenta um acerto alto, mas a amostra é pequena com apenas 21 resultados",
+    "at_utc": "2026-11-19T09:20:21+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 21,
+    "hits": 18,
+    "hit_rate": 0.8571,
+    "break_even": 0.5681,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "tem um acerto significativo, mas é necessário mais dados para confirmar a tendência",
+    "at_utc": "2026-11-19T09:20:21+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 27,
+    "hits": 22,
+    "hit_rate": 0.8148,
+    "break_even": 0.5678,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
+    "note": "apresenta um acerto perfeito, mas a amostra é muito pequena com apenas 8 resultados",
+    "at_utc": "2026-11-19T09:20:21+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 8,
+    "hits": 8,
+    "hit_rate": 1.0,
+    "break_even": 0.4455,
+    "status": "em observação"
+   },
    {
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte",
     "note": "apresenta uma taxa de acerto alta, mas é necessário mais dados para confirmar a tendência",
@@ -23136,39 +23169,6 @@
     "hits": 17,
     "hit_rate": 0.8049,
     "break_even": 0.5777,
-    "status": "em observação"
-   },
-   {
-    "id": "Stake | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "tem uma taxa de acerto de 100%, mas com apenas 9 resultados",
-    "at_utc": "2026-11-18T12:48:34+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 20,
-    "hits": 14,
-    "hit_rate": 0.7,
-    "break_even": 0.5155,
-    "status": "em observação"
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
-    "note": "apresenta uma taxa de acerto de 100%, mas a amostra é muito pequena, com apenas 8 resultados",
-    "at_utc": "2026-11-18T12:48:34+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.4455,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Hora (UTC) = noite & Minuto = 61 em diante",
-    "note": "apresenta um desempenho notável com 12 resultados e acerto de 1.0, mas a amostra é pequena",
-    "at_utc": "2026-11-18T08:35:59+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 14,
-    "hits": 12,
-    "hit_rate": 0.8571,
-    "break_even": 0.5978,
     "status": "em observação"
    }
   ],
@@ -23497,7 +23497,7 @@
     "by_bot_mark": 0,
     "per_day": 2.0,
     "days_to_hint": 8,
-    "days_to_conclusion": 145
+    "days_to_conclusion": 146
    }
   },
   "regime": [
