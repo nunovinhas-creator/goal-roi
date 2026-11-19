@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-19T22:26:23+00:00",
- "messages": 1733,
+ "generated_at_utc": "2026-11-19T22:31:13+00:00",
+ "messages": 1734,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 56,
   "BETFAIR": 334,
-  "STAKE_LOAD": 347,
+  "STAKE_LOAD": 348,
   "OPEN_GAME": 204,
   "TOTALS_FORM": 70,
   "WEAKENED_LINEUP": 18,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2896,
+  "versions": 2897,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-19T22:21:57+00:00",
+  "last_collected_at_utc": "2026-11-19T22:31:12+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T22:26:21+00:00",
+  "collector_last_run_utc": "2026-11-19T22:31:12+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 4,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 259,
+  "stake_original_seen": 260,
   "stake_no_score_after_kickoff": 47,
   "stake_sent_45_after_kickoff": 78,
   "goal_lists": 518,
   "goal_lists_consistent": 260
  },
- "unique_bets": 943,
+ "unique_bets": 944,
  "settled_bets": 764,
  "unsettled_market": 99,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1331,7 +1331,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 158,
+   "bets": 159,
    "settled": 101,
    "matches": 50,
    "wins": 52,
@@ -1842,7 +1842,7 @@
    "prob_above_cut": 0.2653
   },
   "STAKE_LOAD": {
-   "signals": 269,
+   "signals": 270,
    "with_result": 171,
    "hits": 92,
    "misses": 73,
@@ -1866,7 +1866,7 @@
    "roi_announced_odds": 0.024,
    "seen_late": 9,
    "by_bot_mark": 32,
-   "per_day": 19.7,
+   "per_day": 19.6,
    "days_to_hint": 0,
    "days_to_conclusion": 7,
    "prudent_rate": 0.5566,
@@ -2263,7 +2263,7 @@
    },
    {
     "n": 48,
-    "signals": 86,
+    "signals": 87,
     "hits": 34,
     "misses": 14,
     "hit_rate": 0.7083,
@@ -2911,7 +2911,7 @@
    },
    {
     "n": 32,
-    "signals": 64,
+    "signals": 65,
     "hits": 20,
     "misses": 12,
     "hit_rate": 0.625,
@@ -3348,7 +3348,7 @@
    },
    {
     "n": 402,
-    "signals": 523,
+    "signals": 524,
     "hits": 239,
     "misses": 163,
     "hit_rate": 0.5841,
@@ -3452,8 +3452,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1142,
-   "eligible": 943,
+   "total": 1143,
+   "eligible": 944,
    "excluded": 199,
    "reasons": {
     "no_valid_odds": 151,
@@ -3468,16 +3468,16 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 9323,
+    "em observação": 9329,
     "abandonada": 31,
     "promissora": 102
    },
    "hypotheses": [
     {
      "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 192,
-     "games": 63,
-     "roi": -0.041,
+     "n": 193,
+     "games": 64,
+     "roi": -0.0376,
      "status": "em observação"
     },
     {
@@ -3496,9 +3496,9 @@
     },
     {
      "id": "Polymarket | Número de apostas = várias",
-     "n": 169,
-     "games": 66,
-     "roi": -0.0663,
+     "n": 170,
+     "games": 67,
+     "roi": -0.0622,
      "status": "em observação"
     },
     {
@@ -3524,9 +3524,9 @@
     },
     {
      "id": "Polymarket | Quota de mercado = menos de 80 %",
-     "n": 152,
-     "games": 58,
-     "roi": -0.0636,
+     "n": 153,
+     "games": 59,
+     "roi": -0.0592,
      "status": "em observação"
     },
     {
@@ -3537,6 +3537,13 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Valor da aposta = menos de 10 mil $",
+     "n": 149,
+     "games": 69,
+     "roi": -0.0008,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Competição = seleções & Momento = antes do jogo",
      "n": 148,
      "games": 47,
@@ -3544,17 +3551,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Valor da aposta = menos de 10 mil $",
-     "n": 148,
-     "games": 68,
-     "roi": -0.005,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 147,
-     "games": 55,
-     "roi": -0.0956,
+     "n": 148,
+     "games": 56,
+     "roi": -0.0908,
      "status": "em observação"
     },
     {
@@ -3615,9 +3615,9 @@
     },
     {
      "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
-     "n": 129,
-     "games": 45,
-     "roi": -0.0527,
+     "n": 130,
+     "games": 46,
+     "roi": -0.0475,
      "status": "em observação"
     },
     {
@@ -3629,16 +3629,16 @@
     },
     {
      "id": "Polymarket | Mercado = outro mercado",
-     "n": 126,
-     "games": 56,
-     "roi": -0.1417,
+     "n": 127,
+     "games": 57,
+     "roi": -0.1357,
      "status": "em observação"
     },
     {
      "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
-     "n": 126,
-     "games": 54,
-     "roi": 0.0006,
+     "n": 127,
+     "games": 55,
+     "roi": 0.0054,
      "status": "em observação"
     },
     {
@@ -3713,9 +3713,16 @@
     },
     {
      "id": "Polymarket | Número de apostas = várias & Quota de mercado = menos de 80 %",
-     "n": 118,
-     "games": 48,
-     "roi": -0.0751,
+     "n": 119,
+     "games": 49,
+     "roi": -0.0692,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = sim",
+     "n": 117,
+     "games": 38,
+     "roi": 0.0497,
      "status": "em observação"
     },
     {
@@ -3726,17 +3733,10 @@
      "status": "promissora"
     },
     {
-     "id": "Polymarket | Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 116,
-     "games": 37,
-     "roi": 0.0448,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Dia = dia de semana",
-     "n": 115,
-     "games": 45,
-     "roi": -0.0162,
+     "n": 116,
+     "games": 46,
+     "roi": -0.0107,
      "status": "em observação"
     },
     {
@@ -3775,17 +3775,17 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Número de apostas = várias & Valor da aposta = menos de 10 mil $",
+     "n": 113,
+     "games": 55,
+     "roi": -0.0476,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Momento = antes do jogo & Valor da aposta = menos de 10 mil $",
      "n": 112,
      "games": 57,
      "roi": -0.0316,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Número de apostas = várias & Valor da aposta = menos de 10 mil $",
-     "n": 112,
-     "games": 54,
-     "roi": -0.0536,
      "status": "em observação"
     },
     {
@@ -3825,30 +3825,30 @@
     },
     {
      "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00",
-     "n": 108,
-     "games": 64,
-     "roi": -0.1254,
+     "n": 109,
+     "games": 65,
+     "roi": -0.1185,
      "status": "abandonada"
+    },
+    {
+     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 108,
+     "games": 46,
+     "roi": -0.1059,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+     "n": 108,
+     "games": 53,
+     "roi": -0.0319,
+     "status": "em observação"
     },
     {
      "id": "Polymarket | Dia = fim de semana",
      "n": 107,
      "games": 33,
      "roi": -0.0898,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 107,
-     "games": 45,
-     "roi": -0.1127,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-     "n": 107,
-     "games": 52,
-     "roi": -0.038,
      "status": "em observação"
     },
     {
@@ -3880,6 +3880,20 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 %",
+     "n": 103,
+     "games": 49,
+     "roi": -0.1608,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "n": 103,
+     "games": 41,
+     "roi": -0.1201,
+     "status": "em observação"
+    },
+    {
      "id": "Betfair | Momento = durante o jogo",
      "n": 102,
      "games": 99,
@@ -3908,17 +3922,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 %",
-     "n": 102,
+     "id": "Polymarket | Mercado = outro mercado & Número de apostas = várias",
+     "n": 101,
      "games": 48,
-     "roi": -0.1684,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
-     "n": 102,
-     "games": 40,
-     "roi": -0.1274,
+     "roi": -0.157,
      "status": "em observação"
     },
     {
@@ -3926,13 +3933,6 @@
      "n": 100,
      "games": 38,
      "roi": -0.0753,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Mercado = outro mercado & Número de apostas = várias",
-     "n": 100,
-     "games": 47,
-     "roi": -0.1648,
      "status": "em observação"
     },
     {
@@ -4041,10 +4041,24 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 95,
+     "games": 38,
+     "roi": 0.0028,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 95,
      "games": 47,
      "roi": -0.0438,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "n": 95,
+     "games": 45,
+     "roi": -0.0902,
      "status": "em observação"
     },
     {
@@ -4076,11 +4090,11 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 94,
-     "games": 37,
-     "roi": -0.0037,
-     "status": "em observação"
+     "games": 54,
+     "roi": -0.1245,
+     "status": "abandonada"
     },
     {
      "id": "Polymarket | Hora (UTC) = tarde & Momento = antes do jogo",
@@ -4097,10 +4111,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
+     "id": "Polymarket | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim",
      "n": 94,
-     "games": 44,
-     "roi": -0.0978,
+     "games": 34,
+     "roi": -0.1153,
      "status": "em observação"
     },
     {
@@ -4118,24 +4132,10 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 93,
-     "games": 53,
-     "roi": -0.1325,
-     "status": "abandonada"
-    },
-    {
      "id": "Polymarket | Momento = antes do jogo & Número de apostas = várias & Quota de mercado = menos de 80 %",
      "n": 93,
      "games": 41,
      "roi": -0.0362,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 93,
-     "games": 33,
-     "roi": -0.1232,
      "status": "em observação"
     },
     {
@@ -4150,6 +4150,13 @@
      "n": 92,
      "games": 30,
      "roi": -0.0101,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+     "n": 91,
+     "games": 42,
+     "roi": -0.032,
      "status": "em observação"
     },
     {
@@ -4185,13 +4192,6 @@
      "n": 90,
      "games": 34,
      "roi": -0.1158,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-     "n": 90,
-     "games": 41,
-     "roi": -0.0392,
      "status": "em observação"
     },
     {
@@ -4244,6 +4244,41 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Dia = dia de semana & Número de apostas = várias",
+     "n": 88,
+     "games": 39,
+     "roi": 0.0416,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Mercado = outro mercado & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
+     "n": 88,
+     "games": 41,
+     "roi": -0.165,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
+     "n": 88,
+     "games": 40,
+     "roi": -0.1127,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Mercado = outro mercado & Valor da aposta = menos de 10 mil $",
+     "n": 88,
+     "games": 50,
+     "roi": -0.126,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = sim",
+     "n": 88,
+     "games": 32,
+     "roi": 0.013,
+     "status": "em observação"
+    },
+    {
      "id": "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 88,
      "games": 46,
@@ -4286,13 +4321,6 @@
      "status": "em observação"
     },
     {
-     "id": "Polymarket | Dia = dia de semana & Número de apostas = várias",
-     "n": 87,
-     "games": 38,
-     "roi": 0.0349,
-     "status": "em observação"
-    },
-    {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo",
      "n": 87,
      "games": 31,
@@ -4311,34 +4339,6 @@
      "n": 87,
      "games": 45,
      "roi": -0.1239,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Mercado = outro mercado & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
-     "n": 87,
-     "games": 40,
-     "roi": -0.174,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
-     "n": 87,
-     "games": 39,
-     "roi": -0.1211,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Mercado = outro mercado & Valor da aposta = menos de 10 mil $",
-     "n": 87,
-     "games": 49,
-     "roi": -0.1346,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = sim",
-     "n": 87,
-     "games": 31,
-     "roi": 0.006,
      "status": "em observação"
     },
     {
@@ -4482,10 +4482,24 @@
      "status": "em observação"
     },
     {
+     "id": "Polymarket | Hora (UTC) = noite",
+     "n": 83,
+     "games": 37,
+     "roi": -0.0957,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Mercado = outro mercado & Momento = antes do jogo & Quota de mercado = menos de 80 %",
      "n": 83,
      "games": 43,
      "roi": -0.1873,
+     "status": "em observação"
+    },
+    {
+     "id": "Polymarket | Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+     "n": 83,
+     "games": 44,
+     "roi": -0.081,
      "status": "em observação"
     },
     {
@@ -4508,28 +4522,14 @@
      "games": 31,
      "roi": 0.0323,
      "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Hora (UTC) = noite",
-     "n": 82,
-     "games": 36,
-     "roi": -0.1044,
-     "status": "em observação"
-    },
-    {
-     "id": "Polymarket | Liga = UEFA Nations League & Mercado = outro mercado & Número de apostas = várias",
-     "n": 82,
-     "games": 32,
-     "roi": -0.1822,
-     "status": "em observação"
     }
    ]
   },
-  "hypotheses": 9456,
-  "tested": 975,
+  "hypotheses": 9462,
+  "tested": 979,
   "corrected_bar": null,
   "counts": {
-   "em observação": 9401,
+   "em observação": 9407,
    "abandonada": 34,
    "promissora": 21
   },
@@ -4723,7 +4723,7 @@
       0.3069
      ],
      "prob_above_cut": 0.9787,
-     "prob_adds": 0.9943,
+     "prob_adds": 0.9935,
      "bets": 33,
      "pending_status": null,
      "entry_status": "em observação",
@@ -4803,7 +4803,7 @@
       -0.0593
      ],
      "prob_above_cut": 0.0051,
-     "prob_adds": 0.0078,
+     "prob_adds": 0.0067,
      "bets": 34,
      "pending_status": null,
      "entry_status": "abandonada",
@@ -4842,7 +4842,7 @@
       -0.0504
      ],
      "prob_above_cut": 0.0065,
-     "prob_adds": 0.012,
+     "prob_adds": 0.0104,
      "bets": 39,
      "pending_status": null,
      "entry_status": "abandonada",
@@ -5474,6 +5474,139 @@
      "bad_total": 3
     },
     {
+     "match_id": "vitoria-ba-vs-bragantino-20261120",
+     "match": "Vitoria BA — Bragantino",
+     "league": "Brazilian BRAZIL SERIE A",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-19T22:30+00:00",
+     "date_utc": "2026-11-19T22:30:58+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Draw No Bet",
+     "selection": "RB Bragantino",
+     "odds": 1.81,
+     "odds_last": 1.81,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 89,
+     "good": [
+      {
+       "id": "Stake | Competição = liga & Momento do aviso = até 45 min depois do início",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ]
+       ],
+       "n": 12,
+       "games": 12,
+       "hits": 11,
+       "break_even": 0.5392,
+       "prob_above": 0.9796,
+       "roi": 0.6875,
+       "edge": 0.2059,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = até 45 min depois do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ]
+       ],
+       "n": 44,
+       "games": 38,
+       "hits": 32,
+       "break_even": 0.5374,
+       "prob_above": 0.9783,
+       "roi": 0.3023,
+       "edge": 0.1418,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = até 45 min depois do início",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ]
+       ],
+       "n": 25,
+       "games": 23,
+       "hits": 20,
+       "break_even": 0.5925,
+       "prob_above": 0.9774,
+       "roi": 0.356,
+       "edge": 0.1613,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 30,
+     "bad": [
+      {
+       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 92,
+       "games": 35,
+       "hits": 47,
+       "break_even": 0.5115,
+       "prob_above": 0.1104,
+       "roi": -0.0624,
+       "edge": -0.0908,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Número de apostas",
+         "várias"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 25,
+       "games": 18,
+       "hits": 13,
+       "break_even": 0.5534,
+       "prob_above": 0.1461,
+       "roi": -0.1223,
+       "edge": -0.0991,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 5
+    },
+    {
      "match_id": "ittihad-kalba-vs-sharjah-scc-20261120",
      "match": "Ittihad Kalba — Sharjah SCC",
      "league": "UAE Premier League",
@@ -5641,7 +5774,7 @@
      "conflict": false,
      "validated": false,
      "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 108,
+     "odds_band_n": 109,
      "good": [
       {
        "id": "Polymarket | Hora (UTC) = noite & Número de apostas = uma",
@@ -5721,7 +5854,112 @@
        "source": "gerador"
       }
      ],
-     "bad_total": 49
+     "bad_total": 48
+    },
+    {
+     "match_id": "newcastle-united-vs-arsenal-20261121",
+     "match": "Newcastle United — Arsenal",
+     "league": "England Premier League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-21T17:30+00:00",
+     "date_utc": "2026-11-18T12:15:47+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(-0.5)",
+     "odds": 1.59,
+     "odds_last": 1.59,
+     "max_mult": 1,
+     "share": 100,
+     "share_last": 100,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 109,
+     "good": [
+      {
+       "id": "Polymarket | Dia = dia de semana & Número de apostas = várias",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Número de apostas",
+         "várias"
+        ]
+       ],
+       "n": 88,
+       "games": 39,
+       "hits": 49,
+       "break_even": 0.5261,
+       "prob_above": 0.8266,
+       "roi": 0.0416,
+       "edge": 0.0655,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 1,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 34,
+       "games": 32,
+       "hits": 12,
+       "break_even": 0.5792,
+       "prob_above": 0.0079,
+       "roi": -0.3909,
+       "edge": -0.1848,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 39,
+       "games": 35,
+       "hits": 15,
+       "break_even": 0.5769,
+       "prob_above": 0.0101,
+       "roi": -0.3356,
+       "edge": -0.172,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 41
     },
     {
      "match_id": "seattle-sounders-vs-salt-lake-20261120",
@@ -6568,446 +6806,16 @@
       }
      ],
      "bad_total": 3
-    },
-    {
-     "match_id": "vitoria-ba-vs-bragantino-20261120",
-     "match": "Vitoria BA — Bragantino",
-     "league": "Brazilian BRAZIL SERIE A",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-19T22:30+00:00",
-     "date_utc": "2026-11-19T21:51:33+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Polymarket",
-     "selection": "AH2(-0.5)",
-     "odds": 2.7,
-     "odds_last": 2.7,
-     "max_mult": 1,
-     "share": 68,
-     "share_last": 68,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 77,
-     "good": [
-      {
-       "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Quota de mercado = menos de 80 %",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 2,00 a 3,00"
-        ],
-        [
-         "Momento",
-         "antes do jogo"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ]
-       ],
-       "n": 44,
-       "games": 32,
-       "hits": 24,
-       "break_even": 0.4537,
-       "prob_above": 0.8853,
-       "roi": 0.1877,
-       "edge": 0.0924,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 2,00 a 3,00"
-        ],
-        [
-         "Número de apostas",
-         "várias"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 25,
-       "games": 20,
-       "hits": 15,
-       "break_even": 0.4625,
-       "prob_above": 0.8715,
-       "roi": 0.2884,
-       "edge": 0.1027,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 2,00 a 3,00"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 19,
-       "games": 15,
-       "hits": 12,
-       "break_even": 0.4507,
-       "prob_above": 0.8672,
-       "roi": 0.3632,
-       "edge": 0.1106,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 9,
-     "bad": [
-      {
-       "id": "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Mercado",
-         "outro mercado"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 46,
-       "games": 29,
-       "hits": 15,
-       "break_even": 0.4749,
-       "prob_above": 0.029,
-       "roi": -0.3774,
-       "edge": -0.1491,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 28,
-       "games": 17,
-       "hits": 9,
-       "break_even": 0.5048,
-       "prob_above": 0.0312,
-       "roi": -0.3871,
-       "edge": -0.1758,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 26
-    },
-    {
-     "match_id": "vitoria-ba-vs-bragantino-20261120",
-     "match": "Vitoria BA — Bragantino",
-     "league": "Brazilian BRAZIL SERIE A",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-19T22:30+00:00",
-     "date_utc": "2026-11-19T21:51:33+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Polymarket",
-     "selection": "AH1(+0.5)",
-     "odds": 1.59,
-     "odds_last": 1.59,
-     "max_mult": 1,
-     "share": 22,
-     "share_last": 22,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 108,
-     "good": [
-      {
-       "id": "Polymarket | Dia = dia de semana & Número de apostas = várias & Quota de mercado = menos de 80 %",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Número de apostas",
-         "várias"
-        ],
-        [
-         "Quota de mercado",
-         "menos de 80 %"
-        ]
-       ],
-       "n": 61,
-       "games": 25,
-       "hits": 34,
-       "break_even": 0.5015,
-       "prob_above": 0.8447,
-       "roi": 0.0913,
-       "edge": 0.0841,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 1,
-     "bad": [
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Mercado",
-         "outro mercado"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 34,
-       "games": 32,
-       "hits": 12,
-       "break_even": 0.5792,
-       "prob_above": 0.0079,
-       "roi": -0.3909,
-       "edge": -0.1848,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 39,
-       "games": 35,
-       "hits": 15,
-       "break_even": 0.5769,
-       "prob_above": 0.0101,
-       "roi": -0.3356,
-       "edge": -0.172,
-       "status": "abandonada",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 52
-    },
-    {
-     "match_id": "vasco-da-gama-bra-vs-internacional-20261120",
-     "match": "Vasco da Gama (Bra) — Internacional",
-     "league": "Brazilian BRAZIL SERIE A",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-19T22:30+00:00",
-     "date_utc": "2026-11-19T12:07:14+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Polymarket",
-     "selection": "AH1(-0.5)",
-     "odds": 1.61,
-     "odds_last": 1.61,
-     "max_mult": 1,
-     "share": 100,
-     "share_last": 100,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 108,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Mercado",
-         "outro mercado"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 34,
-       "games": 32,
-       "hits": 12,
-       "break_even": 0.5792,
-       "prob_above": 0.0079,
-       "roi": -0.3909,
-       "edge": -0.1848,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 39,
-       "games": 35,
-       "hits": 15,
-       "break_even": 0.5769,
-       "prob_above": 0.0101,
-       "roi": -0.3356,
-       "edge": -0.172,
-       "status": "abandonada",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 50
-    },
-    {
-     "match_id": "newcastle-united-vs-arsenal-20261121",
-     "match": "Newcastle United — Arsenal",
-     "league": "England Premier League",
-     "family": "Polymarket",
-     "type": "POLYMARKET",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-21T17:30+00:00",
-     "date_utc": "2026-11-18T12:15:47+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Polymarket",
-     "selection": "AH2(-0.5)",
-     "odds": 1.59,
-     "odds_last": 1.59,
-     "max_mult": 1,
-     "share": 100,
-     "share_last": 100,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 108,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Mercado",
-         "outro mercado"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 34,
-       "games": 32,
-       "hits": 12,
-       "break_even": 0.5792,
-       "prob_above": 0.0079,
-       "roi": -0.3909,
-       "edge": -0.1848,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 39,
-       "games": 35,
-       "hits": 15,
-       "break_even": 0.5769,
-       "prob_above": 0.0101,
-       "roi": -0.3356,
-       "edge": -0.172,
-       "status": "abandonada",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 42
     }
    ],
    "counts": {
     "favorável": 0,
-    "misto": 6,
+    "misto": 8,
     "sem evidência": 0,
-    "contraditório": 8,
-    "evitar": 2
+    "contraditório": 6,
+    "evitar": 0
    },
-   "generated_utc": "2026-11-19T22:26:44+00:00",
+   "generated_utc": "2026-11-19T22:31:34+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -7020,9 +6828,9 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 9371,
-     "with_prospective_evidence": 3065,
-     "prospective_games": 63831
+     "hypotheses": 9377,
+     "with_prospective_evidence": 3071,
+     "prospective_games": 64022
     },
     "llm/novas": {
      "hypotheses": 20,
@@ -7134,13 +6942,13 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 506,
-    "settled": 425,
+    "bets": 507,
+    "settled": 426,
     "games": 274,
-    "wins": 210,
-    "units": 28.01,
-    "roi": 0.0659,
-    "roi_cut": 0.0468
+    "wins": 211,
+    "units": 28.63,
+    "roi": 0.0672,
+    "roi_cut": 0.0481
    },
    "skipped": {
     "bets": 399,
@@ -7161,7 +6969,6 @@
     "roi_cut": -0.0514
    },
    "curve": [
-    -2.92,
     -2.12,
     -1.2,
     -1.2,
@@ -7560,13 +7367,14 @@
     28.01,
     27.01,
     27.61,
-    28.01
+    28.23,
+    28.63
    ],
-   "prob_followed_better": 0.7749,
+   "prob_followed_better": 0.775,
    "first_followed_utc": "2026-11-12T19:27:25+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 714,
+    "results_verified": 715,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -7585,21 +7393,21 @@
    }
   },
   "multiplicity": {
-   "tested_now": 975,
-   "distinct_game_sets_tested": 897,
+   "tested_now": 979,
+   "distinct_game_sets_tested": 901,
    "distinct_game_sets_promising_or_better": 21,
    "promising_or_better": 21,
    "promising_sum_games": 876,
    "promising_union_games": 225,
    "evidence_levels": {
-    "exploratória": 441,
-    "prospetiva": 534,
+    "exploratória": 443,
+    "prospetiva": 536,
     "não verificável": 0
    },
    "prospective_categories_tested": {
-    "prospective": 32618,
-    "mixed": 659,
-    "before_registration": 5680,
+    "prospective": 32769,
+    "mixed": 665,
+    "before_registration": 5700,
     "after_registration_not_operational": 205,
     "result_known_before_decision": 832,
     "result_time_unproven": 0
@@ -7674,7 +7482,7 @@
    "newly_selected": [],
    "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
   },
-  "expected_by_chance": 48.8,
+  "expected_by_chance": 49.0,
   "top": [
    {
     "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
@@ -8413,7 +8221,7 @@
      0.3069
     ],
     "prob_above_cut": 0.9787,
-    "prob_adds": 0.9943,
+    "prob_adds": 0.9935,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:45:32+00:00",
@@ -11059,7 +10867,7 @@
      0.354
     ],
     "prob_above_cut": 0.961,
-    "prob_adds": 0.9909,
+    "prob_adds": 0.9897,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-18T20:16:24+00:00",
@@ -12094,7 +11902,7 @@
      0.2588
     ],
     "prob_above_cut": 0.9526,
-    "prob_adds": 0.982,
+    "prob_adds": 0.9795,
     "pending_status": null,
     "entry_status": "promissora",
     "born_utc": "2026-11-14T20:41:21+00:00",
@@ -12796,7 +12604,7 @@
      0.3041
     ],
     "prob_above_cut": 0.9511,
-    "prob_adds": 0.9842,
+    "prob_adds": 0.9822,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T18:13:22+00:00",
@@ -14135,7 +13943,7 @@
      0.3529
     ],
     "prob_above_cut": 0.9469,
-    "prob_adds": 0.984,
+    "prob_adds": 0.9822,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-19T15:45:36+00:00",
@@ -15263,7 +15071,7 @@
      0.303
     ],
     "prob_above_cut": 0.94,
-    "prob_adds": 0.9788,
+    "prob_adds": 0.9763,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-18T22:48:07+00:00",
@@ -17301,25 +17109,25 @@
    "Betfair | Dia = dia de semana & Tamanho do mercado = menos de 10 mil $": "abandonada",
    "Betfair | Hora (UTC) = tarde & Reforço = sem reforço": "abandonada",
    "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": "abandonada",
    "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": "abandonada",
    "Betfair | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
    "Polymarket | Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 %": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
    "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
    "Betfair | Competição = seleções": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": "abandonada",
    "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": "abandonada",
-   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
-   "Betfair | Competição = seleções & Dia = dia de semana": "abandonada",
+   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": "abandonada",
-   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
+   "Betfair | Competição = seleções & Dia = dia de semana": "abandonada",
+   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -17763,7 +17571,7 @@
      0.0415
     ],
     "prob_above_cut": 0.1086,
-    "prob_adds": 0.1306,
+    "prob_adds": 0.1199,
     "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
     "family": "Polymarket",
     "conditions": [
@@ -17986,7 +17794,7 @@
    },
    {
     "n": 92,
-    "signals": 145,
+    "signals": 146,
     "hits": 47,
     "misses": 45,
     "hit_rate": 0.511,
@@ -18022,7 +17830,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 49,
+    "open": 50,
     "born_verified": true,
     "game_set": "81c03b35ac64249e",
     "prospective": {
@@ -18061,84 +17869,84 @@
     "entry_status": "em observação"
    },
    {
-    "n": 76,
-    "signals": 82,
-    "hits": 33,
-    "misses": 43,
-    "hit_rate": 0.4342,
+    "n": 94,
+    "signals": 101,
+    "hits": 48,
+    "misses": 46,
+    "hit_rate": 0.5106,
     "ci95": [
-     0.3286,
-     0.5461
+     0.4112,
+     0.6093
     ],
-    "break_even": 0.5054,
-    "roi": -0.1721,
-    "games": 37,
-    "bets": 76,
+    "break_even": 0.581,
+    "roi": -0.1245,
+    "games": 54,
+    "bets": 94,
     "unidentified": 0,
-    "prudent_rate": 0.4292,
-    "prob_above": 0.0997,
-    "edge": -0.093,
+    "prudent_rate": 0.5021,
+    "prob_above": 0.1101,
+    "edge": -0.0765,
     "edge_ci": [
-     -0.2089,
-     0.0264
+     -0.1786,
+     0.0256
     ],
-    "prob_above_cut": 0.0765,
-    "prob_adds": 0.1646,
-    "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não",
+    "prob_above_cut": 0.0781,
+    "prob_adds": 0.073,
+    "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
     "family": "Polymarket",
     "conditions": [
      [
-      "Outros sinais no mesmo jogo",
-      "jogo com vários tipos de sinal"
+      "Faixa de odd",
+      "odd 1,50 a 2,00"
      ],
      [
-      "Sinal anterior de outro tipo no mesmo jogo",
-      "não"
+      "Outros sinais no mesmo jogo",
+      "jogo com vários tipos de sinal"
      ]
     ],
     "source": "gerador",
-    "born_utc": "2026-11-14T13:47:59+00:00",
+    "born_utc": "2026-11-14T13:22:27+00:00",
     "reason": null,
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 6,
+    "open": 7,
     "born_verified": true,
-    "game_set": "00226317fe68b7d2",
+    "game_set": "6457b4e79378d1bb",
     "prospective": {
-     "games": 27,
-     "hits": 9.5,
-     "misses": 17.5,
-     "prob_above": 0.0591,
-     "roi": -0.2422,
+     "games": 44,
+     "hits": 21.43,
+     "misses": 22.57,
+     "prob_above": 0.1361,
+     "roi": -0.0953,
      "categories": {
-      "prospective": 27,
-      "mixed": 5,
-      "before_registration": 4,
+      "prospective": 44,
+      "mixed": 3,
+      "before_registration": 6,
       "after_registration_not_operational": 1,
       "result_known_before_decision": 0,
       "result_time_unproven": 0
      }
     },
-    "evidence_level": "exploratória",
+    "evidence_level": "prospetiva",
     "status": "abandonada",
     "pending_status": null,
     "status_changes": [
      {
-      "games": 34,
+      "games": 31,
       "from": "em observação",
       "to": "abandonada",
-      "prob_above": 0.0991,
-      "known_utc": "2026-11-17T21:48:52+00:00"
+      "prob_above": 0.0755,
+      "known_utc": "2026-11-16T20:59:59+00:00"
      }
     ],
     "confirmation": null,
     "at_birth": {
-     "games": 1,
-     "prob_above": 0.3804
+     "games": 4,
+     "prob_above": 0.434
     },
     "result_time_unknown": 0,
-    "entry_status": "abandonada"
+    "entry_status": "em observação"
    }
   ],
   "llm": [
@@ -23397,19 +23205,19 @@
       ]
      ],
      "expect": null,
-     "games": 64,
-     "n": 108,
-     "roi": -0.1254,
-     "game_roi": -0.1812,
-     "game_roi_cut": -0.1976,
-     "prob_above": 0.0673,
-     "prob_above_cut": 0.0443,
-     "edge": -0.0867,
+     "games": 65,
+     "n": 109,
+     "roi": -0.1185,
+     "game_roi": -0.1689,
+     "game_roi_cut": -0.1855,
+     "prob_above": 0.0811,
+     "prob_above_cut": 0.0542,
+     "edge": -0.0805,
      "edge_ci": [
-      -0.1816,
-      0.0085
+      -0.1748,
+      0.014
      ],
-     "prospective_games": 56,
+     "prospective_games": 57,
      "born_utc": "2026-11-14T11:33:14+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -23467,6 +23275,7 @@
       "portugal-vs-denmark-20261114",
       "remo-vs-chapecoense-20261119",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "st-kitts-and-nevis-vs-bonaire-20261117",
@@ -23744,19 +23553,19 @@
       ]
      ],
      "expect": null,
-     "games": 32,
-     "n": 36,
-     "roi": -0.3397,
-     "game_roi": -0.4166,
-     "game_roi_cut": -0.4282,
-     "prob_above": 0.0304,
-     "prob_above_cut": 0.0211,
-     "edge": -0.1438,
+     "games": 33,
+     "n": 37,
+     "roi": -0.3138,
+     "game_roi": -0.3852,
+     "game_roi_cut": -0.3974,
+     "prob_above": 0.0414,
+     "prob_above_cut": 0.0292,
+     "edge": -0.1316,
      "edge_ci": [
-      -0.2666,
-      -0.0175
+      -0.2537,
+      -0.0067
      ],
-     "prospective_games": 24,
+     "prospective_games": 25,
      "born_utc": "2026-11-14T18:49:31+00:00",
      "evidence_level": "exploratória",
      "confirmation": null,
@@ -23790,6 +23599,7 @@
       "macedonia-vs-slovenia-20261116",
       "mallorca-vs-cordoba-cf-20261114",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "spain-vs-england-20261115",
       "wales-vs-portugal-20261117",
       "wimbledon-vs-blackpool-20261114"
@@ -24183,19 +23993,19 @@
       ]
      ],
      "expect": null,
-     "games": 53,
-     "n": 93,
-     "roi": -0.1325,
-     "game_roi": -0.1443,
-     "game_roi_cut": -0.1615,
-     "prob_above": 0.0913,
-     "prob_above_cut": 0.0638,
-     "edge": -0.0837,
+     "games": 54,
+     "n": 94,
+     "roi": -0.1245,
+     "game_roi": -0.1302,
+     "game_roi_cut": -0.1476,
+     "prob_above": 0.1101,
+     "prob_above_cut": 0.0781,
+     "edge": -0.0765,
      "edge_ci": [
-      -0.1865,
-      0.0193
+      -0.1786,
+      0.0256
      ],
-     "prospective_games": 43,
+     "prospective_games": 44,
      "born_utc": "2026-11-14T13:22:27+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24244,6 +24054,7 @@
       "portugal-vs-denmark-20261114",
       "remo-vs-chapecoense-20261119",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "st-kitts-and-nevis-vs-bonaire-20261117",
@@ -24282,19 +24093,19 @@
       ]
      ],
      "expect": null,
-     "games": 35,
-     "n": 53,
-     "roi": -0.1792,
-     "game_roi": -0.1971,
-     "game_roi_cut": -0.2132,
-     "prob_above": 0.0725,
-     "prob_above_cut": 0.053,
-     "edge": -0.1083,
+     "games": 36,
+     "n": 54,
+     "roi": -0.1644,
+     "game_roi": -0.1744,
+     "game_roi_cut": -0.191,
+     "prob_above": 0.0922,
+     "prob_above_cut": 0.0683,
+     "edge": -0.0976,
      "edge_ci": [
-      -0.2285,
-      0.0137
+      -0.217,
+      0.023
      ],
-     "prospective_games": 28,
+     "prospective_games": 29,
      "born_utc": "2026-11-14T16:02:31+00:00",
      "evidence_level": "exploratória",
      "confirmation": null,
@@ -24329,6 +24140,7 @@
       "norway-vs-wales-20261114",
       "poland-vs-sweden-20261117",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "sweden-vs-bosnia-20261114",
@@ -24441,19 +24253,19 @@
       ]
      ],
      "expect": null,
-     "games": 41,
-     "n": 56,
-     "roi": -0.2063,
-     "game_roi": -0.3654,
-     "game_roi_cut": -0.3781,
-     "prob_above": 0.0412,
-     "prob_above_cut": 0.0282,
-     "edge": -0.1211,
+     "games": 42,
+     "n": 57,
+     "roi": -0.1918,
+     "game_roi": -0.3419,
+     "game_roi_cut": -0.3551,
+     "prob_above": 0.0533,
+     "prob_above_cut": 0.037,
+     "edge": -0.1114,
      "edge_ci": [
-      -0.2338,
-      -0.0064
+      -0.2235,
+      0.0022
      ],
-     "prospective_games": 30,
+     "prospective_games": 31,
      "born_utc": "2026-11-14T17:38:20+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24492,6 +24304,7 @@
       "norway-vs-wales-20261114",
       "portugal-vs-denmark-20261114",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "stockport-county-vs-reading-20261114",
@@ -24524,19 +24337,19 @@
       ]
      ],
      "expect": null,
-     "games": 46,
-     "n": 64,
-     "roi": -0.1578,
-     "game_roi": -0.163,
-     "game_roi_cut": -0.1798,
-     "prob_above": 0.0838,
-     "prob_above_cut": 0.0597,
-     "edge": -0.092,
+     "games": 47,
+     "n": 65,
+     "roi": -0.1458,
+     "game_roi": -0.1464,
+     "game_roi_cut": -0.1635,
+     "prob_above": 0.1028,
+     "prob_above_cut": 0.0743,
+     "edge": -0.0836,
      "edge_ci": [
-      -0.2005,
-      0.0174
+      -0.1915,
+      0.0247
      ],
-     "prospective_games": 38,
+     "prospective_games": 39,
      "born_utc": "2026-11-14T14:32:11+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24580,6 +24393,7 @@
       "norway-vs-wales-20261114",
       "poland-vs-sweden-20261117",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "sweden-vs-bosnia-20261114",
@@ -24616,19 +24430,19 @@
       ]
      ],
      "expect": null,
-     "games": 36,
-     "n": 44,
-     "roi": -0.22,
-     "game_roi": -0.3314,
-     "game_roi_cut": -0.3448,
-     "prob_above": 0.0513,
-     "prob_above_cut": 0.0364,
-     "edge": -0.1198,
+     "games": 37,
+     "n": 45,
+     "roi": -0.2013,
+     "game_roi": -0.3057,
+     "game_roi_cut": -0.3196,
+     "prob_above": 0.0666,
+     "prob_above_cut": 0.0479,
+     "edge": -0.1091,
      "edge_ci": [
-      -0.2383,
-      0.0009
+      -0.2269,
+      0.0103
      ],
-     "prospective_games": 27,
+     "prospective_games": 28,
      "born_utc": "2026-11-14T16:09:00+00:00",
      "evidence_level": "exploratória",
      "confirmation": null,
@@ -24662,6 +24476,7 @@
       "mallorca-vs-cordoba-cf-20261114",
       "norway-vs-wales-20261114",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "sweden-vs-bosnia-20261114",
@@ -24860,19 +24675,19 @@
       ]
      ],
      "expect": null,
-     "games": 50,
-     "n": 66,
-     "roi": -0.1968,
-     "game_roi": -0.3442,
-     "game_roi_cut": -0.3573,
-     "prob_above": 0.0267,
-     "prob_above_cut": 0.0171,
-     "edge": -0.1241,
+     "games": 51,
+     "n": 67,
+     "roi": -0.1846,
+     "game_roi": -0.3253,
+     "game_roi_cut": -0.3388,
+     "prob_above": 0.0347,
+     "prob_above_cut": 0.0225,
+     "edge": -0.1158,
      "edge_ci": [
-      -0.2281,
-      -0.0183
+      -0.2193,
+      -0.0108
      ],
-     "prospective_games": 41,
+     "prospective_games": 42,
      "born_utc": "2026-11-14T14:38:10+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24918,6 +24733,7 @@
       "norway-vs-wales-20261114",
       "portugal-vs-denmark-20261114",
       "romania-vs-poland-20261114",
+      "sl-benfica-women-vs-as-roma-women-20261119",
       "sociedad-b-vs-sporting-gijon-20261114",
       "spain-vs-england-20261115",
       "stockport-county-vs-reading-20261114",
@@ -26415,7 +26231,7 @@
     "roi_announced_odds": 0.0886,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 19.3,
+    "per_day": 19.2,
     "days_to_hint": 0,
     "days_to_conclusion": 9
    },
@@ -26449,7 +26265,7 @@
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
-    "signals": 259,
+    "signals": 260,
     "with_result": 162,
     "hits": 89,
     "misses": 67,
@@ -26954,7 +26770,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 943,
+   "bets": 944,
    "settled": 764,
    "matches": 415,
    "wins": 373,
@@ -26989,6 +26805,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-19T22:30:58+00:00",
+   "match_id": "vitoria-ba-vs-bragantino-20261120",
+   "group": "STAKE_LOAD/pre",
+   "match": "Vitoria BA — Bragantino",
+   "selection": "Draw No Bet: RB Bragantino",
+   "odds": 1.81,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-19T22:08:51+00:00",
    "match_id": "orlando-city-vs-cincinnati-20261120",
@@ -27890,22 +27719,6 @@
    "settled_by": null,
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-18T23:41:55+00:00",
-   "match_id": "campinense-vs-patos-pb-20261119",
-   "group": "OPEN_GAME",
-   "match": "Campinense — Patos PB",
-   "selection": "Over 3",
-   "odds": 1.81,
-   "ft": [
-    3,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -27916,6 +27729,15 @@
    "date_utc": "2026-11-19T20:41:43+00:00",
    "kickoff_utc": "2026-11-19T20:00+00:00",
    "why": "mercado que o resultado final não decide",
+   "signals": 1
+  },
+  {
+   "match_id": "glebe-north-vs-bangor-celtic-20261119",
+   "match": "Glebe North — Bangor Celtic",
+   "league": "Ireland Senior League",
+   "date_utc": "2026-11-19T20:29:02+00:00",
+   "kickoff_utc": null,
+   "why": "à espera dos minutos dos golos",
    "signals": 1
   },
   {
@@ -28439,15 +28261,6 @@
    "kickoff_utc": "2026-11-15T17:00+00:00",
    "why": "mercado que o resultado final não decide",
    "signals": 1
-  },
-  {
-   "match_id": "belarus-vs-albania-20261115",
-   "match": "Belarus — Albania",
-   "league": "UEFA Nations League",
-   "date_utc": "2026-11-15T17:05:45+00:00",
-   "kickoff_utc": "2026-11-15T17:00+00:00",
-   "why": "mercado que o resultado final não decide",
-   "signals": 1
   }
  ],
  "matches": {
@@ -28895,44 +28708,6 @@
    "goals_source": "Highlightly",
    "ft": [
     2,
-    1
-   ]
-  },
-  "campinense-vs-patos-pb-20261119": {
-   "teams": [
-    "Campinense",
-    "Patos PB"
-   ],
-   "events": [
-    {
-     "d": "2026-11-18T23:41:55+00:00",
-     "k": "OPEN_GAME",
-     "phase": "live",
-     "selection": "Over 3",
-     "odds": 1.81,
-     "minute": 41,
-     "score_at_signal": [
-      1,
-      1
-     ],
-     "rhythm": 82,
-     "bot_over_pct": 87,
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     58,
-     "2-1"
-    ],
-    [
-     76,
-     "3-1"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    3,
     1
    ]
   },
@@ -30382,6 +30157,15 @@
      "share": 22,
      "market": "Polymarket",
      "total": 5500.0
+    },
+    {
+     "d": "2026-11-19T22:30:58+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "RB Bragantino",
+     "odds": 1.81,
+     "market": "Draw No Bet",
+     "total": 7600.0
     }
    ],
    "goals": null,
@@ -36449,7 +36233,7 @@
    "day": "2026-11-18"
   },
   {
-   "bets": 57,
+   "bets": 58,
    "settled": 30,
    "wins": 17,
    "units": 2.15,
