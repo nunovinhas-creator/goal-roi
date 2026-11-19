@@ -7,7 +7,7 @@ Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunc
 import collections, csv, json, math, pathlib, re
 from datetime import datetime, timedelta, timezone
 
-from . import brain, certification, insights, llm_eval
+from . import brain, certification, insights, llm_eval, polymarket_alerts
 from .eligibility import eligible, exclusion_reasons
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
@@ -541,6 +541,8 @@ def build(csv_path=None, register=False, now=None):
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
     bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
     signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
+    finished_matches = set(ft) | set(bsd)
+    finished_matches.update(b['match_id'] for b in signals if b['ft'] or b['match_result_first_seen_utc'])
     by = collections.OrderedDict()
     for b in bets:
         by.setdefault(b['group'], []).append(b)
@@ -595,6 +597,7 @@ def build(csv_path=None, register=False, now=None):
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
         'operational': operational_evidence(signals),
+        polymarket_alerts.REPORT_KEY: polymarket_alerts.candidates(msgs, finished_matches, now),
         'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
