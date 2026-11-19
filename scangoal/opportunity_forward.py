@@ -57,7 +57,7 @@ def signal_timing(message, cutoff, as_of):
 def baseline_signal(m, cutoff, now):
     if (not isinstance(m, dict) or m.get("type") != "POLYMARKET" or m.get("phase") != "pre"
             or m.get("market") != "Asian Total" or m.get("selection") != "Over 2.5"
-            or m.get("period", "regulation") != "regulation" or m.get("bet") is not True
+            or m.get("period") != "regulation" or m.get("market_scope") != "match_goals" or m.get("bet") is not True
             or any(m.get(flag) is not False
                    for flag in ("had_ft_at_first_sight", "edited_at_first_sight", "burst"))
             or not eligible(dict(m, in_roi=True))):

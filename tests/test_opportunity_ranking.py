@@ -14,7 +14,7 @@ NOW = "2026-11-20T12:00:00+00:00"
 def signal(mid="match-1", **changes):
     return {
         "type": "POLYMARKET", "phase": "pre",
-        "market": "Asian Total", "selection": "Over 2.5",
+        "market": "Asian Total", "period": "regulation", "market_scope": "match_goals", "selection": "Over 2.5",
         "match_id": mid, "message_id": mid,
         "teams": [mid + " home", mid + " away"], "league": "Example League",
         "bet": True, "share": 79, "total": 9900, "odds": 1.85,

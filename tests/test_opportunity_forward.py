@@ -23,7 +23,7 @@ def signal(mid="game-1", **changes):
     return {
         "type": "POLYMARKET",
         "phase": "pre",
-        "market": "Asian Total",
+        "market": "Asian Total", "period": "regulation", "market_scope": "match_goals",
         "selection": "Over 2.5",
         "match_id": mid,
         "teams": ["Alpha", "Beta"],

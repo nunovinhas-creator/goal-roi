@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from scangoal import notify, polymarket_alerts, report
+from scangoal import notify, opportunity_forward, polymarket_alerts, report
 from scangoal.parser import parse
 from test_stale_notices import state as notification_state
 
@@ -29,7 +29,7 @@ def signal(**changes):
         'match_id': 'a-vs-b-20261119',
         'teams': ['A', 'B'],
         'league': 'Example League',
-        'market': 'Asian Total',
+        'market': 'Asian Total', 'period': 'regulation', 'market_scope': 'match_goals',
         'selection': 'Over 2.5',
         'odds': 1.85,
         'share': 79,
@@ -159,6 +159,31 @@ class PolymarketAlerts(unittest.TestCase):
         self.assertFalse(parse(raw.replace("Polymarket ·", "Polymarket · LIVE ·"))["bet"])
         live = parse(raw.replace("19 nov 2026 13:10", "LIVE 32' 1:1"))
         self.assertEqual((live["phase"], live["score_at_signal"]), ("live", [1, 1]))
+
+    def test_original_header_scope_is_required_by_both_consumers(self):
+        def evaluate(header, quote):
+            parsed = parse("\n".join((
+                "📈 🔷 Polymarket · " + header + "19 nov 2026 21:00",
+                "A — B · Example League", quote + " @1.85 · $9.9K",
+                "🧾 2 trades · market share 72%",
+                "https://scangoal.com/match/a-vs-b-20261119?lang=en",
+            )))
+            row = dict(parsed, message_id=1, date_utc=timestamp(-3), collected_at_utc=timestamp(-2),
+                       had_ft_at_first_sight=False, edited_at_first_sight=False, burst=False)
+            alerts = polymarket_alerts.candidates([row], set(), NOW)
+            eligible = opportunity_forward.eligible_signal(row, NOW - timedelta(hours=1), NOW + timedelta(minutes=20))
+            return parsed, bool(alerts), eligible is not None
+
+        for market in ('Yellow Cards', 'Team Total', 'Overtime', 'Unknown Scope', 'Player Total', 'Corners'):
+            with self.subTest(market=market):
+                original, alert, admitted = evaluate(market + " · ", "Over 2.5")
+                self.assertFalse(alert or admitted)
+                self.assertEqual(original['bet'], market == 'Corners')
+        for quote in ('Team Total Over 2.5', 'Over 2.5 team goals', 'Over 2.5 unknown', '1H Over 2.5'):
+            with self.subTest(quote=quote):
+                self.assertEqual(evaluate("", quote)[1:], (False, False))
+        self.assertEqual(evaluate("", "Over 2.5")[1:], (True, True))
+        self.assertEqual(evaluate("Total Goals · ", "Over 2.5 (90 min)")[1:], (True, True))
 
     def test_amount_is_parsed_in_full_without_ambiguous_grouping(self):
         raw = ("📈 🔷 Polymarket · 19 nov 2026 13:10\nA — B · Example League\n"
