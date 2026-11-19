@@ -30,7 +30,7 @@ Disciplina (fixada a 12/11/2026):
 - Características que só se conhecem depois do primeiro sinal (reforço, movimento da odd...) tornam a hipótese
   "informativa": explica, mas não dá para apostar no momento do sinal, e não entra na lista "a seguir".
 """
-import hashlib, itertools, json, math
+import hashlib, itertools, json, math, re
 from datetime import datetime, timedelta, timezone
 
 from . import certification, chronology, freshness, insights
@@ -53,6 +53,8 @@ PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / mant
 ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
 CONFIRM_STEPS = 2        # jogos seguidos em que a nova condição se tem de manter para o estado mudar
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
+# Apenas para hipóteses explicitamente propostas pela LLM: não multiplicar o gerador histórico.
+POLYMARKET_EXACT_SELECTION = 'Seleção exata'
 
 
 def earlier_index(signals):
@@ -80,6 +82,11 @@ def atoms(b, multi, earlier=None):
                 ('Golos até ao sinal', 'nenhum' if sum(s) == 0 else '1 ou 2' if sum(s) <= 2 else '3 ou mais')]
     if b.get('minute') is not None:
         out.append(('Minuto', 'até ao 30' if b['minute'] <= 30 else '31 a 60' if b['minute'] <= 60 else '61 em diante'))
+    if b['type'] == 'POLYMARKET' and b.get('market') == 'Asian Total':
+        selection = b.get('selection')
+        if isinstance(selection, str) and re.fullmatch(r'(?:Over|Under) [0-9]+(?:\.[0-9]{1,2})?', selection):
+            # A linha exata vem da versão original do sinal, antes do resultado.
+            out.append((POLYMARKET_EXACT_SELECTION, selection))
     if b['type'] == 'BETFAIR':
         out.append(('Seleção', {'1': 'equipa da casa', 'X': 'empate', '2': 'equipa de fora'}.get(b.get('selection'))))
         if b.get('sel_volume') is not None:
@@ -116,7 +123,11 @@ def candidates(signals):
     signals = [b for b in signals if eligible(b)]
     multi, support, earlier = multi_matches(signals), {}, earlier_index(signals)
     for b in signals:
-        fam, at = insights.family(b), sorted(set(atoms(b, multi, earlier)))
+        # A linha exata é avaliável em propostas LLM, mas não entra no gerador
+        # combinatório retrospetivo de 3 dimensões (controlo de multiplicidade).
+        fam, at = insights.family(b), sorted(
+            (d, v) for d, v in set(atoms(b, multi, earlier)) if d != POLYMARKET_EXACT_SELECTION
+        )
         for k in range(1, MAX_CONDITIONS + 1):
             for c in itertools.combinations(at, k):
                 if len({x[0] for x in c}) == k:   # uma característica só entra uma vez
