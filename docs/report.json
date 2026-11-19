@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-19T14:08:39+00:00",
- "messages": 1684,
+ "generated_at_utc": "2026-11-19T14:17:55+00:00",
+ "messages": 1686,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 54,
-  "BETFAIR": 326,
+  "BETFAIR": 328,
   "STAKE_LOAD": 330,
   "OPEN_GAME": 200,
   "TOTALS_FORM": 70,
@@ -15,10 +15,8 @@
   "None": 57,
   "TOTALS_FORM_NO_ODDS": 80
  },
- "unparsed": 101,
+ "unparsed": 103,
  "unparsed_samples": [
-  "💷 🟨 Betfair · LIVE",
-  "🏁 Signal result",
   "📊 🟩 Kalshi · LIVE 81' 0:0",
   "🏁 Signal result",
   "💷 🟨 Betfair · LIVE",
@@ -26,6 +24,8 @@
   "🧑‍💼 NEW COACH",
   "💷 🟨 Betfair · LIVE",
   "💷💷 🟨 Betfair ×2 · LIVE",
+  "💷 🟨 Betfair · LIVE",
+  "💷 🟨 Betfair · LIVE",
   "💷 🟨 Betfair · LIVE"
  ],
  "excluded_first_seen_with_result": 37,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2812,
+  "versions": 2814,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-19T14:06:16+00:00",
+  "last_collected_at_utc": "2026-11-19T14:17:55+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T14:08:36+00:00",
+  "collector_last_run_utc": "2026-11-19T14:17:55+00:00",
   "name_review": [
    {
     "bot": [
@@ -1626,7 +1626,7 @@
    "roi_announced_odds": 0.2279,
    "seen_late": 4,
    "by_bot_mark": 0,
-   "per_day": 12.7,
+   "per_day": 12.6,
    "days_to_hint": 0,
    "days_to_conclusion": 16,
    "prudent_rate": 0.38,
@@ -1702,7 +1702,7 @@
    "by_bot_mark": 0,
    "per_day": 0.4,
    "days_to_hint": 73,
-   "days_to_conclusion": 799,
+   "days_to_conclusion": 800,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -1811,7 +1811,7 @@
    "roi_announced_odds": -0.0552,
    "seen_late": 0,
    "by_bot_mark": 126,
-   "per_day": 31.4,
+   "per_day": 31.3,
    "days_to_hint": 0,
    "days_to_conclusion": 3,
    "prudent_rate": 0.4822,
@@ -1848,7 +1848,7 @@
    "roi_announced_odds": 0.0297,
    "seen_late": 9,
    "by_bot_mark": 31,
-   "per_day": 19.8,
+   "per_day": 19.7,
    "days_to_hint": 0,
    "days_to_conclusion": 8,
    "prudent_rate": 0.5578,
@@ -1922,7 +1922,7 @@
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 13.1,
+   "per_day": 13.0,
    "days_to_hint": 0,
    "days_to_conclusion": 18,
    "prudent_rate": 0.8173,
@@ -1961,7 +1961,7 @@
    "by_bot_mark": 0,
    "per_day": 1.9,
    "days_to_hint": 8,
-   "days_to_conclusion": 149,
+   "days_to_conclusion": 150,
    "prudent_rate": 0.5181,
    "prob_above": 0.5042,
    "edge": 0.0006,
@@ -3451,9 +3451,9 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 9067,
+    "em observação": 9066,
     "abandonada": 29,
-    "promissora": 94
+    "promissora": 95
    },
    "hypotheses": [
     {
@@ -3590,18 +3590,18 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 128,
+     "games": 128,
+     "roi": -0.0245,
+     "status": "promissora"
+    },
+    {
      "id": "Polymarket | Competição = seleções & Quota de mercado = menos de 80 %",
      "n": 128,
      "games": 40,
      "roi": -0.0492,
      "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 127,
-     "games": 127,
-     "roi": -0.0358,
-     "status": "promissora"
     },
     {
      "id": "Polymarket | Mercado = outro mercado",
@@ -3765,6 +3765,13 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 110,
+     "games": 110,
+     "roi": -0.0109,
+     "status": "promissora"
+    },
+    {
      "id": "Polymarket | Dia = dia de semana",
      "n": 110,
      "games": 42,
@@ -3784,13 +3791,6 @@
      "games": 56,
      "roi": -0.0305,
      "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 109,
-     "games": 109,
-     "roi": -0.0228,
-     "status": "promissora"
     },
     {
      "id": "Polymarket | Competição = seleções & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
@@ -4136,6 +4136,13 @@
      "status": "em observação"
     },
     {
+     "id": "Forma de golos | Parte do jogo = 2.ª parte",
+     "n": 89,
+     "games": 89,
+     "roi": -0.0827,
+     "status": "em observação"
+    },
+    {
      "id": "Jogo aberto | Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 89,
      "games": 89,
@@ -4203,13 +4210,6 @@
      "n": 88,
      "games": 86,
      "roi": 0.1431,
-     "status": "em observação"
-    },
-    {
-     "id": "Forma de golos | Parte do jogo = 2.ª parte",
-     "n": 88,
-     "games": 88,
-     "roi": -0.096,
      "status": "em observação"
     },
     {
@@ -4509,7 +4509,7 @@
    ]
   },
   "hypotheses": 9190,
-  "tested": 930,
+  "tested": 940,
   "corrected_bar": null,
   "counts": {
    "em observação": 9142,
@@ -4881,162 +4881,6 @@
   },
   "agenda": {
    "items": [
-    {
-     "match_id": "cong-an-ha-noi-vs-johor-darul-takzim-20261119",
-     "match": "Cong An Ha Noi — Johor Darul Takzim",
-     "league": "Asian ASEAN Club Championship",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-19T12:30+00:00",
-     "date_utc": "2026-11-19T13:47:38+00:00",
-     "minute": null,
-     "score_at_signal": [
-      1,
-      1
-     ],
-     "market": "3rd Goal",
-     "selection": "Johor Darul Takzim FC",
-     "odds": 1.8,
-     "odds_last": 1.8,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 86,
-     "good": [
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 23,
-       "games": 22,
-       "hits": 20,
-       "break_even": 0.5757,
-       "prob_above": 0.9951,
-       "roi": 0.5167,
-       "edge": 0.2107,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 35,
-       "games": 30,
-       "hits": 27,
-       "break_even": 0.5852,
-       "prob_above": 0.9924,
-       "roi": 0.3203,
-       "edge": 0.1793,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ],
-        [
-         "Valor da aposta",
-         "menos de 10 mil $"
-        ]
-       ],
-       "n": 34,
-       "games": 31,
-       "hits": 26,
-       "break_even": 0.5545,
-       "prob_above": 0.987,
-       "roi": 0.42,
-       "edge": 0.1654,
-       "status": "promissora",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 46,
-     "bad": [
-      {
-       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Mercado",
-         "outros mercados"
-        ]
-       ],
-       "n": 27,
-       "games": 17,
-       "hits": 7,
-       "break_even": 0.4379,
-       "prob_above": 0.0372,
-       "roi": -0.5043,
-       "edge": -0.1658,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados & Número de apostas = uma",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Mercado",
-         "outros mercados"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ]
-       ],
-       "n": 18,
-       "games": 12,
-       "hits": 3,
-       "break_even": 0.3895,
-       "prob_above": 0.0492,
-       "roi": -0.6368,
-       "edge": -0.1674,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 9
-    },
     {
      "match_id": "eintracht-frankfurt-vs-hoffenheim-20261121",
      "match": "Eintracht Frankfurt — Hoffenheim",
@@ -5475,110 +5319,6 @@
       }
      ],
      "bad_total": 19
-    },
-    {
-     "match_id": "roltek-dob-vs-nk-bistrica-doljna-20261119",
-     "match": "Roltek Dob — NK Bistrica Doljna",
-     "league": "Slovenian Cup",
-     "family": "Forma de golos",
-     "type": "TOTALS_FORM",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-19T13:45:55+00:00",
-     "minute": 61,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Over 0.75",
-     "odds": 1.68,
-     "odds_last": 1.68,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 48,
-     "good": [
-      {
-       "id": "Forma de golos | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Hora (UTC)",
-         "tarde"
-        ]
-       ],
-       "n": 25,
-       "games": 25,
-       "hits": 19,
-       "break_even": 0.5858,
-       "prob_above": 0.8134,
-       "roi": 0.1618,
-       "edge": 0.0761,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 1,
-     "bad": [
-      {
-       "id": "Forma de golos | Dia = dia de semana & Parte do jogo = 2.ª parte",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ]
-       ],
-       "n": 15,
-       "games": 15,
-       "hits": 6,
-       "break_even": 0.588,
-       "prob_above": 0.0767,
-       "roi": -0.3953,
-       "edge": -0.1463,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Forma de golos | Dia = dia de semana & Golos até ao sinal = nenhum & Parte do jogo = 2.ª parte",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Golos até ao sinal",
-         "nenhum"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ]
-       ],
-       "n": 13,
-       "games": 13,
-       "hits": 5,
-       "break_even": 0.5698,
-       "prob_above": 0.0923,
-       "roi": -0.4123,
-       "edge": -0.142,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 11
     },
     {
      "match_id": "seattle-sounders-vs-salt-lake-20261120",
@@ -6557,12 +6297,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 5,
+    "misto": 3,
     "sem evidência": 0,
     "contraditório": 6,
     "evitar": 2
    },
-   "generated_utc": "2026-11-19T14:09:12+00:00",
+   "generated_utc": "2026-11-19T14:18:30+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6576,13 +6316,13 @@
    "by_source": {
     "gerador": {
      "hypotheses": 9108,
-     "with_prospective_evidence": 2977,
-     "prospective_games": 61417
+     "with_prospective_evidence": 2981,
+     "prospective_games": 61585
     },
     "llm/novas": {
      "hypotheses": 20,
      "with_prospective_evidence": 7,
-     "prospective_games": 147
+     "prospective_games": 148
     },
     "llm/refinar": {
      "hypotheses": 54,
@@ -6673,8 +6413,8 @@
     },
     {
      "id": "Forma de golos | Competição = liga & Golos em falta para ganhar = até 1 golo",
-     "games": 30,
-     "roi": -0.1525,
+     "games": 31,
+     "roi": -0.1253,
      "expect": "acima",
      "mode": null
     },
@@ -6690,12 +6430,12 @@
   "walk_forward": {
    "followed": {
     "bets": 479,
-    "settled": 408,
-    "games": 264,
-    "wins": 201,
-    "units": 28.06,
-    "roi": 0.0688,
-    "roi_cut": 0.0496
+    "settled": 409,
+    "games": 265,
+    "wins": 202,
+    "units": 28.75,
+    "roi": 0.0703,
+    "roi_cut": 0.0511
    },
    "skipped": {
     "bets": 399,
@@ -6716,7 +6456,6 @@
     "roi_cut": -0.0666
    },
    "curve": [
-    -4.31,
     -4.81,
     -5.81,
     -4.59,
@@ -7115,13 +6854,14 @@
     26.27,
     27.01,
     27.56,
-    28.06
+    28.06,
+    28.75
    ],
-   "prob_followed_better": 0.756,
+   "prob_followed_better": 0.7657,
    "first_followed_utc": "2026-11-12T19:27:25+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 697,
+    "results_verified": 698,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -7140,21 +6880,21 @@
    }
   },
   "multiplicity": {
-   "tested_now": 930,
-   "distinct_game_sets_tested": 858,
+   "tested_now": 940,
+   "distinct_game_sets_tested": 864,
    "distinct_game_sets_promising_or_better": 18,
    "promising_or_better": 18,
    "promising_sum_games": 726,
    "promising_union_games": 216,
    "evidence_levels": {
-    "exploratória": 430,
-    "prospetiva": 500,
+    "exploratória": 438,
+    "prospetiva": 502,
     "não verificável": 0
    },
    "prospective_categories_tested": {
-    "prospective": 30967,
+    "prospective": 31264,
     "mixed": 641,
-    "before_registration": 5375,
+    "before_registration": 5439,
     "after_registration_not_operational": 191,
     "result_known_before_decision": 818,
     "result_time_unproven": 0
@@ -7229,7 +6969,7 @@
    "newly_selected": [],
    "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
   },
-  "expected_by_chance": 46.5,
+  "expected_by_chance": 47.0,
   "top": [
    {
     "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
@@ -19121,71 +18861,6 @@
     ]
    },
    {
-    "date_utc": "2026-11-19T13:47:38+00:00",
-    "match": "Cong An Ha Noi — Johor Darul Takzim",
-    "match_id": "cong-an-ha-noi-vs-johor-darul-takzim-20261119",
-    "type": "STAKE_LOAD",
-    "market": "3rd Goal",
-    "selection": "Johor Darul Takzim FC",
-    "odds": 1.8,
-    "kickoff_utc": "2026-11-19T12:30+00:00",
-    "phase": "live",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-      "status": "promissora",
-      "n": 34,
-      "games": 31,
-      "hit_rate": 0.7647,
-      "prob_above": 0.987,
-      "edge": 0.1654,
-      "edge_ci": [
-       0.046,
-       0.2721
-      ],
-      "prob_above_cut": 0.9813,
-      "prudent_rate": 0.7262,
-      "break_even": 0.5545,
-      "certified": false
-     },
-     {
-      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 49,
-      "games": 36,
-      "hit_rate": 0.7143,
-      "prob_above": 0.9866,
-      "edge": 0.1558,
-      "edge_ci": [
-       0.0427,
-       0.258
-      ],
-      "prob_above_cut": 0.9804,
-      "prudent_rate": 0.7197,
-      "break_even": 0.5508,
-      "certified": false
-     },
-     {
-      "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 43,
-      "games": 36,
-      "hit_rate": 0.6977,
-      "prob_above": 0.9639,
-      "edge": 0.1258,
-      "edge_ci": [
-       0.0114,
-       0.2299
-      ],
-      "prob_above_cut": 0.9494,
-      "prudent_rate": 0.7058,
-      "break_even": 0.582,
-      "certified": false
-     }
-    ]
-   },
-   {
     "date_utc": "2026-11-19T12:51:56+00:00",
     "match": "Eintracht Frankfurt — Hoffenheim",
     "match_id": "eintracht-frankfurt-vs-hoffenheim-20261121",
@@ -25030,7 +24705,7 @@
     "roi_announced_odds": -0.0552,
     "seen_late": 0,
     "by_bot_mark": 126,
-    "per_day": 31.4,
+    "per_day": 31.3,
     "days_to_hint": 0,
     "days_to_conclusion": 3
    },
@@ -25059,7 +24734,7 @@
     "roi_announced_odds": 0.0568,
     "seen_late": 0,
     "by_bot_mark": 30,
-    "per_day": 21.6,
+    "per_day": 21.5,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -25119,7 +24794,7 @@
     "by_bot_mark": 0,
     "per_day": 1.9,
     "days_to_hint": 8,
-    "days_to_conclusion": 149
+    "days_to_conclusion": 150
    }
   },
   "regime": [
