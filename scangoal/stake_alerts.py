@@ -134,12 +134,16 @@ def deliver(signals, now=None, env=None, sender=None, path=None, publisher=None)
     if not token or not chat:
         print('STAKE_ALERTS skipped (no keys)')
         return []
+    candidates = matches(signals, now)
+    if not candidates:  # sem sinais Stake elegíveis, não há qualquer envio a proteger
+        print('STAKE_ALERTS sent 0')
+        return []
     path = Path(path) if path else data_dir() / STATE_NAME
     log_path = path.with_name(LOG_NAME)
     state = load_state(path)
     intents, lines = load_log(log_path)
     verify_state(state, intents)
-    pending = [m for m in matches(signals, now) if m['key'] not in intents]
+    pending = [m for m in candidates if m['key'] not in intents]
     if not pending:
         print('STAKE_ALERTS sent 0')
         return []
