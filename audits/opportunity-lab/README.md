@@ -37,3 +37,22 @@ Uma aposta teórica por jogo: **primeiro sinal elegível**, com a odd e quota or
 Esta não é a certificação `brain/certification` nem a auditoria da LLM. Não muda automaticamente o estado de hipóteses nem o ranking em produção. As portas da [issue #56](https://github.com/nunovinhas-creator/goal-roi/issues/56) continuam obrigatórias: tamanho de amostra, independência, estabilidade, baselines, correção de multiplicidade, cronologia e verificação em produção. Não promover estratégias com 8/9 resultados passados.
 
 **Limite conhecido:** esta auditoria analisa sinais originais existentes no GitHub (captura partilhada), não demonstra uma fonte SHADOW autónoma nem SLA de 120 segundos. O trabalho da PR #47 continua separado.
+
+## Fase 3: ranking conservador e benchmark (somente leitura)
+
+A execução independente `python -m scripts.opportunity_ranking` produz um JSON agregado sem identificadores de jogos, sem escrever ficheiros ou enviar mensagens. A única candidata inscrita, por enquanto, é a regra **pré-registada** `polymarket_pre_over25_share_lt80_total_lt10000_v1` da PR #55.
+
+O benchmark usa **sinais Polymarket pré-jogo, Asian Total Over 2.5 sem os cortes de quota e valor**, respeitando *o mesmo instante inicial*, odds válidas, versão original, primeira leitura comprovada, pelo menos 15 minutos antes do jogo, mesmo tratamento de resultados e uma aposta por jogo. É um benchmark **sobreposto**, não um controlo independente, e **não** fornece prova causal ou estatística de vantagem.
+
+Métricas calculadas para a candidata e o benchmark:
+
+- `forward_games`, `settled`, `pending`, `quarantined`, `wins`, `losses`, `timeouts_counted_as_losses`.
+- `roi_advertised`: lucro teórico médio por jogo liquidado à odd original.
+- `roi_odds_minus_2pct`: ROI após penalização fixa de 2% na odd (não é medida de slippage/comissões executados).
+- `roi_minus_baseline_descriptive`: diferença de ROIs observados, sem inferência.
+- `descriptive_two_se_score`: ROI reduzido menos duas vezes o erro-padrão amostral dos lucros individuais **se houver pelo menos 30 jogos futuros liquidados**. Esta penalização exploratória **não é um intervalo de confiança** nem uma correção de multiplicidade.
+- `rank_exploratory`: nulo enquanto existirem menos de 30 jogos liquidados. Mesmo após 30, qualquer prioridade é **apenas para investigação**, nunca uma classificação como aposta lucrativa.
+
+A forma do relatório admite candidatos adicionais futuramente, mas a implementação só reconhece **uma** regra congelada. Mais regras exigem registo prospectivo independente, orçamento de multiplicidade e testes adversariais. O campo `statistical_claim` permanece `none`, `certification=not_activated`, `automatic_alerts_changed=false` em todos os casos. **Não** altera o cérebro, a LLM, o Telegram nem o workflow de produção. Se a auditoria anterior e o novo cálculo não coincidirem, recusa a avaliação em vez de publicar estatísticas inconsistentes.
+
+Este passo **não conclui** a Fase 3 no seu sentido científico integral: faltam calibração estatística validada, custo de execução real, qualidade das odds, vários candidatos pré-registados e a correção de testes múltiplos. É a infraestrutura de *ranking exploratório sem ativação* para prosseguir a investigação sem olhar para resultados futuros.
