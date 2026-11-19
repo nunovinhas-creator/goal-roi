@@ -6,3 +6,18 @@ preview_urls = false
 
 [triggers]
 crons = ["*/15 * * * *"]
+
+[vars]
+RECOVERY_MODE = "observe"
+RECOVERY_ENABLED = "false"
+
+[observability]
+enabled = true
+
+[[durable_objects.bindings]]
+name = "GUARD"
+class_name = "RecoveryGuard"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RecoveryGuard"]
