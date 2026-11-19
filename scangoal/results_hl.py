@@ -11,7 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from .results_bsd import capture_result_versions, load_aliases, load_json, match_events, pending_targets, save_result_state
+from .results_bsd import capture_result_versions, load_aliases, load_result_state, match_events, pending_targets, save_result_state
 from .store import data_dir
 
 ROOT = 'https://sports.highlightly.net/football/matches'
@@ -59,7 +59,7 @@ def run(fetch=request_json, now=None, token=None):
         print('HL_NOT_CONFIGURED')
         return None
     path = data_dir() / 'results_hl.json'
-    state = load_json(path, {'results': {}, 'near_misses': {}, 'last_run_utc': None, 'stats': {}})
+    state = load_result_state(path)
     if state['last_run_utc'] and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
         print('HL_SKIPPED_TOO_SOON')
         return state
@@ -107,7 +107,7 @@ def run(fetch=request_json, now=None, token=None):
         misses[mid] = misses.get(mid, 0) + 1
         if misses[mid] >= GIVE_UP_CHECKS:
             not_covered[mid] = now.isoformat(timespec='seconds')
-    capture_result_versions(state, found, unique, observed_clock())
+    capture_result_versions(state, found, events, observed_clock())
     state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     state['last_run_utc'] = now.isoformat(timespec='seconds')
     state['stats'] = {'not_covered': len(not_covered), 'targets': len(targets), 'matched_this_run': len([m for m in targets if m in state['results']]), 'requests': requests,

@@ -119,20 +119,32 @@ def match_events(targets, events, aliases, unfinished=None):
 
 
 def capture_result_versions(state, found, events, observed_at):
-    """Capture corrections returned by an existing query without spending more quota."""
-    by_provider_id = {event.get('id'): event for event in events}
-    observed = dict(found)
+    """Capture every FT version returned by the ordinary quota-limited queries."""
+    remember_provider_results(state, found, observed_at)
+    by_provider_id = {}
+    for event in events:
+        if isinstance(event, dict) and type(event.get('id')) is int:
+            by_provider_id.setdefault(event['id'], []).append(event)
     for match_id, stored in state['results'].items():
-        event = by_provider_id.get(stored.get('bsd_id'))
-        if event is None or match_id in observed:
-            continue
-        score, kickoff = score_of(event), kickoff_of(event)
-        if (score is not None and kickoff is not None
-                and kickoff.isoformat(timespec='minutes') == stored.get('event_date')
-                and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
-                        for side in ('home', 'away'))):
-            observed[match_id] = dict(stored, ft=score)
-    remember_provider_results(state, observed, observed_at)
+        for event in by_provider_id.get(stored.get('bsd_id'), ()):
+            score, kickoff = score_of(event), kickoff_of(event)
+            if (score is not None and kickoff is not None
+                    and kickoff.isoformat(timespec='minutes') == stored.get('event_date')
+                    and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
+                            for side in ('home', 'away'))):
+                remember_provider_results(state, {match_id: dict(stored, ft=score)}, observed_at)
+
+
+def load_result_state(path):
+    """An unreadable existing provider archive must not be replaced with an empty one."""
+    try:
+        doc = json.loads(path.read_text(encoding='utf-8'))
+    except FileNotFoundError:
+        return {'results': {}, 'near_misses': {}, 'last_run_utc': None, 'stats': {}}
+    if (not isinstance(doc, dict) or not isinstance(doc.get('results'), dict)
+            or not isinstance(doc.get('ft_versions', {}), dict)):
+        raise ValueError('Invalid provider result archive')
+    return doc
 
 
 def save_result_state(path, state):
@@ -181,7 +193,7 @@ def run(fetch=request_json, now=None, token=None, *, after_bsd=None):
         print('BSD_NOT_CONFIGURED')
         return None
     path = data_dir() / 'results_bsd.json'
-    state = load_json(path, {'results': {}, 'near_misses': {}, 'last_run_utc': None, 'stats': {}})
+    state = load_result_state(path)
     if state['last_run_utc'] and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
         print('BSD_SKIPPED_TOO_SOON')
         return state
@@ -214,9 +226,9 @@ def run(fetch=request_json, now=None, token=None, *, after_bsd=None):
             if isinstance(ev, dict) and ev.get('id') not in seen_ids:
                 seen_ids.add(ev.get('id'))
                 unique.append(ev)
-        events = unique
-        found, near = match_events(targets, events, aliases)
+        found, near = match_events(targets, unique, aliases)
         capture_result_versions(state, found, events, observed_clock())
+        events = unique
         state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     events_seen = len(events)
     sample = sorted({'%s — %s' % (name_of(e, 'home_team'), name_of(e, 'away_team')) for e in events})[:15]
