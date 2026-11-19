@@ -73896,6 +73896,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60": {
+  "born_utc": "2026-11-19T07:14:08+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "e0deeb6879ba11920a469d9a43a766d72b2970a97d12a80a1cfdfba5254e57b7",
+   "registry_size": 9052,
+   "report_generated_at_utc": "2026-11-19T07:14:08+00:00",
+   "response_sha256": "51527f30f583e14f30a03b6ebcac1f6f6ed9a6c3cf22da315cb3117bd8ea219c"
+  },
+  "reason": "Jogos de fim de semana, com poucos golos e diferença de 2 ou mais golos, podem ter uma tendência de manter o resultado na parte inicial da 2.ª parte",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-15T16:35:14+00:00",
   "conditions": [
@@ -101207,6 +101240,39 @@
   ],
   "family": "Polymarket",
   "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-19T07:14:08+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "e0deeb6879ba11920a469d9a43a766d72b2970a97d12a80a1cfdfba5254e57b7",
+   "registry_size": 9052,
+   "report_generated_at_utc": "2026-11-19T07:14:08+00:00",
+   "response_sha256": "51527f30f583e14f30a03b6ebcac1f6f6ed9a6c3cf22da315cb3117bd8ea219c"
+  },
+  "reason": "Apostas em mercados de golos, com quota baixa e baixo valor, podem ser vantajosas em competições de seleções",
+  "source": "llm"
  },
  "Polymarket | Competição = seleções & Mercado = golos (mais/menos) & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T18:54:00+00:00",
@@ -145287,6 +145353,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-19T07:14:08+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "e0deeb6879ba11920a469d9a43a766d72b2970a97d12a80a1cfdfba5254e57b7",
+   "registry_size": 9052,
+   "report_generated_at_utc": "2026-11-19T07:14:08+00:00",
+   "response_sha256": "51527f30f583e14f30a03b6ebcac1f6f6ed9a6c3cf22da315cb3117bd8ea219c"
+  },
+  "reason": "Apostas noturnas com baixo valor e sem sinais anteriores podem ter uma boa taxa de acerto com odds moderadas",
+  "source": "llm"
  },
  "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = sim": {
   "born_utc": "2026-11-14T19:21:29+00:00",
