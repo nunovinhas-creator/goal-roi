@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import brain, certification, insights, llm_eval, polymarket_alerts
 from .eligibility import eligible, exclusion_reasons
+from .opportunity_results import collected as result_observation
 from .parser import MIN_ODDS, parse, settle
 from .store import data_dir
 
@@ -25,11 +26,12 @@ def key_of(p):
     return (p.get('match_id'), p['type'], p.get('market'), p.get('selection'))
 
 
-def load(chronology=None):
+def load(chronology=None, *, result_observations=None):
     """-> (mensagens na 1.ª versão, FT por jogo, marcas ✅/❌ do bot por aposta, notas de fim de jogo, auditoria).
 
     chronology (opcional, PR 3): dicionário preenchido com a PRIMEIRA recolha (collected_at_utc) em que o sistema viu cada
     resultado do bot, cada marca ✅/❌ e cada nota de fim de jogo, para o valor final usado. Não altera nenhum outro retorno.
+    result_observations (opcional): versões FT por ID de jogo, em paralelo com o retorno operacional existente.
     """
     first, ft, marks, notes, goals = {}, {}, {}, [], {}
     seen_ft, seen_mark, seen_note = {}, {}, {}   # valor -> primeira recolha em que apareceu (ficheiro append-only, por ordem)
@@ -54,6 +56,12 @@ def load(chronology=None):
             notes.append((r['date_utc'], [t.lower() for t in p['teams']], p['ft']))
             seen_note.setdefault((r['date_utc'], tuple(t.lower() for t in p['teams']), tuple(p['ft'])), got)
         elif p.get('ft') and p.get('match_id'):
+            if result_observations is not None:
+                observation = result_observation(
+                    'telegram', r['message_id'], p['ft'], got,
+                    published=r.get('edit_date_utc') or r.get('date_utc'),
+                )
+                result_observations.setdefault(p['match_id'], []).append(observation)
             ft[p['match_id']] = p['ft']
             seen_ft.setdefault((p['match_id'], tuple(p['ft'])), got)
             seen_any.setdefault(p['match_id'], got)

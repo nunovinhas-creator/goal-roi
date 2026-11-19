@@ -7,7 +7,7 @@ the benchmark nor the two-standard-error penalty is a confirmatory test.
 import math
 from datetime import timedelta
 
-from . import chronology, opportunity_forward
+from . import chronology, opportunity_forward, opportunity_results
 from .eligibility import eligible, game_identity
 
 MIN_RANK_GAMES = 30
@@ -66,14 +66,11 @@ def payoff(signal, outcome, now):
     kickoff = chronology.kickoff_time(signal)
     if not kickoff:
         return ("quarantined", None, None)
-    if isinstance(outcome, dict) and outcome.get("conflict") is True:
+    result = opportunity_results.resolve(outcome, kickoff=kickoff, as_of=now)
+    if result.conflict:
         return ("quarantined", None, None)
-    ft = outcome.get("ft") if isinstance(outcome, dict) else None
-    known = chronology.parse_utc(outcome.get("known_utc")) if isinstance(outcome, dict) else None
-    if (isinstance(ft, list) and len(ft) == 2
-            and all(type(x) is int and x >= 0 for x in ft)
-            and known is not None and kickoff <= known <= now):
-        if sum(ft) > 2:
+    if result.score is not None:
+        if sum(result.score) > 2:
             odd = signal["odds"]
             return ("win", odd - 1.0, odd * ODDS_FACTOR - 1.0)
         return ("loss", -1.0, -1.0)

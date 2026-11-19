@@ -6,7 +6,7 @@ This is a theoretical, conservative diagnostic, NOT a certified trading strategy
 from datetime import timedelta
 import math
 
-from . import chronology
+from . import chronology, opportunity_results
 from .eligibility import eligible, game_identity
 
 MIN_LEAD = timedelta(minutes=15)
@@ -55,11 +55,11 @@ def eligible_signal(m, cutoff, now):
 
 
 def evaluate(messages, results, protocol, *, activation_utc, now):
-    """Aggregate per independent match, no history replay and no financial claims.
+    """Aggregate historical or current prospective results per match.
 
-    results: {match_id: {ft: [home,away], known_utc: ISO8601, conflict?: bool}}
-    A no-result match older than 3 days is *lost*, not silently dropped.
-    Conflicting/invalid known scores are quarantined, never promoted as wins.
+    Results map each match ID to observations or an already observed result.
+    A no-result match older than 3 days is counted as a loss.
+    A visible disagreement between valid observations puts the match in quarantine.
     """
     if (not isinstance(protocol, dict) or protocol.get("id") != EXPECTED_RULE_ID
             or protocol.get(BORN_KEY) != EXPECTED_BORN
@@ -97,17 +97,13 @@ def evaluate(messages, results, protocol, *, activation_utc, now):
     pnl = pnl_cut = 0.0
     for mid, (_, m) in sorted(chosen.items()):
         ko = chronology.kickoff_time(m)
-        result = results.get(mid) if isinstance(results, dict) else None
-        if isinstance(result, dict) and result.get("conflict") is True:
+        evidence = results.get(mid) if isinstance(results, dict) else None
+        result = opportunity_results.resolve(evidence, kickoff=ko, as_of=as_of)
+        if result.conflict:
             quarantined += 1
             continue
-        ft = result.get("ft") if isinstance(result, dict) else None
-        known = chronology.parse_utc(result.get("known_utc")) if isinstance(result, dict) else None
-        valid_ft = (isinstance(ft, list) and len(ft) == 2
-                    and all(type(x) is int and x >= 0 for x in ft))
-        # Observed result must be later than the decision, kickoff and actual report cutoff.
-        if valid_ft and known and known >= ko and known > chosen[mid][0][0] and known <= as_of:
-            win = sum(ft) >= 3
+        if result.score is not None:
+            win = sum(result.score) >= 3
             wins += int(win)
             losses += int(not win)
             settled += 1

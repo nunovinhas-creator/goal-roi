@@ -10,7 +10,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scangoal import chronology, opportunity_forward, report
+from scangoal import opportunity_forward, opportunity_results, report
 from scangoal.store import data_dir
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,37 +24,21 @@ def read_json(path, default):
         return default
 
 
-def sourced_results(bot_ft, observed, directory):
-    """Require consistent full-time scores and a provable first observation time."""
-    found = {}
-
-    def add(mid, ft, known):
-        if isinstance(mid, str) and isinstance(ft, (list, tuple)) and len(ft) == 2:
-            found.setdefault(mid, []).append((list(ft), known))
-
-    for mid, ft in bot_ft.items():
-        add(mid, ft, (observed.get("ft") or {}).get(mid))
-    for filename in ("results_hl.json", "results_bsd.json"):
+def sourced_results(observed, directory):
+    """Collect independent, timestamped versions without choosing a score yet."""
+    found = {mid: list(rows) for mid, rows in observed.items()}
+    for filename, source in (("results_hl.json", "highlightly"), ("results_bsd.json", "bsd")):
         doc = read_json(directory / filename, {})
-        if not isinstance(doc, dict):
+        if not isinstance(doc, dict) or not isinstance(doc.get("results"), dict):
             continue
-        for mid, info in (doc.get("results") or {}).items():
+        for mid, info in doc["results"].items():
             if isinstance(info, dict):
-                add(mid, info.get("ft"), info.get("matched_at_utc"))
-
-    out = {}
-    for mid, rows in found.items():
-        different = {tuple(ft) for ft, _ in rows if all(type(v) is int and v >= 0 for v in ft)}
-        if len(different) != 1:
-            out[mid] = {"conflict": True}
-            continue
-        known = sorted(t for _, stamp in rows
-                       if (t := chronology.parse_utc(stamp)) is not None)
-        if known:
-            out[mid] = {"ft": list(next(iter(different))), "known_utc": chronology.iso(known[0])}
-        else:
-            out[mid] = {"ft": list(next(iter(different))), "known_utc": None}
-    return out
+                row = opportunity_results.collected(
+                    source, mid, info.get("ft"), info.get("matched_at_utc"),
+                    period=info.get("period", "regulation"),
+                )
+                found.setdefault(mid, []).append(row)
+    return {mid: tuple(rows) for mid, rows in found.items()}
 
 
 def main():
@@ -63,8 +47,8 @@ def main():
     state = read_json(directory / "notify_state.json", {})
     activation = ((state.get("migrations") or {}).get("polymarket_over25_v1") or {}).get("at_utc")
     observed = {}
-    messages, ft, _, _, _ = report.load(observed)
-    results = sourced_results(ft, observed, directory)
+    messages, _, _, _, _ = report.load(result_observations=observed)
+    results = sourced_results(observed, directory)
     result = opportunity_forward.evaluate(
         messages, results, protocol,
         activation_utc=activation,

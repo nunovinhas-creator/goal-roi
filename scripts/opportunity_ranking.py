@@ -18,8 +18,8 @@ def main():
     state = read_json(directory / "notify_state.json", {})
     activation = ((state.get("migrations") or {}).get("polymarket_over25_v1") or {}).get("at_utc")
     observations = {}
-    messages, bot_ft, _, _, _ = report.load(observations)
-    evidence = sourced_results(bot_ft, observations, directory)
+    messages, _, _, _, _ = report.load(result_observations=observations)
+    evidence = sourced_results(observations, directory)
     ranking = opportunity_ranking.build(
         messages, evidence, protocol,
         activation_utc=activation,
