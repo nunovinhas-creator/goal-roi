@@ -1,21 +1,24 @@
-"""Aviso pelo Telegram dos sinais Stake que cumprem as linhas 1, 6 e 9 escolhidas pelo utilizador (19/11/2026).
+"""Avisos Stake das linhas 1, 6 e 9, só LIVE e no máximo 30 minutos após o sinal.
 
-Independente do resto dos avisos: não depende do estado das hipóteses nem de certificados. Só lê os sinais e envia.
-- Linha 1: Stake | odd 1,50 a 2,00 & jogo com um só tipo de sinal & valor da aposta menos de 10 mil $
-- Linha 6: Stake | competição = liga & aviso até 45 min depois do início & sem sinal anterior de outro tipo no jogo
-- Linha 9: Stake | odd 1,50 a 2,00 & aviso até 45 min depois do início & jogo com um só tipo de sinal
-Um aviso por jogo e aposta (jogo, mercado, seleção), com as linhas que cumpre. Só sinais atuais (freshness: ao vivo até
-30 min). Estado em data/stake_alerts_state.json; a intenção grava-se antes do envio, por isso nunca reenvia.
-Segredos: TG_BOT_TOKEN e TG_CHAT_ID. Sem eles, não faz nada. `--preview` lista sem enviar nem gravar.
+Um aviso por aposta (jogo, mercado, seleção). A intenção é registada em dois ficheiros
+auditáveis e PUBLICADA em main antes de contactar o Telegram. Falta, corrupção,
+truncagem ou erro de publicação bloqueiam o envio (fail closed). Uma resposta Telegram
+ambígua nunca é repetida, mesmo que isso implique perder o aviso.
 """
-import json, os, sys
+import json
+import os
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
+from types import SimpleNamespace
 
 from . import brain, freshness, insights, notify
 from .store import data_dir
 
 STATE_NAME = 'stake_alerts_state.json'
-KEEP_DAYS_KEYS = 500
+LOG_NAME = 'stake_alerts_log.jsonl'
+STATE_FORMAT = 'stake_alerts_v1'
+LOG_FORMAT = 'stake_alerts_intents_v1'
 LINES = {
     1: ('odd 1,50 a 2,00 · um só tipo de sinal · valor < 10 mil $',
         (('Faixa de odd', 'odd 1,50 a 2,00'), ('Outros sinais no mesmo jogo', 'jogo com um só tipo de sinal'), ('Valor da aposta', 'menos de 10 mil $'))),
@@ -26,16 +29,23 @@ LINES = {
 }
 
 
+class StakeStateError(RuntimeError):
+    """Sem prova completa de deduplicação ou de publicação: não enviar."""
+
+
 def key_of(b):
-    return '|'.join(str(x) for x in (b.get('match_id'), b.get('market'), b.get('selection')))
+    """Identidade estável da aposta, não da mensagem nem da odd."""
+    return '|'.join(str(b[k]) for k in ('match_id', 'market', 'selection'))
 
 
 def matches(signals, now):
-    """Sinais Stake atuais que cumprem pelo menos uma das linhas -> [{...}], por ordem de hora, uma entrada por aposta."""
+    """Sinais Stake LIVE atuais, com uma entrada por aposta e indicação das linhas."""
     multi, earlier = brain.multi_matches(signals), brain.earlier_index(signals)
     out, seen = [], set()
     for b in sorted(signals, key=lambda s: s['date_utc']):
-        if insights.family(b) != 'Stake' or not freshness.current(b, now):
+        if (insights.family(b) != 'Stake' or b.get('phase') != 'live' or
+                not all(b.get(k) for k in ('match_id', 'market', 'selection')) or
+                not freshness.current(b, now)):
             continue
         k = key_of(b)
         if k in seen:
@@ -60,40 +70,102 @@ def text(m, now):
                       'https://scangoal.com/match/%s?lang=en' % b['match_id']])
 
 
+def _atomic_json(path, obj):
+    temporary = path.with_suffix(path.suffix + '.tmp')
+    temporary.write_text(json.dumps(obj, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    os.replace(temporary, path)
+
+
 def load_state(path):
+    """Não reconstruir silenciosamente o estado: isso poderia repetir avisos antigos."""
     try:
-        s = json.loads(path.read_text(encoding='utf-8'))
-        return s if isinstance(s, dict) and isinstance(s.get('sent'), dict) else {'sent': {}}
-    except (OSError, ValueError):
-        return {'sent': {}}
+        state = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError) as exc:
+        raise StakeStateError('stake state missing or unreadable') from exc
+    if (not isinstance(state, dict) or state.get('format') != STATE_FORMAT or
+            not isinstance(state.get('sent'), dict) or
+            type(state.get('sent_total')) is not int or
+            state['sent_total'] != len(state['sent']) or
+            any(not isinstance(k, str) or not k or not isinstance(v, str) or not v
+                for k, v in state['sent'].items())):
+        raise StakeStateError('stake state invalid or truncated')
+    return state
 
 
-def save_state(path, state):
-    state['sent'] = dict(sorted(state['sent'].items(), key=lambda kv: kv[1])[-KEEP_DAYS_KEYS:])
-    tmp = path.with_suffix('.tmp')
-    tmp.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    os.replace(tmp, path)
+def load_log(path):
+    """Registo independente e append-only das intenções; não aceitar truncagens."""
+    try:
+        lines = path.read_text(encoding='utf-8').splitlines()
+        header = json.loads(lines[0])
+        if header != {'format': LOG_FORMAT}:
+            raise ValueError('invalid header')
+        seen = {}
+        for line in lines[1:]:
+            event = json.loads(line)
+            if (not isinstance(event, dict) or set(event) != {'event', 'key', 'at'} or
+                    event['event'] != 'intent' or not isinstance(event['key'], str) or
+                    not event['key'] or not isinstance(event['at'], str) or not event['at'] or
+                    event['key'] in seen):
+                raise ValueError('invalid or repeated intent')
+            seen[event['key']] = event['at']
+        return seen, lines
+    except (OSError, ValueError, IndexError, TypeError) as exc:
+        raise StakeStateError('stake intent log missing, corrupt or truncated') from exc
 
 
-def deliver(signals, now=None, env=None, sender=None, path=None):
-    """Envia os avisos novos. -> lista de chaves enviadas. Um erro de envio nunca é repetido (intenção já gravada)."""
-    env, now = os.environ if env is None else env, now or datetime.now(timezone.utc)
+def verify_state(state, intents):
+    if state['sent'] != intents or state['sent_total'] != len(intents):
+        raise StakeStateError('stake state and intent log disagree')
+
+
+def _git_publisher(env, path, log_path):
+    """Reutiliza a barreira Git existente: commit + push de ambos os ficheiros ANTES do envio."""
+    if env.get('NOTIFY_DURABLE') != 'git' or env.get('GITHUB_REF_NAME') != 'main':
+        raise StakeStateError('Stake alerts require NOTIFY_DURABLE=git on main')
+    store = SimpleNamespace(state_path=path, log_path=log_path)
+    return notify.GitPublisher.for_store(store, 'main')
+
+
+def deliver(signals, now=None, env=None, sender=None, path=None, publisher=None):
+    """No máximo uma tentativa por aposta, apenas após prova de publicação remota da intenção."""
+    env = os.environ if env is None else env
+    now = now or datetime.now(timezone.utc)
     token, chat = (env.get('TG_BOT_TOKEN') or '').strip(), (env.get('TG_CHAT_ID') or '').strip()
     if not token or not chat:
         print('STAKE_ALERTS skipped (no keys)')
         return []
-    path, sender = path or data_dir() / STATE_NAME, sender or notify.send
-    state, sent = load_state(path), []
-    for m in matches(signals, now):
-        if m['key'] in state['sent']:
-            continue
-        state['sent'][m['key']] = now.isoformat(timespec='seconds')   # intenção antes do envio: no máximo uma vez
-        save_state(path, state)
+    path = Path(path) if path else data_dir() / STATE_NAME
+    log_path = path.with_name(LOG_NAME)
+    state = load_state(path)
+    intents, lines = load_log(log_path)
+    verify_state(state, intents)
+    pending = [m for m in matches(signals, now) if m['key'] not in intents]
+    if not pending:
+        print('STAKE_ALERTS sent 0')
+        return []
+    publish = publisher if publisher is not None else _git_publisher(env, path, log_path)
+    sender = sender or notify.send
+    sent = []
+    for m in pending:
+        key, stamp = m['key'], now.isoformat(timespec='seconds')
+        # Gravação local completa; se o runner parar antes do push, o aviso não é enviado.
+        lines.append(json.dumps({'event': 'intent', 'key': key, 'at': stamp}, ensure_ascii=False, sort_keys=True))
+        # Substituição atómica de cada ficheiro: divergência entre ambos bloqueia novos avisos.
+        log_tmp = log_path.with_suffix('.tmp')
+        log_tmp.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+        os.replace(log_tmp, log_path)
+        state['sent'][key] = stamp
+        state['sent_total'] = len(state['sent'])
+        _atomic_json(path, state)
+        if publish(key) is not True:
+            raise StakeStateError('stake intent not confirmed on remote main')
         try:
             sender(token, chat, text(m, now))
-            sent.append(m['key'])
-        except Exception as exc:                       # só o tipo; o token nunca sai daqui
+        except Exception as exc:
+            # Intenção já publicada: mesmo uma falha confirmada não é repetida.
             print('STAKE_ALERTS_SEND_FAILED', type(exc).__name__)
+            raise StakeStateError('stake Telegram delivery failed or ambiguous') from None
+        sent.append(key)
     print('STAKE_ALERTS sent', len(sent))
     return sent
 
