@@ -29,7 +29,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from . import equivalence, freshness
+from . import equivalence, freshness, polymarket_alerts
 from .eligibility import text_identity
 from .results_bsd import load_json
 from .store import data_dir
@@ -594,8 +594,13 @@ def game_notices(report, state, now):
     atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
     notified, sent = state.get('notified_items') or {}, set(state.get('watch_sent') or [])
     pairs, games = legacy_pairs(sent), {}
-    for w in (report.get('brain') or {}).get('watch') or []:
-        if not isinstance(w, dict) or not isinstance(w.get('reasons'), list) or not w['reasons']:
+    candidates = list((report.get('brain') or {}).get('watch') or [])
+    activation = (state.get('migrations') or {}).get(polymarket_alerts.ACTIVATION) or {}
+    candidates.extend(polymarket_alerts.after_activation(report.get(polymarket_alerts.REPORT_KEY),
+                                                         parse_time(activation.get('at_utc')), now))
+    for w in candidates:
+        if (not isinstance(w, dict) or not isinstance(w.get('reasons'), list)
+                or not (w['reasons'] or w.get('polymarket_over25'))):
             continue
         if not still_bettable(w, now):
             continue          # P1 17/11/2026: fora de tempo, em QUALQUER nível (indício ou alerta). Barreira final, independente
@@ -625,19 +630,32 @@ def _epoch(v):
 
 
 def game_notice(report, state, now, gk, g):
-    """Aviso curto para apostar (formato `telegram_bet_short_v1`). Uma aposta simples dá exatamente três linhas:
+    """Aviso curto para apostar (formato `telegram_bet_short_v1`). Um indício de tática simples dá três linhas:
         A seguir: <jogo>
         Encaixa em: <tática> (<estado>)
         Aposta: <seleção> @ <odd>
     Várias táticas ou seleções: cada APOSTA aparece uma só vez, por baixo das táticas que a sustentam (as apostas com o
     mesmo conjunto de táticas ficam juntas). Um ALERTA (só com certificado ativo, verificado e da própria tática) acrescenta,
     no fim, o rótulo científico exato dessa tática, que `guard_claims` exige para qualquer afirmação positiva. Nada de ROI,
-    probabilidades, jogos independentes, evidência ou textos finais: essa informação vai para o resumo diário."""
+    probabilidades, jogos independentes, evidência ou textos finais: essa informação vai para o resumo diário.
+    O filtro fixo Polymarket acrescenta os dados do aviso original e a hora de início."""
     items = sorted(g['items'].items(), key=lambda kv: (kv[1]['level'] != 'alerta', kv[0]))
     first = items[0][1]['entries'][0]
-    reasons, covers, alerted, bets = {}, {}, set(), []
-    for ik, it in items:
-        latest = max(it['entries'], key=lambda w: w.get('date_utc') or '')
+    reasons, covers, alerted, bets, fixed = {}, {}, set(), [], []
+    current_bets = []
+    for _, it in items:
+        entries = it['entries']
+        by_date = lambda w: w.get('date_utc') or ''
+        polymarket = max((w for w in entries if w.get('polymarket_over25')), key=by_date, default=None)
+        if polymarket is None:
+            latest = max(entries, key=by_date)
+            current_bets.append(entries)
+        else:
+            latest = max((w for w in entries if alert_reason(report, w)), key=by_date, default=polymarket)
+            fixed.append(polymarket)
+            current_bets.append([polymarket])
+            if latest is not polymarket:
+                current_bets.append([latest])
         sel = '%s%s' % (latest.get('selection') or 'mais um golo', (' @ ' + odd(latest['odds'])) if latest.get('odds') else '')
         if sel not in bets:
             bets.append(sel)
@@ -677,6 +695,11 @@ def game_notice(report, state, now, gk, g):
         lines.append('… e mais %d grupos de táticas.' % (len(grouped) - len(shown)))
     if unsupported:
         lines.append('Aposta: %s' % '; '.join(unsupported))
+    for w in fixed:
+        total = format(w['total'], ',.2f').rstrip('0').rstrip('.').replace(',', ' ').replace('.', ',')
+        lines.append('Polymarket pré-jogo · odd anunciada %s · quota %s%% · valor $%s · início às %s (Lisboa)' %
+                     (odd(w['odds']), w['share'], total, lisbon(w['kickoff_utc'])))
+        lines.append('https://scangoal.com/match/%s?lang=en' % w['match_id'])
     claims = [gr[0] for gr in shown if gr[0] in alerted]
     for hid in claims:                       # rótulo exato (fail-closed): só para a tática do alerta, verificada agora
         text, positive = scientific_label(report, hid)
@@ -693,7 +716,8 @@ def game_notice(report, state, now, gk, g):
         for w in it['entries']:
             effects.append(['watch_sent', legacy_key(w)])
     key = 'game|%s|%s' % (gk, sha('\n'.join(k for k, _ in items))[:12])
-    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, list(reasons), bets=[it['entries'] for _, it in items])
+    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, list(reasons),
+                  bets=current_bets)
 
 
 def explicit_status(report, hid, current):
@@ -887,6 +911,8 @@ def plan(report, state, now):
     migrate_status_reference(report, state, now)
     migrate_format(report, state, now)
     resync_after_foreign_writer(state, now)
+    if isinstance(report.get(polymarket_alerts.REPORT_KEY), list):
+        state.setdefault('migrations', {}).setdefault(polymarket_alerts.ACTIVATION, {'at_utc': now.isoformat()})
     out = [] if state.get('hello') else [hello_notice(report)]
     out += game_notices(report, state, now)
     new = eligible_statuses(report)

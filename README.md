@@ -165,6 +165,12 @@ Hipóteses equivalentes (partilham ≥ 85 % dos jogos, compatíveis, ligação c
 ### Pré-visualização sem envio
 `python -m scangoal.notify --preview [--state ficheiro] [--report ficheiro] [--now ISO] [--out ficheiro]` mostra os avisos que a próxima execução produziria. Não lê credenciais, recusa qualquer ligação de rede e nunca grava estado nem registo.
 
+### Aviso Polymarket para Over 2,5 pré-jogo
+
+O Telegram inclui um indício quando uma mensagem original Polymarket indica **Over 2,5 golos no jogo inteiro**, quota de mercado **abaixo de 80%** e valor sinalizado **abaixo de $10.000**. A odd anunciada segue o mínimo habitual de 1,10. O aviso mostra a quota, o valor, a odd e a hora de início em Lisboa.
+
+A primeira execução do notificador com este filtro guarda a hora de ativação. A partir daí são considerados os sinais emitidos e lidos depois dessa hora, até ao início do jogo. A recolha completa e as leituras rápidas usam o mesmo registo de entrega, por jogo, mercado e seleção.
+
 ## Simulador de banca
 Na página: aplica uma regra (valor fixo ou percentagem da banca) às apostas liquidadas do saldo estrito, por ordem, com escolha de tipos de sinal e de corte na odd. Corre no navegador; não altera dados.
 
