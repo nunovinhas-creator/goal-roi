@@ -30,10 +30,10 @@ def make_client():
                           receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1)
 
 
-async def fetch(client, entity, limit, now):
+async def fetch(client, entity, limit, now, **bounds):
     """Lê as últimas `limit` mensagens. -> (linhas a guardar, id mais antigo lido, ids presentes)."""
     rows, oldest, present = [], None, set()
-    async for msg in client.iter_messages(entity, limit=limit):
+    async for msg in client.iter_messages(entity, limit=limit, **bounds):
         oldest = msg.id
         present.add(msg.id)
         if getattr(msg, 'out', False) or not (msg.raw_text or '').strip():
@@ -43,10 +43,65 @@ async def fetch(client, entity, limit, now):
     return rows, oldest, present
 
 
+def write_json(path, value):
+    temporary = path.with_suffix('.tmp')
+    temporary.write_text(json.dumps(value, ensure_ascii=False) + '\n', encoding='utf-8')
+    temporary.replace(path)
+
+
+def record_window(directory, previous, last_id, oldest, present, now):
+    """Persist full-window evidence separately from fast reads and scientific inputs."""
+    path = directory / 'collection_windows.json'
+    state = json.loads(path.read_text()) if path.exists() else {'intervals': []}
+    lower = state.get('full_high_id', last_id)
+    prior = previous.get('last_run_utc')
+    delayed = prior and (datetime.fromisoformat(now) - datetime.fromisoformat(prior)).total_seconds() >= 1800
+    uncovered = bool(lower and oldest and oldest > lower + 1)
+    if delayed or uncovered:
+        state['intervals'].append({'previous_read': prior, 'observed_at': now, 'after_id': lower,
+                                   'before_id': oldest, 'cursor': oldest,
+                                   'status': 'pending' if uncovered else 'window_checked'})
+        print('SCANGOAL_INTERRUPTION', prior, now, 'outside_window', uncovered)
+    state['full_high_id'] = max(lower, max(present, default=0))
+    write_json(path, state)
+    return state
+
+
+async def recover_page(client, entity, directory, state, now):
+    """Archive one bounded page, isolated from reports, notices and the live message ledger."""
+    gap = next((g for g in state['intervals'] if g['status'] == 'pending'), None)
+    if gap is None:
+        return
+    archive = directory / 'collection_backfill'
+    archive.mkdir(exist_ok=True)
+    path = archive / f"{gap['after_id']}-{gap['before_id']}-{gap['cursor']}.json"
+    if path.exists():
+        page = json.loads(path.read_text())
+    else:
+        rows, oldest, ids = await fetch(client, entity, 100, now,
+                                        min_id=gap['after_id'], offset_id=gap['cursor'])
+        if any(not gap['after_id'] < i < gap['cursor'] for i in ids):
+            raise ValueError('Backfill outside recorded interval')
+        page = {'rows': rows, 'oldest': oldest, 'count': len(ids)}
+        write_json(path, page)
+    if page['count'] < 100:
+        gap['status'] = 'available_history_checked'
+    else:
+        gap['cursor'] = page['oldest']
+    write_json(directory / 'collection_windows.json', state)
+
+
 async def collect():
     from .store import append_versions, data_dir, load_seen
+    directory = data_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / 'state.json'
+    previous = json.loads(path.read_text()) if path.exists() else {}
     client = make_client()
     _, last_id = load_seen(data_dir() / 'messages.jsonl')
+    windows = directory / 'collection_windows.json'
+    if not windows.exists():
+        write_json(windows, {'full_high_id': last_id, 'intervals': []})
     now = iso(datetime.now(timezone.utc))
     await asyncio.wait_for(client.connect(), 30)
     try:
@@ -56,12 +111,18 @@ async def collect():
         entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         async with asyncio.timeout(150):
             rows, oldest, present = await fetch(client, entity, RECENT, now)
+        added = append_versions(rows)
+        state = record_window(directory, previous, last_id, oldest, present, now)
+        try:
+            async with asyncio.timeout(15):
+                await recover_page(client, entity, directory, state, now)
+        except Exception as exc:
+            print('SCANGOAL_BACKFILL_PENDING', type(exc).__name__)
     finally:
         await client.disconnect()
     # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
     stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
     missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
-    added = append_versions(rows)
     # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
     (data_dir() / 'state.json').write_text(json.dumps({'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing}) + '\n', encoding='utf-8')
     if last_id and oldest and oldest > last_id + 1:

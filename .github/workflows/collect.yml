@@ -26,6 +26,8 @@ jobs:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
       - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
+        with:
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0 (= tag v5, 2026-11-16)
         with:
           python-version: '3.11'
@@ -121,7 +123,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ steps.fast.outcome }}" = "skipped" ]; then sleep 480; fi
-          gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main
+          timeout 85s python scripts/dispatch_collection.py
       # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
       - name: Tell the user when a collection fails (at most once an hour)
         if: ${{ failure() }}

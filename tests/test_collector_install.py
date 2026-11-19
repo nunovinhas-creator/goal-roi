@@ -116,7 +116,7 @@ class WorkflowInstall(unittest.TestCase):
         self.text = (ROOT/'.github/workflows/collect.yml').read_text(encoding='utf-8')
 
     def test_no_new_workflow(self):
-        self.assertEqual(sorted(p.name for p in (ROOT/'.github/workflows').iterdir()), ['collect.yml', 'tests.yml'])
+        self.assertEqual(sorted(p.name for p in (ROOT/'.github/workflows').iterdir()), ['collect.yml', 'continuity.yml', 'tests.yml'])
 
     def test_permissions_timeout_and_start_stamp(self):
         self.assertIn('permissions:\n  contents: write\n  actions: write\n'
@@ -137,7 +137,7 @@ class WorkflowInstall(unittest.TestCase):
                      '  group: scangoal-write\n  cancel-in-progress: false',
                      'run: python -u -m scangoal.results_bsd',
                      'run: python -u -m scangoal.notify',
-                     'gh workflow run collect.yml --repo "${GITHUB_REPOSITORY}" --ref main',
+                     'timeout 85s python scripts/dispatch_collection.py',
                      'run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch'):
             self.assertIn(line, self.text)
         code = [l.split('#', 1)[0] for l in self.text.splitlines() if not l.lstrip().startswith('#')]
