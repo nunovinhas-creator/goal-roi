@@ -39,9 +39,54 @@ class StakeAlerts(unittest.TestCase):
         self.assertEqual(len(m), 1)
         self.assertEqual(m[0]['lines'], [1, 6, 9])
 
-    def test_only_line_1_when_notice_late(self):
-        m = stake_alerts.matches([sig(after=60)], NOW)
-        self.assertEqual(m[0]['lines'], [1])
+    def test_partial_lines_never_alert(self):
+        # Regressão de produção: odd 1,45 gerou um aviso linha 6;
+        # aposta posterior cumpriu só a linha 1. Nenhuma deve chegar ao Telegram.
+        incomplete = [
+            sig(odds=1.45),                       # 6 (ou outra combinação parcial)
+            sig(after=60),                       # 1, sem 6 nem 9
+            sig(total=20000),                    # 6 e 9, sem 1
+            sig(league='International Friendly'), # 1 e 9, sem 6
+            sig(odds=1.45, total=20000),          # sem a faixa de odd e sem a linha 1
+        ]
+        for s in incomplete:
+            with self.subTest(odds=s['odds'], total=s['total'],
+                              after=s['after_kickoff_min'], league=s['league']):
+                self.assertEqual(stake_alerts.matches([s], NOW), [])
+
+    def test_exact_conjunction_all_line_subsets(self):
+        # Cobrir combinações parciais mesmo se um futuro refactor alterar os átomos.
+        source = sig()
+        all_conditions = {n: set(conds) for n, (_, conds) in stake_alerts.LINES.items()}
+        from itertools import combinations
+        union = set().union(*all_conditions.values())
+        for size in range(4):
+            for included in combinations((1, 6, 9), size):
+                active = set().union(*(all_conditions[n] for n in included))
+                # Átomos partilhados por linhas podem tornar outras linhas verdadeiras;
+                # a verdade é determinada pela conjunção efetiva, não pelo nome do subconjunto.
+                should_alert = all(conds <= active for conds in all_conditions.values())
+                with self.subTest(included=included), patch.object(stake_alerts.brain, 'atoms', return_value=list(active)):
+                    found = stake_alerts.matches([source.copy()], NOW)
+                    self.assertEqual(bool(found), should_alert)
+                    if found:
+                        self.assertEqual(found[0]['lines'], [1, 6, 9])
+
+    def test_do_not_emit_partial_alerts_or_intents(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / stake_alerts.STATE_NAME
+            initialize(path)
+            sends, pushes = [], []
+            incomplete = [sig(odds=1.45, mid='only-six'), sig(after=60, mid='only-one'),
+                          sig(total=20000, mid='six-nine')]
+            result = stake_alerts.deliver(incomplete, NOW, ENV,
+                                          lambda *args: sends.append(args), path,
+                                          lambda key: pushes.append(key) or True)
+            self.assertEqual(result, [])
+            self.assertEqual(sends, [])
+            self.assertEqual(pushes, [])
+            self.assertEqual(stake_alerts.load_state(path)['sent_total'], 0)
+            self.assertEqual(stake_alerts.load_log(path.with_name(stake_alerts.LOG_NAME))[0], {})
 
     def test_old_wrong_odd_other_type_or_finished(self):
         self.assertEqual(stake_alerts.matches([sig(odds=2.45, total=20000, after=60)], NOW), [])
