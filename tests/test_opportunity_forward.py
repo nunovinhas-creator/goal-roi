@@ -1,6 +1,11 @@
 """Offline adversarial tests for the predeclared PR #55 forward-only ROI ledger."""
 import copy
+import json
+import tempfile
 import unittest
+from pathlib import Path
+
+from scripts.opportunity_forward_audit import sourced_results
 
 from scangoal import opportunity_forward as lab
 
@@ -127,6 +132,34 @@ class ProspectiveOpportunityTests(unittest.TestCase):
             lab.evaluate([signal()], {}, p, activation_utc=ACTIVATION, now=NOW)
         with self.assertRaises(ValueError):
             run([signal()], now="2020-01-01T00:00:00+00:00")
+
+
+
+class ResultSourceTests(unittest.TestCase):
+    def test_consistent_known_result_is_usable(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "results_hl.json").write_text(json.dumps({"results": {
+                "game-1": {"ft": [2, 1], "matched_at_utc": "2026-11-19T21:00:00+00:00"}
+            }}), encoding="utf-8")
+            out = sourced_results({"game-1": [2, 1]}, {"ft": {"game-1": "2026-11-19T20:00:00+00:00"}}, Path(d))
+            self.assertEqual(out["game-1"]["known_utc"], "2026-11-19T20:00:00+00:00")
+            self.assertEqual(out["game-1"]["ft"], [2, 1])
+
+    def test_disagreement_is_quarantined(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "results_bsd.json").write_text(json.dumps({"results": {
+                "game-1": {"ft": [0, 1], "matched_at_utc": "2026-11-19T21:00:00+00:00"}
+            }}), encoding="utf-8")
+            out = sourced_results({"game-1": [2, 1]}, {"ft": {"game-1": "2026-11-19T20:00:00+00:00"}}, Path(d))
+            self.assertTrue(out["game-1"]["conflict"])
+
+    def test_missing_proven_timestamp_never_counts_as_success(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = sourced_results({"game-1": [2, 1]}, {}, Path(d))
+            self.assertIsNone(out["game-1"]["known_utc"])
+            self.assertEqual(run([signal()], out)["wins"], 0)
+
+
 
 
 if __name__ == "__main__":
