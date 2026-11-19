@@ -1,9 +1,9 @@
 {
- "generated_at_utc": "2026-11-19T00:46:38+00:00",
- "messages": 1637,
+ "generated_at_utc": "2026-11-19T00:50:59+00:00",
+ "messages": 1639,
  "types": {
   "SERVICE": 10,
-  "GOAL_BREWING": 53,
+  "GOAL_BREWING": 54,
   "BETFAIR": 320,
   "STAKE_LOAD": 315,
   "OPEN_GAME": 198,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 16,
   "OPEN_GAME_NO_ODDS": 14,
   "FULL_TIME_NOTE": 21,
-  "POLYMARKET": 492,
+  "POLYMARKET": 493,
   "None": 55,
   "TOTALS_FORM_NO_ODDS": 77
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2721,
+  "versions": 2723,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-19T00:40:19+00:00",
+  "last_collected_at_utc": "2026-11-19T00:50:59+00:00",
   "hl_results": 96,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 44,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-19T00:46:36+00:00",
+  "collector_last_run_utc": "2026-11-19T00:50:59+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 478,
   "goal_lists_consistent": 248
  },
- "unique_bets": 888,
+ "unique_bets": 889,
  "settled_bets": 720,
  "unsettled_market": 84,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -929,7 +929,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/live": {
-   "bets": 42,
+   "bets": 43,
    "settled": 41,
    "matches": 29,
    "wins": 21,
@@ -1650,7 +1650,7 @@
    "prob_above_cut": 0.2825
   },
   "GOAL_BREWING": {
-   "signals": 53,
+   "signals": 54,
    "with_result": 3,
    "hits": 1,
    "misses": 2,
@@ -1761,7 +1761,7 @@
    "prob_above_cut": 0.4559
   },
   "POLYMARKET": {
-   "signals": 231,
+   "signals": 232,
    "with_result": 212,
    "hits": 103,
    "misses": 109,
@@ -3304,7 +3304,7 @@
    },
    {
     "n": 374,
-    "signals": 487,
+    "signals": 488,
     "hits": 222,
     "misses": 152,
     "hit_rate": 0.5823,
@@ -3408,13 +3408,13 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1080,
-   "eligible": 888,
-   "excluded": 192,
+   "total": 1082,
+   "eligible": 889,
+   "excluded": 193,
    "reasons": {
-    "no_valid_odds": 144,
-    "no_market": 144,
-    "no_selection": 144,
+    "no_valid_odds": 145,
+    "no_market": 145,
+    "no_selection": 145,
     "burst": 10,
     "provenance_not_verified": 50,
     "had_ft_at_first_sight": 39,
@@ -3424,7 +3424,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 8889,
+    "em observação": 8906,
     "abandonada": 30,
     "promissora": 88
    },
@@ -4481,11 +4481,11 @@
     }
    ]
   },
-  "hypotheses": 9007,
+  "hypotheses": 9024,
   "tested": 905,
   "corrected_bar": null,
   "counts": {
-   "em observação": 8963,
+   "em observação": 8980,
    "abandonada": 31,
    "promissora": 13
   },
@@ -5076,6 +5076,162 @@
      "bad_total": 22
     },
     {
+     "match_id": "cruzeiro-vs-palmeiras-20261119",
+     "match": "Cruzeiro — Palmeiras",
+     "league": "Brazilian BRAZIL SERIE A",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": null,
+     "date_utc": "2026-11-19T00:50:47+00:00",
+     "minute": 56,
+     "score_at_signal": [
+      0,
+      1
+     ],
+     "market": "Polymarket",
+     "selection": "AH2(-0.5)",
+     "odds": 1.69,
+     "odds_last": 1.69,
+     "max_mult": 1,
+     "share": 3,
+     "share_last": 3,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 101,
+     "good": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 17,
+       "games": 14,
+       "hits": 13,
+       "break_even": 0.5867,
+       "prob_above": 0.9482,
+       "roi": 0.3253,
+       "edge": 0.1543,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 24,
+       "games": 15,
+       "hits": 17,
+       "break_even": 0.5842,
+       "prob_above": 0.8979,
+       "roi": 0.2221,
+       "edge": 0.1181,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Dia = dia de semana & Golos até ao sinal = 1 ou 2",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Golos até ao sinal",
+         "1 ou 2"
+        ]
+       ],
+       "n": 12,
+       "games": 9,
+       "hits": 9,
+       "break_even": 0.509,
+       "prob_above": 0.8791,
+       "roi": 0.5675,
+       "edge": 0.1303,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 11,
+     "bad": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 63,
+       "games": 47,
+       "hits": 29,
+       "break_even": 0.58,
+       "prob_above": 0.0196,
+       "roi": -0.2159,
+       "edge": -0.1359,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 35,
+       "games": 31,
+       "hits": 14,
+       "break_even": 0.5803,
+       "prob_above": 0.0436,
+       "roi": -0.3209,
+       "edge": -0.1329,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 14
+    },
+    {
      "match_id": "newcastle-united-vs-arsenal-20261121",
      "match": "Newcastle United — Arsenal",
      "league": "England Premier League",
@@ -5179,12 +5335,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 3,
+    "misto": 4,
     "sem evidência": 0,
     "contraditório": 0,
     "evitar": 0
    },
-   "generated_utc": "2026-11-19T00:46:55+00:00",
+   "generated_utc": "2026-11-19T00:51:17+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -5197,7 +5353,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 8930,
+     "hypotheses": 8947,
      "with_prospective_evidence": 2876,
      "prospective_games": 58856
     },
@@ -5311,7 +5467,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 456,
+    "bets": 457,
     "settled": 387,
     "games": 255,
     "wins": 188,
@@ -16184,7 +16340,7 @@
    },
    {
     "n": 86,
-    "signals": 92,
+    "signals": 93,
     "hits": 44,
     "misses": 42,
     "hit_rate": 0.5116,
@@ -16224,7 +16380,7 @@
     "expect": null,
     "mode": null,
     "tradable": false,
-    "open": 6,
+    "open": 7,
     "born_verified": true,
     "game_set": "31582ea798f22207",
     "prospective": {
@@ -22945,7 +23101,7 @@
     "days_to_conclusion": 8
    },
    "POLYMARKET": {
-    "signals": 231,
+    "signals": 232,
     "with_result": 212,
     "hits": 103,
     "misses": 109,
@@ -23478,7 +23634,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 888,
+   "bets": 889,
    "settled": 720,
    "matches": 391,
    "wins": 347,
@@ -23513,6 +23669,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-19T00:50:47+00:00",
+   "match_id": "cruzeiro-vs-palmeiras-20261119",
+   "group": "POLYMARKET/live",
+   "match": "Cruzeiro — Palmeiras",
+   "selection": "Polymarket: AH2(-0.5)",
+   "odds": 1.69,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-19T00:23:12+00:00",
    "match_id": "remo-vs-chapecoense-20261119",
@@ -24393,22 +24562,6 @@
    "settled_by": null,
    "n_signals": 2,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-17T22:34:40+00:00",
-   "match_id": "atletico-mineiro-u20-vs-sao-paulo-u20-20261118",
-   "group": "TOTALS_FORM",
-   "match": "Atletico Mineiro U20 — Sao Paulo U20",
-   "selection": "Over 1.75",
-   "odds": 1.77,
-   "ft": [
-    1,
-    1
-   ],
-   "w": 0.5,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -24954,42 +25107,6 @@
   }
  ],
  "matches": {
-  "atletico-mineiro-u20-vs-sao-paulo-u20-20261118": {
-   "teams": [
-    "Atletico Mineiro U20",
-    "Sao Paulo U20"
-   ],
-   "events": [
-    {
-     "d": "2026-11-17T22:34:40+00:00",
-     "k": "TOTALS_FORM",
-     "phase": "live",
-     "selection": "Over 1.75",
-     "odds": 1.77,
-     "minute": 32,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     42,
-     "0-1"
-    ],
-    [
-     78,
-     "1-1"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    1,
-    1
-   ]
-  },
   "flamengo-vs-atletico-paranaense-20261119": {
    "teams": [
     "Flamengo",
@@ -25443,6 +25560,21 @@
      ],
      "market": "Match Result",
      "total": 13000.0
+    },
+    {
+     "d": "2026-11-19T00:50:47+00:00",
+     "k": "POLYMARKET",
+     "phase": "live",
+     "selection": "AH2(-0.5)",
+     "odds": 1.69,
+     "minute": 56,
+     "score_at_signal": [
+      0,
+      1
+     ],
+     "share": 3,
+     "market": "Polymarket",
+     "total": 6200.0
     }
    ],
    "goals": null,
@@ -32607,7 +32739,7 @@
    "day": "2026-11-18"
   },
   {
-   "bets": 2,
+   "bets": 3,
    "settled": 0,
    "wins": 0,
    "units": 0.0,
