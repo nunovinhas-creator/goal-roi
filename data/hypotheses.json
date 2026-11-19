@@ -82158,6 +82158,31 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Faixa de odd = odd até 1,50 & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-19T08:16:34+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd até 1,50"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Jogo aberto",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "3e90c7bf9b23f342d26b4e9ca48287da40363903f0af825b8b96b62a8fa7efdf",
+   "registry_size": 9055,
+   "report_generated_at_utc": "2026-11-19T08:16:34+00:00",
+   "response_sha256": "998ef180eb192170be4292f401a40a6b59e0bb91ea2b450368ba4dcfc6f19c3c"
+  },
+  "reason": "odd baixa com ritmo alto",
+  "source": "llm"
+ },
  "Jogo aberto | Faixa de odd = odd até 1,50 & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-15T20:00:09+00:00",
   "conditions": [
