@@ -23,6 +23,28 @@ for (const status of ['queued','in_progress','completed']) {
     assert.equal(f.posts(),0);
   });
 }
+test('GitHub API reads use Cloudflare-compatible manual redirects', async () => {
+  const f=fixture('completed',2);
+  let reads=0;
+  const request=async (url, options) => {
+    assert.equal(options.method,'GET');
+    assert.equal(options.redirect,'manual');
+    reads++;
+    return f.request(url,options);
+  };
+  assert.equal((await inspect(null,now,request)).decision,'wait');
+  assert.equal(reads,2);
+});
+test('GitHub redirects are rejected, not followed', async () => {
+  let calls=0;
+  const request=async (url, options) => {
+    assert.equal(options.redirect,'manual');
+    calls++;
+    return Response.redirect('https://example.invalid/unsafe',302);
+  };
+  await assert.rejects(inspect(null,now,request),/GitHub lookup HTTP 302/);
+  assert.equal(calls,1);
+});
 test('recent job protects a run after a long queue', async () => {
   assert.equal((await inspect(null,now,fixture('in_progress',40,5).request)).reason,'recent_job');
 });
@@ -81,5 +103,6 @@ test('concurrent ticks and eviction after lost reply use one durable claim', asy
   assert.equal(results.filter(r=>r.status==='rejected').length,1);
   assert.equal((await (await new RecoveryGuard(ctx,env).fetch()).json()).decision,'already_requested');
   assert.equal(f.posts(),1);
+  assert.equal(calls.mock.calls.find(c=>c.arguments[1]?.method==='POST')?.arguments[1]?.redirect,'manual');
   assert.equal(calls.mock.calls.filter(c=>String(c.arguments[0]).includes('/runs?')).length,3);
 });
