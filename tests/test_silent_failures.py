@@ -357,9 +357,9 @@ class NextCollection(unittest.TestCase):
     def test_no_new_schedule_dispatch_or_concurrency_change(self):
         text = WORKFLOW.read_text(encoding='utf-8')
         self.assertEqual(re.findall(r"cron: '([^']+)'", text), ['3,13,23,33,43,53 * * * *'])
-        self.assertEqual(text.count('gh workflow run'), 1)
+        self.assertEqual(text.count('python scripts/dispatch_collection.py'), 1)
         self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)
-        self.assertEqual(sorted(p.name for p in WORKFLOW.parent.iterdir()), ['collect.yml', 'tests.yml'])
+        self.assertEqual(sorted(p.name for p in WORKFLOW.parent.iterdir()), ['collect.yml', 'continuity.yml', 'tests.yml'])
 
     @unittest.skipUnless(shutil.which('bash'), 'bash required')
     def test_a_failed_launch_fails_the_step(self):
@@ -368,13 +368,13 @@ class NextCollection(unittest.TestCase):
         script = '\n'.join(l[10:] for l in lines[lines.index('        run: |') + 1:] if l.startswith('          '))
         script = script.replace('${{ steps.fast.outcome }}', 'success')
         with tempfile.TemporaryDirectory() as d:
-            for name, body in (('gh', 'echo "HTTP 500" >&2; exit 1'), ('sleep', 'exit 0')):
+            for name, body in (('python', 'echo "HTTP 500" >&2; exit 1'), ('sleep', 'exit 0')):
                 stub = Path(d) / name
                 stub.write_text('#!/bin/sh\n' + body + '\n')
                 stub.chmod(0o755)
             env = dict(os.environ, PATH=d + os.pathsep + os.environ['PATH'], GITHUB_REPOSITORY='owner/repo')
             failed = subprocess.run(['bash', '--noprofile', '--norc', '-eo', 'pipefail', '-c', script], env=env, capture_output=True)
-            (Path(d) / 'gh').write_text('#!/bin/sh\nexit 0\n')
+            (Path(d) / 'python').write_text('#!/bin/sh\nexit 0\n')
             ok = subprocess.run(['bash', '--noprofile', '--norc', '-eo', 'pipefail', '-c', script], env=env, capture_output=True)
         self.assertNotEqual(failed.returncode, 0)
         self.assertEqual(ok.returncode, 0)

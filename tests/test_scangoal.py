@@ -435,7 +435,7 @@ Liverpool Women — Aston Villa Women
         self.assertEqual((found, near, unfinished), ({}, {}, {'m': {'status': 'Finished after extra time', 'id': 1}}))
         wf = Path('.github/workflows/collect.yml').read_text(encoding='utf-8')
         self.assertNotIn("github.event_name == 'workflow_dispatch' && '0'", wf)                         # execução manual já não gasta quota sozinha
-        self.assertIn('gh workflow run collect.yml', wf)
+        self.assertIn('timeout 85s python scripts/dispatch_collection.py', wf)
 
 
 class Brain(Hardening):
