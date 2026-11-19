@@ -1,6 +1,8 @@
 const repo = 'https://api.github.com/repos/nunovinhas-creator/goal-roi';
 const workflow = repo + '/actions/workflows/collect.yml';
 const threshold = 30 * 60;
+// Fail closed: both independent configuration switches must explicitly allow recovery.
+const recoveryEnabled = env => env.RECOVERY_MODE === 'active' && env.RECOVERY_ENABLED === 'true';
 
 export async function inspect(token, now = Date.now(), request = fetch) {
   const headers = {'User-Agent':'goal-roi-continuity'};
@@ -43,7 +45,7 @@ export async function inspect(token, now = Date.now(), request = fetch) {
 export class RecoveryGuard {
   constructor(ctx, env) { this.sql = ctx.storage.sql; this.env = env; }
   async fetch() {
-    if (this.env.RECOVERY_MODE !== 'active' || !this.env.GITHUB_ACTIONS_TOKEN)
+    if (!recoveryEnabled(this.env) || !this.env.GITHUB_ACTIONS_TOKEN)
       return Response.json({decision:'disabled'});
     const report = await inspect(this.env.GITHUB_ACTIONS_TOKEN);
     if (report.decision !== 'would_recover') return Response.json(report);
@@ -63,12 +65,12 @@ export default {async scheduled(event, env) {
   const id = new Date(event.scheduledTime).toISOString();
   const report = await inspect(env.GITHUB_ACTIONS_TOKEN);
   let outcome = report;
-  if (env.RECOVERY_MODE === 'active' && report.decision === 'would_recover') {
+  if (recoveryEnabled(env) && report.decision === 'would_recover') {
     const guard = env.GUARD.get(env.GUARD.idFromName('goal-roi-main'));
     const response = await guard.fetch('https://guard.internal/check');
     if (!response.ok) throw Error('Recovery guard failed');
     outcome = await response.json();
   }
   console.log(JSON.stringify({scheduled_utc:id, observed_utc:new Date().toISOString(),
-    mode:env.RECOVERY_MODE || 'observe', ...outcome}));
+    mode:recoveryEnabled(env) ? 'active' : 'observe', ...outcome}));
 }};
