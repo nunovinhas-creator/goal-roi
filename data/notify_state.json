@@ -1654,7 +1654,7 @@
   "delivered": 96,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-19T19:42:58+00:00",
+ "format_last_run_utc": "2026-11-19T19:49:33+00:00",
  "health": {
   "reference": {
    "bsd_results": 36,
@@ -1664,12 +1664,12 @@
    "hypotheses": 9355,
    "settled_bets": 755,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 50,
+   "statuses": 53,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-19T19:42:58+00:00",
+ "last_run_utc": "2026-11-19T19:49:33+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -2192,6 +2192,7 @@
   "Betfair | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo": "promissora",
   "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Reforço = sem reforço": "promissora",
+  "Betfair | Faixa de odd = odd acima de 3,00 & Reforço = sem reforço": "promissora",
   "Betfair | Hora (UTC) = tarde & Momento = durante o jogo & Reforço = sem reforço": "abandonada",
   "Betfair | Hora (UTC) = tarde & Reforço = sem reforço": "abandonada",
   "Betfair | Reforço = sem reforço & Seleção = equipa da casa": "abandonada",
@@ -2232,7 +2233,9 @@
   "Stake | Momento do aviso = até 45 min depois do início": "promissora",
   "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma": "promissora",
   "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
-  "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "promissora"
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "promissora",
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada"
  },
  "summary_counts": {
   "delivered": 72,
