@@ -64,6 +64,10 @@ def refresh():
     if docs.is_dir():
         shutil.copyfile(out, docs / 'report.json')
     notify.run_checked()          # entregas falhadas/incertas/retiradas -> WATCH_REPORT_FAILED (nunca reenvia)
+    # Se a publicação remota falhar, rounds() regista report_failed;
+    # o workflow preserva a recolha com continue-on-error e não envia o aviso.
+    from . import stake_alerts
+    stake_alerts.deliver(report.LAST.get('signals') or [])
 
 
 async def watch():
