@@ -489,8 +489,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
     view = [b for b in chronology.as_of_view(signals, as_of) if eligible(b) and chronology.decision_time(b) <= cutoff]
-    multi, earlier = brain.multi_matches(view), brain.earlier_index(view)
-    have = [(b, insights.family(b), frozenset(brain.atoms(b, multi, earlier))) for b in view]
+    have = [(b, insights.family(b), frozenset((d, v) for d, v in brain.atoms(b, set())
+                                               if d in brain.RESEARCH_DIMENSIONS)) for b in view]
     index = Index(view)
 
     def match(fam, conds):
@@ -520,8 +520,10 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     # depende do registo posterior. O script de auditoria indica quantas são, nas entradas.
     llm_ids = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm'
                      and (born_eff.get(hid) is None or born_eff[hid] <= cutoff))
-    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None]
-    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None)}
+    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None and brain.research_conditions(registry[hid])]
+    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None),
+                'unavailable_at_decision': sum(1 for hid in llm_ids if born_eff.get(hid) is not None
+                                               and not brain.research_conditions(registry[hid]))}
 
     # Duplicados à nascença (descrição): redundância extensional demonstrável no instante de registo de cada proposta.
     duplicates = []
@@ -541,7 +543,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         return groups_at_birth([(hid, registry[hid], born_eff[hid]) for hid in order], tau, games_at, GROUP_MIN_GAMES)
 
     gens = sorted(hid for hid, h in registry.items() if h.get('source') == 'gerador' and born_eff.get(hid) is not None
-                  and not any(c[0] in brain.POST for c in h['conditions']))
+                  and brain.research_conditions(h))
 
     def controls(hid):
         """Sem ler resultados; apoio e exclusão só com os sinais já LIDOS no nascimento de h (P1-A)."""
@@ -569,7 +571,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         out = []
         for i in range(len(conds)):
             pid = brain.hyp_id(h['family'], conds[:i] + conds[i + 1:])
-            if pid in registry and born_eff.get(pid) is not None and born_eff[pid] < t and pid != hid:
+            if (pid in registry and born_eff.get(pid) is not None and born_eff[pid] < t
+                    and pid != hid and brain.research_conditions(registry[pid])):
                 out.append(pid)
         return sorted(set(out))
 
@@ -696,7 +699,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
                            'duplicates_at_birth': duplicates,
                            'by_mode': {m: sum(1 for hid in valid if (registry[hid].get('mode') or 'novas') == m) for m in ('novas', 'refinar', 'evitar')}},
             'primary': primary, 'secondary': sec, 'pre_protocol': pre_protocol, 'hypotheses': table,
-            'notes': ['hit rates and prob_above are not used; no criterion reads them',
+            'notes': ['hypotheses and controls with dimensions unavailable at the decision are excluded',
+                      'hit rates and prob_above are not used; no criterion reads them',
                       'pre-protocol bets are post-registration evidence gathered before the protocol: descriptive only',
                       'the bootstrap-t p is a diagnostic only and never changes the verdict']}
 

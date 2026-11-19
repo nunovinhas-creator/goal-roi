@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scangoal import notify, polymarket_alerts, report
+from scangoal.parser import parse
 from test_stale_notices import state as notification_state
 
 
@@ -138,6 +139,40 @@ class PolymarketAlerts(unittest.TestCase):
             Path(directory, 'messages.jsonl').write_text(json.dumps(message) + '\n', encoding='utf-8')
             row, = report.build(now=NOW)[polymarket_alerts.REPORT_KEY]
         self.assertEqual((row['total'], row['share'], row['odds']), (7100, 72, 1.85))
+
+
+    def test_market_scope_and_state_on_original_message(self):
+        raw = ("📈 🔷 Polymarket · 19 nov 2026 13:10\nA — B · Example League\n"
+               "Over 2.5 @1.85 · $9.9K\n🧾 2 trades · market share 72%\n"
+               "https://scangoal.com/match/a-vs-b-20261119?lang=en")
+        for text, market, period in (
+            (raw.replace("Polymarket ·", "Polymarket · 1st Half ·"), "1st Half - Asian Total", "first_half"),
+            (raw.replace("Over 2.5", "Over 2.5 Corners"), "Total Corners", "regulation"),
+            (raw.replace("Over 2.5", "Over 2,5 (90 min)"), "Asian Total", "regulation"),
+        ):
+            with self.subTest(market=market):
+                parsed = parse(text)
+                self.assertEqual((parsed["market"], parsed["period"], parsed["selection"]),
+                                 (market, period, "Over 2.5"))
+                alerts = polymarket_alerts.candidates([dict(signal(), **parsed)], set(), NOW)
+                self.assertEqual(len(alerts), int(market == "Asian Total"))
+        self.assertFalse(parse(raw.replace("Polymarket ·", "Polymarket · LIVE ·"))["bet"])
+        live = parse(raw.replace("19 nov 2026 13:10", "LIVE 32' 1:1"))
+        self.assertEqual((live["phase"], live["score_at_signal"]), ("live", [1, 1]))
+
+    def test_amount_is_parsed_in_full_without_ambiguous_grouping(self):
+        raw = ("📈 🔷 Polymarket · 19 nov 2026 13:10\nA — B · Example League\n"
+               "Over 2.5 @1.85–2.10 · $VALUE\n🧾 2 trades · market share 72%")
+        for token, amount in (("10,500", None), ("10.500", None), ("10 500", 10500),
+                              ("10,500.00", 10500), ("10.500,00", 10500),
+                              ("9,9K", 9900), ("9 500,25", 9500.25), ("9500 USD?", None)):
+            with self.subTest(token=token):
+                row = parse(raw.replace("VALUE", token))
+                self.assertEqual(row.get("total"), amount)
+                self.assertEqual(row["bet"], amount is not None)
+                if amount is not None:
+                    self.assertEqual(row["odds"], 1.85)
+        self.assertFalse(parse(raw.replace("VALUE", "9000").replace("1.85–2.10", "2.10–1.85"))["bet"])
 
 
 def notification_report(messages, now, watch=()):

@@ -135,7 +135,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             continue
         b = out.get(k)
         if b is None:
-            b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
+            b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'period', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
                                                  'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league',
                                                  'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals', 'window', 'bot_prob', 'usual_prob', 'total', 'n_bets', 'sel_volume')}
             b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None, steps=[],

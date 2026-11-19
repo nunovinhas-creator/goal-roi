@@ -1,13 +1,12 @@
 """Phase 3 opportunity ranking: no retrospective leak, no ranking with short samples."""
+import json
 import unittest
+from pathlib import Path
 
 from scangoal import opportunity_ranking
 
-PROTOCOL = {
-    "id": "polymarket_pre_over25_share_lt80_total_lt10000_v1",
-    "declared_before_forward_samples_at_utc": "2026-11-19T15:16:22Z",
-    "born_merge_sha": "b7c7ba6720e37ec7a38c28c49e2223101fc45f9a",
-}
+PROTOCOL = json.loads((Path(__file__).resolve().parents[1] /
+                       "audits/opportunity-lab/polymarket-over25-v1.json").read_text())
 ACTIVATION = "2026-11-19T15:19:15.977169+00:00"
 NOW = "2026-11-20T12:00:00+00:00"
 
@@ -17,7 +16,7 @@ def signal(mid="match-1", **changes):
         "type": "POLYMARKET", "phase": "pre",
         "market": "Asian Total", "selection": "Over 2.5",
         "match_id": mid, "message_id": mid,
-        "teams": ["A", "B"], "league": "Example League",
+        "teams": [mid + " home", mid + " away"], "league": "Example League",
         "bet": True, "share": 79, "total": 9900, "odds": 1.85,
         "date_utc": "2026-11-19T15:35:00+00:00",
         "collected_at_utc": "2026-11-19T15:36:00+00:00",
@@ -142,6 +141,62 @@ class OpportunityRankingTests(unittest.TestCase):
         self.assertEqual((row["settled"], row["losses"],
                           row["timeouts_counted_as_losses"]), (1, 1, 1))
         self.assertEqual(row["roi_odds_minus_2pct"], -1.0)
+
+    def test_ft_after_deadline_keeps_primary_loss_and_adds_reconciliation(self):
+        rows = [signal()]
+        deadline = "2026-11-22T18:00:00Z"
+        late = {"match-1": result(time="2026-11-22T18:00:00.000001Z")}
+        base = run(rows, now=deadline)
+        self.assertEqual(base, run(rows, late, now=deadline))
+        c = run(rows, late, now="2026-11-22T18:01:00Z")["ranking"][0]
+        self.assertEqual((c["wins"], c["losses"], c["timeouts_counted_as_losses"]), (0, 1, 1))
+        self.assertEqual((c["ft_confirmed"], c["late_ft_confirmed"], c["roi_advertised"]), (0, 1, -1.0))
+        timely = {"match-1": result(time=deadline)}
+        self.assertEqual(run(rows, timely, now=deadline)["ranking"][0]["wins"], 1)
+
+    def test_late_disagreement_does_not_remove_primary_confirmed_ft(self):
+        from scangoal import opportunity_results
+        rows = [signal()]
+        first = opportunity_results.collected("highlightly", 1, [2, 1], "2026-11-19T20:05:00Z")
+        late = opportunity_results.collected("bsd", 2, [1, 1], "2026-11-22T18:05:00Z")
+        c = run(rows, {"match-1": (first, late)}, now="2026-11-22T18:10:00Z")["ranking"][0]
+        self.assertEqual((c["wins"], c["quarantined"], c["late_quarantined"]), (1, 0, 1))
+        self.assertEqual(c["forward_games"], c["ft_confirmed"] + c["pending"] +
+                         c["quarantined"] + c["timeouts_counted_as_losses"])
+
+    def test_fractional_cutoff_and_distinct_signal_clocks(self):
+        from scangoal import chronology, opportunity_forward
+        activation = "2026-11-19T15:20:00.900000Z"
+        before = signal(date_utc="2026-11-19T15:20:00.500000Z",
+                        collected_at_utc="2026-11-19T15:20:00.700000Z")
+        raw_before = signal(date_utc="2026-11-19T15:20:01.500000Z",
+                            collected_at_utc="2026-11-19T15:20:00.800000Z")
+        valid = signal(date_utc="2026-11-19T15:20:00.950000Z",
+                       collected_at_utc="2026-11-19T15:20:00.990000Z")
+        no_tz = signal(date_utc="2026-11-19T15:40:00", kickoff_utc="2026-11-19T18:00:00")
+        rows = [before, raw_before, valid, no_tz]
+        out = run(rows, activation=activation)
+        self.assertEqual(out["cutoff_utc"], "2026-11-19T15:20:00.900000+00:00")
+        self.assertEqual(out["ranking"][0]["forward_games"], 1)
+        self.assertEqual(run([valid], activation=activation, now="2026-11-19T15:35:00.9Z")["baseline"]["forward_games"], 0)
+        timing = opportunity_forward.signal_timing(valid, chronology.parse_utc(activation), chronology.parse_utc(NOW))
+        self.assertLess(timing.emitted, timing.collected)
+        self.assertLess(timing.collected, timing.available)
+        self.assertLess(timing.available, timing.decision)
+        self.assertLess(timing.decision, timing.kickoff)
+
+    def test_aliases_share_one_fixture_and_keep_first_eligible_quote(self):
+        first = signal("original", teams=["Alpha ", "Beta"], odds=1.85)
+        other = signal("alias", teams=["ALPHA", "beta"], odds=3.5,
+                       date_utc="2026-11-19T15:40:00Z", collected_at_utc="2026-11-19T15:41:00Z")
+        outcomes = {"alias": result()}
+        c = run([other, first], outcomes)["ranking"][0]
+        self.assertEqual((c["forward_games"], c["wins"], c["roi_advertised"]), (1, 1, 0.85))
+
+    def test_differs_if_any_frozen_protocol_field_is_edited(self):
+        altered = dict(PROTOCOL, conditions={**PROTOCOL["conditions"], "share_market_exclusive_upper": 25})
+        with self.assertRaisesRegex(ValueError, "changed preregistration"):
+            run([signal()], protocol=altered)
 
 
 if __name__ == "__main__":

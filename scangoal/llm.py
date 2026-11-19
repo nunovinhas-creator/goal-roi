@@ -59,7 +59,7 @@ def vocabulary(signals):
     for b in signals:
         fam = vocab.setdefault(insights.family(b), {})
         for dim, val in brain.atoms(b, multi, earlier):
-            if dim not in brain.POST:
+            if dim in brain.RESEARCH_DIMENSIONS:
                 fam.setdefault(dim, {})
                 fam[dim][val] = fam[dim].get(val, 0) + 1
     return vocab

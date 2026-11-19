@@ -78,12 +78,23 @@ def resolve(evidence, *, kickoff, as_of):
             return Resolution()
         if evidence.get("conflict") is True:
             return Resolution(conflict=True, available_at=known, first_available_at=known)
-        return Resolution(score_pair(evidence.get("ft")), available_at=known, first_available_at=known)
+        score = score_pair(evidence.get("ft"))
+        return Resolution(score, available_at=known, first_available_at=known) if score is not None else Resolution()
 
     if not isinstance(evidence, (list, tuple)):
         return Resolution()
     latest, first_by_score = {}, {}
+    legacy_scores, legacy_conflicts = set(), []
     for row in evidence:
+        if isinstance(row, dict):
+            legacy = resolve(row, kickoff=kickoff, as_of=as_of)
+            if legacy.conflict:
+                legacy_conflicts.append(legacy.available_at)
+            if legacy.score is not None:
+                legacy_scores.add(legacy.score)
+                first_by_score[legacy.score] = min(legacy.available_at,
+                                                    first_by_score.get(legacy.score, legacy.available_at))
+            continue
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
                 or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
                 or not row.observed_at <= row.available_at <= as_of
@@ -96,16 +107,16 @@ def resolve(evidence, *, kickoff, as_of):
         version = row.published_at or row.observed_at
         current = latest.get(key)
         if current is None or version > current[0]:
-            latest[key] = (version, {row.score}, row.available_at)
+            latest[key] = (version, {row.score})
         elif version == current[0]:
             current[1].add(row.score)
 
-    scores = {score for _, values, _ in latest.values() for score in values}
-    if not scores:
+    scores = {score for _, values in latest.values() for score in values} | legacy_scores
+    if not scores and not legacy_conflicts:
         return Resolution()
-    score = next(iter(scores)) if len(scores) == 1 else None
+    score = next(iter(scores)) if len(scores) == 1 and not legacy_conflicts else None
     return Resolution(score, conflict=score is None, available_at=first_by_score.get(score),
-                      first_available_at=min(first_by_score.values()))
+                      first_available_at=min([*first_by_score.values(), *legacy_conflicts]))
 
 
 def remember_provider_results(state, matched, stamp):

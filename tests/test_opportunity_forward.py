@@ -13,11 +13,8 @@ from scripts.opportunity_forward_audit import sourced_results
 from scangoal import chronology, opportunity_ranking, opportunity_results, report
 from scangoal import opportunity_forward as lab
 
-PROTOCOL = {
-    "id": "polymarket_pre_over25_share_lt80_total_lt10000_v1",
-    "declared_before_forward_samples_at_utc": "2026-11-19T15:16:22Z",
-    "born_merge_sha": "b7c7ba6720e37ec7a38c28c49e2223101fc45f9a",
-}
+PROTOCOL = json.loads((Path(__file__).resolve().parents[1] /
+                       "audits/opportunity-lab/polymarket-over25-v1.json").read_text())
 ACTIVATION = "2026-11-19T15:20:00+00:00"
 NOW = "2026-11-20T12:00:00+00:00"
 

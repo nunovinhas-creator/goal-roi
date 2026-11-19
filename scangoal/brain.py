@@ -55,6 +55,7 @@ CONFIRM_STEPS = 2        # jogos seguidos em que a nova condição se tem de man
 POST = {'Outros sinais no mesmo jogo', 'Reforço', 'Odd depois do sinal', 'Quota depois do sinal', 'Velocidade do reforço'}
 # Apenas para hipóteses explicitamente propostas pela LLM: não multiplicar o gerador histórico.
 POLYMARKET_EXACT_SELECTION = 'Seleção exata'
+POLYMARKET_PERIOD = 'Período do mercado'
 
 
 def earlier_index(signals):
@@ -82,6 +83,8 @@ def atoms(b, multi, earlier=None):
                 ('Golos até ao sinal', 'nenhum' if sum(s) == 0 else '1 ou 2' if sum(s) <= 2 else '3 ou mais')]
     if b.get('minute') is not None:
         out.append(('Minuto', 'até ao 30' if b['minute'] <= 30 else '31 a 60' if b['minute'] <= 60 else '61 em diante'))
+    if b['type'] == 'POLYMARKET' and b.get('period'):
+        out.append((POLYMARKET_PERIOD, b['period']))
     if b['type'] == 'POLYMARKET' and b.get('market') == 'Asian Total':
         selection = b.get('selection')
         if isinstance(selection, str) and re.fullmatch(r'(?:Over|Under) [0-9]+(?:\.[0-9]{1,2})?', selection):
@@ -126,7 +129,7 @@ def candidates(signals):
         # A linha exata é avaliável em propostas LLM, mas não entra no gerador
         # combinatório retrospetivo de 3 dimensões (controlo de multiplicidade).
         fam, at = insights.family(b), sorted(
-            (d, v) for d, v in set(atoms(b, multi, earlier)) if d != POLYMARKET_EXACT_SELECTION
+            (d, v) for d, v in set(atoms(b, multi, earlier)) if d not in (POLYMARKET_EXACT_SELECTION, POLYMARKET_PERIOD)
         )
         for k in range(1, MAX_CONDITIONS + 1):
             for c in itertools.combinations(at, k):
@@ -242,6 +245,13 @@ AS_OF_DIMENSIONS = frozenset({
     'Parte do jogo', 'Confiança indicada pelo bot', 'Ritmo indicado pelo bot', 'Golos em falta para ganhar', 'Vantagem indicada pelo bot',
     'Mercado', 'Momento do aviso', 'Marcador no momento', 'Golos até ao sinal', 'Minuto', 'Seleção', 'Volume na seleção',
     'Valor da aposta', 'Número de apostas'})
+
+
+RESEARCH_DIMENSIONS = AS_OF_DIMENSIONS | {POLYMARKET_EXACT_SELECTION, POLYMARKET_PERIOD}
+
+
+def research_conditions(h):
+    return all(d in RESEARCH_DIMENSIONS for d, _ in h['conditions'])
 
 
 def certifiable(h):
@@ -525,6 +535,7 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         born = chronology.born(h)
         born_of[hid] = born
         gen = h.get('source') == 'gerador'
+        research_safe = h.get('source') != 'llm' or research_conditions(h)
         # Propostas de quem já viu resultados (llm/manual) só contam sinais posteriores ao registo; sem registo válido, nenhum.
         pool = [(b, at) for b, fam, at in have if fam == h['family'] and (gen or (born is not None and (chronology.signal_time(b) or born) > born))]
         match = [b for b, at in pool if conds <= at]
@@ -533,15 +544,15 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         if s['games'] >= HINT_AT:
             matched[hid] = match
         row = dict(s, id=hid, family=h['family'], conditions=h['conditions'], source=h.get('source'), born_utc=h.get('born_utc'), reason=h.get('reason'), expect=h.get('expect'), mode=h.get('mode'),
-                   tradable=not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')], born_verified=born is not None,
+                   tradable=research_safe and not any(c[0] in POST for c in conds), open=[b for b in match if b['w'] is None and not b.get('no_source')], born_verified=born is not None,
                    game_set=None if exploratory else game_set(match), _games=None if exploratory else game_ids(match))
         if not exploratory or hid in matched:
             ordered[hid] = ordered_games(match)
         if not exploratory:
             matches[hid] = match
         if not exploratory:
-            row['prospective'] = prospective_summary(ordered[hid], born)
-            row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if row['prospective']['games'] >= PROSPECTIVE_MIN else 'exploratória')
+            row['prospective'] = prospective_summary(ordered[hid], born) if research_safe else None
+            row['evidence_level'] = ('não verificável' if born is None else 'prospetiva' if (row['prospective'] or {}).get('games', 0) >= PROSPECTIVE_MIN else 'exploratória')
             row['_game_roi'] = game_roi(ordered[hid])   # só apresentação (PR 5); retirado antes de publicar
         rows.append(row)
     tested = len(matched)

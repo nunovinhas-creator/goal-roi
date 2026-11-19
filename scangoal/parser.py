@@ -1,4 +1,5 @@
 """Parser por regras das mensagens do bot ScanGoal. Sem LLM, sem rede."""
+import math
 import re
 from datetime import datetime, timedelta, timezone
 
@@ -139,26 +140,86 @@ def parse(text):
     return m
 
 
+def polymarket_amount(token):
+    """Parse a complete USD amount. A single separator with three digits is ambiguous."""
+    value = " ".join(token.upper().split())
+    if re.fullmatch(r"[0-9]+(?:[.,][0-9]{1,2})?K", value):
+        amount = float(value[:-1].replace(",", ".")) * 1000
+    elif re.fullmatch(r"[0-9]+(?:[.,][0-9]{1,2})?", value):
+        amount = float(value.replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}( [0-9]{3})+(?:[.,][0-9]{1,2})?", value):
+        amount = float(value.replace(" ", "").replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}(,[0-9]{3})+(?:\.[0-9]{1,2})", value):
+        amount = float(value.replace(",", ""))
+    elif re.fullmatch(r"[0-9]{1,3}(\.[0-9]{3})+(?:,[0-9]{1,2})", value):
+        amount = float(value.replace(".", "").replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}(?:,[0-9]{3}){2,}|[0-9]{1,3}(?:\.[0-9]{3}){2,}", value):
+        amount = float(value.replace(",", "").replace(".", ""))
+    else:
+        return None
+    return amount if math.isfinite(amount) else None
+
+
+FIRST_HALF = re.compile(r"\b(?:1st[- ]half|first[- ]half|1h|h1|1ª parte|half[- ]time|ht)\b", re.I)
+SECOND_HALF = re.compile(r"\b(?:2nd[- ]half|second[- ]half|2h|h2|2ª parte)\b", re.I)
+NON_REGULATION = re.compile(r"\b(?:extra[- ]time|penalties|to qualify|incl\.? overtime)\b", re.I)
+REGULATION_SUFFIX = re.compile(r"\s*\((?:90\s*(?:min(?:utes?)?)?|full[- ]time|regulation(?: time)?|ft)\)\s*$", re.I)
+POLYMARKET_TOTAL = re.compile(r"\b(Over|Under) ([0-9]+(?:[.,][0-9]{1,2})?)\b", re.I)
+
+
 def polymarket(m, h, lines, text):
-    """Dinheiro na Polymarket: seleção, odd (a mais baixa quando vem um intervalo), valor, número de transações e quota."""
+    """Separate quote, amount, match phase and market period on a single message."""
     m['type'] = 'POLYMARKET'
-    s = re.match(r'^(.+?) @([\d.]+)(?:[–-][\d.]+)? · \$([\d.]+K?)', lines[2]) if len(lines) > 2 else None
+    quote = re.fullmatch(r"(.+?) @([0-9]+(?:\.[0-9]+)?)(?:[–-]([0-9]+(?:\.[0-9]+)?))? · \$(.+)",
+                         lines[2].strip()) if len(lines) > 2 else None
     head = lines[1].rsplit(' · ', 1) if len(lines) > 1 else []
     teams = [t.strip() for t in head[0].split('—', 1)] if head and '—' in head[0] else None
-    if not s or not teams or len(teams) != 2:
+    if not quote or not teams or not all(teams):
         return
-    live = re.search(r"LIVE (\d+)(?:\+\d+)?' (\d+):(\d+)", h)
-    tr, sh = re.search(r'🧾 (\d+) trades?', text), re.search(r'market share (\d+)%', text)
-    sel = s[1].strip()
-    if re.match(r'^(Over|Under) [\d.]+$', sel):
+    sel, low, high, token = quote.groups()
+    amount = polymarket_amount(token)
+    low, high = float(low), float(high) if high is not None else None
+    if (amount is None or not math.isfinite(low)
+            or (high is not None and (not math.isfinite(high) or high < low))):
+        return
+
+    live = re.search(r"\bLIVE (\d+)(?:\+\d+)?' (\d+):(\d+)", h, re.I)
+    kickoff = kickoff_utc(h)
+    if live is None and (kickoff is None or re.search(r"\b(?:LIVE|in[- ]play|finished)\b", h, re.I)):
+        return
+    tr = re.search(r'🧾 (\d+) trades?', text)
+    sh = re.search(r'market share ([0-9]+(?:[.,][0-9]{1,2})?)%', text)
+    share = float(sh[1].replace(",", ".")) if sh else None
+    if share is not None and share > 100:
+        share = None
+
+    context = h + " " + sel
+    first, second = FIRST_HALF.search(context), SECOND_HALF.search(context)
+    if (first and second) or NON_REGULATION.search(context):
+        period = 'other'
+    else:
+        period = 'first_half' if first else 'second_half' if second else 'regulation'
+    regulation_selection = REGULATION_SUFFIX.sub("", sel).strip()
+    total = POLYMARKET_TOTAL.search(sel)
+    if total and re.search(r'\bcorners?\b', context, re.I):
+        market = 'Total Corners'
+        sel = total[1].title() + ' ' + total[2].replace(',', '.')
+    elif total and period in ('first_half', 'second_half'):
+        market = '1st Half - Asian Total' if period == 'first_half' else '2nd Half - Asian Total'
+        sel = total[1].title() + ' ' + total[2].replace(',', '.')
+    elif period == 'regulation' and POLYMARKET_TOTAL.fullmatch(regulation_selection):
         market = 'Asian Total'
-    elif sel in teams or sel.lower() == 'draw':
+        sel = total[1].title() + ' ' + total[2].replace(',', '.')
+    elif period == 'regulation' and (sel in teams or sel.lower() == 'draw'):
         market, sel = '1X2', 'X' if sel.lower() == 'draw' else '12'[teams.index(sel)]
     else:
-        market = 'Polymarket'          # mercado que o resultado final não decide por regra: fica para a marca do bot
-    m.update(phase='live' if live else 'pre', teams=teams, league=clean_league(head[1]) if len(head) > 1 else None, kickoff_utc=None if live else kickoff_utc(h),
-             minute=int(live[1]) if live else None, score_at_signal=[int(live[2]), int(live[3])] if live else None,
-             market=market, selection=sel, odds=float(s[2]), total=money(s[3]), n_bets=int(tr[1]) if tr else None, share=int(sh[1]) if sh else None, bet=True)
+        market = 'Polymarket'
+    m.update(phase='live' if live else 'pre', period=period, teams=teams,
+             league=clean_league(head[1]) if len(head) > 1 else None, kickoff_utc=kickoff,
+             minute=int(live[1]) if live else None,
+             score_at_signal=[int(live[2]), int(live[3])] if live else None,
+             market=market, selection=sel, odds=low, total=amount,
+             n_bets=int(tr[1]) if tr else None, share=share, bet=True)
 
 
 def goal_brewing(m, lines, text):

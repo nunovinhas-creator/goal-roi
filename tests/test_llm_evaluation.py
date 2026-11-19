@@ -113,8 +113,26 @@ class Leakage(unittest.TestCase):
         born['Jogo aberto | Liga = A1'] = T0 + timedelta(days=99)
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry, born=born)
-        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 1})
+        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 1, 'unavailable_at_decision': 0})
         self.assertEqual((res['population']['evaluated'], res['population']['llm_hypotheses']), (1, 2))   # a futura não existe para a avaliação
+
+    def test_late_earlier_signal_cannot_define_candidate_or_control(self):
+        dimension = 'Sinal anterior de outro tipo no mesmo jogo'
+        candidate = hyp('A0', 'llm', LLM_BORN, extra=[(dimension, 'sim')])
+        safe = hyp('A0', 'llm', LLM_BORN)
+        bad_control = hyp('A0', 'gerador', GEN_BORN, extra=[(dimension, 'sim')])
+        old = sig('fixture', 1.0, 60, league='A0')
+        late = dict(sig('fixture', 1.0, 50, league='A0'), type='TOTALS_FORM',
+                    signal_seen_utc=iso(T0 + timedelta(minutes=90)))
+        registry = {'candidate': candidate, 'safe': safe, 'control': bad_control}
+        before = run([old], registry, as_of=T0 + timedelta(days=5))
+        after = run([old, late], registry, as_of=T0 + timedelta(days=5))
+        for output in (before, after):
+            self.assertEqual(output['population']['excluded']['unavailable_at_decision'], 1)
+            self.assertEqual([h['id'] for h in output['hypotheses']], ['safe'])
+            self.assertEqual(output['hypotheses'][0]['controls'], 0)
+            self.assertEqual(output['hypotheses'][0]['protocol_games'], 1)
+
 
 
 class HitRateIsNotEvidence(unittest.TestCase):
