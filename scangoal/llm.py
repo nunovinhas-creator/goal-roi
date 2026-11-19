@@ -14,6 +14,7 @@ from urllib.request import Request, urlopen
 
 from . import brain, chronology, equivalence, insights
 from .eligibility import game_identity
+from .llm_budget import BudgetUnavailable, GitBudget
 from .results_bsd import load_json
 from .store import data_dir
 
@@ -25,6 +26,7 @@ PRICES = {'@cf/meta/llama-3.3-70b-instruct-fp8-fast': (26668, 204805), '@cf/meta
 MODES = ('novas', 'refinar', 'evitar', 'notas')
 MAX_RESPONSE_TOKENS = 900
 REQUEST_TIMEOUT_SECONDS = 60
+UTC_DAY_GUARD = timedelta(minutes=5)
 CHAT_TEMPLATE_ALLOWANCE = 256
 SYSTEM_PROMPT = 'És um analista de apostas desportivas rigoroso. Respondes só com JSON válido.'
 CLAIM_WORDS = re.compile(r'\b(?:certificad[ao]s?|validad[ao]s?|rentáve(?:l|is)|lucro comprovado|vantagem comprovada)\b', re.I)
@@ -346,12 +348,23 @@ def reset_budget(state, at):
         state.update(day=day, neurons_today=0.0, accepted_today=0, calls_today=0)
 
 
-def run(call=request, now=None, env=None):
+def request_window(at):
+    next_day = datetime.combine(at.date() + timedelta(days=1), datetime.min.time(), tzinfo=UTC)
+    return next_day - at > UTC_DAY_GUARD
+
+
+def run(call=None, now=None, env=None, *, budget=None):
     env = os.environ if env is None else env
     account = env.get('CLOUDFLARE_ACCOUNT_ID', '').strip()
     key = env.get('MASTER_BRAIN_LLM_API_KEY', '').strip()
     if not account or not key or not re.fullmatch(r'[0-9a-f]{32}', account):
         print('LLM_NOT_CONFIGURED')
+        return None
+    live = call is None or call is request
+    if budget is None and env.get('LLM_BUDGET_MODE') == 'git' and env.get('GITHUB_REF_NAME') == 'main':
+        budget = GitBudget(account)
+    if live and budget is None:
+        print('LLM_SKIPPED_BUDGET_UNVERIFIED')
         return None
     directory = data_dir()
     lock_id = hashlib.sha256(str(directory.resolve()).encode()).hexdigest()
@@ -359,10 +372,10 @@ def run(call=request, now=None, env=None):
     lock_dir.mkdir(mode=0o700, exist_ok=True)
     with (lock_dir / lock_id).open('a') as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
-        return run_locked(call, account, key, directory, now)
+        return run_locked(request if call is None else call, account, key, directory, now, budget)
 
 
-def run_locked(call, account, key, directory, now):
+def run_locked(call, account, key, directory, now, budget):
     from . import report
 
     def clock():
@@ -414,18 +427,30 @@ def run_locked(call, account, key, directory, now):
                 continue
             at = clock()
             reset_budget(state, at)
-            until_midnight = datetime.combine(at.date() + timedelta(days=1), datetime.min.time(), tzinfo=UTC) - at
-            if until_midnight <= timedelta(seconds=REQUEST_TIMEOUT_SECONDS):
+            if not request_window(at):
                 outcome = 'skipped_utc_boundary'
                 break
             reserved = reserve(model, prompt)
             before = state.get('neurons_today', 0)
             if round(before + reserved, 1) > DAILY_NEURONS:
                 continue
+            if budget is not None:
+                try:
+                    if not budget.reserve(at.date(), round(reserved * 10), round(DAILY_NEURONS * 10)):
+                        continue
+                except BudgetUnavailable:
+                    outcome = 'budget_unverified'
+                    break
+                # An interruption after publication leaves the remote charge occupied. Local
+                # telemetry is optional for correctness and never releases the remote hold.
             state.update(neurons_today=round(before + reserved, 1),
                          calls_today=state.get('calls_today', 0) + 1, last_run_utc=at.isoformat(),
                          last_outcome='attempt_reserved')
             save_state(spath, state)
+            ready = clock()
+            if ready.date() != at.date() or not request_window(ready):
+                outcome = 'skipped_utc_boundary'
+                break
             try:
                 response = call(account, key, model, prompt)
             except LLMError as exc:
