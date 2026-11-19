@@ -15,7 +15,7 @@ proveniência (sha256 do pedido e da resposta). O balanço enviado ao modelo é 
 nenhuma percentagem acima de 50 % lhe é apresentada como confirmação.
 """
 import hashlib
-import json, os, re, sys
+import json, math, os, re, sys
 from datetime import datetime, timedelta, timezone
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -65,7 +65,64 @@ def vocabulary(signals):
     return vocab
 
 
-def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None):
+def opportunity_prompt(report):
+    """Bounded, numeric-only context. No match names, raw signals or post-hoc ROI."""
+    if not isinstance(report, dict) or report.get('status') != 'exploratory_only':
+        return []
+    rows = report.get('ranking')
+    if not isinstance(rows, list) or len(rows) != 1 or not isinstance(rows[0], dict):
+        return []
+    candidate = rows[0]
+    if (candidate.get('rule_id') != 'polymarket_pre_over25_share_lt80_total_lt10000_v1'
+            or candidate.get('certified') is not False
+            or report.get('certification') != 'not_activated'
+            or report.get('statistical_claim') != 'none'):
+        return []
+    n = candidate.get('settled')
+    if type(n) is not int or n < 0:
+        return []
+    # No ROI / upside anecdotes in the prompt until 30 independent forward games.
+    prefix = 'Polymarket PRE Over 2.5, quota <80%, valor <$10K:'
+    if n < 30:
+        return [prefix + ' %d jogos futuros liquidados; amostra insuficiente (<30), SEM conclusão de ROI.' % n,
+                'Não refines a regra congelada com estes resultados, nem a declares lucrativa.']
+    roi = candidate.get('roi_odds_minus_2pct')
+    benchmark = (report.get('baseline') or {}).get('roi_odds_minus_2pct')
+    if (type(roi) not in (int, float) or not math.isfinite(roi)
+            or type(benchmark) not in (int, float) or not math.isfinite(benchmark)):
+        return []
+    return [prefix + ' %d jogos futuros; ROI teórico com odd ×0,98 = %+.3f por jogo.' % (n, roi),
+            'Comparador sobreposto, não independente: ROI teórico de Polymarket PRE Over 2.5 = %+.3f.' % benchmark,
+            'Comparação apenas exploratória; nenhuma vantagem certificada, nenhum envio de alertas novo.']
+
+
+def opportunity_digest(now):
+    """Local-only reading; never loads Telegram credentials or calls Cloudflare.
+
+    Fail closed if no activation, corrupt data or mismatched chronology.
+    Skipping the digest must never affect LLM hypothesis registration.
+    """
+    from . import opportunity_ranking, report
+    from scripts.opportunity_forward_audit import PROTOCOL, read_json, sourced_results
+    try:
+        directory = data_dir()
+        state = read_json(directory / 'notify_state.json', {})
+        activation = ((state.get('migrations') or {}).get('polymarket_over25_v1') or {}).get('at_utc')
+        if not activation:
+            return None
+        protocol = read_json(PROTOCOL, {})
+        observed = {}
+        messages, bot_ft, _, _, _ = report.load(observed)
+        results = sourced_results(bot_ft, observed, directory)
+        return opportunity_ranking.build(
+            messages, results, protocol, activation_utc=activation, now=now,
+        )
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, IndexError, ArithmeticError):
+        print('LLM_OPPORTUNITY_CONTEXT_SKIPPED')
+        return None
+
+
+def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None, opportunity=None):
     lines = ['Medimos sinais de apostas de futebol de um bot. Cada sinal tem características. Uma hipótese é uma família de sinal',
              'mais 1 a %d condições (característica = valor). Queremos hipóteses NOVAS que possam acertar acima do que a odd exige.' % MAX_CONDITIONS, '',
              'Características disponíveis por família (valor: número de sinais):']
@@ -86,6 +143,9 @@ def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None):
         lines += ['- %s -> %d jogos, lucro médio por jogo %s à odd anunciada (esperado: %s)'
                   % (h['id'], h['games'], '—' if h.get('roi') is None else ('%+.2f' % h['roi']), h.get('expect') or 'acima') for h in track['llm']]
         lines.append('Amostras curtas e ruidosas: não concluas que um género de hipótese funciona ou falhou. Propõe hipóteses com lógica própria.')
+    digest = opportunity_prompt(opportunity)
+    if digest:
+        lines += ['', 'Evidência prospetiva PR #55 (filtro pré-registado, sem certificação):', *digest]
     if mode == 'notas':
         lines += ['', 'Escreve até 3 observações curtas e prudentes sobre o que estes números sugerem. Cada observação refere UMA hipótese da lista,',
                   'copiando o identificador exatamente como está escrito (o texto antes de "->"). Não inventes números; diz quando a amostra é pequena.',
@@ -207,7 +267,8 @@ def run(call=request, now=None, env=None):
     if not vocab:
         outcome = 'no_data'
     else:
-        prompt, raw = build_prompt(vocab, top, len(registry), mode, weak, rep['brain'].get('track')), None
+        digest = opportunity_digest(now)
+        prompt, raw = build_prompt(vocab, top, len(registry), mode, weak, rep['brain'].get('track'), digest), None
         checker = equivalence.Redundancy(signals, registry)
         for model in MODELS:
             try:
