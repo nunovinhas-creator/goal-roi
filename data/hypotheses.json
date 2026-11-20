@@ -144128,6 +144128,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Competição = liga & Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-20T20:30:41+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Competição = liga & Golos até ao sinal = 1 ou 2 & Valor da aposta = 10 mil $ ou mais": {
   "born_utc": "2026-11-20T15:59:54+00:00",
   "conditions": [
@@ -145197,6 +145216,25 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Marcador no momento = empatado & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-20T20:30:41+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Stake",
@@ -151189,6 +151227,25 @@
    [
     "Faixa de odd",
     "odd 2,00 a 3,00"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Golos até ao sinal = 1 ou 2": {
+  "born_utc": "2026-11-20T20:30:41+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
    ]
   ],
   "family": "Stake",
@@ -162965,6 +163022,25 @@
    [
     "Número de apostas",
     "uma"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 2,00 a 3,00 & Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-20T20:30:41+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
    ]
   ],
   "family": "Stake",
@@ -175118,6 +175194,17 @@
    [
     "Valor da aposta",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Liga = German Bundesliga": {
+  "born_utc": "2026-11-20T20:30:41+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "German Bundesliga"
    ]
   ],
   "family": "Stake",
