@@ -1,5 +1,23 @@
 [
  {
+  "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
+  "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 13 resultados",
+  "at_utc": "2026-11-20T05:38:46+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+  "note": "tem um acerto de 0.8214, o que sugere um desempenho positivo, mas é necessário mais dados para confirmação",
+  "at_utc": "2026-11-20T05:38:46+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+  "note": "apresenta um acerto de 0.6364, mas a amostra de 33 resultados pode ser considerada pequena para uma conclusão definitiva",
+  "at_utc": "2026-11-20T05:38:46+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
   "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
   "note": "apresenta um acerto de 0.8148, mas a amostra é pequena com apenas 28 resultados",
   "at_utc": "2026-11-20T01:46:01+00:00",
@@ -219,24 +237,6 @@
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
   "note": "A taxa de acerto de 0.8947 sugere um desempenho superior à odd exigida, mas a amostra é pequena.",
   "at_utc": "2026-11-17T20:12:13+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-  "note": "A taxa de acerto de 0.7647 é razoável, mas a amostra é pequena e mais dados são necessários para confirmação.",
-  "at_utc": "2026-11-17T20:12:13+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Reforço = sem reforço",
-  "note": "A taxa de acerto de 0.359 é baixa, mas a amostra é razoável e sugere que esta hipótese pode não ser promissora.",
-  "at_utc": "2026-11-17T20:12:13+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-  "note": "apresenta um acerto alto, mas a amostra é pequena",
-  "at_utc": "2026-11-17T15:56:51+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
  }
 ]
