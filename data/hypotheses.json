@@ -135149,6 +135149,35 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Quota de mercado = menos de 80 % & Seleção exata = Under 2.5 & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-20T10:27:29+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Seleção exata",
+    "Under 2.5"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "2a0e82532c2c69ceff8929f74509def1895d6184464d7623d98f52f5fee0e488",
+   "registry_size": 9600,
+   "report_generated_at_utc": "2026-11-20T10:27:29+00:00",
+   "response_sha256": "11d86c661c71df2bb4352ee14883a49ea742cc8ce6f0def5987b7800c1a81c8c"
+  },
+  "reason": "Apostas em under 2.5 com quota baixa e valor baixo podem ser mais lucrativas",
+  "source": "llm"
+ },
  "Polymarket | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T13:54:02+00:00",
   "conditions": [
