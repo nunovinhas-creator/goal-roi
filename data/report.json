@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T09:19:00+00:00",
+ "generated_at_utc": "2026-11-20T09:29:23+00:00",
  "messages": 1761,
  "types": {
   "SERVICE": 10,
@@ -40,16 +40,16 @@
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
-  "hl_last_run_utc": "2026-11-20T07:53:05+00:00",
+  "hl_last_run_utc": "2026-11-20T09:28:37+00:00",
   "bsd_results": 36,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 14,
-  "bsd_last_run_utc": "2026-11-20T08:31:49+00:00",
+  "bsd_last_run_utc": "2026-11-20T09:28:37+00:00",
   "goal_minutes_matches": 102,
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T09:18:58+00:00",
+  "collector_last_run_utc": "2026-11-20T09:28:35+00:00",
   "name_review": [
    {
     "bot": [
@@ -1734,7 +1734,7 @@
    "by_bot_mark": 0,
    "per_day": 0.3,
    "days_to_hint": 80,
-   "days_to_conclusion": 878,
+   "days_to_conclusion": 879,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -6531,7 +6531,7 @@
     "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T09:19:36+00:00",
+   "generated_utc": "2026-11-20T09:30:00+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -25574,17 +25574,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 179,
-  "llm_last_run_utc": "2026-11-20T08:31:51+00:00",
+  "llm_runs": 180,
+  "llm_last_run_utc": "2026-11-20T09:28:38+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-20",
-   "calls_today": 9,
-   "neurons_today": 1990.7,
+   "calls_today": 10,
+   "neurons_today": 2192.0,
    "accepted_today": 1,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "apresenta um alto acerto de 0.7778, mas é necessário mais dados para confirmar a eficácia da hipótese",
+    "at_utc": "2026-11-20T09:28:38+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 36,
+    "hits": 28,
+    "hit_rate": 0.7778,
+    "break_even": 0.5834,
+    "status": "promissora"
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "tem uma amostra razoável de 28 resultados, com um acerto de 0.8214, sugerindo potencial para ser uma hipótese lucrativa",
+    "at_utc": "2026-11-20T09:28:38+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 28,
+    "hits": 23,
+    "hit_rate": 0.8214,
+    "break_even": 0.5687,
+    "status": "em observação"
+   },
+   {
+    "id": "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
+    "note": "tem uma amostra pequena de 33 resultados, mas ainda assim apresenta um acerto de 0.6364, o que pode indicar uma tendência positiva, embora seja necessário mais dados para confirmar",
+    "at_utc": "2026-11-20T09:28:38+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 33,
+    "hits": 21,
+    "hit_rate": 0.6364,
+    "break_even": 0.4885,
+    "status": "em observação"
+   },
    {
     "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $",
     "note": "apresenta um acerto de 1.0, mas a amostra é pequena com apenas 13 resultados",
@@ -25682,39 +25715,6 @@
     "hits": 21,
     "hit_rate": 0.6364,
     "break_even": 0.4885,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
-    "note": "apresenta uma taxa de acerto de 0.75, mas a amostra é razoável com 36 resultados",
-    "at_utc": "2026-11-19T17:13:19+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 37,
-    "hits": 27,
-    "hit_rate": 0.7297,
-    "break_even": 0.5709,
-    "status": "promissora"
-   },
-   {
-    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "note": "tem uma taxa de acerto de 0.8696, mas é necessário mais dados para confirmar a tendência",
-    "at_utc": "2026-11-19T17:13:19+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 24,
-    "hits": 20,
-    "hit_rate": 0.8511,
-    "break_even": 0.5805,
-    "status": "em observação"
-   },
-   {
-    "id": "Betfair | Faixa de odd = odd acima de 3,00 & Hora (UTC) = noite & Momento = durante o jogo",
-    "note": "apresenta uma taxa de acerto baixa de 0.5455, mas a amostra é pequena com apenas 11 resultados",
-    "at_utc": "2026-11-19T17:13:19+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 11,
-    "hits": 6,
-    "hit_rate": 0.5455,
-    "break_even": 0.231,
     "status": "em observação"
    }
   ],
