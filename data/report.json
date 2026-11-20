@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T01:36:37+00:00",
+ "generated_at_utc": "2026-11-20T01:46:41+00:00",
  "messages": 1742,
  "types": {
   "SERVICE": 10,
@@ -44,12 +44,12 @@
   "bsd_results": 36,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 14,
-  "bsd_last_run_utc": "2026-11-20T00:48:28+00:00",
+  "bsd_last_run_utc": "2026-11-20T01:45:59+00:00",
   "goal_minutes_matches": 102,
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T01:36:35+00:00",
+  "collector_last_run_utc": "2026-11-20T01:45:57+00:00",
   "name_review": [
    {
     "bot": [
@@ -1690,7 +1690,7 @@
    "by_bot_mark": 0,
    "per_day": 2.9,
    "days_to_hint": 2,
-   "days_to_conclusion": 94,
+   "days_to_conclusion": 95,
    "prudent_rate": 0.4272,
    "prob_above": 0.3774,
    "edge": -0.0254,
@@ -1836,7 +1836,7 @@
    "roi_announced_odds": -0.0471,
    "seen_late": 0,
    "by_bot_mark": 130,
-   "per_day": 30.6,
+   "per_day": 30.5,
    "days_to_hint": 0,
    "days_to_conclusion": 3,
    "prudent_rate": 0.5001,
@@ -1986,7 +1986,7 @@
    "by_bot_mark": 0,
    "per_day": 1.8,
    "days_to_hint": 9,
-   "days_to_conclusion": 158,
+   "days_to_conclusion": 159,
    "prudent_rate": 0.5181,
    "prob_above": 0.5042,
    "edge": 0.0006,
@@ -6428,7 +6428,7 @@
     "contraditório": 6,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T01:37:06+00:00",
+   "generated_utc": "2026-11-20T01:47:13+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -25486,17 +25486,50 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 171,
-  "llm_last_run_utc": "2026-11-20T00:48:30+00:00",
+  "llm_runs": 172,
+  "llm_last_run_utc": "2026-11-20T01:46:01+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-20",
-   "calls_today": 1,
-   "neurons_today": 208.1,
+   "calls_today": 2,
+   "neurons_today": 402.4,
    "accepted_today": 0,
-   "last_mode": "evitar"
+   "last_mode": "notas"
   },
   "notes": [
+   {
+    "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
+    "note": "apresenta um acerto de 0.8148, mas a amostra é pequena com apenas 28 resultados",
+    "at_utc": "2026-11-20T01:46:01+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 28,
+    "hits": 22,
+    "hit_rate": 0.8148,
+    "break_even": 0.5507,
+    "status": "em observação"
+   },
+   {
+    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "tem um acerto de 0.8214, mas a amostra também é pequena com 28 resultados",
+    "at_utc": "2026-11-20T01:46:01+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 28,
+    "hits": 23,
+    "hit_rate": 0.8214,
+    "break_even": 0.5687,
+    "status": "em observação"
+   },
+   {
+    "id": "Betfair | Faixa de odd = odd acima de 3,00 & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+    "note": "apresenta um baixo acerto de 0.4167, com uma amostra de 24 resultados, o que pode indicar um desempenho ruim, mas a amostra é pequena",
+    "at_utc": "2026-11-20T01:46:01+00:00",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "n": 24,
+    "hits": 10,
+    "hit_rate": 0.4167,
+    "break_even": 0.2359,
+    "status": "em observação"
+   },
    {
     "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
     "note": "amostra razoável, acerto de 0.8696 sugere potencial lucratividade",
@@ -25589,39 +25622,6 @@
     "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
     "note": "tem uma taxa de acerto de 1,0 com 8 resultados, mas a amostra é muito pequena para tirar conclusões significativas",
     "at_utc": "2026-11-19T13:21:31+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 8,
-    "hits": 8,
-    "hit_rate": 1.0,
-    "break_even": 0.4455,
-    "status": "em observação"
-   },
-   {
-    "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-    "note": "apresenta um acerto alto, mas a amostra é pequena com apenas 21 resultados",
-    "at_utc": "2026-11-19T09:20:21+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 24,
-    "hits": 20,
-    "hit_rate": 0.8511,
-    "break_even": 0.5805,
-    "status": "em observação"
-   },
-   {
-    "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
-    "note": "tem um acerto significativo, mas é necessário mais dados para confirmar a tendência",
-    "at_utc": "2026-11-19T09:20:21+00:00",
-    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "n": 28,
-    "hits": 23,
-    "hit_rate": 0.8214,
-    "break_even": 0.5687,
-    "status": "em observação"
-   },
-   {
-    "id": "Betfair | Hora (UTC) = tarde & Odd depois do sinal = subiu & Seleção = equipa da casa",
-    "note": "apresenta um acerto perfeito, mas a amostra é muito pequena com apenas 8 resultados",
-    "at_utc": "2026-11-19T09:20:21+00:00",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "n": 8,
     "hits": 8,
@@ -25866,7 +25866,7 @@
     "roi_announced_odds": -0.0471,
     "seen_late": 0,
     "by_bot_mark": 130,
-    "per_day": 30.6,
+    "per_day": 30.5,
     "days_to_hint": 0,
     "days_to_conclusion": 3
    },
@@ -25895,7 +25895,7 @@
     "roi_announced_odds": 0.061,
     "seen_late": 0,
     "by_bot_mark": 33,
-    "per_day": 21.3,
+    "per_day": 21.2,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -25924,7 +25924,7 @@
     "roi_announced_odds": -0.0269,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 8.3,
+    "per_day": 8.2,
     "days_to_hint": 0,
     "days_to_conclusion": 29
    },
@@ -25955,7 +25955,7 @@
     "by_bot_mark": 0,
     "per_day": 1.8,
     "days_to_hint": 9,
-    "days_to_conclusion": 158
+    "days_to_conclusion": 159
    }
   },
   "regime": [

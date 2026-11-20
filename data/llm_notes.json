@@ -1,5 +1,23 @@
 [
  {
+  "id": "Stake | Hora (UTC) = noite & Número de apostas = uma & Valor da aposta = menos de 10 mil $",
+  "note": "apresenta um acerto de 0.8148, mas a amostra é pequena com apenas 28 resultados",
+  "at_utc": "2026-11-20T01:46:01+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
+  "note": "tem um acerto de 0.8214, mas a amostra também é pequena com 28 resultados",
+  "at_utc": "2026-11-20T01:46:01+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
+  "id": "Betfair | Faixa de odd = odd acima de 3,00 & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não",
+  "note": "apresenta um baixo acerto de 0.4167, com uma amostra de 24 resultados, o que pode indicar um desempenho ruim, mas a amostra é pequena",
+  "at_utc": "2026-11-20T01:46:01+00:00",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ },
+ {
   "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
   "note": "amostra razoável, acerto de 0.8696 sugere potencial lucratividade",
   "at_utc": "2026-11-19T21:56:42+00:00",
@@ -219,24 +237,6 @@
   "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
   "note": "apresenta um acerto alto, mas a amostra é pequena",
   "at_utc": "2026-11-17T15:56:51+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
-  "note": "tem um desempenho razoável, mas a taxa necessária é baixa",
-  "at_utc": "2026-11-17T15:56:51+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Dia = fim de semana & Marcador no momento = diferença de 2 ou mais golos",
-  "note": "apresenta um acerto baixo e a amostra é razoável, o que pode indicar uma hipótese menos promissora",
-  "at_utc": "2026-11-17T15:56:51+00:00",
-  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
- },
- {
-  "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
-  "note": "apresenta um acerto de 0.8947, mas a amostra é pequena, com apenas 19 resultados",
-  "at_utc": "2026-11-17T11:46:53+00:00",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
  }
 ]
