@@ -1,7 +1,8 @@
 // Execute the actual dashboard functions without a browser, fetch, or services.
 const fs=require('node:fs'), vm=require('node:vm'), assert=require('node:assert/strict');
 const html=fs.readFileSync('docs/index.html','utf8');
-const extract=(start,end)=>html.slice(html.indexOf(start),html.indexOf(end,html.indexOf(start)));
+const js=fs.readFileSync('docs/dashboard.js','utf8');
+const extract=(start,end)=>js.slice(js.indexOf(start),js.indexOf(end,js.indexOf(start)));
 const source=extract('function verdict(', '\nconst ICON=')+'\n'+extract('function answer(', '\nfunction fresh(');
 const payload=JSON.parse(fs.readFileSync(0,'utf8'));
 function render(d){
@@ -24,5 +25,5 @@ for(const operational of [undefined,{}, {scope:'all_signals',accuracy:{OPEN_GAME
 }
 assert.match(html, /Leitura exploratória dos dados/);
 assert.match(html, /Inclui sinais inelegíveis/);
-assert.match(html, /Exploratório: /);
+assert.match(js, /Exploratório: /);
 console.log('Dashboard operational regressions passed');

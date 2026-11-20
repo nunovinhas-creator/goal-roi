@@ -1,100 +1,570 @@
-// Dashboard refresh in a real browser (Playwright/Chromium), fully offline: every request is answered by page.route.
-// One coherent snapshot of report.json across all sections; a new report redraws everything without duplicates and
-// keeps the reader's sort, filter and simulator choices; a failed refresh keeps the last snapshot, flagged as stale.
-// Usage: node tests/dashboard_refresh.cjs [path/to/index.html] [path/to/report.json]
-const fs=require('node:fs'), assert=require('node:assert/strict');
-const {chromium}=require('playwright');
-const html=fs.readFileSync(process.argv[2]||'docs/index.html','utf8');
-const base=JSON.parse(fs.readFileSync(process.argv[3]||'docs/report.json','utf8'));
+// Static dashboard end-to-end regressions. Report, CSS and JS are served by browser
+// routes so the test uses the exact GitHub Pages entry point without external services.
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const {chromium} = require('playwright');
 
-function snapshot(minutesAgo,extra){
-  const d=structuredClone(base);
-  d.audit=Object.assign({},d.audit,{collector_last_run_utc:new Date(Date.now()-minutesAgo*60000).toISOString().replace(/\.\d+Z$/,'+00:00')});
-  return Object.assign(d,extra||{});
+const indexPath = process.argv[2] || 'docs/index.html';
+const base = JSON.parse(fs.readFileSync(process.argv[3] || 'docs/report.json','utf8'));
+const docs = path.dirname(indexPath);
+const root = 'http://goal-roi.test/';
+const date = new Date(base.generated_at_utc);
+const percent = (value, places=1) => (value * 100).toFixed(places).replace('.',',') + ' %';
+const units = n => (n > 0 ? '+' : '') + String(n).replace('.',',');
+const count = n => new Intl.NumberFormat('pt-PT').format(n);
+const euro = value => (Math.round(value * 100) / 100).toLocaleString('pt-PT', {
+  minimumFractionDigits:2, maximumFractionDigits:2
+}) + ' €';
+const sizes = [[375,812],[768,1024],[1440,1000]];
+const Q7 = 'Q7 Todas as apostas (referência)';
+const assets = {
+  '/': ['text/html', indexPath],
+  '/dashboard.js': ['text/javascript', path.join(docs,'dashboard.js')],
+  '/dashboard.css': ['text/css', path.join(docs,'dashboard.css')]
+};
+const files = Object.fromEntries(Object.entries(assets).map(([name,[contentType,file]]) =>
+  [name,{status:200,contentType,body:fs.readFileSync(file,'utf8')}]));
+
+function snapshot(minutesAgo, extra={}) {
+  const d = structuredClone(base);
+  d.audit = {...d.audit, collector_last_run_utc:new Date(date - minutesAgo*60000).toISOString()};
+  Object.assign(d,extra);
+  if (extra.unique_bets !== undefined) {
+    const added = d.unique_bets - base.unique_bets;
+    Object.values(d.groups)[0].bets += added;
+    d.questions[Q7].bets += added;
+    d.daily.at(-1).bets += added;
+  }
+  return d;
 }
 
-(async()=>{
-  const A=snapshot(5), tl=A.timeline||[];
-  const B=snapshot(1,{messages:A.messages+7,settled_bets:A.settled_bets+1,timeline:tl.concat([Object.assign({},tl[tl.length-1]||{t:'OPEN_GAME',o:2,w:1,g:1,s:'x',m:'Novo'},{u:((tl[tl.length-1]||{}).u||0)+1})])});
-  let reply={status:200,body:JSON.stringify(A)}, requests=0;const held=[];
-  const browser=await chromium.launch();
-  try{
-    const page=await browser.newPage();
-    const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-    await page.route('**/*',route=>{const url=route.request().url();
-      if(url==='http://goal-roi.test/')return route.fulfill({status:200,contentType:'text/html',body:html});
-      if(url.startsWith('http://goal-roi.test/report.json')){requests++;if(reply.hold){held.push(route);return}return reply.abort?route.abort('internetdisconnected'):route.fulfill({status:reply.status,contentType:'application/json',body:reply.body})}
-      return route.abort()});                                                 // fonts and anything else: offline
-    await page.goto('http://goal-roi.test/');
-    await page.waitForFunction(()=>document.getElementById('facts').children.length>0);
-    const facts=()=>page.$eval('#facts',e=>e.textContent), fresh=()=>page.$eval('#fresh',e=>[e.textContent,e.classList.contains('stale')]);
-    const counts=()=>page.evaluate(()=>Object.fromEntries(['facts','signals','filters','simtypes','braincounts','groups','qc','calib','risk','move','says','best','avoid','boardopen','wf','entry','llm','notes','watch','uns','daily','questions']
-      .map(id=>[id,document.getElementById(id)?document.getElementById(id).children.length:null]).concat([['charts',document.querySelectorAll('#chart svg').length],['main',document.querySelectorAll('main').length],['tips',document.querySelectorAll('#tip').length]])));
-    assert.match(await facts(),new RegExp(`^${A.messages} mensagens lidas`));
-    assert.match((await fresh())[0],/Atualizado em/);assert.equal((await fresh())[1],false);
-    const first=await counts();
-
-    // The reader's choices: a sort, a filter, the simulator.
-    const sortTh=await page.$$('table:has(#hyps) thead button.sort');
-    const hasSort=sortTh.length>1; if(hasSort)await sortTh[1].click();
-    const sortState=()=>page.evaluate(()=>[...document.getElementById('hyps').closest('table').querySelectorAll('thead th')].map(t=>t.getAttribute('aria-sort')));
-    const sorted=await sortState();
-    await page.click('#filters button:nth-child(2)');
-    await page.fill('#simbank','500');await page.dispatchEvent('#simbank','input');
-    const types=await page.$$('#simtypes input');const hasTypes=types.length>0;if(hasTypes)await types[0].uncheck();
-    const sim=await page.$eval('#simout',e=>e.textContent);
-
-    // Same report again: nothing redrawn (marker survives), only agenda and indicator.
-    await page.evaluate(()=>{document.getElementById('facts').firstElementChild.dataset.mark='kept'});
-    const asked=requests;await page.evaluate(()=>agendaRefresh());
-    await page.waitForTimeout(300);assert.equal(requests,asked+1);
-    assert.equal(await page.$eval('#facts',e=>e.firstElementChild.dataset.mark||''),'kept');
-
-    // New report: every section from B, nothing duplicated, choices kept.
-    reply={status:200,body:JSON.stringify(B)};
-    await page.evaluate(()=>agendaRefresh());
-    await page.waitForFunction(n=>document.getElementById('facts').textContent.startsWith(n+' mensagens'),B.messages);
-    assert.match(await facts(),new RegExp(`${B.settled_bets} com resultado`));
-    assert.deepEqual(await counts(),first);                                  // same structure, no duplicate rows/nodes/buttons
-    if(B.timeline.length>=2)assert.match(await page.$eval('#chart svg',s=>s.getAttribute('aria-label')),new RegExp(`ao longo de ${B.timeline.length} apostas`));
-    assert.match((await fresh())[0],/Atualizado em/);assert.equal((await fresh())[1],false);
-    assert.deepEqual(await sortState(),sorted);
-    assert.equal(await page.$eval('#filters button:nth-child(2)',b=>b.getAttribute('aria-pressed')),'true');
-    assert.equal(await page.$eval('#simbank',e=>e.value),'500');
-    if(hasTypes)assert.equal(await page.$eval('#simtypes input',e=>e.checked),false);
-    if(hasSort){                                                              // one listener per button: one click toggles once
-      const before=await sortState();await (await page.$$('table:has(#hyps) thead button.sort'))[1].click();
-      assert.notDeepEqual(await sortState(),before)}
-    const simAfter=await page.$eval('#simout',e=>e.textContent);
-    assert.ok(simAfter.length>0&&(B.timeline.length!==A.timeline.length||simAfter===sim));
-
-    // Network error, HTTP error, invalid JSON: last snapshot kept, flagged as stale.
-    for(const r of [{abort:true},{status:500,body:'{}'},{status:200,body:'{"truncated'}]){
-      reply=r;await page.evaluate(()=>agendaRefresh());
-      await page.waitForFunction(()=>document.getElementById('fresh').classList.contains('stale'));
-      assert.match((await fresh())[0],/^Falha ao atualizar; dados de /);
-      assert.match(await facts(),new RegExp(`^${B.messages} mensagens lidas`));
-      assert.deepEqual(await counts(),first);
-      reply={status:200,body:JSON.stringify(B)};await page.evaluate(()=>agendaRefresh());
-      await page.waitForFunction(()=>!document.getElementById('fresh').classList.contains('stale'));
+async function setup(page, reply, useTimers = false) {
+  const errors = [], held = [];
+  let requests = 0;
+  page.on('pageerror', error => errors.push(String(error)));
+  if (useTimers) await page.clock.install({time:date});
+  else await page.clock.setFixedTime(date);
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    if (url.origin !== new URL(root).origin) return route.abort();
+    if (url.pathname === '/report.json') {
+      requests++;
+      if (reply?.hold) { held.push(route); return; }
+      return reply?.abort ? route.abort('internetdisconnected') : route.fulfill({
+        status:reply?.status || 200, contentType:'application/json',
+        body:reply?.body ?? JSON.stringify(reply?.report ?? base)
+      });
     }
-    // Out-of-order responses: two concurrent refreshes, the newer answer (C) arrives first, the older one afterwards.
-    // The older answer (a report or a failure) must never take the page back.
-    const C=snapshot(0,{messages:B.messages+2});
-    for(const late of [{status:200,body:JSON.stringify(A)},{abort:true}]){
-      reply={hold:true};held.length=0;
-      await page.evaluate(()=>{agendaRefresh();agendaRefresh()});
-      await page.waitForFunction(()=>true);while(held.length<2)await page.waitForTimeout(20);
-      await held[1].fulfill({status:200,contentType:'application/json',body:JSON.stringify(C)});
-      await page.waitForFunction(n=>document.getElementById('facts').textContent.startsWith(n+' mensagens'),C.messages);
-      await (late.abort?held[0].abort('internetdisconnected'):held[0].fulfill({status:200,contentType:'application/json',body:late.body}));
-      await page.waitForTimeout(500);
-      assert.match(await facts(),new RegExp(`^${C.messages} mensagens lidas`));
-      assert.deepEqual(await fresh().then(f=>f[1]),false);
-      assert.deepEqual(await counts(),first);
-      reply={status:200,body:JSON.stringify(C)};
+    return files[url.pathname] ? route.fulfill(files[url.pathname]) : route.abort();
+  });
+  return {held,errors,requests:() => requests, respond:value => { reply=value; }};
+}
+
+async function ready(page, expected) {
+  await page.waitForFunction(n => document.querySelector('#conteudo').getAttribute('aria-busy') === 'false' &&
+    (n === null || document.querySelector('#metric-tracked').textContent === n), expected == null ? null : count(expected));
+}
+
+async function go(page, view) {
+  const link = page.locator(`nav [href="#${view}"]`);
+  await link.click();
+  await page.waitForFunction(id => !document.getElementById(id).hidden &&
+    document.querySelector(`nav [href="#${id}"]`).getAttribute('aria-current') === 'page', view);
+}
+
+async function expand(page, id) {
+  const details = page.locator('#'+id);
+  await details.locator('summary').click();
+  await page.waitForFunction(id => document.getElementById(id).open, id);
+}
+
+async function refresh(page) {
+  await page.evaluate(() => agendaRefresh());
+}
+
+async function hasText(page, selector, search) {
+  await page.waitForFunction(([selector, search]) => document.querySelector(selector)?.textContent.includes(search), [selector, search]);
+}
+
+async function noOverflow(page) {
+  const sizes = await page.evaluate(() => [document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+  assert.ok(sizes[0] <= sizes[1], `page overflow: ${sizes[0]}px in ${sizes[1]}px`);
+}
+
+async function refreshRegression(page) {
+  const A = snapshot(5);
+  const B = snapshot(1,{generated_at_utc:new Date(+date+1000).toISOString(),messages:A.messages+7,unique_bets:A.unique_bets+1});
+  const C = snapshot(0,{generated_at_utc:new Date(+date+2000).toISOString(),messages:B.messages+2,unique_bets:B.unique_bets+2});
+  const remote = await setup(page,{report:A});
+  await page.goto(root);
+  await ready(page,A.unique_bets);
+  const facts=()=>page.locator('#facts').textContent();
+  const isStale=()=>page.locator('#fresh').evaluate(e=>e.classList.contains('stale'));
+  assert.match(await facts(),new RegExp(`^${A.messages} mensagens lidas`));
+  await hasText(page,'#fresh','Atualizado em');
+  assert.equal(await isStale(),false);
+
+  await go(page,'resultados');
+  await expand(page,'simulador');
+  await expand(page,'dados-resultados');
+  await page.locator('#filters button').nth(1).click();
+  await page.selectOption('#simmode','pct');
+  await page.fill('#simbank','500');
+  await page.fill('#simval','2.5');
+  await page.selectOption('#simcut','0.02');
+  const type=page.locator('#simtypes input').first();
+  const hasTypes=await type.count();
+  if(hasTypes) await type.uncheck();
+  const sim=await page.locator('#simout').textContent();
+  const filters=await page.locator('#filters button').count();
+
+  await go(page,'laboratorio');
+  await expand(page,'hipoteses');
+  const sort = page.locator('#hipoteses thead button').nth(1);
+  await sort.click();
+  const sortState=()=>page.locator('#hipoteses thead').innerHTML();
+  const sorted=await sortState();
+  const rows=await page.locator('#hyps tr').count();
+
+  await go(page,'sinais');
+  await page.locator('[name="signal-phase"][value="por começar"] + span').click();
+  const source = 'Stake', state = 'misto';
+  await page.selectOption('#signal-source',source);
+  await page.selectOption('#signal-status',state);
+  const firstCard=page.locator('.signal-card').first();
+  const cardCount=await page.locator('.signal-card').count();
+  assert.ok(cardCount > 0);
+  await firstCard.locator('summary').click();
+
+  await page.locator('#facts').evaluate(node=>node.firstElementChild.dataset.marker='kept');
+  const requests=remote.requests();
+  await refresh(page);
+  assert.equal(remote.requests(),requests+1);
+  assert.equal(await page.locator('#facts > :first-child').getAttribute('data-marker'),'kept');
+
+  const incomplete = {generated_at_utc:new Date(+date+1000).toISOString()};
+  const readSignals = () => page.locator('#agendalist').innerHTML();
+  const before = await readSignals();
+  remote.respond({report:incomplete});
+  await refresh(page);
+  assert.equal(await readSignals(),before,'A → incomplete B must preserve the filtered signals');
+  assert.equal(await page.locator('#facts > :first-child').getAttribute('data-marker'),'kept');
+  assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+  assert.equal(await page.inputValue('#signal-source'),source);
+  assert.equal(await page.inputValue('#signal-status'),state);
+  assert.equal(await firstCard.locator('details').evaluate(node=>node.open),true);
+  assert.equal(await firstCard.locator('summary').evaluate(node=>node===document.activeElement),true);
+
+  remote.respond({report:B});
+  await refresh(page);
+  await ready(page,B.unique_bets);
+  assert.match(await page.locator('#fresh').textContent(),/Atualizado em/);
+  assert.equal(await page.locator('nav [aria-current]').getAttribute('href'),'#sinais');
+  assert.equal(await page.locator('[name="signal-phase"]:checked').inputValue(),'por começar');
+  assert.equal(await page.inputValue('#signal-source'),source);
+  assert.equal(await page.inputValue('#signal-status'),state);
+  assert.equal(await page.locator('.signal-card').count(),cardCount);
+  assert.equal(await firstCard.locator('details').evaluate(node=>node.open),true);
+  assert.equal(await firstCard.locator('summary').evaluate(node=>node===document.activeElement),true);
+  assert.match(await facts(),new RegExp(`^${B.messages} mensagens lidas`));
+  assert.match(await facts(),new RegExp(`${B.settled_bets} com resultado`));
+
+  await go(page,'laboratorio');
+  assert.equal(await sortState(),sorted);
+  assert.equal(await page.locator('#hyps tr').count(),rows);
+  await sort.click();
+  assert.notEqual(await sortState(),sorted);
+  await go(page,'resultados');
+  assert.equal(await page.locator('#filters button').nth(1).getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('#filters button').count(),filters);
+  for(const [id,value] of [['simbank','500'],['simmode','pct'],['simval','2.5'],['simcut','0.02']]) {
+    assert.equal(await page.inputValue('#'+id),value);
+  }
+  if(hasTypes) assert.equal(await type.isChecked(),false);
+  assert.equal(await page.locator('#simout').textContent(),sim);
+  assert.equal(await page.locator('main').count(),1);
+  assert.equal(await page.locator('#tip').count(),1);
+  assert.equal(await page.locator('#chart svg').count(),A.timeline.length>=2 ? 1 : 0);
+
+  const reject = [
+    {abort:true}, {status:500,body:'{}'}, {body:'{"truncated'}, {body:'{}'},
+    {report:incomplete}, {report:{...B,timeline:[]}}, {report:{...B,timeline:[...B.timeline.slice(0,-1),{}]}},
+    {report:{...B,questions:{}}}, {report:{...B,brain:{...B.brain,agenda:{...B.brain.agenda,items:{}}}}},
+    {report:{...B,brain:{...B.brain,agenda:undefined}}}, {report:{...B,brain:undefined}}
+  ];
+  await page.locator('#simval').focus();
+  const readResults = () => page.evaluate(() => ({
+    metrics:document.querySelector('.metrics').textContent,
+    balance:document.querySelector('#balance-total').textContent,
+    chart:document.querySelector('#chart svg').outerHTML,
+    outcomes:document.querySelector('#results-outcomes').innerHTML,
+    simulator:document.querySelector('#simout').innerHTML,
+    curve:document.querySelector('#simchart').innerHTML,
+    controls:['simbank','simmode','simval','simcut'].map(id=>document.getElementById(id).value),
+    open:[...document.querySelectorAll('#resultados details[open][id]')].map(node=>node.id),
+    focused:document.activeElement.id,
+    route:location.hash
+  }));
+  const expected = await readResults();
+  for(const reply of reject) {
+    remote.respond(reply);
+    await refresh(page);
+    assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+    assert.deepEqual(await readResults(),expected,'An invalid response must preserve the rendered results, simulator and focus');
+    assert.equal(await isStale(),true);
+    assert.match(await facts(),new RegExp(`^${B.messages} mensagens lidas`));
+    remote.respond({report:B});
+    await refresh(page);
+    assert.equal(await isStale(),false);
+  }
+
+  for(const late of [{body:JSON.stringify(A)},{abort:true}]) {
+    remote.respond({hold:true});
+    remote.held.length=0;
+    const pending=page.evaluate(()=>Promise.all([agendaRefresh(),agendaRefresh()]));
+    for(let attempt=0; remote.held.length<2 && attempt<100; attempt++) await new Promise(r=>setTimeout(r,10));
+    assert.equal(remote.held.length,2);
+    await remote.held[1].fulfill({contentType:'application/json',body:JSON.stringify(C)});
+    await ready(page,C.unique_bets);
+    if(late.abort) await remote.held[0].abort('internetdisconnected');
+    else await remote.held[0].fulfill({contentType:'application/json',body:late.body});
+    await pending;
+    assert.match(await facts(),new RegExp(`^${C.messages} mensagens lidas`));
+    assert.equal(await isStale(),false);
+    remote.respond({report:C});
+  }
+  const older = {...A, generated_at_utc:new Date(+date-1000).toISOString()};
+  remote.respond({report:older});
+  await refresh(page);
+  assert.match(await facts(),new RegExp(`^${C.messages} mensagens lidas`));
+  assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+
+  remote.respond({report:snapshot(46,{generated_at_utc:new Date(+date+3000).toISOString()})});
+  await refresh(page);
+  await hasText(page,'#fresh','Recolha parada desde');
+  assert.equal(await isStale(),true);
+  assert.deepEqual(remote.errors,[]);
+}
+
+async function collectionWarning(page, width, height) {
+  const last = new Date(+date - 45 * 60000 + 5000);
+  const A = snapshot(0);
+  A.audit.collector_last_run_utc = last.toISOString();
+  const remote = await setup(page,{report:A},true);
+  await page.goto(root);
+  await ready(page,A.unique_bets);
+  const banner = page.locator('#collection-warning');
+  assert.equal(await banner.isVisible(),false);
+  await page.clock.fastForward(15000);
+  assert.equal(await banner.isVisible(),true,'The warning must appear as collection crosses 45 minutes');
+  const lisbon = new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',
+    year:'numeric',hour:'2-digit',minute:'2-digit'}).format(last);
+  assert.ok((await banner.textContent()).includes(lisbon));
+  assert.match(await banner.textContent(),/\(Lisboa\).*Confirme as odds e a disponibilidade/);
+  const warningPosition = await banner.boundingBox();
+  assert.ok(warningPosition.y >= 0 && warningPosition.y + warningPosition.height < height);
+  await noOverflow(page);
+  const captures = process.env.DASHBOARD_CAPTURE_DIR;
+  if (captures && width !== 768) {
+    fs.mkdirSync(captures,{recursive:true});
+    await page.screenshot({path:path.join(captures,`stale-${width}.png`)});
+  }
+  await go(page,'sinais');
+  await page.locator('[name="signal-phase"][value="por começar"] + span').click();
+  const cards = page.locator('.signal-card');
+  const before = await cards.count();
+  assert.ok(before > 0);
+  assert.equal(await page.locator('.signal-stale:visible').count(),before);
+  assert.equal(await banner.isVisible(),true);
+  await noOverflow(page);
+  const validity = await page.locator('.signal-validity').allTextContents();
+  const verdicts = await page.locator('.signal-foot .chip:not(.signal-stale)').allTextContents();
+
+  // The next actual polling tick recovers without navigation or manual refresh.
+  const C = snapshot(0,{generated_at_utc:new Date(+date+3*60000).toISOString()});
+  C.audit.collector_last_run_utc = C.generated_at_utc;
+  remote.respond({report:C});
+  await page.clock.fastForward(3*60000);
+  await hasText(page,'#fresh','Atualizado em');
+  assert.equal(await banner.isVisible(),false);
+  assert.equal(await page.locator('.signal-stale:visible').count(),0);
+  assert.equal(await cards.count(),before);
+  assert.deepEqual(await page.locator('.signal-validity').allTextContents(),validity);
+  assert.deepEqual(await page.locator('.signal-foot .chip:not(.signal-stale)').allTextContents(),verdicts);
+  await go(page,'overview');
+  assert.equal(await banner.isVisible(),false);
+  remote.respond({report:{...C,brain:{...C.brain,agenda:{...C.brain.agenda,items:[]}}}});
+  await refresh(page);
+  await go(page,'sinais');
+  assert.equal(await cards.count(),0);
+  await hasText(page,'#agendalist','Sem sinais na janela de observação');
+  assert.deepEqual(remote.errors,[]);
+}
+
+async function realReport(browser) {
+  for (const [width,height] of sizes) {
+    const page=await browser.newPage({viewport:{width,height},isMobile:width===375,hasTouch:width===375,
+      colorScheme:width===768?'dark':'light'});
+    const remote=await setup(page);
+    await page.goto(root);
+    await ready(page,base.unique_bets);
+    await noOverflow(page);
+    assert.equal(await page.locator('#overview').isVisible(),true);
+    assert.equal(await page.locator('#hyps tr').count(),0);
+    assert.equal(await page.locator('main [role="status"]:visible').count(),0);
+    assert.equal(await page.getByRole('heading',{level:1,name:'GOAL-ROI'}).count(),1);
+    assert.match(await page.locator('#overview').ariaSnapshot(),/Apostas acompanhadas/);
+    assert.equal(await page.locator('html').getAttribute('data-theme'),width===768?'dark':'light');
+
+    if(width===375) {
+      await page.keyboard.press('Tab');
+      const focused=await page.locator(':focus').textContent();
+      assert.match(focused,/Saltar para o conteúdo/);
+      await page.keyboard.press('Enter');
+      assert.equal(await page.locator(':focus').getAttribute('id'),'conteudo');
     }
-    assert.deepEqual(errors,[]);
+    // Representative foreground/underlay pairs across both color schemes.
+    for(let i=0;i<2;i++) {
+      const ratios=await page.evaluate(() => {
+        const l = s => {
+          const a = document.createElement('span'); a.style.color=s; document.body.append(a);
+          const rgb=getComputedStyle(a).color.match(/\d+/g).slice(0,3).map(n=>{
+            const x=n/255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4;
+          });a.remove();return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+        };
+        return [['.metric dt','.metric'],['.finding p','.finding'],['.hero-copy > p','.hero'],
+          ['nav a[aria-current]','nav a[aria-current]'],['.fresh','.topbar']].map(([f,b])=>{
+          const x=l(getComputedStyle(document.querySelector(f)).color), y=l(getComputedStyle(document.querySelector(b)).backgroundColor);
+          return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
+        });
+      });
+      assert.ok(ratios.every(r=>r>=4.5),JSON.stringify(ratios));
+      await page.locator('#theme').click();
+    }
+
+    if(width===375) {
+      const link=page.getByRole('navigation').getByRole('link',{name:'Sinais',exact:true});
+      await link.focus();
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => document.activeElement?.id === 'agendah');
+      assert.equal(await link.getAttribute('aria-current'),'page');
+    } else await go(page,'sinais');
+    await noOverflow(page);
+    const agenda=base.brain?.agenda;
+    if(agenda) {
+      const active=agenda.items.filter(a=>a.when==='por começar' ? Date.parse(a.kickoff_utc)>date :
+        a.when==='a decorrer' && date-Date.parse(a.date_utc)>=0 && date-Date.parse(a.date_utc)<=agenda.rules.live_max_min*60000);
+      assert.equal(await page.locator('.signal-card').count(),active.length);
+      if(active.length) {
+        const first=page.locator('.signal-card').first();
+        assert.equal(await first.locator('h2').textContent(),active[0].match);
+        for(const value of [active[0].family,active[0].market,active[0].odds.toFixed(2).replace('.',',')]) {
+          assert.ok((await first.textContent()).includes(value));
+        }
+        const disclosure=first.locator('summary');
+        await disclosure.focus();
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
+        assert.equal(await disclosure.evaluate(node=>node.matches(':focus-visible') && getComputedStyle(node).outlineStyle==='solid'),true);
+        await page.keyboard.press('Enter');
+        assert.equal(await first.locator('details').evaluate(e=>e.open),true);
+      }
+      if(active.some(a=>a.verdict==='contraditório')) await hasText(page,'#agendalist','Sinais contraditórios');
+    }
+
+    await go(page,'resultados');
+    await noOverflow(page);
+    const reference=base.questions?.[Q7];
+    if(reference?.roi) {
+      assert.equal(await page.locator('#metric-roi').textContent(),percent(reference.roi['odd-0%'].roi));
+      await hasText(page,'#balance-note',percent(reference.roi['odd-0%'].roi));
+      assert.deepEqual(await page.locator('#results-odds li b').allTextContents(),
+        Object.values(reference.roi).map(v=>percent(v.roi)));
+      assert.deepEqual(await page.locator('#results-outcomes li b').allTextContents(),
+        [reference.wins,reference.settled-reference.wins-reference.pushes,reference.pushes,reference.bets-reference.settled].map(count));
+    }
+    if(base.timeline.length>=2) {
+      const chart=page.locator('#chart').getByRole('img');
+      assert.match(await chart.getAttribute('aria-label'),new RegExp(`ao longo de ${base.timeline.length} apostas`));
+      assert.equal((await chart.locator('polyline').getAttribute('points')).split(' ').length,base.timeline.length+1);
+      const slider=page.getByRole('slider',{name:'Consultar aposta no gráfico'});
+      await slider.press('End');
+      await hasText(page,'#chart-point',`saldo ${units(base.timeline.at(-1).u)} un.`);
+      await slider.press('Home');
+      await hasText(page,'#chart-point',`saldo ${units(base.timeline[0].u)} un.`);
+      await noOverflow(page);
+    }
+    await expand(page,'dados-resultados');
+    await page.waitForSelector('#groups tr');
+    await noOverflow(page);
+    const groups=Object.values(base.groups);
+    assert.deepEqual(await page.locator('#groups tr td:nth-child(6)').allTextContents(),groups.map(g=>g.roi ? percent(g.roi['odd-0%'].roi) : '—'));
+    await expand(page,'simulador');
+    await page.waitForSelector('#simout dd');
+    await verifySimulator(page,base.timeline);
+    await noOverflow(page);
+
+    await go(page,'laboratorio');
+    for(const [id,selector] of [
+      ['taticas','#best li'],['hipoteses','#hyps tr'],['estudo-chronologico','#wf tr'],
+      ['propostas','#llm tr'],['prospetivo','#prospective tr'],['notas','#notes p'],['entradas','#entry tr'],
+      ['sinais-hipoteses','#watch p'],['exploracao','#signals .row'],['faixas-odd','#calib > *'],
+      ['comportamento','#regime tr'],['segmentos','#questions tr']
+    ]) {
+      await expand(page,id);
+      await page.waitForSelector(selector);
+      await noOverflow(page);
+    }
+    assert.equal(await page.locator('#wf tr').count(),base.brain.walk_forward.not_reconstructible?3:2);
+    await go(page,'metodologia');
+    for(const [id,child] of [['qualidade','#qc dd'],['por-liquidar','#uns tr'],['evidencia-operacional','#facts span']]){
+      await expand(page,id);
+      await page.waitForSelector(child);
+      await noOverflow(page);
+    }
+    assert.equal(await page.getByRole('link',{name:'Descarregar CSV'}).getAttribute('href'),'bets.csv');
+    assert.equal(await page.getByRole('link',{name:'Abrir JSON'}).getAttribute('href'),'report.json');
+    assert.deepEqual(remote.errors,[]);
+    await page.close();
+  }
+}
+
+// The reference loop intentionally uses the input rows directly, independently of
+// DOM renderers. The same payouts, capped stakes and odds cuts must reach the UI.
+async function verifySimulator(page, rows) {
+  async function compare(start, value, cut, fractional, excluded) {
+    let bank=start, n=0, staked=0, peak=start, drawdown=0, low=start;
+    for(const row of rows) {
+      if(row.t===excluded || row.w==null) continue;
+      const stake=Math.min(bank,fractional ? bank*value/100 : value);
+      if(stake<=0) break;
+      bank += stake * (row.w>0 ? row.w*(row.o*(1-cut)-1) : row.w);
+      n++;
+      staked += stake;
+      peak=Math.max(peak,bank);
+      low=Math.min(low,bank);
+      drawdown=Math.max(drawdown,peak-bank);
+    }
+    assert.deepEqual(await page.locator('#simout dd').allTextContents(),[
+      String(n),euro(bank),(bank>=start?'+':'')+euro(bank-start),
+      staked ? percent((bank-start)/staked) : '—',euro(drawdown),euro(low)
+    ]);
+    if(n>=2) assert.equal((await page.locator('#simchart polyline').getAttribute('points')).split(' ').length,n+1);
+  }
+  await compare(1000,10,0,false);
+  await page.fill('#simbank','257');
+  await page.selectOption('#simmode','pct');
+  await page.fill('#simval','5.5');
+  await page.selectOption('#simcut','0.05');
+  const first=page.locator('#simtypes input').first(), hasType=await first.count();
+  const exclusion=hasType ? await first.inputValue() : undefined;
+  if(hasType) await first.uncheck();
+  await compare(257,5.5,.05,true,exclusion);
+}
+
+async function missingAndCertificates(browser, width, height) {
+  const page=await browser.newPage({viewport:{width,height},timezoneId:'America/New_York'});
+  const remote=await setup(page,{hold:true});
+  await page.goto(root+'#simulador');
+  await page.waitForSelector('#fresh');
+  assert.match(await page.locator('#fresh').textContent(),/A carregar/);
+  assert.equal(await page.locator('#conteudo').getAttribute('aria-busy'),'true');
+  await page.waitForFunction(()=>document.querySelector('#simulador').open);
+  assert.equal(remote.held.length,1);
+  await remote.held[0].fulfill({status:500,body:'{}'});
+  await ready(page);
+  await hasText(page,'#load-state','Não foi possível carregar');
+  await hasText(page,'#simchart','Nenhuma aposta liquidada');
+  await noOverflow(page);
+
+  const empty = {
+    generated_at_utc:base.generated_at_utc, messages:0, unique_bets:0, settled_bets:0, first_signal_utc:null,
+    min_settled:base.min_settled, audit:{last_collected_at_utc:null}, groups:{}, accuracy:{},
+    timeline:[], daily:[], recent_bets:[],
+    questions:{[Q7]:{bets:0,settled:0,wins:0,pushes:0,units:0,avg_odds:null,roi:null}}
+  };
+  remote.respond({report:empty});
+  await page.getByRole('button',{name:'Tentar novamente'}).click();
+  await ready(page);
+  assert.equal(await page.locator('#load-state').isVisible(),false);
+  await go(page,'sinais');
+  await hasText(page,'#agendalist','não disponibiliza a agenda');
+  await go(page,'overview');
+  assert.equal(await page.locator('#metric-settled').textContent(),'0');
+  assert.equal(await page.locator('#metric-roi').textContent(),'—');
+  assert.equal(await page.locator('#metric-science').textContent(),'Indisponível');
+  await go(page,'laboratorio');
+  await expand(page,'hipoteses');
+  await hasText(page,'#hyps','Nenhuma hipótese');
+  await noOverflow(page);
+
+  const hypothesis={...base.brain.top[0],id:'fixture-1',status:'forte'};
+  const signal={
+    match_id:'x',match:'Equipa A — Equipa B',market:'1X2',selection:'Equipa A',family:'Betfair',type:'BETFAIR',odds:1.85,bad:[],
+    when:'por começar',phase:'pre',kickoff_utc:new Date(+date+3600000).toISOString(),
+    date_utc:date.toISOString(),verdict:'favorável',validated:true,good:[hypothesis]
+  };
+  const live={...signal,match_id:'live',match:'Equipa C — Equipa D',kickoff_utc:null,when:'a decorrer',
+    phase:'live',minute:33,verdict:'sem evidência',validated:false,good:[]};
+  const expired={...live,match_id:'old',match:'Jogo expirado',date_utc:new Date(date-31*60000).toISOString()};
+  const validation={method:'eprocess_online_alpha_v1',state:'active',ledger_valid:true,certified:['fixture-1']};
+  const make = (v,h=[]) => snapshot(0,{brain:{counts:{forte:1},top:h,validation:v,
+    agenda:{items:[signal,live,expired],rules:{min_results:10,live_max_min:30},generated_utc:date.toISOString()}}});
+  const proof={...hypothesis,confirmation:{certifiable:true,rank:1,certified_utc:date.toISOString()}};
+
+  for(const fixture of [make({...validation,state:'not_activated'},[proof]),make(validation,[hypothesis]),
+      make(validation,[{...proof,id:'outra'}]),make({...validation,ledger_valid:false},[proof])]) {
+    remote.respond({report:fixture});
+    await refresh(page);
+    assert.equal(await page.locator('#hyps .chip.ok').count(),0);
+    assert.doesNotMatch(await page.locator('#metric-science-note').textContent(),/1 tática/);
+    await go(page,'sinais');
+    await hasText(page,'#agendalist','Indício favorável');
+    assert.equal(await page.locator('#agendalist .chip.ok').count(),0);
+    assert.equal(await page.locator('.signal-card').count(),2);
+    assert.doesNotMatch(await page.locator('#agendalist').textContent(),/Jogo expirado/);
+    await go(page,'laboratorio');
+  }
+  remote.respond({report:make(validation,[proof])});
+  await refresh(page);
+  await hasText(page,'#metric-science-note','1 tática certificada');
+  assert.match(await page.locator('#hyps .chip.ok').textContent(),/Forte/);
+  await go(page,'sinais');
+  await hasText(page,'#agendalist','Tática certificada');
+  await page.locator('[name="signal-phase"][value="a decorrer"] + span').click();
+  assert.equal(await page.locator('.signal-card').count(),1);
+  await hasText(page,'#agendalist','Ao vivo');
+  await page.selectOption('#signal-status','certificado');
+  await hasText(page,'#agendalist','Nenhum sinal corresponde');
+  await page.selectOption('#signal-status','');
+  await page.clock.setFixedTime(new Date(+date+31*60000));
+  await refresh(page);
+  assert.equal(await page.locator('.signal-card').count(),0);
+  await page.locator('[name="signal-phase"][value=""] + span').click();
+  assert.equal(await page.locator('.signal-card').count(),1);
+  await hasText(page,'#agendalist','Equipa A');
+  assert.deepEqual(remote.errors,[]);
+  await page.close();
+}
+
+(async () => {
+  const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
+    {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
+  try {
+    const regressions = [];
+    for (const [width,height] of sizes) {
+      for (const check of [refreshRegression, collectionWarning]) {
+        const page = await browser.newPage({viewport:{width,height},isMobile:width===375,hasTouch:width===375,
+          timezoneId:'America/New_York',colorScheme:width===768?'dark':'light'});
+        try { await check(page,width,height); }
+        catch (error) { regressions.push(new Error(`${check.name} at ${width}px`, {cause:error})); }
+        finally { await page.close(); }
+      }
+    }
+    if (regressions.length) throw new AggregateError(regressions,'Dashboard audit regressions failed');
+    await realReport(browser);
+    for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
-  }finally{await browser.close()}
-})().catch(e=>{console.error(e);process.exit(1)});
+  } finally { await browser.close(); }
+})().catch(error=>{console.error(error);process.exitCode=1});
