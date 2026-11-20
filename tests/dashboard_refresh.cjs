@@ -430,18 +430,23 @@ async function realReport(browser) {
   }
 }
 
-// The reference loop intentionally uses the input rows directly, independently of
-// DOM renderers. The same payouts, capped stakes and odds cuts must reach the UI.
+// The legacy fixture has no settlement clocks. All commitments reserve cash
+// before any payout is available, then the observed outcomes are applied.
 async function verifySimulator(page, rows) {
   async function compare(start, value, cut, fractional, excluded) {
-    let bank=start, n=0, staked=0, peak=start, drawdown=0, low=start;
+    let uncommitted=start;
+    const positions=[];
     for(const row of rows) {
       if(row.t===excluded || row.w==null) continue;
-      const stake=Math.min(bank,fractional ? bank*value/100 : value);
+      const stake=Math.min(uncommitted,fractional ? uncommitted*value/100 : value);
       if(stake<=0) break;
+      uncommitted -= stake;
+      positions.push([row,stake]);
+    }
+    const n=positions.length, staked=start-uncommitted;
+    let bank=start, peak=start, drawdown=0, low=start;
+    for(const [row,stake] of positions) {
       bank += stake * (row.w>0 ? row.w*(row.o*(1-cut)-1) : row.w);
-      n++;
-      staked += stake;
       peak=Math.max(peak,bank);
       low=Math.min(low,bank);
       drawdown=Math.max(drawdown,peak-bank);
