@@ -5,6 +5,7 @@ Sinal = primeira versão da mensagem; resultado = FT em qualquer versão de qual
 Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunca contam como conclusão).
 """
 import collections, csv, json, math, pathlib, re
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 from . import brain, certification, insights, llm_eval, polymarket_alerts
@@ -35,6 +36,7 @@ def load(chronology=None, *, result_observations=None):
     """
     first, ft, marks, notes, goals = {}, {}, {}, [], {}
     seen_ft, seen_mark, seen_note = {}, {}, {}   # valor -> primeira recolha em que apareceu (ficheiro append-only, por ordem)
+    note_observations = []
     seen_any = {}                                  # jogo -> primeira recolha de QUALQUER resultado do bot (mesmo corrigido depois)
     audit = {'versions': 0, 'edits_changing_signal': 0, 'bot_mark_disagreements': 0, 'last_collected_at_utc': None}
     path = data_dir() / 'messages.jsonl'
@@ -55,6 +57,12 @@ def load(chronology=None, *, result_observations=None):
         if p['type'] == 'FULL_TIME_NOTE' and p.get('ft'):
             notes.append((r['date_utc'], [t.lower() for t in p['teams']], p['ft']))
             seen_note.setdefault((r['date_utc'], tuple(t.lower() for t in p['teams']), tuple(p['ft'])), got)
+            if result_observations is not None:
+                observation = opportunity_results.collected(
+                    'telegram', r['message_id'], p['ft'], got,
+                    published=r.get('edit_date_utc') or r.get('date_utc'),
+                )
+                note_observations.append((p, opportunity_results.utc(r['date_utc']), observation))
         elif p.get('ft') and p.get('match_id'):
             if result_observations is not None:
                 observation = opportunity_results.collected(
@@ -90,7 +98,37 @@ def load(chronology=None, *, result_observations=None):
         chronology['marks'] = {k: seen_mark.get((k, v)) for k, v in marks.items()}
         chronology['notes'] = dict(seen_note)
         chronology['ft_any'] = dict(seen_any)
+    if note_observations:
+        link_ft_notes(first.values(), note_observations, result_observations)
     return [first[k] for k in sorted(first)], ft, marks, notes, audit
+
+
+def link_ft_notes(messages, notes, observations):
+    """Attribute each standalone FT note to a single fixture provable when it was read."""
+    by_teams = collections.defaultdict(list)
+    for message in messages:
+        if not message.get('match_id'):
+            continue
+        kickoff, home, away, league = match_identity.components(message)
+        seen = match_identity.signal_seen(message)
+        if kickoff and home and away and league and seen:
+            by_teams[home, away].append(((kickoff, league), seen, message['match_id']))
+
+    for note, published, observation in notes:
+        if published is None or observation.available_at is None:
+            continue
+        home, away = map(match_identity.normalized, note['teams'])
+        fixtures = collections.defaultdict(set)
+        for (kickoff, league), seen, mid in by_teams[home, away]:
+            if note.get('match_id') and note['match_id'] != mid:
+                continue
+            if (seen <= observation.available_at and
+                    opportunity_results.REGULATION_TIME <= published - kickoff <= opportunity_forward.MAX_UNRESOLVED):
+                fixtures[kickoff, league].add(mid)
+        if len(fixtures) == 1:
+            (kickoff, _), ids = next(iter(fixtures.items()))
+            for mid in ids:
+                observations.setdefault(mid, []).append(replace(observation, kickoff=kickoff))
 
 
 def lead_minutes(m):
@@ -498,7 +536,7 @@ def publish_ledger_state(validation, ledger, ledger_path, registry, now, registe
 
 def research_bets(signals, observations, now, *, bindings=None):
     """Settle FT-dependent research rows from the same versioned evidence as the opportunity audit."""
-    snapshot_sources = {'bot_message', 'HL', 'BSD'}
+    snapshot_sources = {'bot_message', 'bot_full_time_note', 'HL', 'BSD'}
     if bindings is None:
         signals, bindings = match_identity.resolve(signals, now)
     evidence = opportunity_forward.fixture_evidence(observations, bindings)
