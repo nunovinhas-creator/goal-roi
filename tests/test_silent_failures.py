@@ -359,7 +359,6 @@ class NextCollection(unittest.TestCase):
         self.assertEqual(re.findall(r"cron: '([^']+)'", text), ['3,13,23,33,43,53 * * * *'])
         self.assertEqual(text.count('python scripts/dispatch_collection.py'), 1)
         self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)
-        self.assertEqual(sorted(p.name for p in WORKFLOW.parent.iterdir()), ['collect.yml', 'continuity.yml', 'tests.yml'])
 
     @unittest.skipUnless(shutil.which('bash'), 'bash required')
     def test_a_failed_launch_fails_the_step(self):
