@@ -1,10 +1,10 @@
 {
- "generated_at_utc": "2026-11-20T17:00:14+00:00",
- "messages": 1855,
+ "generated_at_utc": "2026-11-20T17:00:57+00:00",
+ "messages": 1856,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 60,
-  "BETFAIR": 349,
+  "BETFAIR": 350,
   "STAKE_LOAD": 379,
   "OPEN_GAME": 215,
   "TOTALS_FORM": 78,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 3081,
+  "versions": 3082,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-20T17:00:14+00:00",
+  "last_collected_at_utc": "2026-11-20T17:00:54+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T17:00:14+00:00",
+  "collector_last_run_utc": "2026-11-20T17:00:54+00:00",
   "name_review": [
    {
     "bot": [
@@ -451,7 +451,7 @@
   "goal_lists": 552,
   "goal_lists_consistent": 275
  },
- "unique_bets": 1005,
+ "unique_bets": 1006,
  "settled_bets": 804,
  "unsettled_market": 101,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -628,7 +628,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "BETFAIR/pre/mkt<10K": {
-   "bets": 20,
+   "bets": 21,
    "settled": 16,
    "matches": 16,
    "wins": 3,
@@ -1697,7 +1697,7 @@
    "prob_above_cut": 0.7453
   },
   "BETFAIR/pre": {
-   "signals": 33,
+   "signals": 34,
    "with_result": 26,
    "hits": 10,
    "misses": 16,
@@ -2600,7 +2600,7 @@
    },
    {
     "n": 57,
-    "signals": 84,
+    "signals": 85,
     "hits": 18,
     "misses": 39,
     "hit_rate": 0.3158,
@@ -2843,7 +2843,7 @@
    },
    {
     "n": 30,
-    "signals": 64,
+    "signals": 65,
     "hits": 13,
     "misses": 17,
     "hit_rate": 0.4333,
@@ -3438,7 +3438,7 @@
    },
    {
     "n": 104,
-    "signals": 137,
+    "signals": 138,
     "hits": 25,
     "misses": 79,
     "hit_rate": 0.2415,
@@ -3492,8 +3492,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1212,
-   "eligible": 1000,
+   "total": 1213,
+   "eligible": 1001,
    "excluded": 212,
    "reasons": {
     "no_valid_odds": 159,
@@ -3509,7 +3509,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 9758,
+    "em observação": 9764,
     "promissora": 102,
     "abandonada": 31
    },
@@ -4566,11 +4566,11 @@
     }
    ]
   },
-  "hypotheses": 9891,
+  "hypotheses": 9897,
   "tested": 896,
   "corrected_bar": null,
   "counts": {
-   "em observação": 9841,
+   "em observação": 9847,
    "promissora": 22,
    "abandonada": 28
   },
@@ -11540,6 +11540,124 @@
       }
      ],
      "bad_total": 3
+    },
+    {
+     "match_id": "ac-milan-vs-frosinone-20261122",
+     "match": "AC Milan — Frosinone",
+     "league": "Italian Serie A",
+     "family": "Betfair",
+     "type": "BETFAIR",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-22T17:00+00:00",
+     "date_utc": "2026-11-20T17:00:14+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1X2",
+     "selection": "Frosinone",
+     "odds": 5.9,
+     "odds_last": 5.9,
+     "max_mult": 1,
+     "share": 66,
+     "share_last": 66,
+     "verdict": "evitar",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd acima de 3,00",
+     "odds_band_n": 33,
+     "good": [],
+     "good_total": 0,
+     "bad": [
+      {
+       "id": "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 % & Seleção = equipa de fora",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Quota de mercado",
+         "menos de 80 %"
+        ],
+        [
+         "Seleção",
+         "equipa de fora"
+        ]
+       ],
+       "n": 8,
+       "games": 8,
+       "hits": 0,
+       "break_even": 0.3458,
+       "prob_above": 0.062,
+       "roi": -1.0,
+       "economics": {
+        "admitted": 13,
+        "results_confirmed": 4,
+        "wins": 0,
+        "losses": 4,
+        "voids": 0,
+        "imputed_losses": 7,
+        "pending": 2,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 11,
+        "profit_advertised": -11.0,
+        "profit_odds_minus_2pct": -11.0,
+        "roi_advertised": -1.0,
+        "roi_odds_minus_2pct": -1.0,
+        "confirmed_hit_rate": 0.0,
+        "expected_profit": null
+       },
+       "edge": -0.1537,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Betfair | Antecedência = mais de 60 min & Tamanho do mercado = menos de 10 mil $",
+       "conditions": [
+        [
+         "Antecedência",
+         "mais de 60 min"
+        ],
+        [
+         "Tamanho do mercado",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 10,
+       "games": 10,
+       "hits": 1,
+       "break_even": 0.3704,
+       "prob_above": 0.0853,
+       "roi": -0.831,
+       "economics": {
+        "admitted": 11,
+        "results_confirmed": 6,
+        "wins": 0,
+        "losses": 6,
+        "voids": 0,
+        "imputed_losses": 4,
+        "pending": 1,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 10,
+        "profit_advertised": -10.0,
+        "profit_odds_minus_2pct": -10.0,
+        "roi_advertised": -1.0,
+        "roi_odds_minus_2pct": -1.0,
+        "confirmed_hit_rate": 0.0,
+        "expected_profit": null
+       },
+       "edge": -0.1352,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 10
     }
    ],
    "counts": {
@@ -11547,9 +11665,9 @@
     "misto": 16,
     "sem evidência": 0,
     "contraditório": 10,
-    "evitar": 2
+    "evitar": 3
    },
-   "generated_utc": "2026-11-20T17:00:36+00:00",
+   "generated_utc": "2026-11-20T17:01:40+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -11562,7 +11680,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 9803,
+     "hypotheses": 9809,
      "with_prospective_evidence": 2846,
      "prospective_games": 60643
     },
@@ -11916,7 +12034,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 269,
+    "bets": 270,
     "settled": 202,
     "games": 202,
     "wins": 106,
@@ -33802,7 +33920,7 @@
    {
     "phase": "pre",
     "level": 1,
-    "signals": 27,
+    "signals": 28,
     "n": 20,
     "hits": 5,
     "hit_rate": 0.25,
@@ -33952,7 +34070,7 @@
     "days_to_conclusion": 19
    },
    "BETFAIR/pre": {
-    "signals": 27,
+    "signals": 28,
     "with_result": 20,
     "hits": 5,
     "misses": 15,
@@ -34275,7 +34393,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q2 Betfair: sem reforço (sinal único)": {
-   "bets": 116,
+   "bets": 117,
    "settled": 70,
    "matches": 69,
    "wins": 19,
@@ -34355,7 +34473,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q3 Betfair: odd [2.50; ∞)": {
-   "bets": 134,
+   "bets": 135,
    "settled": 88,
    "matches": 85,
    "wins": 29,
@@ -34423,7 +34541,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q5 Betfair pré-jogo: sinal a mais de 60 min do início": {
-   "bets": 20,
+   "bets": 21,
    "settled": 17,
    "matches": 16,
    "wins": 3,
@@ -34559,7 +34677,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 1005,
+   "bets": 1006,
    "settled": 804,
    "matches": 441,
    "wins": 395,
@@ -34594,6 +34712,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-20T17:00:14+00:00",
+   "match_id": "ac-milan-vs-frosinone-20261122",
+   "group": "BETFAIR/pre/mkt<10K",
+   "match": "AC Milan — Frosinone",
+   "selection": "Frosinone",
+   "odds": 5.9,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-20T16:53:58+00:00",
    "match_id": "fc-botosani-vs-cs-voluntari-20261120",
@@ -35448,22 +35579,6 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-20T03:50:33+00:00",
-   "match_id": "seattle-sounders-vs-salt-lake-20261120",
-   "group": "STAKE_LOAD/live",
-   "match": "Seattle Sounders — Salt Lake",
-   "selection": "Over 2.5",
-   "odds": 1.55,
-   "ft": [
-    1,
-    1
-   ],
-   "w": -1.0,
-   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   }
@@ -37775,6 +37890,28 @@
      "rhythm": 82,
      "bot_over_pct": 72,
      "market": "Asian Total"
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "ac-milan-vs-frosinone-20261122": {
+   "teams": [
+    "AC Milan",
+    "Frosinone"
+   ],
+   "events": [
+    {
+     "d": "2026-11-20T17:00:14+00:00",
+     "k": "BETFAIR",
+     "phase": "pre",
+     "selection": "2",
+     "odds": 5.9,
+     "mult": 1,
+     "share": 66,
+     "mkt_volume": 8600.0,
+     "market": "1X2"
     }
    ],
    "goals": null,
@@ -43849,7 +43986,7 @@
    "day": "2026-11-19"
   },
   {
-   "bets": 64,
+   "bets": 65,
    "settled": 30,
    "wins": 17,
    "units": 3.81,
