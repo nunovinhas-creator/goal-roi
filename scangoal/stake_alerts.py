@@ -129,6 +129,15 @@ def verify_state(state, intents):
         raise StakeStateError('stake state and intent log disagree')
 
 
+def claimed_items(directory):
+    path, log = directory / STATE_NAME, directory / LOG_NAME
+    if not path.exists() and not log.exists():
+        return set()
+    intents, _ = load_log(log)
+    verify_state(load_state(path), intents)
+    return {'item|id:' + key for key in intents}
+
+
 def _git_publisher(env, path, log_path):
     """Reutiliza a barreira Git existente: commit + push de ambos os ficheiros ANTES do envio."""
     if env.get('NOTIFY_DURABLE') != 'git' or env.get('GITHUB_REF_NAME') != 'main':
@@ -160,7 +169,9 @@ def _deliver(candidates, now, env, sender, path, publisher, token, chat, clock):
     state = load_state(path)
     intents, lines = load_log(log_path)
     verify_state(state, intents)
+    general = notify.claimed_items(path.parent)
     pending = [m for m in candidates if m['key'] not in intents
+               and notify.item_key(m['b']) not in general
                and '|'.join(str(m['b'][k]) for k in ('match_id', 'market', 'selection')) not in intents]
     if not pending:
         print('STAKE_ALERTS sent 0')
