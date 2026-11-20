@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T02:57:57+00:00",
+ "generated_at_utc": "2026-11-20T03:04:17+00:00",
  "messages": 1744,
  "types": {
   "SERVICE": 10,
@@ -40,7 +40,7 @@
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
-  "hl_last_run_utc": "2026-11-20T01:26:58+00:00",
+  "hl_last_run_utc": "2026-11-20T03:04:16+00:00",
   "bsd_results": 36,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 14,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T02:57:57+00:00",
+  "collector_last_run_utc": "2026-11-20T03:04:14+00:00",
   "name_review": [
    {
     "bot": [
@@ -1728,7 +1728,7 @@
    "by_bot_mark": 0,
    "per_day": 0.3,
    "days_to_hint": 78,
-   "days_to_conclusion": 852,
+   "days_to_conclusion": 853,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -4894,15 +4894,6 @@
      "market": "Asian Handicap",
      "odds": 1.68,
      "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
-    },
-    {
-     "date_utc": "2026-11-19T10:44:22+00:00",
-     "kickoff_utc": "2026-11-20T03:00+00:00",
-     "match": "Seattle Sounders — Salt Lake",
-     "selection": "Under 3",
-     "market": "Asian Total",
-     "odds": 1.93,
-     "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
     }
    ],
    "min_results": 8,
@@ -5592,151 +5583,6 @@
      "bad_total": 32
     },
     {
-     "match_id": "seattle-sounders-vs-salt-lake-20261120",
-     "match": "Seattle Sounders — Salt Lake",
-     "league": "US Major League Soccer",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-20T03:00+00:00",
-     "date_utc": "2026-11-19T10:44:22+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Total",
-     "selection": "Under 3",
-     "odds": 1.93,
-     "odds_last": 1.93,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 90,
-     "good": [
-      {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 35,
-       "games": 30,
-       "hits": 27,
-       "break_even": 0.5852,
-       "prob_above": 0.9924,
-       "roi": 0.3203,
-       "edge": 0.1793,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 50,
-       "games": 37,
-       "hits": 35,
-       "break_even": 0.5536,
-       "prob_above": 0.9812,
-       "roi": 0.2567,
-       "edge": 0.1454,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 24,
-       "games": 20,
-       "hits": 19,
-       "break_even": 0.5911,
-       "prob_above": 0.9725,
-       "roi": 0.3304,
-       "edge": 0.1622,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 32,
-     "bad": [
-      {
-       "id": "Stake | Momento do aviso = antes do início",
-       "conditions": [
-        [
-         "Momento do aviso",
-         "antes do início"
-        ]
-       ],
-       "n": 63,
-       "games": 29,
-       "hits": 30,
-       "break_even": 0.4937,
-       "prob_above": 0.1244,
-       "roi": -0.0655,
-       "edge": -0.0915,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
-       "conditions": [
-        [
-         "Momento do aviso",
-         "antes do início"
-        ],
-        [
-         "Valor da aposta",
-         "10 mil $ ou mais"
-        ]
-       ],
-       "n": 34,
-       "games": 15,
-       "hits": 15,
-       "break_even": 0.4713,
-       "prob_above": 0.1328,
-       "roi": -0.1406,
-       "edge": -0.1095,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 3
-    },
-    {
      "match_id": "bayern-munchen-vs-cologne-20261120",
      "match": "Bayern Munchen — Cologne",
      "league": "German Bundesliga",
@@ -6172,139 +6018,6 @@
      "bad_total": 3
     },
     {
-     "match_id": "seattle-sounders-vs-salt-lake-20261120",
-     "match": "Seattle Sounders — Salt Lake",
-     "league": "US Major League Soccer",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "por começar",
-     "kickoff_utc": "2026-11-20T03:00+00:00",
-     "date_utc": "2026-11-19T10:49:19+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Total",
-     "selection": "Under 2.75",
-     "odds": 2.18,
-     "odds_last": 2.18,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "contraditório",
-     "conflict": true,
-     "validated": false,
-     "odds_band": "odd 2,00 a 3,00",
-     "odds_band_n": 40,
-     "good": [
-      {
-       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Número de apostas",
-         "uma"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 50,
-       "games": 37,
-       "hits": 35,
-       "break_even": 0.5536,
-       "prob_above": 0.9812,
-       "roi": 0.2567,
-       "edge": 0.1454,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Competição",
-         "liga"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 23,
-       "games": 18,
-       "hits": 17,
-       "break_even": 0.5531,
-       "prob_above": 0.9553,
-       "roi": 0.3467,
-       "edge": 0.152,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 64,
-       "games": 48,
-       "hits": 42,
-       "break_even": 0.548,
-       "prob_above": 0.9507,
-       "roi": 0.2129,
-       "edge": 0.1052,
-       "status": "promissora",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 22,
-     "bad": [
-      {
-       "id": "Stake | Momento do aviso = antes do início",
-       "conditions": [
-        [
-         "Momento do aviso",
-         "antes do início"
-        ]
-       ],
-       "n": 63,
-       "games": 29,
-       "hits": 30,
-       "break_even": 0.4937,
-       "prob_above": 0.1244,
-       "roi": -0.0655,
-       "edge": -0.0915,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
-       "conditions": [
-        [
-         "Momento do aviso",
-         "antes do início"
-        ],
-        [
-         "Valor da aposta",
-         "10 mil $ ou mais"
-        ]
-       ],
-       "n": 34,
-       "games": 15,
-       "hits": 15,
-       "break_even": 0.4713,
-       "prob_above": 0.1328,
-       "roi": -0.1406,
-       "edge": -0.1095,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 3
-    },
-    {
      "match_id": "manchester-city-vs-fulham-20261121",
      "match": "Manchester City — Fulham",
      "league": "England Premier League",
@@ -6444,7 +6157,7 @@
      "family": "Polymarket",
      "type": "POLYMARKET",
      "phase": "pre",
-     "when": "por começar",
+     "when": "a decorrer",
      "kickoff_utc": "2026-11-20T03:00+00:00",
      "date_utc": "2026-11-20T02:55:23+00:00",
      "minute": null,
@@ -6597,7 +6310,7 @@
      "family": "Polymarket",
      "type": "POLYMARKET",
      "phase": "pre",
-     "when": "por começar",
+     "when": "a decorrer",
      "kickoff_utc": "2026-11-20T03:00+00:00",
      "date_utc": "2026-11-20T02:41:55+00:00",
      "minute": null,
@@ -6740,10 +6453,10 @@
     "favorável": 0,
     "misto": 5,
     "sem evidência": 0,
-    "contraditório": 8,
+    "contraditório": 6,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T02:58:16+00:00",
+   "generated_utc": "2026-11-20T03:04:55+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -19297,37 +19010,6 @@
   "llm_total": 86,
   "watch": [
    {
-    "date_utc": "2026-11-20T02:55:23+00:00",
-    "match": "Seattle Sounders — Salt Lake",
-    "match_id": "seattle-sounders-vs-salt-lake-20261120",
-    "type": "POLYMARKET",
-    "market": "Polymarket",
-    "selection": "AH1(-0.5)",
-    "odds": 2.17,
-    "kickoff_utc": "2026-11-20T03:00+00:00",
-    "phase": "pre",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $",
-      "status": "promissora",
-      "n": 40,
-      "games": 32,
-      "hit_rate": 0.625,
-      "prob_above": 0.9632,
-      "edge": 0.1372,
-      "edge_ci": [
-       0.0111,
-       0.2588
-      ],
-      "prob_above_cut": 0.9526,
-      "prudent_rate": 0.5821,
-      "break_even": 0.4416,
-      "certified": false
-     }
-    ]
-   },
-   {
     "date_utc": "2026-11-19T18:53:10+00:00",
     "match": "Western Sydney Women — Wellington Phoenix Women",
     "match_id": "western-sydney-women-vs-wellington-phoenix-women-20261120",
@@ -19679,119 +19361,6 @@
       "prob_above_cut": 0.9728,
       "prudent_rate": 0.7127,
       "break_even": 0.5536,
-      "certified": false
-     },
-     {
-      "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 64,
-      "games": 48,
-      "hit_rate": 0.6614,
-      "prob_above": 0.9507,
-      "edge": 0.1052,
-      "edge_ci": [
-       0.0004,
-       0.2035
-      ],
-      "prob_above_cut": 0.9305,
-      "prudent_rate": 0.6649,
-      "break_even": 0.548,
-      "certified": false
-     }
-    ]
-   },
-   {
-    "date_utc": "2026-11-19T10:49:19+00:00",
-    "match": "Seattle Sounders — Salt Lake",
-    "match_id": "seattle-sounders-vs-salt-lake-20261120",
-    "type": "STAKE_LOAD",
-    "market": "Asian Total",
-    "selection": "Under 2.75",
-    "odds": 2.18,
-    "kickoff_utc": "2026-11-20T03:00+00:00",
-    "phase": "pre",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 50,
-      "games": 37,
-      "hit_rate": 0.7071,
-      "prob_above": 0.9812,
-      "edge": 0.1454,
-      "edge_ci": [
-       0.0322,
-       0.248
-      ],
-      "prob_above_cut": 0.9728,
-      "prudent_rate": 0.7127,
-      "break_even": 0.5536,
-      "certified": false
-     },
-     {
-      "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 64,
-      "games": 48,
-      "hit_rate": 0.6614,
-      "prob_above": 0.9507,
-      "edge": 0.1052,
-      "edge_ci": [
-       0.0004,
-       0.2035
-      ],
-      "prob_above_cut": 0.9305,
-      "prudent_rate": 0.6649,
-      "break_even": 0.548,
-      "certified": false
-     }
-    ]
-   },
-   {
-    "date_utc": "2026-11-19T10:44:22+00:00",
-    "match": "Seattle Sounders — Salt Lake",
-    "match_id": "seattle-sounders-vs-salt-lake-20261120",
-    "type": "STAKE_LOAD",
-    "market": "Asian Total",
-    "selection": "Under 3",
-    "odds": 1.93,
-    "kickoff_utc": "2026-11-20T03:00+00:00",
-    "phase": "pre",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 50,
-      "games": 37,
-      "hit_rate": 0.7071,
-      "prob_above": 0.9812,
-      "edge": 0.1454,
-      "edge_ci": [
-       0.0322,
-       0.248
-      ],
-      "prob_above_cut": 0.9728,
-      "prudent_rate": 0.7127,
-      "break_even": 0.5536,
-      "certified": false
-     },
-     {
-      "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
-      "status": "promissora",
-      "n": 43,
-      "games": 36,
-      "hit_rate": 0.6977,
-      "prob_above": 0.9639,
-      "edge": 0.1258,
-      "edge_ci": [
-       0.0114,
-       0.2299
-      ],
-      "prob_above_cut": 0.9494,
-      "prudent_rate": 0.7058,
-      "break_even": 0.582,
       "certified": false
      },
      {
