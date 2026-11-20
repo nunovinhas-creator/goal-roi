@@ -563,13 +563,16 @@ class ChainContinuityTests(unittest.TestCase):
         """O aviso existente (`notify.failure`, inalterado) só envia nos minutos 00–09 de cada hora, ou se o lançamento seguinte
         falhar. Uma falha deste passo fica sempre vermelha, mas o Telegram só chega se calhar nessa janela."""
         from datetime import datetime
+        from unittest.mock import patch
         from scangoal import notify
         sent, env = [], {'TG_BOT_TOKEN': 't', 'TG_CHAT_ID': 'c'}
         sender = lambda *a: sent.append(a)
         at = lambda hm: datetime.fromisoformat('2026-11-17T%s:00+00:00' % hm)
-        self.assertFalse(notify.failure(sender, at('12:31'), env))
-        self.assertTrue(notify.failure(sender, at('13:04'), env))
-        self.assertTrue(notify.failure(sender, at('12:31'), dict(env, NEXT_COLLECTION_FAILED='1')))
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            self.assertFalse(notify.failure(sender, at('12:31'), env))
+            self.assertTrue(notify.failure(sender, at('12:31'), dict(env, NEXT_COLLECTION_FAILED='1')))
+            self.assertFalse(notify.failure(sender, at('13:04'), env))
+            self.assertTrue(notify.failure(sender, at('14:04'), env))
         self.assertEqual(len(sent), 2)
 
 

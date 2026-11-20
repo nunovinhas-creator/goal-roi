@@ -862,9 +862,10 @@ class Notify(unittest.TestCase):
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
         env = {'TG_BOT_TOKEN': 't', 'TG_CHAT_ID': '1'}
-        self.assertTrue(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), env))
-        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:25:00+00:00'), env))
-        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            self.assertTrue(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), env))
+            self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:25:00+00:00'), env))
+            self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
 
 
 class Polymarket(Hardening):

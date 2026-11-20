@@ -382,11 +382,13 @@ class NextCollection(unittest.TestCase):
         sent = []
         sender = lambda token, chat, text: sent.append((token, chat, text))
         at = datetime(2026, 11, 17, 14, 37, tzinfo=timezone.utc)                  # outside the first 10 minutes
-        self.assertFalse(notify.failure(sender, at, ENV))
-        self.assertFalse(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='')))
-        self.assertTrue(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='1')))
-        self.assertTrue(notify.failure(sender, at.replace(minute=4), ENV))       # unchanged hourly rule
-        self.assertFalse(notify.failure(sender, at, {'NEXT_COLLECTION_FAILED': '1'}))   # no keys: nothing
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            self.assertFalse(notify.failure(sender, at, ENV))
+            self.assertFalse(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='')))
+            self.assertTrue(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='1')))
+            self.assertFalse(notify.failure(sender, at.replace(hour=15, minute=4), ENV))
+            self.assertTrue(notify.failure(sender, at.replace(hour=16, minute=4), ENV))
+            self.assertFalse(notify.failure(sender, at, {'NEXT_COLLECTION_FAILED': '1'}))
         self.assertEqual(len(sent), 2)
         self.assertEqual(sent[0], (TOKEN, CHAT, 'A recolha do goal-roi falhou às 14:37 UTC. Vê as execuções em '
                                                 'https://github.com/nunovinhas-creator/goal-roi/actions'))   # same text

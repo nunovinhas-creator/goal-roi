@@ -34,6 +34,23 @@ def initialize(path):
 
 
 class StakeAlerts(unittest.TestCase):
+    def test_a_signal_that_expires_during_the_git_push_never_reaches_telegram(self):
+        now = NOW
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder, stake_alerts.STATE_NAME)
+            initialize(path)
+
+            def publish(_):
+                nonlocal now
+                now += timedelta(minutes=2)
+                return True
+
+            result = stake_alerts.deliver([sig(minutes_ago=29)], NOW, ENV,
+                                          lambda *_: self.fail('expired alert sent'), path, publish, lambda: now)
+            self.assertEqual(result, [])
+            self.assertEqual(stake_alerts.load_state(path)['sent'], {})
+            self.assertIn('"event": "expired"', path.with_name(stake_alerts.LOG_NAME).read_text())
+
     def test_lines_1_6_9(self):
         m = stake_alerts.matches([sig()], NOW)
         self.assertEqual(len(m), 1)

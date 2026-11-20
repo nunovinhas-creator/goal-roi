@@ -37,7 +37,11 @@ class StakeStateError(RuntimeError):
 
 def key_of(b):
     """Identidade estável da aposta, não da mensagem nem da odd."""
-    return '|'.join(str(b[k]) for k in ('match_id', 'market', 'selection'))
+    fixture = b.get('canonical_match_id') or b['match_id']
+    market = b['market']
+    if b.get('period') and b['period'] != 'regulation':
+        market += ':' + b['period']
+    return '|'.join((fixture, market, b['selection']))
 
 
 def matches(signals, now):
@@ -106,11 +110,15 @@ def load_log(path):
         for line in lines[1:]:
             event = json.loads(line)
             if (not isinstance(event, dict) or set(event) != {'event', 'key', 'at'} or
-                    event['event'] != 'intent' or not isinstance(event['key'], str) or
-                    not event['key'] or not isinstance(event['at'], str) or not event['at'] or
-                    event['key'] in seen):
+                    event['event'] not in ('intent', 'rejected', 'expired') or not isinstance(event['key'], str) or
+                    not event['key'] or not isinstance(event['at'], str) or not event['at']):
                 raise ValueError('invalid or repeated intent')
-            seen[event['key']] = event['at']
+            if event['event'] == 'intent' and event['key'] not in seen:
+                seen[event['key']] = event['at']
+            elif event['event'] != 'intent' and event['key'] in seen:
+                del seen[event['key']]
+            else:
+                raise ValueError('invalid transition')
         return seen, lines
     except (OSError, ValueError, IndexError, TypeError) as exc:
         raise StakeStateError('stake intent log missing, corrupt or truncated') from exc
@@ -129,10 +137,11 @@ def _git_publisher(env, path, log_path):
     return notify.GitPublisher.for_store(store, 'main')
 
 
-def deliver(signals, now=None, env=None, sender=None, path=None, publisher=None):
+def deliver(signals, now=None, env=None, sender=None, path=None, publisher=None, clock=None):
     """No máximo uma tentativa por aposta, apenas após prova de publicação remota da intenção."""
     env = os.environ if env is None else env
     now = now or datetime.now(timezone.utc)
+    clock = clock or notify.run_clock(now)
     token, chat = (env.get('TG_BOT_TOKEN') or '').strip(), (env.get('TG_CHAT_ID') or '').strip()
     if not token or not chat:
         print('STAKE_ALERTS skipped (no keys)')
@@ -142,34 +151,57 @@ def deliver(signals, now=None, env=None, sender=None, path=None, publisher=None)
         print('STAKE_ALERTS sent 0')
         return []
     path = Path(path) if path else data_dir() / STATE_NAME
+    with notify.outbox_lock(path.parent):
+        return _deliver(candidates, now, env, sender, path, publisher, token, chat, clock)
+
+
+def _deliver(candidates, now, env, sender, path, publisher, token, chat, clock):
     log_path = path.with_name(LOG_NAME)
     state = load_state(path)
     intents, lines = load_log(log_path)
     verify_state(state, intents)
-    pending = [m for m in candidates if m['key'] not in intents]
+    pending = [m for m in candidates if m['key'] not in intents
+               and '|'.join(str(m['b'][k]) for k in ('match_id', 'market', 'selection')) not in intents]
     if not pending:
         print('STAKE_ALERTS sent 0')
         return []
     publish = publisher if publisher is not None else _git_publisher(env, path, log_path)
     sender = sender or notify.send
     sent = []
-    for m in pending:
-        key, stamp = m['key'], now.isoformat(timespec='seconds')
-        # Gravação local completa; se o runner parar antes do push, o aviso não é enviado.
-        lines.append(json.dumps({'event': 'intent', 'key': key, 'at': stamp}, ensure_ascii=False, sort_keys=True))
-        # Substituição atómica de cada ficheiro: divergência entre ambos bloqueia novos avisos.
+    rejected = {event['key'] for event in map(json.loads, lines[1:]) if event['event'] == 'rejected'}
+
+    def persist(event, key, stamp):
+        lines.append(json.dumps({'event': event, 'key': key, 'at': stamp}, ensure_ascii=False, sort_keys=True))
         log_tmp = log_path.with_suffix('.tmp')
         log_tmp.write_text('\n'.join(lines) + '\n', encoding='utf-8')
         os.replace(log_tmp, log_path)
-        state['sent'][key] = stamp
+        if event == 'intent':
+            state['sent'][key] = stamp
+        else:
+            del state['sent'][key]
         state['sent_total'] = len(state['sent'])
         _atomic_json(path, state)
+
+    for m in pending:
+        if not freshness.current(m['b'], clock()):
+            continue
+        key, stamp = m['key'], now.isoformat(timespec='seconds')
+        # Gravação local completa; se o runner parar antes do push, o aviso não é enviado.
+        persist('intent', key, stamp)
         if publish(key) is not True:
             raise StakeStateError('stake intent not confirmed on remote main')
+        send_time = clock()
+        if not freshness.current(m['b'], send_time):
+            persist('expired', key, send_time.isoformat())
+            print('STAKE_ALERTS_EXPIRED_BEFORE_SEND')
+            continue
         try:
-            sender(token, chat, text(m, now))
+            sender(token, chat, text(m, send_time))
+        except notify.DeliveryFailed:
+            if key not in rejected and freshness.current(m['b'], clock()):
+                persist('rejected', key, clock().isoformat())
+            raise StakeStateError('stake Telegram rejection confirmed') from None
         except Exception as exc:
-            # Intenção já publicada: mesmo uma falha confirmada não é repetida.
             print('STAKE_ALERTS_SEND_FAILED', type(exc).__name__)
             raise StakeStateError('stake Telegram delivery failed or ambiguous') from None
         sent.append(key)

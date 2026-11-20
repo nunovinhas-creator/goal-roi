@@ -55,7 +55,8 @@ export class RecoveryGuard {
     const response = await fetch(workflow + '/dispatches', {method:'POST', redirect:'manual',
       headers:{Authorization:'Bearer ' + this.env.GITHUB_ACTIONS_TOKEN, 'User-Agent':'goal-roi-continuity',
         'Content-Type':'application/json'}, body:JSON.stringify({ref:'main'}), signal:AbortSignal.timeout(8000)});
-    if (response.status === 429) this.sql.exec('DELETE FROM intent WHERE collector=?', report.collector_id);
+    if ([400, 401, 403, 404, 422, 429].includes(response.status))
+      this.sql.exec('DELETE FROM intent WHERE collector=?', report.collector_id);
     if (!response.ok) throw Error('Dispatch HTTP ' + response.status);
     return Response.json({...report, decision:'requested'});
   }
