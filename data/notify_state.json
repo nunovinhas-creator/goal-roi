@@ -610,13 +610,15 @@
    "attempt_utc": "2026-11-20T21:05:20+00:00",
    "chars": 197,
    "created_utc": "2026-11-20T21:05:20+00:00",
+   "done_utc": "2026-11-20T21:05:20+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "dc29353e1f57bab490958bab5a93660238c2cbaff749e4d3f489a8fb391275ad",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:athletic-bilbao-vs-rcd-espanyol-20261120|6a19c31b46dd": {
    "attempt_utc": "2026-11-20T20:20:59+00:00",
@@ -2396,6 +2398,18 @@
    "sha256": "008576d821e7e09704661cf4f07a69ed72db6762264782ceffe3e43ef2741184",
    "state": "delivered"
   },
+  "game|id:troyes-vs-le-havre-20261120|a1ca79b77df1": {
+   "attempt_utc": "2026-11-20T21:07:20+00:00",
+   "chars": 198,
+   "created_utc": "2026-11-20T21:07:20+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "cc9e9c63c2f4bbde69b18808d866642ee6570edcf1a659c315598e0be06ad5f2",
+   "state": "in_flight"
+  },
   "game|id:troyes-vs-le-havre-20261120|cc3a5f81b85b": {
    "attempt_utc": "2026-11-20T19:30:11+00:00",
    "chars": 197,
@@ -2748,25 +2762,25 @@
   }
  },
  "delivery_counts": {
-  "delivered": 168,
+  "delivered": 169,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-20T21:03:21+00:00",
+ "format_last_run_utc": "2026-11-20T21:05:20+00:00",
  "health": {
   "reference": {
    "bsd_results": 36,
-   "eligible": 1061,
+   "eligible": 1062,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 98,
-   "hypotheses": 10159,
+   "hypotheses": 10163,
    "settled_bets": 839,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 48,
+   "statuses": 50,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-20T21:03:21+00:00",
+ "last_run_utc": "2026-11-20T21:05:20+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -3467,6 +3481,9 @@
   "item|id:tromso-vs-viking-20261121|1x2|Viking": {
    "at_utc": "2026-11-20T19:20:43+00:00"
   },
+  "item|id:troyes-vs-le-havre-20261120|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-20T21:07:20+00:00"
+  },
   "item|id:troyes-vs-le-havre-20261120|Goal Range|2-3": {
    "at_utc": "2026-11-20T15:14:19+00:00"
   },
@@ -3520,7 +3537,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 480,
+ "sent_total": 481,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -3528,7 +3545,9 @@
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
@@ -3859,6 +3878,7 @@
   "2026-11-20T20:27:26+00:00|Bayern Munchen — Cologne|Under 4",
   "2026-11-20T20:59:38+00:00|Bayern Munchen — Cologne|Over 2.5",
   "2026-11-20T20:59:38+00:00|Bayern Munchen — Cologne|Over 3",
-  "2026-11-20T21:04:10+00:00|ASC Police — AS Pompier|Over 2.5"
+  "2026-11-20T21:04:10+00:00|ASC Police — AS Pompier|Over 2.5",
+  "2026-11-20T21:06:26+00:00|Troyes — Le Havre|Over 2.5"
  ]
 }
