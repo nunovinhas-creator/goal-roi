@@ -277,13 +277,14 @@ def admitted(match, start):
             games.setdefault(key, []).append(b)
     for key, rows in games.items():
         bet = brain.committed_bet(rows)
-        if bet is None or not brain.operational_signal(bet, start) or bet.get('result_quarantined'):
+        if bet is None or not brain.operational_signal(bet, start):
             continue
         seen = [s for s in (chronology.parse_utc(b.get('match_result_first_seen_utc')) for b in rows) if s is not None]
         if seen and brain.latest_decision(bet) >= min(seen):
             continue   # um resultado do jogo já tinha sido observado na decisão: não é uma decisão válida
         dt, known = chronology.decision_time(bet), chronology.result_known(bet)
-        value = brain.bet_profit(bet) if bet.get('w') is not None and known is not None and known <= dt + timedelta(days=SETTLE_DAYS) else None
+        proven = not bet.get('result_quarantined') and known is not None and known <= dt + timedelta(days=SETTLE_DAYS)
+        value = brain.bet_profit(bet) if proven else None
         out[key] = (dt.date().isoformat(), value, dt, bet['odds'] * (1 - insights.ODDS_LOSS) - 1)
     return out
 

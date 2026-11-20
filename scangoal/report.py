@@ -27,7 +27,7 @@ def key_of(p):
     return (p.get('match_id'), p['type'], p.get('market'), p.get('selection'))
 
 
-def load(chronology=None, *, result_observations=None):
+def load(chronology=None, *, result_observations=None, as_of=None):
     """-> (mensagens na 1.ª versão, FT por jogo, marcas ✅/❌ do bot por aposta, notas de fim de jogo, auditoria).
 
     chronology (opcional, PR 3): dicionário preenchido com a PRIMEIRA recolha (collected_at_utc) em que o sistema viu cada
@@ -46,8 +46,13 @@ def load(chronology=None, *, result_observations=None):
         if not line.strip():
             continue
         r = json.loads(line)
-        audit['versions'] += 1
         got = r.get('collected_at_utc')
+        if as_of is not None:
+            observed = opportunity_results.utc(got)
+            published = opportunity_results.utc(r.get('edit_date_utc') or r.get('date_utc'))
+            if observed is None or published is None or max(observed, published) > as_of:
+                continue
+        audit['versions'] += 1
         audit['last_collected_at_utc'] = max(audit['last_collected_at_utc'] or '', r.get('collected_at_utc') or '')
         p = parse(r['text'])
         if p['type'] == 'WEAKENED_LINEUP' and p.get('teams'):   # mensagem sem ligação: identidade pelas equipas e pelo dia
@@ -89,9 +94,11 @@ def load(chronology=None, *, result_observations=None):
         else:  # ficheiro append-only: a primeira linha de cada id é a versão original
             first[mid] = dict(p, message_id=mid, date_utc=r['date_utc'], had_ft_at_first_sight='ft' in p, edited_at_first_sight=bool(r.get('edit_date_utc')),
                               signal_text=SIGNAL_PART(r['text']), head=r['text'].strip().splitlines()[0][:60], collected_at_utc=got)
-    same_second = collections.Counter(m['date_utc'] for m in first.values() if m['type'] == 'BETFAIR')
+    # Só sinais disponíveis na mesma leitura podem estabelecer um lote em conjunto.
+    same_second = collections.Counter((m['date_utc'], m['collected_at_utc'])
+                                      for m in first.values() if m['type'] == 'BETFAIR')
     for mid, m in first.items():
-        m['burst'] = m['type'] == 'BETFAIR' and same_second[m['date_utc']] >= BURST
+        m['burst'] = m['type'] == 'BETFAIR' and same_second[m['date_utc'], m['collected_at_utc']] >= BURST
         m['goals'] = goals.get(mid)
     if chronology is not None:   # só o valor final de cada resultado/marca conta, desde a primeira recolha em que apareceu
         chronology['ft'] = {m: seen_ft.get((m, tuple(v))) for m, v in ft.items()}
@@ -554,28 +561,7 @@ def research_bets(signals, observations, now, *, bindings=None):
             yield b
             continue
 
-        kickoff = chronology.kickoff_time(b)
-        if kickoff is None:
-            visible = {v.kickoff for v in versions if v.kickoff is not None and v.available_at is not None
-                       and v.available_at <= cutoff}
-            kickoff = next(iter(visible)) if len(visible) == 1 else None
-        result, late = opportunity_results.settlement(versions, kickoff=kickoff, as_of=now, deadline=deadline)
-        b = dict(b, result_quarantined=result.conflict,
-                 result_reconciliation=(
-                     {'ft': late.score, 'conflict': late.conflict, 'available_utc': chronology.iso(late.available_at)}
-                     if late is not None else None))
-        if result.score is None:
-            yield dict(b, ft=None, w=None, result_known_utc=None, result_known_source=None, settled_by=None,
-                       match_result_first_seen_utc=chronology.iso(result.first_available_at))
-            continue
-
-        market, won = b['market'], None
-        if market and not (b['phase'] == 'live' and market.strip().lower() == 'asian handicap'):
-            won = settle(market, b['selection'], result.score, b['teams'])
-        yield dict(b, ft=list(result.score), w=won, result_known_utc=None,
-                   result_available_utc=result.available_at.isoformat(),
-                   result_known_source='versioned_ft', settled_by='versioned_ft' if won is not None else None,
-                   match_result_first_seen_utc=result.first_available_at.isoformat())
+        yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
 def build(csv_path=None, register=False, now=None):
@@ -583,7 +569,7 @@ def build(csv_path=None, register=False, now=None):
     now = now or datetime.now(timezone.utc)
     chron = {}
     bot_observations, providers = {}, {}
-    msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations)
+    msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations, as_of=now)
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
     for name in ('hl', 'bsd'):
         try:

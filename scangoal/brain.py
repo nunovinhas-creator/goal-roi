@@ -33,7 +33,7 @@ Disciplina (fixada a 12/11/2026):
 import hashlib, itertools, json, math, re
 from datetime import datetime, timedelta, timezone
 
-from . import certification, chronology, freshness, insights, match_identity
+from . import certification, chronology, freshness, insights, match_identity, opportunity_results
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -47,7 +47,8 @@ VALIDATION_METHOD = 'eprocess_online_alpha_v1'     # o Telegram só anuncia vali
 FWER_ALPHA = 0.05        # erro de família, para toda a vida do projeto, das táticas certificadas (forte/confirmada)
 EPROCESS_LAMBDAS = (0.5, 0.25, 0.125, 0.0625, 0.03125)   # fixados a priori (grelha geométrica); nunca escolhidos pelos dados
 VALIDATED = ('forte', 'confirmada')
-OPEN_TIMEOUT_DAYS = 3       # = report.NO_SOURCE_AFTER_DAYS: jogo da cadeia sem resultado até lá fecha como perda
+OPEN_TIMEOUT_DAYS = opportunity_results.SETTLEMENT_WINDOW_DAYS
+COMMITMENT_POLICY = 'first-confirmed-ft-v1'
 PROSPECTIVE_MIN = HINT_AT   # jogos operacionais posteriores (ao registo / à seleção) exigidos à evidência prospetiva e à certificação
 PROMOTE_AT, KEEP_PROMISING = 0.95, 0.90            # entrar em promissora / manter-se (histerese: o dobro do erro admitido)
 ABANDON_AT, KEEP_ABANDONED = 0.10, 0.20            # entrar em abandonada / manter-se
@@ -537,14 +538,12 @@ def confirmation(match, since, alpha, as_of=None):
         if (first is not None and latest_decision(b) >= first) or (settled and first is None):
             skipped['result_seen_before_decision'] += 1      # resultado já visto, ou existente sem hora provada: nunca entra
             continue
-        if b.get('result_quarantined'):
-            skipped['result_quarantined'] += 1
-            continue
         cands.append((t, sent, str(b.get('key')), b))
     cands.sort(key=lambda c: c[:3])
     logs, n, log_e, log_max, cert, bar = [0.0] * len(EPROCESS_LAMBDAS), 0, 0.0, 0.0, None, math.log(1 / alpha)
     open_until, pending, admitted, voided = None, False, 0, 0
     timeout = timedelta(days=OPEN_TIMEOUT_DAYS)
+    commitments = []
 
     def close(y, closed):
         nonlocal n, log_e, log_max, cert
@@ -565,7 +564,18 @@ def confirmation(match, since, alpha, as_of=None):
             voided, pending = voided + 1, False
         admitted += 1
         deadline = t + timeout
-        if b.get('w') is None:                                # ainda aberto: bloqueia a cadeia até ao resultado ou ao prazo
+        commitment = {'policy': COMMITMENT_POLICY, 'sequence': admitted, 'fixture': game_identity(b),
+                      'market': b.get('market'), 'period': b.get('period'), 'selection': b.get('selection'),
+                      'odds': b.get('odds'), 'selected_utc': chronology.iso(since),
+                      'decision_utc': t.isoformat(), 'settlement_deadline_utc': deadline.isoformat()}
+        canonical = json.dumps(commitment, sort_keys=True, separators=(',', ':'), allow_nan=False)
+        commitments.append(dict(commitment, id=hashlib.sha256(canonical.encode()).hexdigest()))
+        if 'first_confirmed_utc' in b:
+            # Uma correção posterior segue para reconciliação e não reabre a cadeia.
+            b = dict(b, w=b['first_confirmed_w'], result_available_utc=b['first_confirmed_utc'],
+                     result_quarantined=False)
+        if b.get('w') is None or b.get('result_quarantined'):
+            skipped['result_quarantined'] += bool(b.get('result_quarantined'))
             open_until, pending = deadline, True
             continue
         known, verdict = chronology.result_check(b)
@@ -580,6 +590,7 @@ def confirmation(match, since, alpha, as_of=None):
         voided, pending = voided + 1, False
     shown = lambda x: round(math.exp(x), 4) if x < 700 else None   # e-valor legível; acima de e^700 só o log10
     return {'games': n, 'admitted': admitted, 'voided_as_loss': voided, 'pending': admitted - n, 'skipped': skipped,
+            'commitments': commitments,
             'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
             'log10_e_max': round(log_max / math.log(10), 4), 'threshold': round(1 / alpha, 2), 'alpha': alpha, 'certified_at': cert}
 
@@ -656,6 +667,8 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
         h = registry[hid]
         conds = {tuple(c) for c in h['conditions']}
         born = chronology.born(h)
+        if as_of is not None and born is not None and born > as_of:
+            continue
         born_of[hid] = born
         gen = h.get('source') == 'gerador'
         research_safe = h.get('source') != 'llm' or research_conditions(h)
@@ -958,6 +971,9 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     """
     # Relógio explícito: só o que o sistema sabia em `as_of` (sinais ainda não lidos e resultados ainda não vistos não contam).
     view = chronology.as_of_view(signals, as_of) if as_of is not None else signals
+    if as_of is not None:
+        registry = {key: value for key, value in registry.items()
+                    if (chronology.born(value) or as_of) <= as_of}
     all_signals = match_identity.annotate(view, as_of)
     signals = [b for b in all_signals if eligible(b)]
     excluded = {}

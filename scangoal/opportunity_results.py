@@ -7,6 +7,7 @@ from . import chronology
 
 
 REGULATION_TIME = timedelta(minutes=90)
+SETTLEMENT_WINDOW_DAYS = 3
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,8 @@ class Resolution:
     conflict: bool = False
     available_at: datetime | None = None
     first_available_at: datetime | None = None
+    first_score: tuple[int, int] | None = None
+    first_consensus_at: datetime | None = None
 
 
 def settlement(evidence, *, kickoff, as_of, deadline):
@@ -71,29 +74,18 @@ def settlement(evidence, *, kickoff, as_of, deadline):
 def resolve(evidence, *, kickoff, as_of):
     """Resolve each record's latest valid version visible at the evaluation cutoff."""
     earliest_ft = kickoff + REGULATION_TIME if kickoff is not None else None
-    if isinstance(evidence, dict):
-        # Existing callers can supply an already observed result with explicit availability.
-        known = utc(evidence.get("known_utc"))
-        if known is None or known > as_of or (earliest_ft is not None and known < earliest_ft):
-            return Resolution()
-        if evidence.get("conflict") is True:
-            return Resolution(conflict=True, available_at=known, first_available_at=known)
-        score = score_pair(evidence.get("ft"))
-        return Resolution(score, available_at=known, first_available_at=known) if score is not None else Resolution()
-
-    if not isinstance(evidence, (list, tuple)):
+    rows = [evidence] if isinstance(evidence, dict) else evidence
+    if not isinstance(rows, (list, tuple)):
         return Resolution()
-    latest, first_by_score = {}, {}
-    legacy_scores, legacy_conflicts = set(), []
-    for row in evidence:
+
+    events = {}
+    for i, row in enumerate(rows):
         if isinstance(row, dict):
-            legacy = resolve(row, kickoff=kickoff, as_of=as_of)
-            if legacy.conflict:
-                legacy_conflicts.append(legacy.available_at)
-            if legacy.score is not None:
-                legacy_scores.add(legacy.score)
-                first_by_score[legacy.score] = min(legacy.available_at,
-                                                    first_by_score.get(legacy.score, legacy.available_at))
+            known = utc(row.get("known_utc"))
+            score = score_pair(row.get("ft"))
+            if (known is not None and known <= as_of and (earliest_ft is None or known >= earliest_ft)
+                    and (score is not None or row.get("conflict") is True)):
+                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
             continue
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
                 or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
@@ -101,22 +93,63 @@ def resolve(evidence, *, kickoff, as_of):
                 or (earliest_ft is not None and (row.available_at < earliest_ft
                     or (row.published_at is not None and row.published_at < earliest_ft)))):
             continue
-        first_by_score[row.score] = min(row.available_at, first_by_score.get(row.score, row.available_at))
-        key = (row.source, row.record_id)
-        # A late read of an older Telegram edit cannot supersede a newer edit.
-        version = row.published_at or row.observed_at
-        current = latest.get(key)
-        if current is None or version > current[0]:
-            latest[key] = (version, {row.score})
-        elif version == current[0]:
-            current[1].add(row.score)
+        events.setdefault(row.available_at, []).append(
+            ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
 
-    scores = {score for _, values in latest.values() for score in values} | legacy_scores
-    if not scores and not legacy_conflicts:
-        return Resolution()
-    score = next(iter(scores)) if len(scores) == 1 and not legacy_conflicts else None
-    return Resolution(score, conflict=score is None, available_at=first_by_score.get(score),
-                      first_available_at=min([*first_by_score.values(), *legacy_conflicts]))
+    latest, score, conflict, since = {}, None, False, None
+    first_score, first_consensus = None, None
+    for available, versions in sorted(events.items()):
+        for key, version, value in versions:
+            current = latest.get(key)
+            if current is None or version > current[0]:
+                latest[key] = (version, {value})
+            elif version == current[0]:
+                current[1].add(value)
+        scores = {value for _, values in latest.values() for value in values}
+        now_conflict = len(scores) != 1 or None in scores
+        now_score = None if now_conflict else next(iter(scores))
+        if (score, conflict) != (now_score, now_conflict):
+            score, conflict, since = now_score, now_conflict, available
+        if first_consensus is None and score is not None:
+            first_score, first_consensus = score, available
+    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus)
+
+
+def settle_research_bet(bet, as_of):
+    """Materialize a versioned research row at a cutoff, including its first confirmed payoff."""
+    from .parser import settle
+
+    versions = bet["_ft_observations"]
+    decision = chronology.decision_time(bet)
+    deadline = decision + timedelta(days=SETTLEMENT_WINDOW_DAYS) if decision is not None else None
+    cutoff = min(as_of, deadline) if deadline is not None else as_of
+    kickoff = chronology.kickoff_time(bet)
+    if kickoff is None:
+        visible = {v.kickoff for v in versions if isinstance(v, Observation) and v.kickoff is not None
+                   and v.available_at is not None and v.available_at <= cutoff}
+        kickoff = next(iter(visible)) if len(visible) == 1 else None
+    result, late = settlement(versions, kickoff=kickoff, as_of=as_of, deadline=deadline)
+
+    def payout(score):
+        market = bet.get("market")
+        if score is not None and market and not (bet.get("phase") == "live" and market.strip().lower() == "asian handicap"):
+            return settle(market, bet["selection"], score, bet.get("teams"))
+        return None
+
+    won = payout(result.score)
+    row = dict(bet, ft=list(result.score) if result.score is not None else None, w=won,
+               result_known_utc=None, result_available_utc=chronology.iso(result.available_at),
+               result_known_source="versioned_ft" if result.score is not None else None,
+               settled_by="versioned_ft" if won is not None else None,
+               match_result_first_seen_utc=chronology.iso(result.first_available_at),
+               result_quarantined=result.conflict,
+               result_quarantined_utc=chronology.iso(result.available_at) if result.conflict else None,
+               first_confirmed_w=payout(result.first_score),
+               first_confirmed_utc=chronology.iso(result.first_consensus_at))
+    row["result_reconciliation"] = (
+        {"ft": late.score, "conflict": late.conflict, "available_utc": chronology.iso(late.available_at)}
+        if late is not None else None)
+    return row
 
 
 def remember_provider_results(state, matched, stamp):
