@@ -679,7 +679,10 @@ class LanguageModel(Hardening):
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
-                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                for row in rows:
+                    row['collected_at_utc'] = (datetime.fromisoformat(row['date_utc']) + timedelta(minutes=1)).isoformat()
+                store.append_versions(rows)
                 self.assertIsNone(llm.run(call, env={}))                                                 # sem chaves: não faz nada
                 now = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
                 st = llm.run(call, now, self.ENV)
