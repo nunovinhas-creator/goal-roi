@@ -60,6 +60,7 @@ jobs:
       - name: Language model investigation (publish quota reservation before each call)
         env:
           LLM_BUDGET_MODE: ${{ github.ref_name == 'main' && vars.GOAL_ROI_LLM_FREE_CONFIRMED == 'true' && 'git' || 'off' }}
+          GOAL_ROI_LLM_FREE_CONFIRMED: ${{ vars.GOAL_ROI_LLM_FREE_CONFIRMED }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           MASTER_BRAIN_LLM_API_KEY: ${{ secrets.MASTER_BRAIN_LLM_API_KEY }}
         run: python -u -m scangoal.llm

@@ -5,6 +5,7 @@ from datetime import timedelta
 import os
 from pathlib import Path
 import subprocess
+import sys
 from tempfile import TemporaryDirectory
 import threading
 import unittest
@@ -96,3 +97,55 @@ class DurableBudget(unittest.TestCase):
         with patch.object(llm, 'request') as transport:
             self.assertIsNone(llm.run(now=DAY, env=ENV))
         transport.assert_not_called()
+
+    def test_missing_explicit_free_confirmation_blocks_transport_and_remote_hold(self):
+        self.first.reserve(DAY.date() - timedelta(days=1), 1, 80000)
+        tip = self.second.tip()
+        env = dict(ENV, GITHUB_REF_NAME='main', LLM_BUDGET_MODE='git')
+        env.pop('GOAL_ROI_LLM_FREE_CONFIRMED')
+        with patch.object(llm, 'request') as transport, patch.object(report, 'build') as build:
+            self.assertIsNone(llm.run(now=DAY, env=env, budget=self.first))
+            for value in ('false', 'True', ' true ', ''):
+                self.assertIsNone(llm.run(transport, DAY, dict(env, GOAL_ROI_LLM_FREE_CONFIRMED=value),
+                                          budget=self.first))
+        transport.assert_not_called()
+        build.assert_not_called()
+        self.assertEqual(self.second.tip(), tip)
+
+        process_env = dict(os.environ, **env, SCANGOAL_DATA_DIR=str(self.root / 'unused'))
+        process_env.pop('GOAL_ROI_LLM_FREE_CONFIRMED', None)
+        completed = subprocess.run([sys.executable, '-m', 'scangoal.llm'], env=process_env,
+                                   check=True, capture_output=True, text=True)
+        self.assertEqual(completed.stdout.strip(), 'LLM_SKIPPED_FREE_UNCONFIRMED')
+        self.assertFalse((self.root / 'unused').exists())
+
+    def test_direct_http_helper_cannot_send_without_a_remote_reservation(self):
+        with patch.object(llm, 'urlopen') as transport, patch.dict(os.environ, ENV):
+            with self.assertRaisesRegex(llm.LLMError, 'unverified remote reservation'):
+                llm.request(ENV['CLOUDFLARE_ACCOUNT_ID'], ENV['MASTER_BRAIN_LLM_API_KEY'], 'fixture', 'prompt')
+        transport.assert_not_called()
+
+    def test_confirmed_runner_sends_only_after_remote_reservation(self):
+        self.first.reserve(DAY.date() - timedelta(days=1), 1, 80000)
+        self.enterContext(patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(self.runners[0] / 'data')}))
+        self.enterContext(patch.object(report, 'build', return_value={'brain': {'top': []}}))
+        self.enterContext(patch.dict(report.LAST, {'research_signals': [sig('fixture', None, 2)]}))
+        self.enterContext(patch.object(llm, 'opportunity_digest', return_value=None))
+
+        def send(*args, **kwargs):
+            _, state = self.second.read(self.second.tip())
+            self.assertEqual(state['day'], DAY.date().isoformat())
+            self.assertGreater(sum(state['holds'].values()), 0)
+            return '{"hypotheses":[]}', {}
+
+        hook = self.remote / 'hooks' / 'pre-receive'
+        hook.write_text('#!/bin/sh\nexit 1\n', encoding='utf-8')
+        hook.chmod(0o755)
+        with patch.object(llm, 'request', side_effect=send) as transport:
+            state = llm.run(now=DAY, env=ENV, budget=self.first)
+            self.assertEqual(state['last_outcome'], 'budget_unverified')
+            transport.assert_not_called()
+            hook.unlink()
+            state = llm.run(now=DAY + timedelta(hours=1), env=ENV, budget=self.first)
+            self.assertEqual(state['last_outcome'], 'ok')
+            transport.assert_called_once()

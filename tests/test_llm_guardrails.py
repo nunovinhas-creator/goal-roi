@@ -12,7 +12,8 @@ from scangoal import llm, report
 from test_chronological_validity import T0, sig
 
 
-ENV = {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "MASTER_BRAIN_LLM_API_KEY": "fixture"}
+ENV = {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "MASTER_BRAIN_LLM_API_KEY": "fixture",
+       "GOAL_ROI_LLM_FREE_CONFIRMED": "true"}
 DAY = T0 + timedelta(hours=10)
 FAMILY = "Jogo aberto"
 VOCAB = {FAMILY: {"Liga": {"Example": 8, "Other": 8},

@@ -643,7 +643,8 @@ class GoalMinutes(Hardening):
 
 
 class LanguageModel(Hardening):
-    ENV = {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32, 'MASTER_BRAIN_LLM_API_KEY': 'k'}
+    ENV = {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32, 'MASTER_BRAIN_LLM_API_KEY': 'k',
+           'GOAL_ROI_LLM_FREE_CONFIRMED': 'true'}
 
     def test_only_proposals_made_of_known_features_are_accepted(self):
         from scangoal import llm

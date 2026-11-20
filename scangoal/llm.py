@@ -2,7 +2,7 @@
 
 O pedido distingue descoberta histórica de resultados prospetivos e contém apenas agregados.
 O modelo propõe investigações; o motor determina evidência e certificação. As propostas são
-validadas e registadas após a resposta. Cada tentativa reserva quota local antes da chamada.
+validadas e registadas após a resposta. Cada chamada real exige confirmação Free e reserva remota.
 """
 import fcntl
 import hashlib
@@ -31,13 +31,16 @@ CHAT_TEMPLATE_ALLOWANCE = 256
 SYSTEM_PROMPT = 'És um analista de apostas desportivas rigoroso. Respondes só com JSON válido.'
 CLAIM_WORDS = re.compile(r'\b(?:certificad[ao]s?|validad[ao]s?|rentáve(?:l|is)|lucro comprovado|vantagem comprovada)\b', re.I)
 UTC = timezone.utc
+_REMOTE_RESERVATION = object()
 
 
 class LLMError(RuntimeError):
     pass
 
 
-def request(account, key, model, prompt):
+def request(account, key, model, prompt, *, _reservation=None):
+    if _reservation is not _REMOTE_RESERVATION:
+        raise LLMError('unverified remote reservation')
     url = 'https://api.cloudflare.com/client/v4/accounts/%s/ai/v1/chat/completions' % account
     body = json.dumps({'model': model, 'temperature': 0.7, 'max_tokens': MAX_RESPONSE_TOKENS, 'messages': [
         {'role': 'system', 'content': SYSTEM_PROMPT},
@@ -355,6 +358,9 @@ def request_window(at):
 
 def run(call=None, now=None, env=None, *, budget=None):
     env = os.environ if env is None else env
+    if env.get('GOAL_ROI_LLM_FREE_CONFIRMED') != 'true':
+        print('LLM_SKIPPED_FREE_UNCONFIRMED')
+        return None
     account = env.get('CLOUDFLARE_ACCOUNT_ID', '').strip()
     key = env.get('MASTER_BRAIN_LLM_API_KEY', '').strip()
     if not account or not key or not re.fullmatch(r'[0-9a-f]{32}', account):
@@ -363,7 +369,7 @@ def run(call=None, now=None, env=None, *, budget=None):
     live = call is None or call is request
     if budget is None and env.get('LLM_BUDGET_MODE') == 'git' and env.get('GITHUB_REF_NAME') == 'main':
         budget = GitBudget(account)
-    if live and budget is None:
+    if live and not isinstance(budget, GitBudget):
         print('LLM_SKIPPED_BUDGET_UNVERIFIED')
         return None
     directory = data_dir()
@@ -372,10 +378,10 @@ def run(call=None, now=None, env=None, *, budget=None):
     lock_dir.mkdir(mode=0o700, exist_ok=True)
     with (lock_dir / lock_id).open('a') as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
-        return run_locked(request if call is None else call, account, key, directory, now, budget)
+        return _run_locked(request if call is None else call, account, key, directory, now, budget, live=live)
 
 
-def run_locked(call, account, key, directory, now, budget):
+def _run_locked(call, account, key, directory, now, budget, *, live):
     from . import report
 
     def clock():
@@ -452,7 +458,10 @@ def run_locked(call, account, key, directory, now, budget):
                 outcome = 'skipped_utc_boundary'
                 break
             try:
-                response = call(account, key, model, prompt)
+                if live:
+                    response = call(account, key, model, prompt, _reservation=_REMOTE_RESERVATION)
+                else:
+                    response = call(account, key, model, prompt)
             except LLMError as exc:
                 outcome = 'failed: %s' % exc
                 if str(exc) in ('HTTP 402', 'HTTP 429'):
