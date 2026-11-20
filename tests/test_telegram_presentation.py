@@ -1360,17 +1360,32 @@ class X_Presentation(unittest.TestCase):
         d.run()
         self.assertEqual((d.sent, consistent(self, d)['delivery_counts']), ([], {'blocked': 1}))
 
-    def test_a_newer_hint_does_not_replace_the_certified_quote_or_keep_it_current(self):
+    def test_a_newer_hint_keeps_the_bet_current_and_the_certificate_on_its_own_signal(self):
         pick = entry('m1', minutes=-29, kickoff=None, odds=1.95, reasons=[reason(HA, 'forte', True)])
         newer = dict(entry('m1', minutes=-3, kickoff=None, odds=2.1, reasons=[reason(HB)]), type='STAKE_LOAD')
         other = entry('m1', 'Under 3.25', minutes=-2, kickoff=None)
         rep = report({HA: 'forte', HB: 'promissora'}, rows={HA: row('forte', confirmation=certificate()), HB: row()},
                      watch=[newer, pick, other], validation=active(HA))
         n, = notify.game_notices(rep, {}, NOW)
-        self.assertIn('🎯 Over 2,5 @ 1,95 · Asian Total · Jogo aberto · ALERTA', n.text)
-        self.assertNotIn('2,10', n.text)
+        self.assertEqual(n.text.splitlines()[2:5], [
+            '🎯 Over 2,5 @ 2,10 · Asian Total · Stake · INDÍCIO · sinal de 16/11 11:57 UTC',
+            '↳ Referência histórica · 16/11 11:31 UTC · Jogo aberto · odd 1,95',
+            notify.scientific_label(rep, HA)[0],
+        ])
+        self.assertEqual(n.claims, [HA])
+        self.assertTrue(notify.guard_claims(n.text, rep, n.claims, exact_lines=True))
         self.assertTrue(n.still_current(NOW))
-        self.assertFalse(n.still_current(NOW + timedelta(minutes=2)))
+        self.assertTrue(n.still_current(NOW + timedelta(minutes=2)))
+        self.assertFalse(n.still_current(NOW + timedelta(minutes=28)))
+
+    def test_quotes_with_different_expiry_times_remain_dated_observations(self):
+        older = dict(entry('m1', minutes=-60, kickoff=10, odds=2.21), phase='pre')
+        # 11:35 UTC, although its raw timestamp sorts before the 11:00 UTC observation.
+        recent = dict(entry('m1', kickoff=None, odds=1.87), date_utc='2026-11-16T10:35:00-01:00', phase='live')
+        n, = notify.game_notices(report(watch=[older, recent]), {}, NOW)
+        self.assertEqual(n.text.splitlines()[2], '🎯 Over 2,5 @ 1,87 · Asian Total · sinal de 16/11 11:35 UTC')
+        self.assertTrue(n.still_current(NOW + timedelta(minutes=6)))  # só o sinal pré-jogo continua vigente
+        self.assertFalse(n.still_current(NOW + timedelta(minutes=10)))
 
     def test_every_non_bet_message_carries_the_scientific_state(self):
         st = base_state()

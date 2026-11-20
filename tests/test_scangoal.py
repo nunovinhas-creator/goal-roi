@@ -824,7 +824,8 @@ class Notify(unittest.TestCase):
         # PR 5: the two bettable signals are the same game and selection (a reinforcement): ONE alert; the signal of 3 hours
         # ago, with the game already under way, does not generate an alert.
         self.assertEqual(len(alerts), 1)
-        self.assertEqual(alerts[0].splitlines(), ['🟢 ALERTA · Origem desconhecida', '⚽ A — B', '🎯 Over 2,5 @ 1,90',
+        self.assertEqual(alerts[0].splitlines(), ['🟢 ALERTA · Origem desconhecida', '⚽ A — B',
+                                                 '🎯 Over 2,5 @ 1,90 · sinal de 12/11 11:50 UTC',
                                                  notify.scientific_label(rep, 'Jogo aberto | Minuto = 31 a 60')[0]])
         self.assertFalse(any(m.startswith('Resumo') for m in out))                     # a certificação de h1 só no resumo das 22h
         day = lambda k: datetime.fromisoformat('2026-11-12T22:05:00+00:00') + timedelta(days=k)

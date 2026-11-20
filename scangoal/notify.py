@@ -646,11 +646,21 @@ def bet_source(w):
     return KIND.get(kind, 'Origem desconhecida')
 
 
-def match_link(match_id):
+def match_link(match_id, *, polymarket=False):
     mid = text_identity(match_id)
-    if mid and re.fullmatch(r'[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-vs-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-[0-9]{8}', mid):
-        return 'https://scangoal.com/match/%s?lang=en' % mid
-    return None
+    if not mid:
+        return None
+    if polymarket:
+        # O ID de origem do #55 pode ter outro formato. Só aceitar um segmento de URL literal.
+        if mid in ('.', '..') or not re.fullmatch(r'[A-Za-z0-9._~-]+', mid):
+            return None
+    elif not re.fullmatch(r'[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-vs-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-[0-9]{8}', mid):
+        return None
+    return 'https://scangoal.com/match/%s?lang=en' % mid
+
+
+def observed_at(w):
+    return freshness.parse(w['date_utc']).astimezone(UTC).strftime('%d/%m %H:%M UTC')
 
 
 def bet_line(w):
@@ -703,30 +713,35 @@ def game_notice(report, state, now, gk, g):
         entries = it['entries']
         by_date = lambda w: w.get('date_utc') or ''
         polymarket = max((w for w in entries if w.get('polymarket_over25')), key=by_date, default=None)
-        latest = max(entries, key=by_date)
-        # Uma seleção certificada mostra a cotação do sinal que tem o certificado dessa hipótese.
-        quote = max((w for w in entries if alert_reason(report, w)), key=by_date, default=polymarket or latest)
+        certified = max((w for w in entries if alert_reason(report, w)), key=by_date, default=None)
         if polymarket is None:
-            current_bets.append(entries if quote is latest else [quote])
+            current_bets.append(entries)
+            quote = max(entries, key=lambda w: freshness.parse(w['date_utc']))
         else:
-            if link is None:
-                return None                 # o link de origem faz parte do aviso fixo
+            link = match_link(polymarket.get('match_id'), polymarket=True)
+            quote = certified or polymarket
             current_bets.append([polymarket])
             if quote is not polymarket:
                 current_bets.append([quote])
 
         reasons = [r for w in entries for r in w['reasons']]
         hids.update(dict.fromkeys(r['id'] for r in reasons if isinstance(r, dict) and isinstance(r.get('id'), str)))
-        alert = alert_reason(report, quote)
         line = bet_line(quote)
         source = bet_source(quote)
         if len(sources) > 1 and source != quote.get('market'):
             line += ' · ' + source
-        if g['alert'] and len(items) > 1:
-            line += ' · ALERTA' if alert else ' · INDÍCIO'
+        if g['alert'] and (len(items) > 1 or (certified is not None and quote is not certified)):
+            line += ' · ALERTA' if quote is certified else ' · INDÍCIO'
+        # O texto fica fixo antes do push. Com reforços, a cotação descreve o sinal observado.
+        if polymarket is None and len(entries) > 1:
+            line += ' · sinal de ' + observed_at(quote)
         lines.append(line)
-        if alert:
-            hid = alert['id']
+        if certified is not None:
+            if certified is not quote:
+                price = 'odd ' + odd(certified['odds']) if certified.get('odds') else 'sem odd'
+                lines.append('↳ Referência histórica · %s · %s · %s' %
+                             (observed_at(certified), bet_source(certified), ' '.join(price.splitlines())))
+            hid = alert_reason(report, certified)['id']
             claims[hid] = None
             lines.append(scientific_label(report, hid)[0])
             reasons = [r for r in reasons if not isinstance(r, dict) or not certificate(report, r.get('id'))]
@@ -741,11 +756,15 @@ def game_notice(report, state, now, gk, g):
             lines.append(details + 'quota %s%% · valor $%s · início %s (Lisboa)' %
                          (share, total, lisbon(polymarket['kickoff_utc'])))
 
-    if link:
-        lines.append('🔗 ' + link)
     # O limite inclui emoji. Um aviso de aposta incompleto não chega ao outbox nem marca seleções como avisadas.
-    if len('\n'.join(lines).encode('utf-16-le')) > MAX_TEXT * 2:
+    body_size = len('\n'.join(lines).encode('utf-16-le'))
+    if body_size > MAX_TEXT * 2:
         return None
+    # Uma ligação opcional não pode fazer o aviso exceder o limite nem introduzir afirmações científicas.
+    if link and not positive_claims(link, report):
+        link_line = '🔗 ' + link
+        if body_size + len(('\n' + link_line).encode('utf-16-le')) <= MAX_TEXT * 2:
+            lines.append(link_line)
 
     # Os efeitos mantêm o agrupamento e o limite históricos, independentes das linhas agora apresentadas.
     grouped = groups_of(report, [h for h in hids if h in claims]) + groups_of(report, [h for h in hids if h not in claims])

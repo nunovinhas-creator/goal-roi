@@ -138,6 +138,8 @@ Um aviso comum com uma aposta e ligação ao jogo ocupa cinco linhas.
 
 Cada seleção tem uma linha com o mercado e a odd, seguida de um resumo das hipóteses que a sustentam. O resumo conta IDs distintos ou grupos reconhecidos pela regra de equivalência. Os critérios completos e as estatísticas estão no relatório e no dashboard. Uma seleção com certificado ativo e verificado leva o rótulo científico exato da sua hipótese logo abaixo da aposta. Os avisos são enviados em texto plano.
 
+Quando há reforços para a mesma aposta, a cotação é datada. Se o certificado corresponde a um sinal anterior, o rótulo exato acompanha a referência histórica a esse sinal. Um aviso pré-jogo Polymarket mantém a odd anunciada, a quota, o valor e o início em Lisboa. A ligação usa o identificador de origem quando este permite um caminho seguro e a ligação cabe na mensagem.
+
 Resumo diário (22:00 de Lisboa), um bloco por mudança de estado:
 ```
 Resumo das táticas — 16/11
