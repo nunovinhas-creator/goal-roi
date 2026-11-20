@@ -1,163 +1,125 @@
 <!doctype html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Goal ROI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#eef1ee;--card:#ffffff;--ink:#14201b;--mut:#586860;--line:#d6ddd8;--track:#e3e8e4;
-  --mark:#2643a8;--band:#c9d2f1;--good:#1b7f4b;--good-bg:#dff1e6;--bad:#b8382c;--bad-bg:#f7e1de;--wait:#6a5a12;--wait-bg:#f1ebcf;--none-bg:#e6ebe7;
-}
-@media(prefers-color-scheme:dark){:root{
-  --bg:#0f1512;--card:#171e1a;--ink:#e8ede9;--mut:#9aa8a0;--line:#2a332e;--track:#252e29;
-  --mark:#95a8f5;--band:#313f7a;--good:#5ccb8f;--good-bg:#173527;--bad:#f08a7e;--bad-bg:#40201c;--wait:#e2cf7a;--wait-bg:#38321a;--none-bg:#222a26;
-}}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
-main{max-width:1020px;margin:0 auto;padding:28px 16px 64px}
-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
-h1{font:800 34px/1 Archivo,sans-serif;font-stretch:112%;letter-spacing:-.02em;margin:0}
-h2{font:700 21px/1.2 Archivo,sans-serif;font-stretch:106%;margin:44px 0 4px}
-.lede{color:var(--mut);margin:4px 0 0;max-width:68ch}
-.fresh{font-size:14px;color:var(--mut);display:flex;align-items:center;gap:8px}
-.fresh i{width:9px;height:9px;border-radius:50%;background:var(--good);display:inline-block}
-.fresh.stale i{background:var(--bad)}.fresh.stale{color:var(--bad)}
-.answer{margin:24px 0 0;padding:20px 22px;background:var(--ink);color:var(--bg);border-radius:14px}
-.answer p{margin:0;font:600 21px/1.35 Archivo,sans-serif;max-width:60ch}
-section.agenda{margin-top:18px;padding:20px 22px;background:var(--card);border:2px solid var(--ink);border-radius:14px}
-section.agenda h2{margin:0 0 4px}.agtop{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px}
-.agcounts{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
-.ag{display:grid;grid-template-columns:92px 1fr auto;gap:2px 16px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
-.ag:first-of-type{border-top:0}.ag .t{font-weight:700;font-size:15px;line-height:1.3}.ag .t small{display:block;font-weight:400;color:var(--mut);font-size:13px}
-.ag .m b{font-weight:700}.ag .m .lg{color:var(--mut);font-size:13.5px}.ag .why{margin:5px 0 0;font-size:14.5px;color:var(--mut)}.ag .why b{color:var(--ink);font-weight:650}
-.ag .warn{margin:4px 0 0;font-size:13.5px;color:var(--wait)}.ag.dim{opacity:.72}
-.chip.ok{background:var(--good);color:var(--card)}
-@media(max-width:640px){.ag{grid-template-columns:1fr auto;gap:4px 12px}.ag .t{display:flex;gap:8px;align-items:baseline}.ag .t small{display:inline}.ag .m{grid-column:1/-1;grid-row:2}}
-section.board{margin-top:18px;padding:20px 22px;background:var(--card);border:2px solid var(--mark);border-radius:14px}
-section.board h2{margin:0 0 4px}section.board h3{margin:14px 0 6px;font:700 16.5px/1.25 Archivo,sans-serif}section.board h3.gap{margin-top:20px}
-.boardgrid{display:grid;grid-template-columns:3fr 2fr;gap:6px 32px}@media(max-width:860px){.boardgrid{grid-template-columns:1fr}}
-section.board ol,section.board ul{margin:0;padding-left:22px}section.board li{margin:0 0 12px}section.board li b{font-weight:700}
-section.board .why{display:block;color:var(--mut);font-size:14.5px}section.board .chip{margin-left:6px;vertical-align:1px}
-#boardopen p{margin:0 0 10px}
-.answer small{display:block;margin-top:8px;font-size:14.5px;font-weight:400;opacity:.8;max-width:75ch}
-.facts{display:flex;flex-wrap:wrap;gap:6px 28px;margin:16px 2px 0;color:var(--mut);font-size:15px}
-.facts b{color:var(--ink);font-weight:700}
-h3.sub{margin:22px 2px 4px;font:700 16.5px/1.25 Archivo,sans-serif}
-#braincounts{margin:0 2px 12px}#watch p,#notes p{margin:6px 0}
-.says{margin:12px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
-.says li{padding:13px 20px;border-top:1px solid var(--line);max-width:none}.says li:first-child{border-top:0}
-.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
-.duo .panel{margin-top:0}.duo h3{margin:0 0 6px;font:700 16.5px/1.25 Archivo,sans-serif}
-.big{font:800 30px/1.1 Archivo,sans-serif;font-stretch:108%}.duo p{margin:6px 0 0;color:var(--mut);font-size:14.5px}
-
-.sig{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
-.row{display:grid;grid-template-columns:minmax(210px,1.1fr) minmax(260px,2fr) auto;gap:6px 22px;align-items:center;padding:16px 20px;border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.row h3{margin:0;font:700 16.5px/1.25 Archivo,sans-serif}
-.row .cnt{color:var(--mut);font-size:14px;margin-top:2px}
-.plot{position:relative;height:44px}
-.plot svg{display:block;width:100%;height:44px;overflow:visible}
-.plot .cap{position:absolute;left:0;right:0;bottom:-2px;display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);pointer-events:none}
-.read{font-size:14px;color:var(--mut);margin-top:6px}
-.read b{color:var(--ink)}
-.eta{font-size:13px;margin-top:2px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-size:13.5px;font-weight:650;white-space:nowrap}
-.chip.good{background:var(--good-bg);color:var(--good)}.chip.bad{background:var(--bad-bg);color:var(--bad)}
-.chip.wait{background:var(--wait-bg);color:var(--wait)}.chip.none{background:var(--none-bg);color:var(--mut)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13.5px;color:var(--mut);margin:10px 2px 0}
-.legend span{display:inline-flex;align-items:center;gap:7px}
-.k-dot{width:11px;height:11px;border-radius:50%;background:var(--mark)}.k-band{width:26px;height:9px;border-radius:5px;background:var(--band)}.k-tick{width:3px;height:16px;background:var(--ink);border-radius:2px}
-
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;padding:18px 20px}
-#chart{position:relative}
-#chart svg{display:block;width:100%;height:auto}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:8px;font-size:13px;line-height:1.35;white-space:nowrap;transform:translate(-50%,-115%);display:none;z-index:2}
-.wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%}
-th,td{padding:9px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-tr:last-child td{border-bottom:0}
-th{font-weight:600;color:var(--mut);font-size:13px}
-th:first-child,td:first-child{text-align:left;padding-left:0}th:last-child,td:last-child{padding-right:0}
-td.l{text-align:left}td.name{white-space:normal;min-width:160px}
-.pos{color:var(--good)}.neg{color:var(--bad)}.mut{color:var(--mut)}
-.prog{display:inline-block;width:64px;height:6px;border-radius:3px;background:var(--track);vertical-align:middle;margin-left:8px;overflow:hidden}
-.prog i{display:block;height:100%;background:var(--mark)}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
-.filters button{font:600 14px Archivo,sans-serif;padding:6px 13px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
-.more{font:600 14px Archivo,sans-serif;margin-top:12px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
-.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.filters button:focus-visible,summary:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
-.bet{display:grid;grid-template-columns:86px 1fr auto;gap:2px 14px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
-.bet:first-child{border-top:0}
-button.sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
-th[aria-sort=descending] button.sort::after{content:' ▼'}th[aria-sort=ascending] button.sort::after{content:' ▲'}
-.sim{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;margin-bottom:14px}.sim label{display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--mut)}
-.sim input[type=number],.sim select{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:130px}.sim select{width:210px}
-.simtypes{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 12px;font-size:14px}.simtypes label{display:flex;gap:6px;align-items:center}
-.simout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 24px;margin:0 0 10px}.simout div{border-top:1px solid var(--line);padding-top:8px}.simout dt{color:var(--mut);font-size:14px}.simout dd{margin:0;font-weight:700;font-size:19px}
-.bet{cursor:pointer}.bet:hover .what b{text-decoration:underline}.bet:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
-.story{padding:4px 0 14px 100px;font-size:14px}.story p{margin:3px 0}.story .when{color:var(--mut);font-variant-numeric:tabular-nums}
-@media(max-width:640px){.story{padding-left:0}}
-.bet .when{color:var(--mut);font-size:13.5px}.bet .what b{font-weight:650}.bet .what div{color:var(--mut);font-size:14px}
-details{margin-top:12px}summary{cursor:pointer;font-weight:650;padding:4px 0}
-.note{color:var(--mut);font-size:14.5px;margin:6px 0 0;max-width:75ch}
-.qc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 24px;margin:0}
-.qc div{border-top:1px solid var(--line);padding-top:8px}.qc dt{color:var(--mut);font-size:14px}.qc dd{margin:0;font-weight:700;font-size:19px}
-a{color:var(--mark)}
-footer{margin-top:40px;color:var(--mut);font-size:13.5px}
-@media(max-width:760px){
-  h1{font-size:28px}.answer p{font-size:18.5px}
-  .row{grid-template-columns:1fr auto;padding:14px 16px}.row .plotcell{grid-column:1/-1;grid-row:2}
-  .bet{grid-template-columns:1fr auto}.bet .when{grid-column:1/-1}
-}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101a32">
+<meta name="description" content="Monitorização de sinais de futebol, resultados históricos e investigação prospetiva.">
+<title>Goal-ROI · Análise de sinais de futebol</title>
+<link rel="stylesheet" href="dashboard.css">
+<script defer src="dashboard.js"></script>
 </head>
-<body><main>
-<header>
-  <h1>Goal ROI</h1>
-  <span class="fresh" id="fresh"><i></i><span>A carregar…</span></span>
-</header>
-<p class="lede">Os sinais de apostas dão lucro? Esta página segue cada sinal até ao resultado final e faz as contas com regras fixas.</p>
-
-<section class="answer" aria-live="polite"><p id="answer">A carregar os dados…</p><small id="answer2"></small></section>
-<div class="facts" id="facts"></div>
-
-<section class="agenda" id="agenda" aria-labelledby="agendah">
-  <div class="agtop"><h2 id="agendah">Jogos por começar: o que o cérebro diz</h2><span class="note" id="agendafresh"></span></div>
-  <p class="note" id="agendanote"></p>
-  <div class="agcounts" id="agendacounts"></div>
-  <div id="agendalist"></div>
-</section>
-
-<section class="board" aria-labelledby="boardh">
-  <h2 id="boardh">O que parece funcionar agora</h2>
-  <p class="note" id="boardnote"></p>
-  <div class="boardgrid">
-    <div><h3>Melhores táticas até agora</h3><ol id="best"></ol></div>
-    <div><h3>Em aberto neste momento</h3><div id="boardopen"></div><h3 class="gap">A evitar</h3><ul id="avoid"></ul></div>
+<body>
+<a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
+<div class="shell">
+  <div class="rail">
+    <a class="brand" href="#overview">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M6 17l5-5 4 3 7-8m-5 0h5v5M6 22h16"/></svg></span>
+      <span>Goal<span class="brand-accent">-ROI</span></span>
+    </a>
+    <nav aria-label="Navegação principal">
+    <a href="#overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Visão geral</span></a>
+    <a href="#sinais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h5l3-7 4 14 3-7h5"/></svg><span>Sinais</span></a>
+    <a href="#resultados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 15l4-4 4 2 5-6"/></svg><span>Resultados</span></a>
+    <a href="#laboratorio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6m-5 0v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10"/></svg><span>Laboratório</span></a>
+    <a href="#metodologia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16M3 4h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v15h-5a5 5 0 0 0-4 2 5 5 0 0 0-4-2H3z"/></svg><span>Metodologia</span></a>
+    </nav>
   </div>
-  <p class="note" id="boardllm"></p>
+  <div class="workspace">
+    <header class="topbar">
+      <span class="current-view" id="current-view">Visão geral</span>
+      <div class="top-actions">
+        <span class="fresh" id="fresh" role="status"><i aria-hidden="true"></i><span>A carregar…</span></span>
+        <button type="button" class="theme" id="theme" aria-label="Modo escuro" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 14.3A9 9 0 0 1 9.7 3.2a9 9 0 1 0 11.1 11.1z"/></svg>
+        </button>
+      </div>
+    </header>
+    <main id="conteudo" tabindex="-1" aria-busy="true">
+      <div class="load-state" id="load-state" role="status" hidden>
+        <span id="load-message"></span>
+        <button type="button" class="more" id="retry">Tentar novamente</button>
+      </div>
+<section id="overview" class="view" aria-labelledby="overview-title">
+  <div class="hero">
+    <div class="hero-copy">
+      <h1 id="overview-title" tabindex="-1">GOAL<span>-ROI</span></h1>
+      <p>Analisamos sinais de futebol, acompanhamos os resultados e medimos se existe vantagem real.</p>
+    </div>
+    <div class="pitch" aria-hidden="true"><i></i><b></b></div>
+  </div>
+  <dl class="metrics" aria-label="Indicadores do relatório">
+    <div class="metric"><dt>Apostas acompanhadas</dt><dd id="metric-tracked">—</dd></div>
+    <div class="metric"><dt>Apostas com resultado</dt><dd id="metric-settled">—</dd></div>
+    <div class="metric"><dt>ROI histórico</dt><dd id="metric-roi">—</dd><dd class="metric-note" id="metric-roi-note">À odd anunciada</dd></div>
+    <div class="metric"><dt>Validação científica</dt><dd id="metric-science" class="metric-state">—</dd><dd class="metric-note" id="metric-science-note">Certificação das táticas</dd></div>
+  </dl>
+  <div class="finding">
+    <span class="finding-mark" aria-hidden="true">i</span>
+    <p id="overview-conclusion">A carregar o relatório…</p>
+    <a href="#metodologia">Como avaliamos <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="overview-links">
+    <a class="jump-card" href="#sinais"><span><strong>Sinais agora</strong><span id="overview-signals">A carregar…</span></span><svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></a>
+    <a class="jump-card" href="#resultados"><span><strong>Explorar resultados</strong><span>Saldo e simulador</span></span><svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></a>
+  </div>
 </section>
-
-<h2>Leitura exploratória dos dados</h2>
-<p class="note">Inclui sinais inelegíveis. Estas observações não alimentam o veredito principal nem os avisos de comportamento.</p>
-<ul class="says" id="says"></ul>
-
-<h2>Acerto por tipo — estatísticas exploratórias</h2>
-<p class="note">Inclui sinais inelegíveis e sinais sem odd. Não constitui conclusão operacional.</p>
-<p class="note">Para dar lucro, um sinal tem de acertar mais vezes do que a odd exige. O ponto mostra a taxa de acerto medida; a faixa mostra onde o valor real pode estar; o traço vertical é o mínimo necessário.</p>
-<div class="legend"><span><i class="k-dot"></i>taxa de acerto medida</span><span><i class="k-band"></i>margem de incerteza (95 %)</span><span><i class="k-tick"></i>mínimo para não perder dinheiro</span></div>
-<div class="sig" id="signals"></div>
-
-<h2>Saldo acumulado</h2>
-<p class="note">Uma unidade em cada aposta, à odd do primeiro sinal de cada jogo. Só entram apostas cujo sinal foi lido na versão original, antes de haver resultado.</p>
-<div class="panel"><div id="chart"><div class="tip" id="tip"></div></div></div>
-
-<h2>Simulador de banca</h2>
-<p class="note">Aplica uma regra de aposta às apostas já liquidadas, pela ordem em que apareceram. Mostra o que teria acontecido; não prevê o que vai acontecer.</p>
+<section id="sinais" class="view" aria-labelledby="agendah" hidden>
+  <div class="view-head">
+    <h1 id="agendah" tabindex="-1">Sinais agora</h1>
+    <p>Agenda de sinais em acompanhamento. Horas de Lisboa.</p>
+  </div>
+  <div class="filterbar" aria-label="Filtros da agenda">
+    <fieldset class="phase-picker"><legend class="sr-only">Momento do jogo</legend>
+      <label><input type="radio" name="signal-phase" value="" checked><span>Todos</span></label>
+      <label><input type="radio" name="signal-phase" value="por começar"><span>Pré-jogo</span></label>
+      <label><input type="radio" name="signal-phase" value="a decorrer"><span>Ao vivo</span></label>
+    </fieldset>
+    <label>Origem <select id="signal-source"><option value="">Todas</option></select></label>
+    <label>Estado <select id="signal-status"><option value="">Todos</option></select></label>
+  </div>
+  <div class="agenda-meta"><p id="signal-count" role="status"></p><p id="agendafresh" class="note"></p></div>
+  <div id="agendalist" class="signal-list"></div>
+  <div id="agendacounts" class="facts"></div>
+  <details class="disclosure"><summary>Como ler a agenda</summary>
+    <div class="disclosure-body"><p class="note" id="agendanote">A agenda mostra sinais disponíveis no relatório.</p><p class="note">Favorável e misto descrevem indícios. Sinais contraditórios apontam para seleções diferentes no mesmo jogo e mercado.</p></div>
+  </details>
+</section>
+<section id="resultados" class="view" aria-labelledby="results-title" hidden>
+  <div class="view-head">
+    <h1 id="results-title" tabindex="-1">Resultados</h1>
+    <p>Histórico à odd anunciada, com uma unidade por aposta.</p>
+  </div>
+  <div class="result-feature">
+    <figure class="surface balance">
+      <figcaption><h2>Como evoluiu o saldo?</h2><div class="chart-total" id="balance-total">—</div><p class="note" id="balance-note"></p></figcaption>
+      <div id="chart"><div class="tip" id="tip" aria-hidden="true"></div></div>
+      <div class="chart-controls" id="chart-controls" hidden>
+        <label for="chart-position">Consultar aposta no gráfico</label><input id="chart-position" type="range" min="1" value="1" step="1" aria-describedby="chart-point">
+        <output id="chart-point" for="chart-position"></output>
+      </div>
+    </figure>
+    <figure class="surface">
+      <figcaption><h2>Como se repartem os resultados?</h2><p class="note">Apostas acompanhadas no histórico.</p></figcaption>
+      <div id="results-outcomes"></div>
+    </figure>
+  </div>
+  <div class="result-grid">
+    <figure class="surface">
+      <figcaption><h2>Como varia o ROI por origem?</h2><p class="note">Grupos do relatório, à odd anunciada. N indica apostas liquidadas.</p></figcaption>
+      <div id="results-groups"></div>
+    </figure>
+    <figure class="surface">
+      <figcaption><h2>Quanto pesa uma odd mais baixa?</h2><p class="note">A mesma amostra com três preços. As reduções são cenários históricos.</p></figcaption>
+      <div id="results-odds"></div>
+    </figure>
+  </div>
+  <div class="section-label"><h2>Risco e incerteza</h2></div>
+  <div class="duo" id="risk"></div>
+<details class="disclosure" id="simulador">
+  <summary>Simulador de banca</summary>
+  <div class="disclosure-body">
+<p class="note">Simulação histórica, sem valor preditivo. Usa até 600 apostas liquidadas do relatório, por ordem do sinal.</p>
 <div class="panel">
   <div class="sim">
     <label>Banca inicial (€)<input type="number" id="simbank" value="1000" min="10" step="10"></label>
@@ -165,468 +127,200 @@ footer{margin-top:40px;color:var(--mut);font-size:13.5px}
     <label><span id="simvallabel">Valor por aposta (€)</span><input type="number" id="simval" value="10" min="0.1" step="0.1"></label>
     <label>Odd conseguida<select id="simcut"><option value="0">A anunciada</option><option value="0.02">2 % abaixo</option><option value="0.05">5 % abaixo</option></select></label>
   </div>
-  <div class="simtypes" id="simtypes" role="group" aria-label="Tipos de sinal a incluir"></div>
+  <fieldset class="sim-group"><legend>Tipos de sinal a incluir</legend><div class="simtypes" id="simtypes" role="group" aria-label="Tipos de sinal a incluir"></div></fieldset>
   <dl class="simout" id="simout"></dl>
   <div id="simchart"></div>
 </div>
+  </div>
+</details>
+<details class="disclosure" id="dados-resultados">
+  <summary>Ver dados completos</summary>
+  <div class="disclosure-body">
 
-<h2>Lucro por grupo</h2>
-<p class="note">Um grupo só conta como conclusivo com <span id="minset">300</span> apostas liquidadas. As colunas “odd −2 %” e “odd −5 %” mostram o que sobra se não conseguires a odd anunciada.</p>
-<div class="panel wrap"><table><thead><tr><th>Grupo</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>Saldo</th><th>ROI</th><th>Entre</th><th>Odd −2 %</th><th>Odd −5 %</th></tr></thead><tbody id="groups"></tbody></table></div>
-
-<h2>Movimento da odd — exploratório</h2>
-<p class="note">Quando o bot reforça um sinal Betfair, traz a odd mais recente. Se a odd desce depois do primeiro sinal, o mercado concordou com ele. É um indicador mais rápido do que esperar pelos resultados.</p>
-<div class="duo" id="move"></div>
-
-<h2>Acerto por faixa de odd — exploratório</h2>
-<p class="note">Todos os sinais com odd, agrupados por faixa. O traço é a taxa que a própria odd exige; o ponto é o que aconteceu.</p>
-<div class="sig" id="calib"></div>
-
-<h2>Cérebro: hipóteses em teste</h2>
-<p class="note" id="brainnote"></p>
-<p class="note">Clica no título de uma coluna para ordenar; clica outra vez para inverter.</p>
-<div class="facts" id="braincounts"></div>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese</th><th>Jogos</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>Vantagem em pontos (intervalo de 90 %)</th><th>ROI</th><th>Estado</th></tr></thead><tbody id="hyps"></tbody></table><button type="button" class="more" id="hypsmore" hidden></button></div>
-<h3 class="sub">Seguir o cérebro teria compensado?</h3>
-<p class="note" id="wfnote"></p>
-<div class="panel wrap"><table><thead><tr><th style="text-align:left">Sinais com odd</th><th>Apostas</th><th>Com resultado</th><th>Ganhas</th><th>Saldo</th><th>ROI</th><th>ROI com odd −2 %</th></tr></thead><tbody id="wf"></tbody></table></div>
-<h3 class="sub">Notas do investigador</h3>
-<p class="note">Observações escritas pelo modelo de linguagem sobre uma hipótese concreta. O texto é opinião do modelo; os números ao lado vêm dos dados.</p>
-<div class="panel" id="notes"></div>
-<h3 class="sub">Hipóteses propostas pelo modelo de linguagem</h3>
-<p class="note" id="llmnote"></p>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th style="text-align:left">Hipótese e motivo</th><th>Proposta em</th><th>Resultados desde então</th><th>Acerto</th><th>Estado</th></tr></thead><tbody id="llm"></tbody></table></div>
-<h3 class="sub">Entrar ao primeiro sinal ou esperar pelo reforço?</h3>
-<p class="note">Sinais Betfair. Cada linha simula entrar só quando o sinal chega a esse reforço, à odd desse momento.</p>
-<div class="panel wrap"><table><thead><tr><th>Momento</th><th style="text-align:left">Entrada</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="entry"></tbody></table></div>
-<h3 class="sub">A seguir agora</h3>
-<p class="note">Sinais ainda apostáveis (ao vivo: até 30 minutos depois do sinal; antes do jogo: até ao início) que encaixam numa hipótese promissora, forte ou confirmada. São indícios para observar, não recomendações.</p>
-<div class="panel" id="watch"></div>
-
-<h2>Confiança indicada pelo bot — exploratório</h2>
-<p class="note">Nos sinais de jogo aberto o bot indica uma percentagem “Over”. Aqui compara-se essa percentagem com o que aconteceu. <span id="nextgoal"></span></p>
-<div class="panel wrap"><table><thead><tr><th>Confiança indicada</th><th>Resultados</th><th>Média indicada</th><th>Acerto real</th><th>A odd exige</th></tr></thead><tbody id="conf"></tbody></table></div>
-
-<h2>Mudanças de comportamento — exploratório</h2>
-<p class="note">Compara os últimos 40 resultados de cada tipo com os anteriores. Inclui sinais inelegíveis; esta tabela não gera alertas operacionais.</p>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Resultados</th><th>Acerto antes</th><th>Acerto recente</th><th>ROI antes</th><th>ROI recente</th><th>Estado</th></tr></thead><tbody id="regime"></tbody></table></div>
-
-<h2>Segmentos — exploração histórica</h2>
-<p class="note" id="segnote"></p>
-<div class="panel wrap"><table><thead><tr><th>Sinal</th><th>Corte</th><th>Resultados</th><th>Acerto</th><th>Precisa</th><th>Prob. acima do mínimo</th><th>ROI</th></tr></thead><tbody id="segs"></tbody></table></div>
-
-<h2>Sorte e risco</h2>
-<div class="duo" id="risk"></div>
-
-<h2>Dia a dia</h2>
-<div class="panel wrap"><table><thead><tr><th>Dia</th><th>Apostas</th><th>Com resultado</th><th>Ganhas</th><th>Saldo do dia</th></tr></thead><tbody id="daily"></tbody></table></div>
-
-<h2>Últimas apostas</h2>
+<h3>Resultados por grupo</h3>
+<p class="note">O limiar histórico por grupo é de <span id="minset">300</span> apostas liquidadas. As colunas “odd −2 %” e “odd −5 %” mostram o que sobra com odds inferiores à anunciada.</p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-groups"><table><caption class="sr-only" id="table-groups">Resultados por grupo</caption><thead><tr><th scope="col">Grupo</th><th scope="col">Liquidadas</th><th scope="col">Ganhas</th><th scope="col">Odd média</th><th scope="col">Saldo</th><th scope="col">ROI</th><th scope="col">Entre</th><th scope="col">Odd −2 %</th><th scope="col">Odd −5 %</th></tr></thead><tbody id="groups"></tbody></table></div>
+<h3>Dia a dia</h3>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-daily"><table><caption class="sr-only" id="table-daily">Resultados por dia</caption><thead><tr><th scope="col">Dia</th><th scope="col">Apostas</th><th scope="col">Com resultado</th><th scope="col">Ganhas</th><th scope="col">Saldo do dia</th></tr></thead><tbody id="daily"></tbody></table></div>
+<h3>Últimas apostas</h3>
 <p class="note">Clica numa aposta para ver todos os sinais desse jogo por ordem, com os golos.</p>
 <div class="panel">
   <div class="filters" id="filters" role="group" aria-label="Filtrar apostas"></div>
   <div id="recent"></div>
 </div>
+  </div>
+</details>
+</section>
+<section id="laboratorio" class="view" aria-labelledby="lab-title" hidden>
+  <div class="view-head">
+    <h1 id="lab-title" tabindex="-1">Laboratório</h1>
+    <p>Hipóteses em teste, evolução da evidência e propostas do modelo de linguagem.</p>
+  </div>
+  <div class="lab-summary surface">
+    <h2>Estado das hipóteses</h2>
+    <div id="braincounts" class="lab-counts"></div>
+    <p class="note" id="lab-overlap"></p>
+  </div>
+  <div class="lab-overview">
+    <div class="surface"><h2>Avaliação ao longo do tempo</h2><div id="lab-study"></div><a href="#estudo-chronologico">Ver estudo <span aria-hidden="true">→</span></a></div>
+    <div class="surface"><h2>Propostas do modelo de linguagem</h2><div id="lab-llm"></div><a href="#prospetivo">Ver acompanhamento <span aria-hidden="true">→</span></a></div>
+  </div>
+<details class="disclosure" id="taticas">
+  <summary>Ranking de táticas</summary>
+  <div class="disclosure-body">
+<div class="board">
 
-<details class="panel"><summary>Perguntas em teste (exploratório)</summary>
+  <p class="note" id="boardnote"></p>
+  <div class="boardgrid">
+    <div><h3>Melhores táticas até agora</h3><ol id="best"></ol></div>
+    <div><h3>Em aberto neste momento</h3><div id="boardopen"></div><h3 class="gap">A evitar</h3><ul id="avoid"></ul></div>
+  </div>
+  <p class="note" id="boardllm"></p>
+</div>
+  </div>
+</details>
+<details class="disclosure" id="hipoteses">
+  <summary>Hipóteses em teste</summary>
+  <div class="disclosure-body">
+<p class="note" id="brainnote"></p>
+<p class="note">Clica no título de uma coluna para ordenar; clica outra vez para inverter.</p>
+
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-hyps"><table><caption class="sr-only" id="table-hyps">Hipóteses em teste</caption><thead><tr><th scope="col">Sinal</th><th scope="col" style="text-align:left">Hipótese</th><th scope="col">Jogos</th><th scope="col">Acerto</th><th scope="col">Precisa</th><th scope="col">Prob. acima do mínimo</th><th scope="col">Vantagem em pontos (intervalo de 90 %)</th><th scope="col">ROI</th><th scope="col">Estado</th></tr></thead><tbody id="hyps"></tbody></table><button type="button" class="more" id="hypsmore" hidden></button></div>
+  </div>
+</details>
+<details class="disclosure" id="estudo-chronologico">
+  <summary>Estudo cronológico (walk-forward)</summary>
+  <div class="disclosure-body">
+<p class="note" id="wfnote"></p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-wf"><table><caption class="sr-only" id="table-wf">Estudo cronológico</caption><thead><tr><th scope="col" style="text-align:left">Sinais com odd</th><th scope="col">Apostas</th><th scope="col">Com resultado</th><th scope="col">Ganhas</th><th scope="col">Saldo</th><th scope="col">ROI</th><th scope="col">ROI com odd −2 %</th></tr></thead><tbody id="wf"></tbody></table></div>
+  </div>
+</details>
+<details class="disclosure" id="propostas">
+  <summary>Propostas da LLM</summary>
+  <div class="disclosure-body">
+<p class="note" id="llmnote"></p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-llm"><table><caption class="sr-only" id="table-llm">Propostas da LLM</caption><thead><tr><th scope="col">Sinal</th><th scope="col" style="text-align:left">Hipótese e motivo</th><th scope="col">Proposta em</th><th scope="col">Resultados desde então</th><th scope="col">Acerto</th><th scope="col">Estado</th></tr></thead><tbody id="llm"></tbody></table></div>
+  </div>
+</details>
+<details class="disclosure" id="prospetivo">
+  <summary>Acompanhamento prospetivo da LLM</summary>
+  <div class="disclosure-body">
+    <p class="note" id="prospective-note"></p>
+    <div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-prospective">
+      <table>
+        <caption id="table-prospective" class="sr-only">Acompanhamento prospetivo das propostas da LLM</caption>
+        <thead><tr><th scope="col">Hipótese</th><th scope="col">Jogos independentes</th><th scope="col">Resultados confirmados</th><th scope="col">Perdas imputadas</th><th scope="col">Pendentes</th><th scope="col">ROI à odd anunciada</th><th scope="col">ROI com odd −2%</th></tr></thead>
+        <tbody id="prospective"></tbody>
+      </table>
+    </div>
+  </div>
+</details>
+<details class="disclosure" id="notas">
+  <summary>Notas do investigador</summary>
+  <div class="disclosure-body">
+<p class="note">Observações escritas pelo modelo de linguagem sobre uma hipótese concreta. O texto é opinião do modelo; os números ao lado vêm dos dados.</p>
+<div class="panel" id="notes"></div>
+  </div>
+</details>
+<details class="disclosure" id="entradas">
+  <summary>Entradas Betfair e reforços</summary>
+  <div class="disclosure-body">
+<p class="note">Sinais Betfair. Cada linha simula entrar só quando o sinal chega a esse reforço, à odd desse momento.</p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-entry"><table><caption class="sr-only" id="table-entry">Entradas e reforços</caption><thead><tr><th scope="col">Momento</th><th scope="col" style="text-align:left">Entrada</th><th scope="col">Resultados</th><th scope="col">Acerto</th><th scope="col">Precisa</th><th scope="col">Prob. acima do mínimo</th><th scope="col">ROI</th></tr></thead><tbody id="entry"></tbody></table></div>
+  </div>
+</details>
+<details class="disclosure" id="sinais-hipoteses">
+  <summary>Sinais que encaixam nas hipóteses</summary>
+  <div class="disclosure-body">
+<p class="note">Sinais ainda apostáveis (ao vivo: até 30 minutos depois do sinal; antes do jogo: até ao início) que encaixam numa hipótese promissora, forte ou confirmada. São indícios para observar, não recomendações.</p>
+<div class="panel" id="watch"></div>
+  </div>
+</details>
+<details class="disclosure" id="exploracao">
+  <summary>Leitura exploratória dos dados</summary>
+  <div class="disclosure-body">
+<p class="note">Inclui sinais inelegíveis. Estas observações não alimentam o veredito principal nem os avisos de comportamento.</p>
+<ul class="says" id="says"></ul>
+
+<h3>Acerto por tipo — estatísticas exploratórias</h3>
+<p class="note">Inclui sinais inelegíveis e sinais sem odd. Não constitui conclusão operacional.</p>
+<p class="note">Para dar lucro, um sinal tem de acertar mais vezes do que a odd exige. O ponto mostra a taxa de acerto medida; a faixa mostra onde o valor real pode estar; o traço vertical é o mínimo necessário.</p>
+<div class="legend"><span><i class="k-dot"></i>taxa de acerto medida</span><span><i class="k-band"></i>margem de incerteza (95 %)</span><span><i class="k-tick"></i>mínimo para não perder dinheiro</span></div>
+<div class="sig" id="signals"></div>
+  </div>
+</details>
+<details class="disclosure" id="faixas-odd">
+  <summary>Movimento e faixas de odd</summary>
+  <div class="disclosure-body">
+<h3>Movimento da odd — exploratório</h3>
+<p class="note">Quando o bot reforça um sinal Betfair, traz a odd mais recente. Se a odd desce depois do primeiro sinal, o mercado concordou com ele. É um indicador mais rápido do que esperar pelos resultados.</p>
+<div class="duo" id="move"></div>
+
+<h3>Acerto por faixa de odd — exploratório</h3>
+<p class="note">Todos os sinais com odd, agrupados por faixa. O traço é a taxa que a própria odd exige; o ponto é o que aconteceu.</p>
+<div class="sig" id="calib"></div>
+  </div>
+</details>
+<details class="disclosure" id="comportamento">
+  <summary>Confiança do bot e mudanças de comportamento</summary>
+  <div class="disclosure-body">
+<h3>Confiança indicada pelo bot — exploratório</h3>
+<p class="note">Nos sinais de jogo aberto o bot indica uma percentagem “Over”. Aqui compara-se essa percentagem com o que aconteceu. <span id="nextgoal"></span></p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-conf"><table><caption class="sr-only" id="table-conf">Confiança do bot</caption><thead><tr><th scope="col">Confiança indicada</th><th scope="col">Resultados</th><th scope="col">Média indicada</th><th scope="col">Acerto real</th><th scope="col">A odd exige</th></tr></thead><tbody id="conf"></tbody></table></div>
+
+<h3>Mudanças de comportamento — exploratório</h3>
+<p class="note">Compara os últimos 40 resultados de cada tipo com os anteriores. Inclui sinais inelegíveis; esta tabela não gera alertas operacionais.</p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-regime"><table><caption class="sr-only" id="table-regime">Mudanças de comportamento</caption><thead><tr><th scope="col">Sinal</th><th scope="col">Resultados</th><th scope="col">Acerto antes</th><th scope="col">Acerto recente</th><th scope="col">ROI antes</th><th scope="col">ROI recente</th><th scope="col">Estado</th></tr></thead><tbody id="regime"></tbody></table></div>
+  </div>
+</details>
+<details class="disclosure" id="segmentos">
+  <summary>Segmentos e perguntas em teste</summary>
+  <div class="disclosure-body">
+<p class="note" id="segnote"></p>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-segs"><table><caption class="sr-only" id="table-segs">Segmentos</caption><thead><tr><th scope="col">Sinal</th><th scope="col">Corte</th><th scope="col">Resultados</th><th scope="col">Acerto</th><th scope="col">Precisa</th><th scope="col">Prob. acima do mínimo</th><th scope="col">ROI</th></tr></thead><tbody id="segs"></tbody></table></div><h3>Perguntas em teste (exploratório)</h3>
 <p class="note">Cortes escritos antes de haver dados. Servem para escolher o que testar a seguir; não contam como conclusão.</p>
-<div class="wrap"><table><thead><tr><th>Pergunta</th><th>Liquidadas</th><th>Ganhas</th><th>Odd média</th><th>ROI</th><th>Entre</th></tr></thead><tbody id="questions"></tbody></table></div></details>
-
-<h2>Jogos por liquidar</h2>
+<div class="wrap" tabindex="0" role="region" aria-labelledby="table-questions"><table><caption class="sr-only" id="table-questions">Perguntas em teste</caption><thead><tr><th scope="col">Pergunta</th><th scope="col">Liquidadas</th><th scope="col">Ganhas</th><th scope="col">Odd média</th><th scope="col">ROI</th><th scope="col">Entre</th></tr></thead><tbody id="questions"></tbody></table></div>
+  </div>
+</details>
+</section>
+<section id="metodologia" class="view" aria-labelledby="method-title" hidden>
+  <div class="view-head">
+    <h1 id="method-title" tabindex="-1">Metodologia e transparência</h1>
+    <p>Da origem do sinal ao resultado e à validação científica.</p>
+  </div>
+  <div class="method-grid">
+    <article class="surface"><h2>De onde vêm os sinais?</h2><p>O sistema acompanha avisos de futebol, como volume na Betfair ou Polymarket, apostas de valor elevado na Stake e sinais de jogo aberto.</p></article>
+    <article class="surface"><h2>Como sabemos o resultado?</h2><p>O sistema guarda o aviso e a sua hora. Cruza o resultado de fontes como Highlightly e BSD com o mercado e a seleção. Apostas podem ser ganhas, perdidas, devolvidas ou ficar por liquidar.</p></article>
+    <article class="surface"><h2>Como calculamos o ROI?</h2><p>Dividimos o saldo líquido pelo total apostado nas apostas liquidadas. O histórico usa uma unidade por aposta e a primeira odd anunciada. A odd disponível pode ser menor.</p></article>
+    <article class="surface"><h2>O que significa a amostra?</h2><p>Uma amostra pequena varia mais com o acaso. Várias hipóteses podem usar os mesmos jogos. O laboratório identifica essa sobreposição.</p></article>
+    <article class="surface"><h2>Histórico e validação prospetiva</h2><p>O histórico descreve o que aconteceu. Os testes prospetivos avaliam decisões registadas antes dos resultados. A certificação segue um protocolo próprio.</p><p id="method-cert" class="note"></p><p><a href="#hipoteses">Ver critérios de certificação</a></p></article>
+    <article class="surface"><h2>Quais são as limitações?</h2><p>Há jogos sem resultado verificável, sinais lidos tarde e mercados que o resultado final não resolve. Odds anunciadas e execução real podem divergir.</p></article>
+  </div>
+  <div class="export surface"><div><h2>Dados para auditoria</h2><p class="note">Apostas em CSV e relatório original em JSON.</p></div><div><a class="button" href="bets.csv" download>Descarregar CSV</a><a class="button" href="report.json">Abrir JSON</a></div></div>
+<details class="disclosure" id="evidencia-operacional">
+  <summary>Evidência operacional elegível</summary>
+  <div class="disclosure-body">
+<p id="answer" class="note"></p><p id="answer2" class="note"></p><div class="facts" id="facts"></div>
+  </div>
+</details>
+<details class="disclosure" id="qualidade">
+  <summary>Controlo de qualidade dos dados</summary>
+  <div class="disclosure-body">
+<dl class="qc" id="qc"></dl><div id="names"></div>
+  </div>
+</details>
+<details class="disclosure" id="por-liquidar">
+  <summary>Jogos por liquidar</summary>
+  <div class="disclosure-body">
 <p class="note" id="unsnote"></p>
-<div class="panel wrap"><table><thead><tr><th style="text-align:left">Jogo</th><th style="text-align:left">Competição</th><th>Sinal</th><th style="text-align:left">Motivo</th><th>Resultado</th></tr></thead><tbody id="uns"></tbody></table></div>
-
-<details class="panel"><summary>Controlo de qualidade dos dados</summary><dl class="qc" id="qc"></dl>
-<div id="names"></div></details>
-<p class="note"><a href="bets.csv" download>Descarregar todas as apostas (CSV, abre no Excel)</a></p>
-
-<footer>Medição independente. Não é aconselhamento de apostas.</footer>
-</main>
-<script>
-const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
-const el=(tag,attrs={},text)=>{const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e};
-const sv=(tag,attrs={})=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e};
-const pts=v=>(v>0?'+':v<0?'−':'')+Math.abs(v*100).toFixed(0), edgeText=h=>h.edge_ci?`${pts(h.edge)} pontos (entre ${pts(h.edge_ci[0])} e ${pts(h.edge_ci[1])})`:'—';
-const pct=(v,d=0)=>(v*100).toFixed(d).replace('.',',')+' %', num=v=>v==null?'—':String(v).replace('.',','), cls=v=>v>0?'pos':v<0?'neg':'';
-const sign=v=>(v>0?'+':'')+num(v), hitsOf=(h,n)=>`${h} ${h===1?'acerto':'acertos'} em ${n}`;
-const NAMES={'BETFAIR/pre':['Dinheiro na Betfair, antes do jogo','Aposta no resultado (1X2) que está a receber volume fora do normal'],
- 'BETFAIR/live':['Dinheiro na Betfair, durante o jogo','Igual, mas com o jogo a decorrer'],
- 'OPEN_GAME':['Jogo aberto, com odd','Jogo com ritmo alto: aposta em mais golos'],
- 'OPEN_GAME_NO_ODDS':['Jogo aberto, sem odd','Acerta se houver pelo menos mais um golo'],
- 'POLYMARKET':['Dinheiro na Polymarket','Segue transações de valor elevado num mercado de previsões'],
- 'STAKE_LOAD':['Aposta grande na Stake','Segue uma aposta de valor elevado. A odd indicada pode já não existir quando o aviso chega'],
- 'TOTALS_FORM':['Forma de golos a 100 %','As duas equipas costumam passar esta linha de golos'],
- 'TOTALS_FORM_NO_ODDS':['Forma de golos, sem odd','Acerta se houver pelo menos mais um golo'],
- 'GOAL_BREWING':['Golo a caminho','O bot diz que a probabilidade de golo nos próximos minutos está acima do habitual. Acerta se o golo cair nessa janela'],
- 'WEAKENED_LINEUP':['Alinhamento enfraquecido','Aposta contra a equipa que entra sem os titulares habituais, ao handicap indicado']};
-const GROUPS={'BETFAIR/pre/mkt>=10K':'Betfair antes do jogo, mercado grande','BETFAIR/pre/mkt<10K':'Betfair antes do jogo, mercado pequeno',
- 'BETFAIR/live/mkt>=10K':'Betfair durante o jogo, mercado grande','BETFAIR/live/mkt<10K':'Betfair durante o jogo, mercado pequeno',
- 'POLYMARKET/pre':'Polymarket antes do jogo','POLYMARKET/live':'Polymarket durante o jogo','STAKE_LOAD/pre':'Stake antes do jogo','STAKE_LOAD/live':'Stake durante o jogo','OPEN_GAME':'Jogo aberto','TOTALS_FORM':'Forma de golos','WEAKENED_LINEUP':'Alinhamento enfraquecido'};
-const gname=g=>GROUPS[g]||g;
-
-function verdict(g,min){
-  const n=g.hits+g.misses;
-  if(!n)return['none','Sem resultados'];
-  if(g.break_even==null)return n<30?['none','Poucos dados']:['none','Sem odd para comparar'];
-  if(n<30)return['none','Poucos dados'];
-  const [lo,hi]=g.ci95, tag=n>=min?'':'Indício: ';
-  if(lo>g.break_even)return['good',(n>=min?'Acerta o suficiente':'Indício positivo')];
-  if(hi<g.break_even)return['bad',(n>=min?'Não acerta o suficiente':'Indício negativo')];
-  return['wait',n>=min?'Sem vantagem visível':'Ainda incerto'];
-}
-const ICON={good:'▲',bad:'▼',wait:'◆',none:'○'};
-function chip(kind,text){const c=el('span',{class:'chip '+kind});c.append(el('span',{'aria-hidden':'true'},ICON[kind]),document.createTextNode(text));return c}
-
-function plot(g){
-  const W=1000,H=44,y=20,x=v=>v*W, s=sv('svg',{viewBox:`0 0 ${W} ${H}`,preserveAspectRatio:'none',role:'img'});
-  const t=sv('title');t.textContent=g.hit_rate==null?'Sem resultados':`Taxa de acerto ${pct(g.hit_rate)}; margem ${pct(g.ci95[0])} a ${pct(g.ci95[1])}`+(g.break_even!=null?`; mínimo necessário ${pct(g.break_even)}`:'');s.appendChild(t);
-  s.appendChild(sv('rect',{x:0,y:y-3,width:W,height:6,rx:3,fill:'var(--track)'}));
-  s.appendChild(sv('rect',{x:x(.5)-.5,y:y-8,width:1,height:16,fill:'var(--line)'}));
-  if(g.hit_rate!=null){
-    const [lo,hi]=g.ci95;
-    s.appendChild(sv('rect',{x:x(lo),y:y-7,width:Math.max(6,x(hi)-x(lo)),height:14,rx:7,fill:'var(--band)'}));
-  }
-  const wrap=el('div',{class:'plot'});wrap.appendChild(s);
-  const pin=(v,css)=>{const d=el('span');d.style.cssText=`position:absolute;top:${y}px;left:${v*100}%;transform:translate(-50%,-50%);${css}`;wrap.appendChild(d)};
-  if(g.break_even!=null)pin(g.break_even,'width:3px;height:26px;background:var(--ink);border-radius:2px');
-  if(g.hit_rate!=null)pin(g.hit_rate,'width:14px;height:14px;border-radius:50%;background:var(--mark);box-shadow:0 0 0 2px var(--card)');
-  const cap=el('div',{class:'cap'});cap.append(el('span',{},'0 %'),el('span',{},'50 %'),el('span',{},'100 %'));wrap.appendChild(cap);
-  return wrap;
-}
-
-function pending(g){
-  const gone=g.no_source||0, odd=g.unsettleable||0, wait=g.signals-g.with_result-gone-odd, out=[];
-  if(wait>0)out.push(`${wait} à espera de resultado`);
-  if(gone)out.push(`${gone} sem resultado disponível nas fontes`);
-  if(odd)out.push(`${odd} em mercados que o resultado final não decide`);
-  return out.length?'. '+out.join('; '):'';
-}
-
-function signals(d){
-  const box=$('signals');
-  const order=Object.entries(d.accuracy||{}).sort((a,b)=>(b[1].hits+b[1].misses)-(a[1].hits+a[1].misses));
-  for(const [key,g] of order){
-    const [title,desc]=NAMES[key]||[key,''], n=g.hits+g.misses, row=el('div',{class:'row'});
-    const a=el('div');a.append(el('h3',{},title),el('div',{class:'cnt'},desc));
-    const b=el('div',{class:'plotcell'});b.appendChild(plot(g));
-    const r=el('div',{class:'read'});
-    if(n){r.append(el('b',{},hitsOf(g.hits,n)),document.createTextNode(` (${pct(g.hit_rate)})`+(g.break_even!=null?(g.baseline?`, o habitual seria ${pct(g.break_even)}`:`, precisa de ${pct(g.break_even)}`):'')+(g.prob_above!=null?`. Probabilidade de estar acima ${g.baseline?'do habitual':'do mínimo'}: ${pct(g.prob_above)}`:'')+pending(g)))}
-    else r.textContent=`${g.signals} ${g.signals===1?'sinal':'sinais'}, ainda sem resultado`+pending(g);
-    if(n&&n<d.min_settled&&g.per_day){const e=el('div',{class:'eta'});e.textContent=`Ritmo: ${num(g.per_day)} resultados por dia. `+(n<30&&g.days_to_hint!=null?`Primeiro indício em cerca de ${g.days_to_hint} ${g.days_to_hint===1?'dia':'dias'}; `:'')+`conclusão em cerca de ${g.days_to_conclusion} dias.`;r.appendChild(e)}
-    b.appendChild(r);
-    const [kind,text]=verdict(g,d.min_settled);
-    row.append(a,b,chip(kind,text));box.appendChild(row);
-  }
-  if(!order.length)box.appendChild(el('div',{class:'row'},'Ainda sem sinais.'));
-}
-
-function answer(d){
-  const operational=d.operational?.scope==='eligible_bets_only'?d.operational:null;
-  const acc=Object.entries(operational?.accuracy||{}).map(([k,g])=>({k,g,n:g.hits+g.misses,v:verdict(g,d.min_settled)}));
-  const firm=acc.filter(x=>x.n>=d.min_settled&&x.v[0]!=='none'), hint=acc.filter(x=>x.n>=30&&x.n<d.min_settled&&(x.v[0]==='good'||x.v[0]==='bad'));
-  const lead=acc.slice().sort((a,b)=>b.n-a.n)[0];
-  let main,sub;
-  if(firm.length){const good=firm.filter(x=>x.v[0]==='good').map(x=>NAMES[x.k][0]);
-    main=good.length?`Com dados suficientes, acerta acima do necessário: ${good.join('; ')}.`:'Com dados suficientes, nenhum tipo de sinal acerta acima do necessário.';
-    sub='Os restantes tipos continuam em medição.'}
-  else if(hint.length){main='Ainda não há conclusões, mas já há indícios: '+hint.map(x=>`${NAMES[x.k][0].toLowerCase()} (${x.v[0]==='good'?'positivo':'negativo'})`).join('; ')+'.';
-    sub=`Um indício só passa a conclusão com ${d.min_settled} apostas liquidadas no mesmo tipo.`}
-  else{main='Ainda é cedo para dizer se os sinais dão lucro.';
-    sub=lead&&lead.n?`O tipo com mais resultados é “${NAMES[lead.k]?NAMES[lead.k][0]:lead.k}”, com ${lead.n}. São precisos pelo menos 30 para um primeiro indício e ${d.min_settled} para uma conclusão.`:'Os primeiros resultados aparecem assim que os jogos terminarem.'}
-  if(!operational){main='Evidência elegível ainda indisponível.';sub='Aguarda um relatório com evidência elegível; as estatísticas exploratórias não sustentam este veredito.'}
-  else{sub='Apenas evidência elegível. '+sub+' Resultados históricos não demonstram capacidade preditiva.'}
-  $('answer').textContent=main;$('answer2').textContent=sub;
-  const days=d.first_signal_utc?Math.max(1,Math.ceil((Date.now()-Date.parse(d.first_signal_utc))/864e5)):0;
-  const tl=d.timeline||[], bal=tl.length?tl[tl.length-1].u:0;
-  [[d.messages,'mensagens lidas'],[d.unique_bets,'apostas seguidas'],[d.settled_bets,'com resultado'],[sign(bal)+' un.','saldo'],[days,days===1?'dia de dados':'dias de dados']].forEach(([v,l])=>{
-    const s=el('span');s.append(el('b',{},String(v)),document.createTextNode(' '+l));$('facts').appendChild(s)});
-}
-
-function fresh(d,failed){
-  const last=d.audit&&(d.audit.collector_last_run_utc||d.audit.last_collected_at_utc), f=$('fresh'), age=last?(Date.now()-Date.parse(last))/60000:null;
-  const when=last?new Date(last).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
-  f.lastElementChild.textContent=last?(failed?`Falha ao atualizar; dados de ${when}`:age>45?`Recolha parada desde ${when}`:`Atualizado em ${when}`):'Sem recolhas ainda';
-  f.classList.toggle('stale',!!failed||age==null||age>45);
-}
-
-function chart(d){
-  const box=$('chart'), tl=d.timeline||[];
-  if(tl.length<2){box.appendChild(el('p',{class:'note'},'O gráfico aparece quando houver pelo menos duas apostas com resultado.'));return}
-  const W=960,H=260,L=44,R=14,T=14,B=30, vals=[0,...tl.map(p=>p.u)], mn=Math.min(...vals), mx=Math.max(...vals), pad=(mx-mn||1)*.12;
-  const y=v=>T+(mx+pad-v)/((mx+pad)-(mn-pad))*(H-T-B), x=i=>L+i/(vals.length-1)*(W-L-R);
-  const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`Saldo acumulado em unidades ao longo de ${tl.length} apostas liquidadas; valor atual ${sign(tl[tl.length-1].u)}`});
-  const step=[1,2,5,10,20,50,100].find(k=>(mx-mn+2*pad)/k<=5)||200;
-  for(let g=Math.ceil((mn-pad)/step)*step;g<=mx+pad;g+=step){
-    s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g===0?'var(--mut)':'var(--line)','stroke-width':1}));
-    const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':12,fill:'var(--mut)'});t.textContent=sign(g);s.appendChild(t)}
-  const tx=sv('text',{x:W-R,y:H-8,'text-anchor':'end','font-size':12,fill:'var(--mut)'});tx.textContent=`${tl.length} apostas liquidadas, por ordem`;s.appendChild(tx);
-  s.appendChild(sv('polyline',{points:vals.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),fill:'none',stroke:'var(--mark)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
-  const last=vals.length-1;s.appendChild(sv('circle',{cx:x(last),cy:y(vals[last]),r:5,fill:'var(--mark)',stroke:'var(--card)','stroke-width':2}));
-  const cross=sv('line',{y1:T,y2:H-B,stroke:'var(--mut)','stroke-width':1,visibility:'hidden'}), dot=sv('circle',{r:5,fill:'var(--mark)',stroke:'var(--card)','stroke-width':2,visibility:'hidden'});
-  s.append(cross,dot);box.appendChild(s);
-  const tip=$('tip');
-  const move=ev=>{const r=s.getBoundingClientRect(), px=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
-    let i=Math.round((px/r.width*W-L)/(W-L-R)*(vals.length-1));i=Math.max(1,Math.min(vals.length-1,i));const p=tl[i-1];
-    cross.setAttribute('x1',x(i));cross.setAttribute('x2',x(i));cross.setAttribute('visibility','visible');
-    dot.setAttribute('cx',x(i));dot.setAttribute('cy',y(p.u));dot.setAttribute('visibility','visible');
-    tip.style.display='block';tip.style.left=Math.max(110,Math.min(r.width-110,x(i)/W*r.width))+'px';const ty=y(p.u)/H*r.height;tip.style.top=ty+'px';tip.style.transform=ty<70?'translate(-50%,18px)':'translate(-50%,-115%)';
-    tip.textContent='';tip.append(el('b',{},`${p.m||'Jogo'}`),el('br'),document.createTextNode(`${p.s} @ ${num(p.o)}: ${sign(p.g)} un. Saldo ${sign(p.u)}`))};
-  const out=()=>{tip.style.display='none';cross.setAttribute('visibility','hidden');dot.setAttribute('visibility','hidden')};
-  s.addEventListener('mousemove',move);s.addEventListener('touchstart',move,{passive:true});s.addEventListener('touchmove',move,{passive:true});s.addEventListener('mouseleave',out);
-}
-
-function insights(d){
-  const I=d.insights; if(!I)return;
-  for(const t of I.narrative)$('says').appendChild(el('li',{},'Exploratório: '+t));
-  const mv=(title,m,note)=>{const p=el('div',{class:'panel'});p.appendChild(el('h3',{},title));
-    if(!m.n){p.appendChild(el('p',{},'Ainda sem apostas com reforço.'))}
-    else{p.appendChild(el('div',{class:'big'},`${m.shortened} de ${m.n}`));p.appendChild(el('p',{},`apostas em que a odd desceu depois do sinal. Subiu em ${m.drifted}. Variação típica: ${m.median_move_pct>0?'+':''}${num(m.median_move_pct)} %.`));
-      const a=m.when_shortened,b=m.when_drifted;p.appendChild(el('p',{},`Quando desceu: ${hitsOf(a.hits,a.n)}. Quando subiu: ${hitsOf(b.hits,b.n)}.`))}
-    p.appendChild(el('p',{},note));$('move').appendChild(p)};
-  mv('Antes do jogo',I.price_move.pre,'Aqui a odd só mexe por dinheiro e notícias, por isso é o indicador mais limpo.');
-  mv('Durante o jogo',I.price_move.live,'Aqui a odd também mexe com o relógio e os golos; serve só de contexto.');
-  for(const c of I.calibration){const row=el('div',{class:'row'}), a=el('div');a.append(el('h3',{},c.band.replace('odd','Odd')),el('div',{class:'cnt'},`${c.signals} sinais`));
-    const b=el('div',{class:'plotcell'});b.appendChild(plot(c));const r=el('div',{class:'read'});
-    if(c.n)r.append(el('b',{},hitsOf(c.hits,c.n)),document.createTextNode(` (${pct(c.hit_rate)}), a odd exige ${pct(c.break_even)}`));else r.textContent='Ainda sem resultados';
-    b.appendChild(r);const v=verdict({hits:c.hits,misses:c.misses,break_even:c.break_even,ci95:c.ci95},d.min_settled);row.append(a,b,chip(v[0],v[1]));$('calib').appendChild(row)}
-  for(const c of I.bot_confidence||[]){const tr=el('tr');td(tr,c.band,'name');td(tr,c.n);td(tr,c.stated!=null?pct(c.stated):'—','mut');td(tr,c.hit_rate!=null?pct(c.hit_rate):'—');td(tr,c.break_even!=null?pct(c.break_even):'—','mut');$('conf').appendChild(tr)}
-  const ng=I.next_goal;if(ng&&ng.n)$('nextgoal').textContent=`Depois de um sinal de jogo aberto, o golo seguinte demorou tipicamente ${ng.median_min} minutos (${ng.n} ${ng.n===1?'caso':'casos'} em que a lista de golos do bot bate certo com o resultado).`;
-  for(const r of I.regime||[]){const tr=el('tr');td(tr,(NAMES[r.type]||[r.type])[0],'name');
-    if(r.before){td(tr,r.n);td(tr,pct(r.before.hit_rate));td(tr,pct(r.recent.hit_rate));td(tr,pct(r.before.roi,1),cls(r.before.roi));td(tr,pct(r.recent.roi,1),cls(r.recent.roi));td(tr,chip(r.state==='piorou'?'bad':r.state==='melhorou'?'good':'wait',r.state[0].toUpperCase()+r.state.slice(1)))}
-    else{td(tr,`${r.n} de ${r.needed}`);for(let i=0;i<4;i++)td(tr,'—','mut');td(tr,chip('none','Poucos dados'))}
-    $('regime').appendChild(tr)}
-  $('segnote').textContent=`Cada linha é um corte dos sinais com pelo menos ${I.method.min_segment} resultados, ordenado da melhor para a pior evidência. Foram comparados ${I.segments_tested} cortes: quantos mais se comparam, mais provável é algum parecer bom por acaso. Servem para escolher o que confirmar em dados novos.`;
-  for(const g of I.segments){const tr=el('tr');td(tr,g.family,'l');td(tr,`${g.dimension}: ${g.value}`,'name');td(tr,g.n);td(tr,pct(g.hit_rate));td(tr,g.break_even!=null?pct(g.break_even):'—','mut');
-    td(tr,g.prob_above!=null?pct(g.prob_above):'—',g.prob_above==null?'mut':g.prob_above>=.9?'pos':g.prob_above<=.1?'neg':'');td(tr,g.roi!=null?pct(g.roi,1):'—',g.roi==null?'mut':cls(g.roi));$('segs').appendChild(tr)}
-  if(!I.segments.length){const tr=el('tr');td(tr,`Ainda nenhum corte tem ${I.method.min_segment} resultados.`,'mut').colSpan=7;$('segs').appendChild(tr)}
-  const L=I.luck, card=(title,big,text)=>{const p=el('div',{class:'panel'});p.append(el('h3',{},title),el('div',{class:'big'},big),el('p',{},text));$('risk').appendChild(p)};
-  if(L.n){const z=L.z||0;
-    card('Saldo contra a sorte',`${sign(L.units)} un.`,`Em ${L.n} apostas a odds justas, a sorte sozinha faz o saldo oscilar cerca de ±${num(Math.round(2*L.luck_sd*10)/10)} unidades. ${Math.abs(z)<2?'O saldo atual está dentro dessa margem: ainda não distingue jeito de sorte.':z>0?'O saldo está acima dessa margem.':'O saldo está abaixo dessa margem.'}`);
-    card('Maior queda',`−${num(L.max_drawdown)} un.`,'A maior descida do saldo desde um máximo. Indica a banca mínima para aguentar uma fase má.');
-    card('Pior sequência',`${L.longest_losing_run} seguidas`,'O maior número de apostas perdidas de seguida até agora.')}
-  else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
-}
-
-const LISBON={timeZone:'Europe/Lisbon'};
-function agendaWhen(a,now){
-  if(a.kickoff_utc&&new Date(a.kickoff_utc)>now){const k=new Date(a.kickoff_utc), day=x=>x.toLocaleDateString('pt-PT',LISBON);
-    const tom=new Date(now.getTime()+864e5), lbl=day(k)===day(now)?'hoje':day(k)===day(tom)?'amanhã':k.toLocaleDateString('pt-PT',Object.assign({weekday:'short',day:'2-digit',month:'2-digit'},LISBON));
-    return [k.toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON)),lbl]}
-  const sc=a.score_at_signal?` · ${a.score_at_signal[0]}-${a.score_at_signal[1]}`:'';
-  return ['Ao vivo',(a.minute!=null?`min. ${a.minute}`:'sinal às '+new Date(a.date_utc).toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON)))+sc]
-}
-function agendaStill(a,now){
-  if(a.when==='por começar')return a.kickoff_utc&&new Date(a.kickoff_utc)>now;
-  return now-new Date(a.date_utc)<=(a.live_max_min||30)*60000;
-}
-const AGV={'favorável':['good','Favorável'],'misto':['wait','Misto'],'sem evidência':['none','Sem evidência'],'contraditório':['bad','Sinais contraditórios'],'evitar':['bad','Evitar']};
-const tname=h=>h.conditions.map(x=>`${x[0][0].toLowerCase()+x[0].slice(1)}: ${x[1]}`).join(' e '), odd=v=>v==null?'—':v.toFixed(2).replace('.',',');
-const tline=h=>`${hitsOf(h.hits,h.n)}, ROI ${pct(h.roi,0)}, ${pct(h.prob_above)} de probabilidade de estar acima do necessário`;
-function agendaUI(d){
-  const A=d.brain&&d.brain.agenda, list=$('agendalist'), now=new Date(); if(!A)return;
-  list.textContent='';$('agendacounts').textContent='';
-  const items=A.items.map(a=>Object.assign({live_max_min:A.rules.live_max_min},a)).filter(a=>agendaStill(a,now));
-  const R=A.rules;
-  $('agendanote').textContent=`Cada sinal com odd ainda apostável, cruzado com as táticas que o cérebro mede (mínimo ${R.min_results} jogos independentes). Favorável: só táticas boas; misto: boas e más. Refeito a cada recolha, cerca de 10 minutos; os jogos saem quando começam. Abaixo de ${R.hint_at} jogos é só indício; alerta no Telegram a partir de ${R.strong_at} jogos.`;
-  $('agendafresh').textContent='Cérebro calculado às '+new Date(A.generated_utc).toLocaleTimeString('pt-PT',Object.assign({hour:'2-digit',minute:'2-digit'},LISBON));
-  for(const v of Object.keys(AGV)){const n=items.filter(a=>a.verdict===v).length;if(n)$('agendacounts').appendChild(chip(AGV[v][0],`${n} ${AGV[v][1].toLowerCase()}`))}
-  if(!items.length){list.appendChild(el('p',{},'Neste momento não há sinais com odd por apostar. Assim que o bot enviar um, aparece aqui com a leitura do cérebro.'));return}
-  const byMatch={};for(const a of items)(byMatch[a.match_id]=byMatch[a.match_id]||[]).push(a);
-  for(const a of items){
-    const r=el('div',{class:'ag'+(a.verdict==='evitar'||a.verdict==='contraditório'?' dim':'')}), [t1,t2]=agendaWhen(a,now);
-    const t=el('div',{class:'t'},t1);t.appendChild(el('small',{},t2));r.appendChild(t);
-    const m=el('div',{class:'m'});
-    m.append(el('b',{},a.match),document.createTextNode(` · ${a.selection}${a.market!=='1X2'?' ('+a.market+')':''} @ ${odd(a.odds)}`),el('div',{class:'lg'},`${a.family}${a.phase==='live'?' ao vivo':a.phase==='pre'?' antes do jogo':''}${a.league?' · '+a.league:''}`));
-    const why=el('p',{class:'why'});
-    if(a.verdict==='contraditório'){why.append(document.createTextNode('O bot deu sinais em seleções diferentes no mesmo jogo: '+byMatch[a.match_id].filter(x=>x.market===a.market).map(x=>`${x.selection} @ ${odd(x.odds)}`).join(' e ')+'. '))}
-    if(a.good.length){why.append(el('b',{},'A favor: '),document.createTextNode(`${tname(a.good[0])} (${tline(a.good[0])}).`+(a.good_total>1?` Encaixa em mais ${a.good_total-1} ${a.good_total===2?'tática boa':'táticas boas'}.`:'')+' '))}
-    if(a.bad.length){why.append(el('b',{},'Contra: '),document.createTextNode(`${tname(a.bad[0])} (${tline(a.bad[0])}).`))}
-    if(!a.good.length&&!a.bad.length)why.append(document.createTextNode('Não encaixa em nenhuma tática com evidência suficiente, nem boa nem má.'));
-    m.appendChild(why);
-    const warn=[];
-    if(a.odds_band_n<R.min_results)warn.push(`Só ${a.odds_band_n} ${a.odds_band_n===1?'resultado':'resultados'} deste tipo de sinal com ${a.odds_band}: as táticas foram medidas sobretudo noutras odds.`);
-    if(a.odds_last&&a.odds_last!==a.odds)warn.push(`A odd passou de ${odd(a.odds)} para ${odd(a.odds_last)}${a.max_mult>1?` no reforço ×${a.max_mult}`:''}.`);
-    else if(a.max_mult>1)warn.push(`Reforçado até ×${a.max_mult}.`);
-    if(a.share!=null&&a.share_last!=null&&a.share_last!==a.share)warn.push(`Quota de mercado de ${a.share} % para ${a.share_last} %.`);
-    if(warn.length)m.appendChild(el('p',{class:'warn'},warn.join(' ')));
-    r.appendChild(m);
-    const [k,txt]=AGV[a.verdict];r.appendChild(a.validated?chip('ok','Validada · alerta'):chip(k,txt));
-    list.appendChild(r)}
-}
-// Uma só fotografia do relatório na página inteira: relatório novo -> todas as secções refeitas a partir do HTML original
-// (sem elementos nem listeners duplicados); o mesmo relatório -> só a agenda e o indicador (jogos que começaram, idade);
-// falha -> fica a última fotografia válida, assinalada como desatualizada.
-const PRISTINE=document.querySelector('main').innerHTML;
-let SNAP=null, CUR=null, ASKED=0, SHOWN=0;
-// Pedidos numerados: uma resposta (ou falha) de um pedido anterior ao último aplicado é ignorada, nunca recua a fotografia.
-function getReport(){const n=++ASKED;return fetch('report.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()})
-  .then(text=>{if(n<SHOWN)throw 'old';SHOWN=n;return text},e=>{if(n<SHOWN)throw 'old';SHOWN=n;throw e})}
-function render(text){
-  const d=JSON.parse(text);
-  if(SNAP!==null){const keep=['simbank','simmode','simval','simcut'].map(id=>[id,$(id).value]);document.querySelector('main').innerHTML=PRISTINE;keep.forEach(([id,v])=>{$(id).value=v})}
-  SNAP=text;CUR=d;
-  fresh(d);answer(d);agendaUI(d);boardUI(d);signals(d);insights(d);brainUI(d);chart(d);simulator(d);unsettledUI(d);tables(d);recent(d);
-}
-function agendaRefresh(){getReport().then(text=>{if(text===SNAP){agendaUI(CUR);fresh(CUR)}else render(text)}).catch(e=>{if(e!=='old'&&CUR){agendaUI(CUR);fresh(CUR,true)}})}
-function boardUI(d){
-  const B=d.brain&&d.brain.board; if(!B)return;
-  const LV={'indício inicial':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
-  const name=h=>h.conditions.length?`${h.family} · ${h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')}`:`${h.family} · todos os sinais deste tipo`;
-  const item=(h,bad)=>{const li=el('li');li.append(el('b',{},name(h)),chip(bad?'bad':LV[h.level],bad?'A evitar':h.level[0].toUpperCase()+h.level.slice(1)));
-    li.appendChild(el('span',{class:'why'},`${hitsOf(h.hits,h.n)}; a odd exige ${pct(h.break_even)}. ROI ${pct(h.roi,1)}.`+(h.edge_ci?` Vantagem estimada: ${edgeText(h)}; com 2 % de perda de odd, ${pct(h.prob_above_cut)} de probabilidade de continuar acima do necessário.`:'')+(h.prob_adds!=null?` Probabilidade de render mais do que os restantes sinais do mesmo tipo: ${pct(h.prob_adds)}.`:'')+(h.missing?` Faltam ${h.missing} jogos independentes para deixar de ser só um indício.`:'')+(h.source==='llm'?' Proposta pelo modelo de linguagem.':'')));return li};
-  $('boardnote').textContent=`As táticas com melhor evidência entre as ${d.brain.hypotheses} que o cérebro e o modelo de linguagem estão a testar, com pelo menos ${B.min_results} jogos independentes. Com tantas em teste, algumas parecem boas só por acaso: abaixo de ${B.hint_at} jogos são indícios, não conclusões. A evidência e os limiares contam um voto por jogo: vários sinais ou mercados no mesmo jogo não a fazem crescer.`;
-  for(const h of B.best)$('best').appendChild(item(h,false));
-  if(!B.best.length){$('best').remove();$('boardh').after(el('p',{},'Ainda nenhuma tática tem evidência suficiente para aparecer aqui. As primeiras devem surgir com mais um ou dois dias de resultados.'))}
-  for(const h of B.avoid)$('avoid').appendChild(item(h,true));
-  if(!B.avoid.length){const li=el('li');li.textContent='Nada a assinalar por agora.';$('avoid').appendChild(li)}
-  const o=$('boardopen');
-  for(const x of B.open){const p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}`),el('span',{class:'why'},`Encaixa em: ${x.tactic.split(' | ')[1].replaceAll(' = ',': ').replaceAll(' & ',' e ')}. ${x.kickoff_utc&&new Date(x.kickoff_utc)>new Date()?'Jogo a '+new Date(x.kickoff_utc).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'. ':''}Sinal das ${new Date(x.date_utc).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}.`));o.appendChild(p)}
-  if(!B.open.length)o.appendChild(el('p',{class:'note'},'Nenhum sinal em aberto encaixa nas táticas acima neste momento.'));
-  const n=(d.brain.notes||[])[0];
-  $('boardllm').textContent=n?`Última nota do modelo de linguagem, sobre "${n.id.replace(' | ',': ')}": ${n.note}`:'';
-}
-
-let sortCol=5, sortDir=-1, showAll=false;
-function brainUI(d){
-  const B=d.brain; if(!B)return;
-  $('brainnote').textContent=`O cérebro combina as características de cada sinal (odd, volume, quota, minuto, liga, hora, reforços) e regista cada combinação como hipótese quando há pelo menos ${B.rules.min_support} sinais. Estão registadas ${B.hypotheses}; ${B.tested} já têm ${B.rules.hint_at} jogos independentes. Com tantas em teste, cerca de ${num(B.expected_by_chance)} pareceriam promissoras só por acaso, por isso “forte” e “confirmada” exigem uma fasquia corrigida (${B.rules.strong_at} e ${B.rules.confirm_at} jogos).`+(B.validation?(B.validation.state==='active'?` “Forte” e “confirmada” só existem com certificado: cada tática promissora é registada uma única vez, em tempo real, e um teste sequencial com nível garantido (e-processo sobre o lucro por jogo, com a odd 2 % pior) tem de a confirmar em pelo menos ${B.validation.min_games} jogos decididos depois desse registo e antes de qualquer resultado do jogo, com uma só aposta por jogo (a primeira) e nunca com dois jogos em aberto ao mesmo tempo; o erro de ${pct(B.validation.alpha)} é repartido por todas as táticas registadas ao longo do tempo. Registadas: ${B.validation.selected}; certificadas: ${B.validation.certified.length}; anteriores à ativação (não certificáveis): ${B.validation.legacy}.`:` A validação científica (“forte”/“confirmada”) está desligada: o registo de seleções ainda não foi ativado${B.validation.state==='ledger_invalid'?' ou não passou a verificação':B.validation.state==='history_unverified'?' ou o seu histórico publicado não pôde ser provado':''}. Nenhuma tática é apresentada como validada; “promissora” é só um indício exploratório.`):'')+(B.multiplicity?` Muitas hipóteses assentam nos mesmos jogos: as ${B.multiplicity.promising_or_better} promissoras ou melhores somam ${B.multiplicity.promising_sum_games} jogos, mas são só ${B.multiplicity.promising_union_games} jogos diferentes. Promissora é um indício exploratório, não uma demonstração.`:'')+(B.rules.confirm_steps?` Para evitar mudanças por um único resultado, cada mudança de estado tem de se confirmar em ${B.rules.confirm_steps} jogos seguidos, e uma promissora só volta a “em observação” abaixo de ${pct(B.rules.keep_promising)}.`:'');
-  const ST={'em observação':'none','promissora':'wait','forte':'good','confirmada':'good','abandonada':'bad'};
-  for(const k of ['em observação','promissora','forte','confirmada','abandonada']){const s=el('span');s.append(el('b',{},String(B.counts[k]||0)),document.createTextNode(' '+(k==='em observação'?'em observação':(B.counts[k]===1?k:k+'s'))));$('braincounts').appendChild(s)}
-  const RANK={'confirmada':5,'forte':4,'promissora':3,'em observação':2,'abandonada':1};
-  const COLS=[null,null,h=>h.games,h=>h.hit_rate,h=>h.break_even,h=>h.prob_above,h=>h.edge,h=>h.roi,h=>RANK[h.status]];
-  const ths=[...$('hyps').parentElement.querySelectorAll('thead th')];
-  const drawH=()=>{const body=$('hyps');body.textContent='';
-    const rows=B.top.slice().sort((x,y)=>{const a=COLS[sortCol](x),b=COLS[sortCol](y);return ((a==null)-(b==null))||sortDir*((a>b)-(a<b))||(y.n-x.n)});
-    for(const h of rows.slice(0,showAll?1e9:25)){const tr=el('tr');td(tr,h.family,'l');
-      td(tr,h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')+(h.tradable?'':' (informativa: só se sabe depois do sinal)'),'l');
-      td(tr,h.games!=null&&h.games!==h.n?`${h.games} (${h.n} sinais)`:(h.games??h.n));td(tr,pct(h.hit_rate));td(tr,h.break_even!=null?pct(h.break_even):'—','mut');td(tr,h.prob_above!=null?pct(h.prob_above):'—',h.prob_above==null?'mut':h.prob_above>=.9?'pos':h.prob_above<=.1?'neg':'');td(tr,edgeText(h),h.edge_ci?(h.edge_ci[0]>0?'pos':h.edge_ci[1]<0?'neg':''):'mut');
-      td(tr,h.roi!=null?pct(h.roi,1):'—',h.roi==null?'mut':cls(h.roi));td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)+(h.pending_status?` · a confirmar: ${h.pending_status}`:h.entry_status&&h.entry_status!==h.status?' · mantida pela histerese (abaixo do limiar de entrada)':'')));body.appendChild(tr)}
-    ths.forEach((th,i)=>{if(COLS[i])th.setAttribute('aria-sort',i===sortCol?(sortDir<0?'descending':'ascending'):'none')});
-    $('hypsmore').hidden=showAll||rows.length<=25;$('hypsmore').textContent=`Mostrar as ${rows.length} hipóteses`};
-  ths.forEach((th,i)=>{if(!COLS[i])return;const label=th.textContent,btn=el('button',{type:'button',class:'sort'},label);th.textContent='';th.appendChild(btn);
-    btn.addEventListener('click',()=>{if(sortCol===i)sortDir=-sortDir;else{sortCol=i;sortDir=-1}drawH()})});
-  $('hypsmore').addEventListener('click',()=>{showAll=true;drawH()});
-  if(B.top.length)drawH();else $('hypsmore').hidden=true;
-  if(!B.top.length){const tr=el('tr');td(tr,'Ainda nenhuma hipótese tem 5 resultados.','mut').colSpan=9;$('hyps').appendChild(tr)}
-const WF=B.walk_forward;
-  if(WF){$('wfnote').textContent=`Cada sinal é decidido só com os resultados que já se conheciam nesse momento${WF.rule.known_after_min!=null?` (um resultado conta ${WF.rule.known_after_min} minutos depois do início do jogo)`:`, pela hora a que o sistema efetivamente leu o sinal e viu cada resultado, e só com as táticas já registadas nessa altura. Sinais lidos tarde demais para apostar (${(WF.not_reconstructible||{}).bets||0}) não contam como decisões`}. Segue-se o sinal quando encaixa numa tática apostável que, nessa altura, já tinha ${WF.rule.min_results} jogos independentes e ${pct(WF.rule.min_prob)} de probabilidade de estar acima do necessário. Se o cérebro acrescenta alguma coisa, os sinais seguidos têm de render mais do que os outros.`+(WF.prob_followed_better!=null?` Probabilidade de os seguidos terem mais vantagem do que os não seguidos: ${pct(WF.prob_followed_better)}.`:'')+(WF.followed.settled<30?` Com ${WF.followed.settled} resultados seguidos, ainda é só um indício.`:'');
-    for(const [name,g] of [['Seguidos pelo cérebro',WF.followed],['Não seguidos',WF.skipped]].concat(WF.not_reconstructible?[['Não reconstituíveis (lidos tarde)',WF.not_reconstructible]]:[])){const tr=el('tr');td(tr,name,'l');td(tr,g.bets);td(tr,g.settled);td(tr,g.wins);td(tr,g.settled?num(g.units)+' un.':'—',g.settled?cls(g.units):'mut');td(tr,g.roi!=null?pct(g.roi,1):'—',g.roi==null?'mut':cls(g.roi));td(tr,g.roi_cut!=null?pct(g.roi_cut,1):'—',g.roi_cut==null?'mut':cls(g.roi_cut));$('wf').appendChild(tr)}}
-  const T=B.llm_today||{}, TR=B.track||{};
-  $('llmnote').textContent=B.llm_runs?`De hora a hora, um modelo de linguagem lê os números e alterna entre propor hipóteses novas, refinar as melhores, apontar situações a evitar e escrever notas. Como já viu resultados, cada proposta só conta os sinais que chegarem depois dela. Propostas aceites até agora: ${B.llm_total||0}. Hoje: ${T.calls_today||0} ${T.calls_today===1?'chamada':'chamadas'}, cerca de ${num(Math.round(T.neurons_today||0))} de 10 000 neurónios gratuitos.`+(TR.llm_with_prospective_evidence?` ${TR.llm_with_prospective_evidence} ${TR.llm_with_prospective_evidence===1?'proposta tem':'propostas têm'} ${TR.min_results} ou mais jogos independentes depois do registo; o modelo recebe esses números só como descrição.`:` Ainda nenhuma proposta tem ${TR.min_results||10} jogos independentes depois do registo.`)+` Nenhuma proposta é dada como confirmada por acertar mais de metade: a avaliação científica segue o protocolo pré-registado (audits/pr4-llm-protocol-v5.md) e ${(B.llm_evaluation||{}).verdict==='não verificada'?'não é feita nesta página (precisa do histórico git completo)':'está no relatório da auditoria'}.`:'De hora a hora, um modelo de linguagem lê os números e propõe hipóteses novas. Ainda não correu: faltam as chaves nos segredos do repositório.';
-  for(const n of B.notes||[]){const p=el('p');p.append(el('b',{},n.id.replace(' | ',': ')),document.createTextNode(` (${hitsOf(n.hits,n.n)}, precisa de ${n.break_even!=null?pct(n.break_even):'—'}). ${n.note}`));$('notes').appendChild(p)}
-  if(!(B.notes||[]).length)$('notes').appendChild(el('p',{class:'note'},'Ainda sem notas. A primeira aparece na próxima ronda de notas do modelo.'));
-  for(const h of B.llm||[]){const tr=el('tr');td(tr,h.family,'l');const c=td(tr,'','l');c.append(el('b',{},h.conditions.map(x=>`${x[0]}: ${x[1]}`).join(' e ')+(h.expect==='abaixo'?' (a evitar)':'')));if(h.reason)c.append(el('br'),document.createTextNode(h.reason));
-    td(tr,new Date(h.born_utc).toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'}));td(tr,h.n);td(tr,h.hit_rate!=null?pct(h.hit_rate):'—');td(tr,chip(ST[h.status],h.status[0].toUpperCase()+h.status.slice(1)));$('llm').appendChild(tr)}
-  if(!(B.llm||[]).length){const tr=el('tr');td(tr,'Ainda sem propostas.','mut').colSpan=6;$('llm').appendChild(tr)}
-  for(const e of B.entry_points||[]){if(!e.signals)continue;const tr=el('tr');td(tr,e.phase==='pre'?'Antes do jogo':'Durante o jogo','l');td(tr,e.level===1?'Ao primeiro sinal':`Ao reforço ×${e.level}`,'l');td(tr,e.n);
-    td(tr,e.hit_rate!=null?pct(e.hit_rate):'—');td(tr,e.break_even!=null?pct(e.break_even):'—','mut');td(tr,e.prob_above!=null?pct(e.prob_above):'—',e.prob_above==null?'mut':e.prob_above>=.9?'pos':e.prob_above<=.1?'neg':'');td(tr,e.roi!=null?pct(e.roi,1):'—',e.roi==null?'mut':cls(e.roi));$('entry').appendChild(tr)}
-  const w=$('watch');
-  const goodN=['promissora','forte','confirmada'].reduce((n,k)=>n+((B.counts||{})[k]||0),0);
-  if(!B.watch.length)w.appendChild(el('p',{class:'note'},goodN?'Neste momento nenhum sinal ainda apostável encaixa numa hipótese promissora, forte ou confirmada (ao vivo: até 30 minutos depois do sinal; antes do jogo: até ao início).':`Ainda nenhuma hipótese chegou a promissora (são precisos ${B.rules.hint_at} jogos independentes). A lista aparece aqui quando isso acontecer.`));
-  for(const x of B.watch){const r=x.reasons[0], p=el('p');p.append(el('b',{},x.match||'Jogo'),document.createTextNode(` · ${x.selection||'mais um golo'}${x.odds?' @ '+num(x.odds):''}. Encaixa em ${x.reasons.length} ${x.reasons.length===1?'hipótese':'hipóteses'}; a melhor: ${r.id.split(' | ')[1]} (${pct(r.hit_rate)} em ${r.n}, ${r.status}).`));w.appendChild(p)}
-}
-
-function unsettledUI(d){
-  const U=d.unsettled||[], a=d.audit||{};
-  $('unsnote').textContent=U.length?`${U.length} ${U.length===1?'jogo terminou':'jogos terminaram'} há mais de 2 horas e ${U.length===1?'continua':'continuam'} sem resultado. As fontes são consultadas de 90 em 90 minutos. Quando um jogo não existe em nenhuma fonte, podes procurar o resultado e dizê-lo: entra como resultado manual${a.manual_results?` (já há ${a.manual_results})`:''}.`:'Todos os jogos terminados há mais de 2 horas têm resultado.';
-  for(const u of U){const tr=el('tr');td(tr,u.match||u.match_id,'l');td(tr,u.league||'—','l');td(tr,new Date(u.date_utc).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),'mut');td(tr,u.why[0].toUpperCase()+u.why.slice(1),'l');
-    const c=td(tr,''),day=new Date(u.kickoff_utc||u.date_utc).toLocaleDateString('pt-PT');
-    c.appendChild(el('a',{href:'https://www.google.com/search?q='+encodeURIComponent(`${u.match.replace(' — ',' vs ')} ${day} resultado`),target:'_blank',rel:'noopener'},'Procurar'));$('uns').appendChild(tr)}
-  if(!U.length){const tr=el('tr');td(tr,'Nada por liquidar.','mut').colSpan=5;$('uns').appendChild(tr)}
-}
-
-const simOff=new Set();
-function simulator(d){
-  const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t))), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-  for(const t of types){const l=el('label'),c=el('input',{type:'checkbox'});c.checked=on.has(t);c.addEventListener('change',()=>{c.checked?(on.add(t),simOff.delete(t)):(on.delete(t),simOff.add(t));run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));$('simtypes').appendChild(l)}
-  const run=()=>{const start=Math.max(1,+$('simbank').value||0), mode=$('simmode').value, val=Math.max(0,+$('simval').value||0), cut=+$('simcut').value;
-    $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
-    let bank=start, peak=start, dd=0, low=start, staked=0, n=0, bust=false;const curve=[start];
-    for(const p of tl){if(!on.has(p.t)||p.w==null)continue;
-      let stake=mode==='flat'?val:bank*val/100;stake=Math.min(stake,bank);if(stake<=0){bust=true;break}
-      const gain=p.w>0?p.w*(p.o*(1-cut)-1):p.w;bank+=stake*gain;staked+=stake;n++;peak=Math.max(peak,bank);dd=Math.max(dd,peak-bank);low=Math.min(low,bank);curve.push(bank)}
-    const out=$('simout');out.textContent='';
-    [[n,'apostas simuladas'],[eur(bank),'banca final'],[(bank>=start?'+':'')+eur(bank-start),'lucro ou perda'],[staked?pct((bank-start)/staked,1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
-      .forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v)));out.appendChild(w)});
-    const box=$('simchart');box.textContent='';
-    if(curve.length<3){box.appendChild(el('p',{class:'note'},n?'São precisas pelo menos duas apostas para desenhar a curva.':'Nenhuma aposta liquidada nos tipos escolhidos.'));return}
-    const W=960,H=200,L=64,R=14,T=12,B=22, mn=Math.min(...curve), mx=Math.max(...curve), pad=(mx-mn||1)*.1, y=v=>T+(mx+pad-v)/((mx+pad)-(mn-pad))*(H-T-B), x=i=>L+i/(curve.length-1)*(W-L-R);
-    const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`Banca simulada ao longo de ${n} apostas: de ${eur(start)} para ${eur(bank)}`});
-    for(const g of [mn,start,mx].filter((v,i,a)=>a.indexOf(v)===i)){s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g===start?'var(--mut)':'var(--line)','stroke-width':1}));
-      const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':12,fill:'var(--mut)'});t.textContent=Math.round(g).toLocaleString('pt-PT');s.appendChild(t)}
-    s.appendChild(sv('polyline',{points:curve.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),fill:'none',stroke:'var(--mark)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
-    box.appendChild(s);if(bust)box.appendChild(el('p',{class:'note'},'A banca chegou a zero antes do fim.'))};
-  ['simbank','simmode','simval','simcut'].forEach(id=>$(id).addEventListener('input',run));
-  $('simmode').addEventListener('change',()=>{$('simval').value=$('simmode').value==='flat'?10:1;run()});
-  run();
-}
-
-function td(tr,t,c){const e=el('td',c?{class:c}:{});if(t instanceof Node)e.appendChild(t);else e.textContent=t;tr.appendChild(e);return e}
-function roi(tr,g,full){const r=g.roi;
-  if(!r){for(let i=0;i<(full?4:2);i++)td(tr,'—','mut');return}
-  const a=r['odd-0%'];td(tr,pct(a.roi,1),cls(a.roi));td(tr,a.ci95?pct(a.ci95[0])+' e '+pct(a.ci95[1]):'—','mut');
-  if(full){td(tr,pct(r['odd-2%'].roi,1),cls(r['odd-2%'].roi));td(tr,pct(r['odd-5%'].roi,1),cls(r['odd-5%'].roi))}}
-function tables(d){
-  $('minset').textContent=d.min_settled;
-  for(const [name,g] of Object.entries(d.groups)){const tr=el('tr');td(tr,gname(name),'name');
-    const f=document.createDocumentFragment(), b=el('span',{class:'prog',title:`${g.settled} de ${d.min_settled}`}), i=el('i');i.style.width=Math.min(100,g.settled/d.min_settled*100)+'%';b.appendChild(i);
-    f.append(document.createTextNode(`${g.settled} de ${g.bets}`),b);td(tr,f);td(tr,g.wins);td(tr,num(g.avg_odds));td(tr,g.settled?sign(g.units):'—',g.settled?cls(g.units):'mut');roi(tr,g,true);$('groups').appendChild(tr)}
-  for(const [name,g] of Object.entries(d.questions||{})){const tr=el('tr');td(tr,name.replace(/^Q\d+ /,''),'name');td(tr,`${g.settled} de ${g.bets}`);td(tr,g.wins);td(tr,num(g.avg_odds));roi(tr,g,false);$('questions').appendChild(tr)}
-  for(const x of (d.daily||[]).slice().reverse()){const tr=el('tr');td(tr,new Date(x.day+'T12:00:00Z').toLocaleDateString('pt-PT',{weekday:'short',day:'2-digit',month:'2-digit'}));td(tr,x.bets);td(tr,x.settled);td(tr,x.wins);td(tr,x.settled?sign(x.units):'—',x.settled?cls(x.units):'mut');$('daily').appendChild(tr)}
-  const a=d.audit||{};
-  if((a.name_review||[]).length){const box=$('names');box.appendChild(el('p',{class:'note'},'Jogos em que o nome das equipas difere entre o bot e a fonte de resultados. Ficam em aberto até o nome ser confirmado à mão:'));
-    const ul=el('ul',{class:'note'});for(const n of a.name_review)ul.appendChild(el('li',{},`${n.bot.join(' — ')} ↔ ${n.bsd_candidates.map(c=>c.join(' — ')).join(' ou ')} (${n.provider})`));box.appendChild(ul)}
-  [[a.versions,'versões de mensagens guardadas'],[d.unparsed,'mensagens em formato desconhecido'],[a.edits_changing_signal,'sinais que o bot alterou depois de publicar'],
-   [a.bot_mark_disagreements,'resultados em que a marca do bot difere das nossas contas'],[d.excluded_first_seen_with_result,'sinais lidos já com resultado (fora do saldo)'],
-   [d.excluded_edited_before_seen,'sinais já editados quando foram lidos (fora do saldo)'],[d.excluded_burst,'sinais chegados em lote no mesmo segundo (fora do saldo)'],
-   [a.deleted_by_bot,'mensagens que o bot apagou depois de publicar'],[a.ended_after_90,'jogos decididos depois dos 90 minutos (em aberto)'],
-   [`${a.stake_sent_45_after_kickoff??0}`,'sinais Stake chegados mais de 45 min depois do início'],[`${a.stake_no_score_after_kickoff??0} de ${a.stake_original_seen??0}`,'sinais Stake originais sem marcador, já com o jogo a decorrer'],
-   [`${a.goal_lists_consistent??0} de ${a.goal_lists??0}`,'listas de golos do bot que batem certo'],
-   [`${(a.goal_minutes_matches??0)-(a.goal_minutes_inconsistent??0)} de ${a.goal_minutes_matches??0}`,'jogos com minutos dos golos confirmados pela Highlightly'],
-   [a.manual_results??0,'resultados introduzidos à mão'],[a.manual_vs_other_disagreements??0,'resultados manuais diferentes dos de outra fonte'],
-   [d.excluded_low_odds,'sinais com odd abaixo de 1,10 (ignorados)'],[a.hl_results,'resultados obtidos na Highlightly'],[a.hl_vs_bot_disagreements,'divergências entre a Highlightly e o bot'],
-   [a.hl_near_misses,'jogos com nome de equipa por rever'],[a.bsd_results,'resultados obtidos na BSD']].forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v??0)));$('qc').appendChild(w)});
-}
-
-function outcome(b){const w=b.w;
-  if(w==null)return b.ft?['none','Não liquidável']:['none','Em aberto'];
-  if(w>0)return['good',w<1?'Meia ganha':'Ganha'];if(w<0)return['bad',w>-1?'Meia perdida':'Perdida'];return['wait','Devolvida']}
-const KIND={BETFAIR:'Betfair',STAKE_LOAD:'Stake',POLYMARKET:'Polymarket',OPEN_GAME:'Jogo aberto',OPEN_GAME_NO_ODDS:'Jogo aberto, sem odd',TOTALS_FORM:'Forma de golos',TOTALS_FORM_NO_ODDS:'Forma de golos, sem odd',GOAL_BREWING:'Golo a caminho',WEAKENED_LINEUP:'Alinhamento enfraquecido',FULL_TIME_NOTE:'Fim do jogo'};
-function story(m){
-  const box=el('div',{class:'story'});
-  if(!m){box.appendChild(el('p',{class:'note'},'Sem detalhe para este jogo.'));return box}
-  const t=m.teams||['equipa da casa','equipa de fora'], money=v=>v>=1000?num(Math.round(v/100)/10)+' mil $':num(v)+' $';
-  for(const e of m.events){const bits=[KIND[e.k]||e.k];
-    if(e.k==='BETFAIR'){bits[0]+=e.phase==='pre'?', antes do jogo':', durante o jogo';bits.push(`${({1:t[0],2:t[1],X:'Empate'})[e.selection]||e.selection} @ ${num(e.odds)}`);if(e.mult>1)bits.push(`reforço ×${e.mult}`);if(e.share!=null)bits.push(`${e.share} % de ${money(e.mkt_volume)}`)}
-    else if(e.k==='GOAL_BREWING'){bits.push(`golo nos próximos ${e.window} min: ${e.bot_prob} % (habitual ${e.usual_prob} %)`)}
-    else if(e.selection){bits.push(`${e.market&&e.market!=='Asian Total'?e.market+': ':''}${e.selection}${e.odds?' @ '+num(e.odds):''}`);if(e.total)bits.push(money(e.total));if(e.rhythm!=null)bits.push(`ritmo ${e.rhythm}, confiança ${e.bot_over_pct} %`)}
-    if(e.minute!=null)bits.push(`minuto ${e.minute}${e.score_at_signal?`, ${e.score_at_signal[0]}-${e.score_at_signal[1]}`:''}`);
-    const p=el('p');p.append(el('span',{class:'when'},new Date(e.d).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})+' '),document.createTextNode(bits.join(' · ')));box.appendChild(p)}
-  if(m.goals&&m.goals.length)box.appendChild(el('p',{},`Golos${m.goals_source==='bot'?' (lista do bot, pode estar incompleta)':''}: `+m.goals.map(g=>`${g[0]}' ${g[1]}`).join(', ')+'.'));
-  if(m.ft)box.appendChild(el('p',{},`Resultado final: ${m.ft[0]}-${m.ft[1]}.`));
-  return box;
-}
-let limit=12, recentF=0;
-function recent(d){
-  const all=d.recent_bets||[], box=$('recent'), F=[['todas','Todas',()=>true],['ganhas','Ganhas',b=>b.w>0],['perdidas','Perdidas',b=>b.w<0],['abertas','Em aberto',b=>b.w==null]];
-  const draw=fn=>{box.textContent='';const every=all.filter(fn), rows=every.slice(0,limit);
-    if(!rows.length){box.appendChild(el('p',{class:'note'},'Nenhuma aposta neste filtro.'));return}
-    for(const b of rows){const r=el('div',{class:'bet'}), t=new Date(b.date_utc);
-      r.appendChild(el('div',{class:'when'},t.toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})));
-      const w=el('div',{class:'what'});w.append(el('b',{},`${b.selection}`),document.createTextNode(b.odds?` @ ${num(b.odds)}`:''));
-      w.appendChild(el('div',{},`${b.match}${b.ft?`, final ${b.ft[0]}-${b.ft[1]}`:''}. ${gname(b.group)}${b.max_mult>1?`, reforçado ×${b.max_mult}`:''}`));
-      r.appendChild(w);const [k,txt]=outcome(b);r.appendChild(chip(k,txt));box.appendChild(r);
-      r.setAttribute('role','button');r.setAttribute('tabindex','0');r.setAttribute('aria-expanded','false');r.title='Ver todos os sinais deste jogo';
-      const toggle=()=>{const open=r.nextElementSibling&&r.nextElementSibling.classList.contains('story');if(open){r.nextElementSibling.remove();r.setAttribute('aria-expanded','false')}else{r.after(story((d.matches||{})[b.match_id]));r.setAttribute('aria-expanded','true')}};
-      r.addEventListener('click',toggle);r.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggle()}})}
-    if(every.length>rows.length){const more=el('button',{type:'button',class:'more'},`Mostrar as ${every.length} apostas`);more.addEventListener('click',()=>{limit=1e9;draw(fn)});box.appendChild(more)}};
-  F.forEach(([id,label,fn],i)=>{const btn=el('button',{type:'button','aria-pressed':i===recentF?'true':'false'},`${label} (${all.filter(fn).length})`);
-    btn.addEventListener('click',()=>{[...$('filters').children].forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');limit=12;recentF=i;draw(fn)});$('filters').appendChild(btn)});
-  draw(F[recentF][2]);
-}
-
-getReport().then(render)
- .catch(e=>{if(e==='old')return;$('answer').textContent='Ainda não há dados para mostrar.';$('fresh').classList.add('stale');$('fresh').lastElementChild.textContent='Sem dados'});
-setInterval(agendaRefresh,3*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)agendaRefresh()});
-</script>
-</body></html>
+<div class="panel wrap" tabindex="0" role="region" aria-labelledby="table-uns"><table><caption class="sr-only" id="table-uns">Jogos por liquidar</caption><thead><tr><th scope="col" style="text-align:left">Jogo</th><th scope="col" style="text-align:left">Competição</th><th scope="col">Sinal</th><th scope="col" style="text-align:left">Motivo</th><th scope="col">Resultado</th></tr></thead><tbody id="uns"></tbody></table></div>
+  </div>
+</details>
+</section>
+    </main>
+    <footer>Medição independente.</footer>
+  </div>
+</div>
+<noscript>Ative o JavaScript para consultar os resultados. <a href="bets.csv">Descarregar apostas em CSV</a></noscript>
+</body>
+</html>
