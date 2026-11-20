@@ -11,7 +11,7 @@ pode transportar informação sobre o desempenho futuro de uma hipótese.
 """
 import itertools
 
-from . import brain, insights
+from . import brain, insights, match_identity
 from .eligibility import game_identity
 
 
@@ -23,7 +23,7 @@ class Index:
     """Conjuntos de sinais como inteiros (bitsets) por família e característica, sobre uma lista fixa de sinais."""
 
     def __init__(self, signals):
-        self.signals = list(signals)
+        self.signals = match_identity.annotate(signals)
         multi, earlier = brain.multi_matches(self.signals), brain.earlier_index(self.signals)
         self.fam = {}
         for i, b in enumerate(self.signals):

@@ -440,7 +440,7 @@ Liverpool Women — Aston Villa Women
 
 class Brain(Hardening):
     def sig(self, i, hour, win, odds=2.0, mult=1):
-        return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': ['A', 'B'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
+        return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': [f'Home {i}', f'Away {i}'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
                 'date_utc': '2026-11-%02dT%02d:00:00+00:00' % (10 + i % 5, hour), 'kickoff_utc': None, 'max_mult': mult, 'n_signals': 1, 'share': 90, 'share_last': 90,
                 'mkt_volume': 5000, 'lead_min': None, 'minute': None, 'market': '1X2', 'selection': '1', 'score_at_signal': None, 'x4_min': None,
                 'in_roi': True, 'w': None if win is None else (1.0 if win else -1.0), 'no_source': False}
@@ -513,7 +513,8 @@ class Brain(Hardening):
         from scangoal import brain
         row = lambda hid, fam, n, hits, prob, open_=(), tradable=True, status='em observação': {
             'id': hid, 'family': fam, 'conditions': [['Minuto', hid]], 'n': n, 'games': n, 'hits': hits, 'hit_rate': hits / n, 'break_even': 0.5, 'prob_above': prob,
-            'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_)}
+            'roi': 0.1, 'source': 'gerador', 'status': status, 'tradable': tradable, 'open': list(open_),
+            'prospective': {'economics': {'status': 'positive_exploratory', 'roi_odds_minus_2pct': 0.1}}}
         now = datetime.fromisoformat('2026-11-12T20:00:00+00:00')
         sig = lambda key, date, ko=None: {'in_roi': True, 'match_id': 'jogo-' + key, 'key': key, 'date_utc': date, 'kickoff_utc': ko, 'teams': ['A', 'B'], 'selection': 'Over 2.5', 'market': 'Asian Total', 'odds': 1.9}
         rows = [row('a', 'Jogo aberto', 12, 11, 0.97, [sig('k1', '2026-11-12T19:40:00+00:00'), sig('k2', '2026-11-12T10:00:00+00:00'), sig('k3', '2026-11-12T12:00:00+00:00', '2026-11-12T22:00:00+00:00')]),
@@ -543,7 +544,8 @@ class Brain(Hardening):
         settled = s('done', '1', '2026-11-13T22:00+00:00', w=1.0)
         hist = [s('h%d' % i, '1', odds=1.8, w=1.0) for i in range(3)]          # resultados do tipo na faixa 1,50 a 2,00
         row = lambda hid, n, hits, prob, open_, status='em observação', tradable=True: {'id': hid, 'family': 'Betfair', 'conditions': [['Seleção', hid]], 'n': n, 'games': n, 'hits': hits,
-            'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_}
+            'break_even': 0.55, 'prob_above': prob, 'roi': 0.2, 'edge': 0.1, 'status': status, 'source': 'gerador', 'tradable': tradable, 'open': open_,
+            'prospective': {'economics': {'status': 'positive_exploratory', 'roi_odds_minus_2pct': 0.2}}}
         rows = [row('boa', 12, 11, 0.95, [good, both, conflict1, fresh_live, started]), row('boa-igual', 12, 11, 0.94, [good]),   # mesma amostra: conta uma vez
                 row('ma', 12, 3, 0.05, [both, avoid]), row('neutra', 12, 7, 0.5, [none]), row('poucos', 5, 5, 0.99, [none]),
                 row('depois', 20, 18, 0.99, [none], tradable=False), row('forte', 120, 90, 0.999, [conflict2], status='forte')]
@@ -641,7 +643,8 @@ class GoalMinutes(Hardening):
 
 
 class LanguageModel(Hardening):
-    ENV = {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32, 'MASTER_BRAIN_LLM_API_KEY': 'k'}
+    ENV = {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32, 'MASTER_BRAIN_LLM_API_KEY': 'k',
+           'GOAL_ROI_LLM_FREE_CONFIRMED': 'true'}
 
     def test_only_proposals_made_of_known_features_are_accepted(self):
         from scangoal import llm
@@ -658,12 +661,14 @@ class LanguageModel(Hardening):
         self.assertEqual(([g[0] for g in good], bad), (['Betfair | Seleção = empate', 'Betfair | Minuto = 61 em diante & Seleção = equipa da casa'], 5))
         self.assertNotIn('<', good[0][1]['reason'])
         self.assertEqual(good[0][1]['source'], 'llm')
-        self.assertEqual(llm.accept('sem json', vocab, {}), ([], 0))
+        self.assertEqual(llm.accept('sem json', vocab, {}), ([], 1))
         self.assertEqual(llm.accept(raw, vocab, {'Betfair | Seleção = empate': {}})[1], 6)               # já existe no registo
 
     def test_run_registers_with_birth_date_and_respects_daily_limit(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i).replace('@1.94', '@1.94' if i < 6 else '@2.50') for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
+                .replace('Kucukcekmece Sinopspor', f'Home {i}')
+                .replace('@1.94', '@1.94' if i < 6 else '@2.50') for i in range(9)]
         calls = []
         def call(account, key, model, prompt):
             calls.append((model, prompt))
@@ -675,7 +680,10 @@ class LanguageModel(Hardening):
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
-                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                for row in rows:
+                    row['collected_at_utc'] = (datetime.fromisoformat(row['date_utc']) + timedelta(minutes=1)).isoformat()
+                store.append_versions(rows)
                 self.assertIsNone(llm.run(call, env={}))                                                 # sem chaves: não faz nada
                 now = datetime.fromisoformat('2026-11-12T12:00:00+00:00')
                 st = llm.run(call, now, self.ENV)
@@ -692,13 +700,14 @@ class LanguageModel(Hardening):
                 self.assertEqual(len(calls), 2)                                                          # no máximo de hora a hora
                 r = report.build()
                 self.assertEqual((r['brain']['llm_total'], r['brain']['llm'][0]['n'], r['brain']['llm_runs']), (1, 0, 1))   # sinais anteriores não contam
-                self.assertEqual((st['last_mode'], st['calls_today'], st['neurons_today'] > 0), ('novas', 1, True))
+                self.assertEqual((st['last_mode'], st['calls_today'], st['neurons_today'] > 0), ('novas', 2, True))
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
 
     def test_modes_rotate_notes_are_anchored_and_budget_stops_the_day(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
+                .replace('Kucukcekmece Sinopspor', f'Home {i}') for i in range(9)]
         prompts = []
         def call(account, key, model, prompt):
             prompts.append(prompt)
@@ -719,7 +728,7 @@ class LanguageModel(Hardening):
                     st = llm.run(call, t0 + timedelta(hours=k), self.ENV)
                     modes.append(st['last_mode'])
                 self.assertEqual(modes, ['novas', 'refinar', 'evitar', 'notas'])
-                self.assertEqual((st['accepted'], st['rejected']), (0, 3))                              # nenhum sinal na equipa da casa: rejeitadas
+                self.assertEqual((st['accepted'], st['rejected']), (0, 4))                              # nenhum sinal na equipa da casa: rejeitadas
                 self.assertIn('ABAIXO', prompts[2])
                 notes = json.loads((Path(d) / 'llm_notes.json').read_text(encoding='utf-8'))
                 self.assertEqual([(n['id'], n['note']) for n in notes], [('Betfair | Seleção = empate', 'Amostra pequena bainda/b')])   # só a nota ancorada, texto limpo
@@ -979,7 +988,8 @@ class EvidencePerMatch(unittest.TestCase):
         # PR 3 provenance: signal read when sent; result first observed 145 min later (available after 150 min, as before).
         seen = (datetime.fromisoformat(d) + timedelta(minutes=145)).isoformat() if w is not None else None
         return {'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5', 'date_utc': d,
-                'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True, 'key': (match, d),
+                'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga',
+                'teams': [f'Home {match}', f'Away {match}'], 'in_roi': True, 'key': (match, d),
                 'n_signals': 1, 'max_mult': 1, 'no_source': False, 'signal_seen_utc': d, 'result_known_utc': seen}
 
     def test_signals_in_the_same_match_share_one_vote(self):
@@ -1045,8 +1055,8 @@ class EvidencePerMatch(unittest.TestCase):
         from scangoal import llm
         track = {'min_results': 10, 'llm': [{'id': 'Betfair | Seleção = empate', 'games': 12, 'roi': 0.25, 'expect': 'acima'}]}
         text = llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), track)
-        self.assertIn('Betfair | Seleção = empate -> 12 jogos, lucro médio por jogo +0.25', text)
-        self.assertIn('nenhuma está', text)
+        self.assertIn('Betfair | Seleção = empate -> 12 resultados confirmados, 0 perdas imputadas, ROI exploratório +0.25', text)
+        self.assertIn('Nenhuma está', text)
         for word in ('Confirmaram-se', 'Falharam', 'sentido esperado', 'Aprende com este balanço'):
             self.assertNotIn(word, text)
         self.assertNotIn('Propostas anteriores', llm.build_prompt({'Betfair': {'Seleção': {'empate': 9}}}, [], 5, 'novas', (), {'llm': []}))

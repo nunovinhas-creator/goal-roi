@@ -24,7 +24,7 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import brain, chronology, insights
+from . import brain, chronology, insights, match_identity
 from .eligibility import eligible, game_identity
 from .equivalence import Index, Redundancy, expectation, groups_at_birth
 
@@ -190,12 +190,15 @@ def observation_proof(root, ref, since):
             problems.append('observations: cannot read %s' % rel)
             continue
         commits = [tuple(x.split()) for x in log if x.strip()]
-        prev = {}
+        prev, archived = {}, {}
         for sha, stamp, body in _versions(root, rel, commits) if commits else ():
             t = chronology.parse_utc(stamp)
             try:
-                cur = json.loads(body) if body is not None else {}
-                cur = (cur.get(key) or {}) if key else cur
+                doc = json.loads(body) if body is not None else {}
+                cur = (doc.get(key) or {}) if key else doc
+                versions = doc.get('ft_versions', {}) if key == 'results' else {}
+                if not isinstance(versions, dict):
+                    raise ValueError('invalid FT versions')
             except (ValueError, AttributeError):
                 problems.append('unreadable %s at %s' % (rel, sha[:12]))
                 continue
@@ -208,7 +211,18 @@ def observation_proof(root, ref, since):
                 if k not in prev and t is not None and since is not None and t >= since:
                     if not _coherent(chronology.parse_utc(v.get(field) if isinstance(v, dict) else None), t):
                         problems.append('%s entry published out of time at %s: %s' % (rel, sha[:12], k))
-            prev = cur
+            for mid in archived.keys() | versions.keys():
+                before, after = archived.get(mid, []), versions.get(mid, [])
+                if not isinstance(before, list) or not isinstance(after, list) or after[:len(before)] != before:
+                    problems.append('%s FT history rewritten at %s: %s' % (rel, sha[:12], mid))
+                    continue
+                for row in after[len(before):]:
+                    observed = chronology.parse_utc(row.get('observed_at')) if isinstance(row, dict) else None
+                    available = chronology.parse_utc(row.get('available_at')) if isinstance(row, dict) else None
+                    if (observed is None or available is None or available < observed
+                            or not _coherent(available, t)):
+                        problems.append('%s FT version published out of time at %s: %s' % (rel, sha[:12], mid))
+            prev, archived = cur, versions
     return problems[:50]
 
 
@@ -247,14 +261,6 @@ def births(registry, first_seen, verified):
 
 # --------------------------------------------------------------------------------------------- evidência e comparação
 
-def _operational_pre(b, t):
-    """Aposta emitida e lida depois de t e decidível (brain.operational_bet sem a exigência do resultado: protocolo v4, §3)."""
-    if t is None:
-        return False
-    sent, stamp = chronology.signal_time(b), chronology.parse_utc(b.get('signal_seen_utc'))
-    return sent is not None and stamp is not None and sent > t and stamp > t and chronology.decidable(b)
-
-
 def admitted(match, start):
     """Protocolo v4 (§3): {jogo: (dia, valor ou None, hora da decisão, ganho máximo)} dos jogos admitidos depois de `start`.
 
@@ -265,13 +271,13 @@ def admitted(match, start):
     if start is None:
         return out
     games = {}
-    for b in match:
+    for b in match_identity.annotate(match):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
     for key, rows in games.items():
         bet = brain.committed_bet(rows)
-        if bet is None or not _operational_pre(bet, start):
+        if bet is None or not brain.operational_signal(bet, start) or bet.get('result_quarantined'):
             continue
         seen = [s for s in (chronology.parse_utc(b.get('match_result_first_seen_utc')) for b in rows) if s is not None]
         if seen and brain.latest_decision(bet) >= min(seen):
@@ -474,9 +480,11 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     as_of = clock
     # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
-    view = [b for b in chronology.as_of_view(signals, as_of) if eligible(b) and chronology.decision_time(b) <= cutoff]
-    multi, earlier = brain.multi_matches(view), brain.earlier_index(view)
-    have = [(b, insights.family(b), frozenset(brain.atoms(b, multi, earlier))) for b in view]
+    visible = [b for b in chronology.as_of_view(signals, as_of)
+               if chronology.decision_time(b) <= cutoff]
+    view = [b for b in match_identity.annotate(visible, cutoff) if eligible(b)]
+    have = [(b, insights.family(b), frozenset((d, v) for d, v in brain.atoms(b, set())
+                                               if d in brain.RESEARCH_DIMENSIONS)) for b in view]
     index = Index(view)
 
     def match(fam, conds):
@@ -488,7 +496,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     def snap(t):
         """Índice dos sinais elegíveis já LIDOS em t (hora de leitura provada): o que o sistema sabia nesse instante."""
         if t not in snaps:
-            snaps[t] = Index(chronology.as_of_view(view, t))
+            at_birth = chronology.as_of_view(view, t)
+            snaps[t] = Index(match_identity.annotate(at_birth, t))
         return snaps[t]
 
     cache = {}
@@ -506,8 +515,10 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     # depende do registo posterior. O script de auditoria indica quantas são, nas entradas.
     llm_ids = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm'
                      and (born_eff.get(hid) is None or born_eff[hid] <= cutoff))
-    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None]
-    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None)}
+    valid = [hid for hid in llm_ids if born_eff.get(hid) is not None and brain.research_conditions(registry[hid])]
+    excluded = {'no_proven_birth': sum(1 for hid in llm_ids if born_eff.get(hid) is None),
+                'unavailable_at_decision': sum(1 for hid in llm_ids if born_eff.get(hid) is not None
+                                               and not brain.research_conditions(registry[hid]))}
 
     # Duplicados à nascença (descrição): redundância extensional demonstrável no instante de registo de cada proposta.
     duplicates = []
@@ -527,24 +538,24 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         return groups_at_birth([(hid, registry[hid], born_eff[hid]) for hid in order], tau, games_at, GROUP_MIN_GAMES)
 
     gens = sorted(hid for hid, h in registry.items() if h.get('source') == 'gerador' and born_eff.get(hid) is not None
-                  and not any(c[0] in brain.POST for c in h['conditions']))
+                  and brain.research_conditions(h))
 
     def controls(hid):
         """Sem ler resultados; apoio e exclusão só com os sinais já LIDOS no nascimento de h (P1-A)."""
         h, t = registry[hid], born_eff[hid]
         ix = snap(t)
         size = min(len(h['conditions']), brain.MAX_CONDITIONS)
-        own = ix.mask(h['family'], h['conditions'])
-        s = own.bit_count()
+        own = ix.games(h['family'], h['conditions'])
+        s = len(own)
         cands = []
         for c in gens:
             g = registry[c]
             if g['family'] != h['family'] or len(g['conditions']) != size or born_eff[c] >= t:
                 continue
-            m = ix.mask(g['family'], g['conditions'])
+            m = ix.games(g['family'], g['conditions'])
             if m == own:
                 continue
-            if s and s / 2 <= m.bit_count() <= 2 * s:
+            if s and s / 2 <= len(m) <= 2 * s:
                 cands.append(c)
         cands.sort(key=lambda c: hashlib.sha256(('%s\n%s' % (hid, c)).encode('utf-8')).hexdigest())
         return cands[:K]
@@ -555,7 +566,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         out = []
         for i in range(len(conds)):
             pid = brain.hyp_id(h['family'], conds[:i] + conds[i + 1:])
-            if pid in registry and born_eff.get(pid) is not None and born_eff[pid] < t and pid != hid:
+            if (pid in registry and born_eff.get(pid) is not None and born_eff[pid] < t
+                    and pid != hid and brain.research_conditions(registry[pid])):
                 out.append(pid)
         return sorted(set(out))
 
@@ -682,7 +694,8 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
                            'duplicates_at_birth': duplicates,
                            'by_mode': {m: sum(1 for hid in valid if (registry[hid].get('mode') or 'novas') == m) for m in ('novas', 'refinar', 'evitar')}},
             'primary': primary, 'secondary': sec, 'pre_protocol': pre_protocol, 'hypotheses': table,
-            'notes': ['hit rates and prob_above are not used; no criterion reads them',
+            'notes': ['hypotheses and controls with dimensions unavailable at the decision are excluded',
+                      'hit rates and prob_above are not used; no criterion reads them',
                       'pre-protocol bets are post-registration evidence gathered before the protocol: descriptive only',
                       'the bootstrap-t p is a diagnostic only and never changes the verdict']}
 
@@ -694,7 +707,8 @@ def page_summary(signals, registry):
 
     def games_at(hid, t):
         if t not in snaps:
-            snaps[t] = Index(chronology.as_of_view(view, t))
+            at_birth = chronology.as_of_view(view, t)
+            snaps[t] = Index(match_identity.annotate(at_birth, t))
         return snaps[t].games(registry[hid]['family'], registry[hid]['conditions'])
     order = sorted(llm, key=lambda hid: (chronology.born(registry[hid]), hid))
     grp = groups_at_birth([(hid, registry[hid], chronology.born(registry[hid])) for hid in order], TAU, games_at, GROUP_MIN_GAMES)

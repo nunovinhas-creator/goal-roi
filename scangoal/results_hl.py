@@ -11,7 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from .results_bsd import load_aliases, load_json, match_events, pending_targets
+from .results_bsd import capture_result_versions, load_aliases, load_result_state, match_events, pending_targets, save_result_state
 from .store import data_dir
 
 ROOT = 'https://sports.highlightly.net/football/matches'
@@ -52,13 +52,14 @@ def to_event(m):
 
 
 def run(fetch=request_json, now=None, token=None):
-    now = now or datetime.now(UTC)
+    observed_clock = (lambda stamp=now: stamp) if now is not None else (lambda: datetime.now(UTC))
+    now = observed_clock()
     token = (token if token is not None else os.environ.get('HIGHLIGHTLY_KEY', '')).strip()
     if not token:
         print('HL_NOT_CONFIGURED')
         return None
     path = data_dir() / 'results_hl.json'
-    state = load_json(path, {'results': {}, 'near_misses': {}, 'last_run_utc': None, 'stats': {}})
+    state = load_result_state(path)
     if state['last_run_utc'] and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
         print('HL_SKIPPED_TOO_SOON')
         return state
@@ -106,14 +107,12 @@ def run(fetch=request_json, now=None, token=None):
         misses[mid] = misses.get(mid, 0) + 1
         if misses[mid] >= GIVE_UP_CHECKS:
             not_covered[mid] = now.isoformat(timespec='seconds')
-    for mid, res in found.items():
-        state['results'].setdefault(mid, dict(res, matched_at_utc=now.isoformat(timespec='seconds')))   # nunca reescreve
+    capture_result_versions(state, found, events, observed_clock())
     state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     state['last_run_utc'] = now.isoformat(timespec='seconds')
     state['stats'] = {'not_covered': len(not_covered), 'targets': len(targets), 'matched_this_run': len([m for m in targets if m in state['results']]), 'requests': requests,
                       'events_seen': len(unique), 'stopped': stopped, 'quota_remaining': remaining, 'per_day': per_day}
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    save_result_state(path, state)
     print('HL_OK', json.dumps(state['stats']))
     return state
 

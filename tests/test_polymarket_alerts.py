@@ -8,7 +8,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from scangoal import notify, polymarket_alerts, report
+from scangoal import notify, opportunity_forward, polymarket_alerts, report
+from scangoal.parser import parse
 from test_stale_notices import state as notification_state
 
 
@@ -28,7 +29,7 @@ def signal(**changes):
         'match_id': 'a-vs-b-20261119',
         'teams': ['A', 'B'],
         'league': 'Example League',
-        'market': 'Asian Total',
+        'market': 'Asian Total', 'period': 'regulation', 'market_scope': 'match_goals',
         'selection': 'Over 2.5',
         'odds': 1.85,
         'share': 79,
@@ -138,6 +139,91 @@ class PolymarketAlerts(unittest.TestCase):
             Path(directory, 'messages.jsonl').write_text(json.dumps(message) + '\n', encoding='utf-8')
             row, = report.build(now=NOW)[polymarket_alerts.REPORT_KEY]
         self.assertEqual((row['total'], row['share'], row['odds']), (7100, 72, 1.85))
+
+
+    def test_market_scope_and_state_on_original_message(self):
+        raw = ("📈 🔷 Polymarket · 19 nov 2026 13:10\nA — B · Example League\n"
+               "Over 2.5 @1.85 · $9.9K\n🧾 2 trades · market share 72%\n"
+               "https://scangoal.com/match/a-vs-b-20261119?lang=en")
+        for text, market, period in (
+            (raw.replace("Polymarket ·", "Polymarket · 1st Half ·"), "1st Half - Asian Total", "first_half"),
+            (raw.replace("Over 2.5", "Over 2.5 Corners"), "Total Corners", "regulation"),
+            (raw.replace("Over 2.5", "Over 2,5 (90 min)"), "Asian Total", "regulation"),
+        ):
+            with self.subTest(market=market):
+                parsed = parse(text)
+                self.assertEqual((parsed["market"], parsed["period"], parsed["selection"]),
+                                 (market, period, "Over 2.5"))
+                alerts = polymarket_alerts.candidates([dict(signal(), **parsed)], set(), NOW)
+                self.assertEqual(len(alerts), int(market == "Asian Total"))
+        self.assertFalse(parse(raw.replace("Polymarket ·", "Polymarket · LIVE ·"))["bet"])
+        live = parse(raw.replace("19 nov 2026 13:10", "LIVE 32' 1:1"))
+        self.assertEqual((live["phase"], live["score_at_signal"]), ("live", [1, 1]))
+
+    def test_original_header_scope_is_required_by_both_consumers(self):
+        def evaluate(header, quote):
+            parsed = parse("\n".join((
+                "📈 🔷 Polymarket · " + header + "19 nov 2026 21:00",
+                "A — B · Example League", quote + " @1.85 · $9.9K",
+                "🧾 2 trades · market share 72%",
+                "https://scangoal.com/match/a-vs-b-20261119?lang=en",
+            )))
+            row = dict(parsed, message_id=1, date_utc=timestamp(-3), collected_at_utc=timestamp(-2),
+                       had_ft_at_first_sight=False, edited_at_first_sight=False, burst=False)
+            alerts = polymarket_alerts.candidates([row], set(), NOW)
+            eligible = opportunity_forward.eligible_signal(row, NOW - timedelta(hours=1), NOW + timedelta(minutes=20))
+            return parsed, bool(alerts), eligible is not None
+
+        for market in ('Yellow Cards', 'Team Total', 'Overtime', 'Unknown Scope', 'Player Total', 'Corners'):
+            with self.subTest(market=market):
+                original, alert, admitted = evaluate(market + " · ", "Over 2.5")
+                self.assertFalse(alert or admitted)
+                self.assertEqual(original['bet'], market == 'Corners')
+        for quote in ('Team Total Over 2.5', 'Over 2.5 team goals', 'Over 2.5 unknown', '1H Over 2.5'):
+            with self.subTest(quote=quote):
+                self.assertEqual(evaluate("", quote)[1:], (False, False))
+        self.assertEqual(evaluate("", "Over 2.5")[1:], (True, True))
+        self.assertEqual(evaluate("Total Goals · ", "Over 2.5 (90 min)")[1:], (True, True))
+
+    def test_amount_is_parsed_in_full_without_ambiguous_grouping(self):
+        raw = ("📈 🔷 Polymarket · 19 nov 2026 13:10\nA — B · Example League\n"
+               "Over 2.5 @1.85–2.10 · $VALUE\n🧾 2 trades · market share 72%")
+        for token, amount in (("10,500", None), ("10.500", None), ("10 500", 10500),
+                              ("10,500.00", 10500), ("10.500,00", 10500),
+                              ("9,9K", 9900), ("9 500,25", 9500.25), ("9500 USD?", None)):
+            with self.subTest(token=token):
+                row = parse(raw.replace("VALUE", token))
+                self.assertEqual(row.get("total"), amount)
+                self.assertEqual(row["bet"], amount is not None)
+                if amount is not None:
+                    self.assertEqual(row["odds"], 1.85)
+        self.assertFalse(parse(raw.replace("VALUE", "9000").replace("1.85–2.10", "2.10–1.85"))["bet"])
+
+    def test_exact_line_and_unambiguous_share_reach_alert_and_study(self):
+        raw = ("📈 🔷 Polymarket · HEADER19 nov 2026 21:00\nA — B · Example League\n"
+               "Over LINE @1.85 · $9.9K\n🧾 2 trades · market share 72% SHARE\n"
+               "https://scangoal.com/match/a-vs-b-20261119?lang=en")
+        for header, line, share, selection, accepted in (
+            ("", "2.50", "", "Over 2.5", True),
+            ("", "2,50", "· Market share 72.00%", "Over 2.5", True),
+            ("", "2.55", "", "Over 2.55", False),
+            ("", "2.50", "· market share 93%", None, False),
+            ("Yellow Cards · ", "2.50", "", None, False),
+            ("Team Total · ", "2.50", "", None, False),
+            ("Overtime · ", "2.50", "", None, False),
+            ("Total Goals · Corners · ", "2.50", "", None, False),
+            ("1st Half · Full Time · ", "2.50", "", None, False),
+        ):
+            with self.subTest(header=header, line=line, share=share):
+                parsed = parse(raw.replace("HEADER", header).replace("LINE", line).replace("SHARE", share))
+                self.assertEqual(parsed.get("selection"), selection)
+                self.assertEqual(parsed["bet"], selection is not None)
+                row = dict(parsed, message_id=1, date_utc=timestamp(-3), collected_at_utc=timestamp(-2),
+                           had_ft_at_first_sight=False, edited_at_first_sight=False, burst=False)
+                alerts = notification_report([row], NOW)
+                self.assertEqual(bool(notify.messages(alerts, activated_store().load_state(), NOW)), accepted)
+                eligible = opportunity_forward.eligible_signal(row, NOW - timedelta(hours=1), NOW + timedelta(minutes=20))
+                self.assertEqual(eligible is not None, accepted)
 
 
 def notification_report(messages, now, watch=()):

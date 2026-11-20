@@ -91,5 +91,44 @@ class PolymarketExactSelectionTests(unittest.TestCase):
         self.assertNotIn(brain.POLYMARKET_EXACT_SELECTION, brain.POST)
 
 
+class ExperimentalProfiles(unittest.TestCase):
+    def test_discovers_joint_conditions_from_distinct_games_without_outcomes(self):
+        rows = []
+        for prefix, share, amount in (("low", 79, 9_999), ("share", 80, 9_999), ("amount", 79, 10_000)):
+            for i in range(8):
+                row = polymarket()
+                row.update(match_id="%s-%d" % (prefix, i), teams=[prefix + str(i), "Beta"], period="regulation",
+                           share=share, total=amount, w=None, signal_seen_utc="2026-11-19T12:01:00Z")
+                rows.append(row)
+        conditions = sorted([
+            [brain.POLYMARKET_CONTRACT, "Asian Total / Over 2.5 / regulation"],
+            ["Momento", "antes do jogo"], ["Quota de mercado", "menos de 80 %"],
+            ["Valor da aposta", "menos de 10 mil $"],
+        ])
+        hid = brain.hyp_id("Polymarket", [tuple(c) for c in conditions])
+        registry = {}
+        brain.update_registry(rows, registry)
+        self.assertEqual(registry[hid]["conditions"], conditions)
+        self.assertTrue(registry[hid]["experimental_profile"])
+        self.assertFalse(brain.certifiable(registry[hid]))
+        result = next(r for r in brain.evaluate(rows, registry, 300)[0] if r["id"] == hid)
+        self.assertEqual((result["status"], result["tradable"]), ("em observação", False))
+
+        repeated = {}
+        brain.update_registry([rows[0]] * 20, repeated)
+        self.assertFalse(any(h.get("experimental_profile") for h in repeated.values()))
+
+    def test_contract_keeps_period_and_market_distinct(self):
+        variants = [
+            ("Asian Total", "regulation", "Asian Total / Over 2.5 / regulation"),
+            ("1st Half - Asian Total", "first_half", "1st Half - Asian Total / Over 2.5 / first_half"),
+            ("Total Corners", "regulation", "Total Corners / Over 2.5 / regulation"),
+        ]
+        for market, period, expected in variants:
+            row = polymarket(market=market)
+            row["period"] = period
+            self.assertEqual(dict(brain.atoms(row, set()))[brain.POLYMARKET_CONTRACT], expected)
+
+
 if __name__ == "__main__":
     unittest.main()

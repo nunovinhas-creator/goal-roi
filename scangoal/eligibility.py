@@ -13,7 +13,7 @@ def text_identity(value):
 
 def game_identity(signal):
     """Game a signal belongs to, or None when it cannot be proven (no match_id: no independent observation)."""
-    return text_identity(signal.get('match_id'))
+    return text_identity(signal.get('canonical_match_id', signal.get('match_id')))
 
 
 def bet_identity(signal):
@@ -36,7 +36,7 @@ def exclusion_reasons(signal):
         reasons.append('no_market')
     # PR 2 (review #5910343843): an observation only supports decisions when its game and bet are identifiable.
     if game_identity(signal) is None:
-        reasons.append('no_match_identity')
+        reasons.append(signal.get('match_identity_exclusion') or 'no_match_identity')
     if text_identity(signal.get('selection')) is None:
         reasons.append('no_selection')
     return reasons

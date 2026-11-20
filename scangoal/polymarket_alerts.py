@@ -17,6 +17,7 @@ def candidates(messages, finished_matches, now):
     for m in messages:
         if (m.get('type') != 'POLYMARKET' or m.get('phase') != 'pre'
                 or m.get('market') != 'Asian Total' or m.get('selection') != 'Over 2.5'
+                or m.get('market_scope') != 'match_goals' or m.get('period') != 'regulation'
                 or not below(m.get('share'), 80) or not below(m.get('total'), 10_000)):
             continue
         original = m.get('bet') is True and all(

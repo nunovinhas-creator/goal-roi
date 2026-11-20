@@ -320,7 +320,7 @@ def main():
     notify_state = json.loads((data_dir() / 'notify_state.json').read_text(encoding='utf-8'))
     report_mod.build(None, register=False)
     registry = brain.load_registry(data_dir() / 'hypotheses.json')
-    rows = brain.evaluate(report_mod.LAST['signals'], registry, report_mod.MIN_SETTLED)[0]
+    rows = brain.evaluate(report_mod.LAST['research_signals'], registry, report_mod.MIN_SETTLED)[0]
     ledger, problems = activation_plan(published, notify_state, rows, brain.STATUS_RULES, now,
                                        collection_paused='--confirm-collection-paused' in sys.argv, ledger_exists=path.exists())
     if problems:

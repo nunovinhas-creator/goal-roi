@@ -24,7 +24,7 @@ python -m scripts.opportunity_forward_audit
 
 O script usa apenas `data/messages.jsonl`, `notify_state.json` e provas FT de `results_hl.json`/`results_bsd.json`/edições do próprio bot. Não requer credenciais; não altera `data/`, GitHub, Telegram, Cloudflare, workflows, SHADOW ou o notificador.
 
-Uma aposta teórica por jogo: **primeiro sinal elegível**, com a odd e quota originais. O sinal só entra se a leitura estiver comprovada e deixar mais de 15 minutos antes do início. O resultado só conta como conhecido se a hora do primeiro registo for provada, posterior ao início e anterior à auditoria. Divergências de FT ficam em quarentena. Jogos ainda sem resultado ficam pendentes; depois de 3 dias, perdas por ausência de resultado contam como **−1 unidade**. O ROI é calculado à odd anunciada e com **redução de 2% da odd**; comissões e execução real continuam sem prova.
+Uma aposta teórica por jogo: **primeiro sinal elegível**, com a odd e quota originais. O sinal só entra se a leitura estiver comprovada e deixar mais de 15 minutos antes do início. O resultado só conta quando uma observação FT válida está disponível no corte, após a duração mínima do jogo. Uma divergência visível põe o encontro em quarentena. O desfecho primário fecha três dias após o início. Um encontro sem FT comprovado e sem conflito até esse prazo conta como **−1 unidade imputada**, e revisões posteriores têm contagens próprias. O ROI é calculado à odd anunciada e com **redução de 2% da odd**; comissões e execução real continuam sem prova.
 
 ## Leitura correta dos resultados
 
@@ -46,23 +46,24 @@ O benchmark usa **sinais Polymarket pré-jogo, Asian Total Over 2.5 sem os corte
 
 Métricas calculadas para a candidata e o benchmark:
 
-- `forward_games`, `settled`, `pending`, `quarantined`, `wins`, `losses`, `timeouts_counted_as_losses`.
-- `roi_advertised`: lucro teórico médio por jogo liquidado à odd original.
-- `roi_odds_minus_2pct`: ROI após penalização fixa de 2% na odd (não é medida de slippage/comissões executados).
-- `roi_minus_baseline_descriptive`: diferença de ROIs observados, sem inferência.
-- `descriptive_two_se_score`: ROI reduzido menos duas vezes o erro-padrão amostral dos lucros individuais **se houver pelo menos 30 jogos futuros liquidados**. Esta penalização exploratória **não é um intervalo de confiança** nem uma correção de multiplicidade.
-- `rank_exploratory`: nulo enquanto existirem menos de 30 jogos liquidados. Mesmo após 30, qualquer prioridade é **apenas para investigação**, nunca uma classificação como aposta lucrativa.
+- `forward_games`, `ft_confirmed`, `pending`, `quarantined` e `timeouts_counted_as_losses` tornam a cobertura explícita. `settled` soma FT confirmados e perdas imputadas.
+- As métricas de stake, lucro absoluto e ROI são distintas. A taxa de acerto usa apenas FT confirmados. `expected_profit` fica nulo enquanto o estudo for exploratório.
+- `concentration` mede maior grupo e proporção por dia UTC de decisão, campeonato, encontro e lote de recolha. `overlap` conta encontros comuns e cotações coincidentes ou distintas.
+- `descriptive_two_se_score` mostra o ROI com odd ×0,98 menos dois erros-padrão agrupados por dia UTC de decisão. Exige 30 FT confirmados, pelo menos dez dias com FT e no máximo 20% num dia, tanto nos FT como nos resultados liquidados. Esta penalização descritiva pode deixar dependência residual entre dias.
+- `rank_exploratory` só aparece quando o diagnóstico acima é calculável. Trinta jogos dão início à análise, com perdas imputadas, cobertura e concentração visíveis.
 
-A forma do relatório admite candidatos adicionais futuramente, mas a implementação só reconhece **uma** regra congelada. Mais regras exigem registo prospectivo independente, orçamento de multiplicidade e testes adversariais. O campo `statistical_claim` permanece `none`, `certification=not_activated`, `automatic_alerts_changed=false` em todos os casos. **Não** altera o cérebro, a LLM, o Telegram nem o workflow de produção. Se a auditoria anterior e o novo cálculo não coincidirem, recusa a avaliação em vez de publicar estatísticas inconsistentes.
+### Plano confirmatório para revisão independente
 
-Este passo **não conclui** a Fase 3 no seu sentido científico integral: faltam calibração estatística validada, custo de execução real, qualidade das odds, vários candidatos pré-registados e a correção de testes múltiplos. É a infraestrutura de *ranking exploratório sem ativação* para prosseguir a investigação sem olhar para resultados futuros.
+1. Congelar publicação, regra, população, janela, custos, stake, definição de cotação executável, política de dados em falta e a diferença mínima economicamente relevante antes de observar a nova amostra. Recolher evidência numa janela posterior à descoberta. Fixar a potência e o horizonte por simulações que preservem lotes, campeonatos e dependência temporal.
+2. Para retorno absoluto, escolher antecipadamente um teste sequencial de lucro com nulo condicional. Fixar a política de admissão: comprometer um encontro ou lote com stake total predefinido antes da decisão e admitir a unidade seguinte apenas depois de o resultado aproveitado estar fechado. Rever a prova de previsibilidade e simular nulos com séries e lotes correlacionados. O e-processo de `brain.confirmation` documenta a versão por encontro; as suas suposições e evidência de preços teriam de ser verificadas para este estudo.
+3. Para benefício incremental, congelar um comparador separado por mercado, período e oportunidade. Se houver jogos comuns, definir estatística emparelhada e um nulo comparativo próprios. O benchmark atual serve como referência descritiva.
+4. Registar previamente as hipóteses primárias e análises secundárias. Para múltiplas análises confirmatórias, usar alocação sequencial de α antes de cada seleção ou Holm numa família fixa de valores-p válidos sob a dependência. Documentar regras de paragem, falsos positivos e dados censurados. O relatório atual mantém `statistical_claim=none` e `certification=not_activated`.
 
-## Fase 4: a LLM recebe apenas conclusões operacionais com limites explícitos
 
-`scangoal.llm.opportunity_digest` consulta localmente a regra fixa da PR #55, o carimbo de ativação efetivo e o registo de resultados provados **sem rede ou novos segredos**. Aplica a mesma auditoria cruzada de `scangoal/opportunity_ranking.py` e produz apenas agregados; um erro, prova ausente ou divergência suprime o contexto em vez de inventar evidência.
+## Fase 4: descoberta experimental e contexto da LLM
 
-`build_prompt` aceita uma síntese opcional `opportunity`. A secção nova tem um **máximo de três frases**, sempre com o nome fixo da regra e quantidades agregadas. Com menos de 30 jogos futuros liquidados mostra apenas `n` e a indicação de amostra insuficiente: **não envia ROI, probabilidades de lucro nem recordes de 8/9 históricos ao modelo**. Só com 30 ou mais jogos futuros são mostrados o ROI teórico com odd ×0,98 e o benchmark sobreposto, rotulados exclusivamente como *diagnóstico exploratório, não certificado*.
+O cérebro procura automaticamente perfis de contrato nos sinais Polymarket originais. O perfil ancora mercado, seleção, período e fase e combina quota, montante e faixa de odd com apoio em encontros distintos. O registo tem um limite de perfis e elimina combinações que cobrem exatamente os mesmos encontros. Usa características e apoio, independentemente do resultado. Os perfis ficam em observação e excluídos dos alertas e da certificação.
 
-Nem `build_prompt` nem `opportunity_digest` acrescentam qualquer permissão ao modelo. As propostas continuam sujeitas à validação de características, suporte e redundância e nascem com carimbo posterior ao registo (`born_utc`). Não há novas chamadas à Cloudflare Workers AI, mudança de modelo, alteração de `DAILY_NEURONS=8000`, reativação da certificação, envio ao Telegram ou incorporação no ranking científico.
+A LLM recebe secções distintas para descoberta histórica e evidência descritiva prospetiva. O resumo de #55 oculta ROI sem 30 FT confirmados ou quando a amostra está concentrada. Um refinamento tem de manter as condições da proposta-mãe indicada e acrescentar exatamente uma condição. O registo retém os motivos de rejeição, e as notas usam números do relatório.
 
-A interface é **fail-closed**: num ambiente sem ativação, devolve `None` e mantém o pedido anterior; dados corrompidos, cronologias contraditórias, identificadores de regra diferentes ou classificações falsamente certificadas são rejeitados. O percurso usa apenas ficheiros de produção já existentes, em modo de leitura. Os testes de `tests/test_opportunity_llm_context.py` impedem fugas de nomes/textos privados e a contaminação por lucros de amostras curtas.
+O limite local de 8.000 neurónios/dia em UTC é reservado antes de cada tentativa, incluindo fallbacks. Uma falha de transporte ou ausência de contagem fiável mantém a reserva. A contagem reportada só pode reduzir a reserva dentro dos limites conhecidos do modelo. Os testes simulam pedidos, falhas, reinício e mudança de dia. O teto local gere o consumo deste processo e a quota agregada continua a ser aplicada pelo plano Free da conta Cloudflare. A recuperação do estado num runner diferente depende de a execução anterior ter publicado esse estado.

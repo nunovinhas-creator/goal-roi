@@ -84,10 +84,13 @@ def signal_seen(b):
 
 def result_check(b):
     """-> (datetime ou None, motivo): 'verified', 'unknown' (sem prova) ou 'contradictory' (antes do sinal ou do início)."""
-    stamp = parse_utc(b.get('result_known_utc'))
-    if stamp is None:
+    if 'result_available_utc' in b:
+        known = parse_utc(b['result_available_utc'])
+    else:
+        stamp = parse_utc(b.get('result_known_utc'))
+        known = stamp + timedelta(minutes=OBSERVATION_MARGIN_MIN) if stamp is not None else None
+    if known is None:
         return None, 'unknown'
-    known = stamp + timedelta(minutes=OBSERVATION_MARGIN_MIN)
     sent, ko = signal_time(b), kickoff_time(b)
     if sent is None or known < sent or (ko is not None and known < ko):
         return None, 'contradictory'
@@ -148,6 +151,7 @@ def as_of_view(signals, as_of):
         known = result_known(b)
         if b.get('w') is not None and known is not None and known > as_of:
             b = dict(b, w=None, ft=None, settled_by=None, result_known_utc=None, result_known_source=None)
+            b.pop('result_available_utc', None)
         first = parse_utc(b.get('match_result_first_seen_utc'))
         if first is not None and first > as_of:
             b = dict(b, match_result_first_seen_utc=None)

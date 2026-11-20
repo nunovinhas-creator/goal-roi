@@ -1,4 +1,5 @@
 """Parser por regras das mensagens do bot ScanGoal. Sem LLM, sem rede."""
+import math
 import re
 from datetime import datetime, timedelta, timezone
 
@@ -139,26 +140,149 @@ def parse(text):
     return m
 
 
+def polymarket_amount(token):
+    """Parse a complete USD amount. A single separator with three digits is ambiguous."""
+    value = " ".join(token.upper().split())
+    if re.fullmatch(r"[0-9]+(?:[.,][0-9]{1,2})?K", value):
+        amount = float(value[:-1].replace(",", ".")) * 1000
+    elif re.fullmatch(r"[0-9]+(?:[.,][0-9]{1,2})?", value):
+        amount = float(value.replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}( [0-9]{3})+(?:[.,][0-9]{1,2})?", value):
+        amount = float(value.replace(" ", "").replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}(,[0-9]{3})+(?:\.[0-9]{1,2})", value):
+        amount = float(value.replace(",", ""))
+    elif re.fullmatch(r"[0-9]{1,3}(\.[0-9]{3})+(?:,[0-9]{1,2})", value):
+        amount = float(value.replace(".", "").replace(",", "."))
+    elif re.fullmatch(r"[0-9]{1,3}(?:,[0-9]{3}){2,}|[0-9]{1,3}(?:\.[0-9]{3}){2,}", value):
+        amount = float(value.replace(",", "").replace(".", ""))
+    else:
+        return None
+    return amount if math.isfinite(amount) else None
+
+
+FIRST_HALF = r"(?:1st[- ]half|first[- ]half|1h|h1|1ª parte|half[- ]time|ht)"
+SECOND_HALF = r"(?:2nd[- ]half|second[- ]half|2h|h2|2ª parte)"
+REGULATION = r"(?:90\s*(?:min(?:utes?)?)?|full[- ]time|full match|regulation(?: time)?|ft)"
+MATCH_GOALS = r"(?:goals?|total goals?|goals? total|match total|match goals|asian total)"
+CORNERS = r"(?:corners?|total corners?|corners? total)"
+MATCH_WINNER = r"(?:1x2|winner|match winner|moneyline)"
+LIVE_SCORE = re.compile(r"LIVE (\d+)(?:\+\d+)?' (\d+):(\d+)", re.I)
+POLYMARKET_BRAND = re.compile(r"[^\w]*Polymarket(?:\s+×[1-9][0-9]*)?", re.I)
+TOTAL_QUOTE = re.compile(
+    rf"(?:(?P<prefix>{FIRST_HALF}|{SECOND_HALF}|{MATCH_GOALS}|{CORNERS})\s+)?"
+    rf"(?P<side>Over|Under) (?P<line>[0-9]+(?:[.,][0-9]{{1,2}})?)"
+    rf"(?:\s+(?P<suffix>{MATCH_GOALS}|{CORNERS}))?"
+    rf"(?:\s*\((?P<period>{REGULATION}|{FIRST_HALF}|{SECOND_HALF})\))?", re.I,
+)
+POLYMARKET_SHARE = re.compile(r"\bmarket\s+share\s+([0-9]+(?:[.,][0-9]+)?)\s*%", re.I)
+
+
+def decimal_label(token):
+    """Canonical decimal spelling without rounding the quoted line."""
+    integer, _, fraction = token.replace(",", ".").partition(".")
+    integer, fraction = integer.lstrip("0") or "0", fraction.rstrip("0")
+    return f"{integer}.{fraction}" if fraction else integer
+
+
+def market_tag(value):
+    for pattern, tag in ((FIRST_HALF, 'first_half'), (SECOND_HALF, 'second_half'), (REGULATION, 'regulation'),
+                         (MATCH_GOALS, 'match_goals'), (CORNERS, 'corners'), (MATCH_WINNER, 'winner')):
+        if re.fullmatch(pattern, value, re.I):
+            return tag
+    return None
+
+
+def polymarket_header(header):
+    brand, *fields = (part.strip() for part in header.split('·'))
+    if not POLYMARKET_BRAND.fullmatch(brand):
+        return None
+    time, scopes, periods = None, set(), set()
+    for part in fields:
+        if KICKOFF.fullmatch(part) or LIVE_SCORE.fullmatch(part):
+            if time is not None:
+                return None
+            time = part
+            continue
+        tag = market_tag(part)
+        if tag is None:
+            return None
+        (scopes if tag in ('match_goals', 'corners', 'winner') else periods).add(tag)
+    if time is None or len(scopes) > 1 or len(periods) > 1:
+        return None
+    return time, scopes, periods
+
+
+def special_quote_scope(selection, teams):
+    """Identify explicit formats that still use the existing bot settlement."""
+    if re.fullmatch(r"AH[12]\([+-][0-9]+(?:\.[0-9]{1,2})?\)", selection, re.I):
+        return 'handicap'
+    if re.fullmatch(r"BTTS: (?:Yes|No)", selection, re.I):
+        return 'both_teams_to_score'
+    if selection in ('1', 'X', '2'):
+        return 'winner'
+    team = "|".join(re.escape(name) for name in teams)
+    if re.fullmatch(rf"Handicap → Spread: (?:{team}) \([+-]?[0-9]+(?:\.[0-9]{{1,2}})?\)(?: \([^()]+\))?", selection, re.I):
+        return 'handicap'
+    return None
+
+
 def polymarket(m, h, lines, text):
-    """Dinheiro na Polymarket: seleção, odd (a mais baixa quando vem um intervalo), valor, número de transações e quota."""
-    m['type'] = 'POLYMARKET'
-    s = re.match(r'^(.+?) @([\d.]+)(?:[–-][\d.]+)? · \$([\d.]+K?)', lines[2]) if len(lines) > 2 else None
+    """A quote belongs to a positively recognised period and market scope."""
+    m.update(type='POLYMARKET', market='Polymarket')
+    header = polymarket_header(h)
+    quote = re.fullmatch(r"(.+?) @([0-9]+(?:\.[0-9]+)?)(?:[–-]([0-9]+(?:\.[0-9]+)?))? · \$(.+)",
+                         lines[2].strip()) if len(lines) > 2 else None
     head = lines[1].rsplit(' · ', 1) if len(lines) > 1 else []
     teams = [t.strip() for t in head[0].split('—', 1)] if head and '—' in head[0] else None
-    if not s or not teams or len(teams) != 2:
+    if not header or not quote or not teams or not all(teams):
         return
-    live = re.search(r"LIVE (\d+)(?:\+\d+)?' (\d+):(\d+)", h)
-    tr, sh = re.search(r'🧾 (\d+) trades?', text), re.search(r'market share (\d+)%', text)
-    sel = s[1].strip()
-    if re.match(r'^(Over|Under) [\d.]+$', sel):
-        market = 'Asian Total'
-    elif sel in teams or sel.lower() == 'draw':
-        market, sel = '1X2', 'X' if sel.lower() == 'draw' else '12'[teams.index(sel)]
+    raw_sel, low, high, token = quote.groups()
+    amount = polymarket_amount(token)
+    low, high = float(low), float(high) if high is not None else None
+    if (amount is None or not math.isfinite(low)
+            or (high is not None and (not math.isfinite(high) or high < low))):
+        return
+
+    time, scopes, periods = header
+    live, kickoff = LIVE_SCORE.fullmatch(time), kickoff_utc(time)
+    if live is None and kickoff is None:
+        return
+    total = TOTAL_QUOTE.fullmatch(raw_sel)
+    if total:
+        for value in (total['prefix'], total['suffix'], total['period']):
+            if value:
+                tag = market_tag(value)
+                (scopes if tag in ('match_goals', 'corners') else periods).add(tag)
+        if 'winner' in scopes or len(scopes) > 1 or len(periods) > 1:
+            return
+        scope, period = next(iter(scopes), 'match_goals'), next(iter(periods), 'regulation')
+        market = ('Total Corners' if scope == 'corners' else
+                  {'regulation': 'Asian Total', 'first_half': '1st Half - Asian Total',
+                   'second_half': '2nd Half - Asian Total'}[period])
+        sel = total['side'].title() + ' ' + decimal_label(total['line'])
+    elif (raw_sel in teams or raw_sel.lower() == 'draw') and scopes <= {'winner'} and periods <= {'regulation'}:
+        scope, period, market = 'winner', 'regulation', '1X2'
+        sel = 'X' if raw_sel.lower() == 'draw' else '12'[teams.index(raw_sel)]
     else:
-        market = 'Polymarket'          # mercado que o resultado final não decide por regra: fica para a marca do bot
-    m.update(phase='live' if live else 'pre', teams=teams, league=clean_league(head[1]) if len(head) > 1 else None, kickoff_utc=None if live else kickoff_utc(h),
-             minute=int(live[1]) if live else None, score_at_signal=[int(live[2]), int(live[3])] if live else None,
-             market=market, selection=sel, odds=float(s[2]), total=money(s[3]), n_bets=int(tr[1]) if tr else None, share=int(sh[1]) if sh else None, bet=True)
+        scope = special_quote_scope(raw_sel, teams)
+        if scope is None or (scopes and scopes != {scope}) or periods - {'regulation'}:
+            return
+        period, market, sel = 'regulation', 'Polymarket', raw_sel
+
+    tr = re.search(r'🧾 (\d+) trades?', text)
+    shares = {decimal_label(token) for token in POLYMARKET_SHARE.findall(text)}
+    if len(shares) > 1:
+        return
+    share_text = next(iter(shares), "")
+    share = float(share_text) if re.fullmatch(r"[0-9]+(?:\.[0-9]{1,2})?", share_text) else None
+    if share is not None and share > 100:
+        share = None
+    m.update(phase='live' if live else 'pre', period=period, market_scope=scope, teams=teams,
+             league=clean_league(head[1]) if len(head) > 1 else None, kickoff_utc=kickoff,
+             minute=int(live[1]) if live else None,
+             score_at_signal=[int(live[2]), int(live[3])] if live else None,
+             market=market, selection=sel, odds=low, total=amount,
+             n_bets=int(tr[1]) if tr else None, share=share, bet=True)
 
 
 def goal_brewing(m, lines, text):

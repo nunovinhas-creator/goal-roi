@@ -216,7 +216,7 @@ def odds_band(o):
 def dimensions(b, multi):
     """(dimensão, valor) aplicáveis a um sinal. Lista fixa; não acrescentar sem data."""
     out = [('Competição', b['kind']), ('Faixa de odd', odds_band(b['odds'])),
-           ('Outros sinais no mesmo jogo', 'jogo com vários tipos de sinal' if b['match_id'] in multi else 'jogo com um só tipo de sinal'),
+           ('Outros sinais no mesmo jogo', 'jogo com vários tipos de sinal' if game_identity(b) in multi else 'jogo com um só tipo de sinal'),
            ('Dia', 'fim de semana' if datetime.fromisoformat(b['date_utc']).weekday() >= 5 else 'dia de semana')]
     if b['type'] == 'BETFAIR':
         out += [('Momento', 'antes do jogo' if b['phase'] == 'pre' else 'durante o jogo'),
