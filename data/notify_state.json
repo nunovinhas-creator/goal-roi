@@ -970,6 +970,18 @@
    "sha256": "bea82dc515d180a075895158ab3b7da3c78d064df64a103acfcc1558b9b0b90a",
    "state": "delivered"
   },
+  "game|id:cobresal-vs-audax-italiano-20261121|4f32e271270b": {
+   "attempt_utc": "2026-11-20T20:24:58+00:00",
+   "chars": 199,
+   "created_utc": "2026-11-20T20:24:58+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "5481d2f5e490d8fc561f44b0a64f9f3ab05508590f2999a01cf2068ae6330c94",
+   "state": "in_flight"
+  },
   "game|id:cong-an-ha-noi-vs-johor-darul-takzim-20261119|5c7e53009cfc": {
    "attempt_utc": "2026-11-19T12:14:02+00:00",
    "chars": 310,
@@ -1067,6 +1079,14 @@
    "kind": "hint",
    "sha256": "1e4debe2e3397938b333ece864b0ecf19e921ac2aebd916ebb79d21fbe3b56fc",
    "state": "delivered"
+  },
+  "game|id:de-graafschap-vs-mvv-maastricht-20261120|4c1ea9b5a916": {
+   "created_utc": "2026-11-20T20:24:58+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
   },
   "game|id:denmark-vs-norway-20261117|930dc2a858b9": {
    "attempt_utc": "2026-11-17T21:09:58+00:00",
@@ -1716,13 +1736,15 @@
    "attempt_utc": "2026-11-20T20:20:59+00:00",
    "chars": 179,
    "created_utc": "2026-11-20T20:20:59+00:00",
+   "done_utc": "2026-11-20T20:20:59+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "4050631a01903921d993019861b0759acec8dff3f5dc545205baa92c627c27da",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:monaco-vs-aj-auxerre-20261121|abb1505033e1": {
    "attempt_utc": "2026-11-20T15:37:50+00:00",
@@ -2678,17 +2700,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 163,
+  "delivered": 164,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-20T20:17:57+00:00",
+ "format_last_run_utc": "2026-11-20T20:22:59+00:00",
  "health": {
   "reference": {
    "bsd_results": 36,
-   "eligible": 1049,
+   "eligible": 1051,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 98,
-   "hypotheses": 10074,
+   "hypotheses": 10080,
    "settled_bets": 831,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 48,
@@ -2696,7 +2718,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-20T20:17:57+00:00",
+ "last_run_utc": "2026-11-20T20:22:59+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -2906,7 +2928,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 23,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
-  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 21,
+  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 22,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 26,
   "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": 24,
@@ -3066,6 +3088,9 @@
   },
   "item|id:club-atletico-pulpileno-vs-deportivo-maritimo-20261118|Asian Total|Over 2.5": {
    "at_utc": "2026-11-18T20:13:25+00:00"
+  },
+  "item|id:cobresal-vs-audax-italiano-20261121|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-20T20:24:58+00:00"
   },
   "item|id:cong-an-ha-noi-vs-johor-darul-takzim-20261119|1st Half - 1x2|Johor Darul Takzim FC": {
    "at_utc": "2026-11-19T12:14:02+00:00"
@@ -3432,7 +3457,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 475,
+ "sent_total": 476,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -3765,6 +3790,7 @@
   "2026-11-20T20:17:50+00:00|Athletic Bilbao — Rcd Espanyol|Athletic Bilbao",
   "2026-11-20T20:17:50+00:00|Porto — Paredes|Yes",
   "2026-11-20T20:20:07+00:00|Annecy — Clermont Foot|Over 4",
-  "2026-11-20T20:20:28+00:00|Helmond Sport — Dordrecht|Over 4"
+  "2026-11-20T20:20:28+00:00|Helmond Sport — Dordrecht|Over 4",
+  "2026-11-20T20:23:29+00:00|Cobresal — Audax Italiano|Under 2.5"
  ]
 }
