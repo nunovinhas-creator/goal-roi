@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T02:24:48+00:00",
+ "generated_at_utc": "2026-11-20T02:30:01+00:00",
  "messages": 1742,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2913,
+  "versions": 2915,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-20T00:54:39+00:00",
+  "last_collected_at_utc": "2026-11-20T02:30:00+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T02:24:45+00:00",
+  "collector_last_run_utc": "2026-11-20T02:30:00+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,12 +448,12 @@
   "stake_original_seen": 264,
   "stake_no_score_after_kickoff": 47,
   "stake_sent_45_after_kickoff": 80,
-  "goal_lists": 523,
+  "goal_lists": 525,
   "goal_lists_consistent": 262
  },
  "unique_bets": 950,
  "settled_bets": 771,
- "unsettled_market": 100,
+ "unsettled_market": 102,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
  "groups": {
@@ -1861,7 +1861,7 @@
    "vote_break_even": 0.5468,
    "games": 87,
    "no_source": 0,
-   "unsettleable": 89,
+   "unsettleable": 91,
    "hit_rate": 0.565,
    "ci95": [
     0.4888,
@@ -6428,7 +6428,7 @@
     "contraditório": 6,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T02:25:20+00:00",
+   "generated_utc": "2026-11-20T02:30:33+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -25810,7 +25810,7 @@
     "by_bot_mark": 0,
     "per_day": 2.2,
     "days_to_hint": 5,
-    "days_to_conclusion": 126
+    "days_to_conclusion": 127
    },
    "OPEN_GAME": {
     "signals": 186,
@@ -25883,7 +25883,7 @@
     "vote_break_even": 0.5439,
     "games": 80,
     "no_source": 0,
-    "unsettleable": 88,
+    "unsettleable": 90,
     "hit_rate": 0.5783,
     "ci95": [
      0.4999,
@@ -26418,7 +26418,10 @@
    "match": "Sao Paulo — Fluminense RJ",
    "selection": "Fluminense FC Total Goals: Over 0.5",
    "odds": 1.43,
-   "ft": null,
+   "ft": [
+    0,
+    1
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 1,
@@ -26726,7 +26729,10 @@
    "match": "Sao Paulo — Fluminense RJ",
    "selection": "Goal Range: 2-3",
    "odds": 1.92,
-   "ft": null,
+   "ft": [
+    0,
+    1
+   ],
    "w": null,
    "settled_by": null,
    "n_signals": 1,
@@ -27380,6 +27386,24 @@
    "signals": 1
   },
   {
+   "match_id": "orlando-city-vs-cincinnati-20261120",
+   "match": "Orlando City — Cincinnati",
+   "league": "US Major League Soccer",
+   "date_utc": "2026-11-19T19:25:20+00:00",
+   "kickoff_utc": "2026-11-20T00:30+00:00",
+   "why": "à espera da fonte de resultados",
+   "signals": 2
+  },
+  {
+   "match_id": "sao-paulo-vs-fluminense-rj-20261120",
+   "match": "Sao Paulo — Fluminense RJ",
+   "league": "Brazilian BRAZIL SERIE A",
+   "date_utc": "2026-11-19T19:19:39+00:00",
+   "kickoff_utc": "2026-11-20T00:30+00:00",
+   "why": "mercado que o resultado final não decide",
+   "signals": 2
+  },
+  {
    "match_id": "al-ain-fc-vs-al-dhafra-20261119",
    "match": "Al Ain FC — AL Dhafra",
    "league": "UAE Premier League",
@@ -27854,24 +27878,6 @@
    "date_utc": "2026-11-15T22:11:42+00:00",
    "kickoff_utc": null,
    "why": "as fontes não cobrem este jogo",
-   "signals": 1
-  },
-  {
-   "match_id": "belgium-vs-italy-20261115",
-   "match": "Belgium — Italy",
-   "league": "UEFA Nations League",
-   "date_utc": "2026-11-15T19:58:49+00:00",
-   "kickoff_utc": "2026-11-15T19:45+00:00",
-   "why": "mercado que o resultado final não decide",
-   "signals": 2
-  },
-  {
-   "match_id": "eldense-vs-sabadell-20261115",
-   "match": "Eldense — Sabadell",
-   "league": "Spanish Segunda",
-   "date_utc": "2026-11-15T18:29:38+00:00",
-   "kickoff_utc": "2026-11-15T17:30+00:00",
-   "why": "mercado que o resultado final não decide",
    "signals": 1
   }
  ],
@@ -29138,9 +29144,17 @@
      "mult": 16
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     32,
+     "0-1"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    0,
+    1
+   ]
   },
   "orlando-city-vs-cincinnati-20261120": {
    "teams": [
