@@ -180,7 +180,8 @@ def note_ft(b, notes):
     return hit[2] if hit else None
 
 
-def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(), chronology=None):
+def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(),
+               chronology=None, group_aliases=True):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto.
 
     PR 3: cada aposta guarda signal_seen_utc (primeira recolha da mensagem do sinal) e result_known_utc/result_known_source
@@ -202,7 +203,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             continue
         k = key_of(m) + ((m['minute'],) if m['type'] == 'GOAL_BREWING' else ())   # cada aviso de golo é medido à parte
         identity = {name: m[name] for name in ('canonical_match_id', 'match_identity_exclusion') if name in m}
-        fixture = identity.get('canonical_match_id') or m.get('match_id')
+        fixture = (identity.get('canonical_match_id') if group_aliases else None) or m.get('match_id')
         cohort = (fixture, *k[1:], identity.get('match_identity_exclusion'))
         if strict and (cohort in dead or (cohort not in out and not provenance_ok(m))):
             dead.add(cohort)
@@ -693,7 +694,7 @@ def build(csv_path=None, register=False, now=None):
     observations = opportunity_results.merge_sources(bot_observations, providers)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
-                                not_covered=not_covered, chronology=chron)
+                                not_covered=not_covered, chronology=chron, group_aliases=False)
     research = list(research_bets(research_input, observations, now, bindings=bindings))
     LAST['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
