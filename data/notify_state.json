@@ -439,12 +439,16 @@
    "state": "delivered"
   },
   "game|id:al-zawraa-sc-vs-al-talaba-20261120|6fc24df26c4f": {
+   "attempt_utc": "2026-11-20T16:54:38+00:00",
+   "chars": 245,
    "created_utc": "2026-11-20T16:54:38+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "5d115f3a803d9067c36f30c5b711d66081d4f85b24787fa53cf403c274312f42",
+   "state": "in_flight"
   },
   "game|id:always-ready-vs-real-potosi-20261119|835a4cc080cb": {
    "attempt_utc": "2026-11-19T00:58:14+00:00",
@@ -1080,13 +1084,15 @@
    "attempt_utc": "2026-11-20T16:54:38+00:00",
    "chars": 301,
    "created_utc": "2026-11-20T16:54:38+00:00",
+   "done_utc": "2026-11-20T16:54:38+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d75c1362b43151d60e7d63b6b275678cec1aeac50cd73538fa1e1b2c9ca31efb",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:fc-botosani-vs-cs-voluntari-20261120|31db05d8003a": {
    "attempt_utc": "2026-11-20T13:42:17+00:00",
@@ -2336,7 +2342,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 138,
+  "delivered": 139,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-20T16:51:49+00:00",
@@ -2604,6 +2610,9 @@
   },
   "item|id:al-salt-vs-al-yarmouk-amman-20261119|Asian Total|Over 2.75": {
    "at_utc": "2026-11-19T14:23:39+00:00"
+  },
+  "item|id:al-zawraa-sc-vs-al-talaba-20261120|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-20T16:54:38+00:00"
   },
   "item|id:always-ready-vs-real-potosi-20261119|Asian Total|Over 4": {
    "at_utc": "2026-11-19T00:58:14+00:00"
@@ -3012,7 +3021,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 450,
+ "sent_total": 451,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
@@ -3322,6 +3331,7 @@
   "2026-11-20T16:18:27+00:00|Rostov — Kryliya Sovetov|Rostov",
   "2026-11-20T16:29:32+00:00|76 Igdir Belediyespor — Umraniyespor|76 Igdir Belediyespor",
   "2026-11-20T16:40:20+00:00|Shakhtar Donetsk — FC Livyi Bereh|FC Shakhtar Donetsk",
+  "2026-11-20T16:51:25+00:00|AL Zawraa SC — Al Talaba|Over 2.5",
   "2026-11-20T16:53:58+00:00|FC Botosani — Cs Voluntari|Over 4"
  ]
 }
