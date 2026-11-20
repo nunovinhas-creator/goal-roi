@@ -609,7 +609,7 @@ def legacy_hit(pairs, w):
     return bool(t) and any(abs(t - x) <= timedelta(days=LEGACY_PAIR_DAYS) for x in pairs.get((w.get('match'), w.get('selection')), ()))
 
 
-def game_notices(report, state, now):
+def game_notices(report, state, now, excluded_items=()):
     """Contrato (revisão #5920565094): cada APOSTA (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas
     de um mesmo jogo numa recolha saem numa só mensagem. Reforços (outra hora de sinal, outra multiplicidade) e a passagem de
     indício a alerta da mesma aposta nunca geram outro aviso. Uma seleção genuinamente nova num jogo já avisado gera uma
@@ -630,7 +630,7 @@ def game_notices(report, state, now):
             #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
         ik = item_key(w)
-        if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):
+        if ik in notified or ik in excluded_items or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
         g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or '', 'sample': w})
         it = g['items'].setdefault(ik, {'level': 'indício', 'entries': []})
@@ -980,7 +980,7 @@ def hello_notice(report):
                                             'alertas de apostas e, às 22:00 (Lisboa), um resumo diário com as mudanças de estado das táticas.', PAGE], [['hello']])
 
 
-def plan(report, state, now):
+def plan(report, state, now, excluded_items=()):
     """Relatório + estado -> avisos por esta ordem. Aplica ao estado só o que não depende de uma entrega (migrações
     silenciosas, referência de saúde, `statuses` a seguir o relatório, regimes sem aviso, oscilações). Os efeitos de cada
     aviso (o que fica marcado como avisado) só são aplicados quando a intenção de envio é gravada."""
@@ -990,7 +990,7 @@ def plan(report, state, now):
     if isinstance(report.get(polymarket_alerts.REPORT_KEY), list):
         state.setdefault('migrations', {}).setdefault(polymarket_alerts.ACTIVATION, {'at_utc': now.isoformat()})
     out = [] if state.get('hello') else [hello_notice(report)]
-    out += game_notices(report, state, now)
+    out += game_notices(report, state, now, excluded_items)
     new = eligible_statuses(report)
     changes = []
     due = summary_day(now)
@@ -1267,7 +1267,7 @@ def _expire(store, state, now, n, rec, t, reason):
     print('NOTIFY_EXPIRED_BEFORE_SEND' if reason == 'signal_expired_before_send' else 'NOTIFY_EXPIRED_BEFORE_INTENT')
 
 
-def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None, clock=None):
+def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None, clock=None, *, excluded_items=()):
     """Planeia e envia. Para cada aviso: intenção (efeitos + `in_flight`) gravada no estado e no registo ANTES do envio;
     resultado gravado depois. Uma falha ou incerteza para os envios desta execução (os seguintes ficam pendentes e só saem
     se ainda forem válidos na execução seguinte). publish (P0, `GitPublisher`): depois de gravar a intenção e ANTES de contactar
@@ -1283,7 +1283,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
     clock = clock or run_clock(now)
     reconcile(store, state, now)
     recs = state.setdefault('deliveries', {})
-    notices = [n for n in plan(report, state, now) if recs.get(n.key, {}).get('state') in (None, 'pending')]
+    notices = [n for n in plan(report, state, now, excluded_items) if recs.get(n.key, {}).get('state') in (None, 'pending')]
     keys, new_log = {n.key for n in notices}, []
     for key, r in recs.items():
         if r.get('state') == 'pending' and key not in keys:
@@ -1440,7 +1440,29 @@ def outbox_lock(directory):
         yield
 
 
+def claimed_items(directory):
+    """Read the active claims from both general outbox files."""
+    store = FileStore(directory)
+    if not store.state_path.exists() and not store.log_path.exists():
+        return set()
+    state = store.load_state()
+    events, malformed = store.read_log()
+    check_integrity(state, events)
+    if malformed:
+        raise StateRegressed('notification log contains unreadable entries')
+    live = {}
+    for event in events:
+        key = event['key']
+        if event['event'] == 'intent':
+            live[key] = {effect[1] for effect in event.get('effects', ()) if effect[0] == 'item'}
+        elif event['event'] in ('rejected', 'withdrawn'):
+            live.pop(key, None)
+    return set(state.get('notified_items') or {}).union(*live.values())
+
+
 def run(sender=send, now=None, env=None, checkpoint=None):
+    from . import stake_alerts
+
     env = os.environ if env is None else env
     token, chat = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip()
     if not token or not chat:
@@ -1459,7 +1481,8 @@ def run(sender=send, now=None, env=None, checkpoint=None):
         except StateMissing:
             print('NOTIFY_STATE_MISSING')
             raise
-        state, done = deliver(store, report, state, now, sender, token, chat, checkpoint, publish)
+        state, done = deliver(store, report, state, now, sender, token, chat, checkpoint, publish,
+                              excluded_items=stake_alerts.claimed_items(data_dir()))
     print('NOTIFY_OK sent', done)
     return state
 
