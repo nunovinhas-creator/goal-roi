@@ -174,6 +174,14 @@ TOTAL_QUOTE = re.compile(
     rf"(?:\s+(?P<suffix>{MATCH_GOALS}|{CORNERS}))?"
     rf"(?:\s*\((?P<period>{REGULATION}|{FIRST_HALF}|{SECOND_HALF})\))?", re.I,
 )
+POLYMARKET_SHARE = re.compile(r"\bmarket\s+share\s+([0-9]+(?:[.,][0-9]+)?)\s*%", re.I)
+
+
+def decimal_label(token):
+    """Canonical decimal spelling without rounding the quoted line."""
+    integer, _, fraction = token.replace(",", ".").partition(".")
+    integer, fraction = integer.lstrip("0") or "0", fraction.rstrip("0")
+    return f"{integer}.{fraction}" if fraction else integer
 
 
 def market_tag(value):
@@ -251,7 +259,7 @@ def polymarket(m, h, lines, text):
         market = ('Total Corners' if scope == 'corners' else
                   {'regulation': 'Asian Total', 'first_half': '1st Half - Asian Total',
                    'second_half': '2nd Half - Asian Total'}[period])
-        sel = total['side'].title() + ' ' + total['line'].replace(',', '.')
+        sel = total['side'].title() + ' ' + decimal_label(total['line'])
     elif (raw_sel in teams or raw_sel.lower() == 'draw') and scopes <= {'winner'} and periods <= {'regulation'}:
         scope, period, market = 'winner', 'regulation', '1X2'
         sel = 'X' if raw_sel.lower() == 'draw' else '12'[teams.index(raw_sel)]
@@ -262,8 +270,11 @@ def polymarket(m, h, lines, text):
         period, market, sel = 'regulation', 'Polymarket', raw_sel
 
     tr = re.search(r'🧾 (\d+) trades?', text)
-    sh = re.search(r'market share ([0-9]+(?:[.,][0-9]{1,2})?)%', text)
-    share = float(sh[1].replace(",", ".")) if sh else None
+    shares = {decimal_label(token) for token in POLYMARKET_SHARE.findall(text)}
+    if len(shares) > 1:
+        return
+    share_text = next(iter(shares), "")
+    share = float(share_text) if re.fullmatch(r"[0-9]+(?:\.[0-9]{1,2})?", share_text) else None
     if share is not None and share > 100:
         share = None
     m.update(phase='live' if live else 'pre', period=period, market_scope=scope, teams=teams,

@@ -199,6 +199,32 @@ class PolymarketAlerts(unittest.TestCase):
                     self.assertEqual(row["odds"], 1.85)
         self.assertFalse(parse(raw.replace("VALUE", "9000").replace("1.85–2.10", "2.10–1.85"))["bet"])
 
+    def test_exact_line_and_unambiguous_share_reach_alert_and_study(self):
+        raw = ("📈 🔷 Polymarket · HEADER19 nov 2026 21:00\nA — B · Example League\n"
+               "Over LINE @1.85 · $9.9K\n🧾 2 trades · market share 72% SHARE\n"
+               "https://scangoal.com/match/a-vs-b-20261119?lang=en")
+        for header, line, share, selection, accepted in (
+            ("", "2.50", "", "Over 2.5", True),
+            ("", "2,50", "· Market share 72.00%", "Over 2.5", True),
+            ("", "2.55", "", "Over 2.55", False),
+            ("", "2.50", "· market share 93%", None, False),
+            ("Yellow Cards · ", "2.50", "", None, False),
+            ("Team Total · ", "2.50", "", None, False),
+            ("Overtime · ", "2.50", "", None, False),
+            ("Total Goals · Corners · ", "2.50", "", None, False),
+            ("1st Half · Full Time · ", "2.50", "", None, False),
+        ):
+            with self.subTest(header=header, line=line, share=share):
+                parsed = parse(raw.replace("HEADER", header).replace("LINE", line).replace("SHARE", share))
+                self.assertEqual(parsed.get("selection"), selection)
+                self.assertEqual(parsed["bet"], selection is not None)
+                row = dict(parsed, message_id=1, date_utc=timestamp(-3), collected_at_utc=timestamp(-2),
+                           had_ft_at_first_sight=False, edited_at_first_sight=False, burst=False)
+                alerts = notification_report([row], NOW)
+                self.assertEqual(bool(notify.messages(alerts, activated_store().load_state(), NOW)), accepted)
+                eligible = opportunity_forward.eligible_signal(row, NOW - timedelta(hours=1), NOW + timedelta(minutes=20))
+                self.assertEqual(eligible is not None, accepted)
+
 
 def notification_report(messages, now, watch=()):
     return {
