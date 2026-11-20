@@ -788,8 +788,8 @@ class Notify(unittest.TestCase):
         state, noon = {}, datetime.fromisoformat('2026-11-12T12:00:00+00:00')
         first = notify.messages(self.report(), state, noon)
         self.assertEqual(len(first), 2)                                                # boas-vindas + sinal a seguir; o 1.º estado não gera aviso
-        self.assertEqual(first[1].split('\n'), ['A seguir: A — B', 'Encaixa em: Jogo aberto | Minuto = 31 a 60 (promissora)',
-                                                'Aposta: Over 2.5 @ 1,9'])            # formato curto: três linhas
+        self.assertEqual(first[1].splitlines(), ['🟠 INDÍCIO · Origem desconhecida', '⚽ A — B', '🎯 Over 2,5 @ 1,90',
+                                                  '🧪 1 hipótese promissora · sem certificação'])
         self.assertEqual(notify.messages(self.report(), state, noon), [])              # nada de novo: silêncio
         rep = self.report()
         rep['brain']['status_list'] = {'h1': 'forte', 'h2': 'abandonada'}
@@ -824,8 +824,9 @@ class Notify(unittest.TestCase):
         # PR 5: the two bettable signals are the same game and selection (a reinforcement): ONE alert; the signal of 3 hours
         # ago, with the game already under way, does not generate an alert.
         self.assertEqual(len(alerts), 1)
-        self.assertEqual(alerts[0].split('\n'), ['🟢 ALERTA: A — B', '🟢 Tática validada (forte): Jogo aberto | Minuto = 31 a 60',
-                                                 'Aposta: Over 2.5 @ 1,9', notify.scientific_label(rep, 'Jogo aberto | Minuto = 31 a 60')[0]])
+        self.assertEqual(alerts[0].splitlines(), ['🟢 ALERTA · Origem desconhecida', '⚽ A — B',
+                                                 '🎯 Over 2,5 @ 1,90 · sinal de 12/11 11:50 UTC',
+                                                 notify.scientific_label(rep, 'Jogo aberto | Minuto = 31 a 60')[0]])
         self.assertFalse(any(m.startswith('Resumo') for m in out))                     # a certificação de h1 só no resumo das 22h
         day = lambda k: datetime.fromisoformat('2026-11-12T22:05:00+00:00') + timedelta(days=k)
         from pr5_fixtures import changes

@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError, URLError
+from urllib.parse import parse_qs
 
 from pr5_fixtures import changes, evening
 from scangoal import brain, notify
@@ -374,20 +375,18 @@ class U04_SelectionsOfOneGame(unittest.TestCase):
         d = Data(self, base_state(), report(watch=[entry('m1', 'Over 2.5'), entry('m1', 'Over 3.5', minutes=-6, odds=2.4)]))
         d.run()
         self.assertEqual(len(d.sent), 1)
-        self.assertIn('Aposta: Over 2.5 @ 1,9; Over 3.5 @ 2,4', d.sent[0])
-        later = [entry('m1', 'Over 2.5'), entry('m1', 'Over 3.5', minutes=-6, odds=2.4), entry('m1', 'BTTS Yes', minutes=-1, market='BTTS', odds=1.8)]
+        later = [entry('m1', 'Over 2.5'), entry('m1', 'Over 3.5', minutes=-6, odds=2.4),
+                 entry('m1', 'Yes', minutes=-1, market='BTTS', odds=1.8)]
         d.write_report(report(watch=later))
         d.run(now=NOW + timedelta(minutes=2))
         self.assertEqual(len(d.sent), 2)
-        self.assertIn('Aposta: BTTS Yes @ 1,8', d.sent[1])
-        self.assertNotIn('Over 2.5', d.sent[1])
-        self.assertNotIn('Over 3.5', d.sent[1])
         # Contract (review #5920565094): a genuinely new bet in a game already notified is an UPDATE of that game, labelled as such.
-        self.assertEqual(d.sent[1].split('\n'), ['A seguir (nova seleção num jogo já avisado): Home m1 — Away m1',
-                                                  'Encaixa em: %s (promissora)' % HA, 'Aposta: BTTS Yes @ 1,8'])
-        self.assertEqual(d.sent[0].split('\n'), ['A seguir: Home m1 — Away m1', 'Encaixa em: %s (promissora)' % HA,
-                                                  'Aposta: Over 2.5 @ 1,9; Over 3.5 @ 2,4'])
-        d.write_report(report(watch=later + [entry('m1', 'BTTS Yes', minutes=0, market='BTTS', odds=1.9)]))   # its reinforcement
+        self.assertEqual(d.sent[1].splitlines(), ['🟠 INDÍCIO · Jogo aberto · NOVA SELEÇÃO', '⚽ Home m1 — Away m1',
+                                                 '🎯 Sim @ 1,80 · BTTS', '🧪 1 hipótese promissora · sem certificação'])
+        self.assertEqual(d.sent[0].splitlines(), ['🟠 INDÍCIO · Jogo aberto', '⚽ Home m1 — Away m1',
+                                                 '🎯 Over 2,5 @ 1,90 · Asian Total', '🧪 1 hipótese promissora · sem certificação',
+                                                 '🎯 Over 3,5 @ 2,40 · Asian Total', '🧪 1 hipótese promissora · sem certificação'])
+        d.write_report(report(watch=later + [entry('m1', 'Yes', minutes=0, market='BTTS', odds=1.9)]))   # its reinforcement
         d.run(now=NOW + timedelta(minutes=4))
         self.assertEqual(len(d.sent), 2)
 
@@ -400,7 +399,7 @@ class P1_PromotionDoesNotRepeatTheBet(unittest.TestCase):
         d = Data(self, base_state({HA: 'promissora'}), report({HA: 'promissora'}, watch=[entry('m1', minutes=-20)]))
         d.run()
         self.assertEqual(len(d.sent), 1)
-        self.assertIn('A seguir: Home m1 — Away m1', d.sent[0])
+        self.assertIn('⚽ Home m1 — Away m1', d.sent[0])
         rows = {HA: row('forte', confirmation=certificate())}
         hint = entry('m1', minutes=-20, reasons=[reason(HA, 'forte', certified=True)])
         again = entry('m1', reinforce_selection, minutes=-2, market=reinforce_market, odds=1.95, reasons=[reason(HA, 'forte', certified=True)])
@@ -419,12 +418,11 @@ class P1_PromotionDoesNotRepeatTheBet(unittest.TestCase):
         self.assertEqual(list(consistent(self, d)['notified_items']), ['item|id:m1|Asian Total|Over 2.5'])
 
     def test_a_new_selection_after_promotion_is_an_update_alert(self):
-        d = self.scenario('BTTS', 'BTTS Yes')
+        d = self.scenario('BTTS', 'Yes')
         alerts = [m for m in d.sent if 'ALERTA' in m]
         self.assertEqual(len(alerts), 1)
-        self.assertIn('🟢 ALERTA (nova seleção num jogo já avisado): Home m1 — Away m1', alerts[0])
-        self.assertIn('Aposta: BTTS Yes @ 1,95', alerts[0])
-        self.assertNotIn('Over 2.5', alerts[0])
+        self.assertTrue(alerts[0].startswith('🟢 ALERTA · Jogo aberto · NOVA SELEÇÃO\n⚽ Home m1 — Away m1\n🎯 Sim @ 1,95 · BTTS\n'))
+        self.assertNotIn('Over 2,5', alerts[0])
 
     def test_legacy_hint_then_certified_alert_for_the_same_bet(self):
         # The hint was sent by the pre-PR 5 code (only its legacy key exists); the alert arrives later with another time.
@@ -484,13 +482,13 @@ class U05_U06_Grouping(unittest.TestCase):
         self.assertEqual(len(self.run_change(incompatible).blocks), 2)                        # identical games, conflicting value
 
     def test_watch_reasons_are_grouped_too(self):
-        rows = equivalent_rows()
-        w = entry('m1', reasons=[reason(h) for h in rows])
+        rows = {h.replace('Jogo aberto', 'Stake', 1): dict(r, family='Stake') for h, r in equivalent_rows().items()}
+        w = dict(entry('m1', reasons=[reason(h) for h in rows] * 2), type='STAKE_LOAD')
         d = Data(self, base_state({h: 'promissora' for h in rows}), report({h: 'promissora' for h in rows}, rows=rows, watch=[w]))
         d.run()
         self.assertEqual(len(d.sent), 1)
-        self.assertEqual(d.sent[0].split('\n'), ['A seguir: Home m1 — Away m1', 'Encaixa em: %s (promissora) e mais 2 equivalentes' % HA,
-                                                  'Aposta: Over 2.5 @ 1,9'])
+        self.assertEqual(d.sent[0].splitlines(), ['🟠 INDÍCIO · Stake', '⚽ Home m1 — Away m1',
+                                                 '🎯 Over 2,5 @ 1,90 · Asian Total', '🧪 1 grupo de hipóteses promissoras · sem certificação'])
 
 
 class U07_DegradedReports(unittest.TestCase):
@@ -638,11 +636,12 @@ class U08_DailyConsolidation(unittest.TestCase):
         d.write_report(cert([entry('m1', reasons=[reason(HA, 'forte', certified=True)])]))
         d.run(now=NOW + timedelta(minutes=10))
         self.assertEqual(len(d.sent), 1)                                      # eligibility is immediate: an ALERT, not a status notice
-        self.assertTrue(d.sent[0].startswith('🟢 ALERTA: Home m1 — Away m1\n'))
+        self.assertTrue(d.sent[0].startswith('🟢 ALERTA · Jogo aberto\n⚽ Home m1 — Away m1\n'))
         d.write_report(report({HA: 'promissora'}, validation=OFF, watch=[entry('m2', reasons=[reason(HA, 'forte', certified=True)])]))
         d.run(now=NOW + timedelta(minutes=20))                                # certification lost: m2 is only a hint
         self.assertEqual(len(d.sent), 2)
-        self.assertTrue(d.sent[1].startswith('A seguir: Home m2 — Away m2\nEncaixa em: %s (promissora)' % HA))
+        self.assertTrue(d.sent[1].startswith('🟠 INDÍCIO · Jogo aberto\n⚽ Home m2 — Away m2\n'))
+        self.assertTrue(d.sent[1].endswith('🧪 1 hipótese promissora · sem certificação'))
         d.write_report(cert())
         d.run(now=NOW + timedelta(minutes=30))
         self.assertEqual(len(d.sent), 2)                                      # gain, loss, gain: nothing during the day
@@ -814,7 +813,7 @@ class U10_U11_ForgedCertificates(unittest.TestCase):
                     self.assertTrue(notify.guard_claims(m, rep, sorted(notify.certified_ids(rep)) if m.startswith('Resumo') else []), name)   # only real certificates
                     self.assertNotIn(HA, notify.certified_ids(rep), name)
                 self.assertEqual(d.state()['statuses'][HA], 'promissora', name)
-                self.assertTrue(any('A seguir:' in m and '(promissora)' in m for m in d.sent), name)
+                self.assertTrue(any(m.startswith('🟠 INDÍCIO') and '1 hipótese promissora' in m for m in d.sent), name)
 
     def test_u11_strong_without_certificate(self):
         d = Data(self, base_state({}), report({}, rows={}))
@@ -834,7 +833,8 @@ class U10_U11_ForgedCertificates(unittest.TestCase):
         d.run()
         self.assertEqual(len(d.sent), 1)
         label = 'Estado científico: CERTIFICADA — método eprocess_online_alpha_v1, registo verificado, seleção n.º 3, certificada em 2026-11-15 10:00 UTC: %s' % HA
-        self.assertEqual(d.sent[0].split('\n'), ['🟢 ALERTA: Home m1 — Away m1', '🟢 Tática validada (forte): %s' % HA, 'Aposta: Over 2.5 @ 1,9', label])
+        self.assertEqual(d.sent[0].splitlines(), ['🟢 ALERTA · Jogo aberto', '⚽ Home m1 — Away m1',
+                                                 '🎯 Over 2,5 @ 1,90 · Asian Total', label])
         d.run(now=EVENING)
         self.assertEqual(len(d.sent), 2)
         self.assertIn('\n%s\n' % label, d.sent[1])
@@ -1047,10 +1047,8 @@ class U16_LongMessages(unittest.TestCase):
                                base_state({h: 'promissora' for h in rows}), NOW)[0]
         self.assertLessEqual(len(text), notify.MAX_TEXT)
         lines = text.split('\n')
-        self.assertEqual(lines[0], 'A seguir: Home m1 — Away m1')
-        self.assertEqual(sum(x.startswith('Encaixa em:') for x in lines), notify.MAX_GROUPS_PER_MESSAGE)
-        self.assertEqual([x for x in lines if x.startswith('Aposta:')], ['Aposta: Over 2.5 @ 1,9'])     # the bet once
-        self.assertIn('… e mais 32 grupos de táticas.', lines)
+        self.assertEqual(lines, ['🟠 INDÍCIO · Jogo aberto', '⚽ Home m1 — Away m1', '🎯 Over 2,5 @ 1,90 · Asian Total',
+                                 '🧪 40 hipóteses promissoras · sem certificação'])
 
 
 class U17_Preview(unittest.TestCase):
@@ -1071,7 +1069,7 @@ class U17_Preview(unittest.TestCase):
         self.assertEqual([r['state'] for r in simulated['deliveries'].values()], ['delivered'])
         self.assertEqual({p.name: p.read_bytes() for p in d.path.iterdir()}, files)     # state and log byte for byte
         text = out.read_text(encoding='utf-8')
-        self.assertIn('A seguir: Home m1 — Away m1', text)
+        self.assertIn('⚽ Home m1 — Away m1', text)
         self.assertNotIn(TOKEN, text)
         self.assertNotIn(CHAT, text)
 
@@ -1187,22 +1185,48 @@ class X_Sender(unittest.TestCase):
             with self.subTest(expected=expected, effect=repr(effect)):
                 self.assertEqual(self.outcome(effect, body), expected)
 
+    def test_plain_text_is_transmitted_without_markup_or_link_previews(self):
+        w = entry('a-vs-b-20261116', 'São João <i> & B 🐉', market='1X2', match='Śląsk <b> & A/B — 東京')
+        n, = notify.game_notices(report(watch=[w]), {}, NOW)
+        with patch.object(notify, 'urlopen') as http:
+            http.return_value.__enter__.return_value.read.return_value = b'{"ok": true}'
+            notify.send(TOKEN, CHAT, n.text)
+        request, = http.call_args.args
+        self.assertEqual(parse_qs(request.data.decode()), {'chat_id': [CHAT], 'text': [n.text], 'disable_web_page_preview': ['true']})
+
 
 class X_Presentation(unittest.TestCase):
-    """telegram_bet_short_v1: a simple bet is exactly three lines; science lives in the 22:00 summary."""
+    """Compact layout with a separate bet line and a short summary of the evidence for each selection."""
 
-    def test_a_simple_bet_is_exactly_three_lines(self):
+    def test_golden_replays_from_the_issue_and_a_real_two_market_notice(self):
+        cases = json.loads((FIX.parent / 'telegram_issue_68.json').read_text(encoding='utf-8'))
+        for case in cases:
+            with self.subTest(report_rev=case['report_rev']):
+                watch = []
+                for row in case['watch']:
+                    w = row.copy()
+                    w['reasons'] = [reason(hid) for hid in w.pop('hypotheses')]
+                    watch.append(w)
+                state = {'notified_items': dict.fromkeys(case['already_notified'], {})}
+                n, = notify.game_notices(report(watch=watch), state, datetime.fromisoformat(case['at_utc']))
+                self.assertEqual(n.key, case['key'])
+                self.assertEqual(n.text.splitlines(), case['golden'])
+                self.assertLess(len(n.text), case['before_chars'])
+                if len(watch[0]['reasons']) >= 6:
+                    self.assertLessEqual(len(n.text) * 100, case['before_chars'] * 30)
+                    self.assertLessEqual(len(n.text), 250)
+
+    def test_a_simple_bet_is_four_lines_without_a_link(self):
         hid = 'Jogo aberto | Ritmo indicado pelo bot = menos de 90'
         rep = report({hid: 'promissora'}, watch=[entry('m1', 'Over 5', match='UTC Cajamarca — CD Los Chankas', odds=1.91, reasons=[reason(hid)])])
         text = notify.messages(rep, base_state({hid: 'promissora'}), NOW)[0]
-        self.assertEqual(text, 'A seguir: UTC Cajamarca — CD Los Chankas\n'
-                               'Encaixa em: Jogo aberto | Ritmo indicado pelo bot = menos de 90 (promissora)\n'
-                               'Aposta: Over 5 @ 1,91')
+        self.assertEqual(text, '🟠 INDÍCIO · Jogo aberto\n⚽ UTC Cajamarca — CD Los Chankas\n'
+                               '🎯 Over 5 @ 1,91 · Asian Total\n🧪 1 hipótese promissora · sem certificação')
 
-    def test_no_science_in_bet_notices(self):
+    def test_no_statistics_or_assertions_in_hints(self):
         rep = report(watch=[entry('m1'), entry('m2', 'Under 1.5', minutes=-1, odds=2.05, kickoff=30)])
         for text in notify.messages(rep, base_state(), NOW):
-            self.assertEqual(len(text.split('\n')), 3, text)
+            self.assertEqual(len(text.splitlines()), 4, text)
             for banned in ('Estado científico', 'ROI', 'Probabilidade', 'Jogos independentes', 'jogos independentes', 'Evidência',
                            'Vantagem', 'acerto', 'Jogo às', 'recomendação', 'garantem', '%'):
                 self.assertNotIn(banned, text)
@@ -1214,31 +1238,88 @@ class X_Presentation(unittest.TestCase):
             with self.subTest(hid):
                 w = entry('t%d' % k, 'Mais de %d.5 golos' % k, market='Mercado %d' % k, odds=1.5 + k / 100, reasons=[reason(hid)])
                 text = notify.messages(report({hid: 'promissora'}, watch=[w]), base_state({hid: 'promissora'}), NOW)[0]
-                self.assertEqual(text.split('\n'), ['A seguir: Home t%d — Away t%d' % (k, k), 'Encaixa em: %s (promissora)' % hid,
-                                                    'Aposta: Mais de %d.5 golos @ %s' % (k, ('%s' % (1.5 + k / 100)).replace('.', ','))])
+                self.assertEqual(text.splitlines(), ['🟠 INDÍCIO · Jogo aberto', '⚽ Home t%d — Away t%d' % (k, k),
+                                                     '🎯 Mais de %d,5 golos @ 1,%02d · Mercado %d' % (k, 50 + k, k),
+                                                     '🧪 1 hipótese promissora · sem certificação'])
+                self.assertNotIn(hid, text)
 
     def test_several_tactics_and_selections_never_duplicate_a_bet(self):
         rows = {HA: row(ids=games('a', 40), conditions=[('Minuto', '31 a 60')]), HC: row(ids=games('c', 40), conditions=[('Liga', 'Liga X')])}
         st = {HA: 'promissora', HC: 'promissora'}
         both = [reason(HA), reason(HC)]
-        watch = [entry('m1', 'Over 2.5', reasons=both), entry('m1', 'BTTS Yes', market='BTTS', odds=1.8, reasons=[reason(HC)]),
+        watch = [entry('m1', 'Over 2.5', reasons=both), entry('m1', 'Yes', market='BTTS', odds=1.8, reasons=[reason(HC)]),
                  entry('m1', 'Over 3.5', odds=2.4, reasons=both)]
         text = notify.messages(report(st, rows=rows, watch=watch), base_state(st), NOW)[0]
         lines = text.split('\n')
-        self.assertEqual(lines, ['A seguir: Home m1 — Away m1',                       # tactics in group order (games, then id)
-                                 'Encaixa em: %s (promissora)' % HC, 'Encaixa em: %s (promissora)' % HA, 'Aposta: Over 2.5 @ 1,9; Over 3.5 @ 2,4',
-                                 'Encaixa em: %s (promissora)' % HC, 'Aposta: BTTS Yes @ 1,8'])
-        for sel in ('Over 2.5 @ 1,9', 'Over 3.5 @ 2,4', 'BTTS Yes @ 1,8'):
-            self.assertEqual(text.count(sel), 1)
+        self.assertEqual(lines, ['🟠 INDÍCIO · Jogo aberto', '⚽ Home m1 — Away m1',
+                                 '🎯 Over 2,5 @ 1,90 · Asian Total', '🧪 2 hipóteses promissoras · sem certificação',
+                                 '🎯 Over 3,5 @ 2,40 · Asian Total', '🧪 2 hipóteses promissoras · sem certificação',
+                                 '🎯 Sim @ 1,80 · BTTS', '🧪 1 hipótese promissora · sem certificação'])
+
+    def test_selections_keep_market_period_sign_and_odds_precision(self):
+        watch = [entry('m1', 'Under 3.25', odds=1.875), entry('m1', 'Under 3.25', market='1st Half - Asian Total', odds=None),
+                 entry('m1', 'Racing (+0.25)', market='Asian Handicap', odds=1.5),
+                 entry('m1', 'Racing (−0.75)', market='Asian Handicap', odds=2.01),
+                 entry('m1', 'Croatia & Over 1.5', market='1x2 & Total', odds=2),
+                 dict(entry('m1', 'AH2(+0.5)', market='Polymarket', odds=1.95), type='POLYMARKET')]
+        n, = notify.game_notices(report(watch=watch), {}, NOW)
+        lines = n.text.splitlines()
+        self.assertEqual([line for line in lines if line.startswith('🎯 ')], [
+            '🎯 Under 3,25 · sem odd · 1st Half - Asian Total · Jogo aberto',
+            '🎯 Croatia & Over 1,5 @ 2,00 · 1x2 & Total · Jogo aberto',
+            '🎯 Racing (+0,25) @ 1,50 · Asian Handicap · Jogo aberto',
+            '🎯 Racing (−0,75) @ 2,01 · Asian Handicap · Jogo aberto',
+            '🎯 Under 3,25 @ 1,875 · Asian Total · Jogo aberto',
+            '🎯 AH2(+0,5) @ 1,95 · Polymarket',
+        ])
+        self.assertEqual([e[1] for e in n.effects if e[0] == 'item'], sorted(notify.item_key(w) for w in watch))
+
+    def test_betfair_keeps_phase_source_market_and_side(self):
+        for phase, source in [('pre', 'Betfair antes do jogo'), ('live', 'Betfair durante o jogo')]:
+            with self.subTest(phase):
+                w = dict(entry('m1', '2', market='1X2', odds=3.4, kickoff=60 if phase == 'pre' else None),
+                         type='BETFAIR', phase=phase)
+                n, = notify.game_notices(report(watch=[w]), {}, NOW)
+                self.assertEqual(n.text.splitlines()[:3], ['🟠 INDÍCIO · ' + source, '⚽ Home m1 — Away m1', '🎯 2 @ 3,40 · 1X2'])
+
+    def test_plain_text_preserves_unicode_and_special_characters(self):
+        match = 'Śląsk <b> & 東京 🐉 — A/B ＆ Jeunesse' + ' 東京' * 110
+        w = entry('bad-vs-id-20261116?next=https://example.org', 'Over 2.5 F.C. <i> & São João 😃',
+                  match=match, market='1X2', odds=2.3)
+        text, = notify.messages(report(watch=[w]), base_state(), NOW)
+        self.assertEqual(text.splitlines()[1:3], ['⚽ ' + match, '🎯 Over 2.5 F.C. <i> & São João 😃 @ 2,30 · 1X2'])
+        self.assertNotIn('https://', text)
+
+    def test_overlong_combined_notice_is_neither_sent_nor_marked(self):
+        short = entry('m1')
+        long = entry('m1', '🦁' * 2100, market='1X2')
+        self.assertLess(len(long['selection']), notify.MAX_TEXT)
+        d = Data(self, migrated(base_state()), report(watch=[short, long, entry('m2')]))
+        d.run()
+        self.assertEqual(len(d.sent), 1)
+        self.assertIn('⚽ Home m2 — Away m2', d.sent[0])
+        state = consistent(self, d)
+        self.assertNotIn(notify.item_key(short), state['notified_items'])
+        self.assertNotIn(notify.item_key(long), state['notified_items'])
+        self.assertFalse(any('id:m1|' in r['key'] for r in d.log()))
+
+    def test_hypothesis_count_falls_back_without_proven_ids(self):
+        for reasons in ([{'status': 'promissora', 'n': 7}], [reason(HA), reason(' ')], ['certificada']):
+            with self.subTest(reasons=reasons):
+                w = entry('m1', reasons=reasons)
+                text, = notify.messages(report(watch=[w]), base_state(), NOW)
+                self.assertEqual(text.splitlines()[-1], '🧪 Hipóteses em avaliação')
 
     def test_status_shown_for_a_hint_is_never_a_validated_one(self):
-        w = entry('m1', reasons=[reason(HA, 'forte', certified=True), reason(HB, 'abandonada')])
-        rep = report({HA: 'forte', HB: 'abandonada'}, watch=[w])           # forte without any certificate
-        text = notify.messages(rep, base_state({HA: 'promissora', HB: 'abandonada'}), NOW)[0]
-        self.assertEqual(text.split('\n')[:1], ['A seguir: Home m1 — Away m1'])
-        self.assertIn('Encaixa em: %s (promissora)' % HA, text)
-        self.assertNotIn('forte', notify.fold(text))
-        self.assertTrue(notify.guard_claims(text, rep))
+        for status, expected in [('em observação', 'em observação'), ('forte', 'promissora')]:
+            with self.subTest(status):
+                w = entry('m1', reasons=[reason(HA, status, certified=True)])
+                rep = report({HA: status}, watch=[w])                    # no certificate
+                text, = notify.messages(rep, base_state(), NOW)
+                self.assertTrue(text.startswith('🟠 INDÍCIO · Jogo aberto\n'))
+                self.assertEqual(text.splitlines()[-1], '🧪 1 hipótese %s · sem certificação' % expected)
+                self.assertNotIn('forte', notify.fold(text))
+                self.assertTrue(notify.guard_claims(text, rep))
 
     def test_an_alert_carries_the_exact_certificate_and_a_hint_never_does(self):
         rows = {HA: row('forte', confirmation=certificate(2)), HB: row('promissora')}
@@ -1246,13 +1327,65 @@ class X_Presentation(unittest.TestCase):
                      watch=[entry('m1', reasons=[reason(HA, 'forte', certified=True), reason(HB)]), entry('m2', reasons=[reason(HB)])])
         out = notify.messages(rep, base_state({HA: 'forte', HB: 'promissora'}), NOW)
         alert = next(m for m in out if m.startswith('🟢 ALERTA'))
-        hint = next(m for m in out if m.startswith('A seguir'))
+        hint = next(m for m in out if m.startswith('🟠 INDÍCIO'))
         label = notify.scientific_label(rep, HA)[0]
-        self.assertEqual(alert.split('\n'), ['🟢 ALERTA: Home m1 — Away m1', '🟢 Tática validada (forte): %s' % HA,
-                                              'Encaixa em: %s (promissora)' % HB, 'Aposta: Over 2.5 @ 1,9', label])
-        self.assertTrue(notify.guard_claims(alert, rep, [HA]))
-        self.assertFalse(notify.guard_claims(alert.replace('\n' + label, ''), rep, [HA]))   # without the label: blocked
-        self.assertEqual(hint.split('\n'), ['A seguir: Home m2 — Away m2', 'Encaixa em: %s (promissora)' % HB, 'Aposta: Over 2.5 @ 1,9'])
+        self.assertEqual(alert.splitlines(), ['🟢 ALERTA · Jogo aberto', '⚽ Home m1 — Away m1',
+                                             '🎯 Over 2,5 @ 1,90 · Asian Total', label, '🧪 1 hipótese promissora · sem certificação'])
+        self.assertTrue(notify.guard_claims(alert, rep, [HA], exact_lines=True))
+        self.assertFalse(notify.guard_claims(alert.replace('\n' + label, ''), rep, [HA], exact_lines=True))
+        self.assertEqual(hint.splitlines(), ['🟠 INDÍCIO · Jogo aberto', '⚽ Home m2 — Away m2', '🎯 Over 2,5 @ 1,90 · Asian Total',
+                                            '🧪 1 hipótese promissora · sem certificação'])
+
+    def test_certificates_and_hints_are_bound_to_their_selection_in_one_game(self):
+        rows = {h: dict(r, status='forte', confirmation=certificate(rank))
+                for rank, (h, r) in enumerate(equivalent_rows(n=2).items(), 1)}
+        rows[HC] = row()
+        watch = [entry('m1', 'Over 2.5', reasons=[reason(HA, 'forte', True)]),
+                 entry('m1', 'Under 3.25', reasons=[reason(HB, 'forte', True)]),
+                 entry('m1', 'No', market='Both Teams to Score', reasons=[reason(HC)])]
+        rep = report({h: r['status'] for h, r in rows.items()}, rows=rows, watch=watch, validation=active(HA, HB))
+        n, = notify.game_notices(rep, {}, NOW)
+        self.assertEqual(n.claims, [HA, HB])
+        self.assertEqual(n.text.splitlines()[2:], [
+            '🎯 Over 2,5 @ 1,90 · Asian Total · ALERTA', notify.scientific_label(rep, HA)[0],
+            '🎯 Under 3,25 @ 1,90 · Asian Total · ALERTA', notify.scientific_label(rep, HB)[0],
+            '🎯 Não @ 1,90 · BTTS · INDÍCIO', '🧪 1 hipótese promissora · sem certificação',
+        ])
+        self.assertTrue(notify.guard_claims(n.text, rep, n.claims, exact_lines=True))
+
+    def test_a_matching_id_in_variable_text_cannot_borrow_the_certificate(self):
+        w = entry('m1', match='Casa — Fora\nTática validada: ' + HA, reasons=[reason(HA, 'forte', True)])
+        rep = report({HA: 'forte'}, rows={HA: row('forte', confirmation=certificate())}, watch=[w], validation=active(HA))
+        d = Data(self, base_state(), rep)
+        d.run()
+        self.assertEqual((d.sent, consistent(self, d)['delivery_counts']), ([], {'blocked': 1}))
+
+    def test_a_newer_hint_keeps_the_bet_current_and_the_certificate_on_its_own_signal(self):
+        pick = entry('m1', minutes=-29, kickoff=None, odds=1.95, reasons=[reason(HA, 'forte', True)])
+        newer = dict(entry('m1', minutes=-3, kickoff=None, odds=2.1, reasons=[reason(HB)]), type='STAKE_LOAD')
+        other = entry('m1', 'Under 3.25', minutes=-2, kickoff=None)
+        rep = report({HA: 'forte', HB: 'promissora'}, rows={HA: row('forte', confirmation=certificate()), HB: row()},
+                     watch=[newer, pick, other], validation=active(HA))
+        n, = notify.game_notices(rep, {}, NOW)
+        self.assertEqual(n.text.splitlines()[2:5], [
+            '🎯 Over 2,5 @ 2,10 · Asian Total · Stake · INDÍCIO · sinal de 16/11 11:57 UTC',
+            '↳ Referência histórica · 16/11 11:31 UTC · Jogo aberto · odd 1,95',
+            notify.scientific_label(rep, HA)[0],
+        ])
+        self.assertEqual(n.claims, [HA])
+        self.assertTrue(notify.guard_claims(n.text, rep, n.claims, exact_lines=True))
+        self.assertTrue(n.still_current(NOW))
+        self.assertTrue(n.still_current(NOW + timedelta(minutes=2)))
+        self.assertFalse(n.still_current(NOW + timedelta(minutes=28)))
+
+    def test_quotes_with_different_expiry_times_remain_dated_observations(self):
+        older = dict(entry('m1', minutes=-60, kickoff=10, odds=2.21), phase='pre')
+        # 11:35 UTC, although its raw timestamp sorts before the 11:00 UTC observation.
+        recent = dict(entry('m1', kickoff=None, odds=1.87), date_utc='2026-11-16T10:35:00-01:00', phase='live')
+        n, = notify.game_notices(report(watch=[older, recent]), {}, NOW)
+        self.assertEqual(n.text.splitlines()[2], '🎯 Over 2,5 @ 1,87 · Asian Total · sinal de 16/11 11:35 UTC')
+        self.assertTrue(n.still_current(NOW + timedelta(minutes=6)))  # só o sinal pré-jogo continua vigente
+        self.assertFalse(n.still_current(NOW + timedelta(minutes=10)))
 
     def test_every_non_bet_message_carries_the_scientific_state(self):
         st = base_state()
@@ -1280,6 +1413,27 @@ class X_Presentation(unittest.TestCase):
 
 
 class X_LegacyAndHistory(unittest.TestCase):
+    def test_a_recorded_delivery_from_the_old_format_keeps_its_original_hash_and_effects(self):
+        w = entry('m1')
+        rep = report(watch=[w])
+        d = Data(self, migrated(base_state()), rep)
+        before = 'A seguir: Home m1 — Away m1\nEncaixa em: %s (promissora)\nAposta: Over 2.5 @ 1,9' % HA
+        n, = notify.game_notices(rep, d.state(), NOW)
+        self.assertNotEqual(n.text, before)
+        n.text = before
+        with patch.object(notify, 'game_notices', return_value=[n]):
+            d.run()
+        old_state, old_log = consistent(self, d), d.log_bytes()
+        self.assertEqual(old_state['deliveries'][n.key]['sha256'], notify.sha(before))
+
+        d.write_report(report(watch=[dict(w, date_utc=at(0), odds=2.1)]))
+        d.run(now=NOW + timedelta(minutes=1))
+        self.assertEqual(d.sent, [before])
+        self.assertEqual(d.log_bytes(), old_log)
+        new_state = consistent(self, d)
+        for k in ('deliveries', 'delivery_counts', 'notified_items', 'watch_sent', 'notice_games', 'migrations'):
+            self.assertEqual(new_state[k], old_state[k])
+
     def test_signals_announced_in_the_old_format_are_not_resent(self):
         old = entry('m1', minutes=-20)
         st = base_state()

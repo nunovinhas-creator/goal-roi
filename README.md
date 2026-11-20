@@ -120,19 +120,25 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 
 ## Avisos pelo Telegram
 `scangoal/notify.py` envia avisos por um bot teu (segredos `TG_BOT_TOKEN` e `TG_CHAT_ID`; sem eles, o passo é ignorado). Não usa a conta que lê o ScanGoal.
-- Avisos de jogos com sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 jogos por recolha), **só enquanto ainda dá para apostar** (`scangoal/freshness.py`, desde 17/11/2026, para indícios e alertas): pela hora ORIGINAL do sinal, ao vivo até 30 minutos depois; antes do jogo só até ao início conhecido; nunca com o jogo comprovadamente terminado; hora ausente, inválida ou incoerente: não é aviso. A regra aplica-se ao construir `brain.watch` (hora do relatório), ao planear o envio e outra vez com o relógio real imediatamente antes de contactar o Telegram, já com a intenção publicada no git (um sinal que expire durante os envios anteriores ou durante a publicação fica `expired`, nunca é enviado nem contado como entrega); uma promoção de tática nunca reativa sinais antigos, que ficam intactos como dados históricos. Contrato: cada **aposta** (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem numa só mensagem. Reforços (×2, ×4…, outra hora de sinal) e a passagem de indício a alerta da mesma aposta nunca geram outro aviso — a certificação da hipótese é anunciada à parte, no resumo diário ("✅ Tática validada"). Uma seleção genuinamente nova num jogo já avisado sai como **atualização** ("A seguir (nova seleção num jogo já avisado)"), só com a aposta nova.
+- Avisos de jogos com sinais em aberto que encaixam numa hipótese promissora ou melhor (até 5 jogos por recolha), **só enquanto ainda dá para apostar** (`scangoal/freshness.py`, desde 17/11/2026, para indícios e alertas): pela hora ORIGINAL do sinal, ao vivo até 30 minutos depois; antes do jogo só até ao início conhecido; nunca com o jogo comprovadamente terminado; hora ausente, inválida ou incoerente: não é aviso. A regra aplica-se ao construir `brain.watch` (hora do relatório), ao planear o envio e outra vez com o relógio real imediatamente antes de contactar o Telegram, já com a intenção publicada no git (um sinal que expire durante os envios anteriores ou durante a publicação fica `expired`, nunca é enviado nem contado como entrega); uma promoção de tática nunca reativa sinais antigos, que ficam intactos como dados históricos. Contrato: cada **aposta** (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas de um jogo numa recolha saem numa só mensagem. Reforços (×2, ×4…, outra hora de sinal) e a passagem de indício a alerta da mesma aposta nunca geram outro aviso — a certificação da hipótese é anunciada à parte, no resumo diário ("✅ Tática validada"). Uma seleção genuinamente nova num jogo já avisado leva a marca **NOVA SELEÇÃO**.
 - Tipos de sinal que mudam de comportamento.
 - **Um único resumo diário às 22:00 de Lisboa** (`Europe/Lisbon`, hora de verão e de inverno): é o ÚNICO sítio onde saem as mudanças de estado das hipóteses (em observação → promissora, promissora → abandonada, ganho ou perda de certificação…), todas as do período, em blocos curtos, seguidas do resumo do dia (com entregas falhadas, incertas e bloqueadas e relatório degradado, quando os houver). Sem mudanças, o resumo diz "Sem alterações de estado". Uma mudança que surja depois do resumo entra no do dia seguinte; se não couberem todas numa mensagem, as restantes ficam para o seguinte (nunca se perdem nem se repetem).
 - Aviso quando uma recolha falha (no máximo um por hora). Se a cadeia de recolha parar por completo, não há quem avise: a página mostra "Recolha parada".
 
 ### O que cada mensagem mostra
-Aviso de aposta (formato curto, para apostar depressa) — uma aposta simples tem exatamente três linhas:
+Um aviso comum com uma aposta e ligação ao jogo ocupa cinco linhas.
+
 ```
-A seguir: UTC Cajamarca — CD Los Chankas
-Encaixa em: Jogo aberto | Ritmo indicado pelo bot = menos de 90 (promissora)
-Aposta: Over 5 @ 1,91
+🟠 INDÍCIO · Stake
+⚽ Shirak — Gandzasar Kapan
+🎯 Não @ 1,60 · BTTS
+🧪 6 hipóteses promissoras · sem certificação
+🔗 https://scangoal.com/match/shirak-vs-gandzasar-kapan-20261120?lang=en
 ```
-Sem ROI, probabilidades, jogos independentes, evidência ou textos finais. Com várias táticas ou seleções no mesmo jogo, cada aposta aparece uma só vez, por baixo das táticas que a sustentam. Um ALERTA (só com certificado ativo, válido e da própria tática) começa por "🟢 ALERTA", identifica a tática com "🟢 Tática validada (…)" e termina com o rótulo científico exato dessa tática, que a barreira `guard_claims` exige; um indício nunca faz afirmações de certificação.
+
+Cada seleção tem uma linha com o mercado e a odd, seguida de um resumo das hipóteses que a sustentam. O resumo conta IDs distintos ou grupos reconhecidos pela regra de equivalência. Os critérios completos e as estatísticas estão no relatório e no dashboard. Uma seleção com certificado ativo e verificado leva o rótulo científico exato da sua hipótese logo abaixo da aposta. Os avisos são enviados em texto plano.
+
+Quando há reforços para a mesma aposta, a cotação é datada. Se o certificado corresponde a um sinal anterior, o rótulo exato acompanha a referência histórica a esse sinal. Um aviso pré-jogo Polymarket mantém a odd anunciada, a quota, o valor e o início em Lisboa. A ligação usa o identificador de origem quando este permite um caminho seguro e a ligação cabe na mensagem.
 
 Resumo diário (22:00 de Lisboa), um bloco por mudança de estado:
 ```

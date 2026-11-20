@@ -289,10 +289,10 @@ class RealGit(unittest.TestCase):
     def tearDown(self):
         self.world.doCleanups()
 
-    def seed(self, watch):
+    def seed(self, rep):
         from test_notify_durability import git
         view = self.world.runner()
-        (view / 'data' / 'report.json').write_text(json.dumps(report(watch), ensure_ascii=False))
+        (view / 'data' / 'report.json').write_text(json.dumps(rep, ensure_ascii=False))
         (view / 'data' / 'notify_state.json').write_text(json.dumps(state()))
         git(view, 'add', '-A')
         git(view, 'commit', '-qm', 'seed incident-like data')
@@ -300,7 +300,7 @@ class RealGit(unittest.TestCase):
 
     def test_slow_real_push_expires_the_signal_and_the_remote_records_it(self):
         from test_notify_durability import DURABLE
-        self.seed([live('a', 29)])
+        self.seed(report([live('a', 29)]))
         clock = Clock()
         real_call = notify.GitPublisher.__call__
 
@@ -327,11 +327,64 @@ class RealGit(unittest.TestCase):
 
     def test_fast_real_push_still_delivers(self):
         from test_notify_durability import DURABLE
-        self.seed([live('a', 20)])
+        self.seed(report([live('a', 20)]))
         a, sent = self.world.runner(), []
         self.world.notify(a, lambda t, c, text: sent.append(text), env=DURABLE, now=NOW)
         self.assertEqual(len(sent), 1)
-        self.assertTrue(sent[0].startswith('A seguir: Casa a'))
+        self.assertTrue(sent[0].startswith('🟠 INDÍCIO · '))
+        self.assertEqual(sent[0].splitlines()[1], '⚽ Casa a — Fora a')
+
+    def test_1625_reinforcement_survives_a_slow_push_and_is_sent_once(self):
+        from test_stale_notices import HID, at, reason
+        from test_telegram_presentation import active, certificate
+
+        planned = NOW.replace(hour=16, minute=29)
+        hint = 'Stake | Exemplo'
+        old = live('a', 0, date_utc=at(-29, planned), reasons=[reason('forte', True)])
+        newer = live('a', 0, date_utc=at(-4, planned), odds=2.15, type='STAKE_LOAD', reasons=[reason(hid=hint)])
+        rep = report([old, newer], {HID: 'forte', hint: 'promissora'})
+        rep['brain']['validation'] = active(HID)
+        rep['brain']['presentation']['hypotheses'] = {HID: {'confirmation': certificate(), 'prospective_games': 60},
+                                                     hint: {'prospective_games': 30}}
+        self.seed(rep)
+        clock = Clock(planned)
+        real_publish = notify.GitPublisher.__call__
+        runner, sent = self.world.runner(), []
+
+        def slow_push(publisher, key):
+            published = real_publish(publisher, key)
+            clock.advance(2)
+            return published
+
+        def sender(token, chat, text):
+            remote = self.world.runner()
+            log, invalid = notify.parse_log((remote / 'data' / notify.LOG_NAME).read_bytes())
+            self.assertEqual(invalid, 0)
+            intent, = [event for event in log if event['event'] == 'intent']
+            state_at_send = json.loads((remote / 'data' / notify.STATE_NAME).read_text())
+            self.assertEqual(state_at_send['deliveries'][intent['key']]['state'], 'in_flight')
+            self.assertEqual(intent['sha256'], notify.sha(text))
+            self.assertEqual(intent['effects'], [
+                ['notice_games', HID, 60], ['notice_games', hint, 30], ['item', 'item|id:a|1X2|1'],
+                ['watch_sent', '2026-11-17T16:00:00+00:00|Casa a — Fora a|1'],
+                ['watch_sent', '2026-11-17T16:25:00+00:00|Casa a — Fora a|1'],
+            ])
+            self.assertEqual(clock.t, planned + timedelta(minutes=2))
+            sent.append(text)
+
+        with patch.object(notify.GitPublisher, '__call__', slow_push), patch.object(notify, 'run_clock', return_value=clock):
+            self.world.notify(runner, sender, now=planned)
+        text, = sent
+        self.assertEqual(text.splitlines()[2:5], [
+            '🎯 1 @ 2,15 · 1X2 · Stake · INDÍCIO · sinal de 17/11 16:25 UTC',
+            '↳ Referência histórica · 17/11 16:00 UTC · Betfair durante o jogo · odd 3,40',
+            notify.scientific_label(rep, HID)[0],
+        ])
+        self.assertTrue(notify.guard_claims(text, rep, [HID], exact_lines=True))
+        self.world.commit_step(runner)
+        restart = self.world.runner()
+        self.world.notify(restart, lambda *args: sent.append(args[-1]), now=clock.t)
+        self.assertEqual(sent, [text])
 
 
 if __name__ == '__main__':

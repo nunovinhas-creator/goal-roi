@@ -406,7 +406,7 @@ class TelegramNeverClaimsUncertifiedValidation(unittest.TestCase):
         state = {'hello': True, 'statuses': {'h1': 'forte'}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}
         out = notify.messages(self.report({'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': ['h1']}, False), state, T0)
         self.assertFalse(any('ALERTA' in m for m in out))
-        self.assertTrue(any('promissora' in m and 'A seguir' in m for m in out))
+        self.assertTrue(any(m.startswith('🟠 INDÍCIO · ') and 'hipótese promissora · sem certificação' in m for m in out))
 
     def test_certified_tactic_is_announced(self):
         # PR 5: the certificate must belong to the hypothesis itself (its row carries the confirmation) and the scientific

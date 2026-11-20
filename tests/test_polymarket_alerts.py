@@ -57,7 +57,7 @@ class PolymarketAlerts(unittest.TestCase):
             'type': ('STAKE_LOAD', 'OPEN_GAME', None),
             'bet': (False,),
             'phase': ('live', None),
-            'match_id': ('', None),
+            'match_id': ('', ' \t ', None, 123),
             'market': ('1st Half - Asian Total', 'Total Goals', 'Total Corners', '1X2', None),
             'selection': ('Under 2.5', 'Over 2.25', 'Over 2.75', 'Over 3', None),
         }
@@ -132,13 +132,14 @@ class PolymarketAlerts(unittest.TestCase):
                 'Over 2.5 @1.85 · $7.1K',
                 '🧾 2 trades · biggest $4.4K · market share 72%',
                 'Total on Over 2.5 this match: $15K',
-                'https://scangoal.com/match/a-vs-b-20261119?lang=en',
+                'https://scangoal.com/match/match-123?lang=en',
             )),
         }
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': directory}):
             Path(directory, 'messages.jsonl').write_text(json.dumps(message) + '\n', encoding='utf-8')
             row, = report.build(now=NOW)[polymarket_alerts.REPORT_KEY]
         self.assertEqual((row['total'], row['share'], row['odds']), (7100, 72, 1.85))
+        self.assertEqual(row['match_id'], 'match-123')
 
 
     def test_market_scope_and_state_on_original_message(self):
@@ -272,10 +273,83 @@ class PolymarketDelivery(unittest.TestCase):
             self.assertEqual(done, expected)
         self.assertEqual(len(published), 1)
         self.assertEqual(len(texts), 1)
-        self.assertEqual(texts[0].count('Over 2.5 @ 1,85'), 1)
-        self.assertNotIn('2,14', texts[0])
-        self.assertIn('quota 79% · valor $9 900', texts[0])
+        self.assertEqual(texts[0].splitlines(), ['🟠 INDÍCIO · Stake / Polymarket', '⚽ A — B',
+                                              '🎯 Over 2,5 @ 1,85 · Asian Total · Polymarket',
+                                              '🧪 1 hipótese promissora · sem certificação',
+                                              'Polymarket pré-jogo · quota 79% · valor $9 900 · início 10:10 de 19/11 (Lisboa)',
+                                              '🔗 https://scangoal.com/match/a-vs-b-20261119?lang=en'])
         self.assertIn(notify.item_key(generic), state['notified_items'])
+
+    def test_fixed_notice_keeps_decimal_quote_quota_amount_and_summer_kickoff(self):
+        now = datetime(2026, 7, 1, 22, 30, tzinfo=timezone.utc)
+        row = signal(match_id='a-vs-b-20260701', date_utc='2026-07-01T22:27:00+00:00',
+                     collected_at_utc='2026-07-01T22:29:00+00:00', kickoff_utc='2026-07-01T23:10:00+00:00',
+                     odds=1.91, share=78.25, total=7150.50)
+        store = activated_store()
+        state = store.load_state()
+        state['migrations'][polymarket_alerts.ACTIVATION]['at_utc'] = '2026-07-01T22:00:00+00:00'
+        n, = notify.game_notices(notification_report([row], now), state, now)
+        self.assertEqual(n.text.splitlines(), ['🟠 INDÍCIO · Polymarket', '⚽ A — B', '🎯 Over 2,5 @ 1,91 · Asian Total',
+                                               'Polymarket pré-jogo · quota 78,25% · valor $7 150,5 · início 00:10 de 02/07 (Lisboa)',
+                                               '🔗 https://scangoal.com/match/a-vs-b-20260701?lang=en'])
+
+    def test_match_id_controls_the_link_without_changing_the_fixed_notice(self):
+        cases = {
+            'a-vs-b-20261119': True, 'match-123': True, 'Match_123.v2': True,
+            'a-vs-b-20261119?bad=1': False, 'a#fragment': False, 'https://example.invalid': False,
+            '../a': False, '..': False, '%2e%2e': False, 'a\\b': False, 'a b': False,
+            'a\nhttps://example.invalid': False, 'a\u202eb': False, 'valid-123': False,
+        }
+        for match_id, has_link in cases.items():
+            with self.subTest(match_id=match_id):
+                row = signal(match_id=match_id)
+                rep = notification_report([row], NOW)
+                fixed, = rep[polymarket_alerts.REPORT_KEY]
+                store = activated_store()
+                n, = notify.game_notices(rep, store.load_state(), NOW)
+                lines = ['🟠 INDÍCIO · Polymarket', '⚽ A — B', '🎯 Over 2,5 @ 1,85 · Asian Total',
+                         'Polymarket pré-jogo · quota 79% · valor $9 900 · início 10:10 de 19/11 (Lisboa)']
+                if has_link:
+                    lines.append('🔗 https://scangoal.com/match/' + match_id + '?lang=en')
+                self.assertEqual(n.text.splitlines(), lines)
+                self.assertEqual(n.effects, [['item', notify.item_key(fixed)], ['watch_sent', notify.legacy_key(fixed)]])
+                self.assertTrue(n.still_current(NOW))
+                self.assertFalse(n.still_current(NOW + timedelta(minutes=10)))
+
+                sent = []
+                state, count = notify.deliver(store, rep, store.load_state(), NOW,
+                                              lambda *args: sent.append(args[-1]), 'token', 'chat', publish=lambda _: True)
+                self.assertEqual((count, sent), (1, [n.text]))
+                self.assertEqual(notify.game_notices(rep, state, NOW), [])
+
+    def test_alternate_match_id_does_not_relax_the_fixed_filter(self):
+        for changes in ({'share': 80}, {'total': 10_000}, {'odds': 1.09}, {'phase': 'live'},
+                        {'market_scope': 'corners'}, {'period': 'first_half'}, {'selection': 'Under 2.5'},
+                        {'edited_at_first_sight': True}, {'date_utc': timestamp(-6)}, {'kickoff_utc': timestamp(0)}):
+            with self.subTest(changes=changes):
+                rep = notification_report([signal(match_id='match-123', **changes)], NOW)
+                self.assertEqual(notify.game_notices(rep, activated_store().load_state(), NOW), [])
+
+    def test_a_long_match_id_does_not_consume_the_fixed_notice_budget(self):
+        rep = notification_report([signal(match_id='a' * 3900)], NOW)
+        n, = notify.game_notices(rep, activated_store().load_state(), NOW)
+        self.assertIn('🎯 Over 2,5 @ 1,85 · Asian Total', n.text)
+        self.assertIn('quota 79% · valor $9 900 · início 10:10 de 19/11 (Lisboa)', n.text)
+        self.assertNotIn('https://', n.text)
+
+    def test_fixed_quote_survives_a_certified_price_from_another_source(self):
+        row = signal()
+        hid = 'Stake | Exemplo'
+        generic = dict(polymarket_alerts.candidates([row], set(), NOW)[0], type='STAKE_LOAD', odds=2.14,
+                       reasons=[{'id': hid, 'status': 'forte', 'certified': True}])
+        rep = notification_report([row], NOW, [generic])
+        rep['brain']['validation'] = {'method': notify.VALIDATION_METHOD, 'state': 'active', 'ledger_valid': True, 'certified': [hid]}
+        rep['brain']['presentation'] = {'hypotheses': {hid: {'confirmation': {'certifiable': True, 'rank': 1, 'certified_utc': timestamp(-60)}}}}
+        n, = notify.game_notices(rep, activated_store().load_state(), NOW)
+        self.assertEqual(n.claims, [hid])
+        self.assertEqual(n.text.splitlines()[2:5], ['🎯 Over 2,5 @ 2,14 · Asian Total · Stake', notify.scientific_label(rep, hid)[0],
+                                                   'Polymarket pré-jogo · odd anunciada 1,85 · quota 79% · valor $9 900 · início 10:10 de 19/11 (Lisboa)'])
+        self.assertTrue(notify.guard_claims(n.text, rep, n.claims, exact_lines=True))
 
     def test_kickoff_during_publication_blocks_the_send(self):
         row = signal(kickoff_utc=timestamp(1))
