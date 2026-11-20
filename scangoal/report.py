@@ -642,7 +642,7 @@ def build(csv_path=None, register=False, now=None):
     ins = insights.build(signals, bets, acc, MIN_SETTLED)
     reg_path = data_dir() / 'hypotheses.json'
     registry = brain.load_registry(reg_path)
-    if register and brain.update_registry(signals, registry):
+    if register and brain.update_registry(signals, registry, now=now):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     LAST['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)

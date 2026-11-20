@@ -100,7 +100,7 @@ print(json.dumps({
         self.assertEqual(replay["audit"], [1, 0, 1, None])
         self.assertEqual(replay["ranking"], [0, 1])
         self.assertEqual(replay["benchmark"], 0)
-        self.assertEqual(replay["llm_values"], [])
+        self.assertEqual(replay["llm_values"], [None])
 
     def test_telegram_note_and_highlightly_disagree_before_deadline(self):
         note = {"message_id": 43, "date_utc": "2026-11-19T20:00:00Z",
@@ -128,7 +128,7 @@ print(json.dumps({
         self.assertEqual(conflict["ranking"], [0, 1])
         self.assertEqual(conflict["benchmark_quarantine"], 1)
         self.assertEqual(conflict["brain"], dict(wins=0, losses=0, quarantined=1, imputed_losses=0))
-        self.assertEqual(conflict["llm_values"], [])
+        self.assertEqual(conflict["llm_values"], [None])
         self.assertEqual(self.replay("2026-11-20T03:30:00Z"), early)
 
     def test_live_handicap_keeps_its_contract_specific_bot_mark(self):
