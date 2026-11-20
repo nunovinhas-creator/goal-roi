@@ -372,13 +372,15 @@
    "attempt_utc": "2026-11-20T15:37:50+00:00",
    "chars": 692,
    "created_utc": "2026-11-20T15:37:50+00:00",
+   "done_utc": "2026-11-20T15:37:50+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "30e5eee30d73283e5828610476fc0b4afc490b256f7e7353ec5a6ce649cef32b",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:al-salt-vs-al-yarmouk-amman-20261119|68e5f1ba955a": {
    "attempt_utc": "2026-11-19T14:23:39+00:00",
@@ -1417,12 +1419,16 @@
    "state": "delivered"
   },
   "game|id:monaco-vs-aj-auxerre-20261121|abb1505033e1": {
+   "attempt_utc": "2026-11-20T15:37:50+00:00",
+   "chars": 242,
    "created_utc": "2026-11-20T15:37:50+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "deb08ae042fe7e062eebcb5618130171712426ea08f31b15de5d9fcb98ba37ad",
+   "state": "in_flight"
   },
   "game|id:mustaqbal-sport-vs-al-qanater-20261118|893e693c0a23": {
    "attempt_utc": "2026-11-18T13:57:17+00:00",
@@ -2196,7 +2202,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 128,
+  "delivered": 129,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-20T15:30:28+00:00",
@@ -2693,6 +2699,9 @@
   "item|id:mc-el-bayadh-vs-jrb-taghit-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T14:58:30+00:00"
   },
+  "item|id:monaco-vs-aj-auxerre-20261121|Asian Total|Under 3": {
+   "at_utc": "2026-11-20T15:37:50+00:00"
+  },
   "item|id:mustaqbal-sport-vs-al-qanater-20261118|Asian Total|Over 4": {
    "at_utc": "2026-11-18T13:57:17+00:00"
   },
@@ -2842,7 +2851,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 440,
+ "sent_total": 441,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
@@ -3142,6 +3151,7 @@
   "2026-11-20T14:56:05+00:00|MC El Bayadh — JRB Taghit|Over 3",
   "2026-11-20T15:13:06+00:00|Troyes — Le Havre|2-3",
   "2026-11-20T15:24:37+00:00|GC Mascara — MC Saida|Over 3",
+  "2026-11-20T15:35:27+00:00|Monaco — AJ Auxerre|Under 3",
   "2026-11-20T15:35:28+00:00|Al Gharafa — Al-Arabi Doha|Over 3.25"
  ]
 }
