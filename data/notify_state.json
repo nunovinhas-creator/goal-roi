@@ -512,13 +512,15 @@
    "attempt_utc": "2026-11-20T20:20:59+00:00",
    "chars": 193,
    "created_utc": "2026-11-20T20:20:59+00:00",
+   "done_utc": "2026-11-20T20:20:59+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "51231c4d67bad4951f651ff1048f4a1156b9dfb70d75ad9374176b7c4ca0a660",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:arminia-bielefeld-vs-magdeburg-20261120|6bcee4b7e851": {
    "attempt_utc": "2026-11-20T18:58:09+00:00",
@@ -605,12 +607,16 @@
    "state": "delivered"
   },
   "game|id:athletic-bilbao-vs-rcd-espanyol-20261120|6a19c31b46dd": {
+   "attempt_utc": "2026-11-20T20:20:59+00:00",
+   "chars": 230,
    "created_utc": "2026-11-20T20:20:59+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "9a4f069590a7a883d3d71747889e6cdff30b8d031b62fd3c2f03d25bd97e9887",
+   "state": "in_flight"
   },
   "game|id:athletic-bilbao-vs-rcd-espanyol-20261120|76a6e1cd9051": {
    "attempt_utc": "2026-11-20T18:53:25+00:00",
@@ -2660,7 +2666,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 160,
+  "delivered": 161,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-20T20:17:57+00:00",
@@ -2900,13 +2906,13 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 40,
   "Stake | Hora (UTC) = noite & Número de apostas = uma": 28,
-  "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 30,
+  "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 32,
   "Stake | Mercado = outros mercados": 27,
   "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 32,
   "Stake | Momento do aviso = até 45 min depois do início": 35,
   "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma": 30,
   "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 43,
-  "Stake | Número de apostas = uma & Valor da aposta = menos de 10 mil $": 48,
+  "Stake | Número de apostas = uma & Valor da aposta = menos de 10 mil $": 50,
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 29,
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": 33,
   "Stake | Sinal anterior de outro tipo no mesmo jogo = não": 54,
@@ -2967,6 +2973,9 @@
   },
   "item|id:arsenal-women-vs-lyon-women-20261119|Asian Total|Over 3": {
    "at_utc": "2026-11-19T21:21:49+00:00"
+  },
+  "item|id:athletic-bilbao-vs-rcd-espanyol-20261120|1st Half - 1x2|Athletic Bilbao": {
+   "at_utc": "2026-11-20T20:20:59+00:00"
   },
   "item|id:athletic-bilbao-vs-rcd-espanyol-20261120|Asian Total|Under 3": {
    "at_utc": "2026-11-20T18:53:25+00:00"
@@ -3405,7 +3414,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 472,
+ "sent_total": 473,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -3734,6 +3743,7 @@
   "2026-11-20T19:54:38+00:00|Stade Lausanne-Ouchy — Kriens|Over 4",
   "2026-11-20T19:57:19+00:00|Bayern Munchen — Cologne|Bayern Munich",
   "2026-11-20T20:05:41+00:00|FC Andorra — Leganes|Andorra FC",
+  "2026-11-20T20:17:50+00:00|Athletic Bilbao — Rcd Espanyol|Athletic Bilbao",
   "2026-11-20T20:20:07+00:00|Annecy — Clermont Foot|Over 4",
   "2026-11-20T20:20:28+00:00|Helmond Sport — Dordrecht|Over 4"
  ]
