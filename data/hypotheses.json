@@ -84220,6 +84220,39 @@
   "reason": "Combinação de vantagem clara e ritmo baixo",
   "source": "llm"
  },
+ "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-20T03:43:28+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Marcador no momento",
+    "diferença de 2 ou mais golos"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "50daef70fa57a920d3e98dbf73d25b23799c98daa60e5f6c74a0891cb406b89c",
+   "registry_size": 9526,
+   "report_generated_at_utc": "2026-11-20T03:43:28+00:00",
+   "response_sha256": "e88c3ceba6f368166919d3ff33e3c5a51a40d83b0f1da109c279c4d2cff2bef0"
+  },
+  "reason": "Jogos com golos iniciais e diferença grande na segunda parte",
+  "source": "llm"
+ },
  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais": {
   "born_utc": "2026-11-14T14:30:04+00:00",
   "conditions": [
