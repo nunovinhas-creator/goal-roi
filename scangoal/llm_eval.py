@@ -482,7 +482,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
     visible = [b for b in chronology.as_of_view(signals, as_of)
                if chronology.decision_time(b) <= cutoff]
-    view = [b for b in match_identity.annotate(visible, mapping=match_identity.aliases(visible, cutoff)) if eligible(b)]
+    view = [b for b in match_identity.annotate(visible, cutoff) if eligible(b)]
     have = [(b, insights.family(b), frozenset((d, v) for d, v in brain.atoms(b, set())
                                                if d in brain.RESEARCH_DIMENSIONS)) for b in view]
     index = Index(view)
@@ -497,7 +497,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
         """Índice dos sinais elegíveis já LIDOS em t (hora de leitura provada): o que o sistema sabia nesse instante."""
         if t not in snaps:
             at_birth = chronology.as_of_view(view, t)
-            snaps[t] = Index(match_identity.annotate(at_birth, mapping=match_identity.aliases(at_birth, t)))
+            snaps[t] = Index(match_identity.annotate(at_birth, t))
         return snaps[t]
 
     cache = {}
@@ -708,7 +708,7 @@ def page_summary(signals, registry):
     def games_at(hid, t):
         if t not in snaps:
             at_birth = chronology.as_of_view(view, t)
-            snaps[t] = Index(match_identity.annotate(at_birth, mapping=match_identity.aliases(at_birth, t)))
+            snaps[t] = Index(match_identity.annotate(at_birth, t))
         return snaps[t].games(registry[hid]['family'], registry[hid]['conditions'])
     order = sorted(llm, key=lambda hid: (chronology.born(registry[hid]), hid))
     grp = groups_at_birth([(hid, registry[hid], chronology.born(registry[hid])) for hid in order], TAU, games_at, GROUP_MIN_GAMES)

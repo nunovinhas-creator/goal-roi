@@ -3,7 +3,8 @@
 No messages, orders, network requests, certificate, changes to collectors or writes.
 This is a theoretical, conservative diagnostic, NOT a certified trading strategy.
 """
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 import hashlib
 import json
@@ -74,32 +75,49 @@ def eligible_signal(m, cutoff, now):
 def select_signals(messages, cutoff, now):
     """Pick one first quote per fixture using only proof visible at the evaluation cutoff."""
     rows = [m for m in messages if isinstance(m, dict)]
-    mapping = match_identity.aliases(rows, now)
-    ordered = []
-    for message in match_identity.annotate(rows, mapping=mapping):
-        times = baseline_signal(message, cutoff, now)
+    annotated, bindings = match_identity.resolve(rows, now)
+    ordered, exclusions = [], Counter()
+    for original, message in zip(rows, annotated):
+        times = baseline_signal(original, cutoff, now)
         if times is not None:
-            order = (times.collected, times.emitted, str(message.get("message_id")), game_identity(message))
-            ordered.append((order, times, message))
+            canonical = game_identity(message)
+            if canonical is None:
+                exclusions[message.get("match_identity_exclusion", "unproven_independence")] += 1
+                continue
+            order = (times.collected, times.emitted, str(message.get("message_id")), canonical)
+            ordered.append((order, message))
     candidate, baseline = {}, {}
-    for order, times, message in sorted(ordered, key=lambda row: row[0]):
+    for order, message in sorted(ordered, key=lambda row: row[0]):
         mid = game_identity(message)
         baseline.setdefault(mid, (order, message))
         if eligible_signal(message, cutoff, now) is not None:
             candidate.setdefault(mid, (order, message))
-    return candidate, baseline, mapping
+    return candidate, baseline, bindings, dict(exclusions)
 
 
-def fixture_evidence(results, aliases):
+def fixture_evidence(results, bindings):
+    """Use only results assigned to an established fixture before the identifier was reused."""
     grouped = {}
-    for mid, canonical in aliases.items():
-        if canonical is None:
-            continue
+    for mid, binding in bindings.items():
         rows = results.get(mid) if isinstance(results, dict) else None
         if isinstance(rows, dict):
-            grouped.setdefault(canonical, []).append(rows)
-        elif isinstance(rows, (tuple, list)):
-            grouped.setdefault(canonical, []).extend(rows)
+            rows = (rows,)
+        if not isinstance(rows, (tuple, list)):
+            continue
+        for row in rows:
+            if isinstance(row, dict):
+                available, kickoff = opportunity_results.utc(row.get("known_utc")), None
+            elif isinstance(row, opportunity_results.Observation):
+                available, kickoff = row.available_at, row.kickoff
+            else:
+                continue
+            if (available is None or (binding.collision is not None and available >= binding.collision)
+                    or (kickoff is not None and not binding.start <= kickoff <= binding.end)):
+                continue
+            if mid != binding.canonical and binding.available > available:
+                row = (dict(row, known_utc=binding.available.isoformat()) if isinstance(row, dict)
+                       else replace(row, available_at=binding.available))
+            grouped.setdefault(binding.canonical, []).append(row)
     return grouped
 
 
@@ -186,8 +204,8 @@ def evaluate(messages, results, protocol, *, activation_utc, now):
         counts, _ = settled_statistics({}, {}, as_of)
         return {"rule_id": protocol["id"], "status": "not_activated", **counts, "scientific_claim": "none"}
 
-    chosen, _, aliases = select_signals(messages, cutoff, as_of)
-    counts, _ = settled_statistics(chosen, fixture_evidence(results, aliases), as_of)
+    chosen, _, bindings, exclusions = select_signals(messages, cutoff, as_of)
+    counts, _ = settled_statistics(chosen, fixture_evidence(results, bindings), as_of)
     return {
         "rule_id": protocol["id"],
         "status": "exploratory_only",
@@ -195,6 +213,7 @@ def evaluate(messages, results, protocol, *, activation_utc, now):
         "born_utc": born.isoformat(),
         "actual_activation_utc": activated.isoformat(),
         "forward_window_started_utc": cutoff.isoformat(),
+        "identity_exclusions": exclusions,
         **counts,
         "scientific_claim": "none",
         "validation": "not_activated",

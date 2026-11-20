@@ -440,7 +440,7 @@ Liverpool Women — Aston Villa Women
 
 class Brain(Hardening):
     def sig(self, i, hour, win, odds=2.0, mult=1):
-        return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': ['A', 'B'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
+        return {'type': 'BETFAIR', 'phase': 'live', 'match_id': 'm%d' % i, 'key': ('m%d' % i,), 'teams': [f'Home {i}', f'Away {i}'], 'league': 'Liga', 'odds': odds, 'odds_last': odds,
                 'date_utc': '2026-11-%02dT%02d:00:00+00:00' % (10 + i % 5, hour), 'kickoff_utc': None, 'max_mult': mult, 'n_signals': 1, 'share': 90, 'share_last': 90,
                 'mkt_volume': 5000, 'lead_min': None, 'minute': None, 'market': '1X2', 'selection': '1', 'score_at_signal': None, 'x4_min': None,
                 'in_roi': True, 'w': None if win is None else (1.0 if win else -1.0), 'no_source': False}
@@ -665,7 +665,9 @@ class LanguageModel(Hardening):
 
     def test_run_registers_with_birth_date_and_respects_daily_limit(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i).replace('@1.94', '@1.94' if i < 6 else '@2.50') for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
+                .replace('Kucukcekmece Sinopspor', f'Home {i}')
+                .replace('@1.94', '@1.94' if i < 6 else '@2.50') for i in range(9)]
         calls = []
         def call(account, key, model, prompt):
             calls.append((model, prompt))
@@ -700,7 +702,8 @@ class LanguageModel(Hardening):
 
     def test_modes_rotate_notes_are_anchored_and_budget_stops_the_day(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
+                .replace('Kucukcekmece Sinopspor', f'Home {i}') for i in range(9)]
         prompts = []
         def call(account, key, model, prompt):
             prompts.append(prompt)
@@ -981,7 +984,8 @@ class EvidencePerMatch(unittest.TestCase):
         # PR 3 provenance: signal read when sent; result first observed 145 min later (available after 150 min, as before).
         seen = (datetime.fromisoformat(d) + timedelta(minutes=145)).isoformat() if w is not None else None
         return {'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': 'live', 'market': 'Asian Total', 'selection': 'Over 2.5', 'date_utc': d,
-                'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'], 'in_roi': True, 'key': (match, d),
+                'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga',
+                'teams': [f'Home {match}', f'Away {match}'], 'in_roi': True, 'key': (match, d),
                 'n_signals': 1, 'max_mult': 1, 'no_source': False, 'signal_seen_utc': d, 'result_known_utc': seen}
 
     def test_signals_in_the_same_match_share_one_vote(self):

@@ -380,7 +380,8 @@ def committed_fixtures(rows, as_of=None):
 
 def economic_summary(rows, born, as_of=None):
     """One unit committed per game, including unresolved bets in population counts."""
-    counts = dict(admitted=0, results_confirmed=0, wins=0, losses=0, voids=0, imputed_losses=0, pending=0)
+    counts = dict(admitted=0, results_confirmed=0, wins=0, losses=0, voids=0, imputed_losses=0, pending=0,
+                  quarantined=0)
     advertised, stressed = [], []
     for bet in committed_fixtures(rows, as_of):
         if not operational_signal(bet, born):
@@ -394,6 +395,9 @@ def economic_summary(rows, born, as_of=None):
             continue
 
         counts['admitted'] += 1
+        if bet.get('result_quarantined'):
+            counts['quarantined'] += 1
+            continue
         deadline = decision + timedelta(days=OPEN_TIMEOUT_DAYS)
         known = chronology.result_known(bet)
         result_proven = (first_result is not None and known is not None and known <= deadline

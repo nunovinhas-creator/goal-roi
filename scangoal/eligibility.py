@@ -36,7 +36,7 @@ def exclusion_reasons(signal):
         reasons.append('no_market')
     # PR 2 (review #5910343843): an observation only supports decisions when its game and bet are identifiable.
     if game_identity(signal) is None:
-        reasons.append('no_match_identity')
+        reasons.append(signal.get('match_identity_exclusion') or 'no_match_identity')
     if text_identity(signal.get('selection')) is None:
         reasons.append('no_selection')
     return reasons

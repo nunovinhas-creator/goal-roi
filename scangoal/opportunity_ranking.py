@@ -78,8 +78,8 @@ def build(messages, results, protocol, *, activation_utc, now):
             "certification": "not_activated", "automatic_alerts_changed": False,
             "statistical_claim": "none",
         }
-    candidate, baseline, aliases = opportunity_forward.select_signals(messages, cutoff, as_of)
-    evidence = opportunity_forward.fixture_evidence(results, aliases)
+    candidate, baseline, bindings, exclusions = opportunity_forward.select_signals(messages, cutoff, as_of)
+    evidence = opportunity_forward.fixture_evidence(results, bindings)
     cur = statistics(candidate, evidence, as_of)
     benchmark = statistics(baseline, evidence, as_of)
 
@@ -97,6 +97,7 @@ def build(messages, results, protocol, *, activation_utc, now):
         "status": "exploratory_only",
         "cutoff_utc": cutoff.isoformat(),
         "quote_policy": opportunity_forward.QUOTE_POLICY,
+        "identity_exclusions": exclusions,
         "ranking": [{
             "rank_exploratory": 1 if rankable else None,
             "rule_id": protocol["id"],

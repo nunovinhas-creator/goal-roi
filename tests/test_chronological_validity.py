@@ -32,7 +32,8 @@ def sig(match, w, minute, *, seen=0, known=145, typ='OPEN_GAME', market='Asian T
     d = at(minute)
     first = known if first == 'result' else first
     return dict({'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': 'live', 'market': market, 'selection': selection,
-                 'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'],
+                 'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga',
+                 'teams': ['Home ' + str(match), 'Away ' + str(match)],
                  'in_roi': True, 'key': (match, market, selection, d), 'n_signals': 1, 'max_mult': 1, 'no_source': False,
                  'share': None, 'total': None, 'n_bets': None,
                  'signal_seen_utc': None if seen is None else at(minute + seen),

@@ -35,7 +35,7 @@ def utc(value):
         return None
 
 
-def collected(source, record_id, score, stamp, *, period="regulation", published=None):
+def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None):
     """Legacy collectors stamp the start of their step. Apply its observation margin."""
     observed = utc(stamp)
     publication = utc(published)
@@ -46,7 +46,7 @@ def collected(source, record_id, score, stamp, *, period="regulation", published
         available = None
     if source == "telegram" and (publication is None or available is None or publication > available):
         available = None
-    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication)
+    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication, utc(kickoff))
 
 
 @dataclass(frozen=True)

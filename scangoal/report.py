@@ -59,7 +59,7 @@ def load(chronology=None, *, result_observations=None):
             if result_observations is not None:
                 observation = opportunity_results.collected(
                     'telegram', r['message_id'], p['ft'], got,
-                    published=r.get('edit_date_utc') or r.get('date_utc'),
+                    published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=p.get('kickoff_utc'),
                 )
                 result_observations.setdefault(p['match_id'], []).append(observation)
             ft[p['match_id']] = p['ft']
@@ -130,16 +130,19 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if m.get('bet') and m['odds'] < MIN_ODDS:
             continue
         k = key_of(m) + ((m['minute'],) if m['type'] == 'GOAL_BREWING' else ())   # cada aviso de golo é medido à parte
-        if strict and (k in dead or (k not in out and not provenance_ok(m))):
+        identity = {name: m[name] for name in ('canonical_match_id', 'match_identity_exclusion') if name in m}
+        cohort = (k, identity.get('canonical_match_id'), identity.get('match_identity_exclusion'))
+        if strict and (k in dead or (cohort not in out and not provenance_ok(m))):
             dead.add(k)   # o primeiro sinal desta aposta não tem origem provada: a aposta inteira fica fora do ROI
             continue
-        b = out.get(k)
+        b = out.get(cohort)
         if b is None:
-            b = out[k] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'period', 'market_scope', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
+            b = out[cohort] = {f: m.get(f) for f in ('match_id', 'type', 'phase', 'period', 'market_scope', 'market', 'selection', 'odds', 'teams', 'date_utc', 'kickoff_utc',
                                                  'minute', 'share', 'mkt_volume', 'message_id', 'score_at_signal', 'had_ft_at_first_sight', 'league',
                                                  'edited_at_first_sight', 'burst', 'rhythm', 'bot_over_pct', 'goals', 'window', 'bot_prob', 'usual_prob', 'total', 'n_bets', 'sel_volume')}
             b.update(n_signals=0, max_mult=1, odds_at_x4=None, odds_last=m.get('odds'), lead_min=lead_minutes(m), key=k, share_last=m.get('share'), x4_min=None, steps=[],
                      signal_seen_utc=m.get('collected_at_utc'))
+            b.update(identity)
         b['n_signals'] += 1
         if m['type'] == 'BETFAIR':
             b['steps'].append([m.get('mult', 1), m['odds']])
@@ -493,20 +496,26 @@ def publish_ledger_state(validation, ledger, ledger_path, registry, now, registe
                                         'registers them (see newly_selected)')
 
 
-def research_bets(signals, observations, now):
+def research_bets(signals, observations, now, *, bindings=None):
     """Settle FT-dependent research rows from the same versioned evidence as the opportunity audit."""
     snapshot_sources = {'bot_message', 'HL', 'BSD'}
-    mapping = match_identity.aliases(signals, now)
-    evidence = opportunity_forward.fixture_evidence(observations, mapping)
-    for b in match_identity.annotate(signals, mapping=mapping):
+    if bindings is None:
+        signals, bindings = match_identity.resolve(signals, now)
+    evidence = opportunity_forward.fixture_evidence(observations, bindings)
+    for b in signals:
         versions = evidence.get(game_identity(b), ())
-        if not eligible(b) or (b['result_known_source'] not in snapshot_sources and b['w'] is not None):
-            yield b
-            continue
-
+        binding = bindings.get(b['match_id'])
         decision = chronology.decision_time(b)
         deadline = decision + timedelta(days=brain.OPEN_TIMEOUT_DAYS) if decision is not None else None
         cutoff = min(now, deadline) if deadline is not None else now
+        known = chronology.result_known(b)
+        collision = binding.collision if binding is not None else None
+        legacy_settlement = b.get('result_known_source') not in snapshot_sources and b['w'] is not None
+        if not eligible(b) or (legacy_settlement and (known is None or known <= cutoff)
+                               and (collision is None or (known is not None and known < collision))):
+            yield b
+            continue
+
         kickoff = chronology.kickoff_time(b)
         if kickoff is None:
             visible = {v.kickoff for v in versions if v.kickoff is not None and v.available_at is not None
@@ -613,7 +622,11 @@ def build(csv_path=None, register=False, now=None):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     LAST['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
-    research = list(research_bets(signals, observations, now))
+    identified, bindings = match_identity.resolve(msgs, now)
+    identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
+    research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
+                                not_covered=not_covered, chronology=chron)
+    research = list(research_bets(research_input, observations, now, bindings=bindings))
     LAST['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada

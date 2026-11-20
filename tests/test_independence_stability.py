@@ -21,7 +21,8 @@ def sig(match, w, k, *, market='Asian Total', selection='Over 2.5', odds=2.0, ty
     d = '2026-11-%02dT%02d:00:00+00:00' % (1 + k // 20, k % 20)
     seen = (datetime.fromisoformat(d) + timedelta(minutes=145)).isoformat() if w is not None else None
     return dict({'match_id': match, 'w': w, 'odds': odds, 'type': typ, 'phase': phase, 'market': market, 'selection': selection,
-                 'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga', 'teams': ['A', 'B'],
+                 'date_utc': d, 'kickoff_utc': None, 'minute': 50, 'score_at_signal': [1, 0], 'league': 'Liga',
+                 'teams': ['Home ' + str(match), 'Away ' + str(match)],
                  'in_roi': True, 'key': (match, market, selection, d), 'n_signals': 1, 'max_mult': 1, 'no_source': False,
                  'share': None, 'total': None, 'n_bets': None, 'signal_seen_utc': d, 'result_known_utc': seen,
                  'match_result_first_seen_utc': seen}, **extra)
