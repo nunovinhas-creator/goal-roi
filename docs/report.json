@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-20T03:33:21+00:00",
- "messages": 1744,
+ "generated_at_utc": "2026-11-20T03:42:23+00:00",
+ "messages": 1745,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 56,
   "BETFAIR": 336,
-  "STAKE_LOAD": 352,
+  "STAKE_LOAD": 353,
   "OPEN_GAME": 206,
   "TOTALS_FORM": 70,
   "WEAKENED_LINEUP": 18,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2919,
+  "versions": 2920,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-20T02:57:57+00:00",
+  "last_collected_at_utc": "2026-11-20T03:42:23+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T03:33:18+00:00",
+  "collector_last_run_utc": "2026-11-20T03:42:23+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 4,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 264,
+  "stake_original_seen": 265,
   "stake_no_score_after_kickoff": 47,
   "stake_sent_45_after_kickoff": 80,
   "goal_lists": 526,
   "goal_lists_consistent": 262
  },
- "unique_bets": 952,
+ "unique_bets": 953,
  "settled_bets": 772,
  "unsettled_market": 103,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1239,7 +1239,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/live": {
-   "bets": 104,
+   "bets": 105,
    "settled": 63,
    "matches": 48,
    "wins": 39,
@@ -1850,7 +1850,7 @@
    "prob_above_cut": 0.2927
   },
   "STAKE_LOAD": {
-   "signals": 274,
+   "signals": 275,
    "with_result": 174,
    "hits": 94,
    "misses": 74,
@@ -2271,7 +2271,7 @@
    },
    {
     "n": 48,
-    "signals": 88,
+    "signals": 89,
     "hits": 34,
     "misses": 14,
     "hit_rate": 0.7083,
@@ -2838,7 +2838,7 @@
    },
    {
     "n": 35,
-    "signals": 69,
+    "signals": 70,
     "hits": 22,
     "misses": 13,
     "hit_rate": 0.6286,
@@ -3356,7 +3356,7 @@
    },
    {
     "n": 405,
-    "signals": 529,
+    "signals": 530,
     "hits": 242,
     "misses": 163,
     "hit_rate": 0.5873,
@@ -3460,8 +3460,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1151,
-   "eligible": 952,
+   "total": 1152,
+   "eligible": 953,
    "excluded": 199,
    "reasons": {
     "no_valid_odds": 151,
@@ -3476,7 +3476,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 9383,
+    "em observação": 9391,
     "abandonada": 32,
     "promissora": 103
    },
@@ -4533,11 +4533,11 @@
     }
    ]
   },
-  "hypotheses": 9518,
+  "hypotheses": 9526,
   "tested": 1002,
   "corrected_bar": null,
   "counts": {
-   "em observação": 9462,
+   "em observação": 9470,
    "abandonada": 34,
    "promissora": 22
   },
@@ -5335,6 +5335,120 @@
       }
      ],
      "bad_total": 6
+    },
+    {
+     "match_id": "seattle-sounders-vs-salt-lake-20261120",
+     "match": "Seattle Sounders — Salt Lake",
+     "league": "US Major League Soccer",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "live",
+     "when": "a decorrer",
+     "kickoff_utc": "2026-11-20T03:00+00:00",
+     "date_utc": "2026-11-20T03:40:26+00:00",
+     "minute": null,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "1st Half - Asian Total",
+     "selection": "Over 0.5",
+     "odds": 1.7,
+     "odds_last": 1.7,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 90,
+     "good": [
+      {
+       "id": "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 36,
+       "games": 32,
+       "hits": 27,
+       "break_even": 0.5373,
+       "prob_above": 0.9796,
+       "roi": 0.3689,
+       "edge": 0.1528,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Competição = liga & Momento do aviso = até 45 min depois do início",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ]
+       ],
+       "n": 12,
+       "games": 12,
+       "hits": 11,
+       "break_even": 0.5392,
+       "prob_above": 0.9796,
+       "roi": 0.6875,
+       "edge": 0.2059,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = até 45 min depois do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "até 45 min depois do início"
+        ]
+       ],
+       "n": 44,
+       "games": 38,
+       "hits": 32,
+       "break_even": 0.5374,
+       "prob_above": 0.9783,
+       "roi": 0.3023,
+       "edge": 0.1418,
+       "status": "promissora",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 60,
+     "bad": [
+      {
+       "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 95,
+       "games": 38,
+       "hits": 49,
+       "break_even": 0.5107,
+       "prob_above": 0.1517,
+       "roi": -0.051,
+       "edge": -0.074,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 1
     },
     {
      "match_id": "ittihad-kalba-vs-sharjah-scc-20261120",
@@ -6153,12 +6267,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 5,
+    "misto": 6,
     "sem evidência": 0,
     "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T03:33:48+00:00",
+   "generated_utc": "2026-11-20T03:42:50+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6171,7 +6285,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 9432,
+     "hypotheses": 9440,
      "with_prospective_evidence": 3106,
      "prospective_games": 65035
     },
@@ -6285,7 +6399,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 515,
+    "bets": 516,
     "settled": 433,
     "games": 277,
     "wins": 214,
@@ -16988,7 +17102,7 @@
    },
    {
     "n": 95,
-    "signals": 149,
+    "signals": 150,
     "hits": 49,
     "misses": 46,
     "hit_rate": 0.516,
@@ -17024,7 +17138,7 @@
     "expect": null,
     "mode": null,
     "tradable": true,
-    "open": 50,
+    "open": 51,
     "born_verified": true,
     "game_set": "896b5b636b027ee2",
     "prospective": {
@@ -18711,6 +18825,71 @@
   ],
   "llm_total": 86,
   "watch": [
+   {
+    "date_utc": "2026-11-20T03:40:26+00:00",
+    "match": "Seattle Sounders — Salt Lake",
+    "match_id": "seattle-sounders-vs-salt-lake-20261120",
+    "type": "STAKE_LOAD",
+    "market": "1st Half - Asian Total",
+    "selection": "Over 0.5",
+    "odds": 1.7,
+    "kickoff_utc": "2026-11-20T03:00+00:00",
+    "phase": "live",
+    "finished": false,
+    "reasons": [
+     {
+      "id": "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma",
+      "status": "promissora",
+      "n": 36,
+      "games": 32,
+      "hit_rate": 0.75,
+      "prob_above": 0.9796,
+      "edge": 0.1528,
+      "edge_ci": [
+       0.0314,
+       0.264
+      ],
+      "prob_above_cut": 0.9717,
+      "prudent_rate": 0.6866,
+      "break_even": 0.5373,
+      "certified": false
+     },
+     {
+      "id": "Stake | Momento do aviso = até 45 min depois do início",
+      "status": "promissora",
+      "n": 44,
+      "games": 38,
+      "hit_rate": 0.7273,
+      "prob_above": 0.9783,
+      "edge": 0.1418,
+      "edge_ci": [
+       0.0275,
+       0.2479
+      ],
+      "prob_above_cut": 0.9694,
+      "prudent_rate": 0.6732,
+      "break_even": 0.5374,
+      "certified": false
+     },
+     {
+      "id": "Stake | Número de apostas = uma & Valor da aposta = menos de 10 mil $",
+      "status": "promissora",
+      "n": 56,
+      "games": 45,
+      "hit_rate": 0.6545,
+      "prob_above": 0.9701,
+      "edge": 0.1239,
+      "edge_ci": [
+       0.0162,
+       0.2247
+      ],
+      "prob_above_cut": 0.9574,
+      "prudent_rate": 0.6626,
+      "break_even": 0.5392,
+      "certified": false
+     }
+    ]
+   },
    {
     "date_utc": "2026-11-19T18:53:10+00:00",
     "match": "Western Sydney Women — Wellington Phoenix Women",
@@ -25495,7 +25674,7 @@
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
-    "signals": 264,
+    "signals": 265,
     "with_result": 165,
     "hits": 91,
     "misses": 68,
@@ -25519,7 +25698,7 @@
     "roi_announced_odds": 0.0546,
     "seen_late": 0,
     "by_bot_mark": 33,
-    "per_day": 21.2,
+    "per_day": 21.1,
     "days_to_hint": 0,
     "days_to_conclusion": 7
    },
@@ -26000,7 +26179,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 952,
+   "bets": 953,
    "settled": 772,
    "matches": 418,
    "wins": 377,
@@ -26035,6 +26214,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-20T03:40:26+00:00",
+   "match_id": "seattle-sounders-vs-salt-lake-20261120",
+   "group": "STAKE_LOAD/live",
+   "match": "Seattle Sounders — Salt Lake",
+   "selection": "1st Half - Asian Total: Over 0.5",
+   "odds": 1.7,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-20T02:55:23+00:00",
    "match_id": "seattle-sounders-vs-salt-lake-20261120",
@@ -26945,22 +27137,6 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-19T01:45:03+00:00",
-   "match_id": "gremio-vs-bahia-20261119",
-   "group": "STAKE_LOAD/live",
-   "match": "Gremio — Bahia",
-   "selection": "Match Result: Esporte Clube Bahia",
-   "odds": 3.7,
-   "ft": [
-    0,
-    0
-   ],
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -27536,33 +27712,6 @@
    "goals_source": null,
    "ft": null
   },
-  "gremio-vs-bahia-20261119": {
-   "teams": [
-    "Gremio",
-    "Bahia"
-   ],
-   "events": [
-    {
-     "d": "2026-11-19T01:45:03+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "live",
-     "selection": "Esporte Clube Bahia",
-     "odds": 3.7,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Match Result",
-     "total": 6900.0
-    }
-   ],
-   "goals": null,
-   "goals_source": null,
-   "ft": [
-    0,
-    0
-   ]
-  },
   "ponce-fc-vs-ds-edusoccer-20261119": {
    "teams": [
     "Ponce FC",
@@ -27834,6 +27983,19 @@
      "share": 15,
      "market": "Polymarket",
      "total": 7100.0
+    },
+    {
+     "d": "2026-11-20T03:40:26+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "live",
+     "selection": "Over 0.5",
+     "odds": 1.7,
+     "score_at_signal": [
+      0,
+      0
+     ],
+     "market": "1st Half - Asian Total",
+     "total": 6000.0
     }
    ],
    "goals": null,
@@ -35118,7 +35280,7 @@
    "day": "2026-11-19"
   },
   {
-   "bets": 3,
+   "bets": 4,
    "settled": 0,
    "wins": 0,
    "units": 0.0,
