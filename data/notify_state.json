@@ -481,12 +481,16 @@
    "state": "delivered"
   },
   "game|id:bayern-munchen-vs-cologne-20261120|0ce295c7524b": {
+   "attempt_utc": "2026-11-20T09:52:21+00:00",
+   "chars": 226,
    "created_utc": "2026-11-20T09:52:21+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "f6748a2b5d01f1134129f7e31198e4cc7e0ad14ab0513c74a52114ece9d168b6",
+   "state": "in_flight"
   },
   "game|id:bayern-munchen-vs-cologne-20261120|38db2786f508": {
    "attempt_utc": "2026-11-19T19:01:12+00:00",
@@ -1332,13 +1336,15 @@
    "attempt_utc": "2026-11-20T09:52:21+00:00",
    "chars": 490,
    "created_utc": "2026-11-20T09:52:21+00:00",
+   "done_utc": "2026-11-20T09:52:21+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "b011583e5a7e8fd27d883adc5b024f1fc70a562b4ed5f8ad613a1954b7cc9745",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:pss-sleman-vs-arema-20261120|53a1746bfa6b": {
    "attempt_utc": "2026-11-20T07:37:46+00:00",
@@ -1958,7 +1964,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 111,
+  "delivered": 112,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-20T09:49:17+00:00",
@@ -2184,7 +2190,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 23,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
-  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 20,
+  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 21,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 26,
   "Polymarket | Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": 24,
@@ -2239,6 +2245,9 @@
   },
   "item|id:bayern-munchen-vs-cologne-20261120|Asian Total|Over 4.5": {
    "at_utc": "2026-11-19T19:01:12+00:00"
+  },
+  "item|id:bayern-munchen-vs-cologne-20261120|Asian Total|Under 4.5": {
+   "at_utc": "2026-11-20T09:52:21+00:00"
   },
   "item|id:belarus-u19-vs-slovenia-u19-20261117|1X2|1": {
    "at_utc": "2026-11-17T14:47:46+00:00"
@@ -2545,7 +2554,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 423,
+ "sent_total": 424,
  "statuses": {
   "Betfair | Competição = seleções": "abandonada",
   "Betfair | Competição = seleções & Dia = dia de semana": "abandonada",
@@ -2833,6 +2842,7 @@
   "2026-11-20T03:40:26+00:00|Seattle Sounders — Salt Lake|Over 0.5",
   "2026-11-20T03:50:33+00:00|Seattle Sounders — Salt Lake|Over 2.5",
   "2026-11-20T07:34:20+00:00|PSS Sleman — Arema|Over 1",
+  "2026-11-20T09:49:36+00:00|Bayern Munchen — Cologne|Under 4.5",
   "2026-11-20T09:51:30+00:00|PSS Sleman — Arema|Over 3"
  ]
 }
