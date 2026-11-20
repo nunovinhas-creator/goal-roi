@@ -294,7 +294,9 @@ class BrainWatch(unittest.TestCase):
         return b
 
     def build(self, opened, as_of, barrier=True):
-        settled = [self.sig(i, '2026-11-%02dT20:00:00+00:00' % (10 + i % 5), True) for i in range(40)]
+        settled = [self.sig(i, '2026-11-%02dT20:00:00+00:00' % (10 + i % 5), True,
+                            result_available_utc='2026-11-%02dT21:30:00+00:00' % (10 + i % 5))
+                   for i in range(40)]
         reg = {}
         brain.update_registry(settled + opened, reg, now=as_of)
         if barrier:
@@ -316,7 +318,8 @@ class BrainWatch(unittest.TestCase):
     def test_09_mixed_keeps_only_the_current_and_marks_phase_and_finished(self):
         as_of = datetime(2026, 11, 17, 20, 10, tzinfo=UTC)
         opened = [self.sig(100, '2026-11-17T20:00:00+00:00', None), self.sig(101, '2026-11-15T20:00:00+00:00', None),
-                  self.sig(102, '2026-11-17T20:05:00+00:00', None, ft=[1, 1]),
+                  self.sig(102, '2026-11-17T20:05:00+00:00', None, ft=[1, 1],
+                           result_available_utc='2026-11-17T20:08:00+00:00'),
                   self.sig(103, '2026-11-17T20:06:00+00:00', None, match_result_first_seen_utc='2026-11-17T20:08:00+00:00'),
                   self.sig(104, '2026-11-17T19:00:00+00:00', None, phase='pre', kickoff_utc='2026-11-17T21:00:00+00:00')]
         out = self.build(opened, as_of)

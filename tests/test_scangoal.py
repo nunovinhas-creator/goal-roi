@@ -576,7 +576,8 @@ class Brain(Hardening):
 
     def test_report_registers_hypotheses_only_when_asked(self):
         from scangoal import report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i)
+                .replace('Kucukcekmece Sinopspor', 'Equipa %d' % i) for i in range(9)]
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
