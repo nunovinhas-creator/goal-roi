@@ -974,13 +974,15 @@
    "attempt_utc": "2026-11-20T20:24:58+00:00",
    "chars": 199,
    "created_utc": "2026-11-20T20:24:58+00:00",
+   "done_utc": "2026-11-20T20:24:58+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "5481d2f5e490d8fc561f44b0a64f9f3ab05508590f2999a01cf2068ae6330c94",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:cong-an-ha-noi-vs-johor-darul-takzim-20261119|5c7e53009cfc": {
    "attempt_utc": "2026-11-19T12:14:02+00:00",
@@ -1081,12 +1083,16 @@
    "state": "delivered"
   },
   "game|id:de-graafschap-vs-mvv-maastricht-20261120|4c1ea9b5a916": {
+   "attempt_utc": "2026-11-20T20:24:58+00:00",
+   "chars": 209,
    "created_utc": "2026-11-20T20:24:58+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "9c60c72b377c40661763a37909676907f23f0c45174408a5b2f239175a1a2820",
+   "state": "in_flight"
   },
   "game|id:denmark-vs-norway-20261117|930dc2a858b9": {
    "attempt_utc": "2026-11-17T21:09:58+00:00",
@@ -2700,7 +2706,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 164,
+  "delivered": 165,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-20T20:22:59+00:00",
@@ -2902,7 +2908,7 @@
   "Betfair | Reforço = sem reforço": 51,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": 31,
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 24,
-  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": 28,
+  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": 30,
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite": 39,
   "Jogo aberto | Hora (UTC) = noite": 47,
   "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte": 36,
@@ -3112,6 +3118,9 @@
   },
   "item|id:czech-republic-u21-vs-turkey-u21-20261117|1X2|1": {
    "at_utc": "2026-11-17T17:45:48+00:00"
+  },
+  "item|id:de-graafschap-vs-mvv-maastricht-20261120|Asian Total|Over 3": {
+   "at_utc": "2026-11-20T20:24:58+00:00"
   },
   "item|id:denmark-vs-norway-20261117|Asian Total|Over 4": {
    "at_utc": "2026-11-17T21:09:58+00:00"
@@ -3457,7 +3466,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 476,
+ "sent_total": 477,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -3791,6 +3800,7 @@
   "2026-11-20T20:17:50+00:00|Porto — Paredes|Yes",
   "2026-11-20T20:20:07+00:00|Annecy — Clermont Foot|Over 4",
   "2026-11-20T20:20:28+00:00|Helmond Sport — Dordrecht|Over 4",
+  "2026-11-20T20:23:09+00:00|De Graafschap — MVV Maastricht|Over 3",
   "2026-11-20T20:23:29+00:00|Cobresal — Audax Italiano|Under 2.5"
  ]
 }
