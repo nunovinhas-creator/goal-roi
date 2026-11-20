@@ -115,8 +115,15 @@ class WorkflowInstall(unittest.TestCase):
     def setUp(self):
         self.text = (ROOT/'.github/workflows/collect.yml').read_text(encoding='utf-8')
 
-    def test_no_new_workflow(self):
-        self.assertEqual(sorted(p.name for p in (ROOT/'.github/workflows').iterdir()), ['collect.yml', 'continuity.yml', 'tests.yml'])
+    def test_only_reviewed_workflows_and_manual_quota_initialization(self):
+        workflows = ROOT/'.github/workflows'
+        initializer = 'initialize-workers-ai-budget.yml'
+        self.assertEqual(sorted(p.name for p in workflows.iterdir()),
+                         ['collect.yml', 'continuity.yml', initializer, 'tests.yml'])
+        text = (workflows/initializer).read_text(encoding='utf-8')
+        self.assertEqual(re.findall(r'^on: (.+)$', text, re.M), ['workflow_dispatch'])
+        self.assertIn('permissions:\n  contents: write\n\njobs:', text)
+        self.assertNotIn('scangoal-write', text)
 
     def test_permissions_timeout_and_start_stamp(self):
         self.assertIn('permissions:\n  contents: write\n  actions: write\n'
