@@ -386,13 +386,15 @@
    "attempt_utc": "2026-11-20T18:51:24+00:00",
    "chars": 212,
    "created_utc": "2026-11-20T18:51:24+00:00",
+   "done_utc": "2026-11-20T18:51:24+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "37146c70a4c36fee4ab7b6896437edc8c13b2b32b2be92d195305d907f7902ca",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:al-duhail-vs-qatar-sc-20261120|fa5b7e9f587c": {
    "attempt_utc": "2026-11-20T14:21:36+00:00",
@@ -561,6 +563,18 @@
    "kind": "hint",
    "sha256": "ad1b1f7d9a9164f7d24c554ade331e81f9b99e402db843bf29c5cb5b5b554a91",
    "state": "delivered"
+  },
+  "game|id:athletic-bilbao-vs-rcd-espanyol-20261120|76a6e1cd9051": {
+   "attempt_utc": "2026-11-20T18:53:25+00:00",
+   "chars": 204,
+   "created_utc": "2026-11-20T18:53:25+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "e427ec79379ce7dca336aaea87b1c52ec4d3db1b2f9ce323c8bc9dcd7009d6eb",
+   "state": "in_flight"
   },
   "game|id:barcelona-women-vs-servette-fc-chenois-women-20261119|653276c78836": {
    "attempt_utc": "2026-11-19T14:04:37+00:00",
@@ -2440,14 +2454,14 @@
   }
  },
  "delivery_counts": {
-  "delivered": 146,
+  "delivered": 147,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-20T18:49:24+00:00",
+ "format_last_run_utc": "2026-11-20T18:51:24+00:00",
  "health": {
   "reference": {
    "bsd_results": 36,
-   "eligible": 1022,
+   "eligible": 1023,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 98,
    "hypotheses": 9954,
@@ -2458,7 +2472,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-20T18:49:24+00:00",
+ "last_run_utc": "2026-11-20T18:51:24+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -2679,12 +2693,13 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 36,
+  "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 30,
   "Stake | Mercado = outros mercados": 27,
   "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 32,
   "Stake | Momento do aviso = até 45 min depois do início": 33,
   "Stake | Momento do aviso = até 45 min depois do início & Número de apostas = uma": 28,
   "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 38,
-  "Stake | Número de apostas = uma & Valor da aposta = menos de 10 mil $": 44,
+  "Stake | Número de apostas = uma & Valor da aposta = menos de 10 mil $": 47,
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 29,
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": 33,
   "Stake | Sinal anterior de outro tipo no mesmo jogo = não": 47,
@@ -2736,6 +2751,9 @@
   },
   "item|id:arsenal-women-vs-lyon-women-20261119|Asian Total|Over 3": {
    "at_utc": "2026-11-19T21:21:49+00:00"
+  },
+  "item|id:athletic-bilbao-vs-rcd-espanyol-20261120|Asian Total|Under 3": {
+   "at_utc": "2026-11-20T18:53:25+00:00"
   },
   "item|id:barcelona-women-vs-servette-fc-chenois-women-20261119|Asian Total|Over 6.5": {
    "at_utc": "2026-11-19T14:04:37+00:00"
@@ -3141,7 +3159,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 458,
+ "sent_total": 459,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -3461,6 +3479,7 @@
   "2026-11-20T18:24:51+00:00|Manchester City — Fulham|Over 3.5",
   "2026-11-20T18:33:44+00:00|Escorpiones de Belen FC — AD San Carlos|AH2(-0.5)",
   "2026-11-20T18:47:34+00:00|Grassy Park United — Kayamandi|Over 2.5",
-  "2026-11-20T18:50:07+00:00|Al Ahli — Al Nasr Riyadh|Over 3"
+  "2026-11-20T18:50:07+00:00|Al Ahli — Al Nasr Riyadh|Over 3",
+  "2026-11-20T18:52:31+00:00|Athletic Bilbao — Rcd Espanyol|Under 3"
  ]
 }
