@@ -79,6 +79,10 @@ class StateRegressed(NotifyError):
 class DeliveryFailed(NotifyError):
     """Falha confirmada: a mensagem não foi publicada (o Telegram recusou, ou a ligação nunca chegou a fazer-se)."""
 
+    def __init__(self, message='', *, retryable=None):
+        super().__init__(message)
+        self.retryable = message.endswith(' 429') if retryable is None else retryable
+
 
 class DeliveryUncertain(NotifyError):
     """Não se sabe se a mensagem foi publicada (tempo esgotado, ligação cortada, resposta ilegível, erro 5xx)."""
@@ -90,7 +94,7 @@ class DeliveryIncomplete(NotifyError):
 
 
 FAILED_EXIT = 3     # falha efetiva: o passo fica assinalado (continue-on-error no workflow), a recolha continua
-PROBLEMS = ('failed', 'uncertain', 'withdrawn')
+PROBLEMS = ('failed', 'uncertain', 'withdrawn', 'rejected')
 
 
 def send(token, chat, text):
@@ -102,7 +106,7 @@ def send(token, chat, text):
             body = json.loads(r.read(200_000))
     except HTTPError as exc:                     # nunca imprimir o endereço: contém o token
         if 400 <= exc.code < 500:
-            raise DeliveryFailed('HTTP %d' % exc.code) from None
+            raise DeliveryFailed('HTTP %d' % exc.code, retryable=exc.code == 429) from None
         raise DeliveryUncertain('HTTP %d' % exc.code) from None
     except URLError as exc:
         if isinstance(exc.reason, (socket.gaierror, ConnectionRefusedError)):
@@ -1212,7 +1216,7 @@ def reconcile(store, state, now):
             r = recs.setdefault(key, {'kind': evs[0].get('kind'), 'created_utc': evs[0].get('at_utc')})
             if not r.get('rejected_attempts'):
                 r.update(state='pending', rejected_attempts=1, events=names)
-                _bump(state, 'failed')
+                _bump(state, 'rejected')
                 changed = True
             continue
         outcome = terminal[-1] if terminal else ('uncertain' if open_intent else None)
@@ -1339,14 +1343,16 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
             cp('after_expired')
             continue
         cp('before_send')
+        retryable = False
         try:
             sender(token, chat, n.text)
             outcome = 'delivered'
-        except DeliveryFailed:
+        except DeliveryFailed as exc:
             outcome = 'failed'
+            retryable = exc.retryable
         except Exception:                 # qualquer outra exceção: não se sabe se saiu
             outcome = 'uncertain'
-        if outcome == 'failed' and n.bets and not rec.get('rejected_attempts') and n.still_current(clock()):
+        if retryable and n.bets and not rec.get('rejected_attempts') and n.still_current(clock()):
             rejected_record = dict(rec)
             state.clear()
             state.update(before)
@@ -1354,7 +1360,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
             rec = recs[n.key]
             rec.update(state='pending', rejected_attempts=1, attempt_id=rejected_record['attempt_id'])
             rec['events'] += ['intent', 'rejected']
-            _bump(state, 'failed')
+            _bump(state, 'rejected')
             store.save_state(state)
             store.append_log([log_entry(clock(), n.key, 'rejected', rec, reason='telegram_confirmed_rejection')])
             print('NOTIFY_DELIVERY_FAILED')

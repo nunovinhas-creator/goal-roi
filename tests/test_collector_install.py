@@ -151,7 +151,7 @@ class WorkflowInstall(unittest.TestCase):
         self.assertFalse([l for l in code if 'recovery' in l])   # no step runs recovery code
 
     def test_requirements_add_only_pinned_cryptography(self):
-        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==44.0.3'])
+        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==50.0.0'])
 
 
 if __name__ == '__main__':

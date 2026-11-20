@@ -197,8 +197,8 @@ def _deliver(candidates, now, env, sender, path, publisher, token, chat, clock):
             continue
         try:
             sender(token, chat, text(m, send_time))
-        except notify.DeliveryFailed:
-            if key not in rejected and freshness.current(m['b'], clock()):
+        except notify.DeliveryFailed as exc:
+            if exc.retryable and key not in rejected and freshness.current(m['b'], clock()):
                 persist('rejected', key, clock().isoformat())
             raise StakeStateError('stake Telegram rejection confirmed') from None
         except Exception as exc:
