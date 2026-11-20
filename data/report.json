@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-20T07:34:28+00:00",
- "messages": 1756,
+ "generated_at_utc": "2026-11-20T07:37:21+00:00",
+ "messages": 1757,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 56,
   "BETFAIR": 338,
-  "STAKE_LOAD": 355,
+  "STAKE_LOAD": 356,
   "OPEN_GAME": 206,
   "TOTALS_FORM": 70,
   "WEAKENED_LINEUP": 18,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 2938,
+  "versions": 2939,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-20T05:38:43+00:00",
+  "last_collected_at_utc": "2026-11-20T07:37:20+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T07:33:46+00:00",
+  "collector_last_run_utc": "2026-11-20T07:37:20+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 4,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 267,
+  "stake_original_seen": 268,
   "stake_no_score_after_kickoff": 47,
   "stake_sent_45_after_kickoff": 82,
   "goal_lists": 531,
   "goal_lists_consistent": 262
  },
- "unique_bets": 959,
+ "unique_bets": 960,
  "settled_bets": 778,
  "unsettled_market": 104,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1342,7 +1342,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 160,
+   "bets": 161,
    "settled": 104,
    "matches": 52,
    "wins": 54,
@@ -1856,7 +1856,7 @@
    "prob_above_cut": 0.2929
   },
   "STAKE_LOAD": {
-   "signals": 277,
+   "signals": 278,
    "with_result": 178,
    "hits": 97,
    "misses": 75,
@@ -2709,7 +2709,7 @@
    },
    {
     "n": 28,
-    "signals": 59,
+    "signals": 60,
     "hits": 18,
     "misses": 10,
     "hit_rate": 0.6429,
@@ -2844,7 +2844,7 @@
    },
    {
     "n": 39,
-    "signals": 72,
+    "signals": 73,
     "hits": 25,
     "misses": 14,
     "hit_rate": 0.641,
@@ -3362,7 +3362,7 @@
    },
    {
     "n": 409,
-    "signals": 534,
+    "signals": 535,
     "hits": 245,
     "misses": 164,
     "hit_rate": 0.5889,
@@ -3466,8 +3466,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1158,
-   "eligible": 959,
+   "total": 1159,
+   "eligible": 960,
    "excluded": 199,
    "reasons": {
     "no_valid_odds": 151,
@@ -4866,6 +4866,15 @@
    ],
    "open": [
     {
+     "date_utc": "2026-11-20T07:34:20+00:00",
+     "kickoff_utc": "2026-11-20T08:30+00:00",
+     "match": "PSS Sleman — Arema",
+     "selection": "Over 1",
+     "market": "1st Half - Asian Total",
+     "odds": 1.52,
+     "tactic": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não"
+    },
+    {
      "date_utc": "2026-11-19T18:40:37+00:00",
      "kickoff_utc": "2026-11-20T19:30+00:00",
      "match": "Bayern Munchen — Cologne",
@@ -4907,6 +4916,151 @@
   },
   "agenda": {
    "items": [
+    {
+     "match_id": "pss-sleman-vs-arema-20261120",
+     "match": "PSS Sleman — Arema",
+     "league": "Indonesian Liga 1",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-20T08:30+00:00",
+     "date_utc": "2026-11-20T07:34:20+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1st Half - Asian Total",
+     "selection": "Over 1",
+     "odds": 1.52,
+     "odds_last": 1.52,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 93,
+     "good": [
+      {
+       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 36,
+       "games": 31,
+       "hits": 28,
+       "break_even": 0.5834,
+       "prob_above": 0.9948,
+       "roi": 0.3368,
+       "edge": 0.1867,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 52,
+       "games": 38,
+       "hits": 37,
+       "break_even": 0.5511,
+       "prob_above": 0.9865,
+       "roi": 0.2863,
+       "edge": 0.1531,
+       "status": "promissora",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 25,
+       "games": 21,
+       "hits": 20,
+       "break_even": 0.5882,
+       "prob_above": 0.9808,
+       "roi": 0.3535,
+       "edge": 0.1726,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 37,
+     "bad": [
+      {
+       "id": "Stake | Momento do aviso = antes do início",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ]
+       ],
+       "n": 65,
+       "games": 30,
+       "hits": 32,
+       "break_even": 0.4935,
+       "prob_above": 0.1649,
+       "roi": -0.0325,
+       "edge": -0.0765,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais",
+       "conditions": [
+        [
+         "Momento do aviso",
+         "antes do início"
+        ],
+        [
+         "Valor da aposta",
+         "10 mil $ ou mais"
+        ]
+       ],
+       "n": 36,
+       "games": 16,
+       "hits": 17,
+       "break_even": 0.4722,
+       "prob_above": 0.1879,
+       "roi": -0.0776,
+       "edge": -0.0856,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 2
+    },
     {
      "match_id": "eintracht-frankfurt-vs-hoffenheim-20261121",
      "match": "Eintracht Frankfurt — Hoffenheim",
@@ -6526,12 +6680,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 8,
+    "misto": 9,
     "sem evidência": 0,
     "contraditório": 4,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T07:34:50+00:00",
+   "generated_utc": "2026-11-20T07:37:43+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6658,7 +6812,7 @@
   },
   "walk_forward": {
    "followed": {
-    "bets": 522,
+    "bets": 523,
     "settled": 439,
     "games": 278,
     "wins": 218,
@@ -19086,6 +19240,88 @@
   "llm_total": 87,
   "watch": [
    {
+    "date_utc": "2026-11-20T07:34:20+00:00",
+    "match": "PSS Sleman — Arema",
+    "match_id": "pss-sleman-vs-arema-20261120",
+    "type": "STAKE_LOAD",
+    "market": "1st Half - Asian Total",
+    "selection": "Over 1",
+    "odds": 1.52,
+    "kickoff_utc": "2026-11-20T08:30+00:00",
+    "phase": "pre",
+    "finished": false,
+    "reasons": [
+     {
+      "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 36,
+      "games": 31,
+      "hit_rate": 0.7778,
+      "prob_above": 0.9948,
+      "edge": 0.1867,
+      "edge_ci": [
+       0.0724,
+       0.2861
+      ],
+      "prob_above_cut": 0.9921,
+      "prudent_rate": 0.7677,
+      "break_even": 0.5834,
+      "certified": false
+     },
+     {
+      "id": "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 52,
+      "games": 38,
+      "hit_rate": 0.7184,
+      "prob_above": 0.9865,
+      "edge": 0.1531,
+      "edge_ci": [
+       0.0417,
+       0.2539
+      ],
+      "prob_above_cut": 0.9801,
+      "prudent_rate": 0.7183,
+      "break_even": 0.5511,
+      "certified": false
+     },
+     {
+      "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 44,
+      "games": 37,
+      "hit_rate": 0.7045,
+      "prob_above": 0.973,
+      "edge": 0.1334,
+      "edge_ci": [
+       0.0207,
+       0.2356
+      ],
+      "prob_above_cut": 0.9613,
+      "prudent_rate": 0.7117,
+      "break_even": 0.5805,
+      "certified": false
+     },
+     {
+      "id": "Stake | Sinal anterior de outro tipo no mesmo jogo = não",
+      "status": "promissora",
+      "n": 66,
+      "games": 49,
+      "hit_rate": 0.6718,
+      "prob_above": 0.962,
+      "edge": 0.1122,
+      "edge_ci": [
+       0.0086,
+       0.2091
+      ],
+      "prob_above_cut": 0.9455,
+      "prudent_rate": 0.6703,
+      "break_even": 0.5462,
+      "certified": false
+     }
+    ]
+   },
+   {
     "date_utc": "2026-11-19T18:40:37+00:00",
     "match": "Bayern Munchen — Cologne",
     "match_id": "bayern-munchen-vs-cologne-20261120",
@@ -25959,7 +26195,7 @@
     "days_to_conclusion": 3
    },
    "STAKE_LOAD": {
-    "signals": 267,
+    "signals": 268,
     "with_result": 169,
     "hits": 94,
     "misses": 69,
@@ -26464,7 +26700,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 959,
+   "bets": 960,
    "settled": 778,
    "matches": 419,
    "wins": 381,
@@ -26499,6 +26735,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-20T07:34:20+00:00",
+   "match_id": "pss-sleman-vs-arema-20261120",
+   "group": "STAKE_LOAD/pre",
+   "match": "PSS Sleman — Arema",
+   "selection": "1st Half - Asian Total: Over 1",
+   "odds": 1.52,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-20T05:32:16+00:00",
    "match_id": "east-bengal-club-vs-sporting-club-delhi-20261120",
@@ -27407,22 +27656,6 @@
    "ft": null,
    "w": null,
    "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-19T10:49:19+00:00",
-   "match_id": "seattle-sounders-vs-salt-lake-20261120",
-   "group": "STAKE_LOAD/pre",
-   "match": "Seattle Sounders — Salt Lake",
-   "selection": "Under 2.75",
-   "odds": 2.18,
-   "ft": [
-    1,
-    1
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   }
@@ -29439,6 +29672,26 @@
      "share": 100,
      "market": "Asian Total",
      "total": 5100.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "pss-sleman-vs-arema-20261120": {
+   "teams": [
+    "PSS Sleman",
+    "Arema"
+   ],
+   "events": [
+    {
+     "d": "2026-11-20T07:34:20+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Over 1",
+     "odds": 1.52,
+     "market": "1st Half - Asian Total",
+     "total": 17000.0
     }
    ],
    "goals": null,
@@ -35513,7 +35766,7 @@
    "day": "2026-11-19"
   },
   {
-   "bets": 10,
+   "bets": 11,
    "settled": 4,
    "wins": 2,
    "units": -0.55,
