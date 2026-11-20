@@ -387,7 +387,8 @@ def confirmation(match, since, alpha, as_of=None):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
-    cands, skipped = [], {'not_operational': 0, 'decision_window_open': 0, 'result_seen_before_decision': 0, 'overlap': 0}
+    cands, skipped = [], {'not_operational': 0, 'decision_window_open': 0, 'result_seen_before_decision': 0,
+                          'result_quarantined': 0, 'overlap': 0}
     for key, rows in games.items():
         b = committed_bet(rows)
         if b is None:
@@ -403,6 +404,9 @@ def confirmation(match, since, alpha, as_of=None):
         settled = b.get('w') is not None
         if (first is not None and latest_decision(b) >= first) or (settled and first is None):
             skipped['result_seen_before_decision'] += 1      # resultado já visto, ou existente sem hora provada: nunca entra
+            continue
+        if b.get('result_quarantined'):
+            skipped['result_quarantined'] += 1
             continue
         cands.append((t, sent, str(b.get('key')), b))
     cands.sort(key=lambda c: c[:3])

@@ -503,12 +503,19 @@ def research_bets(signals, observations, now):
             yield b
             continue
 
+        decision = chronology.decision_time(b)
+        deadline = decision + timedelta(days=brain.OPEN_TIMEOUT_DAYS) if decision is not None else None
+        cutoff = min(now, deadline) if deadline is not None else now
         kickoff = chronology.kickoff_time(b)
         if kickoff is None:
             visible = {v.kickoff for v in versions if v.kickoff is not None and v.available_at is not None
-                       and v.available_at <= now}
+                       and v.available_at <= cutoff}
             kickoff = next(iter(visible)) if len(visible) == 1 else None
-        result = opportunity_results.resolve(versions, kickoff=kickoff, as_of=now)
+        result, late = opportunity_results.settlement(versions, kickoff=kickoff, as_of=now, deadline=deadline)
+        b = dict(b, result_quarantined=result.conflict,
+                 result_reconciliation=(
+                     {'ft': late.score, 'conflict': late.conflict, 'available_utc': chronology.iso(late.available_at)}
+                     if late is not None else None))
         if result.score is None:
             yield dict(b, ft=None, w=None, result_known_utc=None, result_known_source=None, settled_by=None,
                        match_result_first_seen_utc=chronology.iso(result.first_available_at))

@@ -66,7 +66,9 @@ def payoff(signal, outcome, now):
     kickoff = chronology.kickoff_time(signal)
     if not kickoff:
         return ("quarantined", None, None)
-    result = opportunity_results.resolve(outcome, kickoff=kickoff, as_of=now)
+    result, _ = opportunity_results.settlement(
+        outcome, kickoff=kickoff, as_of=now, deadline=kickoff + opportunity_forward.MAX_UNRESOLVED,
+    )
     if result.conflict:
         return ("quarantined", None, None)
     if result.score is not None:

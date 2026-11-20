@@ -57,6 +57,17 @@ class Resolution:
     first_available_at: datetime | None = None
 
 
+def settlement(evidence, *, kickoff, as_of, deadline):
+    """Resolve the primary result at its deadline and report later changes separately."""
+    cutoff = min(as_of, deadline) if deadline is not None else as_of
+    primary = resolve(evidence, kickoff=kickoff, as_of=cutoff)
+    if cutoff < as_of:
+        current = resolve(evidence, kickoff=kickoff, as_of=as_of)
+        if (current.score, current.conflict) != (primary.score, primary.conflict):
+            return primary, current
+    return primary, None
+
+
 def resolve(evidence, *, kickoff, as_of):
     """Resolve each record's latest valid version visible at the evaluation cutoff."""
     earliest_ft = kickoff + REGULATION_TIME if kickoff is not None else None
@@ -71,7 +82,7 @@ def resolve(evidence, *, kickoff, as_of):
 
     if not isinstance(evidence, (list, tuple)):
         return Resolution()
-    latest, first = {}, None
+    latest, first_by_score = {}, {}
     for row in evidence:
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
                 or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
@@ -79,7 +90,7 @@ def resolve(evidence, *, kickoff, as_of):
                 or (earliest_ft is not None and (row.available_at < earliest_ft
                     or (row.published_at is not None and row.published_at < earliest_ft)))):
             continue
-        first = min(first, row.available_at) if first is not None else row.available_at
+        first_by_score[row.score] = min(row.available_at, first_by_score.get(row.score, row.available_at))
         key = (row.source, row.record_id)
         # A late read of an older Telegram edit cannot supersede a newer edit.
         version = row.published_at or row.observed_at
@@ -92,9 +103,9 @@ def resolve(evidence, *, kickoff, as_of):
     scores = {score for _, values, _ in latest.values() for score in values}
     if not scores:
         return Resolution()
-    available = max(stamp for _, _, stamp in latest.values())
-    return Resolution(next(iter(scores)) if len(scores) == 1 else None,
-                      conflict=len(scores) > 1, available_at=available, first_available_at=first)
+    score = next(iter(scores)) if len(scores) == 1 else None
+    return Resolution(score, conflict=score is None, available_at=first_by_score.get(score),
+                      first_available_at=min(first_by_score.values()))
 
 
 def remember_provider_results(state, matched, stamp):

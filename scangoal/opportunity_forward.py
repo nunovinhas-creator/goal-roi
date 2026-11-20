@@ -98,7 +98,7 @@ def evaluate(messages, results, protocol, *, activation_utc, now):
     for mid, (_, m) in sorted(chosen.items()):
         ko = chronology.kickoff_time(m)
         evidence = results.get(mid) if isinstance(results, dict) else None
-        result = opportunity_results.resolve(evidence, kickoff=ko, as_of=as_of)
+        result, _ = opportunity_results.settlement(evidence, kickoff=ko, as_of=as_of, deadline=ko + MAX_UNRESOLVED)
         if result.conflict:
             quarantined += 1
             continue

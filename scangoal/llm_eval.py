@@ -285,7 +285,7 @@ def admitted(match, start):
             games.setdefault(key, []).append(b)
     for key, rows in games.items():
         bet = brain.committed_bet(rows)
-        if bet is None or not _operational_pre(bet, start):
+        if bet is None or not _operational_pre(bet, start) or bet.get('result_quarantined'):
             continue
         seen = [s for s in (chronology.parse_utc(b.get('match_result_first_seen_utc')) for b in rows) if s is not None]
         if seen and brain.latest_decision(bet) >= min(seen):
