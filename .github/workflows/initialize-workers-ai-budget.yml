@@ -1,0 +1,17 @@
+name: Initialize Workers AI budget
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  initialize:
+    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Publish or verify the sealed quota journal
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 -m scripts.initialize_workers_ai_budget

@@ -20,6 +20,13 @@ class BudgetUnavailable(RuntimeError):
     """The shared balance or successful publication could not be proved."""
 
 
+def _unique_object(pairs):
+    members = dict(pairs)
+    if len(members) != len(pairs):
+        raise ValueError("Duplicate quota journal keys")
+    return members
+
+
 class GitBudget:
     def __init__(self, account, directory=None, remote="origin"):
         self.account = hashlib.sha256(account.encode()).hexdigest()
@@ -32,7 +39,7 @@ class GitBudget:
                 ["git", "-C", str(self.directory), "-c", "user.name=goal-roi quota",
                  "-c", "user.email=actions@users.noreply.github.com", *args],
                 input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                env=dict(os.environ, GIT_TERMINAL_PROMPT="0"), timeout=15,
+                env=dict(os.environ, GIT_TERMINAL_PROMPT="0", LC_ALL="C"), timeout=15,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise BudgetUnavailable("Git quota transport unavailable") from exc
@@ -41,7 +48,11 @@ class GitBudget:
         return result
 
     def tip(self):
-        advertised = self.git("ls-remote", "--refs", self.remote, REF).stdout.decode("ascii").split()
+        raw = self.git("ls-remote", "--refs", self.remote, REF).stdout
+        try:
+            advertised = raw.decode("ascii").split()
+        except UnicodeError as exc:
+            raise BudgetUnavailable("Invalid quota ref") from exc
         if not advertised:
             return None
         if len(advertised) != 2 or advertised[1] != REF or not OID.fullmatch(advertised[0]):
@@ -54,7 +65,7 @@ class GitBudget:
         if len(raw) > 1_000_000:
             raise BudgetUnavailable("Quota journal too large")
         try:
-            state = json.loads(raw)
+            state = json.loads(raw, object_pairs_hook=_unique_object)
             day = date.fromisoformat(state["day"])
             if (type(state["schema"]) is not int or state["schema"] != 1 or state["account"] != self.account
                     or type(state["sealed"]) is not bool or not isinstance(state["holds"], dict)):
@@ -73,7 +84,9 @@ class GitBudget:
         blob = self.git("hash-object", "-w", "--stdin", data=raw).stdout.strip()
         tree_line = b"100644 blob " + blob + b"\t" + STATE_FILE.encode() + b"\n"
         tree = self.git("mktree", data=tree_line).stdout.decode().strip()
-        args = ["commit-tree", tree, "-m", "quota: reserve Workers AI capacity [skip ci]"]
+        message = ("quota: reserve Workers AI capacity [skip ci]" if parent
+                   else "quota: initialize sealed Workers AI budget [skip ci]")
+        args = ["commit-tree", tree, "-m", message]
         if parent:
             args.extend(["-p", parent])
         commit = self.git(*args).stdout.decode().strip()
@@ -83,10 +96,38 @@ class GitBudget:
                           self.remote, commit + ":" + REF, check=False)
         if result.returncode == 0:
             return True
+        # An advanced tip alone cannot distinguish a lost acknowledgement from a stale lease.
+        prefix = f"!\t{commit}:{REF}\t".encode("ascii")
+        rejected = {prefix + b"[rejected] (stale info)",
+                    prefix + b"[remote rejected] (failed to update ref)",
+                    prefix + b"[remote rejected] (incorrect old value provided)"}
+        if rejected.isdisjoint(result.stdout.splitlines()):
+            raise BudgetUnavailable("Quota publication could not be proved")
         actual = self.tip()
         if actual is None or actual in (parent, commit):
             raise BudgetUnavailable("Quota publication could not be proved")
         return False
+
+    def _empty_state(self, day, *, sealed):
+        return {"schema": 1, "account": self.account, "day": day.isoformat(),
+                "sealed": sealed, "holds": {}}
+
+    def initialize(self, day):
+        """Create a sealed journal if absent and return the validated remote state."""
+        tip = self.tip()
+        if tip is None:
+            try:
+                self.publish(None, self._empty_state(day, sealed=True))
+            except BudgetUnavailable:
+                # A concurrent initializer or a lost acknowledgement may have left a valid ref.
+                pass
+            tip = self.tip()
+            if tip is None:
+                raise BudgetUnavailable("Quota journal initialization could not be verified")
+        _, state = self.read(tip)
+        if self.tip() != tip:
+            raise BudgetUnavailable("Quota journal changed during verification")
+        return tip, state
 
     def reserve(self, day, cost, limit):
         """Publish a new charge before returning permission to send one request."""
@@ -94,12 +135,10 @@ class GitBudget:
             return False
         for _ in range(3):
             parent = self.tip()
-            state = {"schema": 1, "account": self.account, "day": day.isoformat(),
-                     "sealed": False, "holds": {}}
+            state = self._empty_state(day, sealed=parent is None)
             if parent is None:
                 # No evidence of earlier usage today. Seal the day even on first install or
                 # if an operator has deleted the ref. A future UTC day can start at zero.
-                state["sealed"] = True
                 if self.publish(parent, state):
                     return False
                 continue

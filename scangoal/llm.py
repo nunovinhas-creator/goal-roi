@@ -369,7 +369,8 @@ def run(call=None, now=None, env=None, *, budget=None):
     live = call is None or call is request
     if budget is None and env.get('LLM_BUDGET_MODE') == 'git' and env.get('GITHUB_REF_NAME') == 'main':
         budget = GitBudget(account)
-    if live and not isinstance(budget, GitBudget):
+    if live and (not isinstance(budget, GitBudget)
+                 or budget.account != hashlib.sha256(account.encode()).hexdigest()):
         print('LLM_SKIPPED_BUDGET_UNVERIFIED')
         return None
     directory = data_dir()
