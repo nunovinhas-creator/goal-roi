@@ -396,6 +396,18 @@
    "sha256": "30e5eee30d73283e5828610476fc0b4afc490b256f7e7353ec5a6ce649cef32b",
    "state": "delivered"
   },
+  "game|id:al-gharafa-vs-al-arabi-doha-20261120|6b2547ff76f2": {
+   "attempt_utc": "2026-11-20T16:00:22+00:00",
+   "chars": 727,
+   "created_utc": "2026-11-20T16:00:22+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "b34bbc0c147e7c0b673e8c74e94edac4af556e3bb214152de80c5b7845c20bd8",
+   "state": "in_flight"
+  },
   "game|id:al-salt-vs-al-yarmouk-amman-20261119|68e5f1ba955a": {
    "attempt_utc": "2026-11-19T14:23:39+00:00",
    "chars": 607,
@@ -1310,13 +1322,15 @@
    "attempt_utc": "2026-11-20T15:54:22+00:00",
    "chars": 476,
    "created_utc": "2026-11-20T15:54:22+00:00",
+   "done_utc": "2026-11-20T15:54:22+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "1d0bcca0c8166a2af92db22c935c11ae21f6ed4be2ade487e093750daf8a0796",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:kashima-vs-yokohama-fm-20261115|b182a2c04e1a": {
    "attempt_utc": "2026-11-17T13:07:16+00:00",
@@ -2244,17 +2258,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 132,
+  "delivered": 133,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-20T15:51:24+00:00",
+ "format_last_run_utc": "2026-11-20T15:56:22+00:00",
  "health": {
   "reference": {
    "bsd_results": 36,
-   "eligible": 993,
+   "eligible": 994,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 98,
-   "hypotheses": 9858,
+   "hypotheses": 9862,
    "settled_bets": 801,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 50,
@@ -2262,7 +2276,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-20T15:51:24+00:00",
+ "last_run_utc": "2026-11-20T15:56:22+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -2503,6 +2517,9 @@
   },
   "item|id:al-gharafa-vs-al-arabi-doha-20261120|Asian Total|Over 3.25": {
    "at_utc": "2026-11-20T15:37:50+00:00"
+  },
+  "item|id:al-gharafa-vs-al-arabi-doha-20261120|Asian Total|Over 4.5": {
+   "at_utc": "2026-11-20T16:00:22+00:00"
   },
   "item|id:al-salt-vs-al-yarmouk-amman-20261119|Asian Total|Over 2.75": {
    "at_utc": "2026-11-19T14:23:39+00:00"
@@ -2902,7 +2919,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 444,
+ "sent_total": 445,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
@@ -3206,6 +3223,7 @@
   "2026-11-20T15:35:28+00:00|Al Gharafa — Al-Arabi Doha|Over 3.25",
   "2026-11-20T15:37:45+00:00|Monaco — AJ Auxerre|Under 3.25",
   "2026-11-20T15:48:53+00:00|Al Ahli — Al Nasr Riyadh|Over 1.5",
-  "2026-11-20T15:52:33+00:00|Kahraba Ismailia — Ceramica Cleopatra|Over 3.75"
+  "2026-11-20T15:52:33+00:00|Kahraba Ismailia — Ceramica Cleopatra|Over 3.75",
+  "2026-11-20T15:58:02+00:00|Al Gharafa — Al-Arabi Doha|Over 4.5"
  ]
 }
