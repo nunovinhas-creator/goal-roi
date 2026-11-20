@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T13:29:51+00:00",
+ "generated_at_utc": "2026-11-20T13:32:08+00:00",
  "messages": 1800,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 3008,
+  "versions": 3009,
   "edits_changing_signal": 2,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-20T13:29:51+00:00",
+  "last_collected_at_utc": "2026-11-20T13:32:06+00:00",
   "hl_results": 98,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 45,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 6,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-20T13:29:51+00:00",
+  "collector_last_run_utc": "2026-11-20T13:32:06+00:00",
   "name_review": [
    {
     "bot": [
@@ -1821,7 +1821,7 @@
    "seen_late": 2,
    "by_bot_mark": 0,
    "per_day": 1.6,
-   "days_to_hint": 10,
+   "days_to_hint": 11,
    "days_to_conclusion": 179,
    "prudent_rate": 0.7154,
    "prob_above": 0.5193,
@@ -5225,162 +5225,6 @@
      "bad_total": 6
     },
     {
-     "match_id": "beijing-guoan-vs-shanghai-port-20261120",
-     "match": "Beijing Guoan — Shanghai Port",
-     "league": "China FA Cup",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-20T13:00:38+00:00",
-     "minute": 63,
-     "score_at_signal": [
-      0,
-      2
-     ],
-     "market": "Asian Total",
-     "selection": "Over 3",
-     "odds": 1.76,
-     "odds_last": 1.76,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 97,
-     "good": [
-      {
-       "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos",
-       "conditions": [
-        [
-         "Golos até ao sinal",
-         "1 ou 2"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ]
-       ],
-       "n": 33,
-       "games": 33,
-       "hits": 24,
-       "break_even": 0.5491,
-       "prob_above": 0.9686,
-       "roi": 0.3274,
-       "edge": 0.1368,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ]
-       ],
-       "n": 37,
-       "games": 37,
-       "hits": 27,
-       "break_even": 0.5709,
-       "prob_above": 0.9637,
-       "roi": 0.2365,
-       "edge": 0.125,
-       "status": "promissora",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos",
-       "conditions": [
-        [
-         "Golos até ao sinal",
-         "1 ou 2"
-        ],
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ]
-       ],
-       "n": 20,
-       "games": 20,
-       "hits": 15,
-       "break_even": 0.5406,
-       "prob_above": 0.9441,
-       "roi": 0.4,
-       "edge": 0.1396,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 30,
-     "bad": [
-      {
-       "id": "Jogo aberto | Dia = dia de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = sim",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Parte do jogo",
-         "2.ª parte"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "sim"
-        ]
-       ],
-       "n": 15,
-       "games": 15,
-       "hits": 6,
-       "break_even": 0.5798,
-       "prob_above": 0.1399,
-       "roi": -0.1996,
-       "edge": -0.1079,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "sim"
-        ]
-       ],
-       "n": 14,
-       "games": 14,
-       "hits": 6,
-       "break_even": 0.587,
-       "prob_above": 0.1829,
-       "roi": -0.1496,
-       "edge": -0.0924,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 2
-    },
-    {
      "match_id": "bayern-munchen-vs-cologne-20261120",
      "match": "Bayern Munchen — Cologne",
      "league": "German Bundesliga",
@@ -7246,12 +7090,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 10,
+    "misto": 9,
     "sem evidência": 0,
     "contraditório": 6,
     "evitar": 0
    },
-   "generated_utc": "2026-11-20T13:30:20+00:00",
+   "generated_utc": "2026-11-20T13:32:46+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -19855,71 +19699,6 @@
       "prob_above_cut": 0.9362,
       "prudent_rate": 0.6511,
       "break_even": 0.5411,
-      "certified": false
-     }
-    ]
-   },
-   {
-    "date_utc": "2026-11-20T13:00:38+00:00",
-    "match": "Beijing Guoan — Shanghai Port",
-    "match_id": "beijing-guoan-vs-shanghai-port-20261120",
-    "type": "OPEN_GAME",
-    "market": "Asian Total",
-    "selection": "Over 3",
-    "odds": 1.76,
-    "kickoff_utc": null,
-    "phase": "live",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos",
-      "status": "promissora",
-      "n": 33,
-      "games": 33,
-      "hit_rate": 0.7273,
-      "prob_above": 0.9686,
-      "edge": 0.1368,
-      "edge_ci": [
-       0.0167,
-       0.2469
-      ],
-      "prob_above_cut": 0.9569,
-      "prudent_rate": 0.6858,
-      "break_even": 0.5491,
-      "certified": false
-     },
-     {
-      "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte",
-      "status": "promissora",
-      "n": 37,
-      "games": 37,
-      "hit_rate": 0.7297,
-      "prob_above": 0.9637,
-      "edge": 0.125,
-      "edge_ci": [
-       0.0111,
-       0.2294
-      ],
-      "prob_above_cut": 0.9492,
-      "prudent_rate": 0.6959,
-      "break_even": 0.5709,
-      "certified": false
-     },
-     {
-      "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos",
-      "status": "promissora",
-      "n": 58,
-      "games": 58,
-      "hit_rate": 0.6609,
-      "prob_above": 0.939,
-      "edge": 0.0916,
-      "edge_ci": [
-       -0.006,
-       0.1842
-      ],
-      "prob_above_cut": 0.9134,
-      "prudent_rate": 0.6449,
-      "break_even": 0.5534,
       "certified": false
      }
     ]
