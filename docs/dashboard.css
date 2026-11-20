@@ -140,6 +140,18 @@ footer { max-width: 1390px; margin: 0 auto; padding: 6px clamp(18px, 3.5vw, 54px
 .arrow { flex: none; width: 17px; height: 17px; fill: none; stroke: var(--mark); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .load-state { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
 .load-state .more { margin: 0; }
+.collection-warning {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid currentColor;
+  border-inline-start-width: 4px;
+  border-radius: 10px;
+  color: var(--wait);
+  background: var(--wait-bg);
+  font-size: .875rem;
+}
+.chip.signal-stale { display: none; }
+#sinais[data-stale] .signal-stale { display: inline-flex; }
 .filterbar { display: flex; align-items: end; flex-wrap: wrap; gap: 10px 16px; padding-bottom: 3px; }
 .filterbar > label { display: grid; gap: 4px; flex: 0 1 200px; min-width: 0; font-weight: 630; font-size: .8rem; }
 .filterbar select { width: 100%; min-height: 43px; padding: 6px 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 9px; }

@@ -16,6 +16,7 @@ const count = n => new Intl.NumberFormat('pt-PT').format(n);
 const euro = value => (Math.round(value * 100) / 100).toLocaleString('pt-PT', {
   minimumFractionDigits:2, maximumFractionDigits:2
 }) + ' €';
+const sizes = [[375,812],[768,1024],[1440,1000]];
 const Q7 = 'Q7 Todas as apostas (referência)';
 const assets = {
   '/': ['text/html', indexPath],
@@ -28,14 +29,22 @@ const files = Object.fromEntries(Object.entries(assets).map(([name,[contentType,
 function snapshot(minutesAgo, extra={}) {
   const d = structuredClone(base);
   d.audit = {...d.audit, collector_last_run_utc:new Date(date - minutesAgo*60000).toISOString()};
-  return Object.assign(d,extra);
+  Object.assign(d,extra);
+  if (extra.unique_bets !== undefined) {
+    const added = d.unique_bets - base.unique_bets;
+    Object.values(d.groups)[0].bets += added;
+    d.questions[Q7].bets += added;
+    d.daily.at(-1).bets += added;
+  }
+  return d;
 }
 
-async function setup(page, reply) {
+async function setup(page, reply, useTimers = false) {
   const errors = [], held = [];
   let requests = 0;
   page.on('pageerror', error => errors.push(String(error)));
-  await page.clock.setFixedTime(date);
+  if (useTimers) await page.clock.install({time:date});
+  else await page.clock.setFixedTime(date);
   await page.route('**/*', route => {
     const url = new URL(route.request().url());
     if (url.origin !== new URL(root).origin) return route.abort();
@@ -83,10 +92,10 @@ async function noOverflow(page) {
   assert.ok(sizes[0] <= sizes[1], `page overflow: ${sizes[0]}px in ${sizes[1]}px`);
 }
 
-async function refreshRegression(browser) {
-  const page = await browser.newPage({viewport:{width:1440,height:1000}});
-  const A = snapshot(5), B = snapshot(1,{messages:A.messages+7,unique_bets:A.unique_bets+1});
-  const C = snapshot(0,{messages:B.messages+2,unique_bets:B.unique_bets+2});
+async function refreshRegression(page) {
+  const A = snapshot(5);
+  const B = snapshot(1,{generated_at_utc:new Date(+date+1000).toISOString(),messages:A.messages+7,unique_bets:A.unique_bets+1});
+  const C = snapshot(0,{generated_at_utc:new Date(+date+2000).toISOString(),messages:B.messages+2,unique_bets:B.unique_bets+2});
   const remote = await setup(page,{report:A});
   await page.goto(root);
   await ready(page,A.unique_bets);
@@ -120,19 +129,13 @@ async function refreshRegression(browser) {
 
   await go(page,'sinais');
   await page.locator('[name="signal-phase"][value="por começar"] + span').click();
-  const sources=await page.locator('#signal-source option').count();
-  if(sources>1) await page.selectOption('#signal-source',{index:1});
-  const source=await page.inputValue('#signal-source');
+  const source = 'Stake', state = 'misto';
+  await page.selectOption('#signal-source',source);
+  await page.selectOption('#signal-status',state);
   const firstCard=page.locator('.signal-card').first();
-  const status=await page.locator('#signal-status option').count();
-  if(status>1) {
-    const chosen=await page.locator('#signal-status option').nth(1).getAttribute('value');
-    await page.selectOption('#signal-status',chosen);
-  }
-  const state=await page.inputValue('#signal-status');
-  const hasCard=await firstCard.count();
-  if(hasCard) await firstCard.locator('summary').click();
   const cardCount=await page.locator('.signal-card').count();
+  assert.ok(cardCount > 0);
+  await firstCard.locator('summary').click();
 
   await page.locator('#facts').evaluate(node=>node.firstElementChild.dataset.marker='kept');
   const requests=remote.requests();
@@ -140,18 +143,30 @@ async function refreshRegression(browser) {
   assert.equal(remote.requests(),requests+1);
   assert.equal(await page.locator('#facts > :first-child').getAttribute('data-marker'),'kept');
 
+  const incomplete = {generated_at_utc:new Date(+date+1000).toISOString()};
+  const readSignals = () => page.locator('#agendalist').innerHTML();
+  const before = await readSignals();
+  remote.respond({report:incomplete});
+  await refresh(page);
+  assert.equal(await readSignals(),before,'A → incomplete B must preserve the filtered signals');
+  assert.equal(await page.locator('#facts > :first-child').getAttribute('data-marker'),'kept');
+  assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+  assert.equal(await page.inputValue('#signal-source'),source);
+  assert.equal(await page.inputValue('#signal-status'),state);
+  assert.equal(await firstCard.locator('details').evaluate(node=>node.open),true);
+  assert.equal(await firstCard.locator('summary').evaluate(node=>node===document.activeElement),true);
+
   remote.respond({report:B});
   await refresh(page);
   await ready(page,B.unique_bets);
+  assert.match(await page.locator('#fresh').textContent(),/Atualizado em/);
   assert.equal(await page.locator('nav [aria-current]').getAttribute('href'),'#sinais');
   assert.equal(await page.locator('[name="signal-phase"]:checked').inputValue(),'por começar');
   assert.equal(await page.inputValue('#signal-source'),source);
   assert.equal(await page.inputValue('#signal-status'),state);
   assert.equal(await page.locator('.signal-card').count(),cardCount);
-  if(hasCard) {
-    assert.equal(await firstCard.locator('details').evaluate(node=>node.open),true);
-    assert.equal(await firstCard.locator('summary').evaluate(node=>node===document.activeElement),true);
-  }
+  assert.equal(await firstCard.locator('details').evaluate(node=>node.open),true);
+  assert.equal(await firstCard.locator('summary').evaluate(node=>node===document.activeElement),true);
   assert.match(await facts(),new RegExp(`^${B.messages} mensagens lidas`));
   assert.match(await facts(),new RegExp(`${B.settled_bets} com resultado`));
 
@@ -172,10 +187,31 @@ async function refreshRegression(browser) {
   assert.equal(await page.locator('#tip').count(),1);
   assert.equal(await page.locator('#chart svg').count(),A.timeline.length>=2 ? 1 : 0);
 
-  for(const reply of [{abort:true},{status:500,body:'{}'},{body:'{"truncated'},{body:'{}'}]) {
+  const reject = [
+    {abort:true}, {status:500,body:'{}'}, {body:'{"truncated'}, {body:'{}'},
+    {report:incomplete}, {report:{...B,timeline:[]}}, {report:{...B,timeline:[...B.timeline.slice(0,-1),{}]}},
+    {report:{...B,questions:{}}}, {report:{...B,brain:{...B.brain,agenda:{...B.brain.agenda,items:{}}}}},
+    {report:{...B,brain:{...B.brain,agenda:undefined}}}, {report:{...B,brain:undefined}}
+  ];
+  await page.locator('#simval').focus();
+  const readResults = () => page.evaluate(() => ({
+    metrics:document.querySelector('.metrics').textContent,
+    balance:document.querySelector('#balance-total').textContent,
+    chart:document.querySelector('#chart svg').outerHTML,
+    outcomes:document.querySelector('#results-outcomes').innerHTML,
+    simulator:document.querySelector('#simout').innerHTML,
+    curve:document.querySelector('#simchart').innerHTML,
+    controls:['simbank','simmode','simval','simcut'].map(id=>document.getElementById(id).value),
+    open:[...document.querySelectorAll('#resultados details[open][id]')].map(node=>node.id),
+    focused:document.activeElement.id,
+    route:location.hash
+  }));
+  const expected = await readResults();
+  for(const reply of reject) {
     remote.respond(reply);
     await refresh(page);
-    await hasText(page,'#fresh','Falha ao atualizar; dados de ');
+    assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+    assert.deepEqual(await readResults(),expected,'An invalid response must preserve the rendered results, simulator and focus');
     assert.equal(await isStale(),true);
     assert.match(await facts(),new RegExp(`^${B.messages} mensagens lidas`));
     remote.respond({report:B});
@@ -198,16 +234,76 @@ async function refreshRegression(browser) {
     assert.equal(await isStale(),false);
     remote.respond({report:C});
   }
-  remote.respond({report:snapshot(46)});
+  const older = {...A, generated_at_utc:new Date(+date-1000).toISOString()};
+  remote.respond({report:older});
+  await refresh(page);
+  assert.match(await facts(),new RegExp(`^${C.messages} mensagens lidas`));
+  assert.match(await page.locator('#fresh').textContent(),/Falha ao atualizar/);
+
+  remote.respond({report:snapshot(46,{generated_at_utc:new Date(+date+3000).toISOString()})});
   await refresh(page);
   await hasText(page,'#fresh','Recolha parada desde');
   assert.equal(await isStale(),true);
   assert.deepEqual(remote.errors,[]);
-  await page.close();
+}
+
+async function collectionWarning(page, width, height) {
+  const last = new Date(+date - 45 * 60000 + 5000);
+  const A = snapshot(0);
+  A.audit.collector_last_run_utc = last.toISOString();
+  const remote = await setup(page,{report:A},true);
+  await page.goto(root);
+  await ready(page,A.unique_bets);
+  const banner = page.locator('#collection-warning');
+  assert.equal(await banner.isVisible(),false);
+  await page.clock.fastForward(15000);
+  assert.equal(await banner.isVisible(),true,'The warning must appear as collection crosses 45 minutes');
+  const lisbon = new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',
+    year:'numeric',hour:'2-digit',minute:'2-digit'}).format(last);
+  assert.ok((await banner.textContent()).includes(lisbon));
+  assert.match(await banner.textContent(),/\(Lisboa\).*Confirme as odds e a disponibilidade/);
+  const warningPosition = await banner.boundingBox();
+  assert.ok(warningPosition.y >= 0 && warningPosition.y + warningPosition.height < height);
+  await noOverflow(page);
+  const captures = process.env.DASHBOARD_CAPTURE_DIR;
+  if (captures && width !== 768) {
+    fs.mkdirSync(captures,{recursive:true});
+    await page.screenshot({path:path.join(captures,`stale-${width}.png`)});
+  }
+  await go(page,'sinais');
+  await page.locator('[name="signal-phase"][value="por começar"] + span').click();
+  const cards = page.locator('.signal-card');
+  const before = await cards.count();
+  assert.ok(before > 0);
+  assert.equal(await page.locator('.signal-stale:visible').count(),before);
+  assert.equal(await banner.isVisible(),true);
+  await noOverflow(page);
+  const validity = await page.locator('.signal-validity').allTextContents();
+  const verdicts = await page.locator('.signal-foot .chip:not(.signal-stale)').allTextContents();
+
+  // The next actual polling tick recovers without navigation or manual refresh.
+  const C = snapshot(0,{generated_at_utc:new Date(+date+3*60000).toISOString()});
+  C.audit.collector_last_run_utc = C.generated_at_utc;
+  remote.respond({report:C});
+  await page.clock.fastForward(3*60000);
+  await hasText(page,'#fresh','Atualizado em');
+  assert.equal(await banner.isVisible(),false);
+  assert.equal(await page.locator('.signal-stale:visible').count(),0);
+  assert.equal(await cards.count(),before);
+  assert.deepEqual(await page.locator('.signal-validity').allTextContents(),validity);
+  assert.deepEqual(await page.locator('.signal-foot .chip:not(.signal-stale)').allTextContents(),verdicts);
+  await go(page,'overview');
+  assert.equal(await banner.isVisible(),false);
+  remote.respond({report:{...C,brain:{...C.brain,agenda:{...C.brain.agenda,items:[]}}}});
+  await refresh(page);
+  await go(page,'sinais');
+  assert.equal(await cards.count(),0);
+  await hasText(page,'#agendalist','Sem sinais na janela de observação');
+  assert.deepEqual(remote.errors,[]);
 }
 
 async function realReport(browser) {
-  for (const [width,height] of [[375,812],[768,1024],[1440,1000]]) {
+  for (const [width,height] of sizes) {
     const page=await browser.newPage({viewport:{width,height},isMobile:width===375,hasTouch:width===375,
       colorScheme:width===768?'dark':'light'});
     const remote=await setup(page);
@@ -367,8 +463,8 @@ async function verifySimulator(page, rows) {
   await compare(257,5.5,.05,true,exclusion);
 }
 
-async function missingAndCertificates(browser) {
-  const page=await browser.newPage({viewport:{width:375,height:812},timezoneId:'America/New_York'});
+async function missingAndCertificates(browser, width, height) {
+  const page=await browser.newPage({viewport:{width,height},timezoneId:'America/New_York'});
   const remote=await setup(page,{hold:true});
   await page.goto(root+'#simulador');
   await page.waitForSelector('#fresh');
@@ -382,14 +478,20 @@ async function missingAndCertificates(browser) {
   await hasText(page,'#simchart','Nenhuma aposta liquidada');
   await noOverflow(page);
 
-  remote.respond({report:{generated_at_utc:base.generated_at_utc}});
+  const empty = {
+    generated_at_utc:base.generated_at_utc, messages:0, unique_bets:0, settled_bets:0, first_signal_utc:null,
+    min_settled:base.min_settled, audit:{last_collected_at_utc:null}, groups:{}, accuracy:{},
+    timeline:[], daily:[], recent_bets:[],
+    questions:{[Q7]:{bets:0,settled:0,wins:0,pushes:0,units:0,avg_odds:null,roi:null}}
+  };
+  remote.respond({report:empty});
   await page.getByRole('button',{name:'Tentar novamente'}).click();
   await ready(page);
   assert.equal(await page.locator('#load-state').isVisible(),false);
   await go(page,'sinais');
   await hasText(page,'#agendalist','não disponibiliza a agenda');
   await go(page,'overview');
-  assert.equal(await page.locator('#metric-settled').textContent(),'—');
+  assert.equal(await page.locator('#metric-settled').textContent(),'0');
   assert.equal(await page.locator('#metric-roi').textContent(),'—');
   assert.equal(await page.locator('#metric-science').textContent(),'Indisponível');
   await go(page,'laboratorio');
@@ -399,7 +501,7 @@ async function missingAndCertificates(browser) {
 
   const hypothesis={...base.brain.top[0],id:'fixture-1',status:'forte'};
   const signal={
-    match_id:'x',match:'Equipa A — Equipa B',market:'1X2',selection:'Equipa A',family:'Betfair',odds:1.85,
+    match_id:'x',match:'Equipa A — Equipa B',market:'1X2',selection:'Equipa A',family:'Betfair',type:'BETFAIR',odds:1.85,bad:[],
     when:'por começar',phase:'pre',kickoff_utc:new Date(+date+3600000).toISOString(),
     date_utc:date.toISOString(),verdict:'favorável',validated:true,good:[hypothesis]
   };
@@ -450,9 +552,19 @@ async function missingAndCertificates(browser) {
   const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
     {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
   try {
-    await refreshRegression(browser);
+    const regressions = [];
+    for (const [width,height] of sizes) {
+      for (const check of [refreshRegression, collectionWarning]) {
+        const page = await browser.newPage({viewport:{width,height},isMobile:width===375,hasTouch:width===375,
+          timezoneId:'America/New_York',colorScheme:width===768?'dark':'light'});
+        try { await check(page,width,height); }
+        catch (error) { regressions.push(new Error(`${check.name} at ${width}px`, {cause:error})); }
+        finally { await page.close(); }
+      }
+    }
+    if (regressions.length) throw new AggregateError(regressions,'Dashboard audit regressions failed');
     await realReport(browser);
-    await missingAndCertificates(browser);
+    for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1});

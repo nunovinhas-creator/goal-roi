@@ -103,7 +103,15 @@ function fresh(d, failed) {
   const timestamp = Date.parse(last), unavailable = !Number.isFinite(timestamp);
   const stopped = !unavailable && Date.now() - timestamp > 45 * 60000;
   const when = unavailable ? '' : lisbonDate.format(timestamp);
-  const label = failed ? (unavailable ? 'Falha ao atualizar' : `Falha ao atualizar; dados de ${when}`) :
+  const warning = $('collection-warning');
+  warning.hidden = !stopped || (currentView !== 'overview' && currentView !== 'sinais');
+  $('sinais').toggleAttribute('data-stale', stopped);
+  if (stopped) {
+    const time = $('collection-time');
+    time.dateTime = last;
+    if (time.textContent !== when) time.textContent = when;
+  }
+  const label = failed ? (unavailable ? 'Falha ao atualizar' : `Falha ao atualizar · dados de ${when}`) :
     unavailable ? 'Recolha sem data' : stopped ? `Recolha parada desde ${when}` : `Atualizado em ${when}`;
   const box = $('fresh');
   if (box.lastElementChild.textContent !== label) box.lastElementChild.textContent = label;
@@ -251,7 +259,7 @@ function scientificStatus(status, id, certified) {
 
 function historicSummary(d) {
   // Q7 has the same population as the two historical counts. The graph can be a smaller window.
-  const g = d.questions?.['Q7 Todas as apostas (referência)'];
+  const g = d.questions?.[REFERENCE];
   return Number.isFinite(d.unique_bets) && Number.isFinite(d.settled_bets) &&
     g?.bets === d.unique_bets && g.settled === d.settled_bets ? g : null;
 }
@@ -401,7 +409,9 @@ function agendaUI(d, certified, showList) {
     const price = el('p', {class:'signal-price'}, `${a.selection} @ ${odd(a.odds)}`);
     price.append(el('span', {}, ` · ${a.market} · ${a.family}`));
     const foot = el('div', {class:'signal-foot'});
-    foot.append(chip(kind, label), el('span', {class:'signal-validity'}, `Até ${lisbonTime.format(expiry)}${pre ? ' · início' : ''}`));
+    const staleLabel = chip('wait', 'Dados desatualizados');
+    staleLabel.classList.add('signal-stale');
+    foot.append(chip(kind, label), el('span', {class:'signal-validity'}, `Até ${lisbonTime.format(expiry)}${pre ? ' · início' : ''}`), staleLabel);
     const card = el('article', {class:'signal-card', 'data-signal-key':key});
     card.append(meta, el('h2', {}, a.match), price, foot, signalDetails(a, byMatch.get(a.match_id), rules, key));
     return card;
@@ -833,6 +843,7 @@ function selectView(moveFocus) {
   }
   const view = target?.closest('.view') || $('overview');
   currentView = view.id;
+  if (report) fresh(report, failed);
   for (const element of views) element.hidden = element !== view;
   for (const link of nav) {
     if (link.hash === '#' + currentView) {
@@ -864,33 +875,163 @@ function paint() {
   renderView();
 }
 
+const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const isCount = value => Number.isSafeInteger(value) && value >= 0;
+const isText = value => typeof value === 'string';
+const isTimestamp = value => isText(value) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value) && Number.isFinite(Date.parse(value));
+const isNumber = Number.isFinite;
+const isPositive = value => isNumber(value) && value > 0;
+const isNullableNumber = value => value === null || isNumber(value);
+const hasFields = (value, fields) => isRecord(value) &&
+  Object.entries(fields).every(([key, check]) => check(value[key]));
+const listOf = check => value => Array.isArray(value) && value.every(check);
+const recordOf = check => value => isRecord(value) && Object.values(value).every(check);
+const optional = check => value => value === undefined || check(value);
+const interval = value => Array.isArray(value) && value.length === 2 && value.every(isNumber);
+const nullableInterval = value => value === null || interval(value);
+
+const REFERENCE = 'Q7 Todas as apostas (referência)';
+const roiEstimate = value => hasFields(value, {roi:isNumber, ci95:nullableInterval});
+function resultBlock(value) {
+  return hasFields(value, {bets:isCount, settled:isCount, wins:isCount, pushes:isCount, units:isNumber, avg_odds:isNullableNumber}) &&
+    value.wins + value.pushes <= value.settled && value.settled <= value.bets &&
+    (value.settled === 0 ? value.roi === null : hasFields(value.roi, {
+      'odd-0%':roiEstimate, 'odd-2%':roiEstimate, 'odd-5%':roiEstimate
+    }));
+}
+
+const accuracyRows = recordOf(value => hasFields(value, {
+  signals:isCount, with_result:isCount, hits:isCount, misses:isCount,
+  hit_rate:isNullableNumber, break_even:isNullableNumber, ci95:nullableInterval,
+  prob_above:optional(isNullableNumber)
+}));
+const conditions = listOf(value => Array.isArray(value) && value.length === 2 && isText(value[0]));
+const hypothesis = value => hasFields(value, {
+  id:isText, status:isText, conditions, n:isCount, hits:isCount,
+  roi:optional(isNullableNumber), prob_above:optional(isNullableNumber)
+});
+const boardHypothesis = value => hasFields(value, {
+  id:isText, level:isText, conditions, n:isCount, hits:isCount, break_even:isNumber, roi:isNumber,
+  edge_ci:optional(nullableInterval)
+});
+const signal = value => hasFields(value, {
+  match_id:isText, match:isText, family:isText, type:isText, market:isText, selection:isText, date_utc:isTimestamp,
+  when:phase => phase === 'por começar' || phase === 'a decorrer',
+  kickoff_utc:kickoff => kickoff === null || isTimestamp(kickoff),
+  odds:isPositive, odds_last:optional(isNullableNumber), live_max_min:optional(isPositive),
+  verdict:verdict => Object.hasOwn(AGV, verdict),
+  validated:value => typeof value === 'boolean', conflict:optional(value => typeof value === 'boolean'),
+  good:listOf(hypothesis), bad:listOf(hypothesis)
+}) && (value.when !== 'por começar' || isTimestamp(value.kickoff_utc));
+
+const collectionTime = value => value === null || value === '' || isTimestamp(value);
+const reportShape = {
+  generated_at_utc:isTimestamp, messages:isCount, unique_bets:isCount, settled_bets:isCount,
+  min_settled:isPositive, first_signal_utc:value => value === null || isTimestamp(value),
+  audit:value => hasFields(value, {
+    last_collected_at_utc:collectionTime, collector_last_run_utc:optional(collectionTime),
+    name_review:optional(listOf(row => hasFields(row, {bot:listOf(isText), bsd_candidates:listOf(listOf(isText))})))
+  }),
+  groups:recordOf(resultBlock), questions:recordOf(resultBlock), accuracy:accuracyRows,
+  timeline:listOf(value => hasFields(value, {d:isTimestamp, u:isNumber, g:isNumber, w:isNumber, t:isText, m:isText, s:isText, o:isPositive})),
+  daily:listOf(value => hasFields(value, {day:isText, bets:isCount, settled:isCount, wins:isCount, units:isNumber})),
+  recent_bets:listOf(value => hasFields(value, {
+    date_utc:isTimestamp, match_id:isText, group:isText, match:isText, selection:isText, odds:isPositive,
+    ft:value => value === null || interval(value), w:isNullableNumber
+  })),
+  matches:optional(recordOf(value => hasFields(value, {
+    events:listOf(isRecord), goals:optional(value => value === null || listOf(Array.isArray)(value))
+  }))),
+  unsettled:optional(listOf(value => hasFields(value, {
+    match:isText, date_utc:isTimestamp, why:value => isText(value) && value.length > 0
+  }))),
+  operational:optional(value => hasFields(value, {scope:scope => scope === 'eligible_bets_only', accuracy:accuracyRows, regime:optional(listOf(isRecord))})),
+  insights:optional(value => hasFields(value, {
+    narrative:optional(listOf(isText)), segments:optional(listOf(isRecord)), bot_confidence:optional(listOf(isRecord)),
+    calibration:optional(listOf(row => hasFields(row, {band:isText, ci95:nullableInterval}))),
+    regime:optional(listOf(row => isRecord(row) && (!row.before || hasFields(row, {before:isRecord, recent:isRecord, state:isText})))),
+    price_move:optional(recordOf(row => isRecord(row) && (!row.n || hasFields(row, {when_shortened:isRecord, when_drifted:isRecord})))),
+    next_goal:optional(isRecord), luck:optional(isRecord), method:optional(isRecord)
+  })),
+  brain:optional(value => hasFields(value, {
+    counts:optional(recordOf(isCount)), top:optional(listOf(hypothesis)), llm:optional(listOf(hypothesis)),
+    status_list:optional(recordOf(isText)),
+    validation:optional(row => hasFields(row, {state:isText, method:isText, ledger_valid:v => typeof v === 'boolean', certified:listOf(isText)})),
+    presentation:optional(row => hasFields(row, {hypotheses:recordOf(isRecord)})),
+    agenda:optional(row => hasFields(row, {
+      generated_utc:isTimestamp, items:listOf(signal),
+      rules:rules => hasFields(rules, {live_max_min:isPositive, min_results:isPositive})
+    })),
+    board:optional(row => hasFields(row, {best:listOf(boardHypothesis), avoid:listOf(boardHypothesis),
+      open:listOf(item => hasFields(item, {tactic:optional(isText)}))})),
+    watch:optional(listOf(row => hasFields(row, {reasons:listOf(reason => hasFields(reason, {id:isText}))}))),
+    notes:optional(listOf(row => hasFields(row, {id:isText}))),
+    entry_points:optional(listOf(isRecord)),
+    track:optional(row => hasFields(row, {llm:optional(listOf(isRecord))})),
+    walk_forward:optional(row => hasFields(row, {rule:isRecord, followed:isRecord, skipped:isRecord}))
+  }))
+};
+
+function validateReport(next, previous) {
+  // The core comes from scangoal/report.py. Optional sections may be absent
+  // on first load, and published sections may be explicitly empty.
+  if (!hasFields(next, reportShape)) return false;
+  const reference = next.questions[REFERENCE], groups = Object.values(next.groups);
+  if (reference?.bets !== next.unique_bets || reference.settled !== next.settled_bets ||
+      next.timeline.length !== Math.min(next.settled_bets, 600) ||
+      next.recent_bets.length !== Math.min(next.unique_bets, 60) ||
+      groups.reduce((sum, group) => sum + group.bets, 0) !== next.unique_bets ||
+      groups.reduce((sum, group) => sum + group.settled, 0) !== next.settled_bets ||
+      (next.unique_bets > 0 && (!next.first_signal_utc || !next.daily.length))) return false;
+  if (!previous) return true;
+  if (Date.parse(next.generated_at_utc) < Date.parse(previous.generated_at_utc)) return false;
+  // A response must not silently drop sections already supplied by the producer.
+  return ['brain', 'operational', 'insights', 'matches', 'unsettled'].every(key => !Object.hasOwn(previous, key) || Object.hasOwn(next, key)) &&
+    ['agenda', 'validation', 'top', 'counts', 'presentation', 'board', 'track', 'walk_forward', 'llm', 'notes', 'watch', 'entry_points']
+      .every(key => previous.brain?.[key] === undefined || next.brain?.[key] !== undefined) &&
+    Object.keys(previous.insights || {}).every(key => Object.hasOwn(next.insights, key)) &&
+    Object.keys(previous.questions).every(key => Object.hasOwn(next.questions, key));
+}
+
 async function agendaRefresh() {
   const request = ++requested;
+  let text, next, nextCertificates;
   try {
     const response = await fetch('report.json', {cache:'no-store'});
     if (!response.ok) throw new Error('HTTP ' + response.status);
-    const text = await response.text();
+    text = await response.text();
     if (request < applied) return;
-    applied = request;
     if (text !== snapshot) {
-      const next = JSON.parse(text);
-      if (!next || typeof next !== 'object' || Array.isArray(next)) throw new Error('Formato de relatório inválido');
-      if (!Object.keys(next).length) throw new Error('Relatório vazio');
-      // Keep one snapshot for every route and defer hidden renderers until requested.
-      certified = certificates(next.brain);
-      report = next;
-      snapshot = text;
-      revision++;
-      $('facts').replaceChildren();
-      answer(next);
+      next = JSON.parse(text);
+      if (!validateReport(next, report)) throw new Error('Formato de relatório inválido');
+      nextCertificates = certificates(next.brain);
     }
-    failed = false;
-  } catch (error) {
+  } catch {
     if (request < applied) return;
     applied = request;
     failed = true;
-    if (!revision) revision++;
+    if (report) fresh(report, failed);
+    else {
+      if (!revision) revision++;
+      paint();
+    }
+    return;
   }
+
+  applied = request;
+  failed = false;
+  if (!next) {
+    fresh(report, failed);
+    agendaUI(report, certified, currentView === 'sinais');
+    return;
+  }
+  // Commit only a parsed, validated report and its matching scientific state.
+  report = next;
+  certified = nextCertificates;
+  snapshot = text;
+  revision++;
+  $('facts').replaceChildren();
+  answer(next);
   paint();
 }
 

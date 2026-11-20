@@ -52,3 +52,20 @@ O comando `node audits/dashboard-ux/capture.cjs` reproduz as capturas e testa a 
 ## Limites da verificação
 
 O ensaio de interface usou Chromium a 375, 768 e 1440 px, com emulação móvel, verificação de contraste em amostras das duas paletas, navegação por teclado e inspeção da árvore de acessibilidade. Os testes de interface incluem dados reais e incompletos, falhas, expiração, recolha parada, filtros, ordenação, foco, simulador, tabelas e certificações verificáveis e inválidas. A aceitação em dispositivos físicos, em Safari iOS e com leitores de ecrã reais continua por verificar.
+
+## Correções após a auditoria independente da PR #70
+
+A atualização valida o relatório antes de substituir o estado do painel. Os testes comparam os indicadores, os resultados, as curvas do saldo e do simulador, os controlos e o foco antes e depois de respostas inválidas. A recuperação aplica o relatório válido seguinte e uma resposta atrasada não reverte o painel.
+
+O ensaio da recolha faz o relógio atravessar os 45 minutos e espera pela atualização periódica para verificar a recuperação. Confirma a hora de Lisboa e compara as etiquetas de estado e as janelas de validade dos sinais. As capturas usam o relatório da auditoria com uma hora de última recolha simulada. [Desktop](captures/stale-1440.png) · [Telemóvel](captures/stale-375.png)
+
+Para reproduzir a regressão a 375, 768 e 1440 px, execute o mesmo teste nos ficheiros publicados pelo commit auditado e nos ficheiros locais.
+
+```sh
+audit_before=$(mktemp -d)
+git archive 0e72b16799eb11bc9cf0ca458bb78fb859ad925d docs | tar -x -C "$audit_before"
+node tests/dashboard_refresh.cjs "$audit_before/docs/index.html"
+DASHBOARD_CAPTURE_DIR=audits/dashboard-ux/captures node tests/dashboard_refresh.cjs
+```
+
+O primeiro comando de teste falha nas três larguras por perda dos sinais filtrados e ausência do aviso após 45 minutos. O segundo também verifica JSON malformado, HTTP 500, estruturas aninhadas inválidas, respostas fora de ordem, estados vazios e recuperação com filtros, simulador e painéis abertos.
