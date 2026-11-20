@@ -548,6 +548,26 @@ async function missingAndCertificates(browser, width, height) {
   await page.close();
 }
 
+async function simultaneousExposure(browser) {
+  const page = await browser.newPage();
+  try {
+    const stamp = minutes => new Date(+date + minutes * 60000).toISOString();
+    const bet = (placed, paid) => ({d:stamp(placed), z:stamp(paid), o:2, w:1, t:'Teste'});
+    const simulation = {total_bets:3, timed_settlements:3, committed_games:2, max_units_per_game:2,
+      entries:[bet(-90,-60), bet(-90,-60), bet(-30,-10)]};
+    const report = snapshot(1, {simulation});
+    await setup(page, {report});
+    await page.goto(root + '#simulador');
+    await ready(page, report.unique_bets);
+    await page.locator('#simbank').fill('100');
+    await page.locator('#simmode').selectOption('pct');
+    await page.locator('#simval').fill('100');
+    assert.equal(await page.locator('#simout dd').first().textContent(), '2');
+    assert.equal(await page.locator('#simout dd').nth(1).textContent(), euro(400));
+    await hasText(page, '#sim-exposure', '1 oportunidades sem saldo disponível');
+  } finally { await page.close(); }
+}
+
 (async () => {
   const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
     {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
@@ -564,6 +584,7 @@ async function missingAndCertificates(browser, width, height) {
     }
     if (regressions.length) throw new AggregateError(regressions,'Dashboard audit regressions failed');
     await realReport(browser);
+    await simultaneousExposure(browser);
     for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
   } finally { await browser.close(); }

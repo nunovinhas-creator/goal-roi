@@ -581,7 +581,10 @@ class Brain(Hardening):
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
-                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                for row in rows:
+                    row['collected_at_utc'] = (datetime.fromisoformat(row['date_utc']) + timedelta(minutes=1)).isoformat()
+                store.append_versions(rows)
                 r = report.build()
                 self.assertEqual((r['brain']['hypotheses'], (Path(d) / 'hypotheses.json').exists()), (0, False))
                 r = report.build(register=True)
