@@ -11,8 +11,8 @@ from datetime import datetime, timedelta, timezone
 from . import brain, certification, insights, llm_eval, polymarket_alerts
 from .eligibility import eligible, exclusion_reasons, game_identity
 from . import chronology, match_identity, opportunity_forward, opportunity_results
-from .parser import MIN_ODDS, parse, settle
-from .store import data_dir
+from .parser import MIN_ODDS, parse, selection_1x2, settle
+from .store import data_dir, message_rows
 
 HAIRCUTS = (0.0, 0.02, 0.05)
 LAST = {}                     # sinais da última execução de build(), para o módulo llm
@@ -42,10 +42,7 @@ def load(chronology=None, *, result_observations=None, as_of=None):
     path = data_dir() / 'messages.jsonl'
     if not path.exists():
         return [], ft, marks, notes, audit
-    for line in path.read_text(encoding='utf-8').splitlines():
-        if not line.strip():
-            continue
-        r = json.loads(line)
+    for _, r in message_rows(path):
         got = r.get('collected_at_utc')
         if as_of is not None:
             observed = opportunity_results.utc(got)
@@ -66,13 +63,31 @@ def load(chronology=None, *, result_observations=None, as_of=None):
                 observation = opportunity_results.collected(
                     'telegram', r['message_id'], p['ft'], got,
                     published=r.get('edit_date_utc') or r.get('date_utc'),
+                    exact=r.get('receipt_version') == 1,
                 )
                 note_observations.append((p, opportunity_results.utc(r['date_utc']), observation))
         elif p.get('ft') and p.get('match_id'):
+            previous = first.get(r['message_id'])
+            if previous:
+                old, revised = match_identity.components(previous), match_identity.components(p)
+                if previous.get('match_id') != p['match_id'] or any(
+                        left and right and left != right for left, right in zip(old, revised)):
+                    audit['edits_changing_signal'] += 1
+                    continue
+            kickoff = opportunity_results.utc(p.get('kickoff_utc'))
+            published = opportunity_results.utc(r.get('edit_date_utc'))
+            received = opportunity_results.utc(got)
+            if kickoff is not None:
+                earliest = kickoff + opportunity_results.REGULATION_TIME
+                if ((published is not None and published < earliest)
+                        or (r.get('receipt_version') == 1 and (received is None or received < earliest))):
+                    audit['impossible_ft_observations'] = audit.get('impossible_ft_observations', 0) + 1
+                    continue
             if result_observations is not None:
                 observation = opportunity_results.collected(
                     'telegram', r['message_id'], p['ft'], got,
                     published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=p.get('kickoff_utc'),
+                    exact=r.get('receipt_version') == 1,
                 )
                 result_observations.setdefault(p['match_id'], []).append(observation)
             ft[p['match_id']] = p['ft']
@@ -148,8 +163,13 @@ def lead_minutes(m):
 def note_match(b, notes):
     """A nota '🏁 Full time: A x:y B' posterior ao sinal, só com nomes de equipa iguais: (data, nomes, resultado) ou None."""
     teams = [t.lower() for t in (b['teams'] or [])]
+    kickoff = chronology.kickoff_time(b)
+    if kickoff is None:
+        return None
     for date, names, score in notes:
-        if names == teams and date >= b['date_utc']:
+        published = chronology.parse_utc(date)
+        if (names == teams and published is not None and
+                opportunity_results.REGULATION_TIME <= published - kickoff <= opportunity_forward.MAX_UNRESOLVED):
             return date, names, score
     return None
 
@@ -167,18 +187,25 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
     (primeira observação, pelo sistema, do resultado efetivamente usado). Sem prova, ficam None (hora desconhecida).
     """
     chronology = chronology or {}
+    fixtures = collections.defaultdict(set)
+    for m in msgs:
+        if m.get('match_id'):
+            fixtures[m['match_id']].add(match_identity.components(m))
+    ambiguous = {mid for mid, parts in fixtures.items()
+                 if any(len({p[index] for p in parts if p[index] is not None}) > 1 for index in range(4))}
     out, dead = {}, set()
     for m in msgs:
         no_odds = str(m.get('type')).endswith('_NO_ODDS') or (m.get('type') == 'GOAL_BREWING' and m.get('window'))
         if not (m.get('bet') or (no_odds and not strict)):
             continue
-        if m.get('bet') and m['odds'] < MIN_ODDS:
+        if m.get('bet') and (not m.get('match_id') or not math.isfinite(m['odds']) or m['odds'] < MIN_ODDS):
             continue
         k = key_of(m) + ((m['minute'],) if m['type'] == 'GOAL_BREWING' else ())   # cada aviso de golo é medido à parte
         identity = {name: m[name] for name in ('canonical_match_id', 'match_identity_exclusion') if name in m}
-        cohort = (k, identity.get('canonical_match_id'), identity.get('match_identity_exclusion'))
-        if strict and (k in dead or (cohort not in out and not provenance_ok(m))):
-            dead.add(k)   # o primeiro sinal desta aposta não tem origem provada: a aposta inteira fica fora do ROI
+        fixture = identity.get('canonical_match_id') or m.get('match_id')
+        cohort = (fixture, *k[1:], identity.get('match_identity_exclusion'))
+        if strict and (cohort in dead or (cohort not in out and not provenance_ok(m))):
+            dead.add(cohort)
             continue
         b = out.get(cohort)
         if b is None:
@@ -197,6 +224,11 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             b['odds_at_x4'] = m['odds']
             b['x4_min'] = round((datetime.fromisoformat(m['date_utc']) - datetime.fromisoformat(b['date_utc'])).total_seconds() / 60)
     bets = sorted(out.values(), key=lambda b: (b['date_utc'], b['message_id']))
+    note_owners = collections.defaultdict(set)
+    for b in bets:
+        hit = note_match(b, notes)
+        if hit:
+            note_owners[hit[0], tuple(hit[1]), tuple(hit[2])].add((b['match_id'], match_identity.components(b)))
     now = datetime.now(timezone.utc)
     for b in bets:
         b['layout_phase'], b['after_kickoff_min'] = b['phase'], None
@@ -208,25 +240,34 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         b['evidence_eligible'] = eligible(b)
         b['evidence_exclusions'] = exclusion_reasons(b)
         b['group'] = group(b)
-        f, source, known = ft.get(b['match_id']), 'bot_message', (chronology.get('ft') or {}).get(b['match_id'])
+        mid = b['match_id']
+        f, source, known = ft.get(mid), 'bot_message', (chronology.get('ft') or {}).get(mid)
+        if mid in ambiguous:
+            f, source, known = None, None, None
         if not f:
-            hit = note_match(b, notes)
+            hit = note_match(b, notes) if mid not in ambiguous else None
+            if hit and len(note_owners[hit[0], tuple(hit[1]), tuple(hit[2])]) != 1:
+                hit = None
             f, source = (hit[2], 'bot_full_time_note') if hit else (None, None)
             known = (chronology.get('notes') or {}).get((hit[0], tuple(hit[1]), tuple(hit[2]))) if hit else None
         from_bsd = False
-        if not f and bsd and b['match_id'] in bsd:
+        if not f and mid not in ambiguous and bsd and mid in bsd:
             ext = bsd[b['match_id']]
             f, from_bsd, source, known = ext['ft'], True, ext.get('provider', 'BSD'), ext.get('known_utc', ext.get('matched_at_utc'))
         b['ft'], b['w'], b['settled_by'] = f, None, None
         b['result_known_utc'], b['result_known_source'] = None, None
-        b['match_result_first_seen_utc'] = match_first_seen(b, notes, chronology)
+        b['match_result_first_seen_utc'] = match_first_seen(b, notes, chronology) if mid not in ambiguous else None
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
-        det = (details or {}).get(b['match_id'])
+        det = (details or {}).get(mid) if mid not in ambiguous else None
         det = det if det and det.get('consistent') else None
         b['next_goal_min'] = next_goal(b, det)
         if b['type'] == 'GOAL_BREWING':   # acerta se o golo seguinte ao sinal cair dentro da janela indicada; só com minutos de fonte externa
             if det:
+                played = b['minute']
+                prefix = [goal for goal in det['goals'] if goal[0] < played]
+                if len(prefix) > sum(b['score_at_signal']):
+                    continue
                 nxt = det['goals'][sum(b['score_at_signal']):][:1]
                 b['ft'], b['settled_by'] = det['final'], 'minutos dos golos (Highlightly)'
                 b['w'] = 1.0 if nxt and nxt[0][0] <= b['minute'] + b['window'] else -1.0
@@ -239,12 +280,14 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             b['result_known_utc'], b['result_known_source'] = known, source
             continue
         own = settle(b['market'], b['selection'], f, b['teams'])
+        invalid = own is None and b['market'].strip().casefold() in {
+            'asian total', '1x2', 'both teams to score', 'double chance', 'asian handicap'}
         if b['market'].strip().lower() == 'asian handicap' and b['phase'] == 'live':
             own = None   # ao vivo o handicap conta a partir do resultado no momento da aposta: só a marca do bot decide
         if own is not None:
             b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
             b['result_known_utc'], b['result_known_source'] = known, source
-        elif marks and b['key'] in marks and b['market'].strip().lower() != '1x2':  # unknown 1X2 selection stays pending; other unsupported markets may use the bot mark
+        elif marks and b['key'] in marks and not invalid:
             b['w'], b['settled_by'] = (1.0 if marks[b['key']] else -1.0), 'marca do bot'
             b['result_known_utc'], b['result_known_source'] = (chronology.get('marks') or {}).get(b['key']), 'bot_mark'
     return bets
@@ -316,9 +359,10 @@ def label(b):
         return 'golo nos próximos %d min' % b['window']
     if b['market'] is None:
         return 'mais um golo (sem odd)'
-    if b['market'] == '1X2':
+    if b['market'].strip().casefold() == '1x2':
         t = b['teams'] or ['1', '2']
-        return {'1': t[0], '2': t[-1], 'X': 'Empate'}[b['selection']]
+        side = selection_1x2(b['selection'], t)
+        return {'1': t[0], '2': t[-1], 'X': 'Empate'}.get(side, b['selection'])
     return b['selection'] if b['market'] == 'Asian Total' else '%s: %s' % (b['market'], b['selection'])
 
 
@@ -577,7 +621,7 @@ def build(csv_path=None, register=False, now=None):
         except (OSError, ValueError):
             st = {}
         providers['highlightly' if name == 'hl' else name] = st
-        res = st.get('results') or {}
+        res = opportunity_results.provider_snapshot(st, name, now)
         audit[name + '_results'] = len(res)
         audit[name + '_vs_bot_disagreements'] = sum(1 for m, r in res.items() if m in ft and ft[m] != r['ft'])
         audit[name + '_near_misses'] = len(st.get('near_misses') or {})
@@ -620,8 +664,9 @@ def build(csv_path=None, register=False, now=None):
     audit['deleted_by_bot'] = len(state.get('missing_ids') or [])
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
-    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
-    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
+    identified, bindings = match_identity.resolve(msgs, now)
+    bets = build_bets(identified, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
+    signals = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
     finished_matches = set(ft) | set(bsd)
     finished_matches.update(b['match_id'] for b in signals if b['ft'] or b['match_result_first_seen_utc'])
     by = collections.OrderedDict()
@@ -642,11 +687,10 @@ def build(csv_path=None, register=False, now=None):
     ins = insights.build(signals, bets, acc, MIN_SETTLED)
     reg_path = data_dir() / 'hypotheses.json'
     registry = brain.load_registry(reg_path)
-    if register and brain.update_registry(signals, registry):
+    if register and brain.update_registry(signals, registry, now=now):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     LAST['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
-    identified, bindings = match_identity.resolve(msgs, now)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
                                 not_covered=not_covered, chronology=chron)

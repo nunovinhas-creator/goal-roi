@@ -36,11 +36,11 @@ def utc(value):
         return None
 
 
-def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None):
+def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None, exact=False):
     """Legacy collectors stamp the start of their step. Apply its observation margin."""
     observed = utc(stamp)
     publication = utc(published)
-    margin = timedelta(minutes=chronology.OBSERVATION_MARGIN_MIN)
+    margin = timedelta(minutes=0 if exact else chronology.OBSERVATION_MARGIN_MIN)
     try:
         available = observed + margin if observed is not None else None
     except OverflowError:
@@ -153,7 +153,7 @@ def settle_research_bet(bet, as_of):
 
 
 def remember_provider_results(state, matched, stamp):
-    """Preserve the operational first result and append each observed FT version."""
+    """Keep the first snapshot and the version history alongside the current result."""
     for match_id, info in matched.items():
         score = score_pair(info.get("ft"))
         if score is None:
@@ -163,7 +163,10 @@ def remember_provider_results(state, matched, stamp):
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
         if not history or any(history[-1].get(key) != value for key, value in row.items()):
             history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
-        state["results"].setdefault(match_id, dict(info, matched_at_utc=stamp.isoformat(timespec="seconds")))
+            previous = state["results"].get(match_id)
+            if previous is not None:
+                state.setdefault("first_results", {}).setdefault(match_id, previous)
+            state["results"][match_id] = dict(info, matched_at_utc=stamp.isoformat())
 
 
 def provider_observations(state, source):
@@ -178,6 +181,26 @@ def provider_observations(state, source):
               for row in rows if isinstance(row, dict)]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
+
+
+def provider_snapshot(state, source, as_of):
+    """Project the operational provider results at the chosen cutoff."""
+    snapshots = state.get("results") or {}
+    histories = provider_observations(state, source)
+    visible = {}
+    for mid, row in snapshots.items():
+        known = utc(row.get("matched_at_utc"))
+        if mid not in histories:
+            if known is None or known <= as_of:
+                visible[mid] = row
+            continue
+        first = (state.get("first_results") or {}).get(mid, {})
+        result = resolve(histories[mid], kickoff=utc(row.get("event_date")), as_of=as_of)
+        if result.score is not None:
+            visible[mid] = dict(row, ft=list(result.score), matched_at_utc=result.available_at.isoformat())
+        elif result.first_available_at is None and (old := utc(first.get("matched_at_utc"))) and old <= as_of:
+            visible[mid] = first
+    return visible
 
 
 def merge_sources(bot, providers):

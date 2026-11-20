@@ -137,9 +137,9 @@ class Report(unittest.TestCase):
 
     def test_first_signal_rule_reinforcement_and_exclusions(self):
         x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
-        ft_for_barnsley = STAKE_FT.replace('bosnia-u19-vs-san-marino-u19-20261111', 'barnsley-vs-oldham-20261111')
+        ft_for_barnsley = BETFAIR_PRE + '\n🏁 FT 4:1'
         rows = [self.row(1, x4), self.row(2, BETFAIR_PRE), self.row(3, STAKE), self.row(4, OPEN),
-                self.row(5, ft_for_barnsley)]  # 5: vista já com resultado -> não é aposta, mas dá o FT 4:1 ao jogo
+                self.row(5, ft_for_barnsley, '2026-11-11T21:00:00+00:00')]  # mesmo encontro, visto já após o FT
         r = self.run_report(rows)
         self.assertEqual((r['unique_bets'], r['excluded_first_seen_with_result'], r['unparsed']), (3, 1, 0))
         g = r['groups']['BETFAIR/pre/mkt>=10K']
@@ -185,8 +185,10 @@ class BSD(unittest.TestCase):
         self.dir = tempfile.TemporaryDirectory()
         os.environ['SCANGOAL_DATA_DIR'] = self.dir.name
         live = BETFAIR_LIVE.replace('Kucukcekmece Sinopspor — Fatsa Belediyespor', 'Sheff Wed — Accrington FC')
-        rows = [{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': BETFAIR_PRE},
-                {'message_id': 2, 'date_utc': '2026-11-11T19:40:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': live}]
+        rows = [{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None,
+                 'collected_at_utc': '2026-11-11T17:50:00+00:00', 'text': BETFAIR_PRE},
+                {'message_id': 2, 'date_utc': '2026-11-11T19:40:00+00:00', 'edit_date_utc': None,
+                 'collected_at_utc': '2026-11-11T19:41:00+00:00', 'text': live}]
         store.append_versions(rows)
 
     def tearDown(self):
@@ -252,7 +254,8 @@ class BSD(unittest.TestCase):
 
 class Highlightly(BSD):
     def hl(self, i, home, away, when, score='2 - 1', desc='Finished'):
-        return {'id': i, 'date': when, 'homeTeam': {'name': home}, 'awayTeam': {'name': away}, 'league': {'name': 'L'},
+        league = parse(BETFAIR_PRE if home == 'Barnsley' else BETFAIR_LIVE)['league']
+        return {'id': i, 'date': when, 'homeTeam': {'name': home}, 'awayTeam': {'name': away}, 'league': {'name': league},
                 'state': {'description': desc, 'score': {'current': score, 'penalties': None}}}
 
     def run_hl(self, pages, remaining=90, now=None):
@@ -722,8 +725,8 @@ class LanguageModel(Hardening):
                 for r in rows:   # PR 3 (P2-K): each version is read after it was sent (the shared helper reads all at 12:00)
                     r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
                 store.append_versions(rows)
-                report.build(register=True)                                                             # o gerador regista "Seleção = empate"
                 t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
+                report.build(register=True, now=t0 - timedelta(minutes=1))
                 for k in range(4):
                     st = llm.run(call, t0 + timedelta(hours=k), self.ENV)
                     modes.append(st['last_mode'])
@@ -971,7 +974,8 @@ class Insights(unittest.TestCase):
                 empty = report.build()
                 self.assertEqual(empty['insights']['narrative'], ['Ainda não há resultados suficientes para interpretar.'])
                 x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
-                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': t}
+                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None,
+                                    'collected_at_utc': '2026-11-11T17:05:00+00:00', 'text': t}
                 store.append_versions([row(1, x4), row(2, BETFAIR_PRE), row(3, OPEN), row(3, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅')])
                 r = report.build()
             finally:

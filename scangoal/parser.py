@@ -137,6 +137,8 @@ def parse(text):
             weakened_lineup(m, lines, text)
     except (TypeError, IndexError, ValueError):
         m.update(error='fields_missing', bet=False)
+    if m.get('bet') and not math.isfinite(m['odds']):
+        m.update(error='invalid_odds', bet=False)
     return m
 
 
@@ -317,6 +319,8 @@ def weakened_lineup(m, lines, text):
 def _side(token, teams):
     """'Draw' -> X; nome de equipa (prefixo/contido, sem ambiguidade) -> 1 ou 2; caso contrário None."""
     t = token.strip().lower()
+    if not t:
+        return None
     if t == 'draw':
         return 'X'
     exact = [k for k, name in zip('12', teams or []) if name and name.lower() == t]
@@ -349,27 +353,41 @@ def _quarter(diff, line):
 
 def settle(market, selection, ft, teams=None):
     """Lucro em unidades de (odd-1): 1 ganha, -1 perde, 0 devolve, ±0.5 meia. None = mercado não liquidável pelo resultado final."""
+    if (not isinstance(market, str) or not isinstance(selection, str)
+            or not isinstance(ft, (tuple, list)) or len(ft) != 2
+            or any(type(goals) is not int or goals < 0 for goals in ft)):
+        return None
     h, a = ft
-    mk = market.strip().lower()
+    mk = market.strip().casefold()
     if mk == 'asian total':
-        side, line = selection.split()[0], float(selection.split()[1])
-        return _quarter((h + a) if side == 'Over' else -(h + a), -line if side == 'Over' else line)
+        total = re.fullmatch(r'(over|under)\s+([0-9]+(?:\.[0-9]+)?)', selection.strip().casefold())
+        line = asian_line(total[2]) if total else None
+        if line is None:
+            return None
+        return _quarter(h + a, -line) if total[1] == 'over' else _quarter(-(h + a), line)
     if mk == '1x2':
         side = selection_1x2(selection, teams)
         if side is None:
             return None
         return 1.0 if side == ('1' if h > a else '2' if a > h else 'X') else -1.0
     if mk == 'both teams to score':
-        return 1.0 if (selection.strip().lower() == 'yes') == (h > 0 and a > 0) else -1.0
+        side = selection.strip().casefold()
+        return (1.0 if (side == 'yes') == (h > 0 and a > 0) else -1.0) if side in ('yes', 'no') else None
     if mk == 'double chance':
         sides = [_side(tok, teams) for tok in selection.split(' or ')]
         if len(sides) != 2 or None in sides or sides[0] == sides[1]:
             return None
         return 1.0 if ('1' if h > a else '2' if a > h else 'X') in sides else -1.0
     if mk == 'asian handicap':
-        hc = re.match(r'^(.+?) \(([+-]?[\d.]+)\)$', selection.strip())
+        hc = re.fullmatch(r'(.+?) \(([+-]?[0-9]+(?:\.[0-9]+)?)\)', selection.strip())
         side = _side(hc[1], teams) if hc else None
-        if side not in ('1', '2'):
+        line = asian_line(hc[2]) if hc else None
+        if side not in ('1', '2') or line is None:
             return None
-        return _quarter((h - a) if side == '1' else (a - h), float(hc[2]))
+        return _quarter((h - a) if side == '1' else (a - h), line)
     return None
+
+
+def asian_line(token):
+    line = float(token)
+    return line if math.isfinite(line * 4) and (line * 4).is_integer() else None

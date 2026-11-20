@@ -92,6 +92,12 @@ def score_of(event):
     return [h, a] if all(type(n) is int and n >= 0 for n in (h, a)) and type(event.get('id')) is int else None
 
 
+def competition_ok(target, event):
+    expected = norm_team(target.get('league'))
+    observed = norm_team(name_of(event, 'league') or name_of(event, 'competition'))
+    return not expected or not observed or expected == observed
+
+
 def match_events(targets, events, aliases, unfinished=None):
     """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
     names = lambda name: {norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}
@@ -102,12 +108,14 @@ def match_events(targets, events, aliases, unfinished=None):
             index.setdefault((norm_team(name_of(ev, 'home_team')), norm_team(name_of(ev, 'away_team'))), []).append(ev)
     for mid, t in targets.items():
         homes, aways = names(t['teams'][0]), names(t['teams'][1])
-        cands = [ev for h in homes for a in aways for ev in index.get((h, a), []) if time_ok(t, kickoff_of(ev))]
+        cands = [ev for h in homes for a in aways for ev in index.get((h, a), [])
+                 if time_ok(t, kickoff_of(ev)) and competition_ok(t, ev)]
         scored = [(ev, score_of(ev)) for ev in cands]
         if len(cands) == 1 and scored[0][1]:
             ev = cands[0]
             found[mid] = {'ft': scored[0][1], 'bsd_id': ev['id'], 'home': name_of(ev, 'home_team'), 'away': name_of(ev, 'away_team'),
-                          'event_date': kickoff_of(ev).isoformat(timespec='minutes')}
+                          'event_date': kickoff_of(ev).isoformat(timespec='minutes'),
+                          'league': name_of(ev, 'league') or name_of(ev, 'competition') or None}
         elif len(cands) == 1 and unfinished is not None:
             unfinished[mid] = {'status': str(cands[0].get('status')), 'id': cands[0].get('id')}
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
@@ -130,6 +138,7 @@ def capture_result_versions(state, found, events, observed_at):
             score, kickoff = score_of(event), kickoff_of(event)
             if (score is not None and kickoff is not None
                     and kickoff.isoformat(timespec='minutes') == stored.get('event_date')
+                    and competition_ok(stored, event)
                     and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
                             for side in ('home', 'away'))):
                 remember_provider_results(state, {match_id: dict(stored, ft=score)}, observed_at)
@@ -167,7 +176,7 @@ def pending_targets(now, max_age_days=MAX_AGE_DAYS):
         # Só o estado "terminado" da fonte liquida; por isso pode pedir-se cedo e repetir: 1h50 depois do início, ou 1h45 depois de um sinal ao vivo.
         wait = timedelta(minutes=110) if b['kickoff_utc'] else timedelta(minutes=105)
         if wait <= now - ref <= timedelta(days=max_age_days):
-            out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'],
+            out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'], 'league': b.get('league'),
                                              'days': sorted({ref.date().isoformat(), (ref - timedelta(minutes=150)).date().isoformat()})})
     return out
 

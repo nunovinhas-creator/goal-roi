@@ -43,6 +43,14 @@ async def fetch(client, entity, limit, now, **bounds):
     return rows, oldest, present
 
 
+def stamp_receipt(rows):
+    """Stamp a completed page with the time it became available to consumers."""
+    completed = datetime.now(timezone.utc).isoformat()
+    for row in rows:
+        row.update(collected_at_utc=completed, receipt_version=1)
+    return completed
+
+
 def write_json(path, value):
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(value, ensure_ascii=False) + '\n', encoding='utf-8')
@@ -111,6 +119,7 @@ async def collect():
         entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         async with asyncio.timeout(150):
             rows, oldest, present = await fetch(client, entity, RECENT, now)
+        now = stamp_receipt(rows)
         added = append_versions(rows)
         state = record_window(directory, previous, last_id, oldest, present, now)
         try:
@@ -124,7 +133,7 @@ async def collect():
     stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
     missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
     # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
-    (data_dir() / 'state.json').write_text(json.dumps({'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing}) + '\n', encoding='utf-8')
+    write_json(path, {'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing})
     if last_id and oldest and oldest > last_id + 1:
         print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)

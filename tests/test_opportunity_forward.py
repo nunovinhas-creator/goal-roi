@@ -277,7 +277,8 @@ class ResultSourceTests(unittest.TestCase):
              "away_team": "B", "event_date": "2026-11-19T18:00:00Z"},
         ], chronology.parse_utc("2026-11-19T22:00:00Z"))
         save_result_state(path, state)
-        self.assertEqual(state["results"][self.MATCH]["ft"], [2, 1])
+        self.assertEqual(state["results"][self.MATCH]["ft"], [1, 1])
+        self.assertEqual(state["first_results"][self.MATCH]["ft"], [2, 1])
         self.assertEqual([r["ft"] for r in state["ft_versions"][self.MATCH]], [[2, 1], [1, 1]])
         updated = sourced_results({}, self.directory)
         self.assertEqual(before, self.assess(updated, now=cutoff))
@@ -287,7 +288,7 @@ class ResultSourceTests(unittest.TestCase):
         self.assertEqual(report.LAST["research_signals"][0]["ft"], [2, 1])
         report.build(now=chronology.parse_utc("2026-11-19T22:01:00Z"))
         self.assertEqual(report.LAST["research_signals"][0]["ft"], [1, 1])
-        self.assertEqual(report.LAST["signals"][0]["ft"], [2, 1])
+        self.assertEqual(report.LAST["signals"][0]["ft"], [1, 1])
 
     def test_current_only_external_result_cannot_backfill_history(self):
         (self.directory / "results_hl.json").write_text(json.dumps(
