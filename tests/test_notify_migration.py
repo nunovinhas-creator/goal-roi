@@ -80,7 +80,7 @@ class NotifyMigration(unittest.TestCase):
         rep['brain']['watch'][0]['date_utc'] = (at - timedelta(minutes=5)).isoformat()   # P1 17/11/2026: só sinais atuais
         messages = notify.messages(rep, state, at)
         self.assertEqual(len(messages), 2)
-        self.assertTrue(any(m.startswith('A seguir:') for m in messages))
+        self.assertTrue(any(m.startswith('🟠 INDÍCIO · ') for m in messages))
         self.assertTrue(any(m.startswith('Resumo das táticas — 14/11') for m in messages))
         self.assertTrue(all(notify.guard_claims(m, rep) for m in messages))           # no positive claim in either
         self.assertIn('Estado científico:', next(m for m in messages if m.startswith('Resumo')))

@@ -17,7 +17,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scangoal import notify
-from test_telegram_presentation import ENV, NOW, Crash, base_state, entry, migrated, report
+from test_telegram_presentation import ENV, HA, NOW, Crash, base_state, entry, migrated, report
 
 DURABLE = dict(ENV, NOTIFY_DURABLE='git', GITHUB_REF_NAME='main')
 
@@ -212,6 +212,35 @@ class AcrossRunners(GitWorld):
         self.assertIn('NOTIFY_PUBLISH_FAILED', out)
         self.assertEqual(sent, [])
         self.assertFalse((a / '.git' / 'rebase-merge').exists() or (a / '.git' / 'rebase-apply').exists())   # no half rebase left
+
+    def test_racing_clones_across_the_format_change_publish_only_one_intent_per_game(self):
+        old, new = self.runner(), self.runner()
+        sent = []
+        game_notice = notify.game_notice
+
+        def old_notice(*args):
+            notice = game_notice(*args)
+            match = notice.text.splitlines()[1].removeprefix('⚽ ')
+            notice.text = 'A seguir: %s\nEncaixa em: %s (promissora)\nAposta: Over 2.5 @ 1,9' % (match, HA)
+            return notice
+
+        def send(token, chat, text):
+            self.assertTrue(text.startswith('🟠 INDÍCIO'))
+            st = self.remote_state()
+            record, = [r for r in st['deliveries'].values() if r.get('sha256') == notify.sha(text)]
+            self.assertEqual(record['state'], 'in_flight')
+            sent.append(text)
+
+        def race(point):
+            if point == 'after_intent':
+                with patch.object(notify, 'game_notice', game_notice):
+                    self.notify(new, send)
+
+        with patch.object(notify, 'game_notice', old_notice):
+            output = self.notify(old, lambda *_: self.fail('stale clone tried to send'), checkpoint=race)
+        self.assertIn('NOTIFY_PUBLISH_FAILED', output)
+        self.assertEqual(len(sent), 2)
+        self.assertEqual(len(set(sent)), 2)
 
     def test_fast_reads_several_runs_in_one_runner_then_death(self):
         a, sent = self.runner(), []

@@ -1,7 +1,7 @@
 """Avisos pelo Telegram, por um bot do utilizador (API de bots; não usa a conta que lê o ScanGoal).
 
 Envia: aviso de jogo (indício, ou ALERTA só com certificado ativo e verificado da própria hipótese), um por jogo, com as
-seleções novas desse jogo, em formato curto ("A seguir" / "Encaixa em" / "Aposta"); mudanças de comportamento de um tipo de
+seleções novas desse jogo e as respetivas odds logo abaixo do jogo; mudanças de comportamento de um tipo de
 sinal; e um ÚNICO resumo diário às 22:00 de Lisboa (Europe/Lisbon, hora de verão e de inverno), que é também o único sítio
 onde saem as mudanças de estado das hipóteses (promoções, abandonos, ganho ou perda de certificação), em blocos curtos.
 
@@ -39,7 +39,7 @@ FORMAT_MIGRATION = 'telegram_format_v2'
 EVIDENCE_SCOPE = 'eligible_bets_only'
 SUMMARY_HOUR_LISBON = 22            # resumo diário (e únicas mensagens de mudança de estado) às 22:00 de Lisboa
 MAX_WATCH_PER_RUN = 5             # jogos (não sinais) por execução
-MAX_GROUPS_PER_MESSAGE = 8
+MAX_GROUPS_PER_MESSAGE = 8       # limite histórico dos efeitos notice_games
 MAX_TEXT = 3900
 VALID = ('forte', 'confirmada')   # tática validada: só com certificado do teste de confirmação (PR 3)
 VALIDATION_METHOD = 'eprocess_online_alpha_v1'   # único método aceite para anunciar uma tática como validada (fail-closed)
@@ -121,7 +121,11 @@ def dec(v):
 
 
 def odd(v):
-    return str(v).replace('.', ',')
+    value = str(v).replace('.', ',')
+    if re.fullmatch(r'[0-9]+(?:,[0-9]+)?', value):
+        integer, _, fraction = value.partition(',')
+        return integer + ',' + fraction.ljust(2, '0')
+    return value
 
 
 def sha(text):
@@ -268,17 +272,23 @@ def positive_claims(line, report):
     return out
 
 
-def guard_claims(text, report, claims=()):
+def guard_claims(text, report, claims=(), *, exact_lines=False):
     """Barreira final (fail-closed): True só se cada hipótese reivindicada tem certificado verificado, o seu rótulo exato está
-    no texto, e cada linha com uma afirmação positiva termina no id de uma dessas hipóteses."""
-    verified = []
+    no texto, e cada linha com uma afirmação positiva termina no id de uma dessas hipóteses. Nos avisos de aposta, todas
+    as afirmações positivas têm de ser o próprio rótulo, numa linha separada dos dados do jogo e da seleção."""
+    lines = text.split('\n')
+    verified = {}
     for hid in claims:
         label, positive = scientific_label(report, hid)
-        if not positive or label not in text:
+        if not positive or label not in (lines if exact_lines else text):
             return False
-        verified.append(hid)
-    for line in text.split('\n'):
-        if positive_claims(line, report) and not any(line.rstrip().endswith(' ' + hid) for hid in verified):
+        verified[hid] = label
+    for line in lines:
+        if not positive_claims(line, report):
+            continue
+        if exact_lines and line not in verified.values():
+            return False
+        if not exact_lines and not any(line.rstrip().endswith(' ' + hid) for hid in verified):
             return False
     return True
 
@@ -621,7 +631,7 @@ def game_notices(report, state, now):
         old = {(m, sel) for (m, sel), ts in pairs.items() if m == g['sample'].get('match') and legacy_hit({(m, sel): ts}, dict(g['sample'], selection=sel))}
         g['previous'] = max(len(own), len(old))
     ordered = sorted(games.items(), key=lambda kv: (not kv[1]['alert'], -_epoch(kv[1]['last']), kv[0]))
-    return [game_notice(report, state, now, gk, g) for gk, g in ordered[:MAX_WATCH_PER_RUN]]
+    return [n for gk, g in ordered[:MAX_WATCH_PER_RUN] if (n := game_notice(report, state, now, gk, g)) is not None]
 
 
 def _epoch(v):
@@ -629,84 +639,118 @@ def _epoch(v):
     return t.timestamp() if t else 0.0
 
 
+def bet_source(w):
+    kind = text_identity(w.get('type'))
+    if kind == 'BETFAIR':
+        return KIND.get('BETFAIR/%s' % w.get('phase'), 'Betfair')
+    return KIND.get(kind, 'Origem desconhecida')
+
+
+def match_link(match_id):
+    mid = text_identity(match_id)
+    if mid and re.fullmatch(r'[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-vs-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*-[0-9]{8}', mid):
+        return 'https://scangoal.com/match/%s?lang=en' % mid
+    return None
+
+
+def bet_line(w):
+    market = ' '.join(str(w.get('market') or '').splitlines())
+    selection = ' '.join(str(w.get('selection') or 'mais um golo').splitlines())
+    kind = market.casefold()
+    if kind in ('both teams to score', 'btts'):
+        selection = {'yes': 'Sim', 'no': 'Não'}.get(selection.casefold(), selection)
+        market = 'BTTS'
+    if 'handicap' in kind or (kind == 'polymarket' and selection.startswith(('AH1(', 'AH2('))):
+        selection = re.sub(r'(?<=[ (])([+−-]?[0-9]+)\.([0-9]+)(?=\)?$)', r'\1,\2', selection)
+    elif kind not in ('1x2', 'double chance', 'match result'):
+        selection = re.sub(r'((?:^| & )(?:Over|Under|Mais de|Menos de)\s+[0-9]+)\.([0-9]+)\b', r'\1,\2', selection, flags=re.I)
+    price = ' @ ' + ' '.join(odd(w['odds']).splitlines()) if w.get('odds') else ' · sem odd'
+    return '🎯 ' + selection + price + (' · ' + market if market else '')
+
+
+def hypotheses_line(report, reasons):
+    if not reasons or any(not isinstance(r, dict) or not text_identity(r.get('id')) for r in reasons):
+        return '🧪 Hipóteses em avaliação'
+    hids = {r['id'] for r in reasons}
+    count = len(groups_of(report, hids))
+    grouped = count < len(hids)
+    if grouped:
+        noun = 'grupo de hipóteses' if count == 1 else 'grupos de hipóteses'
+    else:
+        noun = 'hipótese' if count == 1 else 'hipóteses'
+    if all(r.get('status') in ('promissora', *VALID) for r in reasons):
+        status = 'promissora' if noun == 'hipótese' else 'promissoras'
+    elif all(r.get('status') == 'em observação' for r in reasons):
+        status = 'em observação'
+    else:
+        status = 'em avaliação'
+    return '🧪 %d %s %s · sem certificação' % (count, noun, status)
+
+
 def game_notice(report, state, now, gk, g):
-    """Aviso curto para apostar (formato `telegram_bet_short_v1`). Um indício de tática simples dá três linhas:
-        A seguir: <jogo>
-        Encaixa em: <tática> (<estado>)
-        Aposta: <seleção> @ <odd>
-    Várias táticas ou seleções: cada APOSTA aparece uma só vez, por baixo das táticas que a sustentam (as apostas com o
-    mesmo conjunto de táticas ficam juntas). Um ALERTA (só com certificado ativo, verificado e da própria tática) acrescenta,
-    no fim, o rótulo científico exato dessa tática, que `guard_claims` exige para qualquer afirmação positiva. Nada de ROI,
-    probabilidades, jogos independentes, evidência ou textos finais: essa informação vai para o resumo diário.
-    O filtro fixo Polymarket acrescenta os dados do aviso original e a hora de início."""
+    """Um aviso por jogo, com a odd, o mercado e o suporte de cada aposta. O certificado fica junto da seleção que sustenta."""
     items = sorted(g['items'].items(), key=lambda kv: (kv[1]['level'] != 'alerta', kv[0]))
     first = items[0][1]['entries'][0]
-    reasons, covers, alerted, bets, fixed = {}, {}, set(), [], []
+    sources = dict.fromkeys(bet_source(w) for _, it in items for w in it['entries'])
+    level = '🟢 ALERTA' if g['alert'] else '🟠 INDÍCIO'
+    update = ' · NOVA SELEÇÃO' if g.get('previous') else ''
+    match = ' '.join(str(first.get('match') or 'Jogo').splitlines())
+    lines = [level + ' · ' + ' / '.join(sources) + update, '⚽ ' + match]
+    link = match_link(first.get('match_id'))
+    hids, claims = {}, {}
     current_bets = []
     for _, it in items:
         entries = it['entries']
         by_date = lambda w: w.get('date_utc') or ''
         polymarket = max((w for w in entries if w.get('polymarket_over25')), key=by_date, default=None)
+        latest = max(entries, key=by_date)
+        # Uma seleção certificada mostra a cotação do sinal que tem o certificado dessa hipótese.
+        quote = max((w for w in entries if alert_reason(report, w)), key=by_date, default=polymarket or latest)
         if polymarket is None:
-            latest = max(entries, key=by_date)
-            current_bets.append(entries)
+            current_bets.append(entries if quote is latest else [quote])
         else:
-            latest = max((w for w in entries if alert_reason(report, w)), key=by_date, default=polymarket)
-            fixed.append(polymarket)
+            if link is None:
+                return None                 # o link de origem faz parte do aviso fixo
             current_bets.append([polymarket])
-            if latest is not polymarket:
-                current_bets.append([latest])
-        sel = '%s%s' % (latest.get('selection') or 'mais um golo', (' @ ' + odd(latest['odds'])) if latest.get('odds') else '')
-        if sel not in bets:
-            bets.append(sel)
-        for w in it['entries']:
-            for x in w['reasons']:
-                if isinstance(x, dict) and isinstance(x.get('id'), str):
-                    reasons.setdefault(x['id'], x)
-                    if sel not in covers.setdefault(x['id'], []):
-                        covers[x['id']].append(sel)
-        if it['level'] == 'alerta':
-            alerted.add(alert_reason(report, latest)['id'])
-    # Certificadas e não certificadas nunca no mesmo grupo: o alerta só fala das certificadas, as outras são indício.
-    grouped = groups_of(report, [h for h in reasons if h in alerted]) + groups_of(report, [h for h in reasons if h not in alerted])
-    shown = grouped[:MAX_GROUPS_PER_MESSAGE]
-    match = first.get('match') or 'Jogo'
-    update = ' (nova seleção num jogo já avisado)' if g.get('previous') else ''
-    lines = [('🟢 ALERTA%s: %s' % (update, match)) if g['alert'] else ('A seguir%s: %s' % (update, match))]
+            if quote is not polymarket:
+                current_bets.append([quote])
 
-    def tactic(gr):
-        rep = gr[0]
-        r = reasons.get(rep) or next(reasons[h] for h in gr if h in reasons)
-        more = len(gr) - 1
-        if rep in alerted:
-            return '🟢 Tática validada (%s%s): %s' % (r['status'], ('; e mais %d equivalente%s' % (more, 's' if more > 1 else '')) if more else '', rep)
-        return 'Encaixa em: %s (%s)%s' % (rep, 'promissora' if r.get('status') in VALID else r.get('status'),
-                                          (' e mais %d equivalente%s' % (more, 's' if more > 1 else '')) if more else '')
-    # Cada aposta uma só vez, agrupada pelas táticas (mostradas) que a sustentam.
-    clusters = {}
-    for sel in bets:
-        support = tuple(i for i, gr in enumerate(shown) if any(sel in covers.get(h, ()) for h in gr))
-        clusters.setdefault(support, []).append(sel)
-    unsupported = clusters.pop((), [])
-    for support, sels in clusters.items():
-        lines += [tactic(shown[i]) for i in support]
-        lines.append('Aposta: %s' % '; '.join(sels))
-    if len(grouped) > len(shown):
-        lines.append('… e mais %d grupos de táticas.' % (len(grouped) - len(shown)))
-    if unsupported:
-        lines.append('Aposta: %s' % '; '.join(unsupported))
-    for w in fixed:
-        total = format(w['total'], ',.2f').rstrip('0').rstrip('.').replace(',', ' ').replace('.', ',')
-        lines.append('Polymarket pré-jogo · odd anunciada %s · quota %s%% · valor $%s · início às %s (Lisboa)' %
-                     (odd(w['odds']), w['share'], total, lisbon(w['kickoff_utc'])))
-        lines.append('https://scangoal.com/match/%s?lang=en' % w['match_id'])
-    claims = [gr[0] for gr in shown if gr[0] in alerted]
-    for hid in claims:                       # rótulo exato (fail-closed): só para a tática do alerta, verificada agora
-        text, positive = scientific_label(report, hid)
-        if positive:
-            lines.append(text)
+        reasons = [r for w in entries for r in w['reasons']]
+        hids.update(dict.fromkeys(r['id'] for r in reasons if isinstance(r, dict) and isinstance(r.get('id'), str)))
+        alert = alert_reason(report, quote)
+        line = bet_line(quote)
+        source = bet_source(quote)
+        if len(sources) > 1 and source != quote.get('market'):
+            line += ' · ' + source
+        if g['alert'] and len(items) > 1:
+            line += ' · ALERTA' if alert else ' · INDÍCIO'
+        lines.append(line)
+        if alert:
+            hid = alert['id']
+            claims[hid] = None
+            lines.append(scientific_label(report, hid)[0])
+            reasons = [r for r in reasons if not isinstance(r, dict) or not certificate(report, r.get('id'))]
+        if reasons:
+            lines.append(hypotheses_line(report, reasons))
+        if polymarket is not None:
+            share = str(polymarket['share']).removesuffix('.0').replace('.', ',')
+            total = format(polymarket['total'], ',.2f').rstrip('0').rstrip('.').replace(',', ' ').replace('.', ',')
+            details = 'Polymarket pré-jogo · '
+            if quote is not polymarket:
+                details += 'odd anunciada %s · ' % odd(polymarket['odds'])
+            lines.append(details + 'quota %s%% · valor $%s · início %s (Lisboa)' %
+                         (share, total, lisbon(polymarket['kickoff_utc'])))
+
+    if link:
+        lines.append('🔗 ' + link)
+    # O limite inclui emoji. Um aviso de aposta incompleto não chega ao outbox nem marca seleções como avisadas.
+    if len('\n'.join(lines).encode('utf-16-le')) > MAX_TEXT * 2:
+        return None
+
+    # Os efeitos mantêm o agrupamento e o limite históricos, independentes das linhas agora apresentadas.
+    grouped = groups_of(report, [h for h in hids if h in claims]) + groups_of(report, [h for h in hids if h not in claims])
     effects = []
-    for gr in shown:
+    for gr in grouped[:MAX_GROUPS_PER_MESSAGE]:
         for h in gr:
             row = hypothesis_row(report, h) or {}
             if row.get('prospective_games') is not None:
@@ -716,7 +760,7 @@ def game_notice(report, state, now, gk, g):
         for w in it['entries']:
             effects.append(['watch_sent', legacy_key(w)])
     key = 'game|%s|%s' % (gk, sha('\n'.join(k for k, _ in items))[:12])
-    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, list(reasons),
+    return Notice(key, 'alert' if g['alert'] else 'hint', lines, effects, claims, hids,
                   bets=current_bets)
 
 
@@ -967,7 +1011,7 @@ def messages(report, state, now):
     out = []
     for n in plan(report, state, now):
         apply_effects(state, n.effects, now)
-        if guard_claims(n.text, report, n.claims):
+        if guard_claims(n.text, report, n.claims, exact_lines=bool(n.bets)):
             out.append(n.text)
     return out
 
@@ -1216,7 +1260,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
         if not n.still_current(t):
             _expire(store, state, now, n, rec, t, 'signal_expired_before_intent')
             continue
-        if not guard_claims(n.text, report, n.claims):
+        if not guard_claims(n.text, report, n.claims, exact_lines=bool(n.bets)):
             apply_effects(state, n.effects, now)
             rec.update(state='blocked', done_utc=iso(now), sha256=sha(n.text))
             rec['events'].append('blocked')

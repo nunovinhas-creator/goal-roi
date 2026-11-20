@@ -331,7 +331,8 @@ class RealGit(unittest.TestCase):
         a, sent = self.world.runner(), []
         self.world.notify(a, lambda t, c, text: sent.append(text), env=DURABLE, now=NOW)
         self.assertEqual(len(sent), 1)
-        self.assertTrue(sent[0].startswith('A seguir: Casa a'))
+        self.assertTrue(sent[0].startswith('🟠 INDÍCIO · '))
+        self.assertEqual(sent[0].splitlines()[1], '⚽ Casa a — Fora a')
 
 
 if __name__ == '__main__':

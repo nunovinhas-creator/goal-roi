@@ -59,7 +59,7 @@ def state():
 
 
 def games(texts):
-    return [t.split('\n')[0] for t in texts if t.startswith(('A seguir', '🟢 ALERTA'))]
+    return [t.splitlines()[1] for t in texts if t.startswith(('🟠 INDÍCIO', '🟢 ALERTA'))]
 
 
 class Rule(unittest.TestCase):
@@ -137,7 +137,7 @@ class Notices(unittest.TestCase):
 
     def test_01_02_recent_live_hints_are_sent(self):
         out, _ = self.sent([live('a', 5), live('b', 29)])
-        self.assertEqual(games(out), ['A seguir: Casa a — Fora a', 'A seguir: Casa b — Fora b'])
+        self.assertEqual(games(out), ['⚽ Casa a — Fora a', '⚽ Casa b — Fora b'])
 
     def test_03_04_old_live_hints_are_not_sent(self):
         out, st = self.sent([live('a', 31), live('b', 2 * 24 * 60)])
@@ -159,7 +159,7 @@ class Notices(unittest.TestCase):
 
     def test_06_07_prematch(self):
         out, _ = self.sent([pre('a', 300, 20), pre('b', 10, -5)])
-        self.assertEqual(games(out), ['A seguir: Casa a — Fora a'])
+        self.assertEqual(games(out), ['⚽ Casa a — Fora a'])
 
     def test_08_promotion_with_ten_historical_signals_sends_nothing_old(self):
         hist = [live('h%d' % i, 60 * (i + 1) * 7) for i in range(10)]        # 7 h a 70 h antes: nenhum apostável
@@ -177,7 +177,7 @@ class Notices(unittest.TestCase):
     def test_09_mix_of_recent_and_old_sends_only_the_recent(self):
         watch = [live('old%d' % i, 60 * 24 + i) for i in range(8)] + [live('new', 4), pre('soon', 120, 15)]
         out, st = self.sent(watch)
-        self.assertEqual(sorted(games(out)), ['A seguir: Casa new — Fora new', 'A seguir: Casa soon — Fora soon'])
+        self.assertEqual(sorted(games(out)), ['⚽ Casa new — Fora new', '⚽ Casa soon — Fora soon'])
         self.assertEqual(sorted(st['notified_items']), ['item|id:new|1X2|1', 'item|id:soon|1X2|1'])
 
     def test_10_already_notified_is_never_duplicated(self):
@@ -278,7 +278,7 @@ class Incident(unittest.TestCase):
                      match='Equipa Nova — Outra Equipa', match_id='equipa-nova-vs-outra-equipa-20261117')
         rep['brain']['watch'].insert(0, fresh)
         out = notify.plan(rep, copy.deepcopy(self.state), now)
-        self.assertEqual([n.text.split('\n')[0] for n in out if n.key.startswith('game|')], ['A seguir: Equipa Nova — Outra Equipa'])
+        self.assertEqual(games([n.text for n in out]), ['⚽ Equipa Nova — Outra Equipa'])
 
 
 class BrainWatch(unittest.TestCase):

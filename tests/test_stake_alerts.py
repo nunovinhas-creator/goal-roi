@@ -39,6 +39,13 @@ class StakeAlerts(unittest.TestCase):
         self.assertEqual(len(m), 1)
         self.assertEqual(m[0]['lines'], [1, 6, 9])
 
+    def test_dedicated_stake_notice_keeps_its_rules_and_context(self):
+        match, = stake_alerts.matches([sig(odds=1.5)], NOW)
+        self.assertEqual(stake_alerts.text(match, NOW).splitlines(), [
+            'Stake · linhas 1, 6, 9', 'A — B · Australian Australia Championship', 'Asian Total · Under 3.25 @1,50',
+            'Sinal das 09:55 (Lisboa), há 5 min', 'https://scangoal.com/match/a-vs-b-20261119?lang=en',
+        ])
+
     def test_partial_lines_never_alert(self):
         # Regressão de produção: odd 1,45 gerou um aviso linha 6;
         # aposta posterior cumpriu só a linha 1. Nenhuma deve chegar ao Telegram.
