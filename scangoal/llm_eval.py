@@ -115,7 +115,7 @@ def registry_history(root, ref, rel=REGISTRY_FILE):
     return first, problems[:50]
 
 
-def protocol_proof(root, commit, published=None, evidence=None):
+def protocol_proof(root, commit, published=None, evidence=None, *, receipts=None, as_of=None):
     """-> (P, problemas). P = max(hora do commit que introduziu o protocolo, primeira publicação verificável no GitHub).
 
     Exige o conteúdo fixado em PROTOCOL_SHA256. `published` é a hora registada pelo servidor GitHub (execução de Actions ou pull
@@ -127,20 +127,22 @@ def protocol_proof(root, commit, published=None, evidence=None):
         adds = _git(root, 'log', '--reverse', '--format=%H %cI', sha, '--', PROTOCOL_FILE).decode().split('\n')
     except (OSError, subprocess.CalledProcessError):
         return None, ['protocol unavailable at %s' % commit]
+    from . import scientific_receipts
+
     problems = []
-    if hashlib.sha256(body).hexdigest() != PROTOCOL_SHA256:
+    sha256 = hashlib.sha256(body).hexdigest()
+    if sha256 != PROTOCOL_SHA256:
         problems.append('protocol content differs from the registered one')
     intro = [line.split() for line in adds if line.strip()]
     if not intro or intro[0][0] != sha:
         problems.append('protocol commit is not the one that introduced the file')
     committed = chronology.parse_utc(intro[0][1]) if intro else None
-    pub = chronology.parse_utc(published) if isinstance(published, str) else published
-    if pub is None or not (isinstance(evidence, str) and evidence.startswith('https://github.com/')):
-        problems.append('protocol publication not proven')
-        return committed, problems
-    if committed is not None and pub < committed:
-        problems.append('protocol publication before its commit')
-    return (max(committed, pub) if committed is not None else pub), problems
+    receipt = scientific_receipts.verify(receipts, 'llm-protocol', {'commit': sha, 'sha256': sha256}, as_of=as_of)
+    if receipt is None:
+        return None, [*problems, 'protocol publication not proven by an independent receipt']
+    if committed is None or receipt.at < committed:
+        problems.append('protocol receipt precedes its declared revision')
+    return (None if problems else receipt.at), problems
 
 
 MESSAGES_FILE = 'data/messages.jsonl'
@@ -468,6 +470,12 @@ def cutoff_of(as_of, protocol_time):
 
 
 def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
+    """Report the v5 study descriptively until its prospective cohort has external proof."""
+    return _evaluate(signals, registry, as_of=as_of, born_eff=born_eff, protocol_time=protocol_time,
+                     problems=(*problems, 'v5 has no independently witnessed prospective cohort and outcomes'))
+
+
+def _evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     """Avaliação completa (pura). signals: sinais do relatório (a vista do relógio e a elegibilidade aplicam-se aqui).
     born_eff: {id: datetime ou None} (births). protocol_time: P. problems: falhas de prova (histórico, protocolo).
 
@@ -478,6 +486,7 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
     final = confirm is not None and as_of >= confirm
     clock = confirm if final else as_of
     cutoff = cutoff_of(as_of, protocol_time)   # fecho da janela: min(relógio, H)
+    registry = chronology.registry_at(registry, cutoff)
     as_of = clock
     # Só sinais LIDOS até ao fecho da janela (min(relógio, H)), com os resultados observados até ao relógio: nada lido depois de H
     # muda a avaliação confirmatória, nem sequer as características dos sinais da janela.
@@ -701,8 +710,11 @@ def evaluate(signals, registry, *, as_of, born_eff, protocol_time, problems=()):
                       'the bootstrap-t p is a diagnostic only and never changes the verdict']}
 
 
-def page_summary(signals, registry):
+def page_summary(signals, registry, *, as_of=None):
     """Resumo para a página (sem git: nunca há conclusão científica no relatório de produção). Grupos como nos protocolos v2/v3."""
+    if as_of is not None:
+        registry = chronology.registry_at(registry, as_of)
+        signals = chronology.as_of_view(signals, as_of)
     llm = sorted(hid for hid, h in registry.items() if h.get('source') == 'llm' and chronology.born(h) is not None)
     view, snaps = [b for b in signals if eligible(b)], {}
 
@@ -714,7 +726,7 @@ def page_summary(signals, registry):
     order = sorted(llm, key=lambda hid: (chronology.born(registry[hid]), hid))
     grp = groups_at_birth([(hid, registry[hid], chronology.born(registry[hid])) for hid in order], TAU, games_at, GROUP_MIN_GAMES)
     return {'protocol': PROTOCOL, 'verdict': VERDICTS[0], 'llm_hypotheses': len(llm), 'groups': len(grp),
-            'reason': 'the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py',
+            'reason': 'the prospective cohort has no independent evidence of temporal order',
             'report': 'audits/pr4-llm-evaluation.md'}
 
 
