@@ -3994,22 +3994,22 @@
   "delivered": 252,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T16:11:09+00:00",
+ "format_last_run_utc": "2026-11-21T16:12:25+00:00",
  "health": {
   "reference": {
-   "bsd_results": 37,
+   "bsd_results": 40,
    "eligible": 1347,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 100,
    "hypotheses": 11777,
-   "settled_bets": 1025,
+   "settled_bets": 1031,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 67,
+   "statuses": 72,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T16:11:09+00:00",
+ "last_run_utc": "2026-11-21T16:12:25+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -5089,6 +5089,7 @@
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": "promissora",
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": "abandonada",
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Dia = fim de semana & Mercado = outros mercados": "abandonada",
   "Stake | Dia = fim de semana & Mercado = outros mercados & Número de apostas = uma": "abandonada",
   "Stake | Dia = fim de semana & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -5098,7 +5099,11 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Hora (UTC) = noite & Número de apostas = uma": "promissora",
   "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": "promissora",
+  "Stake | Hora (UTC) = tarde": "abandonada",
+  "Stake | Hora (UTC) = tarde & Número de apostas = uma": "abandonada",
   "Stake | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Stake | Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada"
  },
  "summary_counts": {
