@@ -638,30 +638,12 @@ def operational_evidence(signals, now=None):
             'regime': insights.regime(rows)}
 
 
-def publish_ledger_state(validation, ledger, ledger_path, registry, now, register):
-    """Seleções em tempo real e coerência do que se publica (revisões #5911603577 e #5912303516, P2-J).
-
-    A avaliação (certificados, estados) usa o registo tal como estava (`evaluated_*`). Com register=True e registo ativo,
-    válido e provado, as candidatas são acrescentadas uma só vez (rank, α e início fixos) e gravadas. Depois, o bloco
-    `validation` passa a descrever o registo GRAVADO — `ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro publicado
-    no mesmo commit — e `newly_selected` lista o que este relatório acrescentou; essas deixam de constar de `candidates`.
-    O cérebro não é reexecutado: as novas seleções só contam (sem jogos ainda) a partir da avaliação seguinte.
-    """
+def ledger_summary(validation):
+    """Describe the externally witnessed prefix evaluated by this report."""
     validation['evaluated_ledger_head_sha256'] = validation.get('ledger_head_sha256')
     validation['evaluated_ledger_entries'] = validation.get('ledger_entries', 0)
     validation['newly_selected'] = []
-    if register and validation['ledger_valid'] and validation['candidates']:
-        n = certification.append(ledger, validation['candidates'], registry, now)
-        if n:
-            certification.save(ledger_path, ledger)
-            validation['newly_selected'] = [{k: e[k] for k in ('rank', 'id', 'alpha', 'selected_utc')} for e in ledger['entries'][-n:]]
-            chosen = {e['id'] for e in validation['newly_selected']}
-            validation['candidates'] = [c for c in validation['candidates'] if c not in chosen]
-    if validation['ledger_valid']:
-        validation['ledger_head_sha256'] = certification.head(ledger)
-        validation['ledger_entries'] = len(ledger['entries'])
-    validation['candidates_meaning'] = ('promising certifiable hypotheses not yet in the ledger; a report with register=True '
-                                        'registers them (see newly_selected)')
+    validation['candidates_meaning'] = 'promising hypotheses awaiting an independently witnessed selection'
 
 
 def research_bets(signals, observations, now, *, bindings=None):
@@ -687,7 +669,7 @@ def research_bets(signals, observations, now, *, bindings=None):
         yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
-def build(csv_path=None, register=False, now=None, *, as_of=None):
+def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
     chron = {}
@@ -791,7 +773,7 @@ def build(csv_path=None, register=False, now=None, *, as_of=None):
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
     brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now)
-    publish_ledger_state(brn['validation'], ledger, ledger_path, registry, now, False)
+    ledger_summary(brn['validation'])
     llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}
