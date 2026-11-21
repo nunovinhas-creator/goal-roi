@@ -100558,6 +100558,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado & Ritmo indicado pelo bot = menos de 90": {
   "born_utc": "2026-11-14T17:33:47+00:00",
   "conditions": [
@@ -107002,6 +107021,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Competição = liga & Golos até ao sinal = nenhum & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Competição = liga & Hora (UTC) = madrugada": {
   "born_utc": "2026-11-20T05:33:44+00:00",
   "conditions": [
@@ -107822,6 +107860,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Competição = liga & Hora (UTC) = tarde & Momento = durante o jogo": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Competição = liga & Hora (UTC) = tarde & Número de apostas = uma": {
   "born_utc": "2026-11-15T16:26:16+00:00",
   "conditions": [
@@ -108208,6 +108265,25 @@
    [
     "Quota de mercado",
     "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = liga & Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
    ]
   ],
   "family": "Polymarket",
@@ -111638,6 +111714,25 @@
    [
     "Momento",
     "antes do jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Competição = seleções & Faixa de odd = odd acima de 3,00 & Momento = durante o jogo": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "seleções"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
    ]
   ],
   "family": "Polymarket",
@@ -121017,6 +121112,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Dia = fim de semana & Golos até ao sinal = nenhum & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Dia = fim de semana & Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = sim": {
   "born_utc": "2026-11-21T09:12:41+00:00",
   "conditions": [
@@ -121913,6 +122027,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Dia = fim de semana & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Dia = fim de semana & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
   "born_utc": "2026-11-14T15:56:32+00:00",
   "conditions": [
@@ -122056,6 +122189,44 @@
    [
     "Liga",
     "England Premier League"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana & Liga = England Premier League & Mercado = outro mercado": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana & Liga = England Premier League & Momento = antes do jogo": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
    ]
   ],
   "family": "Polymarket",
@@ -122424,6 +122595,25 @@
    [
     "Marcador no momento",
     "empatado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana & Marcador no momento = empatado & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
    ]
   ],
   "family": "Polymarket",
@@ -131673,6 +131863,21 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Faixa de odd = odd acima de 3,00 & Marcador no momento = empatado": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Faixa de odd = odd acima de 3,00 & Mercado = outro mercado": {
   "born_utc": "2026-11-14T20:41:21+00:00",
   "conditions": [
@@ -131960,6 +132165,63 @@
    [
     "Momento",
     "durante o jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Número de apostas = várias": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
    ]
   ],
   "family": "Polymarket",
@@ -134469,6 +134731,63 @@
    [
     "Minuto",
     "até ao 30"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Golos até ao sinal = nenhum & Minuto = até ao 30 & Número de apostas = várias": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Golos até ao sinal = nenhum & Minuto = até ao 30 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Golos até ao sinal = nenhum & Minuto = até ao 30 & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
    ]
   ],
   "family": "Polymarket",
@@ -140294,6 +140613,21 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Hora (UTC) = tarde & Marcador no momento = empatado": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos)": {
   "born_utc": "2026-11-14T13:16:28+00:00",
   "conditions": [
@@ -140756,6 +141090,21 @@
    [
     "Valor da aposta",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Hora (UTC) = tarde & Minuto = até ao 30": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
    ]
   ],
   "family": "Polymarket",
@@ -142078,6 +142427,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Liga = England Premier League & Mercado = outro mercado & Momento = antes do jogo": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Liga = England Premier League & Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
   "born_utc": "2026-11-21T11:58:35+00:00",
   "conditions": [
@@ -142092,6 +142460,135 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo & Número de apostas = várias": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Polymarket",
@@ -142126,6 +142623,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Número de apostas = várias & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
    ]
   ],
   "family": "Polymarket",
@@ -142184,6 +142700,44 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Liga = England Premier League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Liga = England Premier League & Quota de mercado = 80 % ou mais": {
   "born_utc": "2026-11-21T03:59:46+00:00",
   "conditions": [
@@ -142209,6 +142763,40 @@
    [
     "Quota de mercado",
     "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = England Premier League & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Polymarket",
@@ -147631,6 +148219,25 @@
    [
     "Minuto",
     "até ao 30"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Mercado = outro mercado & Minuto = até ao 30 & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-21T12:44:32+00:00",
+  "conditions": [
+   [
+    "Mercado",
+    "outro mercado"
+   ],
+   [
+    "Minuto",
+    "até ao 30"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
    ]
   ],
   "family": "Polymarket",
@@ -171059,6 +171666,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Dia = fim de semana & Hora (UTC) = tarde & Liga = England Premier League": {
+  "born_utc": "2026-11-21T12:46:31+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Liga",
+    "England Premier League"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Dia = fim de semana & Hora (UTC) = tarde & Liga = UEFA Nations League": {
   "born_utc": "2026-11-14T16:49:20+00:00",
   "conditions": [
@@ -190261,6 +190887,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Hora (UTC) = tarde & Liga = England Premier League & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T12:46:31+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Hora (UTC) = tarde & Liga = UEFA Nations League": {
   "born_utc": "2026-11-14T16:23:50+00:00",
   "conditions": [
@@ -192586,6 +193231,25 @@
    [
     "Momento do aviso",
     "antes do início"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Liga = England Premier League & Momento do aviso = antes do início & Número de apostas = uma": {
+  "born_utc": "2026-11-21T12:46:31+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "England Premier League"
+   ],
+   [
+    "Momento do aviso",
+    "antes do início"
+   ],
+   [
+    "Número de apostas",
+    "uma"
    ]
   ],
   "family": "Stake",
