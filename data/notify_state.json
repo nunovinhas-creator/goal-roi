@@ -759,13 +759,15 @@
    "attempt_utc": "2026-11-21T16:20:07+00:00",
    "chars": 212,
    "created_utc": "2026-11-21T16:20:07+00:00",
+   "done_utc": "2026-11-21T16:20:07+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "71553ed49f3ea2d3541bbdbc7f65f440f6298f47323123db5f6a9d3df8266231",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:aston-villa-vs-sunderland-20261121|ed143add3c3d": {
    "attempt_utc": "2026-11-21T16:11:09+00:00",
@@ -1424,6 +1426,18 @@
    "kind": "hint",
    "sha256": "96d65860eb782a3c6d6eb7d131d2e6393435886474ddf7389c11510318f8e612",
    "state": "delivered"
+  },
+  "game|id:chesterfield-vs-shrewsbury-20261121|6031ef1ab17e": {
+   "attempt_utc": "2026-11-21T16:22:07+00:00",
+   "chars": 199,
+   "created_utc": "2026-11-21T16:22:07+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "d51499fb4d31431aaddf257e02bf1ee6614e1a1a74e361cc71c0ad850c663bbe",
+   "state": "in_flight"
   },
   "game|id:china-pr-vs-bahrain-20261117|37a4280db234": {
    "attempt_utc": "2026-11-17T12:58:31+00:00",
@@ -4017,17 +4031,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 253,
+  "delivered": 254,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T16:18:07+00:00",
+ "format_last_run_utc": "2026-11-21T16:20:07+00:00",
  "health": {
   "reference": {
    "bsd_results": 40,
-   "eligible": 1358,
+   "eligible": 1361,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 100,
-   "hypotheses": 11814,
+   "hypotheses": 11818,
    "settled_bets": 1031,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 72,
@@ -4035,7 +4049,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T16:18:07+00:00",
+ "last_run_utc": "2026-11-21T16:20:07+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4228,9 +4242,9 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos": 64,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": 31,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 45,
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": 37,
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": 38,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 57,
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 58,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": 23,
@@ -4505,6 +4519,9 @@
   },
   "item|id:cheltenham-vs-bristol-rovers-20261121|Asian Total|Over 4": {
    "at_utc": "2026-11-21T16:18:07+00:00"
+  },
+  "item|id:chesterfield-vs-shrewsbury-20261121|Asian Total|Over 5": {
+   "at_utc": "2026-11-21T16:22:07+00:00"
   },
   "item|id:china-pr-vs-bahrain-20261117|1X2|1": {
    "at_utc": "2026-11-17T12:58:31+00:00"
@@ -5063,7 +5080,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 565,
+ "sent_total": 566,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -5514,6 +5531,7 @@
   "2026-11-21T15:57:43+00:00|Chelsea — Leeds|Under 3.5",
   "2026-11-21T16:08:58+00:00|Aston Villa — Sunderland|Under 1.5",
   "2026-11-21T16:16:03+00:00|Cheltenham — Bristol Rovers|Over 4",
-  "2026-11-21T16:17:35+00:00|Aston Villa — Sunderland|Under 0.5"
+  "2026-11-21T16:17:35+00:00|Aston Villa — Sunderland|Under 0.5",
+  "2026-11-21T16:21:04+00:00|Chesterfield — Shrewsbury|Over 5"
  ]
 }
