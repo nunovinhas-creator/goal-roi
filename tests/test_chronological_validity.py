@@ -993,7 +993,8 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
         validation = self.run_report(now)
         self.assertEqual((validation['state'], validation['ledger_valid']), ('history_unverified', False))
         self.assertEqual(self.read_ledger(), led)
-        self.assertEqual(certification.history_proof(self.path(), led), [])
+        self.assertEqual(certification.git_history_diagnostics(self.path(), led), [])
+        self.assertTrue(certification.history_proof(self.path(), led, as_of=now))
 
     def test_rewritten_ledger_with_recomputed_hashes_is_refused_end_to_end(self):
         self.published()
@@ -1014,7 +1015,7 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
         msgs = notify.messages(report, {'hello': True, 'statuses': {}, 'migrations': {'status_rules:' + brain.STATUS_RULES: {}}}, T0)
         self.assertFalse(any('ALERTA' in m or 'validada' in m for m in msgs))
         self.commit(now + timedelta(hours=2))                                           # even once the rewrite is committed
-        self.assertTrue(certification.history_proof(os.path.join(self.data, certification.FILE), rewritten))
+        self.assertTrue(certification.git_history_diagnostics(os.path.join(self.data, certification.FILE), rewritten))
         self.assertEqual(self.run_report(now + timedelta(hours=3))['state'], 'history_unverified')
 
     def test_incomplete_or_missing_history_fails_closed(self):
@@ -1026,18 +1027,18 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
         self.commit(self.ACT + timedelta(minutes=5))
         clone = os.path.join(self.root, 'shallow')                                     # truncated history
         self.sp.run(['git', 'clone', '-q', '--depth', '1', 'file://' + self.root, clone], check=True, capture_output=True)
-        problems = certification.history_proof(os.path.join(clone, 'data', certification.FILE), led)
+        problems = certification.git_history_diagnostics(os.path.join(clone, 'data', certification.FILE), led)
         self.assertEqual(problems, ['history unavailable: shallow repository'])
         outside = tempfile.TemporaryDirectory()                                        # no git at all
         path = os.path.join(outside.name, certification.FILE)
         certification.save(__import__('pathlib').Path(path), led)
-        self.assertEqual(certification.history_proof(path, led), ['history unavailable: no git repository'])
+        self.assertEqual(certification.git_history_diagnostics(path, led), ['history unavailable: no git repository'])
         outside.cleanup()
         os.remove(os.path.join(self.data, certification.FILE))                         # deleted, then re-created
         self.commit(self.ACT + timedelta(minutes=10))
         self.write(certification.FILE, led)
         self.commit(self.ACT + timedelta(minutes=15))
-        self.assertTrue(any('deleted' in p for p in certification.history_proof(os.path.join(self.data, certification.FILE), led)))
+        self.assertTrue(any('deleted' in p for p in certification.git_history_diagnostics(os.path.join(self.data, certification.FILE), led)))
 
     def path(self):
         return os.path.join(self.data, certification.FILE)
@@ -1046,7 +1047,7 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
         led = certification.activate({}, self.ACT)
         self.write(certification.FILE, led)
         self.commit(self.ACT - timedelta(minutes=1))
-        self.assertIn('genesis published out of time', certification.history_proof(self.path(), led))
+        self.assertIn('genesis published out of time', certification.git_history_diagnostics(self.path(), led))
 
     def test_entry_published_too_late_after_its_selection(self):
         self.published()
@@ -1054,18 +1055,18 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
         certification.append(late, ['x'], self.reg, self.ACT + timedelta(days=1))
         self.write(certification.FILE, late)
         self.commit(self.ACT + timedelta(days=1, hours=2))                             # 2 h > 30 min tolerance
-        self.assertIn('entry 1 published out of time', certification.history_proof(self.path(), late))
+        self.assertIn('entry 1 published out of time', certification.git_history_diagnostics(self.path(), late))
         self.assertEqual(self.run_report(self.ACT + timedelta(days=2))['state'], 'history_unverified')
 
     def test_unpublished_entries_must_be_after_the_last_publication_and_not_in_the_future(self):
         self.published()
         back = self.read_ledger()
         certification.append(back, ['x'], self.reg, self.ACT)                         # dated before the last publication
-        self.assertIn('unpublished entry 1 out of time', certification.history_proof(self.path(), back))
+        self.assertIn('unpublished entry 1 out of time', certification.git_history_diagnostics(self.path(), back))
         future = self.read_ledger()
         certification.append(future, ['x'], self.reg, self.ACT + timedelta(days=9))
-        self.assertIn('unpublished entry 1 out of time', certification.history_proof(self.path(), future, as_of=self.ACT + timedelta(days=1)))
-        self.assertEqual(certification.history_proof(self.path(), future, as_of=self.ACT + timedelta(days=9)), [])
+        self.assertIn('unpublished entry 1 out of time', certification.git_history_diagnostics(self.path(), future, as_of=self.ACT + timedelta(days=1)))
+        self.assertEqual(certification.git_history_diagnostics(self.path(), future, as_of=self.ACT + timedelta(days=9)), [])
 
     def test_brain_without_a_history_proof_is_closed(self):
         led = make_ledger(self.reg, [(['x'], -30)])
