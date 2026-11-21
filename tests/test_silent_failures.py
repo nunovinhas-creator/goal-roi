@@ -351,7 +351,10 @@ class NextCollection(unittest.TestCase):
         self.assertEqual(names[-1], notice)                                       # last step
         self.assertEqual(names[-2], 'Start the next collection')
         self.assertIn('        id: next', s['Start the next collection'])
-        self.assertIn('        if: ${{ failure() }}', s[notice])
+        condition, = (line for line in s[notice] if line.strip().startswith('if:'))
+        self.assertIn('failure()', condition)
+        self.assertIn("steps.resume.outcome == 'success'", condition)
+        self.assertIn("steps.publication.outputs.pending != 'true'", condition)
         self.assertIn("          NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}", s[notice])
         self.assertIn('        run: python -u -m scangoal.notify --failure', s[notice])
         self.assertEqual(sum(n.startswith('Tell the user') for n in names), 1)       # one mechanism, not two

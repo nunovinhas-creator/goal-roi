@@ -50,6 +50,8 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
         if wait > 0:
             await sleep(wait)
         k += 1
+        if pending and failures < 2:
+            update()
         try:
             added = await read()
         except Exception as exc:      # o tipo basta; nunca imprimir segredos
@@ -57,7 +59,7 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
             print('WATCH_READ_FAILED', type(exc).__name__)
             continue
         fails, done = 0, done + 1
-        if (added or pending) and failures < 2:
+        if added and failures < 2:
             update()
     if fails >= 2 and problems is not None:
         problems.append('reads_stopped')
