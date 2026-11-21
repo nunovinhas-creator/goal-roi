@@ -237,7 +237,9 @@ class Telegram(unittest.TestCase):
         notify_step = "Telegram notices through the user's bot (skipped without keys)"
         self.assertIn('        continue-on-error: true', s[notify_step])
         self.assertEqual(names[names.index(notify_step) + 1], 'Commit data')
-        self.assertFalse([l for l in s['Commit data'] if l.startswith('        if:')])   # unchanged: runs while the job succeeds
+        self.assertIn('scangoal.publication publish', '\n'.join(s['Commit data']))
+        self.assertIn("steps.resume.outcome == 'success'", '\n'.join(s['Commit data']))
+        self.assertLess(names.index('Publish the report before sending notices'), names.index(notify_step))
 
 
 # ---------------------------------------------------------------------------------------------------------------------

@@ -78,8 +78,9 @@ def main(argv=None):
             inputs['sha256 data/%s' % f.relative_to(data).as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
         os.environ['SCANGOAL_DATA_DIR'] = str(data)
         from scangoal import report
-        report.build(as_of=as_of)                                  # register=False: nada é escrito
-        signals = report.LAST['research_signals']
+        captured = {}
+        report.build(as_of=as_of, capture=captured)                 # register=False: nada é escrito
+        signals = captured['research_signals']
         registry = brain.load_registry(data / 'hypotheses.json')
     first, history = llm_eval.registry_history(ROOT, ref)
     problems = history + problems + (llm_eval.observation_proof(ROOT, ref, protocol_time) if protocol_time is not None else [])

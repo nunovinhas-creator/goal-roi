@@ -84,9 +84,13 @@ def load(chronology=None, *, result_observations=None, as_of=None):
                         left and right and left != right for left, right in zip(old, revised)):
                     audit['edits_changing_signal'] += 1
                     continue
+            retained_kickoff = p.get('kickoff_utc') or (previous or {}).get('kickoff_utc')
+            if retained_kickoff is None and previous:
+                retained = settlement_kickoff(previous, None)
+                retained_kickoff = retained.isoformat() if retained is not None else None
             observation = opportunity_results.collected(
                 'telegram', r['message_id'], p['ft'], got,
-                published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=p.get('kickoff_utc'),
+                published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=retained_kickoff,
                 exact=r.get('receipt_version') == 1, fixture_id=p['match_id'], link=link,
             )
             embedded.setdefault(p['match_id'], []).append(observation)
@@ -210,16 +214,19 @@ def external_matches(bet, row):
             and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
 
 
-def settlement_kickoff(bet, external):
+def settlement_kickoff(bet, external, fixture_times=()):
     kickoff = chronology.kickoff_time(bet)
     if kickoff is not None:
         return kickoff
+    if len(fixture_times) == 1:
+        return next(iter(fixture_times))
     if external:
         return chronology.parse_utc(external.get('event_date'))
     if (bet.get('phase') == 'live' and type(bet.get('minute')) is int
-            and 0 <= bet['minute'] <= 120 and provenance_ok(bet)):
+            and 0 <= bet['minute'] <= 120 and not any(bet.get(flag) for flag in ('had_ft_at_first_sight', 'edited_at_first_sight', 'burst'))):
         # An original in-play message bounds the latest possible start time.
-        return chronology.signal_time(bet)
+        sent = chronology.signal_time(bet)
+        return sent - timedelta(minutes=max(0, bet['minute'] - 1)) if sent is not None else None
     return None
 
 
@@ -286,22 +293,26 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         mid = b['match_id']
         ext = (bsd or {}).get(mid)
         ext = ext if mid not in ambiguous and external_matches(b, ext) else None
-        kickoff = settlement_kickoff(b, ext)
+        det = (details or {}).get(mid) if mid not in ambiguous else None
+        kickoff = settlement_kickoff(b, ext or (det if external_matches(b, det) else None),
+                                     {parts[0] for parts in fixtures[mid] if parts[0] is not None})
         observed = opportunity_results.utc
         embedded = (chronology.get('telegram') or {}).get(mid, ()) if mid not in ambiguous else ()
         proof = opportunity_results.resolve(embedded, kickoff=kickoff, as_of=now)
         f, source, known = proof.score, 'bot_message', proof.available_at
+        raw = proof.observed_at
         first_seen, conflict = proof.first_available_at, proof.conflict
         if not f and not conflict and mid not in ambiguous:
             notes_for_bet = [row for row in note_versions[mid] if row.kickoff == kickoff]
             note = opportunity_results.resolve(notes_for_bet, kickoff=kickoff, as_of=now)
             f, source, known = note.score, 'bot_full_time_note', note.available_at
+            raw = note.observed_at
             first_seen, conflict = note.first_available_at, note.conflict
         if not f and not conflict and mid not in ambiguous and not embedded:
             legacy = opportunity_results.score_pair(ft.get(mid))
             legacy_stamp = observed((chronology.get('ft') or {}).get(mid))
             if legacy and opportunity_results.ft_time_valid(kickoff, legacy_stamp, legacy_stamp, None, now):
-                f, source, known, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp
+                f, source, known, raw, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp, legacy_stamp
         from_bsd = False
         if ext:
             stamp = observed(ext.get('available_at') or ext.get('known_utc') or ext.get('matched_at_utc'))
@@ -310,7 +321,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             if score and opportunity_results.ft_time_valid(kickoff, seen, stamp, None, now):
                 first_seen = min(first_seen, stamp) if first_seen is not None else stamp
                 if not f and not conflict:
-                    f, source, known, from_bsd = score, ext.get('provider', 'BSD'), stamp, True
+                    f, source, known, raw, from_bsd = score, ext.get('provider', 'BSD'), stamp, seen, True
         f = list(f) if f is not None else None
         b['ft'], b['w'], b['settled_by'] = f, None, None
         b['result_known_utc'], b['result_known_source'] = None, None
@@ -318,10 +329,9 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         b['match_result_first_seen_utc'] = first_seen.isoformat() if first_seen is not None else None
         b['result_quarantined'] = conflict
         b['result_quarantined_utc'] = known.isoformat() if conflict and known is not None else None
-        known = b['result_available_utc']
+        known = raw.isoformat() if raw is not None and f else None
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
-        det = (details or {}).get(mid) if mid not in ambiguous else None
         fetched = observed(det.get('fetched_at_utc')) if det else None
         if not (not conflict and det and det.get('consistent') and (external_matches(b, det) or
                 (ext and ext.get('provider') == 'HL' and ext.get('bsd_id') == det.get('hl_id') and ext.get('bsd_id') is not None))
@@ -634,30 +644,12 @@ def operational_evidence(signals, now=None):
             'regime': insights.regime(rows)}
 
 
-def publish_ledger_state(validation, ledger, ledger_path, registry, now, register):
-    """Seleções em tempo real e coerência do que se publica (revisões #5911603577 e #5912303516, P2-J).
-
-    A avaliação (certificados, estados) usa o registo tal como estava (`evaluated_*`). Com register=True e registo ativo,
-    válido e provado, as candidatas são acrescentadas uma só vez (rank, α e início fixos) e gravadas. Depois, o bloco
-    `validation` passa a descrever o registo GRAVADO — `ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro publicado
-    no mesmo commit — e `newly_selected` lista o que este relatório acrescentou; essas deixam de constar de `candidates`.
-    O cérebro não é reexecutado: as novas seleções só contam (sem jogos ainda) a partir da avaliação seguinte.
-    """
+def ledger_summary(validation):
+    """Describe the externally witnessed prefix evaluated by this report."""
     validation['evaluated_ledger_head_sha256'] = validation.get('ledger_head_sha256')
     validation['evaluated_ledger_entries'] = validation.get('ledger_entries', 0)
     validation['newly_selected'] = []
-    if register and validation['ledger_valid'] and validation['candidates']:
-        n = certification.append(ledger, validation['candidates'], registry, now)
-        if n:
-            certification.save(ledger_path, ledger)
-            validation['newly_selected'] = [{k: e[k] for k in ('rank', 'id', 'alpha', 'selected_utc')} for e in ledger['entries'][-n:]]
-            chosen = {e['id'] for e in validation['newly_selected']}
-            validation['candidates'] = [c for c in validation['candidates'] if c not in chosen]
-    if validation['ledger_valid']:
-        validation['ledger_head_sha256'] = certification.head(ledger)
-        validation['ledger_entries'] = len(ledger['entries'])
-    validation['candidates_meaning'] = ('promising certifiable hypotheses not yet in the ledger; a report with register=True '
-                                        'registers them (see newly_selected)')
+    validation['candidates_meaning'] = 'promising hypotheses awaiting an independently witnessed selection'
 
 
 def research_bets(signals, observations, now, *, bindings=None):
@@ -683,7 +675,7 @@ def research_bets(signals, observations, now, *, bindings=None):
         yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
-def build(csv_path=None, register=False, now=None, *, as_of=None):
+def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
     chron = {}
@@ -776,18 +768,19 @@ def build(csv_path=None, register=False, now=None, *, as_of=None):
     registry = brain.load_registry(reg_path)
     if register and brain.update_registry(signals, registry, now=now):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    LAST['signals'] = [b for b in signals if eligible(b)]
+    captured = LAST if capture is None else capture
+    captured['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
                                 not_covered=not_covered, chronology=chron, group_aliases=False, now=now)
     research = list(research_bets(research_input, observations, now, bindings=bindings))
-    LAST['research_signals'] = [b for b in research if eligible(b)]
+    captured['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
     brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now)
-    publish_ledger_state(brn['validation'], ledger, ledger_path, registry, now, False)
+    ledger_summary(brn['validation'])
     llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}

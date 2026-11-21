@@ -116,11 +116,10 @@ def registry_history(root, ref, rel=REGISTRY_FILE):
 
 
 def protocol_proof(root, commit, published=None, evidence=None, *, receipts=None, as_of=None):
-    """-> (P, problemas). P = max(hora do commit que introduziu o protocolo, primeira publicação verificável no GitHub).
+    """Return the signed time of the exact v5 protocol revision visible at the cutoff.
 
-    Exige o conteúdo fixado em PROTOCOL_SHA256. `published` é a hora registada pelo servidor GitHub (execução de Actions ou pull
-    request que contém o commit) e `evidence` a ligação para esse registo, confirmada pela auditoria independente (P2-C).
-    Sem publicação comprovada, ou com uma hora anterior ao commit (impossível), a avaliação fica não verificada."""
+    The legacy arguments `published` and `evidence` cannot establish chronology.
+    """
     try:
         sha = _git(root, 'rev-parse', '--verify', '%s^{commit}' % commit).decode().strip()
         body = _git(root, 'show', '%s:%s' % (sha, PROTOCOL_FILE))

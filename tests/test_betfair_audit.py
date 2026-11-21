@@ -5,11 +5,11 @@ from scangoal.betfair_audit import evidence_candidates,factual_settle,historical
 from scangoal.parser import selection_1x2, settle
 
 NOW=datetime(2026,11,17,18,tzinfo=timezone.utc)
-TARGET={'g':{'teams':['Alpha','Beta'],'date_utc':'2026-11-16T17:00:00+00:00','kickoff_utc':'2026-11-16T18:00:00+00:00'}}
+TARGET={'g':{'teams':['Alpha','Beta'],'league':'Example Cup','date_utc':'2026-11-16T17:00:00+00:00','kickoff_utc':'2026-11-16T18:00:00+00:00'}}
 
 class BetfairAudit(unittest.TestCase):
     def ev(self,i=1,**changes):
-        return dict(dict(id=i,home_team='Alpha',away_team='Beta',event_date='2026-11-16T18:00:00Z',status='finished',home_score=2,away_score=1),**changes)
+        return dict(dict(id=i,home_team='Alpha',away_team='Beta',league='Example Cup',event_date='2026-11-16T18:00:00Z',status='finished',home_score=2,away_score=1),**changes)
     def envelope(self,events,**changes):
         return dict(dict(provider='bsd',observed_utc=NOW.isoformat(),payload={'results':events}),**changes)
     def test_exact_identity_and_provenance(self):
@@ -39,7 +39,7 @@ class BetfairAudit(unittest.TestCase):
             found,q=evidence_candidates(TARGET,[self.envelope([self.ev(status=status)])],NOW)
             self.assertFalse(found);self.assertTrue(q)
     def test_highlightly_regular_vs_extra_time(self):
-        ev={'id':11,'homeTeam':{'name':'Alpha'},'awayTeam':{'name':'Beta'},'date':'2026-11-16T18:00:00Z','state':{'description':'Finished','score':{'current':'2 - 1'}}}
+        ev={'id':11,'homeTeam':{'name':'Alpha'},'awayTeam':{'name':'Beta'},'league':{'name':'Example Cup'},'date':'2026-11-16T18:00:00Z','state':{'description':'Finished','score':{'current':'2 - 1'}}}
         e={'provider':'hl','observed_utc':NOW.isoformat(),'payload':{'data':[ev]}}
         self.assertIn('g',evidence_candidates(TARGET,[e],NOW)[0])
         ev['state']['description']='Finished after penalties'

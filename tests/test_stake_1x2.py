@@ -41,8 +41,9 @@ class Stake1X2(unittest.TestCase):
     def test_unknown_1x2_never_falls_back_to_bot_mark(self):
         from scangoal import report
         m=dict(type='STAKE_LOAD',phase='pre',bet=True,odds=2.,market='1X2',selection='Unknown',match_id='g',
-               message_id=1,date_utc='2026-11-17T12:00:00+00:00',collected_at_utc='2026-11-17T12:00:01+00:00',teams=['Alpha','Beta'])
+               message_id=1,date_utc='2026-11-17T12:00:00+00:00',kickoff_utc='2026-11-17T13:00:00+00:00',collected_at_utc='2026-11-17T12:00:01+00:00',teams=['Alpha','Beta'])
         for mark in (True,False):
-            bet=report.build_bets([m],{'g':[2,0]},{report.key_of(m):mark},strict=False)[0]
+            bet=report.build_bets([m],{'g':[2,0]},{report.key_of(m):mark},strict=False,
+                                  chronology={'ft': {'g': '2026-11-17T16:00:00+00:00'}})[0]
             self.assertIsNone(bet['w'])
             self.assertEqual(bet['ft'],[2,0])

@@ -150,7 +150,7 @@ def evaluation_window(protocol, activation_utc, now):
         raise ValueError("Invalid prospective audit clock")
     cutoff = max(born, activated) if activated is not None else None
     if cutoff is not None and as_of < cutoff:
-        raise ValueError("Audit precedes activation")
+        return born, None, None, as_of
     return born, activated, cutoff, as_of
 
 

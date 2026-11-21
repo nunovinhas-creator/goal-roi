@@ -14,10 +14,10 @@ class ProviderHistory(unittest.TestCase):
     def test_two_versions_in_one_batch_are_both_saved(self):
         kickoff = evidence.utc('2026-11-19T18:00:00Z')
         stamp = evidence.utc('2026-11-19T20:00:00Z')
-        stored = {"ft": [2, 1], "bsd_id": 42, "home": "Alpha", "away": "Beta",
+        stored = {"ft": [2, 1], "bsd_id": 42, "home": "Alpha", "away": "Beta", "league": "Cup",
                   "event_date": "2026-11-19T18:00+00:00"}
         event = {"id": 42, "status": "finished", "event_date": stored["event_date"],
-                 "home_team": "Alpha", "away_team": "Beta", "away_score": 1}
+                 "home_team": "Alpha", "away_team": "Beta", "away_score": 1, "league": "Cup"}
         state = {'results': {}}
         results_bsd.capture_result_versions(state, {'match': stored},
                                             [dict(event, home_score=v) for v in (2, 1)], stamp)

@@ -59,7 +59,7 @@ def world(llm_outcomes, ctrl_outcomes, *, days=21, n_llm=10, n_ctrl=10, llm_odds
 def run(signals, registry, *, as_of=None, problems=(), born=None, protocol=P):
     as_of = as_of or T0 + timedelta(days=40)   # depois de C: a avaliação confirmatória (relógio fixado em C)
     born_eff = born or {hid: brain.chronology.born(h) for hid, h in registry.items()}
-    return llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born_eff, protocol_time=protocol, problems=list(problems))
+    return llm_eval._evaluate(signals, registry, as_of=as_of, born_eff=born_eff, protocol_time=protocol, problems=list(problems))
 
 
 FAST = dict(BOOT_REPLICATES=99)
@@ -113,8 +113,8 @@ class Leakage(unittest.TestCase):
         born['Jogo aberto | Liga = A1'] = T0 + timedelta(days=99)
         with patch.multiple(llm_eval, **FAST):
             res = run(signals, registry, born=born)
-        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 1, 'unavailable_at_decision': 0})
-        self.assertEqual((res['population']['evaluated'], res['population']['llm_hypotheses']), (1, 2))   # a futura não existe para a avaliação
+        self.assertEqual(res['population']['excluded'], {'no_proven_birth': 0, 'unavailable_at_decision': 0})
+        self.assertEqual((res['population']['evaluated'], res['population']['llm_hypotheses']), (1, 1))   # os registos futuros ou sem hora não existem neste corte
 
     def test_late_earlier_signal_cannot_define_candidate_or_control(self):
         dimension = 'Sinal anterior de outro tipo no mesmo jogo'
@@ -447,7 +447,7 @@ class GitProofs(GitRepo):
         sha = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8'), '2026-11-20T10:00:00+00:00')
         later = self.commit('x.txt', 'x', '2026-11-20T11:00:00+00:00')
         ev = 'https://github.com/o/r/actions/runs/1'
-        self.assertEqual(llm_eval.protocol_proof(self.root, sha, '2026-11-20T10:30:00+00:00', ev), (T0 + timedelta(hours=10, minutes=30), []))
+        self.assertIsNone(llm_eval.protocol_proof(self.root, sha, '2026-11-20T10:30:00+00:00', ev)[0])
         self.assertIn('protocol commit is not the one that introduced the file', llm_eval.protocol_proof(self.root, later, '2026-11-20T12:00:00+00:00', ev)[1])
         edited = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8') + '\nalterado\n', '2026-11-20T12:00:00+00:00')
         self.assertIn('protocol content differs from the registered one', llm_eval.protocol_proof(self.root, edited, '2026-11-20T13:00:00+00:00', ev)[1])
@@ -457,13 +457,11 @@ class GitProofs(GitRepo):
         real = (Path(__file__).resolve().parents[1] / llm_eval.PROTOCOL_FILE).read_bytes()
         sha = self.commit(llm_eval.PROTOCOL_FILE, real.decode('utf-8'), '2026-11-20T10:00:00+00:00')
         ev = 'https://github.com/o/r/actions/runs/1'
-        # hora do commit escrita pelo autor: sozinha não prova nada
-        self.assertEqual(llm_eval.protocol_proof(self.root, sha), (T0 + timedelta(hours=10), ['protocol publication not proven']))
-        self.assertIn('protocol publication not proven', llm_eval.protocol_proof(self.root, sha, '2026-11-20T11:00:00+00:00', None)[1])
-        self.assertIn('protocol publication not proven', llm_eval.protocol_proof(self.root, sha, '2026-11-20T11:00:00+00:00', 'https://exemplo.pt/x')[1])
-        self.assertIn('protocol publication before its commit', llm_eval.protocol_proof(self.root, sha, '2026-11-20T09:00:00+00:00', ev)[1])
-        # commit com data recuada, publicação real 3 dias depois: P é a publicação
-        self.assertEqual(llm_eval.protocol_proof(self.root, sha, '2026-11-23T10:00:00+00:00', ev), (T0 + timedelta(days=3, hours=10), []))
+        for declared_at, url in ((None, None), ('2026-11-20T09:00:00+00:00', ev),
+                                 ('2026-11-23T10:00:00+00:00', ev)):
+            at, problems = llm_eval.protocol_proof(self.root, sha, declared_at, url)
+            self.assertIsNone(at)
+            self.assertIn('protocol publication not proven by an independent receipt', problems)
         # os protocolos v1 (9f7b2aa) e v2 (25cd2d2) ficam no repositório mas deixaram de ser aceites
         for old in ('audits/pr4-llm-protocol.md', 'audits/pr4-llm-protocol-v2.md'):
             text = (Path(__file__).resolve().parents[1] / old).read_bytes()
