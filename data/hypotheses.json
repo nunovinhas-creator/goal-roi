@@ -107304,6 +107304,39 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Competição = liga & Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado": {
+  "born_utc": "2026-11-21T14:53:58.312521+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Mercado",
+    "outro mercado"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Polymarket",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.1-8b-instruct-fast",
+  "provenance": {
+   "prompt_sha256": "6a0366a5179fcb7c1caee378e27414a40c485bfc6742600898b098741fd04366",
+   "registry_size": 11496,
+   "report_generated_at_utc": "2026-11-21T14:52:52+00:00",
+   "response_sha256": "eded1997eaed112c1fe94f4846150868d8f32b6dde3f0c5f8f526e4b285e19f7"
+  },
+  "reason": "liga de dia de semana com odd baixa e mercado diversificado",
+  "source": "llm"
+ },
  "Polymarket | Competição = liga & Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00": {
   "born_utc": "2026-11-20T05:07:02+00:00",
   "conditions": [
@@ -170989,6 +171022,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma": {
+  "born_utc": "2026-11-21T14:53:58.312521+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Stake",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.1-8b-instruct-fast",
+  "provenance": {
+   "prompt_sha256": "6a0366a5179fcb7c1caee378e27414a40c485bfc6742600898b098741fd04366",
+   "registry_size": 11496,
+   "report_generated_at_utc": "2026-11-21T14:52:52+00:00",
+   "response_sha256": "eded1997eaed112c1fe94f4846150868d8f32b6dde3f0c5f8f526e4b285e19f7"
+  },
+  "reason": "aposta de dia de semana com odd média e hora de noite",
+  "source": "llm"
  },
  "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = tarde": {
   "born_utc": "2026-11-19T15:27:55+00:00",
