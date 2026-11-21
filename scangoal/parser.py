@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta, timezone
 
 HEAD = re.compile(r'^(💷|💸|🔥|⏳|🎯|🟥|🏁 Full time|⭐|🎁|✅ Pro|Pro status)')
-URL = re.compile(r'https://scangoal\.com/match/(\S+?)\?')
+URL = re.compile(r'https://scangoal\.com/match/([A-Za-z0-9_-]+)(?=$|[/?#\s)\]>])')
 FT = re.compile(r'🏁 FT (\d+):(\d+)(?: · .+? (✅|❌))?')
 SERVICE = re.compile(r'^(⭐|🎁|✅ Pro|Pro status)')
 KICKOFF = re.compile(r'(\d{1,2}) ([a-z]{3}) (\d{4}) (\d{2}):(\d{2})')

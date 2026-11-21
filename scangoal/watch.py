@@ -3,7 +3,7 @@
 Para que os alertas de sinais ao vivo cheguem em cerca de 2 minutos em vez de 10. Só leitura, como o reader.
 - Uma só ligação ao Telegram por execução, mantida aberta entre leituras (não entra e sai a cada leitura).
 - Cada leitura pede só as últimas FAST_RECENT mensagens; a recolha completa (reader) continua a reler as 400.
-- Atualiza o relatório quando há mensagens novas ou depois de uma ronda sem alterações.
+- Quando há mensagens novas, refaz o relatório e envia os avisos. Sem novidades, não faz nada.
 - Nunca falha a execução: perante um erro (incluindo um pedido do Telegram para esperar) pára de ler e limita-se a
   aguardar o resto do tempo, para a cadência das recolhas não mudar. Duas leituras falhadas seguidas: pára.
 - Só depois de aguardar o tempo todo: código de saída FAILED_EXIT se parou por falhas seguidas, se não arrancou, ou se o
@@ -30,7 +30,21 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
     problems (lista, opcional): recebe 'reads_stopped' e/ou 'report_failed' para o código de saída."""
     total, every = WATCH_SECONDS if total is None else total, INTERVAL if every is None else every
     start, done, fails, k = clock(), 0, 0, 1
-    refreshed = False
+    refreshed = pending = False
+    failures = 0
+
+    def update():
+        nonlocal refreshed, pending, failures
+        try:
+            on_new()
+        except Exception as exc:
+            pending = True
+            failures += 1
+            print('WATCH_REPORT_FAILED', type(exc).__name__)
+        else:
+            refreshed, pending, failures = True, False, 0
+            print('WATCH_REPORT_COMPLETED')
+
     while k * every <= total and fails < 2:
         wait = start + k * every - clock()
         if wait > 0:
@@ -43,29 +57,22 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
             print('WATCH_READ_FAILED', type(exc).__name__)
             continue
         fails, done = 0, done + 1
-        if added:
-            refreshed = True
-            try:
-                on_new()
-            except Exception as exc:
-                print('WATCH_REPORT_FAILED', type(exc).__name__)
-                if problems is not None:
-                    problems.append('report_failed')
+        if (added or pending) and failures < 2:
+            update()
     if fails >= 2 and problems is not None:
         problems.append('reads_stopped')
-    if done and not refreshed:
-        try:
-            on_new()
-        except Exception as exc:
-            print('WATCH_REPORT_FAILED', type(exc).__name__)
-            if problems is not None:
-                problems.append('report_failed')
+    if done and (not refreshed or pending) and failures < 2:
+        update()
+    if pending and problems is not None:
+        problems.append('report_failed')
     return done
 
 
-def refresh():
+def refresh(publisher=None):
     """Relatório e avisos, como os passos da recolha completa."""
-    from . import notify, report
+    from . import notify, report, stake_alerts
+    if publisher is not None:
+        publisher.resume()
     docs = pathlib.Path('docs')
     rep = report.build(docs / 'bets.csv' if docs.is_dir() else None, register=True)
     out = data_dir() / 'report.json'
@@ -75,14 +82,22 @@ def refresh():
         temporary = target.with_suffix('.tmp')
         shutil.copyfile(out, temporary)
         temporary.replace(target)
-    notify.run_checked()          # entregas falhadas/incertas/retiradas -> WATCH_REPORT_FAILED (nunca reenvia)
-    # Se a publicação remota falhar, rounds() regista report_failed;
-    # o workflow preserva a recolha com continue-on-error e não envia o aviso.
-    from . import stake_alerts
-    stake_alerts.deliver(report.LAST.get('signals') or [])
+    if publisher is not None:
+        publisher.publish()
+    try:
+        notify.run_checked()
+        stake_alerts.deliver(report.LAST.get('signals') or [])
+    finally:
+        if publisher is not None:
+            publisher.publish()
 
 
 async def watch():
+    from .publication import Publisher
+
+    publisher = Publisher() if os.environ.get('NOTIFY_DURABLE') == 'git' else None
+    if publisher is not None:
+        publisher.resume()
     client = reader.make_client()
     state = {'entity': None}
 
@@ -102,14 +117,14 @@ async def watch():
             st = json.loads(path.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             st = {}
-        st.update(last_run_utc=now, last_fast_read_utc=now)
-        reader.write_json(path, st)
+        latest = dict(st, last_run_utc=now, last_fast_read_utc=now)
+        reader.write_collection_state(path, st, latest)
         print('WATCH_READ_OK read', len(rows), 'new_versions', added)
         return added
 
     problems = []
     try:
-        done = await rounds(read, refresh, problems=problems)
+        done = await rounds(read, lambda: refresh(publisher), problems=problems)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)

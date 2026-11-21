@@ -23,7 +23,7 @@ import hashlib, json, os, subprocess, sys, tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import chronology
+from . import chronology, scientific_receipts
 
 FILE = 'certification_ledger.json'
 METHOD = 'eprocess_online_alpha_v1'
@@ -224,6 +224,37 @@ def selections(ledger, registry):
     return {e['id']: (e['rank'], e['alpha'], chronology.parse_utc(e['selected_utc'])) for e in ledger['entries']}, []
 
 
+def witnessed_selections(ledger, registry, directory, as_of):
+    """Require a signed receipt for the genesis and each append-only ledger prefix."""
+    if as_of is None or not isinstance(ledger, dict) or not isinstance(ledger.get('entries'), list):
+        return ledger, {}, ['independent ledger receipts required'], []
+    activated = chronology.parse_utc(ledger.get('activated_utc'))
+    if activated is not None and activated > as_of:
+        return None, {}, [], []
+    visible = []
+    for entry in ledger['entries']:
+        stamp = chronology.parse_utc(entry.get('selected_utc')) if isinstance(entry, dict) else None
+        if stamp is None or stamp <= as_of:
+            visible.append(entry)
+    ledger = dict(ledger, entries=visible)
+    selected, problems = selections(ledger, registry)
+    if problems:
+        return ledger, {}, problems, []
+    prior, effective, receipts = None, {}, []
+    for length in range(len(visible) + 1):
+        start = activated if length == 0 else selected[visible[length - 1]['id']][2]
+        proof = scientific_receipts.verify(directory, 'certification-ledger', dict(ledger, entries=visible[:length]), as_of=as_of)
+        if (proof is None or not start <= proof.at <= start + timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+                or (prior is not None and proof.at <= prior)):
+            return ledger, {}, ['ledger prefix %d lacks an independent receipt in order' % length], []
+        receipts.append(proof.identifier)
+        prior = proof.at
+        if length:
+            entry = visible[length - 1]
+            effective[entry['id']] = (entry['rank'], entry['alpha'], prior)
+    return ledger, effective, [], receipts
+
+
 PROMISING = ('promissora', 'forte', 'confirmada')
 REPORT_MAX_AGE_MIN = 20
 
@@ -326,12 +357,9 @@ def main():
     if problems:
         print('CERTIFICATION_NOT_ACTIVATED', '; '.join(problems))
         sys.exit(1)
-    save(path, ledger)
-    check = verify(load(path), registry)
-    if check:
-        print('CERTIFICATION_ACTIVATION_FAILED_VERIFY', check)
-        sys.exit(1)
-    print('CERTIFICATION_ACTIVATED legacy', len(ledger['legacy']), 'head', head(ledger))
+    # A draft whose exact bytes are independently timestamped can be considered in a later cut.
+    # This command never installs an unwitnessed ledger.
+    print(json.dumps(ledger, ensure_ascii=False, sort_keys=True))
 
 
 if __name__ == '__main__':
