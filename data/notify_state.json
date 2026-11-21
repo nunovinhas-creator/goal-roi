@@ -2673,6 +2673,18 @@
    "sha256": "9607db4654179785040057704855a536aaf47d4a803846dd6e6628e6cdbe6e14",
    "state": "delivered"
   },
+  "game|id:nice-vs-paris-saint-germain-20261121|c562f6db1f78": {
+   "attempt_utc": "2026-11-21T15:26:51+00:00",
+   "chars": 215,
+   "created_utc": "2026-11-21T15:26:51+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "81e8140da1d03d34821306d60443677922fd44dabd99540df04ea17fca6ce433",
+   "state": "in_flight"
+  },
   "game|id:norwich-vs-cardiff-city-20261121|218f310dcdd5": {
    "attempt_utc": "2026-11-21T13:06:49+00:00",
    "chars": 197,
@@ -3181,13 +3193,15 @@
    "attempt_utc": "2026-11-21T15:20:52+00:00",
    "chars": 197,
    "created_utc": "2026-11-21T15:20:52+00:00",
+   "done_utc": "2026-11-21T15:20:52+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "2b20f3a6391d56d7b8e3d086906c9d8c49729a77a6956799b34913015ef42e68",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:sl-benfica-women-vs-as-roma-women-20261119|040f69de9e16": {
    "attempt_utc": "2026-11-19T20:43:36+00:00",
@@ -3905,25 +3919,25 @@
   }
  },
  "delivery_counts": {
-  "delivered": 245,
+  "delivered": 246,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T15:17:38+00:00",
+ "format_last_run_utc": "2026-11-21T15:24:52+00:00",
  "health": {
   "reference": {
    "bsd_results": 37,
-   "eligible": 1326,
+   "eligible": 1330,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 100,
-   "hypotheses": 11595,
+   "hypotheses": 11614,
    "settled_bets": 1001,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 53,
+   "statuses": 58,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T15:17:38+00:00",
+ "last_run_utc": "2026-11-21T15:24:52+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4141,7 +4155,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
-  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 25,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 27,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 26,
@@ -4682,6 +4696,9 @@
   "item|id:nice-vs-paris-saint-germain-20261121|1x2|Paris Saint Germain": {
    "at_utc": "2026-11-21T00:21:30+00:00"
   },
+  "item|id:nice-vs-paris-saint-germain-20261121|Asian Total|Over 3.5": {
+   "at_utc": "2026-11-21T15:26:51+00:00"
+  },
   "item|id:norwich-vs-cardiff-city-20261121|Half Time Total Goals|Over 0.5": {
    "at_utc": "2026-11-21T13:06:49+00:00"
   },
@@ -4927,11 +4944,16 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 557,
+ "sent_total": 558,
  "statuses": {
+  "Forma de golos | Competição = liga": "abandonada",
+  "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum & Parte do jogo = 2.ª parte": "abandonada",
+  "Forma de golos | Competição = liga & Marcador no momento = empatado": "abandonada",
   "Forma de golos | Competição = liga & Marcador no momento = empatado & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Competição = liga & Parte do jogo = 2.ª parte": "abandonada",
+  "Forma de golos | Golos até ao sinal = nenhum & Parte do jogo = 2.ª parte": "abandonada",
+  "Forma de golos | Marcador no momento = empatado & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -5351,6 +5373,7 @@
   "2026-11-21T14:49:37+00:00|Union Berlin — Leipzig|RB Leipzig",
   "2026-11-21T14:58:29+00:00|Bayer 04 Leverkusen — Paderborn|Over 1.5",
   "2026-11-21T15:03:38+00:00|Cracovia Krakow — Jagiellonia|Over 4",
-  "2026-11-21T15:18:24+00:00|SK Artis Brno — Jablonec|Over 4"
+  "2026-11-21T15:18:24+00:00|SK Artis Brno — Jablonec|Over 4",
+  "2026-11-21T15:25:27+00:00|Nice — Paris Saint Germain|Over 3.5"
  ]
 }
