@@ -42,9 +42,12 @@ def parse_utc(value):
 def _parse_utc(value):
     try:
         dt = datetime.fromisoformat(value.strip().replace('Z', '+00:00'))
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
-    return dt.astimezone(UTC) if dt.tzinfo else None
+    try:
+        return dt.astimezone(UTC) if dt.tzinfo else None
+    except OverflowError:
+        return None
 
 
 def _loose_utc(value):
@@ -128,6 +131,29 @@ def decidable(b):
 def born(h):
     """Hora de registo de uma hipótese; None se ausente ou malformada (a hipótese não sustenta decisões)."""
     return parse_utc(h.get('born_utc')) if isinstance(h, dict) else None
+
+
+def registry_at(registry, as_of):
+    return {hid: h for hid, h in registry.items() if (stamp := born(h)) is not None and stamp <= as_of}
+
+
+def snapshot_at(state, as_of):
+    """Select a previously saved telemetry snapshot by its completion time."""
+    versions = state.get('snapshots') or []
+    versions = versions if isinstance(versions, list) else []
+    visible = [(stamp, index, row) for index, row in enumerate([*versions, state]) if isinstance(row, dict)
+               and (stamp := parse_utc(row.get('last_run_utc'))) is not None and stamp <= as_of]
+    return max(visible)[2] if visible else {}
+
+
+def archive_snapshot(current, previous, *fields):
+    """Preserve the previous summary before updating a mutable state file."""
+    before = {key: value for key, value in previous.items() if key in fields or key == 'last_run_utc'}
+    after = {key: value for key, value in current.items() if key in fields or key == 'last_run_utc'}
+    versions = previous.get('snapshots', [])
+    if before != after and parse_utc(before.get('last_run_utc')) is not None and (not versions or versions[-1] != before):
+        versions = [*versions, before]
+    return dict(current, snapshots=versions)
 
 
 def iso(dt):

@@ -1,5 +1,6 @@
 """Regulation-time result observations for the prospective opportunity study."""
 
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -20,6 +21,9 @@ class Observation:
     available_at: datetime | None
     published_at: datetime | None = None
     kickoff: datetime | None = None
+    fixture_id: str | None = None
+    link: str | None = None
+    provider_record: dict | None = None
 
 
 def score_pair(score):
@@ -36,7 +40,8 @@ def utc(value):
         return None
 
 
-def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None, exact=False):
+def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None, exact=False,
+              fixture_id=None, link=None):
     """Legacy collectors stamp the start of their step. Apply its observation margin."""
     observed = utc(stamp)
     publication = utc(published)
@@ -45,9 +50,21 @@ def collected(source, record_id, score, stamp, *, period="regulation", published
         available = observed + margin if observed is not None else None
     except OverflowError:
         available = None
-    if source == "telegram" and (publication is None or available is None or publication > available):
+    if source.startswith("telegram") and (publication is None or available is None or publication > available
+                                          or (exact and publication > observed)):
         available = None
-    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication, utc(kickoff))
+    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication, utc(kickoff), fixture_id, link)
+
+
+def ft_time_valid(kickoff, observed, available, published, as_of):
+    """A regulation FT must have existed only after a provable playing interval."""
+    if None in (kickoff, observed, available, as_of):
+        return False
+    try:
+        earliest = kickoff + REGULATION_TIME
+    except OverflowError:
+        return False
+    return earliest <= observed <= available <= as_of and (published is None or earliest <= published <= available)
 
 
 @dataclass(frozen=True)
@@ -73,7 +90,6 @@ def settlement(evidence, *, kickoff, as_of, deadline):
 
 def resolve(evidence, *, kickoff, as_of):
     """Resolve each record's latest valid version visible at the evaluation cutoff."""
-    earliest_ft = kickoff + REGULATION_TIME if kickoff is not None else None
     rows = [evidence] if isinstance(evidence, dict) else evidence
     if not isinstance(rows, (list, tuple)):
         return Resolution()
@@ -83,15 +99,13 @@ def resolve(evidence, *, kickoff, as_of):
         if isinstance(row, dict):
             known = utc(row.get("known_utc"))
             score = score_pair(row.get("ft"))
-            if (known is not None and known <= as_of and (earliest_ft is None or known >= earliest_ft)
+            if (ft_time_valid(kickoff, known, known, None, as_of)
                     and (score is not None or row.get("conflict") is True)):
                 events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
             continue
-        if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
-                or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
-                or not row.observed_at <= row.available_at <= as_of
-                or (earliest_ft is not None and (row.available_at < earliest_ft
-                    or (row.published_at is not None and row.published_at < earliest_ft)))):
+        if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None
+                or (row.source.startswith("telegram") and row.published_at is None)
+                or not ft_time_valid(kickoff or row.kickoff, row.observed_at, row.available_at, row.published_at, as_of)):
             continue
         events.setdefault(row.available_at, []).append(
             ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
@@ -153,20 +167,24 @@ def settle_research_bet(bet, as_of):
 
 
 def remember_provider_results(state, matched, stamp):
-    """Keep the first snapshot and the version history alongside the current result."""
+    """Archive the score and its full provider record in the same observation."""
     for match_id, info in matched.items():
         score = score_pair(info.get("ft"))
         if score is None:
             continue
+        snapshot = deepcopy({k: v for k, v in info.items() if k != "matched_at_utc"})
+        snapshot["ft"] = list(score)
         row = {"ft": list(score), "period": info.get("period", "regulation"),
-               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date")}
+               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date"),
+               "fixture_id": match_id, "snapshot": snapshot}
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
-        if not history or any(history[-1].get(key) != value for key, value in row.items()):
-            history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
-            previous = state["results"].get(match_id)
-            if previous is not None:
-                state.setdefault("first_results", {}).setdefault(match_id, previous)
-            state["results"][match_id] = dict(info, matched_at_utc=stamp.isoformat())
+        if history and all(history[-1].get(key) == value for key, value in row.items()):
+            continue
+        history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
+        previous = state["results"].get(match_id)
+        if previous is not None:
+            state.setdefault("first_results", {}).setdefault(match_id, previous)
+        state["results"][match_id] = dict(deepcopy(snapshot), matched_at_utc=stamp.isoformat())
 
 
 def provider_observations(state, source):
@@ -177,29 +195,56 @@ def provider_observations(state, source):
     return {
         mid: [Observation(source, mid, row.get("period"), score_pair(row.get("ft")),
                           utc(row.get("observed_at")), utc(row.get("available_at")),
-                          kickoff=utc(row.get("kickoff_utc")))
-              for row in rows if isinstance(row, dict)]
+                          kickoff=utc(row.get("kickoff_utc")), fixture_id=mid,
+                          link=(row.get("snapshot") or {}).get("link"), provider_record=row.get("snapshot") or {})
+              for row in rows if isinstance(row, dict) and row.get("fixture_id", mid) == mid]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
 
 
+def _provider_record(mid, version, source, as_of):
+    score = score_pair(version.get("ft"))
+    kickoff = utc(version.get("kickoff_utc"))
+    observed, available = utc(version.get("observed_at")), utc(version.get("available_at"))
+    if (score is None or not ft_time_valid(kickoff, observed, available, None, as_of)
+            or version.get("period") != "regulation" or version.get("fixture_id", mid) != mid):
+        return None
+    snapshot = version.get("snapshot")
+    if snapshot is None:
+        # Old journals only attest these fields. The current snapshot may be a later version.
+        snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
+    if (not isinstance(snapshot, dict) or score_pair(snapshot.get("ft")) != score
+            or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
+        return None
+    return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
+                provider=snapshot.get("provider", source), observed_at=observed.isoformat(),
+                available_at=available.isoformat(), matched_at_utc=available.isoformat())
+
+
 def provider_snapshot(state, source, as_of):
-    """Project the operational provider results at the chosen cutoff."""
-    snapshots = state.get("results") or {}
-    histories = provider_observations(state, source)
-    visible = {}
-    for mid, row in snapshots.items():
-        known = utc(row.get("matched_at_utc"))
-        if mid not in histories:
-            if known is None or known <= as_of:
-                visible[mid] = row
+    """Return one complete, temporally valid provider record per fixture at the cutoff."""
+    snapshots, first = state.get("results") or {}, state.get("first_results") or {}
+    histories, visible = state.get("ft_versions") or {}, {}
+    for mid in snapshots.keys() | histories.keys() | first.keys():
+        versions = histories.get(mid, [])
+        records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
+        # The original snapshot is immutable once updates start. Only restore its own fields.
+        legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
+        if isinstance(legacy, dict):
+            stamp = legacy.get("matched_at_utc")
+            records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                                                   "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                                                   "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
+        candidates = [row for row in records if row is not None]
+        if not candidates:
             continue
-        first = (state.get("first_results") or {}).get(mid, {})
-        result = resolve(histories[mid], kickoff=utc(row.get("event_date")), as_of=as_of)
-        if result.score is not None:
-            visible[mid] = dict(row, ft=list(result.score), matched_at_utc=result.available_at.isoformat())
-        elif result.first_available_at is None and (old := utc(first.get("matched_at_utc"))) and old <= as_of:
-            visible[mid] = first
+        def order(row):
+            return utc(row["observed_at"]), utc(row["available_at"])
+        latest = max(candidates, key=order)
+        # A complete version supersedes its legacy projection at the very same observation.
+        tied = [row for row in candidates if order(row) == order(latest)]
+        if all(row == latest for row in tied):
+            visible[mid] = latest
     return visible
 
 

@@ -106,7 +106,7 @@ def opportunity_prompt(report):
             'Comparação apenas exploratória; nenhuma vantagem certificada, nenhum envio de alertas novo.']
 
 
-def opportunity_digest(now):
+def opportunity_digest(as_of):
     """Local-only reading; never loads Telegram credentials or calls Cloudflare.
 
     Fail closed if no activation, corrupt data or mismatched chronology.
@@ -122,10 +122,10 @@ def opportunity_digest(now):
             return None
         protocol = read_json(PROTOCOL, {})
         observed = {}
-        messages, _, _, _, _ = report.load(result_observations=observed)
+        messages, _, _, _, _ = report.load(result_observations=observed, as_of=as_of)
         results = sourced_results(observed, directory)
         return opportunity_ranking.build(
-            messages, results, protocol, activation_utc=activation, now=now,
+            messages, results, protocol, activation_utc=activation, as_of=as_of,
         )
     except (OSError, ValueError, TypeError, KeyError, AttributeError, IndexError, ArithmeticError):
         print('LLM_OPPORTUNITY_CONTEXT_SKIPPED')
@@ -402,6 +402,14 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
             raise ValueError('Invalid stored LLM accounting')
     else:
         state = {'last_run_utc': None, 'runs': 0, 'accepted': 0, 'rejected': 0}
+    stored = dict(state)
+
+    def save_telemetry():
+        nonlocal stored
+        stored = chronology.archive_snapshot(state, stored, 'runs', 'last_outcome', 'day', 'calls_today',
+                                             'neurons_today', 'accepted_today', 'last_mode')
+        save_state(spath, stored)
+
     last = chronology.parse_utc(state.get('last_run_utc'))
     if last is not None and started - last < timedelta(minutes=MIN_INTERVAL_MIN):
         print('LLM_SKIPPED_TOO_SOON')
@@ -415,9 +423,10 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
             or not 0 <= balance < DAILY_NEURONS):
         print('LLM_SKIPPED_DAILY_BUDGET')
         return state
-    rep = report.build(now=started)
+    rep = report.build(as_of=started)
     signals = chronology.as_of_view(report.LAST['research_signals'], started)
     registry = brain.load_registry(rpath)
+    visible_registry = chronology.registry_at(registry, started)
     vocab = vocabulary(signals)
     mode = MODES[state.get('runs', 0) % len(MODES)]
     have = [(game_identity(b), insights.family(b), set(brain.atoms(b, set()))) for b in signals]
@@ -427,7 +436,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
     outcome, good, notes, used, why = 'no_data', [], [], None, {}
     if vocab:
         digest = opportunity_digest(started)
-        prompt = build_prompt(vocab, top, len(registry), mode, weak, rep['brain'].get('track'), digest,
+        prompt = build_prompt(vocab, top, len(visible_registry), mode, weak, rep['brain'].get('track'), digest,
                               state.get('last_rejection_reasons'))
         raw = None
         outcome = 'skipped_no_affordable_model'
@@ -455,7 +464,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
             state.update(neurons_today=round(before + reserved, 1),
                          calls_today=state.get('calls_today', 0) + 1, last_run_utc=at.isoformat(),
                          last_outcome='attempt_reserved')
-            save_state(spath, state)
+            save_telemetry()
             ready = clock()
             if ready.date() != at.date() or not request_window(ready):
                 outcome = 'skipped_utc_boundary'
@@ -473,7 +482,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
             raw, usage = response if isinstance(response, tuple) and len(response) == 2 else (response, {})
             used = model
             state['neurons_today'] = round(before + measured_cost(model, usage, prompt, reserved), 1)
-            save_state(spath, state)
+            save_telemetry()
             outcome = 'ok'
             break
 
@@ -484,7 +493,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
                 if notes:
                     old = load_json(npath, [])
                     stamped = [dict(n, at_utc=accepted_at.isoformat(timespec='seconds'), model=used) for n in notes]
-                    save_state(npath, (stamped + old)[:40])
+                    save_state(npath, stamped + old)
             else:
                 parents = {h['id'] for h in top[:25] if h['id'] in registry
                            and (chronology.born(registry[h['id']]) or accepted_at) < accepted_at}
@@ -511,7 +520,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
                  last_mode=mode, last_notes=len(notes), rejected_equivalent=state.get('rejected_equivalent', 0) + why.get('equivalent', 0),
                  last_rejected_equivalent=why.get('equivalent', 0), last_rejection_reasons=why,
                  rejection_reasons=cumulative, accepted_today=state.get('accepted_today', 0) + len(good))
-    save_state(spath, state)
+    save_telemetry()
     print('LLM_OK', json.dumps({k: state[k] for k in ('last_mode', 'last_outcome', 'last_model', 'last_accepted', 'last_rejected', 'last_notes', 'neurons_today')}))
     return state
 

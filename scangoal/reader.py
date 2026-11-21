@@ -7,6 +7,8 @@ em cada execução para apanhar as edições em que o bot acrescenta o resultado
 import asyncio, json, os, sys
 from datetime import datetime, timezone
 
+from .chronology import archive_snapshot
+
 RECENT = int(os.environ.get('SCANGOAL_RECENT', '400'))
 
 
@@ -55,6 +57,10 @@ def write_json(path, value):
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(value, ensure_ascii=False) + '\n', encoding='utf-8')
     temporary.replace(path)
+
+
+def write_collection_state(path, previous, state):
+    write_json(path, archive_snapshot(state, previous, 'missing_ids'))
 
 
 def record_window(directory, previous, last_id, oldest, present, now):
@@ -133,7 +139,7 @@ async def collect():
     stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
     missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
     # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
-    write_json(path, {'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing})
+    write_collection_state(path, previous, {'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing})
     if last_id and oldest and oldest > last_id + 1:
         print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)
