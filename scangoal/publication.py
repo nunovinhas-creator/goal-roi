@@ -117,6 +117,10 @@ class Publisher:
                 self.manifest.unlink()
                 self.bundle.unlink(missing_ok=True)
         if phase == 'confirmed':
+            confirmed = saved.get('remote')
+            if (not isinstance(confirmed, str) or not re.fullmatch(r'[0-9a-f]{40,64}', confirmed)
+                    or not self.ancestor(confirmed, self.require('rev-parse', TRACKING))):
+                raise PublicationError('remote history does not contain the last confirmed publication')
             if self.manifest.exists():
                 self.manifest.unlink()
                 self.bundle.unlink(missing_ok=True)
@@ -234,9 +238,9 @@ class Publisher:
                     return
             except PublicationError:
                 remote = None
-            if pending['attempts'] >= MAX_ATTEMPTS:
+            if self.journal is None and pending['attempts'] >= MAX_ATTEMPTS:
                 break
-            pending['attempts'] += 1
+            pending['attempts'] = min(pending['attempts'] + 1, MAX_ATTEMPTS)
             self.write(pending)
             self.durable_write('persisted', pending)
             if remote is None:
