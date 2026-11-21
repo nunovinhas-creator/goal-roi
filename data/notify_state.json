@@ -1333,13 +1333,15 @@
    "attempt_utc": "2026-11-21T15:31:46+00:00",
    "chars": 188,
    "created_utc": "2026-11-21T15:31:46+00:00",
+   "done_utc": "2026-11-21T15:31:46+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "4fe67d9daa111ad8e6d90fe206fbe8a59b460ae888f8cb839d0c8943516e6819",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:chelsea-vs-leeds-20261121|f88950e89ac3": {
    "attempt_utc": "2026-11-21T03:42:03+00:00",
@@ -3385,6 +3387,18 @@
    "sha256": "812f20b4a74b288b1e87f6ee55ed7d0d611730ce32899cd7642a35c25fc84668",
    "state": "delivered"
   },
+  "game|id:tottenham-vs-ipswich-20261121|674205d2cfbe": {
+   "attempt_utc": "2026-11-21T15:35:46+00:00",
+   "chars": 206,
+   "created_utc": "2026-11-21T15:35:46+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "46b5912c399b4b181cd285e5d54c89941e5af013027df1612efde690f1620b72",
+   "state": "in_flight"
+  },
   "game|id:tromso-vs-viking-20261121|7d9d567b74da": {
    "attempt_utc": "2026-11-20T19:20:43+00:00",
    "chars": 175,
@@ -3933,17 +3947,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 247,
+  "delivered": 248,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T15:28:07+00:00",
+ "format_last_run_utc": "2026-11-21T15:33:46+00:00",
  "health": {
   "reference": {
    "bsd_results": 37,
-   "eligible": 1334,
+   "eligible": 1337,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 100,
-   "hypotheses": 11658,
+   "hypotheses": 11687,
    "settled_bets": 1003,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 58,
@@ -3951,7 +3965,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T15:28:07+00:00",
+ "last_run_utc": "2026-11-21T15:33:46+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4875,6 +4889,9 @@
   "item|id:tottenham-vs-ipswich-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T14:31:56+00:00"
   },
+  "item|id:tottenham-vs-ipswich-20261121|Half Time Total Goals|Over 1.5": {
+   "at_utc": "2026-11-21T15:35:46+00:00"
+  },
   "item|id:tromso-vs-viking-20261121|1x2|Viking": {
    "at_utc": "2026-11-20T19:20:43+00:00"
   },
@@ -4961,7 +4978,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 559,
+ "sent_total": 560,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -5392,6 +5409,7 @@
   "2026-11-21T15:03:38+00:00|Cracovia Krakow — Jagiellonia|Over 4",
   "2026-11-21T15:18:24+00:00|SK Artis Brno — Jablonec|Over 4",
   "2026-11-21T15:25:27+00:00|Nice — Paris Saint Germain|Over 3.5",
-  "2026-11-21T15:30:35+00:00|Chelsea — Leeds|Chelsea"
+  "2026-11-21T15:30:35+00:00|Chelsea — Leeds|Chelsea",
+  "2026-11-21T15:34:05+00:00|Tottenham — Ipswich|Over 1.5"
  ]
 }
