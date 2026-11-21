@@ -164,6 +164,7 @@ def settle_research_bet(bet, as_of):
                match_result_first_seen_utc=chronology.iso(result.first_available_at),
                result_quarantined=result.conflict,
                result_quarantined_utc=chronology.iso(result.available_at) if result.conflict else None,
+               first_confirmed_ft=list(result.first_score) if result.first_score is not None else None,
                first_confirmed_w=payout(result.first_score),
                first_confirmed_utc=chronology.iso(result.first_consensus_at))
     row["result_reconciliation"] = (
