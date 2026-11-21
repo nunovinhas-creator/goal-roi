@@ -54,6 +54,17 @@
   "family": "Alinhamento enfraquecido",
   "source": "gerador"
  },
+ "Betfair | Antecedência = 60 min ou menos": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "60 min ou menos"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Antecedência = mais de 60 min": {
   "born_utc": "2026-11-12T15:16:56+00:00",
   "conditions": [
@@ -4966,6 +4977,25 @@
    [
     "Momento",
     "antes do jogo"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Competição = liga & Momento = antes do jogo & Volume na seleção = menos de 10 mil $": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Volume na seleção",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Betfair",
@@ -26300,6 +26330,40 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Hora (UTC) = madrugada & Momento = durante o jogo": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Hora (UTC) = madrugada & Momento = durante o jogo & Reforço = sem reforço": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Momento",
+    "durante o jogo"
+   ],
+   [
+    "Reforço",
+    "sem reforço"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Hora (UTC) = madrugada & Reforço = sem reforço": {
   "born_utc": "2026-11-17T01:46:44+00:00",
   "conditions": [
@@ -33098,6 +33162,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Momento = antes do jogo & Quota de mercado = menos de 80 % & Seleção = equipa de fora": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Seleção",
+    "equipa de fora"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Momento = antes do jogo & Quota de mercado = menos de 80 % & Tamanho do mercado = menos de 10 mil $": {
   "born_utc": "2026-11-16T13:54:47+00:00",
   "conditions": [
@@ -33453,6 +33536,25 @@
    [
     "Seleção",
     "equipa de fora"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Momento = antes do jogo & Seleção = equipa de fora & Volume na seleção = menos de 10 mil $": {
+  "born_utc": "2026-11-21T01:13:46+00:00",
+  "conditions": [
+   [
+    "Momento",
+    "antes do jogo"
+   ],
+   [
+    "Seleção",
+    "equipa de fora"
+   ],
+   [
+    "Volume na seleção",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Betfair",
