@@ -2771,6 +2771,18 @@
    "sha256": "668e9e85731d36e18015f4330adc9f3427e63b89ba11a63ed5d9e1e4a8a2f77a",
    "state": "delivered"
   },
+  "game|id:new-england-vs-philadelphia-20261121|c6584579dc9e": {
+   "attempt_utc": "2026-11-21T18:05:49+00:00",
+   "chars": 291,
+   "created_utc": "2026-11-21T18:05:49+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "561db8e8f95bfddc8beb976767f71839089289b47e5d3c056ca04479c3a7fa62",
+   "state": "in_flight"
+  },
   "game|id:newcastle-united-vs-arsenal-20261121|2c1afd2b6532": {
    "attempt_utc": "2026-11-20T17:41:50+00:00",
    "chars": 170,
@@ -4124,13 +4136,13 @@
  "health": {
   "reference": {
    "bsd_results": 41,
-   "eligible": 1424,
+   "eligible": 1427,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 104,
-   "hypotheses": 12105,
+   "hypotheses": 12108,
    "settled_bets": 1130,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 129,
+   "statuses": 134,
    "validation_state": "not_activated"
   }
  },
@@ -4353,7 +4365,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 35,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 37,
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 33,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
@@ -4913,6 +4925,12 @@
   "item|id:nec-nijmegen-vs-psv-eindhoven-20261121|Asian Total|Under 5.5": {
    "at_utc": "2026-11-21T17:21:19+00:00"
   },
+  "item|id:new-england-vs-philadelphia-20261121|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-21T18:05:49+00:00"
+  },
+  "item|id:new-england-vs-philadelphia-20261121|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-21T18:05:49+00:00"
+  },
   "item|id:new-england-vs-philadelphia-20261121|Asian Total|Under 3": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
@@ -5211,6 +5229,7 @@
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
@@ -5226,8 +5245,10 @@
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": "promissora",
   "Polymarket | Mercado = outro mercado & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -5302,6 +5323,8 @@
   "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": "promissora",
   "Stake | Hora (UTC) = tarde": "abandonada",
   "Stake | Hora (UTC) = tarde & Mercado = outros mercados": "abandonada",
+  "Stake | Hora (UTC) = tarde & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Hora (UTC) = tarde & Momento do aviso = antes do início": "abandonada",
   "Stake | Hora (UTC) = tarde & Número de apostas = uma": "abandonada",
   "Stake | Hora (UTC) = tarde & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -5700,6 +5723,8 @@
   "2026-11-21T16:52:53+00:00|CFR Cluj — Otelul Galati|Over 5",
   "2026-11-21T17:11:46+00:00|Parma — Roma|Under 3.5",
   "2026-11-21T17:18:30+00:00|NEC Nijmegen — PSV Eindhoven|Under 5.5",
-  "2026-11-21T17:48:18+00:00|AC Savoia 1908 — Sorrento|Over 3"
+  "2026-11-21T17:48:18+00:00|AC Savoia 1908 — Sorrento|Over 3",
+  "2026-11-21T18:02:42+00:00|New England — Philadelphia|Under 2.5",
+  "2026-11-21T18:02:43+00:00|New England — Philadelphia|Over 2.5"
  ]
 }
