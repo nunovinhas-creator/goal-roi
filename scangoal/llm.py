@@ -29,7 +29,9 @@ REQUEST_TIMEOUT_SECONDS = 60
 UTC_DAY_GUARD = timedelta(minutes=5)
 CHAT_TEMPLATE_ALLOWANCE = 256
 SYSTEM_PROMPT = 'És um analista de apostas desportivas rigoroso. Respondes só com JSON válido.'
-CLAIM_WORDS = re.compile(r'\b(?:certificad[ao]s?|validad[ao]s?|rentáve(?:l|is)|lucro comprovado|vantagem comprovada)\b', re.I)
+CLAIM_WORDS = re.compile(
+    r'\b(?:certificad[ao]s?|validad[ao]s?|rentáve(?:l|is)|lucro comprovado|vantagem comprovada|'
+    r'garant\w*|certeza|ganhos? futuros?|lucros? futuros?|sure win|guarantee\w*|risk[- ]free)\b', re.I)
 UTC = timezone.utc
 _REMOTE_RESERVATION = object()
 

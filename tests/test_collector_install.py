@@ -136,7 +136,8 @@ class WorkflowInstall(unittest.TestCase):
 
     def test_external_actions_pinned_to_audited_shas_and_credentials_persisted(self):
         uses = re.findall(r'uses: ([^\s#]+)', self.text)
-        self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA])
+        self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA,
+                                'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'])
         self.assertNotIn('persist-credentials', self.text)       # default true: notify durability pushes
 
     def test_schedule_chain_and_normal_steps_unchanged(self):
@@ -151,7 +152,7 @@ class WorkflowInstall(unittest.TestCase):
         self.assertFalse([l for l in code if 'recovery' in l])   # no step runs recovery code
 
     def test_requirements_add_only_pinned_cryptography(self):
-        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==44.0.3'])
+        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==50.0.0'])
 
 
 if __name__ == '__main__':

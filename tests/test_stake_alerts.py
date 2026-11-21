@@ -1,12 +1,13 @@
 """Safety regression tests for live Stake alerts and remote-before-send deduplication."""
 import json
+import os
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from scangoal import stake_alerts
+from scangoal import notify, stake_alerts
 
 UTC = timezone.utc
 NOW = datetime(2026, 11, 19, 10, 0, tzinfo=UTC)
@@ -34,6 +35,50 @@ def initialize(path):
 
 
 class StakeAlerts(unittest.TestCase):
+    def test_both_alert_paths_honor_the_first_claim_for_a_contract(self):
+        for first in ('general', 'stake'):
+            with self.subTest(first=first), tempfile.TemporaryDirectory() as folder:
+                directory = Path(folder)
+                path = directory / stake_alerts.STATE_NAME
+                initialize(path)
+                signal = sig()
+                report = {'brain': {'watch': [dict(signal, match='A — B', reasons=[{'id': 'test', 'status': 'promissora'}])]}}
+                (directory / 'report.json').write_text(json.dumps(report))
+                notify.FileStore(directory).save_state({
+                    'hello': True, 'sent_total': 0, 'watch_sent': [], 'statuses': {},
+                    'migrations': {notify.STATUS_MIGRATION: {'at_utc': NOW.isoformat()},
+                                   notify.FORMAT_MIGRATION: {'at_utc': NOW.isoformat(), 'sent_total': 0}}
+                })
+                calls = []
+                with patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+                    def general():
+                        notify.run(lambda *_: calls.append('general'), NOW, ENV)
+
+                    def stake():
+                        stake_alerts.deliver([signal], NOW, ENV, lambda *_: calls.append('stake'), path, lambda _: True)
+
+                    ordered = (general, stake) if first == 'general' else (stake, general)
+                    for deliver in ordered:
+                        deliver()
+                self.assertEqual(calls, [first])
+
+    def test_a_signal_that_expires_during_the_git_push_never_reaches_telegram(self):
+        now = NOW
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder, stake_alerts.STATE_NAME)
+            initialize(path)
+
+            def publish(_):
+                nonlocal now
+                now += timedelta(minutes=2)
+                return True
+
+            result = stake_alerts.deliver([sig(minutes_ago=29)], NOW, ENV,
+                                          lambda *_: self.fail('expired alert sent'), path, publish, lambda: now)
+            self.assertEqual(result, [])
+            self.assertEqual(stake_alerts.load_state(path)['sent'], {})
+            self.assertIn('"event": "expired"', path.with_name(stake_alerts.LOG_NAME).read_text())
+
     def test_lines_1_6_9(self):
         m = stake_alerts.matches([sig()], NOW)
         self.assertEqual(len(m), 1)
