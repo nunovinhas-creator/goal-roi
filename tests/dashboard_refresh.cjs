@@ -251,6 +251,12 @@ async function collectionWarning(page, width, height) {
   const last = new Date(+date - 45 * 60000 + 5000);
   const A = snapshot(0);
   A.audit.collector_last_run_utc = last.toISOString();
+  // The signal stays valid across both ticks of the warning and recovery scenario.
+  A.brain.agenda.items = [{
+    match_id:'collection-warning-fixture', match:'Equipa A — Equipa B', family:'Betfair', type:'BETFAIR',
+    market:'1X2', selection:'1', odds:2, when:'por começar', phase:'pre', date_utc:date.toISOString(),
+    kickoff_utc:new Date(+date + 3600000).toISOString(), verdict:'sem evidência', validated:false, good:[], bad:[]
+  }];
   const remote = await setup(page,{report:A},true);
   await page.goto(root);
   await ready(page,A.unique_bets);
@@ -284,6 +290,7 @@ async function collectionWarning(page, width, height) {
   // The next actual polling tick recovers without navigation or manual refresh.
   const C = snapshot(0,{generated_at_utc:new Date(+date+3*60000).toISOString()});
   C.audit.collector_last_run_utc = C.generated_at_utc;
+  C.brain.agenda = A.brain.agenda;
   remote.respond({report:C});
   await page.clock.fastForward(3*60000);
   await hasText(page,'#fresh','Atualizado em');
