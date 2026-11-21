@@ -744,7 +744,8 @@ function tables(d, panel){
   }
   if((a.name_review||[]).length){const box=$('names');box.appendChild(el('p',{class:'note'},'Jogos em que o nome das equipas difere entre o bot e a fonte de resultados. Ficam em aberto até o nome ser confirmado à mão:'));
     const ul=el('ul',{class:'note'});for(const n of a.name_review)ul.appendChild(el('li',{},`${n.bot.join(' — ')} ↔ ${n.bsd_candidates.map(c=>c.join(' — ')).join(' ou ')} (${n.provider})`));box.appendChild(ul)}
-  [[a.versions,'versões de mensagens guardadas'],[d.unparsed,'mensagens em formato desconhecido'],[a.edits_changing_signal,'sinais que o bot alterou depois de publicar'],
+  const gaps=a.ingestion_gaps?.count ? [[a.ingestion_gaps.count,'lacunas de ingestão com histórico Telegram por confirmar']] : [];
+  [...gaps,[a.versions,'versões de mensagens guardadas'],[d.unparsed,'mensagens em formato desconhecido'],[a.edits_changing_signal,'sinais que o bot alterou depois de publicar'],
    [a.bot_mark_disagreements,'resultados em que a marca do bot difere das nossas contas'],[d.excluded_first_seen_with_result,'sinais lidos já com resultado (fora do saldo)'],
    [d.excluded_edited_before_seen,'sinais já editados quando foram lidos (fora do saldo)'],[d.excluded_burst,'sinais chegados em lote no mesmo segundo (fora do saldo)'],
    [a.deleted_by_bot,'mensagens que o bot apagou depois de publicar'],[a.ended_after_90,'jogos decididos depois dos 90 minutos (em aberto)'],
@@ -970,6 +971,7 @@ const reportShape = {
   min_settled:isPositive, first_signal_utc:value => value === null || isTimestamp(value),
   audit:value => hasFields(value, {
     last_collected_at_utc:collectionTime, collector_last_run_utc:optional(collectionTime),
+    ingestion_gaps:optional(value => hasFields(value, {count:isCount})),
     name_review:optional(listOf(row => hasFields(row, {bot:listOf(isText), bsd_candidates:listOf(listOf(isText))})))
   }),
   groups:recordOf(resultBlock), questions:recordOf(resultBlock), accuracy:accuracyRows,

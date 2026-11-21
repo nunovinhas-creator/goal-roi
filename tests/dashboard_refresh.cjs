@@ -573,10 +573,53 @@ async function simultaneousExposure(browser) {
   } finally { await page.close(); }
 }
 
+async function w09TimedEntries(browser) {
+  const page = await browser.newPage();
+  try {
+    const stamp = minutes => new Date(+date + minutes * 60_000).toISOString();
+    const entry = {d:stamp(-90), z:stamp(-60), o:2, w:1, t:'Caso auditado'};
+    const other = {...entry, d:stamp(-45), z:stamp(-30), t:'Restantes'};
+    const simulation = {total_bets:3, timed_settlements:3, committed_games:3, max_units_per_game:1,
+      entries:[entry, {...entry}, other]};
+    const timeline = base.timeline.map(row => ({...row, t:'Apenas no formato histórico'}));
+    const report = snapshot(1, {simulation, timeline});
+    report.audit.ingestion_gaps = {count:1};
+    const remote = await setup(page, {report});
+    await page.goto(root + '#simulador');
+    await ready(page, report.unique_bets);
+    assert.equal(await page.locator('#simtypes input[value="Caso auditado"]').count(), 1);
+    assert.equal(await page.locator('#simtypes input[value="Apenas no formato histórico"]').count(), 0);
+    await page.locator('#simtypes input[value="Restantes"]').uncheck();
+    await page.locator('#simbank').fill('100');
+    await page.locator('#simmode').selectOption('pct');
+    await page.locator('#simval').fill('100');
+    assert.equal(await page.locator('#simout dd').first().textContent(), '1');
+    assert.equal(await page.locator('#simout dd').nth(1).textContent(), euro(200));
+    await hasText(page, '#sim-exposure', '1 oportunidades sem saldo disponível');
+
+    const corrected = {...simulation, entries:[{...entry, w:-1, z:stamp(-55)}, {...entry}, other]};
+    remote.respond({report:{...report, simulation:corrected}});
+    await refresh(page);
+    assert.equal(await page.locator('#simout dd').first().textContent(), '1');
+    assert.equal(await page.locator('#simout dd').nth(1).textContent(), euro(0));
+    await hasText(page, '#sim-exposure', '1 oportunidades sem saldo disponível');
+    assert.deepEqual(remote.errors, []);
+    await go(page, 'metodologia');
+    await expand(page, 'qualidade');
+    await hasText(page, '#qc', 'lacunas de ingestão com histórico Telegram por confirmar');
+    console.log('W09 simulation.entries passed (one reserve, original and corrected payouts)');
+  } finally { await page.close(); }
+}
+
 (async () => {
   const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
     {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
   try {
+    if (process.env.GOAL_ROI_W09_TIMED_ONLY === '1') {
+      assert.ok(base.simulation?.entries.length, 'the regenerated report must contain simulation.entries');
+      await w09TimedEntries(browser);
+      return;
+    }
     const regressions = [];
     for (const [width,height] of sizes) {
       for (const check of [refreshRegression, collectionWarning]) {
@@ -590,6 +633,7 @@ async function simultaneousExposure(browser) {
     if (regressions.length) throw new AggregateError(regressions,'Dashboard audit regressions failed');
     await realReport(browser);
     await simultaneousExposure(browser);
+    await w09TimedEntries(browser);
     for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
   } finally { await browser.close(); }
