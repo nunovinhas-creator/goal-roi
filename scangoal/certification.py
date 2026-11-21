@@ -173,7 +173,7 @@ def published_versions(path):
     return versions, problems
 
 
-def history_proof(path, current, as_of=None, versions=None):
+def git_history_diagnostics(path, current, as_of=None, versions=None):
     """Diagnóstico de integridade do histórico local do Git.
 
     1. o registo foi publicado pelo menos uma vez, num repositório com histórico completo (published_versions);
@@ -252,6 +252,14 @@ def witnessed_selections(ledger, registry, directory, as_of):
             entry = visible[length - 1]
             effective[entry['id']] = (entry['rank'], entry['alpha'], prior)
     return ledger, effective, [], receipts
+
+
+def history_proof(path, current, as_of=None, versions=None):
+    """Verify ledger history against independently signed prefix receipts."""
+    cutoff = as_of if as_of is not None else datetime.now(timezone.utc)
+    directory = Path(path).parent / scientific_receipts.DIRECTORY
+    visible, _, problems, _ = witnessed_selections(current, None, directory, cutoff)
+    return problems or (['no witnessed ledger at the cutoff'] if visible is None else [])
 
 
 PROMISING = ('promissora', 'forte', 'confirmada')
