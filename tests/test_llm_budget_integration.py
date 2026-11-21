@@ -49,12 +49,14 @@ class WorkersAIBudgetIntegration(unittest.TestCase):
         self.enterContext(patch.object(llm, "opportunity_digest", return_value=None))
         self.enterContext(patch.object(llm, "MODELS", list(llm.PRICES)[:1]))
         stamp = FIRST_DAY.isoformat()
-        self.enterContext(patch.object(report, "build", return_value={"brain": {"top": []}}))
-        self.enterContext(patch.dict(report.LAST, {"research_signals": [{
-            "match_id": "offline-match", "type": "OPEN_GAME", "league": "Fixture league",
-            "odds": 2.2, "minute": 48, "date_utc": stamp, "signal_seen_utc": stamp,
-            "market": "Asian Total", "selection": "Over 2.5", "score_at_signal": [1, 0],
-        }]}))
+        def build(*, as_of, capture):
+            capture['research_signals'] = [{
+                "match_id": "offline-match", "type": "OPEN_GAME", "league": "Fixture league",
+                "odds": 2.2, "minute": 48, "date_utc": stamp, "signal_seen_utc": stamp,
+                "market": "Asian Total", "selection": "Over 2.5", "score_at_signal": [1, 0],
+            }]
+            return {"brain": {"top": []}}
+        self.enterContext(patch.object(report, "build", side_effect=build))
         self.expected = NEXT_DAY
         self.requests = []
         self.transport = self.enterContext(patch.object(llm, "urlopen", side_effect=self.send))
