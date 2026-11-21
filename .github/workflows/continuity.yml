@@ -14,6 +14,8 @@ jobs:
       actions: write
     if: >-
       github.event_name == 'workflow_run' &&
+      vars.GOAL_ROI_RECOVERY_MODE == 'active' &&
+      vars.GOAL_ROI_RECOVERY_ENABLED == 'true' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       contains(fromJSON('["failure","timed_out","startup_failure"]'), github.event.workflow_run.conclusion)
     runs-on: ubuntu-latest
