@@ -1,8 +1,10 @@
 """Bounded, recoverable publication of collected data and delivery journals."""
 
 import argparse
+import base64
 import contextlib
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -10,6 +12,8 @@ import subprocess
 import sys
 import uuid
 from pathlib import Path
+
+from . import durable_journal
 
 
 PATHS = ('data', 'docs/report.json', 'docs/bets.csv')
@@ -30,6 +34,8 @@ class Publisher:
         self.spool = Path(configured).resolve() if configured else self.root / self.require('rev-parse', '--git-path', 'goal-roi-publication')
         self.spool.mkdir(parents=True, exist_ok=True)
         self.manifest, self.bundle = self.spool / 'pending.json', self.spool / 'pending.bundle'
+        self.journal = durable_journal.configured()
+        self.revision = None
 
     def command(self, *args):
         try:
@@ -64,16 +70,67 @@ class Publisher:
             os.fsync(handle.fileno())
         temporary.replace(self.manifest)
 
-    def read(self):
+    @staticmethod
+    def validate(pending):
         try:
-            pending = json.loads(self.manifest.read_bytes())
             if (not re.fullmatch(r'[0-9a-f]{32}', pending['id'])
                     or any(not re.fullmatch(r'[0-9a-f]{40,64}', pending[k]) for k in ('tip', 'base'))
                     or type(pending['attempts']) is not int or not 0 <= pending['attempts'] <= MAX_ATTEMPTS):
                 raise ValueError
             return pending
-        except (OSError, ValueError, TypeError, KeyError):
+        except (ValueError, TypeError, KeyError):
             raise PublicationError('invalid pending publication manifest') from None
+
+    def read(self):
+        try:
+            return self.validate(json.loads(self.manifest.read_bytes()))
+        except (OSError, ValueError):
+            raise PublicationError('invalid pending publication manifest') from None
+
+    def durable_write(self, phase, pending, *, remote=None):
+        if self.journal is None:
+            return
+        value = {'phase': phase, 'pending': pending, 'remote': remote}
+        if phase != 'confirmed':
+            bundle = self.bundle.read_bytes()
+            value.update(bundle=base64.b64encode(bundle).decode('ascii'), sha256=hashlib.sha256(bundle).hexdigest())
+        self.revision = self.journal.write('publication', self.revision, value)
+
+    def restore(self):
+        if self.journal is None:
+            return
+        self.revision, saved = self.journal.read('publication')
+        if saved is None:
+            if self.manifest.exists():
+                self.durable_write('persisted', self.read())  # Migrate the pending pre-journal artifact.
+            return
+        phase = saved.get('phase')
+        pending = self.validate(saved.get('pending'))
+        if phase not in ('persisted', 'published', 'confirmed'):
+            raise PublicationError('invalid durable publication phase')
+        if self.manifest.exists():
+            local = self.read()
+            if local['id'] != pending['id']:
+                remote = self.remote()
+                if not self.require('log', '-1', '--format=%H', '--fixed-strings', '--grep=' + self.marker(local), remote):
+                    raise PublicationError('runner artifact conflicts with the durable publication journal')
+                self.manifest.unlink()
+                self.bundle.unlink(missing_ok=True)
+        if phase == 'confirmed':
+            if self.manifest.exists():
+                self.manifest.unlink()
+                self.bundle.unlink(missing_ok=True)
+            return
+        try:
+            raw = base64.b64decode(saved['bundle'], validate=True)
+            if hashlib.sha256(raw).hexdigest() != saved['sha256']:
+                raise ValueError
+        except (KeyError, TypeError, ValueError):
+            raise PublicationError('invalid durable publication bundle') from None
+        temporary = self.bundle.with_suffix('.restore')
+        temporary.write_bytes(raw)
+        temporary.replace(self.bundle)
+        self.write(pending)
 
     @staticmethod
     def marker(pending):
@@ -93,8 +150,21 @@ class Publisher:
             os.fsync(handle.fileno())
         temporary.replace(self.bundle)
         self.write(pending)
+        self.durable_write('persisted', pending)
 
-    def complete(self, pending):
+    def confirm_ingestion(self, remote):
+        if self.journal is None:
+            return
+        from .ingestion import CHECKPOINT, confirm
+
+        marker = self.command('show', remote + ':data/' + CHECKPOINT)
+        if marker.returncode == 0:
+            confirm(self.journal, json.loads(marker.stdout))
+
+    def complete(self, pending, remote):
+        self.durable_write('published', pending, remote=remote)
+        self.confirm_ingestion(remote)
+        self.durable_write('confirmed', pending, remote=remote)
         self.write(dict(pending, status='completed'))
         self.bundle.unlink(missing_ok=True)
         self.manifest.unlink(missing_ok=True)
@@ -106,7 +176,7 @@ class Publisher:
         head = self.require('rev-parse', 'HEAD')
         if head != remote and self.ancestor(head, remote) and not self.require('status', '--porcelain', '--untracked-files=no'):
             self.require('merge', '--ff-only', remote)
-        self.complete(pending)
+        self.complete(pending, remote)
         return True
 
     def remote(self):
@@ -168,13 +238,17 @@ class Publisher:
                 break
             pending['attempts'] += 1
             self.write(pending)
+            self.durable_write('persisted', pending)
             if remote is None:
                 continue
             try:
                 pending = self.prepare(pending, remote)
                 if self.command('push', '-q', 'origin', pending['tip'] + ':' + BRANCH).returncode == 0:
-                    self.complete(pending)
-                    return
+                    if self.journal is None:
+                        self.complete(pending, pending['tip'])
+                        return
+                    if self.complete_if_published(pending, self.remote()):
+                        return
             except PublicationError:
                 # A network failure is retriable without manufacturing a second transaction.
                 continue
@@ -184,16 +258,19 @@ class Publisher:
         except PublicationError:
             pass
         self.write(dict(pending, status='degraded'))
+        self.durable_write('persisted', dict(pending, status='degraded'))
         print('PUBLICATION_DEGRADED', pending['id'], 'attempts', pending['attempts'])
         raise PublicationError('data and journal publication is pending reconciliation')
 
     def resume(self):
         with self.locked():
+            self.restore()
             if self.manifest.exists():
                 self.replay(self.read())
 
     def publish(self):
         with self.locked():
+            self.restore()
             if self.manifest.exists():
                 self.replay(self.read())
             base = self.require('rev-parse', TRACKING)
@@ -201,6 +278,7 @@ class Publisher:
             self.check_paths('diff', '--cached', '--name-only', '-z')
             staged_changes = self.require('diff', '--cached', '--name-only')
             if not staged_changes and base == self.require('rev-parse', 'HEAD'):
+                self.confirm_ingestion(base)
                 return
             pending = {'id': uuid.uuid4().hex, 'base': base, 'attempts': 0, 'status': 'pending'}
             self.require('commit', '-q', '--allow-empty', '-m', 'data: collect [skip ci]', '-m', self.marker(pending))
@@ -216,7 +294,7 @@ def main():
     args = parser.parse_args()
     try:
         getattr(Publisher(), args.operation)()
-    except PublicationError as exc:
+    except (PublicationError, durable_journal.DurabilityError) as exc:
         print('PUBLICATION_FAILED', exc)
         return 3
     return 0

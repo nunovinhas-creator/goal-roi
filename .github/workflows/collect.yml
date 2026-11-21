@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 18
     env:
       GOAL_ROI_PUBLICATION_DIR: ${{ runner.temp }}/goal-roi-publication
+      GOAL_ROI_DURABLE_REQUIRED: '1'
+      GOAL_ROI_DURABLE_URL: ${{ vars.GOAL_ROI_DURABLE_URL }}
     steps:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
       - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
@@ -41,6 +43,7 @@ jobs:
         id: resume
         env:
           GH_TOKEN: ${{ github.token }}
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
         run: |
           artifact_run=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=goal-roi-publication&per_page=30" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "main")] | max_by(.id) | .workflow_run.id // empty')
           if [ -n "$artifact_run" ] && [ "$artifact_run" != "$GITHUB_RUN_ID" ]; then
@@ -51,6 +54,7 @@ jobs:
           python -u -m scangoal.publication resume
       - name: Read bot conversation (read-only)
         env:
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION: ${{ secrets.TG_SESSION }}
@@ -76,6 +80,8 @@ jobs:
       - name: Report (fixed rules)
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
       - name: Publish the report before sending notices
+        env:
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
         run: python -u -m scangoal.publication publish
       # Entrega falhada, incerta ou não publicada: código 3 (já gravada, nunca reenviada); o commit de dados continua.
       - name: Telegram notices through the user's bot (skipped without keys)
@@ -87,6 +93,8 @@ jobs:
         run: python -u -m scangoal.notify
       - name: Commit data
         if: ${{ !cancelled() && steps.resume.outcome == 'success' }}
+        env:
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
         run: python -u -m scangoal.publication publish
       # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
       # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
@@ -95,6 +103,7 @@ jobs:
         if: ${{ !cancelled() && success() && steps.resume.outcome == 'success' && github.ref_name == 'main' }}
         continue-on-error: true
         env:
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION: ${{ secrets.TG_SESSION }}
@@ -105,6 +114,8 @@ jobs:
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
       - name: Commit data from the fast reads
         if: ${{ !cancelled() && steps.fast.outcome != 'skipped' && steps.resume.outcome == 'success' }}
+        env:
+          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
         run: python -u -m scangoal.publication publish
       - name: Check for an unpublished transaction
         id: publication
