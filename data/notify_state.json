@@ -2789,13 +2789,15 @@
    "attempt_utc": "2026-11-21T19:11:08+00:00",
    "chars": 254,
    "created_utc": "2026-11-21T19:11:08+00:00",
+   "done_utc": "2026-11-21T19:11:08+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "f82cb280392eac1df8299fa1bce593c9e770b5a47ab2c1f6de8f3fb53599da1a",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:nd-dravinja-vs-ilirija-20261120|daa93fe2cc57": {
    "attempt_utc": "2026-11-20T17:21:08+00:00",
@@ -2922,6 +2924,18 @@
    "kind": "hint",
    "sha256": "f6248f1484c64de2cbbd6d163b5ba43aefedfffeca2b0d806cd44dfce7b509cb",
    "state": "delivered"
+  },
+  "game|id:newcastle-united-vs-arsenal-20261121|9cf64a7065db": {
+   "attempt_utc": "2026-11-21T19:17:08+00:00",
+   "chars": 219,
+   "created_utc": "2026-11-21T19:17:08+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "3f7e063e38b319af0233b472eb202b547758e630a32cd30288bd9828547621f2",
+   "state": "in_flight"
   },
   "game|id:newcastle-united-vs-arsenal-20261121|9e2a5ee2afc8": {
    "attempt_utc": "2026-11-21T18:07:49+00:00",
@@ -4297,17 +4311,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 273,
+  "delivered": 274,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T19:07:24+00:00",
+ "format_last_run_utc": "2026-11-21T19:15:08+00:00",
  "health": {
   "reference": {
    "bsd_results": 41,
-   "eligible": 1458,
+   "eligible": 1460,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 104,
-   "hypotheses": 12304,
+   "hypotheses": 12333,
    "settled_bets": 1154,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 148,
@@ -4315,7 +4329,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T19:07:24+00:00",
+ "last_run_utc": "2026-11-21T19:15:08+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -5132,6 +5146,9 @@
   "item|id:newcastle-united-vs-arsenal-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T16:26:15+00:00"
   },
+  "item|id:newcastle-united-vs-arsenal-20261121|Match Result|Newcastle United": {
+   "at_utc": "2026-11-21T19:17:08+00:00"
+  },
   "item|id:newcastle-united-vs-arsenal-20261121|Newcastle United Total Goals|Over 0.5": {
    "at_utc": "2026-11-21T18:07:49+00:00"
   },
@@ -5407,7 +5424,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 585,
+ "sent_total": 586,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -5418,6 +5435,7 @@
   "Forma de golos | Competição = liga & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Golos até ao sinal = nenhum & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Marcador no momento = empatado & Parte do jogo = 2.ª parte": "abandonada",
+  "Jogo aberto | Competição = liga & Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos": "abandonada",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
   "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde": "abandonada",
@@ -5429,7 +5447,6 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -5955,6 +5972,7 @@
   "2026-11-21T19:00:32+00:00|Feyenoord — Sbv Excelsior|Over 4.5",
   "2026-11-21T19:06:36+00:00|Napoli — Torino|Over 2.5",
   "2026-11-21T19:06:37+00:00|Napoli — Torino|Under 2.5",
-  "2026-11-21T19:08:31+00:00|Schalke — Stuttgart|Over 0.5"
+  "2026-11-21T19:08:31+00:00|Schalke — Stuttgart|Over 0.5",
+  "2026-11-21T19:15:14+00:00|Newcastle United — Arsenal|Newcastle United"
  ]
 }
