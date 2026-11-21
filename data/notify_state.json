@@ -1305,13 +1305,15 @@
    "attempt_utc": "2026-11-21T12:55:33+00:00",
    "chars": 196,
    "created_utc": "2026-11-21T12:55:33+00:00",
+   "done_utc": "2026-11-21T12:55:33+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "af027a8adafdecfc6d315597088ae16e4a56b499ff5cf4f47405bf1964bc44aa",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:club-atletico-pulpileno-vs-deportivo-maritimo-20261118|b577057ebe10": {
    "attempt_utc": "2026-11-18T20:13:25+00:00",
@@ -2518,12 +2520,16 @@
    "state": "delivered"
   },
   "game|id:parma-women-vs-napoli-women-20261121|7eeb216f5dc1": {
+   "attempt_utc": "2026-11-21T12:55:33+00:00",
+   "chars": 201,
    "created_utc": "2026-11-21T12:55:33+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "f35e40730b3d50a0d72aae7c5c0af2e8b1ac18d428b8ab95cfc22a4d36d02bad",
+   "state": "in_flight"
   },
   "game|id:persipa-pati-vs-persiba-bantul-20261117|d3a9db26abfc": {
    "attempt_utc": "2026-11-17T09:54:01+00:00",
@@ -3549,7 +3555,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 219,
+  "delivered": 220,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-21T12:52:31+00:00",
@@ -3761,7 +3767,7 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": 31,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 44,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": 34,
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 29,
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 30,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 54,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 83,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
@@ -4295,6 +4301,9 @@
   "item|id:parma-vs-roma-20261121|Asian Total|Over 3": {
    "at_utc": "2026-11-21T05:15:41+00:00"
   },
+  "item|id:parma-women-vs-napoli-women-20261121|Asian Total|Over 3": {
+   "at_utc": "2026-11-21T12:55:33+00:00"
+  },
   "item|id:persipa-pati-vs-persiba-bantul-20261117|Asian Total|Over 4.75": {
    "at_utc": "2026-11-17T09:54:01+00:00"
   },
@@ -4495,7 +4504,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 531,
+ "sent_total": 532,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -4891,6 +4900,7 @@
   "2026-11-21T12:31:49+00:00|Wolfsburg — Holstein Kiel|Over 0.5",
   "2026-11-21T12:40:34+00:00|Manchester City — Fulham|Yes",
   "2026-11-21T12:46:09+00:00|Manchester City — Fulham|Over 2.5",
+  "2026-11-21T12:53:09+00:00|Parma Women — Napoli Women|Over 3",
   "2026-11-21T12:53:27+00:00|Chonburi — Uthai Thani|Over 3.75",
   "2026-11-21T12:53:38+00:00|Kayserispor — Sariyer|Kayserispor"
  ]
