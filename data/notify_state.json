@@ -867,6 +867,14 @@
    "sha256": "143f3937ab94ec7eee417294d9fb9580e2d4f3584f2db558933b018e3f863153",
    "state": "delivered"
   },
+  "game|id:bayer-04-leverkusen-vs-paderborn-20261121|6f54472c93ed": {
+   "created_utc": "2026-11-21T14:15:23+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
+  },
   "game|id:bayern-munchen-vs-cologne-20261120|0a1ebe907b98": {
    "attempt_utc": "2026-11-20T19:08:17+00:00",
    "chars": 211,
@@ -2225,6 +2233,14 @@
    "sha256": "56d08497b68911881fa79115f575e1ae4dbd1c516fd096716f1370c5d843ebc1",
    "state": "delivered"
   },
+  "game|id:kocaeli-birlik-spor-vs-fenerbahce-20261121|fe46b8f4d488": {
+   "created_utc": "2026-11-21T14:15:23+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
+  },
   "game|id:kyrgyzstan-vs-vietnam-20261117|12fa94e8316a": {
    "attempt_utc": "2026-11-17T12:58:31+00:00",
    "chars": 142,
@@ -2322,6 +2338,18 @@
    "kind": "hint",
    "sha256": "bac572f6a538b7eede3c5fb78e5c9c771888e61547ab4a65d96f1b2e39c76393",
    "state": "delivered"
+  },
+  "game|id:manchester-city-vs-fulham-20261121|6a89bcc19d44": {
+   "attempt_utc": "2026-11-21T14:15:23+00:00",
+   "chars": 212,
+   "created_utc": "2026-11-21T14:15:23+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "e6623a83f25782a93da1deae0b032afaf8a9901b526481232b3d06d5c67f86a7",
+   "state": "in_flight"
   },
   "game|id:manchester-city-vs-fulham-20261121|938dfb6fc3d9": {
    "attempt_utc": "2026-11-21T12:47:14+00:00",
@@ -3714,14 +3742,14 @@
   "delivered": 232,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T14:10:01+00:00",
+ "format_last_run_utc": "2026-11-21T14:13:23+00:00",
  "health": {
   "reference": {
    "bsd_results": 37,
-   "eligible": 1282,
+   "eligible": 1284,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 99,
-   "hypotheses": 11361,
+   "hypotheses": 11380,
    "settled_bets": 949,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 48,
@@ -3729,7 +3757,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T14:10:01+00:00",
+ "last_run_utc": "2026-11-21T14:13:23+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -3947,6 +3975,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 25,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 26,
@@ -4412,6 +4441,9 @@
   "item|id:manchester-city-vs-fulham-20261121|Asian Total|Over 3.5": {
    "at_utc": "2026-11-20T18:27:33+00:00"
   },
+  "item|id:manchester-city-vs-fulham-20261121|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-21T14:15:23+00:00"
+  },
   "item|id:manchester-city-vs-fulham-20261121|Both Teams To Score|Yes": {
    "at_utc": "2026-11-21T12:41:43+00:00"
   },
@@ -4690,6 +4722,7 @@
  "sent_total": 544,
  "statuses": {
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": "promissora",
@@ -4698,7 +4731,6 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Polymarket | Competição = liga & Momento = antes do jogo": "abandonada",
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00": "abandonada",
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -4708,7 +4740,6 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": "abandonada",
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
@@ -4719,6 +4750,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": "promissora",
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
@@ -5091,6 +5123,7 @@
   "2026-11-21T13:38:43+00:00|Sabadell — Granada|Over 1.5",
   "2026-11-21T13:44:10+00:00|Amedspor — Caykur Rizespor|Amed Sportif Faaliyetler",
   "2026-11-21T13:52:08+00:00|Newport — Swindon|Over 3",
-  "2026-11-21T14:08:21+00:00|Como — Cagliari|Yes"
+  "2026-11-21T14:08:21+00:00|Como — Cagliari|Yes",
+  "2026-11-21T14:12:24+00:00|Manchester City — Fulham|Under 2.5"
  ]
 }
