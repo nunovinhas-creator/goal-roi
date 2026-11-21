@@ -584,7 +584,7 @@ def counterexamples_fourth(fourth_brain):
         run('add', '-A')
         run('commit', '-q', '-m', 'ledger', when=act + timedelta(hours=1, minutes=5))
         certification.save(data / certification.FILE, rewritten)
-        proof = certification.history_proof(data / certification.FILE, rewritten)
+        proof = certification.git_history_diagnostics(data / certification.FILE, rewritten)
     old = fourth_brain.build(games, reg, 300, rewritten)['validation']
     new_unproven = brain.build(games, reg, 300, rewritten)['validation']
     new = brain.build(games, reg, 300, rewritten, history_problems=proof)['validation']
