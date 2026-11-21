@@ -2786,12 +2786,16 @@
    "state": "delivered"
   },
   "game|id:napoli-vs-torino-20261121|0ad6e9c2e258": {
+   "attempt_utc": "2026-11-21T19:11:08+00:00",
+   "chars": 254,
    "created_utc": "2026-11-21T19:11:08+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "f82cb280392eac1df8299fa1bce593c9e770b5a47ab2c1f6de8f3fb53599da1a",
+   "state": "in_flight"
   },
   "game|id:nd-dravinja-vs-ilirija-20261120|daa93fe2cc57": {
    "attempt_utc": "2026-11-20T17:21:08+00:00",
@@ -3427,13 +3431,15 @@
    "attempt_utc": "2026-11-21T19:11:08+00:00",
    "chars": 181,
    "created_utc": "2026-11-21T19:11:08+00:00",
+   "done_utc": "2026-11-21T19:11:08+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "7e45e880f79e2d94b38ce3cc53c12fc86183616c040e2e611d21571aeaade254",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:seattle-sounders-vs-salt-lake-20261120|0b540b418451": {
    "attempt_utc": "2026-11-20T02:58:18+00:00",
@@ -4291,7 +4297,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 272,
+  "delivered": 273,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-21T19:07:24+00:00",
@@ -4527,7 +4533,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 37,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 39,
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 33,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
@@ -5093,6 +5099,12 @@
   "item|id:mustaqbal-sport-vs-al-qanater-20261118|Asian Total|Over 4": {
    "at_utc": "2026-11-18T13:57:17+00:00"
   },
+  "item|id:napoli-vs-torino-20261121|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-21T19:11:08+00:00"
+  },
+  "item|id:napoli-vs-torino-20261121|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-21T19:11:08+00:00"
+  },
   "item|id:nd-dravinja-vs-ilirija-20261120|Asian Total|Over 4": {
    "at_utc": "2026-11-20T17:21:08+00:00"
   },
@@ -5395,7 +5407,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 584,
+ "sent_total": 585,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -5941,6 +5953,8 @@
   "2026-11-21T18:43:27+00:00|Feyenoord — Sbv Excelsior|Excelsior Rotterdam (0.5)",
   "2026-11-21T18:51:52+00:00|Newcastle United — Arsenal|Arsenal (0.5)",
   "2026-11-21T19:00:32+00:00|Feyenoord — Sbv Excelsior|Over 4.5",
+  "2026-11-21T19:06:36+00:00|Napoli — Torino|Over 2.5",
+  "2026-11-21T19:06:37+00:00|Napoli — Torino|Under 2.5",
   "2026-11-21T19:08:31+00:00|Schalke — Stuttgart|Over 0.5"
  ]
 }
