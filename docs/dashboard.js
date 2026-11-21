@@ -19,16 +19,16 @@ const GROUPS={'BETFAIR/pre/mkt>=10K':'Betfair antes do jogo, mercado grande','BE
  'POLYMARKET/pre':'Polymarket antes do jogo','POLYMARKET/live':'Polymarket durante o jogo','STAKE_LOAD/pre':'Stake antes do jogo','STAKE_LOAD/live':'Stake durante o jogo','OPEN_GAME':'Jogo aberto','TOTALS_FORM':'Forma de golos','WEAKENED_LINEUP':'Alinhamento enfraquecido'};
 const gname=g=>GROUPS[g]||g;
 
-function verdict(g,min){
+function verdict(g){
   const n=g.hits+g.misses;
   if(!n)return['none','Sem resultados'];
   if(g.break_even==null)return n<30?['none','Poucos dados']:['none','Sem odd para comparar'];
   if(n<30)return['none','Poucos dados'];
   if (!Array.isArray(g.ci95)) return ['none','Incerteza indisponível'];
   const [lo,hi]=g.ci95;
-  if(lo>g.break_even)return['good',(n>=min?'Acerta o suficiente':'Indício positivo')];
-  if(hi<g.break_even)return['bad',(n>=min?'Não acerta o suficiente':'Indício negativo')];
-  return['wait',n>=min?'Sem vantagem visível':'Ainda incerto'];
+  if(lo>g.break_even)return['good','Acerto acima da referência'];
+  if(hi<g.break_even)return['bad','Acerto abaixo da referência'];
+  return['wait','Acerto estatisticamente incerto'];
 }
 const ICON={good:'▲',bad:'▼',wait:'◆',none:'○',ok:'✓'};
 function chip(kind,text){const c=el('span',{class:'chip '+kind});c.append(el('span',{'aria-hidden':'true'},ICON[kind]),document.createTextNode(text));return c}
@@ -70,7 +70,7 @@ function signals(d){
     else r.textContent=`${g.signals} ${g.signals===1?'sinal':'sinais'}, ainda sem resultado`+pending(g);
     if(n&&n<d.min_settled&&g.per_day){const e=el('div',{class:'eta'});e.textContent=`Ritmo: ${num(g.per_day)} resultados por dia. `+(n<30&&g.days_to_hint!=null?`Primeiro indício em cerca de ${g.days_to_hint} ${g.days_to_hint===1?'dia':'dias'}; `:'')+`conclusão em cerca de ${g.days_to_conclusion} dias.`;r.appendChild(e)}
     b.appendChild(r);
-    const [kind,text]=verdict(g,d.min_settled);
+    const [kind,text]=verdict(g);
     row.append(a,b,chip(kind,text));box.appendChild(row);
   }
   if(!order.length)box.appendChild(el('div',{class:'row'},'Ainda sem sinais.'));
@@ -78,15 +78,15 @@ function signals(d){
 
 function answer(d){
   const operational=d.operational?.scope==='eligible_bets_only'?d.operational:null;
-  const acc=Object.entries(operational?.accuracy||{}).map(([k,g])=>({k,g,n:g.hits+g.misses,v:verdict(g,d.min_settled)}));
+  const acc=Object.entries(operational?.accuracy||{}).map(([k,g])=>({k,g,n:g.hits+g.misses,v:verdict(g)}));
   const firm=acc.filter(x=>x.n>=d.min_settled&&x.v[0]!=='none'), hint=acc.filter(x=>x.n>=30&&x.n<d.min_settled&&(x.v[0]==='good'||x.v[0]==='bad'));
   const lead=acc.slice().sort((a,b)=>b.n-a.n)[0];
   let main,sub;
   if(firm.length){const good=firm.filter(x=>x.v[0]==='good').map(x=>(NAMES[x.k] || [x.k])[0]);
-    main=good.length?`Com dados suficientes, acerta acima do necessário: ${good.join('; ')}.`:'Com dados suficientes, nenhum tipo de sinal acerta acima do necessário.';
-    sub='Os restantes tipos continuam em medição.'}
+    main=good.length?`Acerto histórico acima da referência de preço em ${good.join(', ')}.`:'O acerto histórico dos grupos observados não superou a referência de preço.';
+    sub='A referência é a média do inverso das odds anunciadas.'}
   else if(hint.length){main='Ainda não há conclusões, mas já há indícios: '+hint.map(x=>`${(NAMES[x.k] || [x.k])[0].toLowerCase()} (${x.v[0]==='good'?'positivo':'negativo'})`).join('; ')+'.';
-    sub=`Um indício só passa a conclusão com ${d.min_settled} apostas liquidadas no mesmo tipo.`}
+    sub=`A comparação histórica usa um limiar descritivo de ${d.min_settled} apostas liquidadas por tipo.`}
   else{main='Ainda é cedo para dizer se os sinais dão lucro.';
     sub=lead&&lead.n?`O tipo com mais resultados é “${NAMES[lead.k]?NAMES[lead.k][0]:lead.k}”, com ${lead.n}. São precisos pelo menos 30 para um primeiro indício e ${d.min_settled} para uma conclusão.`:'Os primeiros resultados aparecem assim que os jogos terminarem.'}
   if(!operational){main='Evidência elegível ainda indisponível.';sub='Aguarda um relatório com evidência elegível; as estatísticas exploratórias não sustentam este veredito.'}
@@ -100,22 +100,26 @@ function answer(d){
 
 function fresh(d, failed) {
   const last = d?.audit?.collector_last_run_utc || d?.audit?.last_collected_at_utc;
-  const timestamp = Date.parse(last), unavailable = !Number.isFinite(timestamp);
-  const stopped = !unavailable && Date.now() - timestamp > 45 * 60000;
+  const timestamp = Date.parse(last), generated = Date.parse(d?.generated_at_utc), now = Date.now();
+  const unavailable = !Number.isFinite(timestamp);
+  const invalid = timestamp > now || generated > now + 5000;
+  const oldReport = Number.isFinite(generated) && now - generated > 45 * 60000;
+  const stopped = !unavailable && now - timestamp > 45 * 60000;
   const when = unavailable ? '' : lisbonDate.format(timestamp);
   const warning = $('collection-warning');
   warning.hidden = !stopped || (currentView !== 'overview' && currentView !== 'sinais');
-  $('sinais').toggleAttribute('data-stale', stopped);
+  $('sinais').toggleAttribute('data-stale', stopped || oldReport || invalid);
   if (stopped) {
     const time = $('collection-time');
     time.dateTime = last;
     if (time.textContent !== when) time.textContent = when;
   }
   const label = failed ? (unavailable ? 'Falha ao atualizar' : `Falha ao atualizar · dados de ${when}`) :
-    unavailable ? 'Recolha sem data' : stopped ? `Recolha parada desde ${when}` : `Atualizado em ${when}`;
+    unavailable ? 'Recolha sem data' : invalid ? 'Data de recolha ou de relatório no futuro' :
+    stopped ? `Recolha parada desde ${when}` : oldReport ? 'Relatório desatualizado' : `Atualizado em ${when}`;
   const box = $('fresh');
   if (box.lastElementChild.textContent !== label) box.lastElementChild.textContent = label;
-  box.classList.toggle('stale', !!failed || unavailable || stopped);
+  box.classList.toggle('stale', !!failed || unavailable || stopped || oldReport || invalid);
 }
 
 function chart(d){
@@ -205,8 +209,8 @@ function insights(d, panel){
   return;
   }
   const L=I.luck, card=(title,big,text)=>{const p=el('div',{class:'panel'});p.append(el('h3',{},title),el('div',{class:'big'},big),el('p',{},text));$('risk').appendChild(p)};
-  if(L?.n){const z=L.z||0;
-    card('Saldo contra a sorte',`${sign(L.units)} un.`,`Em ${L.n} apostas a odds justas, a sorte sozinha faz o saldo oscilar cerca de ±${num(Math.round(2*L.luck_sd*10)/10)} unidades. ${Math.abs(z)<2?'O saldo atual está dentro dessa margem: ainda não distingue jeito de sorte.':z>0?'O saldo está acima dessa margem.':'O saldo está abaixo dessa margem.'}`);
+  if(L?.n){
+    card('Saldo histórico',`${sign(L.units)} un.`,`Referência exploratória para ${L.n} apostas independentes a odds justas: oscilação de cerca de ±${num(Math.round(2*L.luck_sd*10)/10)} unidades. Apostas no mesmo jogo podem estar correlacionadas.`);
     card('Maior queda',`−${num(L.max_drawdown)} un.`,'A maior descida do saldo desde um máximo. Mostra a dimensão da maior queda histórica.');
     card('Pior sequência',`${L.longest_losing_run} seguidas`,'O maior número de apostas perdidas de seguida até agora.')}
   else card('Sorte e risco','—','Aparece quando houver apostas com resultado.');
@@ -643,16 +647,52 @@ function unsettledUI(d){
 
 const simOff=new Set();
 function simulator(d){
-  const tl=d.timeline||[], types=[...new Set(tl.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t))), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const evidence=d.simulation, rows=evidence?.entries || d.timeline || [];
+  const entries=rows.map(p=>({...p, placed:Date.parse(p.d), settled:p.z ? Date.parse(p.z) : Infinity}))
+    .sort((a,b)=>a.placed-b.placed);
+  const types=[...new Set(entries.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t))), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  $('sim-evidence').textContent=evidence ?
+    `${count(evidence.timed_settlements)} liquidações com hora comprovada em ${count(evidence.total_bets)} apostas. ${count(evidence.committed_games)} jogos identificados, com até ${count(evidence.max_units_per_game)} unidades por jogo. Preços executáveis e custos sem observação.` :
+    'Série histórica sem horários de liquidação. O saldo dos resultados só fica disponível no fim da simulação.';
   const typeBox=$('simtypes'), focusedType=typeBox.contains(document.activeElement) ? document.activeElement.value : null;
   typeBox.replaceChildren();
   for(const t of types){const l=el('label'),c=el('input',{type:'checkbox',value:t});c.checked=on.has(t);c.addEventListener('change',()=>{c.checked?(on.add(t),simOff.delete(t)):(on.delete(t),simOff.add(t));run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));typeBox.appendChild(l);if(t===focusedType)c.focus({preventScroll:true})}
   const run=()=>{const start=Math.max(1,+$('simbank').value||0), mode=$('simmode').value, val=Math.max(0,+$('simval').value||0), cut=+$('simcut').value;
     $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
-    let bank=start, peak=start, dd=0, low=start, staked=0, n=0, bust=false;const curve=[start];
-    for(const p of tl){if(!on.has(p.t)||p.w==null)continue;
-      let stake=mode==='flat'?val:bank*val/100;stake=Math.min(stake,bank);if(stake<=0){bust=true;break}
-      const gain=p.w>0?p.w*(p.o*(1-cut)-1):p.w;bank+=stake*gain;staked+=stake;n++;peak=Math.max(peak,bank);dd=Math.max(dd,peak-bank);low=Math.min(low,bank);curve.push(bank)}
+    let cash=start, reserved=0, peak=start, dd=0, low=start, staked=0, n=0, maxReserved=0, skipped=0;
+    let open=[];
+    const curve=[start];
+    function release(before) {
+      const remaining=[];
+      for (const bet of open) {
+        if (bet.w == null || (before !== Infinity && bet.settled >= before)) {
+          remaining.push(bet);
+          continue;
+        }
+        reserved-=bet.stake;
+        const gain=bet.w>0 ? bet.w*(bet.o*(1-cut)-1) : bet.w;
+        cash+=bet.stake*(1+gain);
+        const balance=cash+reserved;
+        peak=Math.max(peak,balance);
+        dd=Math.max(dd,peak-balance);
+        low=Math.min(low,balance);
+        curve.push(balance);
+      }
+      open=remaining;
+    }
+    for(const p of entries){
+      if(!on.has(p.t))continue;
+      release(p.placed);
+      const stake=Math.min(cash,mode==='flat'?val:cash*val/100);
+      if(stake<=0){skipped++;continue}
+      cash-=stake;reserved+=stake;staked+=stake;n++;
+      maxReserved=Math.max(maxReserved,reserved);
+      open.push({...p,stake});
+      open.sort((a,b)=>a.settled-b.settled);
+    }
+    release(Infinity);
+    const bank=cash+reserved;
+    $('sim-exposure').textContent=`Saldo máximo reservado ${eur(maxReserved)} · em aberto no fim ${eur(reserved)} · ${count(skipped)} oportunidades sem saldo disponível.`;
     const out=$('simout');out.textContent='';
     [[n,'apostas simuladas'],[eur(bank),'banca final'],[(bank>=start?'+':'')+eur(bank-start),'lucro ou perda simulados'],[staked?pct((bank-start)/staked,1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
       .forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v)));out.appendChild(w)});
@@ -663,7 +703,7 @@ function simulator(d){
     for(const g of [mn,start,mx].filter((v,i,a)=>a.indexOf(v)===i)){s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g===start?'var(--mut)':'var(--line)','stroke-width':1}));
       const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':17,fill:'var(--mut)'});t.textContent=Math.round(g).toLocaleString('pt-PT');s.appendChild(t)}
     s.appendChild(sv('polyline',{points:curve.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),fill:'none',stroke:'var(--mark)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
-    box.appendChild(s);if(bust)box.appendChild(el('p',{class:'note'},'A banca chegou a zero antes do fim.'))};
+    box.appendChild(s)};
   for (const id of ['simbank','simval','simcut']) $(id).oninput=run;
   $('simmode').onchange=()=>{$('simval').value=$('simmode').value==='flat'?10:1;run()};
   run();
@@ -934,6 +974,12 @@ const reportShape = {
   }),
   groups:recordOf(resultBlock), questions:recordOf(resultBlock), accuracy:accuracyRows,
   timeline:listOf(value => hasFields(value, {d:isTimestamp, u:isNumber, g:isNumber, w:isNumber, t:isText, m:isText, s:isText, o:isPositive})),
+  simulation:optional(value => hasFields(value, {
+    total_bets:isCount, timed_settlements:isCount, committed_games:isCount, max_units_per_game:isCount,
+    entries:listOf(row => hasFields(row, {d:isTimestamp, z:time => time === null || isTimestamp(time),
+      w:isNullableNumber, o:isPositive, t:isText}) &&
+      (row.w === null ? row.z === null : Date.parse(row.z) > Date.parse(row.d)))
+  })),
   daily:listOf(value => hasFields(value, {day:isText, bets:isCount, settled:isCount, wins:isCount, units:isNumber})),
   recent_bets:listOf(value => hasFields(value, {
     date_utc:isTimestamp, match_id:isText, group:isText, match:isText, selection:isText, odds:isPositive,
@@ -962,7 +1008,7 @@ const reportShape = {
       generated_utc:isTimestamp, items:listOf(signal),
       rules:rules => hasFields(rules, {live_max_min:isPositive, min_results:isPositive})
     })),
-    board:optional(row => hasFields(row, {best:listOf(boardHypothesis), avoid:listOf(boardHypothesis),
+    board:optional(row => hasFields(row, {min_results:isPositive, hint_at:isPositive, best:listOf(boardHypothesis), avoid:listOf(boardHypothesis),
       open:listOf(item => hasFields(item, {tactic:optional(isText)}))})),
     watch:optional(listOf(row => hasFields(row, {reasons:listOf(reason => hasFields(reason, {id:isText}))}))),
     notes:optional(listOf(row => hasFields(row, {id:isText}))),

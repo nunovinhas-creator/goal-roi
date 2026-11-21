@@ -37,6 +37,8 @@ class TemporalRecovery(unittest.TestCase):
         self.assertEqual(before_conflict['w'], 1)
         self.assertFalse(before_conflict['result_quarantined'])
         self.assertEqual(chronology.result_known(latest), at(155))
+        self.assertEqual(list(brain.result_changes(latest)),
+                         [(at(125), None, 1), (at(135), 1, None), (at(155), None, 1)])
 
     def test_correction_leaves_the_sequential_commitments_and_payoff_unchanged(self):
         previous = signal('previous', -45, 0)

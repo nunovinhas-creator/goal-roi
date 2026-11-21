@@ -982,7 +982,7 @@ class LedgerHistoryEndToEnd(unittest.TestCase):
                 out['validation']['candidates'] = list(candidates)
             return out
         with patch.object(report.brain, 'build', build):
-            return report.build(None, register=register, now=now)['brain']['validation']
+            return report.build(None, register=register, now=now, register_certification=register)['brain']['validation']
 
     def published(self):
         led = certification.activate({}, self.ACT)
@@ -1140,7 +1140,7 @@ class PublishedLedgerConsistency(unittest.TestCase):
 
     def real_report(self, now, register=True):
         from scangoal import report
-        return report.build(None, register=register, now=now)['brain']
+        return report.build(None, register=register, now=now, register_certification=register)['brain']
 
     def test_reporting_preserves_a_ledger_without_independent_receipts(self):
         now = datetime(2026, 11, 7, 12, tzinfo=UTC)

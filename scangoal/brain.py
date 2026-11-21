@@ -1114,6 +1114,27 @@ def known_at(b):
     return chronology.result_known(b)
 
 
+def result_changes(b):
+    """Yield changes in a bet's usable outcome in order of evidence availability."""
+    versions = b.get('_ft_observations')
+    if versions is None:
+        known = known_at(b)
+        if known is not None and b['w'] not in (None, 0):
+            yield known, None, b['w']
+        return
+    times = {event.available_at for event in versions if isinstance(event, opportunity_results.Observation)
+             and event.available_at is not None}
+    times.update(stamp for event in versions if isinstance(event, dict)
+                 if (stamp := chronology.parse_utc(event.get('known_utc'))) is not None)
+    previous = None
+    for when in sorted(times):
+        row = opportunity_results.settle_research_bet(b, when)
+        won = row['w'] if known_at(row) is not None and row['w'] != 0 else None
+        if won != previous:
+            yield when, previous, won
+            previous = won
+
+
 def walk_forward(signals, registry):
     """E se tivesse seguido o quadro em destaque? Só decisões que o sistema podia ter tomado, só com o que sabia nesse momento.
 
@@ -1142,7 +1163,7 @@ def walk_forward(signals, registry):
         fam, at = insights.family(b), set(atoms(b, set()))
         fits[id(b)] = [i for i, (_, f, conds, _, _) in enumerate(hyps) if f == fam and conds <= at]
     settled = [b for b in signals if b['w'] is not None and b['w'] != 0]
-    timed = sorted(((known_at(b), b) for b in settled if known_at(b) is not None),
+    timed = sorted(((when, b, old, new) for b in signals for when, old, new in result_changes(b)),
                    key=lambda kb: (kb[0], chronology.signal_time(kb[1]), str(kb[1].get('key'))))
     votes, pos = [insights.Votes() for _ in hyps], 0
     sides, unknown = {True: [], False: []}, []
@@ -1159,10 +1180,13 @@ def walk_forward(signals, registry):
             continue
         when = chronology.decision_time(b)
         while pos < len(timed) and timed[pos][0] <= when:
-            r = timed[pos][1]
+            _, r, old, new = timed[pos]
             for i in fits[id(r)]:
                 if hyps[i][4] or chronology.signal_time(r) > hyps[i][3]:
-                    votes[i].add(r)
+                    if old is not None:
+                        votes[i].remove(dict(r, w=old))
+                    if new is not None:
+                        votes[i].add(dict(r, w=new))
             pos += 1
         follow = False
         for i in fits[id(b)]:

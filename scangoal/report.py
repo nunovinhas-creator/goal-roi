@@ -498,6 +498,7 @@ wilson = insights.wilson
 
 def accuracy(signals, now=None):
     """Taxa de acerto por tipo, com TODOS os sinais (inclui os vistos já com resultado e os sem odd)."""
+    now = now or datetime.now(timezone.utc)
     by = collections.OrderedDict()
     for b in signals:
         name = b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase']
@@ -521,7 +522,7 @@ def accuracy(signals, now=None):
                      if any(r['odds'] for r in done) else None,
                      'seen_late': sum(1 for r in done if not r['in_roi']),
                      'by_bot_mark': sum(1 for r in done if r['settled_by'] == 'marca do bot')}
-        days = max(1.0, ((now or datetime.now(timezone.utc)) - datetime.fromisoformat(min(r['date_utc'] for r in rows))).total_seconds() / 86400)
+        days = max(1.0, (now - datetime.fromisoformat(min(r['date_utc'] for r in rows))).total_seconds() / 86400)
         rate = (hits + miss) / days
         out[name]['per_day'] = round(rate, 1)
         out[name]['days_to_hint'] = max(0, math.ceil((30 - hits - miss) / rate)) if rate else None
@@ -560,6 +561,33 @@ def timeline(bets):
         total += gain
         out.append({'d': b['date_utc'], 'u': round(total, 2), 'g': round(gain, 2), 'w': b['w'], 't': b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase'], 'm': ' — '.join(b['teams'] or []), 's': label(b), 'o': b['odds']})
     return out[-600:]
+
+
+def portfolio(bets, as_of):
+    """Summarize unit exposure and retain the clock for each simulated position."""
+    by_fixture = collections.Counter()
+    entries = []
+    proved = 0
+    for b in bets:
+        fixture = b.get('canonical_match_id')
+        if fixture:
+            by_fixture[fixture] += 1
+        decision = chronology.decision_time(b)
+        if decision is None or decision > as_of:
+            continue
+        known = chronology.result_known(b)
+        known = known if b['w'] is not None and known is not None and decision < known <= as_of else None
+        proved += known is not None
+        entries.append({'d': decision.isoformat(), 'z': known.isoformat() if known else None,
+                        'w': b['w'] if known else None, 'o': b['odds'],
+                        't': b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase']})
+    return {'basis': 'one_advertised_unit_per_historical_bet',
+            'total_bets': len(bets), 'settled_bets': sum(b['w'] is not None for b in bets),
+            'committed_games': len(by_fixture), 'bets_with_fixture': sum(by_fixture.values()),
+            'max_units_per_game': max(by_fixture.values(), default=0),
+            'games_with_multiple_units': sum(units > 1 for units in by_fixture.values()),
+            'timed_settlements': proved, 'priced_at_execution': None, 'known_costs': None,
+            'entries': entries}
 
 
 def match_stories(match_ids, msgs, ft, bsd, details):
@@ -807,6 +835,7 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
+        'simulation': portfolio(bets, now),
         'operational': operational_evidence(signals, now),
         polymarket_alerts.REPORT_KEY: polymarket_alerts.candidates(msgs, finished_matches, now),
         'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals, now), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
