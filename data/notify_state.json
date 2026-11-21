@@ -2775,13 +2775,15 @@
    "attempt_utc": "2026-11-21T18:05:49+00:00",
    "chars": 291,
    "created_utc": "2026-11-21T18:05:49+00:00",
+   "done_utc": "2026-11-21T18:05:49+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "561db8e8f95bfddc8beb976767f71839089289b47e5d3c056ca04479c3a7fa62",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:newcastle-united-vs-arsenal-20261121|2c1afd2b6532": {
    "attempt_utc": "2026-11-20T17:41:50+00:00",
@@ -2810,6 +2812,18 @@
    "kind": "hint",
    "sha256": "f6248f1484c64de2cbbd6d163b5ba43aefedfffeca2b0d806cd44dfce7b509cb",
    "state": "delivered"
+  },
+  "game|id:newcastle-united-vs-arsenal-20261121|9e2a5ee2afc8": {
+   "attempt_utc": "2026-11-21T18:07:49+00:00",
+   "chars": 229,
+   "created_utc": "2026-11-21T18:07:49+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "537036c6b38aa66e31b355bd89a9f53d1958f3bdb5e11ebf53cff9b01e38bbf8",
+   "state": "in_flight"
   },
   "game|id:newells-old-boys-reserves-vs-ferro-carril-oeste-reserves-20261118|1aa321aa9c26": {
    "attempt_utc": "2026-11-18T19:26:22+00:00",
@@ -4129,17 +4143,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 261,
+  "delivered": 262,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T18:01:46+00:00",
+ "format_last_run_utc": "2026-11-21T18:05:49+00:00",
  "health": {
   "reference": {
    "bsd_results": 41,
-   "eligible": 1427,
+   "eligible": 1429,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 104,
-   "hypotheses": 12108,
+   "hypotheses": 12114,
    "settled_bets": 1130,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 134,
@@ -4147,7 +4161,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T18:01:46+00:00",
+ "last_run_utc": "2026-11-21T18:05:49+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4379,8 +4393,8 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 42,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
-  "Stake | Hora (UTC) = noite & Número de apostas = uma": 31,
-  "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 35,
+  "Stake | Hora (UTC) = noite & Número de apostas = uma": 32,
+  "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 37,
   "Stake | Mercado = outros mercados": 27,
   "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 32,
   "Stake | Momento do aviso = até 45 min depois do início": 44,
@@ -4940,6 +4954,9 @@
   "item|id:newcastle-united-vs-arsenal-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T16:26:15+00:00"
   },
+  "item|id:newcastle-united-vs-arsenal-20261121|Newcastle United Total Goals|Over 0.5": {
+   "at_utc": "2026-11-21T18:07:49+00:00"
+  },
   "item|id:newells-old-boys-reserves-vs-ferro-carril-oeste-reserves-20261118|Asian Total|Over 4.5": {
    "at_utc": "2026-11-18T19:26:22+00:00"
   },
@@ -5203,7 +5220,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 573,
+ "sent_total": 574,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -5725,6 +5742,7 @@
   "2026-11-21T17:18:30+00:00|NEC Nijmegen — PSV Eindhoven|Under 5.5",
   "2026-11-21T17:48:18+00:00|AC Savoia 1908 — Sorrento|Over 3",
   "2026-11-21T18:02:42+00:00|New England — Philadelphia|Under 2.5",
-  "2026-11-21T18:02:43+00:00|New England — Philadelphia|Over 2.5"
+  "2026-11-21T18:02:43+00:00|New England — Philadelphia|Over 2.5",
+  "2026-11-21T18:05:43+00:00|Newcastle United — Arsenal|Over 0.5"
  ]
 }
