@@ -1,6 +1,5 @@
 """Bind settlement events to the admission and the available result evidence."""
 
-from dataclasses import asdict
 from datetime import datetime
 
 from . import chronology, opportunity_results, scientific_receipts
@@ -13,8 +12,10 @@ LEGACY_OUTCOME = 'certification-outcome'
 
 
 def _observation(row):
-    return {key: chronology.iso(value) if isinstance(value, datetime) else value
-            for key, value in asdict(row).items()}
+    fields = ('source', 'record_id', 'period', 'score', 'observed_at', 'available_at',
+              'published_at', 'kickoff', 'fixture_id', 'link', 'provider_record')
+    record = {key: getattr(row, key, None) for key in fields}
+    return {key: chronology.iso(value) if isinstance(value, datetime) else value for key, value in record.items()}
 
 
 def settlements(admission, hypothesis, bet, as_of, *, profit, odds_loss):
@@ -23,7 +24,7 @@ def settlements(admission, hypothesis, bet, as_of, *, profit, odds_loss):
     if kickoff is None or as_of is None or admission['period'] not in (None, 'regulation'):
         return
     market = admission['market']
-    if not market or (bet.get('phase') == 'live' and market.casefold().strip() == 'asian handicap'):
+    if not isinstance(market, str) or (bet.get('phase') == 'live' and market.casefold().strip() == 'asian handicap'):
         return
     contract = {key: admission[key] for key in ('market', 'selection', 'period', 'odds')}
     contract.update(teams=bet.get('teams'), phase=bet.get('phase'), odds_loss=odds_loss)
