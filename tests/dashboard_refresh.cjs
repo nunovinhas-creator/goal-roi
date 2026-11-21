@@ -618,6 +618,36 @@ async function w09TimedEntries(browser) {
   } finally { await page.close(); }
 }
 
+async function monetaryPrecision(browser) {
+  const page = await browser.newPage();
+  try {
+    const stamp = minutes => new Date(+date + minutes * 60_000).toISOString();
+    const losing = {d:stamp(-90), z:stamp(-60), o:3, w:-1, t:'Precisão'};
+    const simulation = {total_bets:1, timed_settlements:1, committed_games:1, max_units_per_game:1, entries:[losing]};
+    const report = snapshot(1, {simulation});
+    const remote = await setup(page, {report});
+    await page.goto(root + '#simulador');
+    await ready(page, report.unique_bets);
+    await page.locator('#simbank').fill('257');
+    await page.locator('#simmode').selectOption('pct');
+    await page.locator('#simval').fill('5.5');
+    await page.locator('#simcut').selectOption('0.05');
+    const values = page.locator('#simout dd');
+    assert.deepEqual(await values.allTextContents(), ['1', '242,87 €', '-14,14 €', '-100,0 %', '14,14 €', '242,87 €']);
+    await hasText(page, '#sim-exposure', 'Saldo máximo reservado 14,14 € · em aberto no fim 0,00 €');
+
+    const corrected = {...simulation, entries:[{...losing, w:1, z:stamp(-55)}]};
+    remote.respond({report:{...report, simulation:corrected}});
+    await refresh(page);
+    assert.deepEqual(await values.allTextContents(), ['1', '283,15 €', '+26,15 €', '185,0 %', '0,00 €', '257,00 €']);
+    assert.deepEqual(await page.evaluate(() => ['0.004999', '0.005', '0.005001', '-0.004999', '-0.005', '-0.005001']
+      .map(value => simulationEuros(SimulationDecimal.from(value)))),
+    ['0,00 €', '0,01 €', '0,01 €', '0,00 €', '-0,01 €', '-0,01 €']);
+    assert.deepEqual(remote.errors, []);
+    console.log('Monetary precision passed (positive and negative half-cent boundaries, reserve and revised payout)');
+  } finally { await page.close(); }
+}
+
 (async () => {
   const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
     {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
@@ -641,6 +671,7 @@ async function w09TimedEntries(browser) {
     await realReport(browser);
     await simultaneousExposure(browser);
     await w09TimedEntries(browser);
+    await monetaryPrecision(browser);
     for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
   } finally { await browser.close(); }

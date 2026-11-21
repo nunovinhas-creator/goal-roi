@@ -645,21 +645,66 @@ function unsettledUI(d){
   if(!U.length){const tr=el('tr');td(tr,'Nada por liquidar.','mut').colSpan=5;$('uns').appendChild(tr)}
 }
 
+// Retain exact decimal values through reservations and payouts. Round only for
+// display, with exact halfway amounts rounded away from zero (decimal half-up).
+class SimulationDecimal {
+  constructor(coefficient, scale=0){
+    this.coefficient=coefficient;
+    this.scale=coefficient===0n?0:scale;
+  }
+  static from(value){
+    if(!Number.isFinite(Number(value)) || Number(value)===0)return new SimulationDecimal(0n);
+    const [, integer, fraction='', exponent='0']=String(value).trim().match(/^([+-]?\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/i);
+    const scale=fraction.length-Number(exponent);
+    const coefficient=BigInt(integer+fraction);
+    return scale<0?new SimulationDecimal(coefficient*10n**BigInt(-scale)):new SimulationDecimal(coefficient,scale);
+  }
+  atScale(scale){return this.coefficient*10n**BigInt(scale-this.scale)}
+  plus(other){
+    const scale=Math.max(this.scale,other.scale);
+    return new SimulationDecimal(this.atScale(scale)+other.atScale(scale),scale);
+  }
+  minus(other){return this.plus(new SimulationDecimal(-other.coefficient,other.scale))}
+  times(other){return new SimulationDecimal(this.coefficient*other.coefficient,this.scale+other.scale)}
+  percent(){return new SimulationDecimal(this.coefficient,this.scale+2)}
+  min(other){return this.minus(other).coefficient<0n?this:other}
+  max(other){return this.minus(other).coefficient>0n?this:other}
+  toNumber(){return Number(`${this.coefficient}e-${this.scale}`)}
+  rounded(places){
+    if(this.scale<=places)return this.atScale(places);
+    const divisor=10n**BigInt(this.scale-places);
+    const negative=this.coefficient<0n;
+    const magnitude=negative?-this.coefficient:this.coefficient;
+    const rounded=magnitude/divisor+(magnitude%divisor*2n>=divisor?1n:0n);
+    return negative?-rounded:rounded;
+  }
+}
+function simulationEuros(value){
+  const cents=value.rounded(2), magnitude=cents<0n?-cents:cents;
+  const euros=(magnitude/100n).toLocaleString('pt-PT');
+  return `${cents<0n?'-':''}${euros},${String(magnitude%100n).padStart(2,'0')} €`;
+}
+
 const simOff=new Set();
 function simulator(d){
   const evidence=d.simulation, rows=evidence?.entries || d.timeline || [];
   const entries=rows.map(p=>({...p, placed:Date.parse(p.d), settled:p.z ? Date.parse(p.z) : Infinity}))
     .sort((a,b)=>a.placed-b.placed);
-  const types=[...new Set(entries.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t))), eur=v=>(Math.round(v*100)/100).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const types=[...new Set(entries.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t)));
   $('sim-evidence').textContent=evidence ?
     `${count(evidence.timed_settlements)} liquidações com hora comprovada em ${count(evidence.total_bets)} apostas. ${count(evidence.committed_games)} jogos identificados, com até ${count(evidence.max_units_per_game)} unidades por jogo. Preços executáveis e custos sem observação.` :
     'Série histórica sem horários de liquidação. O saldo dos resultados só fica disponível no fim da simulação.';
   const typeBox=$('simtypes'), focusedType=typeBox.contains(document.activeElement) ? document.activeElement.value : null;
   typeBox.replaceChildren();
   for(const t of types){const l=el('label'),c=el('input',{type:'checkbox',value:t});c.checked=on.has(t);c.addEventListener('change',()=>{c.checked?(on.add(t),simOff.delete(t)):(on.delete(t),simOff.add(t));run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));typeBox.appendChild(l);if(t===focusedType)c.focus({preventScroll:true})}
-  const run=()=>{const start=Math.max(1,+$('simbank').value||0), mode=$('simmode').value, val=Math.max(0,+$('simval').value||0), cut=+$('simcut').value;
+  const run=()=>{
+    const zero=SimulationDecimal.from(0), one=SimulationDecimal.from(1), eur=simulationEuros;
+    const start=SimulationDecimal.from($('simbank').value).max(one), mode=$('simmode').value;
+    const val=SimulationDecimal.from($('simval').value).max(zero);
+    const oddsMultiplier=one.minus(SimulationDecimal.from($('simcut').value));
+    const fraction=val.percent();
     $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
-    let cash=start, reserved=0, peak=start, dd=0, low=start, staked=0, n=0, maxReserved=0, skipped=0;
+    let cash=start, reserved=zero, peak=start, dd=zero, low=start, staked=zero, n=0, maxReserved=zero, skipped=0;
     let open=[];
     const curve=[start];
     function release(before) {
@@ -669,13 +714,14 @@ function simulator(d){
           remaining.push(bet);
           continue;
         }
-        reserved-=bet.stake;
-        const gain=bet.w>0 ? bet.w*(bet.o*(1-cut)-1) : bet.w;
-        cash+=bet.stake*(1+gain);
-        const balance=cash+reserved;
-        peak=Math.max(peak,balance);
-        dd=Math.max(dd,peak-balance);
-        low=Math.min(low,balance);
+        reserved=reserved.minus(bet.stake);
+        const weight=SimulationDecimal.from(bet.w);
+        const gain=bet.w>0?weight.times(SimulationDecimal.from(bet.o).times(oddsMultiplier).minus(one)):weight;
+        cash=cash.plus(bet.stake.times(one.plus(gain)));
+        const balance=cash.plus(reserved);
+        peak=peak.max(balance);
+        dd=dd.max(peak.minus(balance));
+        low=low.min(balance);
         curve.push(balance);
       }
       open=remaining;
@@ -683,25 +729,26 @@ function simulator(d){
     for(const p of entries){
       if(!on.has(p.t))continue;
       release(p.placed);
-      const stake=Math.min(cash,mode==='flat'?val:cash*val/100);
-      if(stake<=0){skipped++;continue}
-      cash-=stake;reserved+=stake;staked+=stake;n++;
-      maxReserved=Math.max(maxReserved,reserved);
+      const stake=cash.min(mode==='flat'?val:cash.times(fraction));
+      if(stake.coefficient<=0n){skipped++;continue}
+      cash=cash.minus(stake);reserved=reserved.plus(stake);staked=staked.plus(stake);n++;
+      maxReserved=maxReserved.max(reserved);
       open.push({...p,stake});
       open.sort((a,b)=>a.settled-b.settled);
     }
     release(Infinity);
-    const bank=cash+reserved;
+    const bank=cash.plus(reserved), profit=bank.minus(start);
     $('sim-exposure').textContent=`Saldo máximo reservado ${eur(maxReserved)} · em aberto no fim ${eur(reserved)} · ${count(skipped)} oportunidades sem saldo disponível.`;
     const out=$('simout');out.textContent='';
-    [[n,'apostas simuladas'],[eur(bank),'banca final'],[(bank>=start?'+':'')+eur(bank-start),'lucro ou perda simulados'],[staked?pct((bank-start)/staked,1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
+    [[n,'apostas simuladas'],[eur(bank),'banca final'],[(profit.coefficient>=0n?'+':'')+eur(profit),'lucro ou perda simulados'],[staked.coefficient?pct(profit.toNumber()/staked.toNumber(),1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
       .forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v)));out.appendChild(w)});
     const box=$('simchart');box.textContent='';
-    if(curve.length<3){box.appendChild(el('p',{class:'note'},n?'São precisas pelo menos duas apostas para desenhar a curva.':val===0?'Indique um valor por aposta acima de zero.':'Nenhuma aposta liquidada nos tipos escolhidos.'));return}
-    const W=720,H=200,L=64,R=14,T=12,B=22, mn=Math.min(...curve), mx=Math.max(...curve), pad=(mx-mn||1)*.1, y=v=>T+(mx+pad-v)/((mx+pad)-(mn-pad))*(H-T-B), x=i=>L+i/(curve.length-1)*(W-L-R);
+    if(curve.length<3){box.appendChild(el('p',{class:'note'},n?'São precisas pelo menos duas apostas para desenhar a curva.':val.coefficient===0n?'Indique um valor por aposta acima de zero.':'Nenhuma aposta liquidada nos tipos escolhidos.'));return}
+    const W=720,H=200,L=64,R=14,T=12,B=22, range=peak.minus(low).toNumber(), pad=(range||1)*.1;
+    const y=value=>T+(peak.minus(value).toNumber()+pad)/(range+2*pad)*(H-T-B), x=i=>L+i/(curve.length-1)*(W-L-R);
     const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`Banca simulada ao longo de ${n} apostas: de ${eur(start)} para ${eur(bank)}`});
-    for(const g of [mn,start,mx].filter((v,i,a)=>a.indexOf(v)===i)){s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g===start?'var(--mut)':'var(--line)','stroke-width':1}));
-      const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':17,fill:'var(--mut)'});t.textContent=Math.round(g).toLocaleString('pt-PT');s.appendChild(t)}
+    for(const g of [low,start,peak].filter((v,i,a)=>a.findIndex(other=>v.minus(other).coefficient===0n)===i)){s.appendChild(sv('line',{x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:g.minus(start).coefficient===0n?'var(--mut)':'var(--line)','stroke-width':1}));
+      const t=sv('text',{x:L-8,y:y(g)+4,'text-anchor':'end','font-size':17,fill:'var(--mut)'});t.textContent=g.rounded(0).toLocaleString('pt-PT');s.appendChild(t)}
     s.appendChild(sv('polyline',{points:curve.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),fill:'none',stroke:'var(--mark)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
     box.appendChild(s)};
   for (const id of ['simbank','simval','simcut']) $(id).oninput=run;
