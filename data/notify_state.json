@@ -1235,13 +1235,15 @@
    "attempt_utc": "2026-11-21T12:18:27+00:00",
    "chars": 230,
    "created_utc": "2026-11-21T12:18:27+00:00",
+   "done_utc": "2026-11-21T12:18:27+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "ef47356284201678471b4a2d32e362b197672fdd4a74b06adfb7f0597f5f7421",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:chelsea-vs-leeds-20261121|c679319c9f2a": {
    "attempt_utc": "2026-11-20T14:28:27+00:00",
@@ -1802,6 +1804,18 @@
    "kind": "hint",
    "sha256": "16753aa956a14dd7ddfb850b1df7715b54907efb86d9435fbc9ee0281f297375",
    "state": "delivered"
+  },
+  "game|id:gomel-vs-bate-borisov-20261121|1dbb94cd2426": {
+   "attempt_utc": "2026-11-21T12:20:27+00:00",
+   "chars": 187,
+   "created_utc": "2026-11-21T12:20:27+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "c770b7541e880a150668f5a4b6404815124448b1bcd1ad84ae6555cdfa705e80",
+   "state": "in_flight"
   },
   "game|id:grassy-park-united-vs-kayamandi-20261120|e5ac5ecfbb87": {
    "attempt_utc": "2026-11-20T18:49:24+00:00",
@@ -3429,17 +3443,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 211,
+  "delivered": 212,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T12:16:27+00:00",
+ "format_last_run_utc": "2026-11-21T12:18:27+00:00",
  "health": {
   "reference": {
    "bsd_results": 37,
-   "eligible": 1220,
+   "eligible": 1221,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 99,
-   "hypotheses": 10982,
+   "hypotheses": 10989,
    "settled_bets": 925,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 50,
@@ -3447,7 +3461,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T12:16:27+00:00",
+ "last_run_utc": "2026-11-21T12:18:27+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4007,6 +4021,9 @@
   "item|id:gc-mascara-vs-mc-saida-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T15:25:54+00:00"
   },
+  "item|id:gomel-vs-bate-borisov-20261121|Asian Total|Over 3": {
+   "at_utc": "2026-11-21T12:20:27+00:00"
+  },
   "item|id:grassy-park-united-vs-kayamandi-20261120|Asian Total|Over 2.5": {
    "at_utc": "2026-11-20T18:49:24+00:00"
   },
@@ -4351,7 +4368,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 523,
+ "sent_total": 524,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -4739,6 +4756,7 @@
   "2026-11-21T11:44:25+00:00|Nurnberg — Eintracht Braunschweig|Under 3.5",
   "2026-11-21T11:44:26+00:00|Nurnberg — Eintracht Braunschweig|Under 2.75",
   "2026-11-21T12:14:39+00:00|FC Badalona Women — Deportivo de La Coruna Women|Over 3.5",
-  "2026-11-21T12:17:26+00:00|Chelsea — Leeds|Over 2.5"
+  "2026-11-21T12:17:26+00:00|Chelsea — Leeds|Over 2.5",
+  "2026-11-21T12:19:35+00:00|Gomel — BATE Borisov|Over 3"
  ]
 }
