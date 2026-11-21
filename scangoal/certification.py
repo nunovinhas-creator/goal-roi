@@ -13,11 +13,8 @@ Regras:
   ainda não constam: rank = posição na lista, α = FWER_ALPHA/(rank(rank+1)). Nada é reescrito nem apagado.
 - Cada entrada guarda o hash das condições da hipótese e o hash da entrada anterior.
 
-Alcance da verificação (revisão #5911747123, P2): a cadeia de hashes DENTRO do ficheiro só prova consistência interna — um
-ficheiro inteiramente reescrito, com hashes recalculados, também a satisfaz. A prova de que o registo só cresceu é externa:
-verify_history() confirma que cada versão publicada (histórico git do ficheiro, com as horas dos commits do GitHub) prolonga a
-anterior sem alterar nada. O relatório expõe a cabeça da cadeia (ledger_head_sha256), que fica também no histórico git do
-relatório. verify() nunca levanta exceções: qualquer entrada malformada é só um problema, que desliga a certificação.
+A cadeia de hashes prova consistência interna. `witnessed_selections` exige um recibo independente para o génesis e cada
+prefixo. Os diagnósticos Git verificam a continuidade da cópia local. A hora efetiva de uma seleção é a do recibo assinado.
 """
 import hashlib, json, os, subprocess, sys, tempfile
 from datetime import datetime, timedelta, timezone
@@ -177,14 +174,14 @@ def published_versions(path):
 
 
 def history_proof(path, current, as_of=None, versions=None):
-    """Prova operacional de integridade histórica (revisão #5911845265, P1-H). -> lista de problemas (vazia = provado).
+    """Diagnóstico de integridade do histórico local do Git.
 
     1. o registo foi publicado pelo menos uma vez, num repositório com histórico completo (published_versions);
     2. cada versão publicada prolonga a anterior e a cópia atual prolonga a última publicada (verify_history);
     3. coerência temporal: o génesis e cada entrada foram publicados no commit que os introduziu entre o seu carimbo e
        PUBLISH_TOLERANCE_MIN depois (nunca antes); entradas ainda não publicadas não são anteriores à última publicação
        nem posteriores a `as_of`.
-    Qualquer problema desliga toda a certificação e impede novas entradas.
+    As horas Git são declaradas pelo escritor. Este diagnóstico não autoriza certificação.
     """
     if versions is None:
         versions, problems = published_versions(path)
@@ -226,8 +223,10 @@ def selections(ledger, registry):
 
 def witnessed_selections(ledger, registry, directory, as_of):
     """Require a signed receipt for the genesis and each append-only ledger prefix."""
-    if as_of is None or not isinstance(ledger, dict) or not isinstance(ledger.get('entries'), list):
-        return ledger, {}, ['independent ledger receipts required'], []
+    if not isinstance(ledger, dict) or not isinstance(ledger.get('entries'), list):
+        return ledger, {}, verify(ledger, registry), []
+    if as_of is None:
+        return ledger, {}, verify(ledger, registry) or ['independent ledger receipts require an evaluation cutoff'], []
     activated = chronology.parse_utc(ledger.get('activated_utc'))
     if activated is not None and activated > as_of:
         return None, {}, [], []

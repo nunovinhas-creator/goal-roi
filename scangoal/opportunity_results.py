@@ -200,7 +200,7 @@ def _provider_record(mid, version, source, as_of):
     if snapshot is None:
         # Old journals only attest these fields. The current snapshot may be a later version.
         snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
-    if (not isinstance(snapshot, dict) or score_pair(snapshot.get("ft")) != score
+    if (not isinstance(snapshot, dict) or snapshot.get("fixture_id", mid) != mid or score_pair(snapshot.get("ft")) != score
             or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
         return None
     return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
@@ -214,21 +214,24 @@ def provider_snapshot(state, source, as_of):
     histories, visible = state.get("ft_versions") or {}, {}
     for mid in snapshots.keys() | histories.keys() | first.keys():
         versions = histories.get(mid, [])
+        versions = [row for row in versions if isinstance(row, dict)] if isinstance(versions, list) else []
         records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
         # The original snapshot is immutable once updates start. Only restore its own fields.
         legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
         if isinstance(legacy, dict):
             stamp = legacy.get("matched_at_utc")
-            records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
-                                                   "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
-                                                   "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
+            observed = utc(stamp)
+            if observed is not None and not any(utc(row.get("observed_at")) == observed for row in versions):
+                records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                                                       "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                                                       "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
         candidates = [row for row in records if row is not None]
         if not candidates:
             continue
         def order(row):
             return utc(row["observed_at"]), utc(row["available_at"])
         latest = max(candidates, key=order)
-        # A complete version supersedes its legacy projection at the very same observation.
+        # Two different versions at the same observation leave the result in conflict.
         tied = [row for row in candidates if order(row) == order(latest)]
         if all(row == latest for row in tied):
             visible[mid] = latest
