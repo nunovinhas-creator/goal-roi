@@ -185303,6 +185303,40 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Hora (UTC) = noite & Liga = UEFA Nations League & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": {
+  "born_utc": "2026-11-21T09:45:03.444330+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Liga",
+    "UEFA Nations League"
+   ],
+   [
+    "Momento do aviso",
+    "mais de 45 min depois do início"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "refinar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "parent_id": "Stake | Hora (UTC) = noite & Liga = UEFA Nations League & Momento do aviso = mais de 45 min depois do início",
+  "provenance": {
+   "prompt_sha256": "b7dfa965f1dffbceb065f9e0850863ae02246d5b0c46fb695b028ce2184998dd",
+   "registry_size": 10868,
+   "report_generated_at_utc": "2026-11-21T09:43:56+00:00",
+   "response_sha256": "e80ce745b6b7d770af0c59ae8cd3ebcb153154232cc8776422e5c73da8e588f1"
+  },
+  "reason": "Analisar apostas noturnas na UEFA Nations League com aviso tardio",
+  "source": "llm"
+ },
  "Stake | Hora (UTC) = noite & Liga = UEFA Nations League & Número de apostas = uma": {
   "born_utc": "2026-11-14T19:57:22+00:00",
   "conditions": [
