@@ -33,7 +33,7 @@ Disciplina (fixada a 12/11/2026):
 import hashlib, itertools, json, math, re
 from datetime import datetime, timedelta, timezone
 
-from . import certification, chronology, freshness, insights, match_identity, opportunity_results, scientific_receipts
+from . import certification, chronology, freshness, insights, match_identity, opportunity_results, scientific_commitments
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -494,7 +494,7 @@ def _log_mean_exp(logs):
     return top + math.log(sum(math.exp(x - top) for x in logs) / len(logs))
 
 
-def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_dir=None):
+def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_dir=None, archive=False):
     """Teste de confirmação com nível garantido: e-processo de apostas (testing by betting), em cadeia sem sobreposição.
 
     Amostra (revisões #5911603577 e #5911747123), toda decidida com informação disponível na hora de cada decisão:
@@ -516,7 +516,8 @@ def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_di
     P(algum n com E_n >= 1/α) <= α, sob qualquer dependência entre jogos. Tudo em domínio logarítmico.
     """
     games = {}
-    for b in match_identity.annotate(match):
+    visible = (b for b in match if as_of is None or (seen := chronology.decision_time(b)) is not None and seen <= as_of)
+    for b in match_identity.annotate(visible, as_of):
         key = game_identity(b)
         if key is not None:
             games.setdefault(key, []).append(b)
@@ -543,7 +544,7 @@ def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_di
     logs, n, log_e, log_max, cert, bar = [0.0] * len(EPROCESS_LAMBDAS), 0, 0.0, 0.0, None, math.log(1 / alpha)
     open_until, pending, admitted, voided = None, False, 0, 0
     timeout = timedelta(days=OPEN_TIMEOUT_DAYS)
-    commitments, proof_problems = [], []
+    commitments, settlement_events, proof_problems = [], [], []
 
     def close(y, closed):
         nonlocal n, log_e, log_max, cert
@@ -572,35 +573,61 @@ def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_di
         record = dict(commitment, id=hashlib.sha256(canonical.encode()).hexdigest())
         commitments.append(record)
         receipt = None
+        proven = None
         if hypothesis is not None:
             kickoff = chronology.kickoff_time(b)
             first = chronology.parse_utc(b.get('match_result_first_seen_utc'))
             before = min(kickoff, first) if first is not None and kickoff is not None else kickoff
             binding = {'hypothesis': hypothesis, 'commitment': record}
-            receipt = scientific_receipts.verify(receipt_dir, 'certification-admission', binding, as_of=as_of)
+            receipt = scientific_commitments.verify(receipt_dir, scientific_commitments.ADMISSION, binding, as_of, archive)
             if receipt is None or before is None or not t <= receipt.at < before:
                 proof_problems.append('admission %d lacks a receipt before the outcome window' % admitted)
+                receipt = None
+            previous_receipt = receipt
+            for content, digest, available in scientific_commitments.settlements(
+                    record, hypothesis, b, as_of, profit=bet_profit, odds_loss=insights.ODDS_LOSS):
+                correction = content['supersedes'] is not None
+                witnessed = scientific_commitments.verify(receipt_dir, scientific_commitments.SETTLEMENT,
+                                                           content, as_of, archive)
+                valid = (witnessed is not None and previous_receipt is not None
+                         and previous_receipt.at < witnessed.at and available <= witnessed.at
+                         and (correction or witnessed.at <= deadline))
+                legacy = None
+                if not correction:
+                    original = {key: content[key] for key in ('admission_id', 'hypothesis', 'ft', 'profit', 'available_utc')}
+                    legacy = scientific_commitments.verify(receipt_dir, scientific_commitments.LEGACY_OUTCOME,
+                                                           original, as_of, archive)
+                    if legacy is not None and (receipt is None or not receipt.at < available <= legacy.at <= deadline):
+                        legacy = None
+                    if valid and receipt.at < available:
+                        proven = content, witnessed.at
+                    else:
+                        valid = False
+                if not valid:
+                    proof_problems.append('settlement %s lacks a valid subsequent outcome receipt' % digest)
+                settlement_events.append({'content': content, 'digest': digest,
+                                          'receipt': scientific_commitments.receipt_summary(witnessed if valid else None),
+                                          'legacy_receipt': scientific_commitments.receipt_summary(legacy)})
+                previous_receipt = witnessed if valid else None
         if 'first_confirmed_utc' in b:
             # Uma correção posterior segue para reconciliação e não reabre a cadeia.
-            b = dict(b, w=b['first_confirmed_w'], result_available_utc=b['first_confirmed_utc'],
+            b = dict(b, ft=b.get('first_confirmed_ft'), w=b['first_confirmed_w'], result_available_utc=b['first_confirmed_utc'],
                      result_quarantined=False)
-        if b.get('w') is None or b.get('result_quarantined'):
+        known, verdict = chronology.result_check(b)
+        if (b.get('w') is None or b.get('result_quarantined') or
+                (as_of is not None and known is not None and known > as_of)):
             skipped['result_quarantined'] += bool(b.get('result_quarantined'))
             open_until, pending = deadline, True
             continue
-        known, verdict = chronology.result_check(b)
         y = bet_profit(b) if verdict == 'verified' and known <= deadline else None
         if y is None:                                         # tardio, sem hora provada ou inválido: perda no prazo
             y, known = -1.0, deadline
             voided += 1
         elif hypothesis is not None:
-            outcome = {'admission_id': record['id'], 'hypothesis': hypothesis, 'ft': b.get('ft'),
-                       'profit': y, 'available_utc': known.isoformat()}
-            witnessed = scientific_receipts.verify(receipt_dir, 'certification-outcome', outcome, as_of=as_of)
-            if witnessed is None or receipt is None or not receipt.at < known <= witnessed.at <= deadline:
+            if proven is None or proven[0]['available_utc'] != known.isoformat() or proven[0]['profit'] != y:
                 proof_problems.append('admission %d lacks a subsequent outcome receipt' % admitted)
             else:
-                known = witnessed.at
+                known = proven[1]
         open_until = known
         close(y, known)
     if pending and as_of is not None and as_of >= open_until:   # o prazo passou no relógio do relatório: perda, nesse prazo
@@ -608,7 +635,7 @@ def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_di
         voided, pending = voided + 1, False
     shown = lambda x: round(math.exp(x), 4) if x < 700 else None   # e-valor legível; acima de e^700 só o log10
     return {'games': n, 'admitted': admitted, 'voided_as_loss': voided, 'pending': admitted - n, 'skipped': skipped,
-            'commitments': commitments,
+            'commitments': commitments, 'settlement_events': settlement_events,
             'e_value': shown(log_e), 'e_max': shown(log_max), 'log10_e': round(log_e / math.log(10), 4),
             'log10_e_max': round(log_max / math.log(10), 4), 'threshold': round(1 / alpha, 2), 'alpha': alpha,
             'certified_at': None if proof_problems else cert, 'proof_problems': proof_problems}
@@ -669,7 +696,8 @@ def stable_status(steps, corrected_bar, min_settled, *, certified_from=_PR2):
     return state, pending, changes
 
 
-def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None, legacy=(), as_of=None, receipt_dir=None):
+def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None, legacy=(), as_of=None,
+             receipt_dir=None, archive_commitments=False):
     """-> (linhas, hipóteses testadas, fasquia de referência 1 − α/testadas; esta já não decide estados).
 
     selected: {id: (rank, α, hora)} do registo de seleções verificado (certification.selections); None = validação não
@@ -725,7 +753,8 @@ def evaluate(signals, registry, min_settled, *, exploratory=False, selected=None
             continue
         ok = certifiable(registry[hid])
         hypothesis = {'id': hid, 'conditions_sha256': certification.conditions_hash(registry[hid])} if receipt_dir is not None else None
-        c = confirmation(matches[hid], t, alpha, as_of, hypothesis=hypothesis, receipt_dir=receipt_dir) if ok else {
+        c = confirmation(matches[hid], t, alpha, as_of, hypothesis=hypothesis, receipt_dir=receipt_dir,
+                         archive=archive_commitments) if ok else {
             'games': 0, 'certified_at': None, 'alpha': alpha, 'threshold': round(1 / alpha, 2)}
         by_id[hid]['confirmation'] = dict(c, rank=rank, selected_utc=chronology.iso(t), certifiable=ok, certified_utc=chronology.iso(c['certified_at']))
         del by_id[hid]['confirmation']['certified_at']
@@ -983,7 +1012,8 @@ def presentation(rows, watched=()):
     return {'version': PRESENTATION, 'hypotheses': out}
 
 
-def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None, receipt_dir=None):
+def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None, receipt_dir=None,
+          archive_commitments=False):
     """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada.
 
     `receipt_dir` contém os recibos assinados do registo, das admissões e dos resultados. `as_of` estabelece a informação
@@ -1008,7 +1038,8 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
         ledger, selected, problems, receipts = certification.witnessed_selections(ledger, registry, receipt_dir, as_of)
     history_unverified = any('receipt' in problem for problem in problems)
     legacy = {x.get('id') for x in (ledger or {}).get('legacy') or [] if isinstance(x, dict)} if not problems else set()
-    rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected, legacy=legacy, as_of=as_of, receipt_dir=receipt_dir)
+    rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected, legacy=legacy, as_of=as_of,
+                               receipt_dir=receipt_dir, archive_commitments=archive_commitments and not problems)
     gaps = [p for r in rows for p in (r.get('confirmation') or {}).get('proof_problems', [])]
     if gaps:
         problems = gaps

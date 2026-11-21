@@ -9,7 +9,7 @@ import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -28,10 +28,35 @@ class Receipt:
     at: datetime
 
 
+def _canonical(content):
+    return json.dumps(content, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False).encode('utf-8')
+
+
 def digest(domain, content):
     payload = {'schema': 1, 'repository': 'nunovinhas-creator/goal-roi', 'domain': domain, 'content': content}
-    encoded = json.dumps(payload, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False)
-    return hashlib.sha256(encoded.encode('utf-8')).hexdigest()
+    return hashlib.sha256(_canonical(payload)).hexdigest()
+
+
+def save_commitment(directory, domain, content):
+    """Publish the exact payload once under its digest, without touching detached receipts."""
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / (digest(domain, content) + '.json')
+    payload = _canonical(content) + b'\n'
+    with NamedTemporaryFile(dir=directory, prefix='.commitment-') as temp:
+        temp.write(payload)
+        temp.flush()
+        os.fsync(temp.fileno())
+        try:
+            os.link(temp.name, path)
+        except FileExistsError:
+            if path.read_bytes() != payload:
+                raise ValueError('stored scientific commitment differs from its digest') from None
+        fd = os.open(directory, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
 
 
 def verify(directory, domain, content, *, as_of):
@@ -40,7 +65,13 @@ def verify(directory, domain, content, *, as_of):
         return None
     try:
         imprint = digest(domain, content)
-        with (Path(directory) / (imprint + '.tsr')).open('rb') as handle:
+        folder = Path(directory)
+        try:
+            if (folder / (imprint + '.json')).read_bytes() != _canonical(content) + b'\n':
+                return None
+        except FileNotFoundError:
+            pass  # Legacy receipts predate the local payload archive.
+        with (folder / (imprint + '.tsr')).open('rb') as handle:
             token = handle.read(MAX_RECEIPT_BYTES + 1)
         if not token or len(token) > MAX_RECEIPT_BYTES:
             return None

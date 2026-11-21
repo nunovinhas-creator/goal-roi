@@ -645,7 +645,8 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
-    brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now)
+    brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now,
+                     archive_commitments=register_certification)
     ledger_summary(brn['validation'])
     llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
