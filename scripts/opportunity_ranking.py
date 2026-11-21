@@ -19,7 +19,7 @@ def main():
     activation = ((state.get("migrations") or {}).get("polymarket_over25_v1") or {}).get("at_utc")
     observations = {}
     messages, _, _, _, _ = report.load(result_observations=observations, as_of=now)
-    evidence = sourced_results(observations, directory)
+    evidence = sourced_results(observations, directory, now)
     ranking = opportunity_ranking.build(
         messages, evidence, protocol,
         activation_utc=activation,
