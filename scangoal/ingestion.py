@@ -74,6 +74,7 @@ class Receipt:
         lower = entry['after_id']
         rows, oldest, present = await reader.fetch(client, entity, limit, entry['started_utc'])
         gap = bool(lower and oldest and lower + 1 < oldest)
+        regressed = bool(lower and max(present, default=0) < lower)
         incomplete = None
         if gap:
             backfill, cursor, ids = await reader.fetch(client, entity, BACKFILL_LIMIT, entry['started_utc'],
@@ -85,6 +86,7 @@ class Receipt:
             if len(ids) >= BACKFILL_LIMIT:
                 incomplete = cursor
         stamp = reader.stamp_receipt(rows)
+        print('SCANGOAL_INGESTION_RECEIVED', entry['id'], 'rows', len(rows), flush=True)
         previous = entry['previous_utc']
         delayed = previous is not None and now() - datetime.fromisoformat(previous) >= timedelta(minutes=30)
         stored, _ = store.load_seen(self.directory / 'messages.jsonl')
@@ -92,8 +94,9 @@ class Receipt:
         known_missing = set(read_json(self.directory / 'state.json').get('missing_ids', []))
         new_missing = set(missing) - known_missing
         gaps = entry['gaps'][:]
-        if gap or delayed or new_missing:
-            reason = 'outside_recent_window' if gap else 'delayed_read' if delayed else 'source_message_unavailable'
+        if gap or regressed or delayed or new_missing:
+            reason = ('outside_recent_window' if gap else 'source_window_regressed' if regressed
+                      else 'delayed_read' if delayed else 'source_message_unavailable')
             gaps.append({'id': entry['id'], 'reason': reason, 'started_utc': previous or entry['started_utc'],
                          'detected_utc': stamp, 'after_id': lower, 'before_id': oldest,
                          'available_backfill': len(backfill) if gap else 0, 'uninspected_before_id': incomplete,
@@ -141,3 +144,8 @@ def confirm(journal, checkpoint):
         raise DurabilityError('published Telegram checkpoint does not match its durable receipt')
     journal.write(KEY, revision, {key: entry[key] for key in ('id', 'high_id', 'received_utc')} | {'phase': 'confirmed'})
     print('SCANGOAL_INGESTION_CONFIRMED', entry['id'], flush=True)
+
+
+def visible_gaps(directory, as_of):
+    return [gap for gap in read_json(directory / CHECKPOINT).get('gaps', [])
+            if datetime.fromisoformat(gap['detected_utc']) <= as_of]

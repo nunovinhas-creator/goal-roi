@@ -741,6 +741,9 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         state = {}
     state = chronology.snapshot_at(state, now)
     audit['collector_last_run_utc'] = state.get('last_run_utc') or audit['last_collected_at_utc']
+    from .ingestion import visible_gaps
+    if gaps := visible_gaps(data_dir(), now):
+        audit['ingestion_gaps'] = {'count': len(gaps), 'latest': gaps[-1]}
     audit['name_review'] = [dict(n, provider=name.upper()) for name in ('hl', 'bsd') for n in (near.get(name) or {}).values()][:30]
     audit['deleted_by_bot'] = len(state.get('missing_ids') or [])
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
