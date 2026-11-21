@@ -2172,6 +2172,14 @@
    "sha256": "16753aa956a14dd7ddfb850b1df7715b54907efb86d9435fbc9ee0281f297375",
    "state": "delivered"
   },
+  "game|id:getafe-vs-atletico-de-madrid-20261122|f695bd98f6a0": {
+   "created_utc": "2026-11-21T22:22:49+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
+  },
   "game|id:gomel-vs-bate-borisov-20261121|1dbb94cd2426": {
    "attempt_utc": "2026-11-21T12:20:27+00:00",
    "chars": 187,
@@ -3081,6 +3089,18 @@
    "kind": "hint",
    "sha256": "2c11b92b99d96f31c4d2d02ab69244fc5789037d484f3de9036aa145614b3176",
    "state": "delivered"
+  },
+  "game|id:pachuca-vs-toluca-20261122|a5b6a7b7fe88": {
+   "attempt_utc": "2026-11-21T22:22:49+00:00",
+   "chars": 183,
+   "created_utc": "2026-11-21T22:22:49+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "afcbf3fc8cc19883f08080fc1aff73c1b0e5dce5b4740692541d6f223f660242",
+   "state": "in_flight"
   },
   "game|id:palestino-vs-deportes-union-la-calera-20261121|a1c5107527fa": {
    "attempt_utc": "2026-11-21T00:58:06+00:00",
@@ -4505,13 +4525,13 @@
  "health": {
   "reference": {
    "bsd_results": 43,
-   "eligible": 1522,
+   "eligible": 1524,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 105,
-   "hypotheses": 12569,
-   "settled_bets": 1246,
+   "hypotheses": 12580,
+   "settled_bets": 1248,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 173,
+   "statuses": 184,
    "validation_state": "not_activated"
   }
  },
@@ -4746,6 +4766,7 @@
   "Polymarket | Sinal anterior de outro tipo no mesmo jogo = não": 92,
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": 33,
   "Stake | Faixa de odd = odd 1,50 a 2,00": 31,
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Número de apostas = uma": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 42,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
@@ -5376,6 +5397,9 @@
   "item|id:orlando-city-vs-cincinnati-20261120|1x2|Orlando City": {
    "at_utc": "2026-11-19T22:10:58+00:00"
   },
+  "item|id:pachuca-vs-toluca-20261122|Draw No Bet|Deportivo Toluca": {
+   "at_utc": "2026-11-21T22:22:49+00:00"
+  },
   "item|id:palestino-vs-deportes-union-la-calera-20261121|Total Goals|Over 0.5": {
    "at_utc": "2026-11-21T00:58:06+00:00"
   },
@@ -5684,9 +5708,14 @@
   "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": "abandonada",
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": "abandonada",
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Momento = antes do jogo": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -5699,6 +5728,7 @@
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo": "abandonada",
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Número de apostas = várias": "abandonada",
+  "Polymarket | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
@@ -5720,6 +5750,7 @@
   "Polymarket | Número de apostas = várias & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Stake | Competição = liga & Dia = fim de semana": "abandonada",
   "Stake | Competição = liga & Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Stake | Competição = liga & Dia = fim de semana & Hora (UTC) = tarde": "abandonada",
@@ -5728,7 +5759,6 @@
   "Stake | Competição = liga & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Competição = liga & Dia = fim de semana & Valor da aposta = menos de 10 mil $": "abandonada",
-  "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00": "abandonada",
   "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados": "abandonada",
   "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início": "abandonada",
   "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -5751,6 +5781,7 @@
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
+  "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": "promissora",
   "Stake | Dia = fim de semana": "abandonada",
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00": "abandonada",
@@ -5760,7 +5791,6 @@
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = 10 mil $ ou mais": "abandonada",
-  "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Dia = fim de semana & Hora (UTC) = tarde": "abandonada",
   "Stake | Dia = fim de semana & Hora (UTC) = tarde & Mercado = outros mercados": "abandonada",
   "Stake | Dia = fim de semana & Hora (UTC) = tarde & Número de apostas = uma": "abandonada",
@@ -5780,11 +5810,13 @@
   "Stake | Dia = fim de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Dia = fim de semana & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Dia = fim de semana & Número de apostas = várias": "abandonada",
+  "Stake | Dia = fim de semana & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Dia = fim de semana & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Número de apostas = uma": "promissora",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados & Momento do aviso = antes do início": "abandonada",
@@ -5792,16 +5824,17 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
-  "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias": "abandonada",
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = 10 mil $ ou mais": "abandonada",
+  "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": "promissora",
   "Stake | Hora (UTC) = tarde": "abandonada",
   "Stake | Hora (UTC) = tarde & Mercado = outros mercados": "abandonada",
   "Stake | Hora (UTC) = tarde & Mercado = outros mercados & Número de apostas = uma": "abandonada",
@@ -5826,10 +5859,12 @@
   "Stake | Momento do aviso = antes do início": "abandonada",
   "Stake | Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
+  "Stake | Número de apostas = várias": "abandonada",
   "Stake | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -6250,6 +6285,7 @@
   "2026-11-21T20:51:26+00:00|Real Madrid — Celta Vigo|Celta de Vigo",
   "2026-11-21T20:57:06+00:00|Strasbourg — Brest|RC Strasbourg (0.5)",
   "2026-11-21T20:57:06+00:00|Strasbourg — Brest|Yes",
-  "2026-11-21T21:42:50+00:00|Real Madrid — Celta Vigo|Under 2.5"
+  "2026-11-21T21:42:50+00:00|Real Madrid — Celta Vigo|Under 2.5",
+  "2026-11-21T22:19:49+00:00|Pachuca — Toluca|Deportivo Toluca"
  ]
 }
