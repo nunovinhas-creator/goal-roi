@@ -90,9 +90,15 @@ def wanted(results, state, extra_time, priority):
 
 def load_state(directory):
     try:
-        return json.loads((directory / 'details_hl.json').read_text(encoding='utf-8'))
+        state = json.loads((directory / 'details_hl.json').read_text(encoding='utf-8'))
     except FileNotFoundError:
         return {'details': {}, 'last_run_utc': None, 'stats': {}}
+    history = state.get('detail_versions', {})
+    if not isinstance(history, dict) or any(not isinstance(rows, list) or not rows
+            or not all(isinstance(row, dict) for row in rows) or state.get('details', {}).get(mid) != rows[-1]
+            for mid, rows in history.items()):
+        raise ValueError('Highlightly detail projection does not match its archived versions')
+    return state
 
 
 def versions(state):
@@ -148,7 +154,8 @@ def observations(state, as_of):
 def source_binding(mid, binding, hl_id):
     fields = {key: binding[key] for key in IDENTITY if key in binding}
     return dict(fields, fixture_id=fields.get('fixture_id', mid), provider='highlightly_detail',
-                hl_id=hl_id, link=fields.get('link') or ROOT + str(hl_id), source_ft=binding.get('ft'))
+                hl_id=hl_id, link=fields.get('link') or ROOT + str(hl_id), source_ft=binding.get('ft'),
+                source_status=binding.get('status'))
 
 
 def refresh_target(state, results, extra_time, now):
@@ -159,7 +166,8 @@ def refresh_target(state, results, extra_time, now):
         if type(hl_id) is not int:
             continue
         current = source_binding(mid, binding, hl_id)
-        changed = detail.get('hl_id') != hl_id or (detail.get('provider') and any(detail.get(k) != v for k, v in current.items()))
+        changed = any(detail.get(k) != value for k, value in current.items()
+                      if k in detail or k in ('hl_id', 'event_date', 'league', 'target_league', 'target_teams', 'source_ft'))
         fetched = stamps(detail)[1]
         if changed or (fetched is not None and timedelta(0) <= now - fetched <= REFRESH_WINDOW):
             last_check = chronology.parse_utc(state.get('checked_at', {}).get(mid)) or fetched
@@ -229,7 +237,7 @@ def run(fetch=request_json, now=None, token=None, priority=None):
 def collect(directory, fetch, now, observed_clock, token, priority):
     path = directory / 'details_hl.json'
     state = load_state(directory)
-    if state['last_run_utc'] and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
+    if state.get('last_run_utc') and now - datetime.fromisoformat(state['last_run_utc']) < timedelta(minutes=MIN_INTERVAL_MIN):
         print('HL_DETAILS_SKIPPED_TOO_SOON')
         return state
     hl = load_json(directory / 'results_hl.json', {})
