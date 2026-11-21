@@ -334,7 +334,9 @@ class WorkflowActivation(unittest.TestCase):
     def test_prerequisites_of_the_barrier_are_in_the_workflow(self):
         text, steps = self.steps()
         self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
-        self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)   # single writer
+        self.assertIn('concurrency:\n'
+                      "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n"
+                      '  cancel-in-progress: false', text)   # production keeps a single writer
         # persisted credentials: v4 tag or its reviewed SHA (v4.4.0), never persist-credentials: false
         self.assertRegex(text, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
         self.assertNotIn('persist-credentials: false', text)

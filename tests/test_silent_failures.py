@@ -40,9 +40,10 @@ def exit_code(fn):
 
 
 def steps():
-    """{step name: its lines}, in workflow order."""
+    """{step name: its lines}, in production collection order."""
     out, name = {}, None
-    for line in WORKFLOW.read_text(encoding='utf-8').split('\n'):
+    production = WORKFLOW.read_text(encoding='utf-8').split('\n  validate:\n', 1)[0]
+    for line in production.splitlines():
         if line.startswith('      - name: '):
             name = line[len('      - name: '):]
             out[name] = []

@@ -188,7 +188,7 @@ class WorkflowScriptTests(unittest.TestCase):
         self.assertNotIn('continue-on-error', main)          # a recolha principal falha de forma visível
         self.assertNotIn('continue-on-error', fast)          # P2: uma falha de persistência deixa a execução vermelha
         self.assertIn("steps.resume.outcome == 'success'", fast)
-        self.assertIn('group: scangoal-write', text)
+        self.assertIn("group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}", text)
         self.assertIn('cancel-in-progress: false', text)
         self.assertIn("cron: '3,13,23,33,43,53 * * * *'", text)
 
