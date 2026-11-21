@@ -328,7 +328,7 @@ class Hardening(unittest.TestCase):
         rows = [self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, OPEN, '2026-11-12T10:00:00+00:00'),
                 self.row(2, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅', '2026-11-12T10:00:00+00:00')]
         extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'read': 2, 'new_versions': 0},
-                 'results_hl.json': {'results': {}, 'near_misses': {'m': {'bot': ['Sheff Wed', 'Accrington'], 'bsd_candidates': [['Sheffield Wednesday', 'Accrington']]}}}}
+                 'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {'m': {'bot': ['Sheff Wed', 'Accrington'], 'bsd_candidates': [['Sheffield Wednesday', 'Accrington']]}}}}
         r, csv_text = self.build(rows, extra)
         self.assertEqual(r['audit']['collector_last_run_utc'], '2026-11-12T11:00:00+00:00')     # hora da recolha, não da última mensagem
         self.assertEqual(r['audit']['name_review'][0]['bot'], ['Sheff Wed', 'Accrington'])
@@ -428,7 +428,7 @@ Liverpool Women — Aston Villa Women
         from scangoal import results_bsd
         old = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'old-game')
         extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'missing_ids': [7, 9]},
-                 'results_hl.json': {'results': {}, 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
+                 'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
         r, _ = self.build([self.row(1, old, '2026-01-01T12:00:00+00:00')], extra)
         self.assertEqual((r['accuracy']['BETFAIR/live']['no_source'], r['audit']['deleted_by_bot'], r['audit']['ended_after_90']), (1, 2, 1))
         target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None}}
@@ -634,7 +634,9 @@ class GoalMinutes(Hardening):
         p = parse(brew)
         self.assertEqual((p['window'], p['bot_prob'], p['usual_prob'], p['minute'], p['score_at_signal']), (15, 50, 37, 25, [1, 1]))
         def details(goals, status='Finished', final=None):
-            return {'details_hl.json': {'details': {'petrzalka-vs-trnava-20261111': {'status': status, 'final': final or [2, 2], 'goals': goals, 'consistent': True, 'score_90': final or [2, 2]}}}}
+            return {'details_hl.json': {'details': {'petrzalka-vs-trnava-20261111': {'status': status, 'final': final or [2, 2], 'goals': goals, 'consistent': True, 'score_90': final or [2, 2],
+                'event_date': '2026-11-11T15:30:00+00:00', 'fetched_at_utc': '2026-11-11T18:00:00+00:00',
+                'league': 'Slovakian 1 Liga Women', 'home': 'FC Petrzalka Women', 'away': 'Spartak Trnava Women'}}}}
         base = [[5, 0, 'home'], [20, 0, 'away']]
         r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')], details(base + [[38, 0, 'home'], [80, 0, 'away']]))
         g = r['accuracy']['GOAL_BREWING']
@@ -768,6 +770,8 @@ class RegimeAndStories(Hardening):
     def test_match_story_lists_every_signal_goals_and_result(self):
         brew = BREW + '\nhttps://scangoal.com/match/barnsley-vs-oldham-20261111?lang=en'
         details = {'details_hl.json': {'details': {'barnsley-vs-oldham-20261111': {'status': 'Finished', 'final': [2, 1], 'consistent': True, 'score_90': [2, 1],
+                                                                                  'fetched_at_utc': '2026-11-11T22:00:00+00:00', 'event_date': '2026-11-11T19:00:00+00:00',
+                                                                                  'home': 'Barnsley', 'away': 'Oldham', 'league': 'England EFL Trophy',
                                                                                   'goals': [[5, 0, 'home'], [20, 0, 'away'], [38, 0, 'home']]}}}}
         r, _ = self.build([self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, brew, '2026-11-11T19:30:00+00:00')], details)
         story = r['matches'][r['recent_bets'][0]['match_id']]
@@ -908,11 +912,12 @@ class Settlement(Hardening):
             mid = 'kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111'
             other = BETFAIR_LIVE.replace(mid, 'x-vs-y-20261111')
             rows = [self.row(1, live, '2026-11-11T12:10:00+00:00'), self.row(2, other, '2026-11-11T12:20:00+00:00')]
-            r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
+            r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
             self.assertEqual(sorted((u['match_id'], u['why']) for u in r['unsettled']),
                              [(mid, 'à espera da fonte de resultados'), ('x-vs-y-20261111', 'as fontes não cobrem este jogo')])
             self.assertEqual(r['accuracy']['BETFAIR/live']['no_source'], 1)
-            r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação'}}})
+            r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação', 'event_date': '2026-11-11T12:00:00+00:00',
+                                                                 'observed_utc': '2026-11-11T15:00:00+00:00'}}})
             bet = [b for b in r['recent_bets'] if b['match_id'] == mid][0]
             self.assertEqual((bet['ft'], bet['settled_by'], r['audit']['manual_results'], len(r['unsettled'])), ([1, 1], 'resultado manual', 1, 1))
 

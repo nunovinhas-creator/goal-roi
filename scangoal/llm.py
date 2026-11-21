@@ -421,8 +421,9 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
             or not 0 <= balance < DAILY_NEURONS):
         print('LLM_SKIPPED_DAILY_BUDGET')
         return state
-    rep = report.build(as_of=started)
-    signals = chronology.as_of_view(report.LAST['research_signals'], started)
+    captured = {}
+    rep = report.build(as_of=started, capture=captured)
+    signals = chronology.as_of_view(captured['research_signals'], started)
     registry = brain.load_registry(rpath)
     visible_registry = chronology.registry_at(registry, started)
     vocab = vocabulary(signals)
