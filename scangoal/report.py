@@ -210,16 +210,19 @@ def external_matches(bet, row):
             and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
 
 
-def settlement_kickoff(bet, external):
+def settlement_kickoff(bet, external, fixture_times=()):
     kickoff = chronology.kickoff_time(bet)
     if kickoff is not None:
         return kickoff
+    if len(fixture_times) == 1:
+        return next(iter(fixture_times))
     if external:
         return chronology.parse_utc(external.get('event_date'))
     if (bet.get('phase') == 'live' and type(bet.get('minute')) is int
             and 0 <= bet['minute'] <= 120 and provenance_ok(bet)):
         # An original in-play message bounds the latest possible start time.
-        return chronology.signal_time(bet)
+        sent = chronology.signal_time(bet)
+        return sent - timedelta(minutes=max(0, bet['minute'] - 1)) if sent is not None else None
     return None
 
 
@@ -286,7 +289,9 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         mid = b['match_id']
         ext = (bsd or {}).get(mid)
         ext = ext if mid not in ambiguous and external_matches(b, ext) else None
-        kickoff = settlement_kickoff(b, ext)
+        det = (details or {}).get(mid) if mid not in ambiguous else None
+        kickoff = settlement_kickoff(b, ext or (det if external_matches(b, det) else None),
+                                     {parts[0] for parts in fixtures[mid] if parts[0] is not None})
         observed = opportunity_results.utc
         embedded = (chronology.get('telegram') or {}).get(mid, ()) if mid not in ambiguous else ()
         proof = opportunity_results.resolve(embedded, kickoff=kickoff, as_of=now)
@@ -321,7 +326,6 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         known = b['result_available_utc']
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
-        det = (details or {}).get(mid) if mid not in ambiguous else None
         fetched = observed(det.get('fetched_at_utc')) if det else None
         if not (not conflict and det and det.get('consistent') and (external_matches(b, det) or
                 (ext and ext.get('provider') == 'HL' and ext.get('bsd_id') == det.get('hl_id') and ext.get('bsd_id') is not None))

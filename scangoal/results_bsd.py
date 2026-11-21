@@ -84,9 +84,9 @@ def time_ok(target, ko):
     if scheduled is not None:
         return abs(ko - scheduled) <= timedelta(minutes=15)
     signal, minute = chronology.signal_time(target), target.get('minute')
-    return (target.get('phase') == 'live' and signal is not None and type(minute) is int and 0 <= minute <= 120
-            and timedelta(0) <= signal - ko <= timedelta(minutes=150)
-            and timedelta(minutes=-5) <= signal - ko - timedelta(minutes=minute) <= timedelta(minutes=45))
+    return (target.get('phase') == 'live' and signal is not None and timedelta(0) <= signal - ko <= timedelta(minutes=150)
+            and (minute is None or (type(minute) is int and 0 <= minute <= 120
+                                    and timedelta(minutes=-5) <= signal - ko - timedelta(minutes=minute) <= timedelta(minutes=45))))
 
 
 def score_of(event):

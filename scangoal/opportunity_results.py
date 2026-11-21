@@ -142,6 +142,10 @@ def settle_research_bet(bet, as_of):
         visible = {v.kickoff for v in versions if isinstance(v, Observation) and v.kickoff is not None
                    and v.available_at is not None and v.available_at <= cutoff}
         kickoff = next(iter(visible)) if len(visible) == 1 else None
+    if kickoff is None and bet.get('phase') == 'live' and type(bet.get('minute')) is int and 0 <= bet['minute'] <= 120:
+        sent = chronology.signal_time(bet)
+        if sent is not None:
+            kickoff = sent - timedelta(minutes=max(0, bet['minute'] - 1))
     result, late = settlement(versions, kickoff=kickoff, as_of=as_of, deadline=deadline)
 
     def payout(score):
