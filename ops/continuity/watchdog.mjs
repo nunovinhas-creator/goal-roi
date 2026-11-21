@@ -1,6 +1,8 @@
 const repo = 'https://api.github.com/repos/nunovinhas-creator/goal-roi';
 const workflow = repo + '/actions/workflows/collect.yml';
 const threshold = 30 * 60;
+const journalBytes = 1_800_000;
+const journalKeys = new Set(['publication', 'ingestion']);
 // Fail closed: both independent configuration switches must explicitly allow recovery.
 const recoveryEnabled = env => env.RECOVERY_MODE === 'active' && env.RECOVERY_ENABLED === 'true';
 
@@ -44,7 +46,8 @@ export async function inspect(token, now = Date.now(), request = fetch) {
 // SQLite-backed singleton; a committed intent survives eviction and an ambiguous POST.
 export class RecoveryGuard {
   constructor(ctx, env) { this.sql = ctx.storage.sql; this.env = env; }
-  async fetch() {
+  async fetch(request) {
+    if (request && new URL(request.url).pathname === '/journal') return this.journal(request);
     if (!recoveryEnabled(this.env) || !this.env.GITHUB_ACTIONS_TOKEN)
       return Response.json({decision:'disabled'});
     const report = await inspect(this.env.GITHUB_ACTIONS_TOKEN);
@@ -60,9 +63,58 @@ export class RecoveryGuard {
     if (!response.ok) throw Error('Dispatch HTTP ' + response.status);
     return Response.json({...report, decision:'requested'});
   }
+
+  async journal(request) {
+    const headers = {'Cache-Control':'no-store'};
+    const bad = status => new Response(null, {status, headers});
+    let query = {key:new URL(request.url).searchParams.get('key')};
+    if (request.method === 'PUT') {
+      const size = Number(request.headers.get('Content-Length'));
+      if (size > journalBytes) return bad(413);
+      try {
+        const body = await request.arrayBuffer();
+        if (body.byteLength > journalBytes) return bad(413);
+        query = JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(body));
+      } catch {
+        return bad(400);
+      }
+      if (!query || !Number.isSafeInteger(query.revision) || query.revision < 0 ||
+          !query.value || typeof query.value !== 'object' || Array.isArray(query.value)) return bad(400);
+    } else if (request.method !== 'GET') return bad(405);
+    if (!journalKeys.has(query.key)) return bad(400);
+
+    this.sql.exec('CREATE TABLE IF NOT EXISTS journal (key TEXT PRIMARY KEY, revision INTEGER NOT NULL, value TEXT NOT NULL)');
+    const current = this.sql.exec('SELECT revision, value FROM journal WHERE key = ?', query.key).toArray()[0];
+    const revision = current?.revision ?? 0;
+    if (request.method === 'GET') {
+      return Response.json({revision, value:current ? JSON.parse(current.value) : null}, {headers});
+    }
+    if (query.revision !== revision) return bad(409);
+    // The read and update run without an intervening await in the same Durable Object.
+    this.sql.exec('INSERT OR REPLACE INTO journal VALUES (?, ?, ?)', query.key, revision + 1, JSON.stringify(query.value));
+    return Response.json({revision:revision + 1}, {headers});
+  }
 }
 
-export default {async scheduled(event, env) {
+function journalAuthorized(request, token) {
+  if (!token) return false;
+  const expected = 'Bearer ' + token;
+  const actual = request.headers.get('Authorization') || '';
+  if (actual.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= actual.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
+}
+
+export default {async fetch(request, env) {
+  const path = new URL(request.url).pathname;
+  if (path !== '/journal') return new Response(null, {status:404});
+  if (!journalAuthorized(request, env.GOAL_ROI_DURABLE_TOKEN)) return new Response(null, {status:403});
+  const journal = env.GUARD.get(env.GUARD.idFromName('goal-roi-journal-main'));
+  const headers = new Headers(request.headers);
+  headers.delete('Authorization');
+  return journal.fetch(new Request(request, {headers}));
+}, async scheduled(event, env) {
   const id = new Date(event.scheduledTime).toISOString();
   const report = await inspect(env.GITHUB_ACTIONS_TOKEN);
   let outcome = report;
