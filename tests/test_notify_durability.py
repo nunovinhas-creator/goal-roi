@@ -337,9 +337,10 @@ class WorkflowActivation(unittest.TestCase):
         self.assertIn('concurrency:\n'
                       "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n"
                       '  cancel-in-progress: false', text)   # production keeps a single writer
-        # persisted credentials: v4 tag or its reviewed SHA (v4.4.0), never persist-credentials: false
-        self.assertRegex(text, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
-        self.assertNotIn('persist-credentials: false', text)
+        production = text.split('\n  validate:\n', 1)[0]
+        # The publishing job requires persisted credentials from the reviewed checkout action.
+        self.assertRegex(production, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
+        self.assertNotIn('persist-credentials: false', production)
         self.assertTrue(any('scangoal.watch' in l for l in steps['Fast reads every 2 minutes until the next collection (read-only)']))
 
     def test_fast_reads_go_through_the_same_run(self):
