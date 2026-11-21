@@ -2729,6 +2729,18 @@
    "sha256": "164a094fab393cee2f6f99836fc38aedc1a20bd40b9e0bd68a36f4a0c308ac1c",
    "state": "delivered"
   },
+  "game|id:nec-nijmegen-vs-psv-eindhoven-20261121|ef678d18dfb3": {
+   "attempt_utc": "2026-11-21T17:21:19+00:00",
+   "chars": 207,
+   "created_utc": "2026-11-21T17:21:19+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "0c0896e29cfbf8a717ac499506b08bb1c02511aecbb91a971b67d09ee3749fba",
+   "state": "in_flight"
+  },
   "game|id:new-england-vs-philadelphia-20261121|af22ceea8646": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
    "chars": 194,
@@ -4092,22 +4104,22 @@
   "delivered": 259,
   "uncertain": 2
  },
- "format_last_run_utc": "2026-11-21T17:15:26+00:00",
+ "format_last_run_utc": "2026-11-21T17:19:19+00:00",
  "health": {
   "reference": {
    "bsd_results": 40,
-   "eligible": 1406,
+   "eligible": 1411,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 104,
-   "hypotheses": 11999,
+   "hypotheses": 12038,
    "settled_bets": 1109,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 120,
+   "statuses": 124,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-21T17:15:26+00:00",
+ "last_run_utc": "2026-11-21T17:19:19+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -4325,6 +4337,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 35,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 35,
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 33,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 30,
@@ -4878,6 +4891,9 @@
   "item|id:nd-dravinja-vs-ilirija-20261120|Asian Total|Over 4": {
    "at_utc": "2026-11-20T17:21:08+00:00"
   },
+  "item|id:nec-nijmegen-vs-psv-eindhoven-20261121|Asian Total|Under 5.5": {
+   "at_utc": "2026-11-21T17:21:19+00:00"
+  },
   "item|id:new-england-vs-philadelphia-20261121|Asian Total|Under 3": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
@@ -5161,9 +5177,12 @@
   "Forma de golos | Golos até ao sinal = nenhum & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Marcador no momento = empatado & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte": "abandonada",
+  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
+  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
@@ -5186,6 +5205,7 @@
   "Polymarket | Hora (UTC) = noite & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": "promissora",
   "Polymarket | Mercado = outro mercado & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Mercado = outro mercado & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -5654,6 +5674,7 @@
   "2026-11-21T16:23:32+00:00|Bournemouth — Nottingham Forest|Over 2.5",
   "2026-11-21T16:23:32+00:00|Newcastle United — Arsenal|Under 2.5",
   "2026-11-21T16:52:53+00:00|CFR Cluj — Otelul Galati|Over 5",
-  "2026-11-21T17:11:46+00:00|Parma — Roma|Under 3.5"
+  "2026-11-21T17:11:46+00:00|Parma — Roma|Under 3.5",
+  "2026-11-21T17:18:30+00:00|NEC Nijmegen — PSV Eindhoven|Under 5.5"
  ]
 }
