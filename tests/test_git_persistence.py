@@ -35,41 +35,27 @@ git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${G
 '''
 
 
-# P2: o passo das leituras rápidas = o de `Commit data` com a última linha trocada por este bloco.
-RETRY_TAIL = '''git pull -q --rebase origin "${GITHUB_REF_NAME}"
-if ! git push -q origin "HEAD:${GITHUB_REF_NAME}"; then
-  echo "::warning::push rejected; one more rebase and push of the same commit"
-  git pull -q --rebase origin "${GITHUB_REF_NAME}"
-  git push -q origin "HEAD:${GITHUB_REF_NAME}"
-fi
-'''
-SINGLE_TAIL = 'git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"\n'
-
 # Envolve o git real só para observar e provocar a corrida: regista cada subcomando e cada push e, antes do push n, corre
 # `before_push_<n>` (outro escritor publica no remoto), como se o remoto tivesse avançado entre o pull e o push.
 SHIM = '''#!/bin/bash
-echo "$1" >> "$SHIM_DIR/subcommands"
-if [ "$1" = push ]; then
+argv=("$@")
+while [[ "$1" = -C || "$1" = -c ]]; do shift 2; done
+subcommand="$1"
+echo "$subcommand" >> "$SHIM_DIR/subcommands"
+if [ "$subcommand" = push ]; then
   n=$(( $(cat "$SHIM_DIR/pushes" 2>/dev/null || echo 0) + 1 )); echo $n > "$SHIM_DIR/pushes"
   echo "$*" >> "$SHIM_DIR/push_args"
   if [ -x "$SHIM_DIR/before_push_$n" ]; then "$SHIM_DIR/before_push_$n" >/dev/null 2>&1 || exit 99; fi
 fi
-exec "$REAL_GIT" "$@"
+exec "$REAL_GIT" "${argv[@]}"
 '''
 
 
 def step_script(name, text=None):
-    """Bloco `run: |` do passo `name` (sem dependência de PyYAML, que o workflow de testes não instala)."""
-    lines = (text or WORKFLOW.read_text(encoding='utf-8')).split('\n')
-    start = next(i for i, l in enumerate(lines) if l.strip() == '- name: %s' % name)
-    run = next(i for i in range(start + 1, len(lines)) if lines[i].strip() == 'run: |')
-    indent = len(lines[run]) - len(lines[run].lstrip()) + 2
-    body = []
-    for l in lines[run + 1:]:
-        if l.strip() and len(l) - len(l.lstrip()) < indent:
-            break
-        body.append(l[indent:])
-    return '\n'.join(body).rstrip('\n') + '\n'
+    """Return the exact command configured for the named workflow step."""
+    lines = (text or WORKFLOW.read_text(encoding='utf-8')).splitlines()
+    start = next(i for i, line in enumerate(lines) if line.strip() == '- name: %s' % name)
+    return next(line.strip().removeprefix('run: ') for line in lines[start + 1:] if line.strip().startswith('run: '))
 
 
 class Sandbox:
@@ -114,7 +100,7 @@ class Sandbox:
         return self.tmp / name
 
     def run_step(self, repo, script, shim=False):
-        env = self.env
+        env = dict(self.env, PYTHONPATH=str(ROOT))
         if shim:
             env = dict(env, SHIM_DIR=str(self.shim_dir), REAL_GIT=shutil.which('git', path=self.env['PATH']),
                        PATH=str(self.shim_dir / 'bin') + os.pathsep + self.env['PATH'])
@@ -190,34 +176,10 @@ def collect(repo, tag):
 
 
 class WorkflowScriptTests(unittest.TestCase):
-    def test_both_steps_set_a_repository_local_identity_before_commit_and_rebase(self):
+    def test_both_steps_run_the_publisher(self):
         for name in STEPS:
-            script = step_script(name)
-            self.assertIn('git config user.name "scangoal-collector"', script, name)
-            self.assertIn('git config user.email "actions@users.noreply.github.com"', script, name)
-            order = [script.index(s) for s in ('git config user.name', 'git config user.email', 'git commit', 'git pull -q --rebase')]
-            self.assertEqual(order, sorted(order), name)
-            self.assertNotIn('--global', script, name)
-            self.assertNotIn('--system', script, name)
-            self.assertNotRegex(script, r'--force|push\s+-f|\+HEAD', name)
-            self.assertNotRegex(script, r'-X\s*(ours|theirs)|--strategy|reset --hard|checkout --(ours|theirs)', name)
-
-    def test_only_the_identity_lines_changed(self):
-        fixed = step_script(STEPS[0])
-        undo = re.sub(r'# Identidade local[^\n]*\ngit config user.name "scangoal-collector"\ngit config user.email '
-                      r'"actions@users.noreply.github.com"\ngit commit -q', 'git -c user.name="scangoal-collector" -c '
-                      r'user.email="actions@users.noreply.github.com" commit -q', fixed)
-        self.assertEqual(undo, PRE_FIX)
-        # P2: o passo das leituras rápidas só difere na última linha (uma nova tentativa); `Commit data` não muda.
-        self.assertTrue(fixed.endswith(SINGLE_TAIL))
-        self.assertEqual(step_script(STEPS[1]), fixed[:-len(SINGLE_TAIL)] + RETRY_TAIL)
-
-    def test_retry_is_bounded_and_only_replays_the_same_commit(self):
-        fast = step_script(STEPS[1])
-        self.assertEqual(fast.count('git pull -q --rebase origin "${GITHUB_REF_NAME}"'), 2)   # uma só nova tentativa
-        self.assertEqual(fast.count('git push -q origin "HEAD:${GITHUB_REF_NAME}"'), 2)
-        self.assertEqual(fast.count('git commit'), 1)                                        # nenhum commit novo
-        self.assertNotRegex(fast, r'python|scangoal\.|notify|watch|while|for |until|sleep')   # sem recolha, avisos ou ciclos
+            self.assertEqual(step_script(name), 'python -u -m scangoal.publication publish')
+        self.assertIn('python -u -m scangoal.publication resume', WORKFLOW.read_text(encoding='utf-8'))
 
     def test_unchanged_step_guards(self):
         text = WORKFLOW.read_text(encoding='utf-8')
@@ -225,7 +187,7 @@ class WorkflowScriptTests(unittest.TestCase):
         fast = text[text.index('- name: Commit data from the fast reads'):text.index('- name: Start the next collection')]
         self.assertNotIn('continue-on-error', main)          # a recolha principal falha de forma visível
         self.assertNotIn('continue-on-error', fast)          # P2: uma falha de persistência deixa a execução vermelha
-        self.assertIn("if: ${{ !cancelled() && github.ref_name == 'main' }}", fast)
+        self.assertIn("steps.resume.outcome == 'success'", fast)
         self.assertIn('group: scangoal-write', text)
         self.assertIn('cancel-in-progress: false', text)
         self.assertIn("cron: '3,13,23,33,43,53 * * * *'", text)
@@ -280,15 +242,15 @@ class GitPersistenceTests(unittest.TestCase):
                 r = self.sb.run_step(runner, step_script(name))
                 self.assertEqual(r.returncode, 0, r.stderr)
                 self.assert_published(runner, msgs, lines)
-                cfg = self.sb.raw('config', '--local', '--get-regexp', '^user\\.', cwd=runner).stdout
-                self.assertEqual(cfg, 'user.name scangoal-collector\nuser.email actions@users.noreply.github.com\n')
+                cfg = self.sb.raw('config', '--local', '--get-regexp', '^user\\.', cwd=runner, check=False).stdout
+                self.assertEqual(cfg, '')
 
     def test_no_changes_exits_zero_without_commit(self):
         runner = self.sb.clone('runner')
         before = self.sb.remote_head()
         for name in STEPS:
             r = self.sb.run_step(runner, step_script(name))
-            self.assertEqual((r.returncode, r.stdout.strip()), (0, 'no changes'))
+            self.assertEqual((r.returncode, r.stdout.strip()), (0, ''))
         self.assertEqual(self.sb.remote_head(), before)
 
     # 2. Rebase com commit remoto não conflitante (o caso exato da #814: merge de uma PR durante as leituras rápidas).
@@ -337,7 +299,7 @@ class GitPersistenceTests(unittest.TestCase):
     # Primeiro passo sem alterações ("no changes", sai antes de configurar): o segundo tem de configurar sozinho.
     def test_fast_step_works_when_main_step_had_nothing_to_commit(self):
         runner = self.sb.clone('runner')
-        self.assertEqual(self.sb.run_step(runner, step_script(STEPS[0])).stdout.strip(), 'no changes')
+        self.assertEqual(self.sb.run_step(runner, step_script(STEPS[0])).stdout.strip(), '')
         msgs = (runner / 'data/messages.jsonl').read_text()
         lines = collect(runner, 'fast')
         self.sb.advance_remote('README.md', append(['x']))
@@ -367,16 +329,17 @@ class GitPersistenceTests(unittest.TestCase):
         r = self.sb.run_step(runner, step_script(STEPS[1]))
         self.assertNotEqual(r.returncode, 0)
         self.assertNotEqual(r.returncode, 128, r.stderr)                    # não é um erro de identidade
-        self.assertIn('CONFLICT', r.stdout + r.stderr)
+        self.assertIn('PUBLICATION_DEGRADED', r.stdout)
         self.assertNotIn('identity unknown', r.stderr)
         self.assertEqual(self.sb.remote_head(), before)                     # nada publicado por cima
         self.assertEqual(self.sb.remote_file('data/messages.jsonl'), remote_msgs)
         # O commit local continua intacto no runner (ORIG_HEAD / rebase em curso), com todas as linhas novas.
-        local = self.sb.raw('show', 'ORIG_HEAD:data/messages.jsonl', cwd=runner).stdout
+        local = self.sb.raw('show', 'HEAD:data/messages.jsonl', cwd=runner).stdout
         self.assertEqual(local, local_msgs)
         for l in lines:
             self.assertIn(l, local)
-        self.assertTrue((runner / '.git' / 'rebase-merge').exists() or (runner / '.git' / 'rebase-apply').exists())
+        self.assertTrue((runner / '.git' / 'goal-roi-publication' / 'pending.bundle').exists())
+        self.assertFalse((runner / '.git' / 'rebase-merge').exists())
 
     # 4. Push rejeitado (o remoto recusa/avançou entre o pull e o push): falha visível, commit local mantido.
     def test_push_rejected_keeps_local_commit(self):
@@ -389,7 +352,7 @@ class GitPersistenceTests(unittest.TestCase):
         r = self.sb.run_step(runner, step_script(STEPS[0]))
         self.assertNotEqual(r.returncode, 0)
         self.assertNotEqual(r.returncode, 128)
-        self.assertIn('rejected', r.stderr)
+        self.assertIn('PUBLICATION_', r.stdout)
         self.assertEqual(self.sb.remote_head(), before)
         head = self.sb.raw('log', '-1', '--format=%cn|%ce|%s', 'HEAD', cwd=runner).stdout.strip()
         self.assertEqual(head, '%s|%s|data: collect [skip ci]' % IDENTITY)
@@ -406,9 +369,10 @@ class FastReadsRetryTests(GitPersistenceTests):
         return self.sb.run_step(runner, step_script(STEPS[1]), shim=True)
 
     def assert_only_git_plumbing(self):
-        self.assertTrue(set(self.sb.shim_log('subcommands')) <= {'add', 'diff', 'config', 'commit', 'pull', 'push'})
+        self.assertTrue(set(self.sb.shim_log('subcommands')) <= {'add', 'diff', 'commit', 'push', 'rev-parse',
+                        'log', 'merge-base', 'cat-file', 'status', 'rebase', 'bundle', 'fetch', 'merge'})
         for args in self.sb.shim_log('push_args'):
-            self.assertEqual(args, 'push -q origin HEAD:main')                    # nunca --force, -f nem +ref
+            self.assertRegex(args, r'^push -q origin [0-9a-f]+:refs/heads/main$')                    # nunca --force, -f nem +ref
 
     # Push rejeitado por avanço concorrente do remoto + recuperação após uma nova tentativa.
     def test_push_rejected_by_concurrent_advance_recovers_after_one_retry(self):
@@ -420,8 +384,8 @@ class FastReadsRetryTests(GitPersistenceTests):
         r = self.run_fast(runner)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(self.sb.shim_log('pushes'), ['2'])                         # 1 recusado + 1 aceite
-        self.assertIn('::warning::push rejected', r.stdout)
-        self.assertIn('rejected', r.stderr)
+        self.assertIn('PUBLICATION_COMPLETED', r.stdout)
+        self.assertIn('PUBLICATION_', r.stdout)
         self.assert_only_git_plumbing()
         self.assert_published(runner, msgs, lines)
         self.assertIn('PR merged during the fast reads', self.sb.remote_file('docs/index.html'))
@@ -451,7 +415,7 @@ class FastReadsRetryTests(GitPersistenceTests):
         self.sb.race_before_push(1, 'data/messages.jsonl', remote_lines)
         r = self.run_fast(runner)
         self.assertNotIn(r.returncode, (0, 128), r.stderr)
-        self.assertIn('CONFLICT', r.stdout + r.stderr)
+        self.assertIn('PUBLICATION_DEGRADED', r.stdout)
         self.assertEqual(self.sb.shim_log('pushes'), ['1'])                         # sem push depois do conflito
         self.assert_only_git_plumbing()
         remote = self.sb.remote_file('data/messages.jsonl')
@@ -461,8 +425,9 @@ class FastReadsRetryTests(GitPersistenceTests):
             self.assertNotIn(l, remote)
         for rel, text in (('data/messages.jsonl', local_msgs), ('data/notify_state.json', local_state),
                           ('data/notify_log.jsonl', local_log)):
-            self.assertEqual(self.sb.raw('show', 'ORIG_HEAD:' + rel, cwd=runner).stdout, text, rel)   # commit local intacto
-        self.assertTrue((runner / '.git' / 'rebase-merge').exists() or (runner / '.git' / 'rebase-apply').exists())
+            self.assertEqual(self.sb.raw('show', 'HEAD:' + rel, cwd=runner).stdout, text, rel)   # commit local intacto
+        self.assertTrue((runner / '.git' / 'goal-roi-publication' / 'pending.bundle').exists())
+        self.assertFalse((runner / '.git' / 'rebase-merge').exists())
 
     # O remoto volta a avançar antes do segundo push: falha definitiva, sem terceira tentativa, commit local intacto.
     def test_definitive_failure_after_the_single_retry(self):
@@ -474,7 +439,7 @@ class FastReadsRetryTests(GitPersistenceTests):
         r = self.run_fast(runner)
         self.assertNotIn(r.returncode, (0, 128), r.stderr)
         self.assertEqual(self.sb.shim_log('pushes'), ['2'])                         # exatamente uma nova tentativa
-        self.assertEqual(self.sb.shim_log('subcommands').count('pull'), 2)
+        self.assertEqual(self.sb.shim_log('subcommands').count('fetch'), 3)
         self.assert_only_git_plumbing()
         self.assertNotIn(lines[0], self.sb.remote_file('data/messages.jsonl'))
         self.assertIn('<p>two</p>', self.sb.remote_file('docs/index.html'))
@@ -494,22 +459,21 @@ class FastReadsRetryTests(GitPersistenceTests):
         hook.write_text('#!/bin/sh\n[ -e %s ] && exit 0\ntouch %s\nexit 0\n' % (flag, flag))
         hook.chmod(0o755)
         # O push 1 chega ao remoto, mas o envoltório devolve erro, como numa resposta perdida.
-        (self.sb.shim_dir / 'bin' / 'git').write_text(SHIM.replace('exec "$REAL_GIT" "$@"',
-            '"$REAL_GIT" "$@"; rc=$?\n[ "$1" = push ] && [ "$(cat "$SHIM_DIR/pushes")" = 1 ] && exit 1\nexit $rc'))
+        (self.sb.shim_dir / 'bin' / 'git').write_text(SHIM.replace('exec "$REAL_GIT" "${argv[@]}"',
+            '"$REAL_GIT" "${argv[@]}"; rc=$?\n[ "$subcommand" = push ] && [ "$(cat "$SHIM_DIR/pushes")" = 1 ] && exit 1\nexit $rc'))
         r = self.run_fast(runner)
         self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertEqual(self.sb.shim_log('pushes'), ['2'])
+        self.assertEqual(self.sb.shim_log('pushes'), ['1'])
         self.assert_published(runner, msgs, lines)
         self.assertEqual(self.sb.raw('log', '--format=%s', 'main', cwd=self.sb.origin).stdout.count('data: collect'), 1)
 
-    # A recolha principal não muda: sem nova tentativa, falha à primeira recusa (já era vermelha).
-    def test_main_collection_step_is_unchanged(self):
+    def test_main_collection_recovers_after_one_retry(self):
         runner = self.sb.clone('runner')
         collect(runner, 'main')
         self.sb.race_before_push(1, 'docs/index.html', ['<p>x</p>'])
         r = self.sb.run_step(runner, step_script(STEPS[0]), shim=True)
-        self.assertNotIn(r.returncode, (0, 128))
-        self.assertEqual(self.sb.shim_log('pushes'), ['1'])
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertEqual(self.sb.shim_log('pushes'), ['2'])
 
 
 def simulate_job(text, failing):
@@ -521,10 +485,18 @@ def simulate_job(text, failing):
         cond = re.search(r'^        if: \$\{\{ (.+) \}\}$', block, re.M)
         steps[name] = (cond.group(1) if cond else 'success()', '        continue-on-error: true' in block.split('\n'))
     failed, ran, skipped = False, [], []
+    resume_completed = failing != 'Resume pending publication'
+    pending = failing in STEPS
     for name in names:
         cond, tolerated = steps[name]
-        go = {'success()': not failed, 'failure()': failed,
-              "!cancelled() && github.ref_name == 'main'": True}[cond]
+        facts = {
+            'success()': not failed, 'failure()': failed, 'always()': True, '!cancelled()': True,
+            "github.ref_name == 'main'": True, "steps.resume.outcome == 'success'": resume_completed,
+            "steps.fast.outcome != 'skipped'": 'Fast reads every 2 minutes until the next collection (read-only)' in ran,
+            "steps.publication.outputs.pending == 'true'": pending,
+            "steps.publication.outputs.pending != 'true'": not pending,
+        }
+        go = all(facts[part] for part in cond.split(' && '))
         if not go:
             skipped.append(name)
             continue
@@ -541,23 +513,20 @@ class ChainContinuityTests(unittest.TestCase):
         conclusion, ran, _ = simulate_job(WORKFLOW.read_text(encoding='utf-8'), self.FAST)
         self.assertEqual(conclusion, 'failure')
         self.assertLess(ran.index(self.FAST), ran.index(self.NEXT))
-        self.assertIn(self.TELL, ran)                                              # o aviso de falha é avaliado
-        self.assertEqual(ran[-1], self.TELL)
+        self.assertIn('Preserve pending data and intent for the next runner', ran)
+        self.assertNotIn(self.TELL, ran)
 
-    def test_before_p2_the_same_failure_was_green_and_silent(self):
-        text = WORKFLOW.read_text(encoding='utf-8').replace(
-            "      - name: %s\n        if: ${{ !cancelled() && github.ref_name == 'main' }}\n" % self.FAST,
-            "      - name: %s\n        if: ${{ !cancelled() && github.ref_name == 'main' }}\n        continue-on-error: true\n" % self.FAST)
-        self.assertIn('continue-on-error: true\n        run: |\n          git add data', text)
-        conclusion, ran, skipped = simulate_job(text, self.FAST)
-        self.assertEqual(conclusion, 'success')
-        self.assertIn(self.TELL, skipped)                                          # P2-A reproduzido: ninguém é avisado
+    def test_failed_resume_blocks_new_reads_and_still_launches_next_job(self):
+        conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), 'Resume pending publication')
+        self.assertEqual(conclusion, 'failure')
+        self.assertIn('Read bot conversation (read-only)', skipped)
+        self.assertIn(self.NEXT, ran)
 
     def test_a_successful_run_stays_green_and_does_not_warn(self):
         conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), None)
         self.assertEqual(conclusion, 'success')
         self.assertIn(self.NEXT, ran)
-        self.assertEqual(skipped, [self.TELL])
+        self.assertEqual(skipped, ['Preserve pending data and intent for the next runner', self.TELL])
 
     def test_telegram_warning_is_not_guaranteed_outside_the_first_ten_minutes(self):
         """O aviso existente (`notify.failure`, inalterado) só envia nos minutos 00–09 de cada hora, ou se o lançamento seguinte
