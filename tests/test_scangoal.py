@@ -137,9 +137,9 @@ class Report(unittest.TestCase):
 
     def test_first_signal_rule_reinforcement_and_exclusions(self):
         x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
-        ft_for_barnsley = STAKE_FT.replace('bosnia-u19-vs-san-marino-u19-20261111', 'barnsley-vs-oldham-20261111')
+        ft_for_barnsley = BETFAIR_PRE + '\n🏁 FT 4:1'
         rows = [self.row(1, x4), self.row(2, BETFAIR_PRE), self.row(3, STAKE), self.row(4, OPEN),
-                self.row(5, ft_for_barnsley)]  # 5: vista já com resultado -> não é aposta, mas dá o FT 4:1 ao jogo
+                self.row(5, ft_for_barnsley, '2026-11-11T21:00:00+00:00')]  # mesmo encontro, visto já após o FT
         r = self.run_report(rows)
         self.assertEqual((r['unique_bets'], r['excluded_first_seen_with_result'], r['unparsed']), (3, 1, 0))
         g = r['groups']['BETFAIR/pre/mkt>=10K']
@@ -185,8 +185,10 @@ class BSD(unittest.TestCase):
         self.dir = tempfile.TemporaryDirectory()
         os.environ['SCANGOAL_DATA_DIR'] = self.dir.name
         live = BETFAIR_LIVE.replace('Kucukcekmece Sinopspor — Fatsa Belediyespor', 'Sheff Wed — Accrington FC')
-        rows = [{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': BETFAIR_PRE},
-                {'message_id': 2, 'date_utc': '2026-11-11T19:40:00+00:00', 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': live}]
+        rows = [{'message_id': 1, 'date_utc': '2026-11-11T17:49:00+00:00', 'edit_date_utc': None,
+                 'collected_at_utc': '2026-11-11T17:50:00+00:00', 'text': BETFAIR_PRE},
+                {'message_id': 2, 'date_utc': '2026-11-11T19:40:00+00:00', 'edit_date_utc': None,
+                 'collected_at_utc': '2026-11-11T19:41:00+00:00', 'text': live}]
         store.append_versions(rows)
 
     def tearDown(self):
@@ -252,7 +254,8 @@ class BSD(unittest.TestCase):
 
 class Highlightly(BSD):
     def hl(self, i, home, away, when, score='2 - 1', desc='Finished'):
-        return {'id': i, 'date': when, 'homeTeam': {'name': home}, 'awayTeam': {'name': away}, 'league': {'name': 'L'},
+        league = parse(BETFAIR_PRE if home == 'Barnsley' else BETFAIR_LIVE)['league']
+        return {'id': i, 'date': when, 'homeTeam': {'name': home}, 'awayTeam': {'name': away}, 'league': {'name': league},
                 'state': {'description': desc, 'score': {'current': score, 'penalties': None}}}
 
     def run_hl(self, pages, remaining=90, now=None):
@@ -325,7 +328,7 @@ class Hardening(unittest.TestCase):
         rows = [self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, OPEN, '2026-11-12T10:00:00+00:00'),
                 self.row(2, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅', '2026-11-12T10:00:00+00:00')]
         extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'read': 2, 'new_versions': 0},
-                 'results_hl.json': {'results': {}, 'near_misses': {'m': {'bot': ['Sheff Wed', 'Accrington'], 'bsd_candidates': [['Sheffield Wednesday', 'Accrington']]}}}}
+                 'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {'m': {'bot': ['Sheff Wed', 'Accrington'], 'bsd_candidates': [['Sheffield Wednesday', 'Accrington']]}}}}
         r, csv_text = self.build(rows, extra)
         self.assertEqual(r['audit']['collector_last_run_utc'], '2026-11-12T11:00:00+00:00')     # hora da recolha, não da última mensagem
         self.assertEqual(r['audit']['name_review'][0]['bot'], ['Sheff Wed', 'Accrington'])
@@ -425,7 +428,7 @@ Liverpool Women — Aston Villa Women
         from scangoal import results_bsd
         old = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'old-game')
         extra = {'state.json': {'last_run_utc': '2026-11-12T11:00:00+00:00', 'missing_ids': [7, 9]},
-                 'results_hl.json': {'results': {}, 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
+                 'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
         r, _ = self.build([self.row(1, old, '2026-01-01T12:00:00+00:00')], extra)
         self.assertEqual((r['accuracy']['BETFAIR/live']['no_source'], r['audit']['deleted_by_bot'], r['audit']['ended_after_90']), (1, 2, 1))
         target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None}}
@@ -573,11 +576,15 @@ class Brain(Hardening):
 
     def test_report_registers_hypotheses_only_when_asked(self):
         from scangoal import report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i) for i in range(9)]
+        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', 'm%d' % i)
+                .replace('Kucukcekmece Sinopspor', 'Equipa %d' % i) for i in range(9)]
         with tempfile.TemporaryDirectory() as d:
             os.environ['SCANGOAL_DATA_DIR'] = d
             try:
-                store.append_versions([self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)])
+                rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
+                for row in rows:
+                    row['collected_at_utc'] = (datetime.fromisoformat(row['date_utc']) + timedelta(minutes=1)).isoformat()
+                store.append_versions(rows)
                 r = report.build()
                 self.assertEqual((r['brain']['hypotheses'], (Path(d) / 'hypotheses.json').exists()), (0, False))
                 r = report.build(register=True)
@@ -627,7 +634,9 @@ class GoalMinutes(Hardening):
         p = parse(brew)
         self.assertEqual((p['window'], p['bot_prob'], p['usual_prob'], p['minute'], p['score_at_signal']), (15, 50, 37, 25, [1, 1]))
         def details(goals, status='Finished', final=None):
-            return {'details_hl.json': {'details': {'petrzalka-vs-trnava-20261111': {'status': status, 'final': final or [2, 2], 'goals': goals, 'consistent': True, 'score_90': final or [2, 2]}}}}
+            return {'details_hl.json': {'details': {'petrzalka-vs-trnava-20261111': {'status': status, 'final': final or [2, 2], 'goals': goals, 'consistent': True, 'score_90': final or [2, 2],
+                'event_date': '2026-11-11T15:30:00+00:00', 'fetched_at_utc': '2026-11-11T18:00:00+00:00',
+                'league': 'Slovakian 1 Liga Women', 'home': 'FC Petrzalka Women', 'away': 'Spartak Trnava Women'}}}}
         base = [[5, 0, 'home'], [20, 0, 'away']]
         r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')], details(base + [[38, 0, 'home'], [80, 0, 'away']]))
         g = r['accuracy']['GOAL_BREWING']
@@ -722,8 +731,8 @@ class LanguageModel(Hardening):
                 for r in rows:   # PR 3 (P2-K): each version is read after it was sent (the shared helper reads all at 12:00)
                     r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
                 store.append_versions(rows)
-                report.build(register=True)                                                             # o gerador regista "Seleção = empate"
                 t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
+                report.build(register=True, now=t0 - timedelta(minutes=1))
                 for k in range(4):
                     st = llm.run(call, t0 + timedelta(hours=k), self.ENV)
                     modes.append(st['last_mode'])
@@ -761,6 +770,8 @@ class RegimeAndStories(Hardening):
     def test_match_story_lists_every_signal_goals_and_result(self):
         brew = BREW + '\nhttps://scangoal.com/match/barnsley-vs-oldham-20261111?lang=en'
         details = {'details_hl.json': {'details': {'barnsley-vs-oldham-20261111': {'status': 'Finished', 'final': [2, 1], 'consistent': True, 'score_90': [2, 1],
+                                                                                  'fetched_at_utc': '2026-11-11T22:00:00+00:00', 'event_date': '2026-11-11T19:00:00+00:00',
+                                                                                  'home': 'Barnsley', 'away': 'Oldham', 'league': 'England EFL Trophy',
                                                                                   'goals': [[5, 0, 'home'], [20, 0, 'away'], [38, 0, 'home']]}}}}
         r, _ = self.build([self.row(1, BETFAIR_PRE, '2026-11-11T17:49:00+00:00'), self.row(2, brew, '2026-11-11T19:30:00+00:00')], details)
         story = r['matches'][r['recent_bets'][0]['match_id']]
@@ -858,9 +869,10 @@ class Notify(unittest.TestCase):
             finally:
                 del os.environ['SCANGOAL_DATA_DIR']
         env = {'TG_BOT_TOKEN': 't', 'TG_CHAT_ID': '1'}
-        self.assertTrue(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), env))
-        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:25:00+00:00'), env))
-        self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            self.assertTrue(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), env))
+            self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:25:00+00:00'), env))
+            self.assertFalse(notify.failure(sender, datetime.fromisoformat('2026-11-12T12:05:00+00:00'), {}))
 
 
 class Polymarket(Hardening):
@@ -900,11 +912,12 @@ class Settlement(Hardening):
             mid = 'kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111'
             other = BETFAIR_LIVE.replace(mid, 'x-vs-y-20261111')
             rows = [self.row(1, live, '2026-11-11T12:10:00+00:00'), self.row(2, other, '2026-11-11T12:20:00+00:00')]
-            r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
+            r, _ = self.build(rows, {'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {}, 'not_covered': {'x-vs-y-20261111': '2026-11-12T00:00:00+00:00'}}})
             self.assertEqual(sorted((u['match_id'], u['why']) for u in r['unsettled']),
                              [(mid, 'à espera da fonte de resultados'), ('x-vs-y-20261111', 'as fontes não cobrem este jogo')])
             self.assertEqual(r['accuracy']['BETFAIR/live']['no_source'], 1)
-            r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação'}}})
+            r, _ = self.build(rows, {'manual_results.json': {mid: {'ft': [1, 1], 'source': 'visto no site da federação', 'event_date': '2026-11-11T12:00:00+00:00',
+                                                                 'observed_utc': '2026-11-11T15:00:00+00:00'}}})
             bet = [b for b in r['recent_bets'] if b['match_id'] == mid][0]
             self.assertEqual((bet['ft'], bet['settled_by'], r['audit']['manual_results'], len(r['unsettled'])), ([1, 1], 'resultado manual', 1, 1))
 
@@ -971,7 +984,8 @@ class Insights(unittest.TestCase):
                 empty = report.build()
                 self.assertEqual(empty['insights']['narrative'], ['Ainda não há resultados suficientes para interpretar.'])
                 x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
-                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None, 'collected_at_utc': 'c', 'text': t}
+                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None,
+                                    'collected_at_utc': '2026-11-11T17:05:00+00:00', 'text': t}
                 store.append_versions([row(1, x4), row(2, BETFAIR_PRE), row(3, OPEN), row(3, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅')])
                 r = report.build()
             finally:

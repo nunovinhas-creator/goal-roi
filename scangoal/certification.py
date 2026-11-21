@@ -13,17 +13,14 @@ Regras:
   ainda não constam: rank = posição na lista, α = FWER_ALPHA/(rank(rank+1)). Nada é reescrito nem apagado.
 - Cada entrada guarda o hash das condições da hipótese e o hash da entrada anterior.
 
-Alcance da verificação (revisão #5911747123, P2): a cadeia de hashes DENTRO do ficheiro só prova consistência interna — um
-ficheiro inteiramente reescrito, com hashes recalculados, também a satisfaz. A prova de que o registo só cresceu é externa:
-verify_history() confirma que cada versão publicada (histórico git do ficheiro, com as horas dos commits do GitHub) prolonga a
-anterior sem alterar nada. O relatório expõe a cabeça da cadeia (ledger_head_sha256), que fica também no histórico git do
-relatório. verify() nunca levanta exceções: qualquer entrada malformada é só um problema, que desliga a certificação.
+A cadeia de hashes prova consistência interna. `witnessed_selections` exige um recibo independente para o génesis e cada
+prefixo. Os diagnósticos Git verificam a continuidade da cópia local. A hora efetiva de uma seleção é a do recibo assinado.
 """
 import hashlib, json, os, subprocess, sys, tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import chronology
+from . import chronology, scientific_receipts
 
 FILE = 'certification_ledger.json'
 METHOD = 'eprocess_online_alpha_v1'
@@ -176,15 +173,15 @@ def published_versions(path):
     return versions, problems
 
 
-def history_proof(path, current, as_of=None, versions=None):
-    """Prova operacional de integridade histórica (revisão #5911845265, P1-H). -> lista de problemas (vazia = provado).
+def git_history_diagnostics(path, current, as_of=None, versions=None):
+    """Diagnóstico de integridade do histórico local do Git.
 
     1. o registo foi publicado pelo menos uma vez, num repositório com histórico completo (published_versions);
     2. cada versão publicada prolonga a anterior e a cópia atual prolonga a última publicada (verify_history);
     3. coerência temporal: o génesis e cada entrada foram publicados no commit que os introduziu entre o seu carimbo e
        PUBLISH_TOLERANCE_MIN depois (nunca antes); entradas ainda não publicadas não são anteriores à última publicação
        nem posteriores a `as_of`.
-    Qualquer problema desliga toda a certificação e impede novas entradas.
+    As horas Git são declaradas pelo escritor. Este diagnóstico não autoriza certificação.
     """
     if versions is None:
         versions, problems = published_versions(path)
@@ -222,6 +219,47 @@ def selections(ledger, registry):
     if problems:
         return {}, problems
     return {e['id']: (e['rank'], e['alpha'], chronology.parse_utc(e['selected_utc'])) for e in ledger['entries']}, []
+
+
+def witnessed_selections(ledger, registry, directory, as_of):
+    """Require a signed receipt for the genesis and each append-only ledger prefix."""
+    if not isinstance(ledger, dict) or not isinstance(ledger.get('entries'), list):
+        return ledger, {}, verify(ledger, registry), []
+    if as_of is None:
+        return ledger, {}, verify(ledger, registry) or ['independent ledger receipts require an evaluation cutoff'], []
+    activated = chronology.parse_utc(ledger.get('activated_utc'))
+    if activated is not None and activated > as_of:
+        return None, {}, [], []
+    visible = []
+    for entry in ledger['entries']:
+        stamp = chronology.parse_utc(entry.get('selected_utc')) if isinstance(entry, dict) else None
+        if stamp is None or stamp <= as_of:
+            visible.append(entry)
+    ledger = dict(ledger, entries=visible)
+    selected, problems = selections(ledger, registry)
+    if problems:
+        return ledger, {}, problems, []
+    prior, effective, receipts = None, {}, []
+    for length in range(len(visible) + 1):
+        start = activated if length == 0 else selected[visible[length - 1]['id']][2]
+        proof = scientific_receipts.verify(directory, 'certification-ledger', dict(ledger, entries=visible[:length]), as_of=as_of)
+        if (proof is None or not start <= proof.at <= start + timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+                or (prior is not None and proof.at <= prior)):
+            return ledger, {}, ['ledger prefix %d lacks an independent receipt in order' % length], []
+        receipts.append(proof.identifier)
+        prior = proof.at
+        if length:
+            entry = visible[length - 1]
+            effective[entry['id']] = (entry['rank'], entry['alpha'], prior)
+    return ledger, effective, [], receipts
+
+
+def history_proof(path, current, as_of=None, versions=None):
+    """Verify ledger history against independently signed prefix receipts."""
+    cutoff = as_of if as_of is not None else datetime.now(timezone.utc)
+    directory = Path(path).parent / scientific_receipts.DIRECTORY
+    visible, _, problems, _ = witnessed_selections(current, None, directory, cutoff)
+    return problems or (['no witnessed ledger at the cutoff'] if visible is None else [])
 
 
 PROMISING = ('promissora', 'forte', 'confirmada')
@@ -326,12 +364,9 @@ def main():
     if problems:
         print('CERTIFICATION_NOT_ACTIVATED', '; '.join(problems))
         sys.exit(1)
-    save(path, ledger)
-    check = verify(load(path), registry)
-    if check:
-        print('CERTIFICATION_ACTIVATION_FAILED_VERIFY', check)
-        sys.exit(1)
-    print('CERTIFICATION_ACTIVATED legacy', len(ledger['legacy']), 'head', head(ledger))
+    # A draft whose exact bytes are independently timestamped can be considered in a later cut.
+    # This command never installs an unwitnessed ledger.
+    print(json.dumps(ledger, ensure_ascii=False, sort_keys=True))
 
 
 if __name__ == '__main__':

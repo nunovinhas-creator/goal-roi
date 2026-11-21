@@ -42,9 +42,12 @@ def parse_utc(value):
 def _parse_utc(value):
     try:
         dt = datetime.fromisoformat(value.strip().replace('Z', '+00:00'))
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
-    return dt.astimezone(UTC) if dt.tzinfo else None
+    try:
+        return dt.astimezone(UTC) if dt.tzinfo else None
+    except OverflowError:
+        return None
 
 
 def _loose_utc(value):
@@ -118,6 +121,8 @@ def decidable(b):
         return False
     latest = t + timedelta(minutes=DECISION_DELAY_MAX_MIN)
     ko = kickoff_time(b)
+    if b.get('phase') == 'pre' and ko is not None:
+        return latest < ko
     if ko is not None and ko > latest:
         return True
     return latest - signal_time(b) <= timedelta(minutes=DECISION_MAX_LAG_MIN)
@@ -126,6 +131,29 @@ def decidable(b):
 def born(h):
     """Hora de registo de uma hipótese; None se ausente ou malformada (a hipótese não sustenta decisões)."""
     return parse_utc(h.get('born_utc')) if isinstance(h, dict) else None
+
+
+def registry_at(registry, as_of):
+    return {hid: h for hid, h in registry.items() if (stamp := born(h)) is not None and stamp <= as_of}
+
+
+def snapshot_at(state, as_of):
+    """Select a previously saved telemetry snapshot by its completion time."""
+    versions = state.get('snapshots') or []
+    versions = versions if isinstance(versions, list) else []
+    visible = [(stamp, index, row) for index, row in enumerate([*versions, state]) if isinstance(row, dict)
+               and (stamp := parse_utc(row.get('last_run_utc'))) is not None and stamp <= as_of]
+    return max(visible)[2] if visible else {}
+
+
+def archive_snapshot(current, previous, *fields):
+    """Preserve the previous summary before updating a mutable state file."""
+    before = {key: value for key, value in previous.items() if key in fields or key == 'last_run_utc'}
+    after = {key: value for key, value in current.items() if key in fields or key == 'last_run_utc'}
+    versions = previous.get('snapshots', [])
+    if before != after and parse_utc(before.get('last_run_utc')) is not None and (not versions or versions[-1] != before):
+        versions = [*versions, before]
+    return dict(current, snapshots=versions) if versions else current
 
 
 def iso(dt):
@@ -137,23 +165,28 @@ def as_of_view(signals, as_of):
 
     - sinais lidos depois de `as_of` não existem ainda; sem prova de leitura (carimbo ausente, inválido, sem fuso ou
       contraditório) também não — fail-closed (revisão #5912461690, P2-K), mesmo que emitidos antes de `as_of`;
-    - um resultado com observação provada depois de `as_of` ainda não é conhecido: a aposta fica em aberto;
+    - sem observação provada até `as_of`, a aposta fica em aberto;
     - a primeira observação de um resultado do jogo posterior a `as_of` ainda não aconteceu.
-    Resultados sem hora provada continuam a contar só "agora" (política da PR 3); por isso uma avaliação com `as_of`
-    anterior aos dados só é exata sem resultados de hora desconhecida — a certificação nunca os usa (fail-closed).
-    No relatório de produção `as_of` é o instante da recolha e a vista não muda nada.
     """
+    from .opportunity_results import settle_research_bet
+
     out = []
     for b in signals:
         t = decision_time(b)
         if t is None or t > as_of:   # sem prova de leitura até `as_of` (ausente, inválida, contraditória): não existe (P2-K)
             continue
+        if '_ft_observations' in b:
+            out.append(settle_research_bet(b, as_of))
+            continue
         known = result_known(b)
-        if b.get('w') is not None and known is not None and known > as_of:
+        if (b.get('w') is not None or b.get('ft') is not None) and (known is None or known > as_of):
             b = dict(b, w=None, ft=None, settled_by=None, result_known_utc=None, result_known_source=None)
             b.pop('result_available_utc', None)
         first = parse_utc(b.get('match_result_first_seen_utc'))
         if first is not None and first > as_of:
             b = dict(b, match_result_first_seen_utc=None)
+        quarantine = parse_utc(b.get('result_quarantined_utc'))
+        if b.get('result_quarantined') and quarantine is not None and quarantine > as_of:
+            b = dict(b, result_quarantined=False, result_quarantined_utc=None)
         out.append(b)
     return out

@@ -213,7 +213,7 @@ def publication_window_rehearsal():
                 git('commit', '-q', '--allow-empty', '-m', 'upstream', cwd=tmp, env=env(act + timedelta(minutes=1)))
                 git('checkout', '-q', '-', cwd=tmp)
                 git('rebase', '-q', 'upstream', cwd=tmp, env=env(act + timedelta(minutes=rebase_delay_min)))
-            return certification.history_proof(tmp / 'data' / certification.FILE, led)
+            return certification.git_history_diagnostics(tmp / 'data' / certification.FILE, led)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
     for delay in (5, 29, 31):
@@ -244,7 +244,7 @@ def checkout_rehearsal(main):
             out[label] = {'source': 'github' if source.startswith('https://') else 'local', 'seconds': round(elapsed, 2),
                           'git_dir_mib': round(size / 2 ** 20, 2), 'shallow': git('rev-parse', '--is-shallow-repository', cwd=dest).stdout.strip(),
                           'commits_visible': int(git('rev-list', '--count', 'HEAD', cwd=dest).stdout.strip()),
-                          'history_proof_without_ledger': certification.history_proof(dest / 'data' / certification.FILE, led)}
+                          'history_proof_without_ledger': certification.git_history_diagnostics(dest / 'data' / certification.FILE, led)}
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     return out

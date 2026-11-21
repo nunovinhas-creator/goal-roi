@@ -27,7 +27,7 @@ def key_of(p):
     return (p.get('match_id'), p['type'], p.get('market'), p.get('selection'))
 
 
-def load(chronology=None, *, result_observations=None):
+def load(chronology=None, *, result_observations=None, as_of=None):
     """-> (mensagens na 1.ª versão, FT por jogo, marcas ✅/❌ do bot por aposta, notas de fim de jogo, auditoria).
 
     chronology (opcional, PR 3): dicionário preenchido com a PRIMEIRA recolha (collected_at_utc) em que o sistema viu cada
@@ -46,8 +46,13 @@ def load(chronology=None, *, result_observations=None):
         if not line.strip():
             continue
         r = json.loads(line)
-        audit['versions'] += 1
         got = r.get('collected_at_utc')
+        if as_of is not None:
+            observed = opportunity_results.utc(got)
+            published = opportunity_results.utc(r.get('edit_date_utc') or r.get('date_utc'))
+            if observed is None or published is None or max(observed, published) > as_of:
+                continue
+        audit['versions'] += 1
         audit['last_collected_at_utc'] = max(audit['last_collected_at_utc'] or '', r.get('collected_at_utc') or '')
         p = parse(r['text'])
         if p['type'] == 'WEAKENED_LINEUP' and p.get('teams'):   # mensagem sem ligação: identidade pelas equipas e pelo dia
@@ -89,9 +94,11 @@ def load(chronology=None, *, result_observations=None):
         else:  # ficheiro append-only: a primeira linha de cada id é a versão original
             first[mid] = dict(p, message_id=mid, date_utc=r['date_utc'], had_ft_at_first_sight='ft' in p, edited_at_first_sight=bool(r.get('edit_date_utc')),
                               signal_text=SIGNAL_PART(r['text']), head=r['text'].strip().splitlines()[0][:60], collected_at_utc=got)
-    same_second = collections.Counter(m['date_utc'] for m in first.values() if m['type'] == 'BETFAIR')
+    # Só sinais disponíveis na mesma leitura podem estabelecer um lote em conjunto.
+    same_second = collections.Counter((m['date_utc'], m['collected_at_utc'])
+                                      for m in first.values() if m['type'] == 'BETFAIR')
     for mid, m in first.items():
-        m['burst'] = m['type'] == 'BETFAIR' and same_second[m['date_utc']] >= BURST
+        m['burst'] = m['type'] == 'BETFAIR' and same_second[m['date_utc'], m['collected_at_utc']] >= BURST
         m['goals'] = goals.get(mid)
     if chronology is not None:   # só o valor final de cada resultado/marca conta, desde a primeira recolha em que apareceu
         chronology['ft'] = {m: seen_ft.get((m, tuple(v))) for m, v in ft.items()}
@@ -153,7 +160,7 @@ def note_ft(b, notes):
     return hit[2] if hit else None
 
 
-def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(), chronology=None):
+def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(), chronology=None, now=None):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto.
 
     PR 3: cada aposta guarda signal_seen_utc (primeira recolha da mensagem do sinal) e result_known_utc/result_known_source
@@ -190,7 +197,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             b['odds_at_x4'] = m['odds']
             b['x4_min'] = round((datetime.fromisoformat(m['date_utc']) - datetime.fromisoformat(b['date_utc'])).total_seconds() / 60)
     bets = sorted(out.values(), key=lambda b: (b['date_utc'], b['message_id']))
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
     for b in bets:
         b['layout_phase'], b['after_kickoff_min'] = b['phase'], None
         if b['type'] == 'STAKE_LOAD' and b['kickoff_utc']:
@@ -360,7 +367,7 @@ def block(rows, odds_key='odds'):
 wilson = insights.wilson
 
 
-def accuracy(signals):
+def accuracy(signals, now=None):
     """Taxa de acerto por tipo, com TODOS os sinais (inclui os vistos já com resultado e os sem odd)."""
     by = collections.OrderedDict()
     for b in signals:
@@ -385,7 +392,7 @@ def accuracy(signals):
                      if any(r['odds'] for r in done) else None,
                      'seen_late': sum(1 for r in done if not r['in_roi']),
                      'by_bot_mark': sum(1 for r in done if r['settled_by'] == 'marca do bot')}
-        days = max(1.0, (datetime.now(timezone.utc) - datetime.fromisoformat(min(r['date_utc'] for r in rows))).total_seconds() / 86400)
+        days = max(1.0, ((now or datetime.now(timezone.utc)) - datetime.fromisoformat(min(r['date_utc'] for r in rows))).total_seconds() / 86400)
         rate = (hits + miss) / days
         out[name]['per_day'] = round(rate, 1)
         out[name]['days_to_hint'] = max(0, math.ceil((30 - hits - miss) / rate)) if rate else None
@@ -501,37 +508,19 @@ def write_csv(signals, path):
                          '%d-%d' % tuple(b['ft']) if b['ft'] else '', res, units, b['settled_by'] or '', 'sim' if b['in_roi'] else 'não'])
 
 
-def operational_evidence(signals):
+def operational_evidence(signals, now=None):
     """Decision-facing statistics, independent of the legacy exploratory tables."""
     rows = [b for b in signals if eligible(b)]
-    return {'scope': 'eligible_bets_only', 'accuracy': accuracy(rows),
+    return {'scope': 'eligible_bets_only', 'accuracy': accuracy(rows, now),
             'regime': insights.regime(rows)}
 
 
-def publish_ledger_state(validation, ledger, ledger_path, registry, now, register):
-    """Seleções em tempo real e coerência do que se publica (revisões #5911603577 e #5912303516, P2-J).
-
-    A avaliação (certificados, estados) usa o registo tal como estava (`evaluated_*`). Com register=True e registo ativo,
-    válido e provado, as candidatas são acrescentadas uma só vez (rank, α e início fixos) e gravadas. Depois, o bloco
-    `validation` passa a descrever o registo GRAVADO — `ledger_head_sha256`/`ledger_entries` iguais aos do ficheiro publicado
-    no mesmo commit — e `newly_selected` lista o que este relatório acrescentou; essas deixam de constar de `candidates`.
-    O cérebro não é reexecutado: as novas seleções só contam (sem jogos ainda) a partir da avaliação seguinte.
-    """
+def ledger_summary(validation):
+    """Describe the externally witnessed prefix evaluated by this report."""
     validation['evaluated_ledger_head_sha256'] = validation.get('ledger_head_sha256')
     validation['evaluated_ledger_entries'] = validation.get('ledger_entries', 0)
     validation['newly_selected'] = []
-    if register and validation['ledger_valid'] and validation['candidates']:
-        n = certification.append(ledger, validation['candidates'], registry, now)
-        if n:
-            certification.save(ledger_path, ledger)
-            validation['newly_selected'] = [{k: e[k] for k in ('rank', 'id', 'alpha', 'selected_utc')} for e in ledger['entries'][-n:]]
-            chosen = {e['id'] for e in validation['newly_selected']}
-            validation['candidates'] = [c for c in validation['candidates'] if c not in chosen]
-    if validation['ledger_valid']:
-        validation['ledger_head_sha256'] = certification.head(ledger)
-        validation['ledger_entries'] = len(ledger['entries'])
-    validation['candidates_meaning'] = ('promising certifiable hypotheses not yet in the ledger; a report with register=True '
-                                        'registers them (see newly_selected)')
+    validation['candidates_meaning'] = 'promising hypotheses awaiting an independently witnessed selection'
 
 
 def research_bets(signals, observations, now, *, bindings=None):
@@ -554,36 +543,15 @@ def research_bets(signals, observations, now, *, bindings=None):
             yield b
             continue
 
-        kickoff = chronology.kickoff_time(b)
-        if kickoff is None:
-            visible = {v.kickoff for v in versions if v.kickoff is not None and v.available_at is not None
-                       and v.available_at <= cutoff}
-            kickoff = next(iter(visible)) if len(visible) == 1 else None
-        result, late = opportunity_results.settlement(versions, kickoff=kickoff, as_of=now, deadline=deadline)
-        b = dict(b, result_quarantined=result.conflict,
-                 result_reconciliation=(
-                     {'ft': late.score, 'conflict': late.conflict, 'available_utc': chronology.iso(late.available_at)}
-                     if late is not None else None))
-        if result.score is None:
-            yield dict(b, ft=None, w=None, result_known_utc=None, result_known_source=None, settled_by=None,
-                       match_result_first_seen_utc=chronology.iso(result.first_available_at))
-            continue
-
-        market, won = b['market'], None
-        if market and not (b['phase'] == 'live' and market.strip().lower() == 'asian handicap'):
-            won = settle(market, b['selection'], result.score, b['teams'])
-        yield dict(b, ft=list(result.score), w=won, result_known_utc=None,
-                   result_available_utc=result.available_at.isoformat(),
-                   result_known_source='versioned_ft', settled_by='versioned_ft' if won is not None else None,
-                   match_result_first_seen_utc=result.first_available_at.isoformat())
+        yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
-def build(csv_path=None, register=False, now=None):
+def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
-    now = now or datetime.now(timezone.utc)
+    now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
     chron = {}
     bot_observations, providers = {}, {}
-    msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations)
+    msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations, as_of=now)
     ext, bsd, near, st_hl = {}, {}, {}, {}                         # resultados externos: Highlightly primeiro, depois BSD
     for name in ('hl', 'bsd'):
         try:
@@ -591,24 +559,29 @@ def build(csv_path=None, register=False, now=None):
         except (OSError, ValueError):
             st = {}
         providers['highlightly' if name == 'hl' else name] = st
-        res = st.get('results') or {}
+        res = opportunity_results.provider_snapshot(st, name, now)
+        telemetry = chronology.snapshot_at(st, now)
         audit[name + '_results'] = len(res)
         audit[name + '_vs_bot_disagreements'] = sum(1 for m, r in res.items() if m in ft and ft[m] != r['ft'])
-        audit[name + '_near_misses'] = len(st.get('near_misses') or {})
-        near[name] = st.get('near_misses') or {}
-        audit[name + '_last_run_utc'] = st.get('last_run_utc')
+        audit[name + '_near_misses'] = len(telemetry.get('near_misses') or {})
+        near[name] = telemetry.get('near_misses') or {}
+        audit[name + '_last_run_utc'] = telemetry.get('last_run_utc')
         ext[name] = res
         if name == 'hl':
-            st_hl = st
+            st_hl = telemetry
         for m, r in res.items():
             bsd.setdefault(m, dict(r, provider=name.upper()))
     try:
         details = json.loads((data_dir() / 'details_hl.json').read_text(encoding='utf-8')).get('details') or {}
     except (OSError, ValueError):
         details = {}
+    details = {mid: row for mid, row in details.items()
+               if (seen := chronology.parse_utc(row.get('fetched_at_utc'))) is not None and seen <= now}
     audit['goal_minutes_matches'] = len(details)
     audit['goal_minutes_inconsistent'] = sum(1 for d in details.values() if not d.get('consistent'))
     manual = brain.load_registry(data_dir() / 'manual_results.json')   # {jogo: {ft: [c, f], source: onde foi visto}}; só entradas revistas à mão
+    manual = {mid: row for mid, row in manual.items()
+              if (seen := chronology.parse_utc(row.get('observed_utc'))) is not None and seen <= now}
     audit['manual_results'] = len(manual)
     audit['manual_vs_other_disagreements'] = sum(1 for m, r in manual.items() if (ft.get(m) or (bsd.get(m) or {}).get('ft')) not in (None, tuple(r['ft']), list(r['ft'])))
     chron['external'] = {}
@@ -621,7 +594,8 @@ def build(csv_path=None, register=False, now=None):
     for m, r in manual.items():
         if m not in bsd and isinstance(r.get('ft'), list) and len(r['ft']) == 2:
             bsd[m] = {'ft': [int(r['ft'][0]), int(r['ft'][1])], 'provider': 'manual', 'known_utc': r.get('observed_utc')}   # sem hora provada: desconhecida
-    not_covered = set(st_hl.get('not_covered') or {}) - set(bsd)
+    not_covered = {mid for mid, stamp in (st_hl.get('not_covered') or {}).items()
+                   if (seen := chronology.parse_utc(stamp)) is not None and seen <= now} - set(bsd)
     for m, d in details.items():   # jogo decidido depois dos 90 minutos: vale o marcador aos 90, reconstruído pelos minutos dos golos
         if m not in bsd and d.get('consistent') and d.get('score_90') and re.search(r'extra time|penalt', d.get('status') or '', re.I):
             bsd[m] = {'ft': d['score_90'], 'provider': 'HL aos 90 min', 'known_utc': d.get('fetched_at_utc')}
@@ -629,13 +603,14 @@ def build(csv_path=None, register=False, now=None):
         state = json.loads((data_dir() / 'state.json').read_text(encoding='utf-8'))
     except (OSError, ValueError):
         state = {}
+    state = chronology.snapshot_at(state, now)
     audit['collector_last_run_utc'] = state.get('last_run_utc') or audit['last_collected_at_utc']
     audit['name_review'] = [dict(n, provider=name.upper()) for name in ('hl', 'bsd') for n in (near.get(name) or {}).values()][:30]
     audit['deleted_by_bot'] = len(state.get('missing_ids') or [])
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
-    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
-    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron)
+    bets = build_bets(msgs, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron, now=now)
+    signals = build_bets(msgs, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron, now=now)
     finished_matches = set(ft) | set(bsd)
     finished_matches.update(b['match_id'] for b in signals if b['ft'] or b['match_result_first_seen_utc'])
     by = collections.OrderedDict()
@@ -650,30 +625,29 @@ def build(csv_path=None, register=False, now=None):
     audit['stake_sent_45_after_kickoff'] = sum(1 for b in stake if (b['after_kickoff_min'] or 0) > 45)
     audit['goal_lists'] = sum(1 for b in signals if b['goals'])
     audit['goal_lists_consistent'] = sum(1 for b in signals if b['next_goal_min'] is not None)
-    acc = accuracy(signals)
+    acc = accuracy(signals, now)
     if csv_path:
         write_csv(signals, csv_path)
     ins = insights.build(signals, bets, acc, MIN_SETTLED)
     reg_path = data_dir() / 'hypotheses.json'
     registry = brain.load_registry(reg_path)
-    if register and brain.update_registry(signals, registry):
+    if register and brain.update_registry(signals, registry, now=now):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    LAST['signals'] = [b for b in signals if eligible(b)]
+    captured = LAST if capture is None else capture
+    captured['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
     identified, bindings = match_identity.resolve(msgs, now)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
-                                not_covered=not_covered, chronology=chron)
+                                not_covered=not_covered, chronology=chron, now=now)
     research = list(research_bets(research_input, observations, now, bindings=bindings))
-    LAST['research_signals'] = [b for b in research if eligible(b)]
+    captured['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
-    # Integridade histórica no percurso real (revisão #5911845265, P1-H): o registo tem de prolongar o que foi publicado no
-    # git, com horas coerentes. Sem prova possível (sem git, histórico shallow, nunca publicado): nenhuma certificação.
-    history = certification.history_proof(ledger_path, ledger, as_of=now) if isinstance(ledger, dict) and 'invalid' not in ledger else None
-    brn = brain.build(research, registry, MIN_SETTLED, ledger, history_problems=history, as_of=now)
-    publish_ledger_state(brn['validation'], ledger, ledger_path, registry, now, register)
-    llm_state = brain.load_registry(data_dir() / 'llm_state.json')
+    receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
+    brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now)
+    ledger_summary(brn['validation'])
+    llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
     brn['llm_today'] = {k: llm_state.get(k) for k in ('day', 'calls_today', 'neurons_today', 'accepted_today', 'last_mode')}
     try:
@@ -682,9 +656,10 @@ def build(csv_path=None, register=False, now=None):
         notes = []
     by_id = {h['id']: h for h in brn['top']}
     brn['notes'] = [dict(n, n=by_id[n['id']]['n'], hits=by_id[n['id']]['hits'], hit_rate=by_id[n['id']]['hit_rate'], break_even=by_id[n['id']]['break_even'],
-                         status=by_id[n['id']]['status']) for n in notes if n.get('id') in by_id][:12]
+                         status=by_id[n['id']]['status']) for n in notes if isinstance(n, dict) and n.get('id') in by_id
+                    and (seen := chronology.parse_utc(n.get('at_utc'))) is not None and seen <= now][:12]
     brn['entry_points'] = brain.entry_points(signals)
-    brn['llm_evaluation'] = llm_eval.page_summary(research, registry)   # PR 4: sem histórico git, nunca uma conclusão científica
+    brn['llm_evaluation'] = llm_eval.page_summary(research, registry, as_of=now)
     return {
         'generated_at_utc': now.isoformat(timespec='seconds'),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),
@@ -698,9 +673,9 @@ def build(csv_path=None, register=False, now=None):
         'first_signal_utc': bets[0]['date_utc'] if bets else None, 'min_settled': MIN_SETTLED,
         'groups': {name: block(rows) for name, rows in sorted(by.items())},
         'accuracy': acc, 'insights': ins, 'brain': brn,
-        'operational': operational_evidence(signals),
+        'operational': operational_evidence(signals, now),
         polymarket_alerts.REPORT_KEY: polymarket_alerts.candidates(msgs, finished_matches, now),
-        'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
+        'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals, now), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 

@@ -135,8 +135,7 @@ class OpportunityRankingTests(unittest.TestCase):
         modified = dict(PROTOCOL, born_merge_sha="bogus")
         with self.assertRaises(ValueError):
             run([signal()], {}, protocol=modified)
-        with self.assertRaises(ValueError):
-            run([signal()], {}, now="2026-11-19T15:01:00+00:00")
+        self.assertEqual(run([signal()], {}, now="2026-11-19T15:01:00+00:00")["status"], "not_activated")
 
     def test_exploratory_score_penalizes_variance(self):
         rows, scores = distributed_games(lambda i: i % 2 == 0)

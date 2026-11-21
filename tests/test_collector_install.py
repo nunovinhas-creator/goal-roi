@@ -107,7 +107,7 @@ class InertHooks(unittest.TestCase):
         self.assertNotIn('after_bsd', inspect.getsource(results_bsd.main))
         self.assertIn('run()', inspect.getsource(results_bsd.main))
         source = '\n'.join(p.read_text(encoding='utf-8') for p in (ROOT/'scangoal').glob('*.py'))
-        for forbidden in ('recovery_tail', 'PreparedTail', 'recovery_oidc', 'cryptography', 'bsd-trial-journal'):
+        for forbidden in ('recovery_tail', 'PreparedTail', 'recovery_oidc', 'bsd-trial-journal'):
             self.assertNotIn(forbidden, source)
 
 

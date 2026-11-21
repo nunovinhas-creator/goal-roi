@@ -39,10 +39,10 @@ def main(argv=None):
     ap.add_argument('--as-of')
     ap.add_argument('--protocol-published-utc')
     ap.add_argument('--protocol-publication-evidence')
+    ap.add_argument('--receipt-directory', type=Path)
     ap.add_argument('--out', default=str(ROOT / 'audits'))
     args = ap.parse_args(argv)
     from scangoal import brain, chronology, llm_eval
-    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit, args.protocol_published_utc, args.protocol_publication_evidence)
     try:
         requested = git('rev-parse', '--verify', '%s^{commit}' % args.ref).decode().strip()
         requested_time = chronology.parse_utc(git('show', '-s', '--format=%cI', requested).decode().strip())
@@ -53,6 +53,7 @@ def main(argv=None):
     if as_of is None:
         print('AUDIT_PR4_BAD_AS_OF')
         return 2
+    protocol_time, protocol = llm_eval.protocol_proof(ROOT, args.protocol_commit, receipts=args.receipt_directory, as_of=as_of)
     # Protocolo v4, §0-C: em C ou depois, os dados são sempre os do primeiro commit de main com hora >= C (nunca um posterior).
     ref, problems = requested, list(protocol)
     _, final = llm_eval.windows(protocol_time)
@@ -77,19 +78,19 @@ def main(argv=None):
             inputs['sha256 data/%s' % f.relative_to(data).as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
         os.environ['SCANGOAL_DATA_DIR'] = str(data)
         from scangoal import report
-        report.build(now=as_of)                                    # register=False: nada é escrito
-        signals = report.LAST['research_signals']
+        captured = {}
+        report.build(as_of=as_of, capture=captured)                 # register=False: nada é escrito
+        signals = captured['research_signals']
         registry = brain.load_registry(data / 'hypotheses.json')
     first, history = llm_eval.registry_history(ROOT, ref)
     problems = history + problems + (llm_eval.observation_proof(ROOT, ref, protocol_time) if protocol_time is not None else [])
-    born = llm_eval.births(registry, first, not history)
+    born = llm_eval.births(registry, first, False)                   # só descrição, sem prova independente de nascimento
     res = llm_eval.evaluate(signals, registry, as_of=as_of, born_eff=born, protocol_time=protocol_time, problems=problems)
     try:
         inputs['protocol_commit'] = git('rev-parse', '--verify', '%s^{commit}' % args.protocol_commit).decode().strip()
     except subprocess.CalledProcessError:
         inputs['protocol_commit'] = args.protocol_commit
-    inputs['protocol_published_utc'] = args.protocol_published_utc
-    inputs['protocol_publication_evidence'] = args.protocol_publication_evidence
+    inputs['protocol_receipt_utc'] = chronology.iso(protocol_time)
     cut = llm_eval.cutoff_of(as_of, protocol_time)
     inputs['llm_hypotheses_registered_after_window'] = sum(1 for hid, h in registry.items() if h.get('source') == 'llm'
                                                           and born.get(hid) is not None and born[hid] > cut)
