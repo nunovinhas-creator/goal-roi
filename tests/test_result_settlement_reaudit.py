@@ -25,7 +25,9 @@ class HistoricalSettlementReaudit(unittest.TestCase):
         self.write_result("hl", [2, 1], "2026-11-20T03:00:00Z")
 
     def write_result(self, source, score, stamp):
-        observation = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": stamp}
+        observation = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": stamp,
+                       "kickoff_utc": "2026-11-19T18:00:00Z",
+                       "snapshot": {"home": "Alpha", "away": "Beta", "league": "Example"}}
         (self.directory / ("results_" + source + ".json")).write_text(
             json.dumps({"ft_versions": {"game-1": [observation]}}), encoding="utf-8",
         )

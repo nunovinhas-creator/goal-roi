@@ -109,6 +109,19 @@ def fixture_evidence(results, bindings):
                 available, kickoff = opportunity_results.utc(row.get("known_utc")), None
             elif isinstance(row, opportunity_results.Observation):
                 available, kickoff = row.available_at, row.kickoff
+                if row.fixture_id is not None and row.fixture_id != mid:
+                    continue
+                if row.source == 'telegram_note' and row.link and mid != binding.canonical:
+                    continue
+                if row.provider_record is not None:
+                    from .results_bsd import norm_team
+
+                    record = row.provider_record
+                    _, home, away, league = binding.parts
+                    names = record.get('target_teams') or (record.get('home'), record.get('away'))
+                    if ([norm_team(name) for name in names] != [norm_team(home), norm_team(away)]
+                            or not league or norm_team(record.get('target_league') or record.get('league')) != norm_team(league)):
+                        continue
             else:
                 continue
             if (available is None or (binding.collision is not None and available >= binding.collision)

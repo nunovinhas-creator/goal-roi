@@ -129,7 +129,7 @@ class OperationalShadow(unittest.TestCase):
         self.assertFalse(r['problems']);self.assertEqual(events,self.ledger()['events'])
     def test_corrections_are_appended_and_first_decision_unchanged(self):
         self.step();self.message();ops.tick(self.pub,self.source,self.auth)
-        first=copy.deepcopy(self.ledger()['events'][0]);self.step()
+        first=copy.deepcopy(self.ledger()['events'][0]);self.step(45 * 60)
         self.message(i=1,text=OPEN+'\n\n🏁 FT 3:0 · Asian Total → Over 2.25 ✅');ops.tick(self.pub,self.source,self.auth)
         self.step();self.message(i=1,text=OPEN+'\n\n🏁 FT 4:0 · Asian Total → Over 2.25 ✅');ops.tick(self.pub,self.source,self.auth)
         events=self.ledger()['events'];self.assertEqual(first,events[0])
