@@ -363,7 +363,9 @@ class NextCollection(unittest.TestCase):
         text = WORKFLOW.read_text(encoding='utf-8')
         self.assertEqual(re.findall(r"cron: '([^']+)'", text), ['3,13,23,33,43,53 * * * *'])
         self.assertEqual(text.count('python scripts/dispatch_collection.py'), 1)
-        self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)
+        self.assertIn('concurrency:\n'
+                      "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n"
+                      '  cancel-in-progress: false', text)
 
     @unittest.skipUnless(shutil.which('bash'), 'bash required')
     def test_a_failed_launch_fails_the_step(self):
