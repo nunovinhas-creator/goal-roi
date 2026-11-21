@@ -153,14 +153,15 @@ def capture_result_versions(state, found, events, observed_at):
         if isinstance(event, dict) and type(event.get('id')) is int:
             by_provider_id.setdefault(event['id'], []).append(event)
     for match_id, stored in state['results'].items():
+        bound_id = stored.get('bsd_id') if match_id in found or stored.get('identity_method') == 'provider_id' else None
         for event in by_provider_id.get(stored.get('bsd_id'), ()):
             score, kickoff = score_of(event), kickoff_of(event)
             if (score is not None and ft_time_valid(kickoff, observed_at, observed_at, None, observed_at)
                     and kickoff == chronology.parse_utc(stored.get('event_date'))
-                    and competition_ok(stored, event, provider_id=stored.get('bsd_id') if stored.get('identity_method') == 'provider_id' else None)
+                    and competition_ok(stored, event, provider_id=bound_id)
                     and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
                             for side in ('home', 'away'))):
-                update = dict(stored, ft=score)
+                update = dict(stored, ft=score, home=name_of(event, 'home_team'), away=name_of(event, 'away_team'))
                 if 'url' in event:
                     update['link'] = event['url']
                 remember_provider_results(state, {match_id: update}, observed_at)
