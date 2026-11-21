@@ -197,7 +197,8 @@ def observation_proof(root, ref, since):
             try:
                 doc = json.loads(body) if body is not None else {}
                 cur = (doc.get(key) or {}) if key else doc
-                versions = doc.get('ft_versions', {}) if key == 'results' else {}
+                history_key = {'results': 'ft_versions', 'details': 'detail_versions'}.get(key)
+                versions = doc.get(history_key, {})
                 if not isinstance(versions, dict):
                     raise ValueError('invalid FT versions')
             except (ValueError, AttributeError):
@@ -206,7 +207,8 @@ def observation_proof(root, ref, since):
             for k, v in prev.items():
                 if k not in cur:
                     problems.append('%s entry removed at %s: %s' % (rel, sha[:12], k))
-                elif cur[k] != v:
+                elif cur[k] != v and not (key == 'details' and isinstance(versions.get(k), list)
+                                         and versions[k] and v in versions[k] and cur[k] == versions[k][-1]):
                     problems.append('%s entry rewritten at %s: %s' % (rel, sha[:12], k))
             for k, v in cur.items():
                 if k not in prev and t is not None and since is not None and t >= since:
@@ -217,7 +219,11 @@ def observation_proof(root, ref, since):
                 if not isinstance(before, list) or not isinstance(after, list) or after[:len(before)] != before:
                     problems.append('%s FT history rewritten at %s: %s' % (rel, sha[:12], mid))
                     continue
-                for row in after[len(before):]:
+                if key == 'details' and (not after or cur.get(mid) != after[-1]):
+                    problems.append('%s detail projection is not its latest version at %s: %s' % (rel, sha[:12], mid))
+                for index, row in enumerate(after[len(before):], len(before)):
+                    if key == 'details' and index == 0 and row == prev.get(mid):
+                        continue  # The exact legacy snapshot was already checked when published.
                     observed = chronology.parse_utc(row.get('observed_at')) if isinstance(row, dict) else None
                     available = chronology.parse_utc(row.get('available_at')) if isinstance(row, dict) else None
                     if (observed is None or available is None or available < observed

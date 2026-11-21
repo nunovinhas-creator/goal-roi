@@ -121,7 +121,7 @@ def opportunity_digest(as_of):
         protocol = read_json(PROTOCOL, {})
         observed = {}
         messages, _, _, _, _ = report.load(result_observations=observed, as_of=as_of)
-        results = sourced_results(observed, directory)
+        results = sourced_results(observed, directory, as_of)
         return opportunity_ranking.build(
             messages, results, protocol, activation_utc=activation, as_of=as_of,
         )

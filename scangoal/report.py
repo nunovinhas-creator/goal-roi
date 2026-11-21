@@ -8,7 +8,7 @@ import collections, csv, json, math, pathlib, re
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
-from . import brain, certification, insights, llm_eval, polymarket_alerts
+from . import brain, certification, details_hl, insights, llm_eval, polymarket_alerts
 from .eligibility import eligible, exclusion_reasons, game_identity
 from . import chronology, match_identity, opportunity_forward, opportunity_results
 from .parser import MIN_ODDS, URL, parse, selection_1x2, settle
@@ -364,6 +364,11 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if own is not None:
             b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
             b['result_known_utc'], b['result_known_source'] = known, source
+            if from_bsd and source == 'HL aos 90 min':
+                b['result_provenance'] = {'source': 'highlightly_detail', 'provider_id': ext.get('hl_id'),
+                                          'fixture_id': mid, 'kickoff_utc': ext.get('event_date'),
+                                          'league': ext.get('league'), 'link': ext.get('link'),
+                                          'observed_at': known, 'available_at': b['result_available_utc']}
         elif not invalid:
             valid_marks = [(row.available_at, mark) for row, mark in (chronology.get('mark_versions') or {}).get(b['key'], ())
                            if row.score == tuple(f) and row.fixture_id == mid and row.published_at is not None
@@ -654,7 +659,7 @@ def ledger_summary(validation):
 
 def research_bets(signals, observations, now, *, bindings=None):
     """Settle FT-dependent research rows from the same versioned evidence as the opportunity audit."""
-    snapshot_sources = {'bot_message', 'bot_full_time_note', 'HL', 'BSD'}
+    snapshot_sources = {'bot_message', 'bot_full_time_note', 'HL', 'BSD', 'HL aos 90 min'}
     if bindings is None:
         signals, bindings = match_identity.resolve(signals, now)
     evidence = opportunity_forward.fixture_evidence(observations, bindings)
@@ -705,12 +710,8 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         for m, r in res.items():
             if any(external_matches(msg, r) for msg in fixtures[m]):
                 bsd.setdefault(m, dict(r, provider=name.upper()))
-    try:
-        details = json.loads((data_dir() / 'details_hl.json').read_text(encoding='utf-8')).get('details') or {}
-    except (OSError, ValueError):
-        details = {}
-    details = {mid: row for mid, row in details.items()
-               if (seen := chronology.parse_utc(row.get('fetched_at_utc'))) is not None and seen <= now}
+    detail_state = details_hl.load_state(data_dir())
+    details = details_hl.snapshot(detail_state, now)
     audit['goal_minutes_matches'] = len(details)
     audit['goal_minutes_inconsistent'] = sum(1 for d in details.values() if not d.get('consistent'))
     manual = brain.load_registry(data_dir() / 'manual_results.json')   # {jogo: {ft: [c, f], source: onde foi visto}}; só entradas revistas à mão
@@ -753,7 +754,8 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         by.setdefault(b['group'], []).append(b)
     unparsed = [m for m in msgs if m.get('type') is None or m.get('error')]
     recent = [{'date_utc': b['date_utc'], 'match_id': b['match_id'], 'group': b['group'], 'match': ' — '.join(b['teams'] or []) or b['match_id'], 'selection': label(b), 'odds': b['odds'], 'ft': b['ft'], 'w': b['w'], 'settled_by': b['settled_by'],
-               'n_signals': b['n_signals'], 'max_mult': b['max_mult']} for b in bets[-60:]][::-1]
+               'n_signals': b['n_signals'], 'max_mult': b['max_mult']}
+              | ({'result_provenance': b['result_provenance']} if 'result_provenance' in b else {}) for b in bets[-60:]][::-1]
     stake = [b for b in signals if b['type'] == 'STAKE_LOAD']
     audit['stake_original_seen'] = sum(1 for b in stake if not b['edited_at_first_sight'])
     audit['stake_no_score_after_kickoff'] = sum(1 for b in stake if not b['edited_at_first_sight'] and b['layout_phase'] == 'pre' and (b['after_kickoff_min'] or 0) > 5)
@@ -771,6 +773,8 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     captured = LAST if capture is None else capture
     captured['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
+    for mid, versions in details_hl.observations(detail_state, now).items():
+        observations.setdefault(mid, []).extend(versions)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
                                 not_covered=not_covered, chronology=chron, group_aliases=False, now=now)
