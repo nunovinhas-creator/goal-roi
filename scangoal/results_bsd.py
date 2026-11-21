@@ -148,7 +148,10 @@ def load_result_state(path):
 
 
 def save_result_state(path, state):
+    from .chronology import archive_snapshot
+
     path.parent.mkdir(parents=True, exist_ok=True)
+    state = archive_snapshot(state, load_result_state(path), 'near_misses', 'not_covered', 'not_regular_time')
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     temporary.replace(path)

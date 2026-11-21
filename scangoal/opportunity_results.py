@@ -1,5 +1,6 @@
 """Regulation-time result observations for the prospective opportunity study."""
 
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -153,17 +154,24 @@ def settle_research_bet(bet, as_of):
 
 
 def remember_provider_results(state, matched, stamp):
-    """Preserve the operational first result and append each observed FT version."""
+    """Archive the score and its full provider record in the same observation."""
     for match_id, info in matched.items():
         score = score_pair(info.get("ft"))
         if score is None:
             continue
+        snapshot = deepcopy({k: v for k, v in info.items() if k != "matched_at_utc"})
+        snapshot["ft"] = list(score)
         row = {"ft": list(score), "period": info.get("period", "regulation"),
-               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date")}
+               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date"),
+               "fixture_id": match_id, "snapshot": snapshot}
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
-        if not history or any(history[-1].get(key) != value for key, value in row.items()):
-            history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
-        state["results"].setdefault(match_id, dict(info, matched_at_utc=stamp.isoformat(timespec="seconds")))
+        if history and all(history[-1].get(key) == value for key, value in row.items()):
+            continue
+        history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
+        previous = state["results"].get(match_id)
+        if previous is not None:
+            state.setdefault("first_results", {}).setdefault(match_id, previous)
+        state["results"][match_id] = dict(deepcopy(snapshot), matched_at_utc=stamp.isoformat())
 
 
 def provider_observations(state, source):
@@ -175,9 +183,56 @@ def provider_observations(state, source):
         mid: [Observation(source, mid, row.get("period"), score_pair(row.get("ft")),
                           utc(row.get("observed_at")), utc(row.get("available_at")),
                           kickoff=utc(row.get("kickoff_utc")))
-              for row in rows if isinstance(row, dict)]
+              for row in rows if isinstance(row, dict) and row.get("fixture_id", mid) == mid]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
+
+
+def _provider_record(mid, version, source, as_of):
+    score = score_pair(version.get("ft"))
+    kickoff = utc(version.get("kickoff_utc"))
+    observed, available = utc(version.get("observed_at")), utc(version.get("available_at"))
+    if (score is None or kickoff is None or observed is None or available is None
+            or not kickoff + REGULATION_TIME <= observed <= available <= as_of
+            or version.get("period") != "regulation" or version.get("fixture_id", mid) != mid):
+        return None
+    snapshot = version.get("snapshot")
+    if snapshot is None:
+        # Old journals only attest these fields. The current snapshot may be a later version.
+        snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
+    if (not isinstance(snapshot, dict) or score_pair(snapshot.get("ft")) != score
+            or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
+        return None
+    return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
+                provider=snapshot.get("provider", source), observed_at=observed.isoformat(),
+                available_at=available.isoformat(), matched_at_utc=available.isoformat())
+
+
+def provider_snapshot(state, source, as_of):
+    """Return one complete, temporally valid provider record per fixture at the cutoff."""
+    snapshots, first = state.get("results") or {}, state.get("first_results") or {}
+    histories, visible = state.get("ft_versions") or {}, {}
+    for mid in snapshots.keys() | histories.keys() | first.keys():
+        versions = histories.get(mid, [])
+        records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
+        # The original snapshot is immutable once updates start. Only restore its own fields.
+        legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
+        if isinstance(legacy, dict):
+            stamp = legacy.get("matched_at_utc")
+            records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                                                   "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                                                   "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
+        candidates = [row for row in records if row is not None]
+        if not candidates:
+            continue
+        def order(row):
+            return utc(row["observed_at"]), utc(row["available_at"])
+        latest = max(candidates, key=order)
+        # A complete version supersedes its legacy projection at the very same observation.
+        tied = [row for row in candidates if order(row) == order(latest)]
+        if all(row == latest for row in tied):
+            visible[mid] = latest
+    return visible
 
 
 def merge_sources(bot, providers):
