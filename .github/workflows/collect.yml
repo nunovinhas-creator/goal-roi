@@ -1,5 +1,7 @@
 name: Collect ScanGoal
 on:
+  push:
+    branches: ['recovery/c-delivery', 'recovery/d-dashboard']
   workflow_dispatch:
     inputs:
       force_results:
@@ -14,22 +16,23 @@ permissions:
   # BSD recovery tail only: OIDC attestation of journal events. Adds no repository access.
   id-token: write
 concurrency:
-  group: scangoal-write
+  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}
   cancel-in-progress: false
 jobs:
   collect:
-    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' && github.event_name != 'push' }}
     runs-on: ubuntu-latest
     # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
     # a run that fits 15 min without the tail can never be cut because of it.
     timeout-minutes: 18
     env:
-      GOAL_ROI_PUBLICATION_DIR: ${{ runner.temp }}/goal-roi-publication
       GOAL_ROI_DURABLE_REQUIRED: '1'
       GOAL_ROI_DURABLE_URL: ${{ vars.GOAL_ROI_DURABLE_URL }}
     steps:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
-      - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - run: &init_runner |
+          echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          printf 'GOAL_ROI_PUBLICATION_DIR=%s/goal-roi-publication\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
         with:
           ref: main
@@ -121,6 +124,9 @@ jobs:
         id: publication
         if: ${{ always() && !cancelled() }}
         run: |
+          if [ '${{ steps.resume.outcome }}' = failure ]; then
+            echo 'Publication resume failed. Ingestion did not start. See the Resume pending publication log.' >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ -f "$GOAL_ROI_PUBLICATION_DIR/pending.json" ]; then
             echo 'pending=true' >> "$GITHUB_OUTPUT"
             echo 'Collection publication degraded. Review the pending transaction artifact.' >> "$GITHUB_STEP_SUMMARY"
@@ -157,3 +163,39 @@ jobs:
           NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}
           NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify --failure
+
+  validate:
+    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.event_name == 'push' }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - run: *init_runner
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: scangoal
+      - name: Verify runner setup and fail-closed publication resume
+        env:
+          GOAL_ROI_DURABLE_REQUIRED: '1'
+        run: |
+          test "$GOAL_ROI_PUBLICATION_DIR" = "$RUNNER_TEMP/goal-roi-publication"
+          export PYTHONPATH="$GITHUB_WORKSPACE"
+          mkdir "$RUNNER_TEMP/collect-validation"
+          cd "$RUNNER_TEMP/collect-validation"
+          mkdir data
+          printf '%s\n' '{"synthetic_checkpoint":42}' > data/ingestion_checkpoint.json
+          sha256sum data/ingestion_checkpoint.json > checkpoint.sha256
+          check_missing_config() {
+            local status=0
+            GOAL_ROI_DURABLE_URL="$1" GOAL_ROI_DURABLE_TOKEN="$2" \
+              python3 -u -m scangoal.publication resume > resume.log 2>&1 || status=$?
+            cat resume.log
+            test "$status" = 3
+            grep -Fx 'PUBLICATION_FAILED invalid durable journal configuration' resume.log
+            sha256sum --check checkpoint.sha256
+            test ! -e "$GOAL_ROI_PUBLICATION_DIR/pending.json"
+          }
+          check_missing_config '' synthetic-token
+          check_missing_config 'https://journal.invalid/journal' ''
+          echo 'COLLECT_VALIDATION_OK runner path and fail-closed resume'

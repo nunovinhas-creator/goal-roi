@@ -135,20 +135,27 @@ class WorkflowInstall(unittest.TestCase):
         self.assertLess(steps.index('GOAL_ROI_JOB_STARTED_UTC'), steps.index('actions/checkout@'))
 
     def test_external_actions_pinned_to_audited_shas_and_credentials_persisted(self):
-        uses = re.findall(r'uses: ([^\s#]+)', self.text)
+        production, validation = self.text.split('\n  validate:\n', 1)
+        uses = re.findall(r'uses: ([^\s#]+)', production)
         self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA,
                                 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'])
-        self.assertNotIn('persist-credentials', self.text)       # default true: notify durability pushes
+        self.assertNotIn('persist-credentials', production)     # default true: notify durability pushes
+        self.assertIn('actions/checkout@'+CHECKOUT_SHA, validation)
+        self.assertIn('persist-credentials: false', validation)
+        self.assertIn('permissions:\n      contents: read', validation)
+        self.assertNotIn('secrets.', validation)
 
     def test_schedule_chain_and_normal_steps_unchanged(self):
         for line in ("    - cron: '3,13,23,33,43,53 * * * *'",
-                     '  group: scangoal-write\n  cancel-in-progress: false',
+                     "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n  cancel-in-progress: false",
+                     "github.ref == 'refs/heads/main' && github.event_name != 'push'",
                      'run: python -u -m scangoal.results_bsd',
                      'run: python -u -m scangoal.notify',
                      'timeout 85s python scripts/dispatch_collection.py',
                      'run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch'):
             self.assertIn(line, self.text)
-        code = [l.split('#', 1)[0] for l in self.text.splitlines() if not l.lstrip().startswith('#')]
+        steps = self.text.split('    steps:\n', 1)[1]
+        code = [l.split('#', 1)[0] for l in steps.splitlines() if not l.lstrip().startswith('#')]
         self.assertFalse([l for l in code if 'recovery' in l])   # no step runs recovery code
 
     def test_requirements_add_only_pinned_cryptography(self):
