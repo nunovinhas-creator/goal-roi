@@ -66,8 +66,10 @@ class BudgetAccounting(unittest.TestCase):
         folder = self.enterContext(TemporaryDirectory())
         self.path = Path(folder) / "llm_state.json"
         self.enterContext(patch.dict(os.environ, {"SCANGOAL_DATA_DIR": folder}))
-        self.enterContext(patch.object(report, "build", return_value={"brain": {"top": []}}))
-        self.enterContext(patch.dict(report.LAST, {"research_signals": [sig("fixture", None, 2)]}))
+        def build(*, as_of, capture):
+            capture['research_signals'] = [sig('fixture', None, 2)]
+            return {"brain": {"top": []}}
+        self.enterContext(patch.object(report, "build", side_effect=build))
         self.enterContext(patch.object(llm, "MODELS", list(llm.PRICES)))
 
     def read(self):
