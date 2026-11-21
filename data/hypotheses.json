@@ -148539,6 +148539,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Competição = liga & Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-21T00:57:16+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Competição = liga & Golos até ao sinal = nenhum & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-20T03:42:23+00:00",
   "conditions": [
@@ -174141,6 +174160,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Golos até ao sinal = nenhum & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-21T00:57:16+00:00",
+  "conditions": [
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Golos até ao sinal = nenhum & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
   "born_utc": "2026-11-14T20:47:54+00:00",
   "conditions": [
@@ -174905,6 +174943,21 @@
    [
     "Hora (UTC)",
     "madrugada"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = madrugada & Marcador no momento = empatado": {
+  "born_utc": "2026-11-21T00:57:16+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
    ]
   ],
   "family": "Stake",
