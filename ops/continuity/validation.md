@@ -23,4 +23,6 @@ O candidato usa o Durable Object SQLite da continuidade com uma identidade separ
 
 O workflow candidato exige `GOAL_ROI_DURABLE_URL` com o endpoint HTTPS `/journal` e o segredo `GOAL_ROI_DURABLE_TOKEN` no Worker e no Actions. O endpoint autentica apenas operações do diário. A configuração da rota e dos segredos depende de autorização de produção. O agendamento do Worker mantém a observação e `RECOVERY_ENABLED=false`.
 
+O despacho suplementar após `workflow_run` requer `GOAL_ROI_RECOVERY_MODE=active` e `GOAL_ROI_RECOVERY_ENABLED=true` nas variáveis do Actions. A observação e a próxima recolha normal têm percursos próprios.
+
 O diário limita cada pedido a 1 800 000 bytes. Uma falha de acesso ou de capacidade impede o avanço do checkpoint. Os artefactos do Actions continuam disponíveis para reconciliação de transações antigas e diagnóstico de falhas. Uma interrupção antes de gravar uma leitura pode deixar versões editadas ou apagadas indisponíveis no Telegram.

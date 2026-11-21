@@ -69,6 +69,9 @@ class Telegram:
 def child(mode, ledger_path):
     with patch.object(durable_journal, 'configured', return_value=DiskJournal(ledger_path, mode)), \
          patch.object(reader, 'make_client', return_value=Telegram(mode)):
+        if mode == 'resume-only':
+            Publisher().resume()
+            return 0
         try:
             result = asyncio.run(reader.collect())
         except durable_journal.DurabilityError as exc:
@@ -76,6 +79,16 @@ def child(mode, ledger_path):
             return 3
         if mode in ('available', 'no-telegram'):
             Publisher().publish()
+        if mode == 'push-crash':
+            def reject_and_stop(args, **kwargs):
+                command = subprocess.run(args, **kwargs)
+                if 'push' in args:
+                    assert command.returncode != 0, 'the isolated remote must reject this push'
+                    print('push rejected before artifact upload', flush=True)
+                    os.kill(os.getpid(), signal.SIGKILL)
+                return command
+
+            Publisher(runner=reject_and_stop).publish()
         return result
 
 
@@ -150,6 +163,24 @@ class DurableIngestionTest(unittest.TestCase):
         self.assertEqual(self.old_state, json.loads((self.lost / 'data/state.json').read_bytes()))
         self.assertEqual(json.loads((self.lost / 'data/messages.jsonl').read_bytes())['message_id'], 101)
         self.assertFalse((self.lost / 'data' / ingestion.CHECKPOINT).exists())
+
+    def test_rejected_push_and_sigkill_before_artifact_resume_from_a_blank_runner(self):
+        hook = self.remote / 'hooks/pre-receive'
+        hook.write_text('#!/bin/sh\nexit 1\n')
+        hook.chmod(0o700)
+        stopped = self.run_reader(self.lost, 'push-crash')
+        self.assertEqual(stopped.returncode, -signal.SIGKILL, stopped.stderr)
+        self.assertIn('push rejected before artifact upload', stopped.stdout)
+        self.assertTrue((self.lost / '.spool/pending.bundle').exists())
+        self.assertEqual(json.loads(self.published('messages.jsonl'))['message_id'], 101)
+        self.fresh_runner()
+        hook.unlink()
+        for _ in range(2):
+            result = self.run_reader(self.second, 'resume-only')
+            self.assertEqual(result.returncode, 0, result.stderr)
+        rows = [json.loads(line) for line in self.published('messages.jsonl').splitlines()]
+        self.assertEqual([row['message_id'] for row in rows], [101, 102])
+        self.assertEqual(self.git(self.remote, 'rev-list', '--count', 'main'), '2')
 
 
 if __name__ == '__main__':
