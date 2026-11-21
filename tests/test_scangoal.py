@@ -733,8 +733,8 @@ class LanguageModel(Hardening):
 
     def test_modes_rotate_notes_are_anchored_and_budget_stops_the_day(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
-                .replace('Kucukcekmece Sinopspor', f'Home {i}') for i in range(9)]
+        live = [BETFAIR_PRE.replace('barnsley-vs-oldham', f'm{i}').replace('Barnsley — Oldham', f'Home {i} — Oldham')
+                .replace('1 · Barnsley @', 'X · Draw @') for i in range(9)]
         prompts = []
         def call(account, key, model, prompt):
             prompts.append(prompt)
@@ -746,8 +746,9 @@ class LanguageModel(Hardening):
             try:
                 rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
                 rows += [self.row(i, live[i] + '\n\n🏁 FT 1:1', '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
-                for r in rows:   # PR 3 (P2-K): each version is read after it was sent (the shared helper reads all at 12:00)
-                    r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
+                for r in rows:
+                    if r['edit_date_utc'] is None:
+                        r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
                 store.append_versions(rows)
                 t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
                 report.build(register=True, now=t0 - timedelta(minutes=1))

@@ -84,9 +84,13 @@ def load(chronology=None, *, result_observations=None, as_of=None):
                         left and right and left != right for left, right in zip(old, revised)):
                     audit['edits_changing_signal'] += 1
                     continue
+            retained_kickoff = p.get('kickoff_utc') or (previous or {}).get('kickoff_utc')
+            if retained_kickoff is None and previous:
+                retained = settlement_kickoff(previous, None)
+                retained_kickoff = retained.isoformat() if retained is not None else None
             observation = opportunity_results.collected(
                 'telegram', r['message_id'], p['ft'], got,
-                published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=p.get('kickoff_utc'),
+                published=r.get('edit_date_utc') or r.get('date_utc'), kickoff=retained_kickoff,
                 exact=r.get('receipt_version') == 1, fixture_id=p['match_id'], link=link,
             )
             embedded.setdefault(p['match_id'], []).append(observation)
@@ -219,7 +223,7 @@ def settlement_kickoff(bet, external, fixture_times=()):
     if external:
         return chronology.parse_utc(external.get('event_date'))
     if (bet.get('phase') == 'live' and type(bet.get('minute')) is int
-            and 0 <= bet['minute'] <= 120 and provenance_ok(bet)):
+            and 0 <= bet['minute'] <= 120 and not any(bet.get(flag) for flag in ('had_ft_at_first_sight', 'edited_at_first_sight', 'burst'))):
         # An original in-play message bounds the latest possible start time.
         sent = chronology.signal_time(bet)
         return sent - timedelta(minutes=max(0, bet['minute'] - 1)) if sent is not None else None
@@ -296,17 +300,19 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         embedded = (chronology.get('telegram') or {}).get(mid, ()) if mid not in ambiguous else ()
         proof = opportunity_results.resolve(embedded, kickoff=kickoff, as_of=now)
         f, source, known = proof.score, 'bot_message', proof.available_at
+        raw = proof.observed_at
         first_seen, conflict = proof.first_available_at, proof.conflict
         if not f and not conflict and mid not in ambiguous:
             notes_for_bet = [row for row in note_versions[mid] if row.kickoff == kickoff]
             note = opportunity_results.resolve(notes_for_bet, kickoff=kickoff, as_of=now)
             f, source, known = note.score, 'bot_full_time_note', note.available_at
+            raw = note.observed_at
             first_seen, conflict = note.first_available_at, note.conflict
         if not f and not conflict and mid not in ambiguous and not embedded:
             legacy = opportunity_results.score_pair(ft.get(mid))
             legacy_stamp = observed((chronology.get('ft') or {}).get(mid))
             if legacy and opportunity_results.ft_time_valid(kickoff, legacy_stamp, legacy_stamp, None, now):
-                f, source, known, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp
+                f, source, known, raw, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp, legacy_stamp
         from_bsd = False
         if ext:
             stamp = observed(ext.get('available_at') or ext.get('known_utc') or ext.get('matched_at_utc'))
@@ -315,7 +321,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
             if score and opportunity_results.ft_time_valid(kickoff, seen, stamp, None, now):
                 first_seen = min(first_seen, stamp) if first_seen is not None else stamp
                 if not f and not conflict:
-                    f, source, known, from_bsd = score, ext.get('provider', 'BSD'), stamp, True
+                    f, source, known, raw, from_bsd = score, ext.get('provider', 'BSD'), stamp, seen, True
         f = list(f) if f is not None else None
         b['ft'], b['w'], b['settled_by'] = f, None, None
         b['result_known_utc'], b['result_known_source'] = None, None
@@ -323,7 +329,7 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         b['match_result_first_seen_utc'] = first_seen.isoformat() if first_seen is not None else None
         b['result_quarantined'] = conflict
         b['result_quarantined_utc'] = known.isoformat() if conflict and known is not None else None
-        known = b['result_available_utc']
+        known = raw.isoformat() if raw is not None and f else None
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         b['no_source'] = not f and (now - ref > timedelta(days=NO_SOURCE_AFTER_DAYS) or b['match_id'] in not_covered)
         fetched = observed(det.get('fetched_at_utc')) if det else None

@@ -75,6 +75,7 @@ class Resolution:
     first_available_at: datetime | None = None
     first_score: tuple[int, int] | None = None
     first_consensus_at: datetime | None = None
+    observed_at: datetime | None = None
 
 
 def settlement(evidence, *, kickoff, as_of, deadline):
@@ -101,19 +102,19 @@ def resolve(evidence, *, kickoff, as_of):
             score = score_pair(row.get("ft"))
             if (ft_time_valid(kickoff, known, known, None, as_of)
                     and (score is not None or row.get("conflict") is True)):
-                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
+                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score, known))
             continue
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None
                 or (row.source.startswith("telegram") and row.published_at is None)
                 or not ft_time_valid(kickoff or row.kickoff, row.observed_at, row.available_at, row.published_at, as_of)):
             continue
         events.setdefault(row.available_at, []).append(
-            ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
+            ((row.source, row.record_id), row.published_at or row.observed_at, row.score, row.observed_at))
 
-    latest, score, conflict, since = {}, None, False, None
+    latest, score, conflict, since, observed = {}, None, False, None, None
     first_score, first_consensus = None, None
     for available, versions in sorted(events.items()):
-        for key, version, value in versions:
+        for key, version, value, _ in versions:
             current = latest.get(key)
             if current is None or version > current[0]:
                 latest[key] = (version, {value})
@@ -124,9 +125,10 @@ def resolve(evidence, *, kickoff, as_of):
         now_score = None if now_conflict else next(iter(scores))
         if (score, conflict) != (now_score, now_conflict):
             score, conflict, since = now_score, now_conflict, available
+            observed = max(row[3] for row in versions)
         if first_consensus is None and score is not None:
             first_score, first_consensus = score, available
-    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus)
+    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus, observed)
 
 
 def settle_research_bet(bet, as_of):

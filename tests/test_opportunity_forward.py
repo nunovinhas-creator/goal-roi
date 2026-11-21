@@ -148,7 +148,8 @@ class ResultSourceTests(unittest.TestCase):
     def write_provider(self, name, score, stamp, **extra):
         observed = chronology.parse_utc(stamp)
         available = (observed + timedelta(minutes=5)).isoformat() if observed else None
-        row = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": available, **extra}
+        row = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": available,
+               "kickoff_utc": self.KO, "snapshot": {"home": "A", "away": "B", "league": "Example"}, **extra}
         (self.directory / ("results_" + name + ".json")).write_text(
             json.dumps({"ft_versions": {self.MATCH: [row]}}), encoding="utf-8",
         )
@@ -157,7 +158,7 @@ class ResultSourceTests(unittest.TestCase):
         return opportunity_results.collected("telegram", 42, score, stamp, published=stamp)
 
     def assess(self, results, *, now=NOW, messages=None):
-        rows = [signal()] if messages is None else messages
+        rows = [signal(teams=["A", "B"], league="Example")] if messages is None else messages
         audit = run(rows, results, now=now)
         ranking = opportunity_ranking.build(rows, results, PROTOCOL, activation_utc=ACTIVATION, now=now)
         for key in ("settled", "wins", "losses", "pending", "quarantined", "roi_odds_minus_2pct"):

@@ -873,11 +873,13 @@ class ReportProvenance(unittest.TestCase):
     def test_external_and_manual_results(self):
         v1 = self.version(self.OPEN, '2026-11-11T17:50:00+00:00')
         mid = 'czarni-sosnowiec-women-vs-sk-brann-women-20261111'
-        hl = {'results_hl.json': {'results': {mid: {'ft': [1, 5], 'matched_at_utc': '2026-11-11T22:00:00+00:00'}}}}
+        hl = {'results_hl.json': {'results': {mid: {'ft': [1, 5], 'matched_at_utc': '2026-11-11T22:00:00+00:00',
+                    'event_date': '2026-11-11T17:00:00+00:00', 'home': 'Czarni Sosnowiec Women',
+                    'away': 'SK Brann Women', 'league': "UEFA Women's Europa Cup"}}}}
         b = self.build([v1], hl)[0]
         self.assertEqual((b['result_known_utc'], b['result_known_source']), ('2026-11-11T22:00:00+00:00', 'HL'))
         b = self.build([v1], {'manual': {mid: {'ft': [1, 5]}}})[0]
-        self.assertEqual((b['w'], b['result_known_utc']), (1.0, None))                   # settled, but time unknown
+        self.assertEqual((b['w'], b['result_known_utc']), (None, None))                  # missing observation leaves it open
         self.assertEqual(chronology.result_check(b)[1], 'unknown')
 
 
@@ -911,13 +913,14 @@ class ReportProvenance(unittest.TestCase):
         v2 = self.version(self.OPEN + '\n\n🏁 FT 1:4 · Over 5 ❌', '2026-11-11T19:40:00+00:00', '2026-11-11T19:38:00+00:00')
         v3 = self.version(self.OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅', '2026-11-11T21:00:00+00:00', '2026-11-11T20:59:00+00:00')
         b = self.full([v1, v2, v3])[0][0]
-        self.assertEqual((b['result_known_utc'], b['match_result_first_seen_utc']), ('2026-11-11T21:00:00+00:00', '2026-11-11T19:40:00+00:00'))
+        self.assertEqual((b['result_known_utc'], b['match_result_first_seen_utc']), ('2026-11-11T21:00:00+00:00', '2026-11-11T19:45:00+00:00'))
         hl = {'results_hl.json': {'results': {mid: {'ft': [1, 5], 'matched_at_utc': '2026-11-11T19:10:00+00:00',
-                                                   'event_date': '2026-11-11T17:10:00+00:00', 'bsd_id': 127}}}}
+                                                   'event_date': '2026-11-11T17:00:00+00:00', 'bsd_id': 127, 'home': 'Czarni Sosnowiec Women',
+                                                   'away': 'SK Brann Women', 'league': "UEFA Women's Europa Cup"}}}}
         b = self.full([v1, v3], hl)[0][0]                                              # Highlightly saw it before the bot edit
         self.assertEqual((b['result_known_utc'], b['match_result_first_seen_utc']), ('2026-11-11T21:00:00+00:00', '2026-11-11T19:10:00+00:00'))
         b = self.full([v1, v3], {'manual_results.json': {mid: {'ft': [1, 5], 'source': 'x'}}})[0][0]
-        self.assertEqual(b['match_result_first_seen_utc'], '2026-11-11T21:00:00+00:00')  # an undated source supplies no observation
+        self.assertEqual(b['match_result_first_seen_utc'], '2026-11-11T21:05:00+00:00')  # an undated source supplies no observation
 
     def test_the_ledger_is_never_created_by_the_collection(self):
         v1 = self.version(self.OPEN, '2026-11-11T17:50:00+00:00')
