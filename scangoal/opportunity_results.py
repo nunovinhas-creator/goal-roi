@@ -75,6 +75,7 @@ class Resolution:
     first_available_at: datetime | None = None
     first_score: tuple[int, int] | None = None
     first_consensus_at: datetime | None = None
+    observed_at: datetime | None = None
 
 
 def settlement(evidence, *, kickoff, as_of, deadline):
@@ -101,19 +102,19 @@ def resolve(evidence, *, kickoff, as_of):
             score = score_pair(row.get("ft"))
             if (ft_time_valid(kickoff, known, known, None, as_of)
                     and (score is not None or row.get("conflict") is True)):
-                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
+                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score, known))
             continue
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None
                 or (row.source.startswith("telegram") and row.published_at is None)
                 or not ft_time_valid(kickoff or row.kickoff, row.observed_at, row.available_at, row.published_at, as_of)):
             continue
         events.setdefault(row.available_at, []).append(
-            ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
+            ((row.source, row.record_id), row.published_at or row.observed_at, row.score, row.observed_at))
 
-    latest, score, conflict, since = {}, None, False, None
+    latest, score, conflict, since, observed = {}, None, False, None, None
     first_score, first_consensus = None, None
     for available, versions in sorted(events.items()):
-        for key, version, value in versions:
+        for key, version, value, _ in versions:
             current = latest.get(key)
             if current is None or version > current[0]:
                 latest[key] = (version, {value})
@@ -124,9 +125,10 @@ def resolve(evidence, *, kickoff, as_of):
         now_score = None if now_conflict else next(iter(scores))
         if (score, conflict) != (now_score, now_conflict):
             score, conflict, since = now_score, now_conflict, available
+            observed = max(row[3] for row in versions)
         if first_consensus is None and score is not None:
             first_score, first_consensus = score, available
-    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus)
+    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus, observed)
 
 
 def settle_research_bet(bet, as_of):
@@ -142,6 +144,10 @@ def settle_research_bet(bet, as_of):
         visible = {v.kickoff for v in versions if isinstance(v, Observation) and v.kickoff is not None
                    and v.available_at is not None and v.available_at <= cutoff}
         kickoff = next(iter(visible)) if len(visible) == 1 else None
+    if kickoff is None and bet.get('phase') == 'live' and type(bet.get('minute')) is int and 0 <= bet['minute'] <= 120:
+        sent = chronology.signal_time(bet)
+        if sent is not None:
+            kickoff = sent - timedelta(minutes=max(0, bet['minute'] - 1))
     result, late = settlement(versions, kickoff=kickoff, as_of=as_of, deadline=deadline)
 
     def payout(score):
@@ -213,7 +219,7 @@ def _provider_record(mid, version, source, as_of):
     if snapshot is None:
         # Old journals only attest these fields. The current snapshot may be a later version.
         snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
-    if (not isinstance(snapshot, dict) or score_pair(snapshot.get("ft")) != score
+    if (not isinstance(snapshot, dict) or snapshot.get("fixture_id", mid) != mid or score_pair(snapshot.get("ft")) != score
             or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
         return None
     return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
@@ -227,21 +233,24 @@ def provider_snapshot(state, source, as_of):
     histories, visible = state.get("ft_versions") or {}, {}
     for mid in snapshots.keys() | histories.keys() | first.keys():
         versions = histories.get(mid, [])
+        versions = [row for row in versions if isinstance(row, dict)] if isinstance(versions, list) else []
         records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
         # The original snapshot is immutable once updates start. Only restore its own fields.
         legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
         if isinstance(legacy, dict):
             stamp = legacy.get("matched_at_utc")
-            records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
-                                                   "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
-                                                   "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
+            observed = utc(stamp)
+            if observed is not None and not any(utc(row.get("observed_at")) == observed for row in versions):
+                records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                                                       "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                                                       "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
         candidates = [row for row in records if row is not None]
         if not candidates:
             continue
         def order(row):
             return utc(row["observed_at"]), utc(row["available_at"])
         latest = max(candidates, key=order)
-        # A complete version supersedes its legacy projection at the very same observation.
+        # Two different versions at the same observation leave the result in conflict.
         tied = [row for row in candidates if order(row) == order(latest)]
         if all(row == latest for row in tied):
             visible[mid] = latest

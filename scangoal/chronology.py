@@ -153,7 +153,7 @@ def archive_snapshot(current, previous, *fields):
     versions = previous.get('snapshots', [])
     if before != after and parse_utc(before.get('last_run_utc')) is not None and (not versions or versions[-1] != before):
         versions = [*versions, before]
-    return dict(current, snapshots=versions)
+    return dict(current, snapshots=versions) if versions else current
 
 
 def iso(dt):

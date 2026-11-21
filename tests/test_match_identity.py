@@ -114,7 +114,9 @@ class FixtureAliases(unittest.TestCase):
         def ft(day, score):
             stamp = f'2026-11-{day}T12:05:00Z'
             return {'ft': score, 'period': 'regulation', 'observed_at': stamp,
-                    'available_at': stamp, 'kickoff_utc': f'2026-11-{day}T10:00:00Z'}
+                    'available_at': stamp, 'kickoff_utc': f'2026-11-{day}T10:00:00Z',
+                    'snapshot': {'league': 'Example League', 'home': 'Alpha' if day == 24 else 'Gamma',
+                                 'away': 'Beta' if day == 24 else 'Delta'}}
 
         original = message(1, 24, 'Alpha — Beta')
         collision = message(2, 26, 'Gamma — Delta')

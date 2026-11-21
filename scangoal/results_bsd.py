@@ -84,9 +84,9 @@ def time_ok(target, ko):
     if scheduled is not None:
         return abs(ko - scheduled) <= timedelta(minutes=15)
     signal, minute = chronology.signal_time(target), target.get('minute')
-    return (target.get('phase') == 'live' and signal is not None and type(minute) is int and 0 <= minute <= 120
-            and timedelta(0) <= signal - ko <= timedelta(minutes=150)
-            and timedelta(minutes=-5) <= signal - ko - timedelta(minutes=minute) <= timedelta(minutes=45))
+    return (target.get('phase') == 'live' and signal is not None and timedelta(0) <= signal - ko <= timedelta(minutes=150)
+            and (minute is None or (type(minute) is int and 0 <= minute <= 120
+                                    and timedelta(minutes=-5) <= signal - ko - timedelta(minutes=minute) <= timedelta(minutes=45))))
 
 
 def score_of(event):
@@ -182,7 +182,7 @@ def save_result_state(path, state):
     from .chronology import archive_snapshot
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    state = archive_snapshot(state, load_result_state(path), 'near_misses', 'not_covered', 'not_regular_time')
+    state.update(archive_snapshot(state, load_result_state(path), 'near_misses', 'not_covered', 'not_regular_time'))
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(state, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     temporary.replace(path)

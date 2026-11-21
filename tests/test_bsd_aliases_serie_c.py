@@ -24,11 +24,11 @@ ALIASES_FILE = ROOT/'data'/'team_aliases.json'
 # Real bot targets (messages 28108, 28550, 28607; Italian Serie C; live signals, no kickoff).
 TARGETS = {
     'lumezzane-vs-trento-calcio-1921-20261114':
-        {'teams': ['Lumezzane', 'Trento Calcio 1921'], 'date_utc': '2026-11-14T18:09:06+00:00', 'kickoff_utc': None},
+        {'teams': ['Lumezzane', 'Trento Calcio 1921'], 'date_utc': '2026-11-14T18:09:06+00:00', 'kickoff_utc': None, 'phase': 'live', 'league': 'Italian Serie C'},
     'fc-guidonia-montecelio-1937-vs-as-ostia-mare-20261115':
-        {'teams': ['FC Guidonia Montecelio 1937', 'AS Ostia Mare'], 'date_utc': '2026-11-15T15:29:31+00:00', 'kickoff_utc': None},
+        {'teams': ['FC Guidonia Montecelio 1937', 'AS Ostia Mare'], 'date_utc': '2026-11-15T15:29:31+00:00', 'kickoff_utc': None, 'phase': 'live', 'league': 'Italian Serie C'},
     'cittadella-vs-us-folgore-caratese-asd-20261115':
-        {'teams': ['Cittadella', 'US Folgore Caratese ASD'], 'date_utc': '2026-11-15T16:59:32+00:00', 'kickoff_utc': None},
+        {'teams': ['Cittadella', 'US Folgore Caratese ASD'], 'date_utc': '2026-11-15T16:59:32+00:00', 'kickoff_utc': None, 'phase': 'live', 'league': 'Italian Serie C'},
 }
 # BSD names as recorded in data/results_bsd.json near_misses (names only).
 BSD_NAMES = {
@@ -49,7 +49,7 @@ def synthetic(i, mid, minutes_before_signal=60, status='finished', score=(1, 1),
     signal = datetime.fromisoformat(TARGETS[mid]['date_utc'])
     ko = (signal - timedelta(minutes=minutes_before_signal)).astimezone(timezone.utc)
     return {'id': i, 'status': status, 'home_team': {'name': home}, 'away_team': away,
-            'event_date': ko.isoformat().replace('+00:00', 'Z'), 'home_score': score[0], 'away_score': score[1]}
+            'event_date': ko.isoformat().replace('+00:00', 'Z'), 'league': TARGETS[mid]['league'], 'home_score': score[0], 'away_score': score[1]}
 
 
 class SerieCAliases(unittest.TestCase):

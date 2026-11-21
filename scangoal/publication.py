@@ -100,6 +100,15 @@ class Publisher:
         self.manifest.unlink(missing_ok=True)
         print('PUBLICATION_COMPLETED', pending['id'])
 
+    def complete_if_published(self, pending, remote):
+        if not self.published(pending, remote):
+            return False
+        head = self.require('rev-parse', 'HEAD')
+        if head != remote and self.ancestor(head, remote) and not self.require('status', '--porcelain', '--untracked-files=no'):
+            self.require('merge', '--ff-only', remote)
+        self.complete(pending)
+        return True
+
     def remote(self):
         self.require('fetch', '-q', 'origin', BRANCH)
         return self.require('rev-parse', 'FETCH_HEAD')
@@ -148,16 +157,21 @@ class Publisher:
             raise PublicationError('bundle lacks the original publication intent')
         # The immutable intent is recognised even when a push succeeded and its acknowledgement was lost.
         for _ in range(2):
+            remote = None
             try:
                 remote = self.remote()
-                if self.published(pending, remote):
-                    self.complete(pending)
+                if self.complete_if_published(pending, remote):
                     return
-                if pending['attempts'] >= MAX_ATTEMPTS:
-                    break
+            except PublicationError:
+                remote = None
+            if pending['attempts'] >= MAX_ATTEMPTS:
+                break
+            pending['attempts'] += 1
+            self.write(pending)
+            if remote is None:
+                continue
+            try:
                 pending = self.prepare(pending, remote)
-                pending['attempts'] += 1
-                self.write(pending)
                 if self.command('push', '-q', 'origin', pending['tip'] + ':' + BRANCH).returncode == 0:
                     self.complete(pending)
                     return
@@ -165,8 +179,7 @@ class Publisher:
                 # A network failure is retriable without manufacturing a second transaction.
                 continue
         try:
-            if self.published(pending, self.remote()):
-                self.complete(pending)
+            if self.complete_if_published(pending, self.remote()):
                 return
         except PublicationError:
             pass

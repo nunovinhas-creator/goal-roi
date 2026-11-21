@@ -21,6 +21,7 @@ from .chronology import parse_utc
 from .eligibility import eligible
 from .parser import parse, selection_1x2, settle
 from .results_bsd import load_json, match_events
+from .opportunity_results import ft_time_valid
 from .results_hl import to_event
 from .store import data_dir
 
@@ -153,8 +154,8 @@ def evidence_candidates(targets,envelopes,now):
         except (TypeError,ValueError,KeyError,AttributeError):
             quarantine.append({'reason':'malformed provider event','evidence_sha256':sha(envelope)});continue
         for mid,r in matches.items():
-            if observed<parse_utc(targets[mid]['date_utc']) or observed<parse_utc(r['event_date']):
-                quarantine.append({'match_id':mid,'reason':'result observed before signal or kickoff'});continue
+            if observed < parse_utc(targets[mid]['date_utc']) or not ft_time_valid(parse_utc(r['event_date']), observed, observed, None, now):
+                quarantine.append({'match_id':mid,'reason':'result observed before signal or regulation time'});continue
             found[mid].append(dict(r,provider=provider,observed_utc=observed.isoformat(),evidence_sha256=sha(envelope)))
         for mid,r in near.items(): quarantine.append({'match_id':mid,'reason':'name mismatch; no alias introduced','detail':r})
         for mid,r in unfinished.items(): quarantine.append({'match_id':mid,'reason':'not regular-time finished','detail':r})
@@ -246,7 +247,7 @@ def make_audit(now,envelopes=()):
         for old_mid,r in st.get('results',{}).items():
             if not all(k in r for k in ('bsd_id','home','away','event_date','ft')): continue
             event={'id':r['bsd_id'],'home_team':r['home'],'away_team':r['away'],'event_date':r['event_date'],
-                   'status':'finished','home_score':r['ft'][0],'away_score':r['ft'][1]}
+                   'status':'finished','home_score':r['ft'][0],'away_score':r['ft'][1],'league':r.get('league')}
             events.append(event); originals[r['bsd_id']]=(old_mid,r)
         cache_scanned+=len(events)
         matched,_=match_events(targets,events,{})

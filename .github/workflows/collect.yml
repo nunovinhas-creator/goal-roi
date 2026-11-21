@@ -114,6 +114,9 @@ jobs:
             echo 'pending=true' >> "$GITHUB_OUTPUT"
             echo 'Collection publication degraded. Review the pending transaction artifact.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ '${{ steps.fast.outcome }}' = failure ]; then
+            echo 'Fast reads ended in a degraded state. See WATCH_PROBLEMS in the job log.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Preserve pending data and intent for the next runner
         if: ${{ always() && !cancelled() && steps.publication.outputs.pending == 'true' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -136,7 +139,7 @@ jobs:
           timeout 85s python scripts/dispatch_collection.py
       # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
       - name: Tell the user when a collection fails (at most once an hour)
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}

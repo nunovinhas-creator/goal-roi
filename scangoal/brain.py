@@ -986,9 +986,8 @@ def presentation(rows, watched=()):
 def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None, receipt_dir=None):
     """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada.
 
-    history_problems: resultado de certification.history_proof (revisão #5911845265, P1-H). Com registo, a certificação só
-    fica ativa se a prova de integridade histórica tiver sido feita e não tiver problemas; None (prova não feita) também
-    desliga tudo (fail-closed). as_of: relógio do relatório, para fechar como perda os jogos pendentes além do prazo.
+    `receipt_dir` contém os recibos assinados do registo, das admissões e dos resultados. `as_of` estabelece a informação
+    disponível e o fecho dos jogos pendentes. `history_problems` é um argumento legado de diagnóstico.
     """
     # Relógio explícito: só o que o sistema sabia em `as_of` (sinais ainda não lidos e resultados ainda não vistos não contam).
     view = chronology.as_of_view(signals, as_of) if as_of is not None else signals
@@ -1007,7 +1006,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     selected, problems, receipts = {}, [], []
     if ledger is not None:
         ledger, selected, problems, receipts = certification.witnessed_selections(ledger, registry, receipt_dir, as_of)
-    history_unverified = bool(problems)
+    history_unverified = any('receipt' in problem for problem in problems)
     legacy = {x.get('id') for x in (ledger or {}).get('legacy') or [] if isinstance(x, dict)} if not problems else set()
     rows, tested, _ = evaluate(signals, registry, min_settled, selected=selected, legacy=legacy, as_of=as_of, receipt_dir=receipt_dir)
     gaps = [p for r in rows for p in (r.get('confirmation') or {}).get('proof_problems', [])]
