@@ -16840,6 +16840,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = fim de semana & Faixa de odd = odd acima de 3,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = fim de semana & Faixa de odd = odd acima de 3,00 & Quota de mercado = 80 % ou mais": {
   "born_utc": "2026-11-15T13:33:53+00:00",
   "conditions": [
@@ -39720,6 +39739,21 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota depois do sinal = subiu": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Quota depois do sinal",
+    "subiu"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Reforço = reforço ×4 ou mais": {
   "born_utc": "2026-11-13T10:46:54+00:00",
   "conditions": [
@@ -40098,6 +40132,25 @@
    [
     "Volume na seleção",
     "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Seleção = equipa de fora & Volume na seleção = menos de 10 mil $": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Seleção",
+    "equipa de fora"
+   ],
+   [
+    "Volume na seleção",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Betfair",
@@ -147869,6 +147922,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Competição = liga & Dia = fim de semana & Mercado = outros mercados": {
   "born_utc": "2026-11-15T07:56:56+00:00",
   "conditions": [
@@ -148088,6 +148160,25 @@
    [
     "Golos até ao sinal",
     "1 ou 2"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = nenhum": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
    ]
   ],
   "family": "Stake",
@@ -149179,6 +149270,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Competição = liga & Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Competição = liga & Golos até ao sinal = nenhum & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-20T03:42:23+00:00",
   "conditions": [
@@ -149265,6 +149375,44 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Hora (UTC) = madrugada & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Hora (UTC) = madrugada & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Stake",
@@ -160551,6 +160699,25 @@
    [
     "Golos até ao sinal",
     "nenhum"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = madrugada": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "madrugada"
    ]
   ],
   "family": "Stake",
@@ -175637,6 +175804,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Hora (UTC) = madrugada & Marcador no momento = empatado & Mercado = outros mercados": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Hora (UTC) = madrugada & Mercado = outros mercados": {
   "born_utc": "2026-11-19T01:09:25+00:00",
   "conditions": [
@@ -175709,6 +175895,44 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Hora (UTC) = madrugada & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = madrugada & Mercado = outros mercados & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Hora (UTC) = madrugada & Mercado = outros mercados & Valor da aposta = menos de 10 mil $": {
   "born_utc": "2026-11-20T03:50:50+00:00",
   "conditions": [
@@ -175723,6 +175947,21 @@
    [
     "Valor da aposta",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = madrugada & Momento do aviso = mais de 45 min depois do início": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Momento do aviso",
+    "mais de 45 min depois do início"
    ]
   ],
   "family": "Stake",
@@ -175772,6 +176011,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = madrugada & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-21T02:50:40+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "madrugada"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Stake",
