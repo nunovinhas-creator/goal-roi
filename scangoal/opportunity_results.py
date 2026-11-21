@@ -21,6 +21,9 @@ class Observation:
     available_at: datetime | None
     published_at: datetime | None = None
     kickoff: datetime | None = None
+    fixture_id: str | None = None
+    link: str | None = None
+    provider_record: dict | None = None
 
 
 def score_pair(score):
@@ -37,7 +40,8 @@ def utc(value):
         return None
 
 
-def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None, exact=False):
+def collected(source, record_id, score, stamp, *, period="regulation", published=None, kickoff=None, exact=False,
+              fixture_id=None, link=None):
     """Legacy collectors stamp the start of their step. Apply its observation margin."""
     observed = utc(stamp)
     publication = utc(published)
@@ -46,9 +50,21 @@ def collected(source, record_id, score, stamp, *, period="regulation", published
         available = observed + margin if observed is not None else None
     except OverflowError:
         available = None
-    if source == "telegram" and (publication is None or available is None or publication > available):
+    if source.startswith("telegram") and (publication is None or available is None or publication > available
+                                          or (exact and publication > observed)):
         available = None
-    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication, utc(kickoff))
+    return Observation(source, str(record_id), period, score_pair(score), observed, available, publication, utc(kickoff), fixture_id, link)
+
+
+def ft_time_valid(kickoff, observed, available, published, as_of):
+    """A regulation FT must have existed only after a provable playing interval."""
+    if None in (kickoff, observed, available, as_of):
+        return False
+    try:
+        earliest = kickoff + REGULATION_TIME
+    except OverflowError:
+        return False
+    return earliest <= observed <= available <= as_of and (published is None or earliest <= published <= available)
 
 
 @dataclass(frozen=True)
@@ -74,7 +90,6 @@ def settlement(evidence, *, kickoff, as_of, deadline):
 
 def resolve(evidence, *, kickoff, as_of):
     """Resolve each record's latest valid version visible at the evaluation cutoff."""
-    earliest_ft = kickoff + REGULATION_TIME if kickoff is not None else None
     rows = [evidence] if isinstance(evidence, dict) else evidence
     if not isinstance(rows, (list, tuple)):
         return Resolution()
@@ -84,15 +99,13 @@ def resolve(evidence, *, kickoff, as_of):
         if isinstance(row, dict):
             known = utc(row.get("known_utc"))
             score = score_pair(row.get("ft"))
-            if (known is not None and known <= as_of and (earliest_ft is None or known >= earliest_ft)
+            if (ft_time_valid(kickoff, known, known, None, as_of)
                     and (score is not None or row.get("conflict") is True)):
                 events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
             continue
-        if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
-                or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
-                or not row.observed_at <= row.available_at <= as_of
-                or (earliest_ft is not None and (row.available_at < earliest_ft
-                    or (row.published_at is not None and row.published_at < earliest_ft)))):
+        if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None
+                or (row.source.startswith("telegram") and row.published_at is None)
+                or not ft_time_valid(kickoff or row.kickoff, row.observed_at, row.available_at, row.published_at, as_of)):
             continue
         events.setdefault(row.available_at, []).append(
             ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
@@ -182,7 +195,8 @@ def provider_observations(state, source):
     return {
         mid: [Observation(source, mid, row.get("period"), score_pair(row.get("ft")),
                           utc(row.get("observed_at")), utc(row.get("available_at")),
-                          kickoff=utc(row.get("kickoff_utc")))
+                          kickoff=utc(row.get("kickoff_utc")), fixture_id=mid,
+                          link=(row.get("snapshot") or {}).get("link"), provider_record=row.get("snapshot") or {})
               for row in rows if isinstance(row, dict) and row.get("fixture_id", mid) == mid]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
@@ -192,8 +206,7 @@ def _provider_record(mid, version, source, as_of):
     score = score_pair(version.get("ft"))
     kickoff = utc(version.get("kickoff_utc"))
     observed, available = utc(version.get("observed_at")), utc(version.get("available_at"))
-    if (score is None or kickoff is None or observed is None or available is None
-            or not kickoff + REGULATION_TIME <= observed <= available <= as_of
+    if (score is None or not ft_time_valid(kickoff, observed, available, None, as_of)
             or version.get("period") != "regulation" or version.get("fixture_id", mid) != mid):
         return None
     snapshot = version.get("snapshot")

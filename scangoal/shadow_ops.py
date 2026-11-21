@@ -280,19 +280,8 @@ def knowledge_times():
         if (result.get('score_90') is not None or result.get('final') is not None
                 or str(result.get('status', '')).casefold().startswith('finished')):
             add(mid, result.get('fetched_at_utc'))
-    notes_by_day = {}
-    for date, teams, score in notes:
-        key = (date[:10], tuple(team.casefold() for team in teams))
-        notes_by_day.setdefault(key, []).append(chronology['notes'].get((date, tuple(teams), tuple(score))))
-    for msg in msgs:
-        # A late signal can follow an already observed full-time note. Match
-        # ordered teams on the UTC match day even if the note predates the signal.
-        names = tuple(team.casefold() for team in msg.get('teams') or ())
-        for stamp in notes_by_day.get((msg['date_utc'][:10], names), ()):
-            add(msg.get('match_id'), stamp)
-        hit = report.note_match(msg, notes) if names else None
-        if hit:
-            add(msg.get('match_id'), chronology['notes'].get((hit[0], tuple(hit[1]), tuple(hit[2]))))
+    for note in notes:
+        add(note.fixture_id, note.available_at.isoformat())
     return times, msgs
 
 

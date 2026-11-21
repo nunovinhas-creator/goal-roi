@@ -91,7 +91,8 @@ def priority_matches():
 
 
 def run(fetch=request_json, now=None, token=None, priority=None):
-    now = now or datetime.now(UTC)
+    observed_clock = (lambda stamp=now: stamp) if now is not None else (lambda: datetime.now(UTC))
+    now = observed_clock()
     token = (token if token is not None else os.environ.get('HIGHLIGHTLY_KEY', '')).strip()
     if not token:
         print('HL_DETAILS_NOT_CONFIGURED')
@@ -120,7 +121,10 @@ def run(fetch=request_json, now=None, token=None, priority=None):
             continue
         if not re.search(r'^finished', d['status'], re.I):
             continue                                        # ainda não terminou na fonte: tenta-se mais tarde
-        state['details'][mid] = dict(d, hl_id=hl_id, fetched_at_utc=now.isoformat(timespec='seconds'))
+        binding = (hl.get('results') or {}).get(mid) or (hl.get('not_regular_time') or {}).get(mid) or {}
+        provenance = {key: binding[key] for key in ('fixture_id', 'event_date', 'league', 'target_league',
+                                                     'home', 'away', 'target_teams', 'identity_method', 'link') if key in binding}
+        state['details'][mid] = dict(d, **provenance, hl_id=hl_id, fetched_at_utc=observed_clock().isoformat())
     state['last_run_utc'] = now.isoformat(timespec='seconds')
     state['stats'] = {'pending': len(todo), 'requests': requests, 'stopped': stopped, 'quota_remaining': remaining, 'fields_seen': shape,
                       'stored': len(state['details']), 'consistent': sum(1 for d in state['details'].values() if d['consistent'])}
