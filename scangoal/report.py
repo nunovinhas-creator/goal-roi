@@ -669,7 +669,7 @@ def research_bets(signals, observations, now, *, bindings=None):
         yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
-def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False):
+def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
     chron = {}
@@ -762,13 +762,14 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     registry = brain.load_registry(reg_path)
     if register and brain.update_registry(signals, registry, now=now):
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
-    LAST['signals'] = [b for b in signals if eligible(b)]
+    captured = LAST if capture is None else capture
+    captured['signals'] = [b for b in signals if eligible(b)]
     observations = opportunity_results.merge_sources(bot_observations, providers)
     identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
     research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
                                 not_covered=not_covered, chronology=chron, group_aliases=False, now=now)
     research = list(research_bets(research_input, observations, now, bindings=bindings))
-    LAST['research_signals'] = [b for b in research if eligible(b)]
+    captured['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY

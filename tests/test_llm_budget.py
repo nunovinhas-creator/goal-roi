@@ -40,8 +40,10 @@ class DurableBudget(unittest.TestCase):
 
     def test_interruption_after_reservation_uses_budget_on_a_fresh_runner(self):
         self.first.reserve(DAY.date() - timedelta(days=1), 100, 100)
-        self.enterContext(patch.object(report, 'build', return_value={'brain': {'top': []}}))
-        self.enterContext(patch.dict(report.LAST, {'research_signals': [sig('fixture', None, 2)]}))
+        def build(*, as_of, capture):
+            capture['research_signals'] = [sig('fixture', None, 2)]
+            return {'brain': {'top': []}}
+        self.enterContext(patch.object(report, 'build', side_effect=build))
         self.enterContext(patch.object(llm, 'DAILY_NEURONS', 10))
         self.enterContext(patch.object(llm, 'reserve', return_value=10))
 
@@ -128,8 +130,10 @@ class DurableBudget(unittest.TestCase):
     def test_confirmed_runner_sends_only_after_remote_reservation(self):
         self.first.reserve(DAY.date() - timedelta(days=1), 1, 80000)
         self.enterContext(patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(self.runners[0] / 'data')}))
-        self.enterContext(patch.object(report, 'build', return_value={'brain': {'top': []}}))
-        self.enterContext(patch.dict(report.LAST, {'research_signals': [sig('fixture', None, 2)]}))
+        def build(*, as_of, capture):
+            capture['research_signals'] = [sig('fixture', None, 2)]
+            return {'brain': {'top': []}}
+        self.enterContext(patch.object(report, 'build', side_effect=build))
         self.enterContext(patch.object(llm, 'opportunity_digest', return_value=None))
 
         def send(*args, **kwargs):

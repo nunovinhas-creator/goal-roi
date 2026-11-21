@@ -132,8 +132,7 @@ class ProspectiveOpportunityTests(unittest.TestCase):
         p["declared_before_forward_samples_at_utc"] = "yesterday"
         with self.assertRaises(ValueError):
             lab.evaluate([signal()], {}, p, activation_utc=ACTIVATION, now=NOW)
-        with self.assertRaises(ValueError):
-            run([signal()], now="2020-01-01T00:00:00+00:00")
+        self.assertEqual(run([signal()], now="2020-01-01T00:00:00+00:00")["status"], "not_activated")
 
 
 
@@ -264,7 +263,7 @@ class ResultSourceTests(unittest.TestCase):
                "collected_at_utc": "2026-11-19T15:36:00Z", "text": text}
         (self.directory / "messages.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
         path = self.directory / "results_hl.json"
-        info = {"bsd_id": 17, "home": "A", "away": "B", "event_date": "2026-11-19T18:00+00:00"}
+        info = {"bsd_id": 17, "home": "A", "away": "B", "league": "Example", "event_date": "2026-11-19T18:00+00:00"}
         state = {"results": {}}
         cutoff = chronology.parse_utc("2026-11-19T21:00:00Z")
         opportunity_results.remember_provider_results(state, {self.MATCH: dict(info, ft=[2, 1])},
@@ -274,11 +273,11 @@ class ResultSourceTests(unittest.TestCase):
         from scangoal.results_bsd import capture_result_versions, save_result_state
         capture_result_versions(state, {}, [
             {"id": 17, "status": "finished", "home_score": 1, "away_score": 1, "home_team": "A",
-             "away_team": "B", "event_date": "2026-11-19T18:00:00Z"},
+             "away_team": "B", "league": "Example", "event_date": "2026-11-19T18:00:00Z"},
         ], chronology.parse_utc("2026-11-19T22:00:00Z"))
         save_result_state(path, state)
-        self.assertEqual(state["results"][self.MATCH]["ft"], [1, 1])
         self.assertEqual(state["first_results"][self.MATCH]["ft"], [2, 1])
+        self.assertEqual(state["results"][self.MATCH]["ft"], [1, 1])
         self.assertEqual([r["ft"] for r in state["ft_versions"][self.MATCH]], [[2, 1], [1, 1]])
         updated = sourced_results({}, self.directory)
         self.assertEqual(before, self.assess(updated, now=cutoff))
