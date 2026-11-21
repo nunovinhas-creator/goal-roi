@@ -2450,12 +2450,16 @@
    "state": "delivered"
   },
   "game|id:norwich-vs-cardiff-city-20261121|218f310dcdd5": {
+   "attempt_utc": "2026-11-21T13:06:49+00:00",
+   "chars": 197,
    "created_utc": "2026-11-21T13:06:49+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "679585fd1bd1e9a059130f5af0a1355f92736982feda2dfe79b1d5e7a15ba49c",
+   "state": "in_flight"
   },
   "game|id:nurnberg-vs-eintracht-braunschweig-20261121|cb03e0614fac": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
@@ -2993,13 +2997,15 @@
    "attempt_utc": "2026-11-21T13:06:49+00:00",
    "chars": 176,
    "created_utc": "2026-11-21T13:06:49+00:00",
+   "done_utc": "2026-11-21T13:06:49+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "61541184bdfd305c8645df9b68e6c254112c2621f6dec68b16a7dc37ba01f011",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:swit-szczecin-vs-stal-stalowa-wola-20261120|966b3211345b": {
    "attempt_utc": "2026-11-20T12:53:34+00:00",
@@ -3577,7 +3583,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 221,
+  "delivered": 222,
   "uncertain": 2
  },
  "format_last_run_utc": "2026-11-21T13:02:51+00:00",
@@ -4302,6 +4308,9 @@
   "item|id:nice-vs-paris-saint-germain-20261121|1x2|Paris Saint Germain": {
    "at_utc": "2026-11-21T00:21:30+00:00"
   },
+  "item|id:norwich-vs-cardiff-city-20261121|Half Time Total Goals|Over 0.5": {
+   "at_utc": "2026-11-21T13:06:49+00:00"
+  },
   "item|id:nurnberg-vs-eintracht-braunschweig-20261121|Asian Total|Under 2.75": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
@@ -4529,7 +4538,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 533,
+ "sent_total": 534,
  "statuses": {
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": "promissora",
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
@@ -4928,6 +4937,7 @@
   "2026-11-21T12:53:09+00:00|Parma Women — Napoli Women|Over 3",
   "2026-11-21T12:53:27+00:00|Chonburi — Uthai Thani|Over 3.75",
   "2026-11-21T12:53:38+00:00|Kayserispor — Sariyer|Kayserispor",
+  "2026-11-21T13:02:42+00:00|Norwich — Cardiff City|Over 0.5",
   "2026-11-21T13:04:59+00:00|Sudtirol — Cremonese|Cremonese"
  ]
 }
