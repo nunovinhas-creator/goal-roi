@@ -884,6 +884,18 @@
    "sha256": "86c1111ba770c0500021d060bd9dc8d65c963da1295777114f418fecf64fedf2",
    "state": "delivered"
   },
+  "game|id:augsburg-vs-mainz-20261122|445a8acaf6b5": {
+   "attempt_utc": "2026-11-22T16:10:32+00:00",
+   "chars": 198,
+   "created_utc": "2026-11-22T16:10:32+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "4cb9f8eb1a9a6ba8e2b729faeead2163ee4046c6df01a2118f842e536ed87e3f",
+   "state": "in_flight"
+  },
   "game|id:augsburg-vs-mainz-20261122|eb9228cfb0cc": {
    "attempt_utc": "2026-11-22T11:48:54+00:00",
    "chars": 196,
@@ -2946,13 +2958,23 @@
    "attempt_utc": "2026-11-22T16:04:31+00:00",
    "chars": 224,
    "created_utc": "2026-11-22T16:04:31+00:00",
+   "done_utc": "2026-11-22T16:04:31+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "c88db17f832a724165f7d291204e9022274b2709412ecb6d10f54fe7eb3d4ad2",
-   "state": "in_flight"
+   "state": "delivered"
+  },
+  "game|id:liverpool-vs-manchester-united-20261122|e094f2424168": {
+   "created_utc": "2026-11-22T16:10:32+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
   },
   "game|id:malawi-vs-egypt-20261117|9fcc2fe8c526": {
    "attempt_utc": "2026-11-17T14:47:46+00:00",
@@ -4986,25 +5008,25 @@
   }
  },
  "delivery_counts": {
-  "delivered": 322,
+  "delivered": 323,
   "uncertain": 3
  },
- "format_last_run_utc": "2026-11-22T16:00:32+00:00",
+ "format_last_run_utc": "2026-11-22T16:08:34+00:00",
  "health": {
   "reference": {
    "bsd_results": 45,
-   "eligible": 1748,
+   "eligible": 1752,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 108,
-   "hypotheses": 13404,
+   "hypotheses": 13442,
    "settled_bets": 1383,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 218,
+   "statuses": 223,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-22T16:00:32+00:00",
+ "last_run_utc": "2026-11-22T16:08:34+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -5201,7 +5223,7 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 58,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
-  "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 26,
+  "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 28,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": 46,
@@ -5225,8 +5247,8 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 83,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 49,
-  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 44,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 51,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 48,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 60,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 48,
@@ -5357,6 +5379,9 @@
   },
   "item|id:augsburg-vs-mainz-20261122|Asian Total|Under 3.5": {
    "at_utc": "2026-11-22T11:48:54+00:00"
+  },
+  "item|id:augsburg-vs-mainz-20261122|Asian Total|Under 4.5": {
+   "at_utc": "2026-11-22T16:10:32+00:00"
   },
   "item|id:baniyas-sc-vs-al-nasr-sc-20261121|Asian Total|Over 3.5": {
    "at_utc": "2026-11-21T05:26:44+00:00"
@@ -6257,7 +6282,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 634,
+ "sent_total": 635,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Dia = fim de semana": "abandonada",
@@ -6297,10 +6322,11 @@
   "Jogo aberto | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": "abandonada",
+  "Jogo aberto | Dia = fim de semana & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte": "abandonada",
-  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": "abandonada",
-  "Polymarket | Competição = liga & Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais": "abandonada",
+  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
+  "Polymarket | Competição = liga & Mercado = golos (mais/menos) & Número de apostas = uma": "abandonada",
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": "abandonada",
@@ -6312,7 +6338,6 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": "promissora",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -6320,15 +6345,18 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = outro mercado & Valor da aposta = 10 mil $ ou mais": "abandonada",
-  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = várias & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo": "abandonada",
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Hora (UTC) = tarde & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Hora (UTC) = tarde & Número de apostas = uma & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Número de apostas = uma": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = uma": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -6374,6 +6402,7 @@
   "Stake | Competição = liga & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Competição = liga & Momento do aviso = antes do início": "abandonada",
   "Stake | Competição = liga & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
+  "Stake | Competição = liga & Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
@@ -6426,6 +6455,7 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias": "abandonada",
@@ -6927,6 +6957,7 @@
   "2026-11-22T15:09:40+00:00|Ajax — ADO Den Haag|Under 3.5",
   "2026-11-22T15:22:26+00:00|Trabzonspor — Eyupspor|Over 3.5",
   "2026-11-22T15:57:57+00:00|Manta — Delfin|Over 2.5",
-  "2026-11-22T16:03:08+00:00|Liverpool — Manchester United|Under 2.5"
+  "2026-11-22T16:03:08+00:00|Liverpool — Manchester United|Under 2.5",
+  "2026-11-22T16:08:01+00:00|Augsburg — Mainz|Under 4.5"
  ]
 }
