@@ -1072,6 +1072,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Antecedência = mais de 60 min & Faixa de odd = odd 2,00 a 3,00 & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "mais de 60 min"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Antecedência = mais de 60 min & Faixa de odd = odd 2,00 a 3,00 & Seleção = equipa da casa": {
   "born_utc": "2026-11-22T00:59:18.490623+00:00",
   "conditions": [
@@ -1100,6 +1119,25 @@
   },
   "reason": "Apostas antecipadas com odd moderada e seleção da equipa da casa",
   "source": "llm"
+ },
+ "Betfair | Antecedência = mais de 60 min & Faixa de odd = odd 2,00 a 3,00 & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "mais de 60 min"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
  },
  "Betfair | Antecedência = mais de 60 min & Faixa de odd = odd 2,00 a 3,00 & Volume na seleção = menos de 10 mil $": {
   "born_utc": "2026-11-21T09:54:55+00:00",
@@ -5995,6 +6033,25 @@
    [
     "Hora (UTC)",
     "noite"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Competição = liga & Hora (UTC) = noite & Momento = antes do jogo": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Momento",
+    "antes do jogo"
    ]
   ],
   "family": "Betfair",
@@ -19586,6 +19643,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = fim de semana & Hora (UTC) = noite & Quota de mercado = 80 % ou mais": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = fim de semana & Hora (UTC) = noite & Quota de mercado = menos de 80 %": {
   "born_utc": "2026-11-21T18:54:47+00:00",
   "conditions": [
@@ -23650,6 +23726,25 @@
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "reason": "Mercados noturnos com odds mais altas tendem a ter mais incertezas",
   "source": "llm"
+ },
+ "Betfair | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Reforço = sem reforço": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Reforço",
+    "sem reforço"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
  },
  "Betfair | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Seleção = equipa da casa": {
   "born_utc": "2026-11-17T19:05:54+00:00",
@@ -176856,6 +176951,17 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Liga = US Major League Soccer": {
+  "born_utc": "2026-11-22T20:03:01+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "US Major League Soccer"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Marcador no momento = diferença de 1 golo": {
   "born_utc": "2026-11-15T21:36:00+00:00",
   "conditions": [
@@ -191650,6 +191756,44 @@
    [
     "Golos até ao sinal",
     "1 ou 2"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Faixa de odd = odd acima de 3,00 & Golos até ao sinal = nenhum": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "nenhum"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Competição = liga & Faixa de odd = odd acima de 3,00 & Hora (UTC) = noite": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
    ]
   ],
   "family": "Stake",
@@ -221435,6 +221579,25 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Faixa de odd = odd acima de 3,00 & Hora (UTC) = noite & Marcador no momento = empatado": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Marcador no momento",
+    "empatado"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Faixa de odd = odd acima de 3,00 & Hora (UTC) = noite & Mercado = outros mercados": {
   "born_utc": "2026-11-17T21:34:13+00:00",
   "conditions": [
@@ -240178,6 +240341,44 @@
   "family": "Stake",
   "source": "gerador"
  },
+ "Stake | Liga = French Ligue 1 & Momento do aviso = até 45 min depois do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "French Ligue 1"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Liga = French Ligue 1 & Momento do aviso = até 45 min depois do início & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "French Ligue 1"
+   ],
+   [
+    "Momento do aviso",
+    "até 45 min depois do início"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
  "Stake | Liga = French Ligue 1 & Momento do aviso = mais de 45 min depois do início": {
   "born_utc": "2026-11-22T17:50:16+00:00",
   "conditions": [
@@ -240279,6 +240480,25 @@
    [
     "Valor da aposta",
     "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Liga = French Ligue 1 & Número de apostas = uma & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "French Ligue 1"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Stake",
@@ -240396,6 +240616,25 @@
    [
     "Valor da aposta",
     "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Liga = French Ligue 1 & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-22T20:05:01+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "French Ligue 1"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Stake",
