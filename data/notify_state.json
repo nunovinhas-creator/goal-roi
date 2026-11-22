@@ -2466,6 +2466,18 @@
    "sha256": "16753aa956a14dd7ddfb850b1df7715b54907efb86d9435fbc9ee0281f297375",
    "state": "delivered"
   },
+  "game|id:getafe-vs-atletico-de-madrid-20261122|09850e3843b2": {
+   "attempt_utc": "2026-11-22T19:39:29+00:00",
+   "chars": 221,
+   "created_utc": "2026-11-22T19:39:29+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "ecec9b6a7e6509e3a47fd3c01ae3c309f92f5c68c1e369e646d5a06e9e1a73d1",
+   "state": "in_flight"
+  },
   "game|id:getafe-vs-atletico-de-madrid-20261122|0ac7004f6372": {
    "attempt_utc": "2026-11-22T18:58:46+00:00",
    "chars": 299,
@@ -5285,22 +5297,22 @@
   "delivered": 343,
   "uncertain": 4
  },
- "format_last_run_utc": "2026-11-22T19:30:55+00:00",
+ "format_last_run_utc": "2026-11-22T19:37:29+00:00",
  "health": {
   "reference": {
    "bsd_results": 47,
-   "eligible": 1837,
+   "eligible": 1839,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 108,
-   "hypotheses": 13778,
-   "settled_bets": 1493,
+   "hypotheses": 13783,
+   "settled_bets": 1497,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 248,
+   "statuses": 251,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-22T19:30:55+00:00",
+ "last_run_utc": "2026-11-22T19:37:29+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -6030,6 +6042,9 @@
   "item|id:gc-mascara-vs-mc-saida-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T15:25:54+00:00"
   },
+  "item|id:getafe-vs-atletico-de-madrid-20261122|1st Half - Asian Total|Over 1": {
+   "at_utc": "2026-11-22T19:39:29+00:00"
+  },
   "item|id:getafe-vs-atletico-de-madrid-20261122|1x2|Atletico Madrid": {
    "at_utc": "2026-11-21T22:22:49+00:00"
   },
@@ -6678,6 +6693,7 @@
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Marcador no momento = diferença de 2 ou mais golos": "abandonada",
   "Jogo aberto | Minuto = 61 em diante & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": "abandonada",
   "Polymarket | Competição = liga & Mercado = golos (mais/menos) & Número de apostas = uma": "abandonada",
+  "Polymarket | Competição = liga & Momento = durante o jogo": "promissora",
   "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": "promissora",
   "Polymarket | Competição = liga & Número de apostas = uma & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
@@ -6706,7 +6722,6 @@
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo": "abandonada",
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
-  "Polymarket | Hora (UTC) = noite & Número de apostas = várias": "abandonada",
   "Polymarket | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": "promissora",
   "Polymarket | Hora (UTC) = tarde & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -6830,6 +6845,7 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Golos até ao sinal = nenhum & Momento do aviso = até 45 min depois do início": "promissora",
   "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": "promissora",
   "Stake | Hora (UTC) = tarde": "abandonada",
   "Stake | Hora (UTC) = tarde & Mercado = outros mercados": "abandonada",
@@ -6853,6 +6869,7 @@
   "Stake | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": "abandonada",
+  "Stake | Marcador no momento = empatado & Momento do aviso = até 45 min depois do início": "promissora",
   "Stake | Marcador no momento = empatado & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Mercado = golos (total asiático) & Momento do aviso = mais de 45 min depois do início": "abandonada",
   "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
@@ -6860,6 +6877,7 @@
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início": "abandonada",
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Mercado = outros mercados & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Momento do aviso = antes do início": "abandonada",
@@ -7357,6 +7375,7 @@
   "2026-11-22T18:55:57+00:00|Marseille — Le Mans|AH2(+1.5)",
   "2026-11-22T18:57:53+00:00|Celta B — Valladolid|RC Celta Fortuna",
   "2026-11-22T19:00:32+00:00|Brentford — Everton|Over 2.75",
-  "2026-11-22T19:26:32+00:00|Marseille — Le Mans|AH1(-0.5)"
+  "2026-11-22T19:26:32+00:00|Marseille — Le Mans|AH1(-0.5)",
+  "2026-11-22T19:36:31+00:00|Getafe — Atletico de Madrid|Over 1"
  ]
 }
