@@ -83299,6 +83299,35 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Golos até ao sinal = 3 ou mais": {
+  "born_utc": "2026-11-22T13:21:02.552718+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.1-8b-instruct-fast",
+  "provenance": {
+   "prompt_sha256": "7efc6fdbae5dd3082cfa695433510d0b8f9ff67b3b99b92c3112f22780796ec4",
+   "registry_size": 13070,
+   "report_generated_at_utc": "2026-11-22T13:20:07+00:00",
+   "response_sha256": "7c5220ba133041973daa4b4e062279d2046e8889fc656f140c23a5f9e5e6abe1"
+  },
+  "reason": "três ou mais golos em jogo de segunda-feira com odds médias",
+  "source": "llm"
+ },
  "Jogo aberto | Dia = dia de semana & Faixa de odd = odd até 1,50": {
   "born_utc": "2026-11-20T21:04:55+00:00",
   "conditions": [
@@ -131274,6 +131303,39 @@
   ],
   "family": "Polymarket",
   "source": "gerador"
+ },
+ "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos) & Número de apostas = uma": {
+  "born_utc": "2026-11-22T13:21:02.552718+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Número de apostas",
+    "uma"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Polymarket",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.1-8b-instruct-fast",
+  "provenance": {
+   "prompt_sha256": "7efc6fdbae5dd3082cfa695433510d0b8f9ff67b3b99b92c3112f22780796ec4",
+   "registry_size": 13070,
+   "report_generated_at_utc": "2026-11-22T13:20:07+00:00",
+   "response_sha256": "7c5220ba133041973daa4b4e062279d2046e8889fc656f140c23a5f9e5e6abe1"
+  },
+  "reason": "jogo de fim de semana com odds médias e uma aposta",
+  "source": "llm"
  },
  "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = outro mercado": {
   "born_utc": "2026-11-16T13:02:22+00:00",
