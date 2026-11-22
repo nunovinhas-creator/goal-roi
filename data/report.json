@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-22T01:32:01+00:00",
+ "generated_at_utc": "2026-11-22T01:43:20+00:00",
  "messages": 3257,
  "types": {
   "SERVICE": 10,
@@ -45,11 +45,11 @@
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 21,
   "bsd_last_run_utc": "2026-11-22T01:31:59+00:00",
-  "goal_minutes_matches": 109,
+  "goal_minutes_matches": 112,
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-22T01:31:57+00:00",
+  "collector_last_run_utc": "2026-11-22T01:43:15+00:00",
   "name_review": [
    {
     "bot": [
@@ -449,7 +449,7 @@
   "stake_no_score_after_kickoff": 79,
   "stake_sent_45_after_kickoff": 156,
   "goal_lists": 855,
-  "goal_lists_consistent": 389
+  "goal_lists_consistent": 390
  },
  "unique_bets": 1547,
  "settled_bets": 1267,
@@ -2223,7 +2223,7 @@
    "by_bot_mark": 0,
    "per_day": 0.3,
    "days_to_hint": 95,
-   "days_to_conclusion": 1044,
+   "days_to_conclusion": 1045,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -2482,7 +2482,7 @@
    "by_bot_mark": 0,
    "per_day": 1.5,
    "days_to_hint": 11,
-   "days_to_conclusion": 196,
+   "days_to_conclusion": 197,
    "prudent_rate": 0.5181,
    "prob_above": 0.5042,
    "edge": 0.0006,
@@ -3986,8 +3986,8 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 12320,
-    "promissora": 99,
+    "em observação": 12319,
+    "promissora": 100,
     "abandonada": 198
    },
    "hypotheses": [
@@ -4280,10 +4280,24 @@
     },
     {
      "id": "Jogo aberto | Parte do jogo = 2.ª parte",
+     "n": 181,
+     "games": 177,
+     "roi": 0.0345,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
      "n": 180,
      "games": 176,
-     "roi": 0.0318,
+     "roi": 0.0218,
      "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 180,
+     "games": 178,
+     "roi": 0.0826,
+     "status": "promissora"
     },
     {
      "id": "Polymarket | Competição = seleções",
@@ -4298,20 +4312,6 @@
      "games": 104,
      "roi": -0.1085,
      "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo",
-     "n": 179,
-     "games": 175,
-     "roi": 0.0192,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 179,
-     "games": 177,
-     "roi": 0.0799,
-     "status": "promissora"
     },
     {
      "id": "Polymarket | Dia = fim de semana & Número de apostas = várias",
@@ -4363,17 +4363,17 @@
      "status": "abandonada"
     },
     {
+     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
+     "n": 166,
+     "games": 166,
+     "roi": 0.0768,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
      "n": 166,
      "games": 66,
      "roi": 0.058,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Outros sinais no mesmo jogo = jogo com um só tipo de sinal",
-     "n": 165,
-     "games": 165,
-     "roi": 0.0739,
      "status": "em observação"
     },
     {
@@ -4405,6 +4405,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Dia = fim de semana",
+     "n": 164,
+     "games": 163,
+     "roi": -0.006,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 164,
      "games": 82,
@@ -4416,13 +4423,6 @@
      "n": 164,
      "games": 64,
      "roi": 0.0057,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana",
-     "n": 163,
-     "games": 162,
-     "roi": -0.0095,
      "status": "em observação"
     },
     {
@@ -4482,17 +4482,17 @@
      "status": "abandonada"
     },
     {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00",
+     "n": 160,
+     "games": 157,
+     "roi": 0.0266,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Competição = liga & Número de apostas = várias",
      "n": 160,
      "games": 78,
      "roi": 0.1491,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00",
-     "n": 159,
-     "games": 156,
-     "roi": 0.0237,
      "status": "em observação"
     },
     {
@@ -4531,6 +4531,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Minuto = 31 a 60",
+     "n": 155,
+     "games": 154,
+     "roi": 0.0841,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %",
      "n": 155,
      "games": 55,
@@ -4550,13 +4557,6 @@
      "games": 154,
      "roi": -0.0054,
      "status": "promissora"
-    },
-    {
-     "id": "Jogo aberto | Minuto = 31 a 60",
-     "n": 154,
-     "games": 153,
-     "roi": 0.0811,
-     "status": "em observação"
     },
     {
      "id": "Polymarket | Mercado = outro mercado & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal",
@@ -4594,6 +4594,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
+     "n": 151,
+     "games": 147,
+     "roi": 0.0061,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
      "n": 151,
      "games": 65,
@@ -4605,13 +4612,6 @@
      "n": 151,
      "games": 72,
      "roi": 0.0206,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 2.ª parte",
-     "n": 150,
-     "games": 146,
-     "roi": 0.003,
      "status": "em observação"
     },
     {
@@ -4713,6 +4713,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Competição = liga",
+     "n": 144,
+     "games": 144,
+     "roi": 0.0061,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Dia = fim de semana & Momento = antes do jogo & Número de apostas = várias",
      "n": 144,
      "games": 65,
@@ -4724,13 +4731,6 @@
      "n": 144,
      "games": 76,
      "roi": 0.0668,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Competição = liga",
-     "n": 143,
-     "games": 143,
-     "roi": 0.0027,
      "status": "em observação"
     },
     {
@@ -4804,6 +4804,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
+     "n": 136,
+     "games": 133,
+     "roi": 0.0248,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo",
      "n": 136,
      "games": 86,
@@ -4816,13 +4823,6 @@
      "games": 68,
      "roi": -0.0859,
      "status": "abandonada"
-    },
-    {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Golos em falta para ganhar = até 1 golo",
-     "n": 135,
-     "games": 132,
-     "roi": 0.0216,
-     "status": "em observação"
     },
     {
      "id": "Polymarket | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = sim",
@@ -4909,6 +4909,13 @@
      "status": "promissora"
     },
     {
+     "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais",
+     "n": 132,
+     "games": 130,
+     "roi": 0.0617,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não",
      "n": 132,
      "games": 67,
@@ -4934,13 +4941,6 @@
      "n": 131,
      "games": 131,
      "roi": -0.083,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais",
-     "n": 131,
-     "games": 129,
-     "roi": 0.0578,
      "status": "em observação"
     },
     {
@@ -4993,6 +4993,13 @@
      "status": "em observação"
     },
     {
+     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
+     "n": 130,
+     "games": 127,
+     "roi": 0.0075,
+     "status": "em observação"
+    },
+    {
      "id": "Polymarket | Número de apostas = várias & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = sim",
      "n": 130,
      "games": 55,
@@ -5007,10 +5014,24 @@
      "status": "abandonada"
     },
     {
-     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
+     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 129,
+     "games": 128,
+     "roi": 0.0068,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Sinal anterior de outro tipo no mesmo jogo = não",
+     "n": 129,
+     "games": 127,
+     "roi": 0.0509,
+     "status": "em observação"
+    },
+    {
+     "id": "Jogo aberto | Ritmo indicado pelo bot = menos de 90",
      "n": 129,
      "games": 126,
-     "roi": 0.0039,
+     "roi": 0.0833,
      "status": "em observação"
     },
     {
@@ -5019,32 +5040,11 @@
      "games": 89,
      "roi": -0.0795,
      "status": "em observação"
-    },
-    {
-     "id": "Stake | Momento do aviso = antes do início",
-     "n": 129,
-     "games": 68,
-     "roi": -0.0991,
-     "status": "abandonada"
-    },
-    {
-     "id": "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $",
-     "n": 129,
-     "games": 84,
-     "roi": -0.0719,
-     "status": "em observação"
-    },
-    {
-     "id": "Jogo aberto | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não",
-     "n": 128,
-     "games": 127,
-     "roi": 0.0024,
-     "status": "em observação"
     }
    ]
   },
   "hypotheses": 12617,
-  "tested": 2151,
+  "tested": 2155,
   "corrected_bar": null,
   "counts": {
    "em observação": 12432,
@@ -5313,7 +5313,7 @@
       0.2762
      ],
      "prob_above_cut": 0.7796,
-     "prob_adds": 0.8243,
+     "prob_adds": 0.8198,
      "bets": 9,
      "pending_status": null,
      "entry_status": "em observação",
@@ -6832,7 +6832,7 @@
     "contraditório": 0,
     "evitar": 8
    },
-   "generated_utc": "2026-11-22T01:33:26+00:00",
+   "generated_utc": "2026-11-22T01:44:45+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -6846,18 +6846,18 @@
    "by_source": {
     "gerador": {
      "hypotheses": 12525,
-     "with_prospective_evidence": 4637,
-     "prospective_games": 132327
+     "with_prospective_evidence": 4639,
+     "prospective_games": 132620
     },
     "llm/refinar": {
      "hypotheses": 59,
      "with_prospective_evidence": 21,
-     "prospective_games": 613
+     "prospective_games": 615
     },
     "llm/novas": {
      "hypotheses": 22,
      "with_prospective_evidence": 14,
-     "prospective_games": 305
+     "prospective_games": 306
     },
     "llm/evitar": {
      "hypotheses": 11,
@@ -6873,26 +6873,26 @@
    "llm": [
     {
      "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 31 a 60 & Parte do jogo = 2.ª parte",
-     "games": 76,
-     "roi": -0.0105,
+     "games": 77,
+     "roi": -0.0047,
      "economics": {
       "admitted": 117,
-      "results_confirmed": 116,
-      "wins": 43,
+      "results_confirmed": 117,
+      "wins": 44,
       "losses": 33,
       "voids": 40,
       "imputed_losses": 0,
-      "pending": 1,
+      "pending": 0,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
       "stake_per_game": 1,
-      "resolved_stake_units": 116,
-      "profit_advertised": -1.22,
-      "profit_odds_minus_2pct": -2.6556,
-      "roi_advertised": -0.0105,
-      "roi_odds_minus_2pct": -0.0229,
-      "confirmed_hit_rate": 0.5658,
+      "resolved_stake_units": 117,
+      "profit_advertised": -0.55,
+      "profit_odds_minus_2pct": -2.019,
+      "roi_advertised": -0.0047,
+      "roi_odds_minus_2pct": -0.0173,
+      "confirmed_hit_rate": 0.5714,
       "expected_profit": null
      },
      "expect": "acima",
@@ -7169,27 +7169,27 @@
      "mode": "refinar"
     },
     {
-     "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Parte do jogo = 1.ª parte",
+     "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 1 golo & Parte do jogo = 2.ª parte",
      "games": 24,
-     "roi": 0.0747,
+     "roi": 0.0694,
      "economics": {
-      "admitted": 30,
-      "results_confirmed": 30,
-      "wins": 15,
-      "losses": 9,
-      "voids": 6,
+      "admitted": 36,
+      "results_confirmed": 36,
+      "wins": 16,
+      "losses": 8,
+      "voids": 12,
       "imputed_losses": 0,
       "pending": 0,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
       "stake_per_game": 1,
-      "resolved_stake_units": 30,
-      "profit_advertised": 2.24,
-      "profit_odds_minus_2pct": 1.7152,
-      "roi_advertised": 0.0747,
-      "roi_odds_minus_2pct": 0.0572,
-      "confirmed_hit_rate": 0.625,
+      "resolved_stake_units": 36,
+      "profit_advertised": 2.5,
+      "profit_odds_minus_2pct": 1.99,
+      "roi_advertised": 0.0694,
+      "roi_odds_minus_2pct": 0.0553,
+      "confirmed_hit_rate": 0.6667,
       "expected_profit": null
      },
      "expect": "acima",
@@ -7200,12 +7200,12 @@
   "walk_forward": {
    "followed": {
     "bets": 432,
-    "settled": 359,
-    "games": 359,
-    "wins": 168,
-    "units": -10.56,
-    "roi": -0.0294,
-    "roi_cut": -0.0455
+    "settled": 360,
+    "games": 360,
+    "wins": 169,
+    "units": -9.89,
+    "roi": -0.0275,
+    "roi_cut": -0.0436
    },
    "skipped": {
     "bets": 272,
@@ -7584,13 +7584,14 @@
     -10.25,
     -9.56,
     -10.56,
-    -10.56
+    -10.56,
+    -9.89
    ],
-   "prob_followed_better": 0.1165,
+   "prob_followed_better": 0.1222,
    "first_followed_utc": "2026-11-14T01:19:17+00:00",
    "first_decision_utc": "2026-11-12T10:39:40+00:00",
    "chronology": {
-    "results_verified": 1103,
+    "results_verified": 1104,
     "results_unknown_time": 0,
     "results_contradictory_time": 0,
     "hypotheses_without_valid_birth": 0
@@ -7609,21 +7610,21 @@
    }
   },
   "multiplicity": {
-   "tested_now": 2151,
-   "distinct_game_sets_tested": 2004,
+   "tested_now": 2155,
+   "distinct_game_sets_tested": 2007,
    "distinct_game_sets_promising_or_better": 8,
    "promising_or_better": 8,
    "promising_sum_games": 309,
    "promising_union_games": 160,
    "evidence_levels": {
-    "exploratória": 511,
-    "prospetiva": 1640,
+    "exploratória": 506,
+    "prospetiva": 1649,
     "não verificável": 0
    },
    "prospective_categories_tested": {
-    "prospective": 94628,
+    "prospective": 94973,
     "mixed": 1267,
-    "before_registration": 11169,
+    "before_registration": 11185,
     "after_registration_not_operational": 340,
     "result_known_before_decision": 266,
     "result_time_unproven": 0
@@ -7698,7 +7699,7 @@
    "newly_selected": [],
    "candidates_meaning": "promising certifiable hypotheses not yet in the ledger; a report with register=True registers them (see newly_selected)"
   },
-  "expected_by_chance": 107.6,
+  "expected_by_chance": 107.8,
   "top": [
    {
     "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim",
@@ -7829,7 +7830,7 @@
      0.2686
     ],
     "prob_above_cut": 0.9739,
-    "prob_adds": 0.993,
+    "prob_adds": 0.9924,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T03:00:05+00:00",
@@ -8352,7 +8353,7 @@
      0.3375
     ],
     "prob_above_cut": 0.9628,
-    "prob_adds": 0.9822,
+    "prob_adds": 0.9812,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:12:01+00:00",
@@ -8433,7 +8434,7 @@
      0.3375
     ],
     "prob_above_cut": 0.9628,
-    "prob_adds": 0.9822,
+    "prob_adds": 0.9812,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T13:20:27+00:00",
@@ -8518,7 +8519,7 @@
      0.3375
     ],
     "prob_above_cut": 0.9628,
-    "prob_adds": 0.9822,
+    "prob_adds": 0.9812,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T16:10:59+00:00",
@@ -8782,7 +8783,7 @@
      0.2485
     ],
     "prob_above_cut": 0.9523,
-    "prob_adds": 0.9827,
+    "prob_adds": 0.9814,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T03:00:05+00:00",
@@ -8863,7 +8864,7 @@
      0.319
     ],
     "prob_above_cut": 0.9556,
-    "prob_adds": 0.9781,
+    "prob_adds": 0.9769,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T03:23:23+00:00",
@@ -9029,7 +9030,7 @@
      0.3261
     ],
     "prob_above_cut": 0.9513,
-    "prob_adds": 0.9773,
+    "prob_adds": 0.9762,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T01:19:49+00:00",
@@ -9293,7 +9294,7 @@
      0.3443
     ],
     "prob_above_cut": 0.9501,
-    "prob_adds": 0.9763,
+    "prob_adds": 0.9752,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T17:16:49+00:00",
@@ -9378,7 +9379,7 @@
      0.3446
     ],
     "prob_above_cut": 0.9504,
-    "prob_adds": 0.9732,
+    "prob_adds": 0.9719,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:38:32+00:00",
@@ -9727,7 +9728,7 @@
      0.3424
     ],
     "prob_above_cut": 0.9486,
-    "prob_adds": 0.9721,
+    "prob_adds": 0.9708,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:32:49+00:00",
@@ -9812,7 +9813,7 @@
      0.3424
     ],
     "prob_above_cut": 0.9486,
-    "prob_adds": 0.9721,
+    "prob_adds": 0.9708,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:12:01+00:00",
@@ -10153,7 +10154,7 @@
      0.3289
     ],
     "prob_above_cut": 0.946,
-    "prob_adds": 0.9704,
+    "prob_adds": 0.969,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:34:09+00:00",
@@ -10238,7 +10239,7 @@
      0.3349
     ],
     "prob_above_cut": 0.9452,
-    "prob_adds": 0.9734,
+    "prob_adds": 0.9722,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -10408,7 +10409,7 @@
      0.2451
     ],
     "prob_above_cut": 0.9367,
-    "prob_adds": 0.973,
+    "prob_adds": 0.9712,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T01:19:49+00:00",
@@ -10743,7 +10744,7 @@
      0.2563
     ],
     "prob_above_cut": 0.933,
-    "prob_adds": 0.9672,
+    "prob_adds": 0.9652,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T19:53:23+00:00",
@@ -10828,7 +10829,7 @@
      0.3093
     ],
     "prob_above_cut": 0.9359,
-    "prob_adds": 0.9639,
+    "prob_adds": 0.9622,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T13:20:27+00:00",
@@ -10913,7 +10914,7 @@
      0.3093
     ],
     "prob_above_cut": 0.9359,
-    "prob_adds": 0.9639,
+    "prob_adds": 0.9622,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T12:19:38+00:00",
@@ -10994,7 +10995,7 @@
      0.2622
     ],
     "prob_above_cut": 0.9329,
-    "prob_adds": 0.9664,
+    "prob_adds": 0.9645,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T09:25:24+00:00",
@@ -11075,7 +11076,7 @@
      0.2622
     ],
     "prob_above_cut": 0.9329,
-    "prob_adds": 0.9664,
+    "prob_adds": 0.9645,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T08:33:12+00:00",
@@ -11160,7 +11161,7 @@
      0.3224
     ],
     "prob_above_cut": 0.9342,
-    "prob_adds": 0.9644,
+    "prob_adds": 0.9629,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -11245,7 +11246,7 @@
      0.3224
     ],
     "prob_above_cut": 0.9342,
-    "prob_adds": 0.9644,
+    "prob_adds": 0.9629,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:59:26+00:00",
@@ -11588,7 +11589,7 @@
      0.3527
     ],
     "prob_above_cut": 0.9331,
-    "prob_adds": 0.9595,
+    "prob_adds": 0.9579,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-21T12:19:45+00:00",
@@ -11669,7 +11670,7 @@
      0.3527
     ],
     "prob_above_cut": 0.9331,
-    "prob_adds": 0.9595,
+    "prob_adds": 0.9579,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T00:22:52+00:00",
@@ -11924,7 +11925,7 @@
      0.3385
     ],
     "prob_above_cut": 0.9311,
-    "prob_adds": 0.958,
+    "prob_adds": 0.9563,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T17:33:47+00:00",
@@ -12260,7 +12261,7 @@
      0.3489
     ],
     "prob_above_cut": 0.9298,
-    "prob_adds": 0.9573,
+    "prob_adds": 0.9556,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T21:21:51+00:00",
@@ -12773,7 +12774,7 @@
      0.2394
     ],
     "prob_above_cut": 0.9193,
-    "prob_adds": 0.9613,
+    "prob_adds": 0.959,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T01:19:49+00:00",
@@ -13028,7 +13029,7 @@
      0.3334
     ],
     "prob_above_cut": 0.9259,
-    "prob_adds": 0.9543,
+    "prob_adds": 0.9525,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:38:32+00:00",
@@ -13201,7 +13202,7 @@
      0.3294
     ],
     "prob_above_cut": 0.9231,
-    "prob_adds": 0.9559,
+    "prob_adds": 0.9542,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -13286,7 +13287,7 @@
      0.3294
     ],
     "prob_above_cut": 0.9231,
-    "prob_adds": 0.9559,
+    "prob_adds": 0.9542,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:59:26+00:00",
@@ -13371,7 +13372,7 @@
      0.2954
     ],
     "prob_above_cut": 0.9198,
-    "prob_adds": 0.9555,
+    "prob_adds": 0.9535,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T12:02:51+00:00",
@@ -14883,7 +14884,7 @@
      0.31
     ],
     "prob_above_cut": 0.911,
-    "prob_adds": 0.9437,
+    "prob_adds": 0.9415,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T16:49:20+00:00",
@@ -14968,7 +14969,7 @@
      0.31
     ],
     "prob_above_cut": 0.911,
-    "prob_adds": 0.9437,
+    "prob_adds": 0.9415,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T16:10:59+00:00",
@@ -15049,7 +15050,7 @@
      0.2991
     ],
     "prob_above_cut": 0.9096,
-    "prob_adds": 0.9433,
+    "prob_adds": 0.9409,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:36:09+00:00",
@@ -15134,7 +15135,7 @@
      0.2957
     ],
     "prob_above_cut": 0.9085,
-    "prob_adds": 0.9441,
+    "prob_adds": 0.9418,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T13:58:27+00:00",
@@ -15601,6 +15602,91 @@
     "last_change": null
    },
    {
+    "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 1 golo & Minuto = 31 a 60",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Golos em falta para ganhar",
+      "até 1 golo"
+     ],
+     [
+      "Marcador no momento",
+      "diferença de 1 golo"
+     ],
+     [
+      "Minuto",
+      "31 a 60"
+     ]
+    ],
+    "n": 23,
+    "hits": 18,
+    "hit_rate": 0.7674,
+    "break_even": 0.5946,
+    "prob_above": 0.9225,
+    "roi": 0.2109,
+    "status": "em observação",
+    "tradable": true,
+    "experimental": false,
+    "expect": null,
+    "games": 23,
+    "bets": 23,
+    "edge": 0.118,
+    "edge_ci": [
+     -0.0202,
+     0.2406
+    ],
+    "prob_above_cut": 0.9009,
+    "prob_adds": 0.9434,
+    "pending_status": null,
+    "entry_status": "em observação",
+    "born_utc": "2026-11-14T16:49:20+00:00",
+    "born_verified": true,
+    "evidence_level": "exploratória",
+    "prospective": {
+     "games": 19,
+     "hits": 14.0,
+     "misses": 4.0,
+     "prob_above": 0.9082,
+     "roi": 0.2141,
+     "economics": {
+      "admitted": 29,
+      "results_confirmed": 29,
+      "wins": 15,
+      "losses": 4,
+      "voids": 10,
+      "imputed_losses": 0,
+      "pending": 0,
+      "quarantined": 0,
+      "scope": "prospective_exploratory",
+      "status": "positive_exploratory",
+      "stake_per_game": 1,
+      "resolved_stake_units": 29,
+      "profit_advertised": 6.21,
+      "profit_odds_minus_2pct": 5.7258,
+      "roi_advertised": 0.2141,
+      "roi_odds_minus_2pct": 0.1974,
+      "confirmed_hit_rate": 0.7895,
+      "expected_profit": null
+     },
+     "categories": {
+      "prospective": 19,
+      "mixed": 0,
+      "before_registration": 4,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "at_birth": null,
+    "result_time_unknown": null,
+    "game_set": "1b1365dcf76aa518",
+    "confirmation": null,
+    "validation_blocked": null,
+    "certification": null,
+    "status_changes": 0,
+    "last_change": null
+   },
+   {
     "id": "Polymarket | Dia = fim de semana & Hora (UTC) = manhã & Valor da aposta = menos de 10 mil $",
     "family": "Polymarket",
     "conditions": [
@@ -15971,7 +16057,7 @@
      0.2902
     ],
     "prob_above_cut": 0.9037,
-    "prob_adds": 0.9416,
+    "prob_adds": 0.9392,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T21:05:59+00:00",
@@ -16816,7 +16902,7 @@
      0.3172
     ],
     "prob_above_cut": 0.9029,
-    "prob_adds": 0.9392,
+    "prob_adds": 0.937,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-17T16:41:39+00:00",
@@ -17330,7 +17416,7 @@
      0.3075
     ],
     "prob_above_cut": 0.9011,
-    "prob_adds": 0.9376,
+    "prob_adds": 0.9353,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -17934,7 +18020,7 @@
      0.329
     ],
     "prob_above_cut": 0.9022,
-    "prob_adds": 0.9337,
+    "prob_adds": 0.9314,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T18:32:49+00:00",
@@ -18019,7 +18105,7 @@
      0.318
     ],
     "prob_above_cut": 0.9004,
-    "prob_adds": 0.9356,
+    "prob_adds": 0.9332,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-17T20:28:21+00:00",
@@ -18440,7 +18526,7 @@
      0.3322
     ],
     "prob_above_cut": 0.9001,
-    "prob_adds": 0.935,
+    "prob_adds": 0.9328,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -18525,7 +18611,7 @@
      0.3322
     ],
     "prob_above_cut": 0.9001,
-    "prob_adds": 0.935,
+    "prob_adds": 0.9328,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T09:59:59+00:00",
@@ -18610,7 +18696,7 @@
      0.2926
     ],
     "prob_above_cut": 0.8968,
-    "prob_adds": 0.9356,
+    "prob_adds": 0.9331,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T21:18:43+00:00",
@@ -18861,7 +18947,7 @@
      0.1877
     ],
     "prob_above_cut": 0.8824,
-    "prob_adds": 0.9486,
+    "prob_adds": 0.9449,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T18:57:02+00:00",
@@ -18955,7 +19041,7 @@
      0.1877
     ],
     "prob_above_cut": 0.8824,
-    "prob_adds": 0.9486,
+    "prob_adds": 0.9449,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T18:57:02+00:00",
@@ -19049,7 +19135,7 @@
      0.2162
     ],
     "prob_above_cut": 0.8879,
-    "prob_adds": 0.9422,
+    "prob_adds": 0.9387,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-13T18:57:02+00:00",
@@ -19307,7 +19393,7 @@
      0.3032
     ],
     "prob_above_cut": 0.8966,
-    "prob_adds": 0.9341,
+    "prob_adds": 0.9317,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:59:26+00:00",
@@ -19392,7 +19478,7 @@
      0.3032
     ],
     "prob_above_cut": 0.8966,
-    "prob_adds": 0.9341,
+    "prob_adds": 0.9317,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T22:59:26+00:00",
@@ -19562,7 +19648,7 @@
      0.3403
     ],
     "prob_above_cut": 0.8998,
-    "prob_adds": 0.9316,
+    "prob_adds": 0.9293,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-21T14:23:52+00:00",
@@ -19647,7 +19733,7 @@
      0.3403
     ],
     "prob_above_cut": 0.8998,
-    "prob_adds": 0.9316,
+    "prob_adds": 0.9293,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-21T14:23:52+00:00",
@@ -19728,7 +19814,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.9315,
+    "prob_adds": 0.9292,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T14:34:09+00:00",
@@ -19813,7 +19899,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.9315,
+    "prob_adds": 0.9292,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T15:01:27+00:00",
@@ -19898,7 +19984,7 @@
      0.3401
     ],
     "prob_above_cut": 0.8996,
-    "prob_adds": 0.9315,
+    "prob_adds": 0.9292,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-14T15:01:27+00:00",
@@ -19983,7 +20069,7 @@
      0.3028
     ],
     "prob_above_cut": 0.8961,
-    "prob_adds": 0.9337,
+    "prob_adds": 0.9313,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T17:16:49+00:00",
@@ -20153,7 +20239,7 @@
      0.3076
     ],
     "prob_above_cut": 0.896,
-    "prob_adds": 0.9338,
+    "prob_adds": 0.9314,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-16T20:22:07+00:00",
@@ -20238,7 +20324,7 @@
      0.3076
     ],
     "prob_above_cut": 0.896,
-    "prob_adds": 0.9338,
+    "prob_adds": 0.9314,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-17T20:19:11+00:00",
@@ -20319,7 +20405,7 @@
      0.3076
     ],
     "prob_above_cut": 0.896,
-    "prob_adds": 0.9338,
+    "prob_adds": 0.9314,
     "pending_status": null,
     "entry_status": "em observação",
     "born_utc": "2026-11-15T21:18:43+00:00",
@@ -20363,91 +20449,6 @@
     "at_birth": null,
     "result_time_unknown": null,
     "game_set": "f751b03c493024ce",
-    "confirmation": null,
-    "validation_blocked": null,
-    "certification": null,
-    "status_changes": 0,
-    "last_change": null
-   },
-   {
-    "id": "Stake | Hora (UTC) = tarde & Momento do aviso = até 45 min depois do início & Valor da aposta = 10 mil $ ou mais",
-    "family": "Stake",
-    "conditions": [
-     [
-      "Hora (UTC)",
-      "tarde"
-     ],
-     [
-      "Momento do aviso",
-      "até 45 min depois do início"
-     ],
-     [
-      "Valor da aposta",
-      "10 mil $ ou mais"
-     ]
-    ],
-    "n": 14,
-    "hits": 11,
-    "hit_rate": 0.7857,
-    "break_even": 0.5976,
-    "prob_above": 0.9118,
-    "roi": 0.4082,
-    "status": "em observação",
-    "tradable": true,
-    "experimental": false,
-    "expect": null,
-    "games": 11,
-    "bets": 14,
-    "edge": 0.1357,
-    "edge_ci": [
-     -0.0328,
-     0.2793
-    ],
-    "prob_above_cut": 0.8932,
-    "prob_adds": 0.9542,
-    "pending_status": null,
-    "entry_status": "em observação",
-    "born_utc": "2026-11-17T13:29:03+00:00",
-    "born_verified": true,
-    "evidence_level": "exploratória",
-    "prospective": {
-     "games": 6,
-     "hits": 5.33,
-     "misses": 0.67,
-     "prob_above": null,
-     "roi": -0.0138,
-     "economics": {
-      "admitted": 12,
-      "results_confirmed": 6,
-      "wins": 5,
-      "losses": 1,
-      "voids": 0,
-      "imputed_losses": 2,
-      "pending": 4,
-      "quarantined": 0,
-      "scope": "prospective_exploratory",
-      "status": "nonpositive_exploratory",
-      "stake_per_game": 1,
-      "resolved_stake_units": 8,
-      "profit_advertised": -0.11,
-      "profit_odds_minus_2pct": -0.2678,
-      "roi_advertised": -0.0138,
-      "roi_odds_minus_2pct": -0.0335,
-      "confirmed_hit_rate": 0.8333,
-      "expected_profit": null
-     },
-     "categories": {
-      "prospective": 6,
-      "mixed": 0,
-      "before_registration": 5,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "at_birth": null,
-    "result_time_unknown": null,
-    "game_set": "9e9ff63621db3051",
     "confirmation": null,
     "validation_blocked": null,
     "certification": null,
@@ -20498,6 +20499,7 @@
    "Stake | Dia = fim de semana & Número de apostas = uma": "abandonada",
    "Stake | Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
    "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
+   "Jogo aberto | Competição = liga & Dia = fim de semana & Parte do jogo = 2.ª parte": "abandonada",
    "Stake | Competição = liga & Dia = fim de semana & Faixa de odd = odd 1,50 a 2,00": "abandonada",
    "Forma de golos | Competição = liga & Parte do jogo = 2.ª parte": "abandonada",
    "Polymarket | Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -20511,7 +20513,6 @@
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Quota de mercado = 80 % ou mais": "abandonada",
    "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
    "Forma de golos | Competição = liga": "abandonada",
-   "Jogo aberto | Competição = liga & Dia = fim de semana & Parte do jogo = 2.ª parte": "abandonada",
    "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
    "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte": "abandonada",
    "Stake | Faixa de odd = odd 1,50 a 2,00 & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
@@ -22150,7 +22151,7 @@
      -0.0183
     ],
     "prob_above_cut": 0.0282,
-    "prob_adds": 0.112,
+    "prob_adds": 0.1015,
     "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Jogo aberto",
     "conditions": [
@@ -22212,7 +22213,7 @@
      0.0714
     ],
     "prob_above_cut": 0.1312,
-    "prob_adds": 0.3695,
+    "prob_adds": 0.3496,
     "id": "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Minuto = 31 a 60 & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = menos de 90",
     "family": "Jogo aberto",
     "conditions": [
@@ -22286,29 +22287,29 @@
     "entry_status": "em observação"
    },
    {
-    "n": 9,
+    "n": 10,
     "signals": 25,
-    "hits": 6,
+    "hits": 7,
     "misses": 3,
-    "hit_rate": 0.6667,
+    "hit_rate": 0.7,
     "ci95": [
-     0.3542,
-     0.8794
+     0.3968,
+     0.8922
     ],
-    "break_even": 0.5773,
-    "roi": 0.0704,
-    "games": 9,
-    "bets": 9,
+    "break_even": 0.5795,
+    "roi": 0.0944,
+    "games": 10,
+    "bets": 10,
     "unidentified": 0,
-    "prudent_rate": 0.6196,
-    "prob_above": 0.6585,
-    "edge": 0.0423,
+    "prudent_rate": 0.6397,
+    "prob_above": 0.7214,
+    "edge": 0.0603,
     "edge_ci": [
-     -0.1438,
-     0.2137
+     -0.1203,
+     0.2245
     ],
-    "prob_above_cut": 0.6202,
-    "prob_adds": 0.9136,
+    "prob_above_cut": 0.685,
+    "prob_adds": 0.9392,
     "id": "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Minuto = 31 a 60 & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não",
     "family": "Jogo aberto",
     "conditions": [
@@ -22336,9 +22337,9 @@
     "mode": "refinar",
     "experimental": false,
     "tradable": false,
-    "open": 1,
+    "open": 0,
     "born_verified": true,
-    "game_set": "face0c2338b59171",
+    "game_set": "d03264611206c020",
     "prospective": null,
     "evidence_level": "exploratória",
     "status": "em observação",
@@ -22952,7 +22953,7 @@
      0.2715
     ],
     "prob_above_cut": 0.7738,
-    "prob_adds": 0.9518,
+    "prob_adds": 0.9463,
     "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais",
     "family": "Jogo aberto",
     "conditions": [
@@ -24338,19 +24339,19 @@
       ]
      ],
      "expect": null,
-     "games": 76,
-     "n": 76,
-     "roi": -0.0689,
-     "game_roi": -0.0689,
-     "game_roi_cut": -0.0817,
-     "prob_above": 0.1006,
-     "prob_above_cut": 0.0668,
-     "edge": -0.0697,
+     "games": 77,
+     "n": 77,
+     "roi": -0.0619,
+     "game_roi": -0.0619,
+     "game_roi_cut": -0.0748,
+     "prob_above": 0.1185,
+     "prob_above_cut": 0.08,
+     "edge": -0.0641,
      "edge_ci": [
-      -0.1594,
-      0.0196
+      -0.1533,
+      0.0246
      ],
-     "prospective_games": 69,
+     "prospective_games": 70,
      "born_utc": "2026-11-14T13:20:27+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24426,6 +24427,7 @@
       "swansea-vs-west-brom-20261121",
       "telstar-vs-pec-zwolle-20261121",
       "tottenham-vs-ipswich-20261121",
+      "univ-de-concepcion-vs-nublense-20261122",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vis-pesaro-1898-vs-pianese-20261114",
       "warta-srem-vs-polonia-leszno-20261115",
@@ -24623,19 +24625,19 @@
       ]
      ],
      "expect": null,
-     "games": 51,
-     "n": 51,
-     "roi": 0.0336,
-     "game_roi": 0.0336,
-     "game_roi_cut": 0.0181,
-     "prob_above": 0.4613,
-     "prob_above_cut": 0.3883,
-     "edge": -0.0071,
+     "games": 52,
+     "n": 52,
+     "roi": 0.0429,
+     "game_roi": 0.0429,
+     "game_roi_cut": 0.0272,
+     "prob_above": 0.5036,
+     "prob_above_cut": 0.429,
+     "edge": -0.0004,
      "edge_ci": [
-      -0.1132,
-      0.096
+      -0.1054,
+      0.1015
      ],
-     "prospective_games": 48,
+     "prospective_games": 49,
      "born_utc": "2026-11-13T18:57:02+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -24685,6 +24687,7 @@
       "spain-vs-england-20261115",
       "telstar-vs-pec-zwolle-20261121",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "utc-cajamarca-vs-cd-los-chankas-20261116",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vfb-stuttgart-women-vs-bayer-04-leverkusen-women-20261116",
@@ -25297,19 +25300,19 @@
       ]
      ],
      "expect": null,
-     "games": 75,
-     "n": 75,
-     "roi": 0.0401,
-     "game_roi": 0.0401,
-     "game_roi_cut": 0.024,
-     "prob_above": 0.4488,
-     "prob_above_cut": 0.3646,
-     "edge": -0.0076,
+     "games": 76,
+     "n": 76,
+     "roi": 0.0465,
+     "game_roi": 0.0465,
+     "game_roi_cut": 0.0304,
+     "prob_above": 0.4845,
+     "prob_above_cut": 0.3984,
+     "edge": -0.0027,
      "edge_ci": [
-      -0.0975,
-      0.0804
+      -0.092,
+      0.0845
      ],
-     "prospective_games": 68,
+     "prospective_games": 69,
      "born_utc": "2026-11-14T12:06:51+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -25384,6 +25387,7 @@
       "st-pauli-vs-bochum-20261121",
       "telstar-vs-pec-zwolle-20261121",
       "thailand-u23-vs-singapore-u23-20261114",
+      "univ-de-concepcion-vs-nublense-20261122",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vis-pesaro-1898-vs-pianese-20261114",
       "warta-srem-vs-polonia-leszno-20261115",
@@ -26906,19 +26910,19 @@
       ]
      ],
      "expect": null,
-     "games": 111,
-     "n": 111,
-     "roi": 0.0321,
-     "game_roi": 0.0321,
-     "game_roi_cut": 0.0178,
-     "prob_above": 0.5733,
-     "prob_above_cut": 0.4687,
-     "edge": 0.0078,
+     "games": 112,
+     "n": 112,
+     "roi": 0.036,
+     "game_roi": 0.036,
+     "game_roi_cut": 0.0216,
+     "prob_above": 0.6021,
+     "prob_above_cut": 0.4978,
+     "edge": 0.0111,
      "edge_ci": [
-      -0.0669,
-      0.0808
+      -0.0632,
+      0.0837
      ],
-     "prospective_games": 109,
+     "prospective_games": 110,
      "born_utc": "2026-11-12T16:15:53+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27026,6 +27030,7 @@
       "swansea-vs-west-brom-20261121",
       "thailand-u23-vs-singapore-u23-20261114",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vis-pesaro-1898-vs-pianese-20261114",
       "warta-srem-vs-polonia-leszno-20261115",
@@ -27059,19 +27064,19 @@
       ]
      ],
      "expect": null,
-     "games": 88,
-     "n": 88,
-     "roi": 0.0424,
-     "game_roi": 0.0424,
-     "game_roi_cut": 0.0264,
-     "prob_above": 0.5458,
-     "prob_above_cut": 0.4521,
-     "edge": 0.0052,
+     "games": 89,
+     "n": 89,
+     "roi": 0.0478,
+     "game_roi": 0.0478,
+     "game_roi_cut": 0.0317,
+     "prob_above": 0.5784,
+     "prob_above_cut": 0.4844,
+     "edge": 0.0093,
      "edge_ci": [
-      -0.0781,
-      0.0865
+      -0.0735,
+      0.09
      ],
-     "prospective_games": 85,
+     "prospective_games": 86,
      "born_utc": "2026-11-12T17:30:52+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27159,6 +27164,7 @@
       "st-pauli-vs-bochum-20261121",
       "thailand-u23-vs-singapore-u23-20261114",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vis-pesaro-1898-vs-pianese-20261114",
       "warta-srem-vs-polonia-leszno-20261115",
@@ -27185,19 +27191,19 @@
       ]
      ],
      "expect": null,
-     "games": 151,
-     "n": 151,
-     "roi": 0.008,
-     "game_roi": 0.008,
-     "game_roi_cut": -0.0056,
-     "prob_above": 0.371,
-     "prob_above_cut": 0.2628,
-     "edge": -0.0133,
+     "games": 152,
+     "n": 152,
+     "roi": 0.011,
+     "game_roi": 0.011,
+     "game_roi_cut": -0.0027,
+     "prob_above": 0.396,
+     "prob_above_cut": 0.2843,
+     "edge": -0.0106,
      "edge_ci": [
-      -0.0783,
-      0.0508
+      -0.0755,
+      0.0531
      ],
-     "prospective_games": 150,
+     "prospective_games": 151,
      "born_utc": "2026-11-12T15:16:56+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27342,6 +27348,7 @@
       "tottenham-vs-ipswich-20261121",
       "troyes-vs-le-havre-20261120",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "utc-cajamarca-vs-cd-los-chankas-20261116",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vfb-stuttgart-women-vs-bayer-04-leverkusen-women-20261116",
@@ -27378,19 +27385,19 @@
       ]
      ],
      "expect": null,
-     "games": 91,
-     "n": 91,
-     "roi": 0.0338,
-     "game_roi": 0.0338,
-     "game_roi_cut": 0.0189,
-     "prob_above": 0.5013,
-     "prob_above_cut": 0.4056,
-     "edge": -0.0004,
+     "games": 92,
+     "n": 92,
+     "roi": 0.0388,
+     "game_roi": 0.0388,
+     "game_roi_cut": 0.0238,
+     "prob_above": 0.534,
+     "prob_above_cut": 0.4373,
+     "edge": 0.0036,
      "edge_ci": [
-      -0.0827,
-      0.0798
+      -0.0781,
+      0.0832
      ],
-     "prospective_games": 89,
+     "prospective_games": 90,
      "born_utc": "2026-11-12T16:32:35+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27479,6 +27486,7 @@
       "thailand-u23-vs-singapore-u23-20261114",
       "troyes-vs-le-havre-20261120",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "utc-cajamarca-vs-cd-los-chankas-20261116",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vfb-stuttgart-women-vs-bayer-04-leverkusen-women-20261116",
@@ -27507,19 +27515,19 @@
       ]
      ],
      "expect": null,
-     "games": 109,
-     "n": 109,
-     "roi": 0.0638,
-     "game_roi": 0.0638,
-     "game_roi_cut": 0.048,
-     "prob_above": 0.6578,
-     "prob_above_cut": 0.5586,
-     "edge": 0.018,
+     "games": 110,
+     "n": 110,
+     "roi": 0.068,
+     "game_roi": 0.068,
+     "game_roi_cut": 0.052,
+     "prob_above": 0.6846,
+     "prob_above_cut": 0.5872,
+     "edge": 0.0213,
      "edge_ci": [
-      -0.0574,
-      0.0914
+      -0.0537,
+      0.0942
      ],
-     "prospective_games": 107,
+     "prospective_games": 108,
      "born_utc": "2026-11-12T16:15:53+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27626,6 +27634,7 @@
       "thailand-u23-vs-singapore-u23-20261114",
       "troyes-vs-le-havre-20261120",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "utc-cajamarca-vs-cd-los-chankas-20261116",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vfb-stuttgart-women-vs-bayer-04-leverkusen-women-20261116",
@@ -27658,19 +27667,19 @@
       ]
      ],
      "expect": null,
-     "games": 92,
-     "n": 92,
-     "roi": 0.0491,
-     "game_roi": 0.0491,
-     "game_roi_cut": 0.0331,
-     "prob_above": 0.5808,
-     "prob_above_cut": 0.4857,
-     "edge": 0.0095,
+     "games": 93,
+     "n": 93,
+     "roi": 0.0542,
+     "game_roi": 0.0542,
+     "game_roi_cut": 0.0381,
+     "prob_above": 0.6121,
+     "prob_above_cut": 0.5174,
+     "edge": 0.0134,
      "edge_ci": [
-      -0.0723,
-      0.0891
+      -0.0679,
+      0.0925
      ],
-     "prospective_games": 89,
+     "prospective_games": 90,
      "born_utc": "2026-11-12T17:30:52+00:00",
      "evidence_level": "prospetiva",
      "confirmation": null,
@@ -27761,6 +27770,7 @@
       "st-pauli-vs-bochum-20261121",
       "thailand-u23-vs-singapore-u23-20261114",
       "uae-vs-syria-20261117",
+      "univ-de-concepcion-vs-nublense-20261122",
       "verspah-oita-vs-fc-tiamo-hirakata-20261121",
       "vfb-stuttgart-women-vs-bayer-04-leverkusen-women-20261116",
       "vis-pesaro-1898-vs-pianese-20261114",
@@ -48075,7 +48085,7 @@
     "roi_announced_odds": -0.0502,
     "seen_late": 0,
     "by_bot_mark": 86,
-    "per_day": 32.9,
+    "per_day": 32.8,
     "days_to_hint": 0,
     "days_to_conclusion": 0
    },
@@ -48135,7 +48145,7 @@
     "by_bot_mark": 0,
     "per_day": 1.5,
     "days_to_hint": 11,
-    "days_to_conclusion": 196
+    "days_to_conclusion": 197
    }
   },
   "regime": [
