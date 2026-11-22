@@ -1,14 +1,14 @@
 {
- "generated_at_utc": "2026-11-22T09:47:37+00:00",
- "messages": 3328,
+ "generated_at_utc": "2026-11-22T09:52:40+00:00",
+ "messages": 3330,
  "types": {
   "SERVICE": 10,
   "GOAL_BREWING": 80,
   "BETFAIR": 502,
-  "STAKE_LOAD": 696,
+  "STAKE_LOAD": 697,
   "OPEN_GAME": 307,
   "TOTALS_FORM": 114,
-  "WEAKENED_LINEUP": 23,
+  "WEAKENED_LINEUP": 24,
   "OPEN_GAME_NO_ODDS": 21,
   "FULL_TIME_NOTE": 53,
   "POLYMARKET": 955,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 5377,
+  "versions": 5379,
   "edits_changing_signal": 4,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-22T09:35:55+00:00",
+  "last_collected_at_utc": "2026-11-22T09:52:40+00:00",
   "hl_results": 108,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 60,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-22T09:47:35+00:00",
+  "collector_last_run_utc": "2026-11-22T09:52:40+00:00",
   "name_review": [
    {
     "bot": [
@@ -445,13 +445,13 @@
   "deleted_by_bot": 0,
   "ended_after_90": 5,
   "hl_vs_bsd_disagreements": 0,
-  "stake_original_seen": 507,
+  "stake_original_seen": 508,
   "stake_no_score_after_kickoff": 80,
   "stake_sent_45_after_kickoff": 156,
   "goal_lists": 861,
   "goal_lists_consistent": 394
  },
- "unique_bets": 1574,
+ "unique_bets": 1575,
  "settled_bets": 1280,
  "unsettled_market": 193,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1706,7 +1706,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "STAKE_LOAD/pre": {
-   "bets": 298,
+   "bets": 299,
    "settled": 198,
    "matches": 101,
    "wins": 95,
@@ -2235,8 +2235,8 @@
    "seen_late": 0,
    "by_bot_mark": 0,
    "per_day": 0.3,
-   "days_to_hint": 98,
-   "days_to_conclusion": 1078,
+   "days_to_hint": 99,
+   "days_to_conclusion": 1079,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -2358,7 +2358,7 @@
    "prob_above_cut": 0.4378
   },
   "STAKE_LOAD": {
-   "signals": 517,
+   "signals": 518,
    "with_result": 330,
    "hits": 162,
    "misses": 158,
@@ -3386,7 +3386,7 @@
    },
    {
     "n": 51,
-    "signals": 89,
+    "signals": 90,
     "hits": 29,
     "misses": 22,
     "hit_rate": 0.5644,
@@ -3877,7 +3877,7 @@
    },
    {
     "n": 679,
-    "signals": 901,
+    "signals": 902,
     "hits": 392,
     "misses": 287,
     "hit_rate": 0.5667,
@@ -3982,8 +3982,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 1862,
-   "eligible": 1569,
+   "total": 1863,
+   "eligible": 1570,
    "excluded": 293,
    "reasons": {
     "no_valid_odds": 240,
@@ -3999,7 +3999,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 12460,
+    "em observação": 12465,
     "promissora": 99,
     "abandonada": 196
    },
@@ -5056,11 +5056,11 @@
     }
    ]
   },
-  "hypotheses": 12755,
+  "hypotheses": 12760,
   "tested": 2176,
   "corrected_bar": null,
   "counts": {
-   "em observação": 12570,
+   "em observação": 12575,
    "abandonada": 177,
    "promissora": 8
   },
@@ -7076,6 +7076,267 @@
       }
      ],
      "bad_total": 15
+    },
+    {
+     "match_id": "osasuna-vs-malaga-20261122",
+     "match": "Osasuna — Malaga",
+     "league": "Spanish La Liga Primera",
+     "family": "Stake",
+     "type": "STAKE_LOAD",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-22T17:30+00:00",
+     "date_utc": "2026-11-22T09:49:41+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "1x2",
+     "selection": "Osasuna",
+     "odds": 1.77,
+     "odds_last": 1.77,
+     "max_mult": 1,
+     "share": null,
+     "share_last": null,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 181,
+     "good": [
+      {
+       "id": "Stake | Hora (UTC) = manhã & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "manhã"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ],
+        [
+         "Valor da aposta",
+         "menos de 10 mil $"
+        ]
+       ],
+       "n": 17,
+       "games": 14,
+       "hits": 12,
+       "break_even": 0.5521,
+       "prob_above": 0.8737,
+       "roi": 0.3554,
+       "economics": {
+        "admitted": 11,
+        "results_confirmed": 10,
+        "wins": 7,
+        "losses": 3,
+        "voids": 0,
+        "imputed_losses": 0,
+        "pending": 1,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "positive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 10,
+        "profit_advertised": 1.64,
+        "profit_odds_minus_2pct": 1.4172,
+        "roi_advertised": 0.164,
+        "roi_odds_minus_2pct": 0.1417,
+        "confirmed_hit_rate": 0.7,
+        "expected_profit": null
+       },
+       "edge": 0.1124,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Hora (UTC) = manhã & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Hora (UTC)",
+         "manhã"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 41,
+       "games": 26,
+       "hits": 28,
+       "break_even": 0.535,
+       "prob_above": 0.8373,
+       "roi": 0.2978,
+       "economics": {
+        "admitted": 26,
+        "results_confirmed": 20,
+        "wins": 14,
+        "losses": 6,
+        "voids": 0,
+        "imputed_losses": 1,
+        "pending": 5,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "positive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 21,
+        "profit_advertised": 5.07,
+        "profit_odds_minus_2pct": 4.5586,
+        "roi_advertised": 0.2414,
+        "roi_odds_minus_2pct": 0.2171,
+        "confirmed_hit_rate": 0.7,
+        "expected_profit": null
+       },
+       "edge": 0.0802,
+       "status": "em observação",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Competição = liga & Hora (UTC) = manhã & Sinal anterior de outro tipo no mesmo jogo = não",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Hora (UTC)",
+         "manhã"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "não"
+        ]
+       ],
+       "n": 34,
+       "games": 21,
+       "hits": 22,
+       "break_even": 0.5303,
+       "prob_above": 0.8044,
+       "roi": 0.2125,
+       "economics": {
+        "admitted": 15,
+        "results_confirmed": 12,
+        "wins": 7,
+        "losses": 5,
+        "voids": 0,
+        "imputed_losses": 0,
+        "pending": 3,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "positive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 12,
+        "profit_advertised": 1.58,
+        "profit_odds_minus_2pct": 1.3284,
+        "roi_advertised": 0.1317,
+        "roi_odds_minus_2pct": 0.1107,
+        "confirmed_hit_rate": 0.5833,
+        "expected_profit": null
+       },
+       "edge": 0.0757,
+       "status": "em observação",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 3,
+     "bad": [
+      {
+       "id": "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Número de apostas = uma",
+       "conditions": [
+        [
+         "Mercado",
+         "outros mercados"
+        ],
+        [
+         "Momento do aviso",
+         "antes do início"
+        ],
+        [
+         "Número de apostas",
+         "uma"
+        ]
+       ],
+       "n": 57,
+       "games": 35,
+       "hits": 19,
+       "break_even": 0.4736,
+       "prob_above": 0.0092,
+       "roi": -0.388,
+       "economics": {
+        "admitted": 60,
+        "results_confirmed": 30,
+        "wins": 9,
+        "losses": 20,
+        "voids": 1,
+        "imputed_losses": 6,
+        "pending": 24,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 36,
+        "profit_advertised": -18.41,
+        "profit_odds_minus_2pct": -18.7418,
+        "roi_advertised": -0.5114,
+        "roi_odds_minus_2pct": -0.5206,
+        "confirmed_hit_rate": 0.3103,
+        "expected_profit": null
+       },
+       "edge": -0.1719,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Stake | Competição = liga & Dia = fim de semana & Mercado = outros mercados",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Dia",
+         "fim de semana"
+        ],
+        [
+         "Mercado",
+         "outros mercados"
+        ]
+       ],
+       "n": 93,
+       "games": 55,
+       "hits": 36,
+       "break_even": 0.5377,
+       "prob_above": 0.0154,
+       "roi": -0.3773,
+       "economics": {
+        "admitted": 64,
+        "results_confirmed": 40,
+        "wins": 13,
+        "losses": 27,
+        "voids": 0,
+        "imputed_losses": 2,
+        "pending": 22,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "resolved_stake_units": 42,
+        "profit_advertised": -19.71,
+        "profit_odds_minus_2pct": -20.1558,
+        "roi_advertised": -0.4693,
+        "roi_odds_minus_2pct": -0.4799,
+        "confirmed_hit_rate": 0.325,
+        "expected_profit": null
+       },
+       "edge": -0.1331,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 40
     },
     {
      "match_id": "lille-vs-bayern-munchen-20261125",
@@ -10619,12 +10880,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 8,
+    "misto": 9,
     "sem evidência": 0,
     "contraditório": 7,
     "evitar": 11
    },
-   "generated_utc": "2026-11-22T09:49:03+00:00",
+   "generated_utc": "2026-11-22T09:54:07+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -10637,7 +10898,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 12663,
+     "hypotheses": 12668,
      "with_prospective_evidence": 4720,
      "prospective_games": 134899
     },
@@ -11000,7 +11261,7 @@
     "roi_cut": -0.0377
    },
    "skipped": {
-    "bets": 278,
+    "bets": 279,
     "settled": 182,
     "games": 182,
     "wins": 100,
@@ -24654,7 +24915,7 @@
    },
    {
     "n": 64,
-    "signals": 121,
+    "signals": 122,
     "hits": 29,
     "misses": 35,
     "hit_rate": 0.4524,
@@ -24699,7 +24960,7 @@
     "mode": null,
     "experimental": false,
     "tradable": true,
-    "open": 55,
+    "open": 56,
     "born_verified": true,
     "game_set": "de06c6451a99420d",
     "prospective": {
@@ -26834,7 +27095,7 @@
    },
    {
     "n": 19,
-    "signals": 32,
+    "signals": 33,
     "hits": 11,
     "misses": 8,
     "hit_rate": 0.5676,
@@ -26883,7 +27144,7 @@
     "mode": "refinar",
     "experimental": false,
     "tradable": false,
-    "open": 13,
+    "open": 14,
     "born_verified": true,
     "game_set": "0eaf08641537540e",
     "prospective": null,
@@ -52048,7 +52309,7 @@
     "days_to_conclusion": 0
    },
    "STAKE_LOAD": {
-    "signals": 507,
+    "signals": 508,
     "with_result": 321,
     "hits": 159,
     "misses": 152,
@@ -52566,7 +52827,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 1574,
+   "bets": 1575,
    "settled": 1280,
    "matches": 656,
    "wins": 605,
@@ -52601,6 +52862,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-22T09:49:41+00:00",
+   "match_id": "osasuna-vs-malaga-20261122",
+   "group": "STAKE_LOAD/pre",
+   "match": "Osasuna — Malaga",
+   "selection": "1x2: Osasuna",
+   "odds": 1.77,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-22T09:19:58+00:00",
    "match_id": "lille-vs-bayern-munchen-20261125",
@@ -53484,25 +53758,18 @@
    "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-21T21:20:04+00:00",
-   "match_id": "groningen-vs-sc-heerenveen-20261121",
-   "group": "OPEN_GAME",
-   "match": "Groningen — SC Heerenveen",
-   "selection": "Over 3",
-   "odds": 1.6,
-   "ft": [
-    1,
-    3
-   ],
-   "w": 1.0,
-   "settled_by": "resultado",
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
+  {
+   "match_id": "resources-capital-vs-lucky-mile-20261122",
+   "match": "Resources Capital — Lucky Mile",
+   "league": "Hong Kong Division 1",
+   "date_utc": "2026-11-22T07:53:42+00:00",
+   "kickoff_utc": null,
+   "why": "à espera dos minutos dos golos",
+   "signals": 1
+  },
   {
    "match_id": "academia-quintana-vs-ponce-fc-20261122",
    "match": "Academia Quintana — Ponce FC",
@@ -54033,15 +54300,6 @@
    "kickoff_utc": "2026-11-21T14:00+00:00",
    "why": "mercado que o resultado final não decide",
    "signals": 3
-  },
-  {
-   "match_id": "wayside-celtic-vs-st-francis-20261120",
-   "match": "Wayside Celtic — St Francis",
-   "league": "Ireland Senior League",
-   "date_utc": "2026-11-20T20:20:44+00:00",
-   "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
-   "signals": 1
   }
  ],
  "matches": {
@@ -54454,71 +54712,6 @@
    "ft": [
     2,
     1
-   ]
-  },
-  "groningen-vs-sc-heerenveen-20261121": {
-   "teams": [
-    "Groningen",
-    "SC Heerenveen"
-   ],
-   "events": [
-    {
-     "d": "2026-11-21T07:08:17+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "pre",
-     "selection": "Over 3",
-     "odds": 1.66,
-     "market": "Asian Total",
-     "total": 13000.0
-    },
-    {
-     "d": "2026-11-21T07:08:17+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "pre",
-     "selection": "Over 3.25",
-     "odds": 1.86,
-     "market": "Asian Total",
-     "total": 8000.0
-    },
-    {
-     "d": "2026-11-21T07:08:18+00:00",
-     "k": "STAKE_LOAD",
-     "phase": "pre",
-     "selection": "Over 3.5",
-     "odds": 2.06,
-     "market": "Asian Total",
-     "total": 7000.0
-    },
-    {
-     "d": "2026-11-21T21:20:04+00:00",
-     "k": "OPEN_GAME",
-     "phase": "live",
-     "selection": "Over 3",
-     "odds": 1.6,
-     "minute": 60,
-     "score_at_signal": [
-      1,
-      1
-     ],
-     "rhythm": 88,
-     "bot_over_pct": 73,
-     "market": "Asian Total"
-    }
-   ],
-   "goals": [
-    [
-     73,
-     "1-2"
-    ],
-    [
-     80,
-     "1-3"
-    ]
-   ],
-   "goals_source": "bot",
-   "ft": [
-    1,
-    3
    ]
   },
   "lens-vs-toulouse-20261121": {
@@ -55936,6 +56129,26 @@
      "odds": 1.54,
      "market": "1x2",
      "total": 58000.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
+  "osasuna-vs-malaga-20261122": {
+   "teams": [
+    "Osasuna",
+    "Malaga"
+   ],
+   "events": [
+    {
+     "d": "2026-11-22T09:49:41+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Osasuna",
+     "odds": 1.77,
+     "market": "1x2",
+     "total": 7000.0
     }
    ],
    "goals": null,
@@ -62024,7 +62237,7 @@
    "day": "2026-11-21"
   },
   {
-   "bets": 30,
+   "bets": 31,
    "settled": 14,
    "wins": 8,
    "units": 1.29,
