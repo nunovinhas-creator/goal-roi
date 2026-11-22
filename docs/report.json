@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-22T11:17:07+00:00",
+ "generated_at_utc": "2026-11-22T11:20:28+00:00",
  "messages": 3365,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-22T11:17:06+00:00",
+  "collector_last_run_utc": "2026-11-22T11:19:21+00:00",
   "name_review": [
    {
     "bot": [
@@ -4000,7 +4000,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 12538,
+    "em observação": 12539,
     "promissora": 99,
     "abandonada": 195
    },
@@ -5057,11 +5057,11 @@
     }
    ]
   },
-  "hypotheses": 12832,
+  "hypotheses": 12833,
   "tested": 2176,
   "corrected_bar": null,
   "counts": {
-   "em observação": 12647,
+   "em observação": 12648,
    "abandonada": 177,
    "promissora": 8
   },
@@ -11353,13 +11353,13 @@
        "prob_above": 0.1424,
        "roi": -0.2291,
        "economics": {
-        "admitted": 20,
+        "admitted": 21,
         "results_confirmed": 17,
         "wins": 7,
         "losses": 10,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 4,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -11614,13 +11614,13 @@
        "prob_above": 0.1424,
        "roi": -0.2291,
        "economics": {
-        "admitted": 20,
+        "admitted": 21,
         "results_confirmed": 17,
         "wins": 7,
         "losses": 10,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 4,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -11780,13 +11780,13 @@
        "prob_above": 0.8642,
        "roi": 0.1097,
        "economics": {
-        "admitted": 33,
+        "admitted": 34,
         "results_confirmed": 29,
         "wins": 16,
         "losses": 13,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 4,
+        "pending": 5,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -11829,13 +11829,13 @@
        "prob_above": 0.1424,
        "roi": -0.2291,
        "economics": {
-        "admitted": 20,
+        "admitted": 21,
         "results_confirmed": 17,
         "wins": 7,
         "losses": 10,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 4,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -14069,7 +14069,7 @@
     "contraditório": 20,
     "evitar": 14
    },
-   "generated_utc": "2026-11-22T11:18:05+00:00",
+   "generated_utc": "2026-11-22T11:21:20+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -14097,7 +14097,7 @@
      "prospective_games": 616
     },
     "llm/evitar": {
-     "hypotheses": 11,
+     "hypotheses": 12,
      "with_prospective_evidence": 3,
      "prospective_games": 95
     }
@@ -28945,6 +28945,92 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Polymarket | Mercado e seleção exatos = Asian Total / Under 2.5 / regulation & Número de apostas = várias & Quota de mercado = 80 % ou mais",
+    "family": "Polymarket",
+    "conditions": [
+     [
+      "Mercado e seleção exatos",
+      "Asian Total / Under 2.5 / regulation"
+     ],
+     [
+      "Número de apostas",
+      "várias"
+     ],
+     [
+      "Quota de mercado",
+      "80 % ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-22T11:20:27.893769+00:00",
+    "reason": "mercados com alta quota e várias apostas podem ser mais arriscados",
+    "expect": "abaixo",
+    "mode": "evitar",
+    "experimental": true,
+    "tradable": false,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "economics": {
+      "admitted": 0,
+      "results_confirmed": 0,
+      "wins": 0,
+      "losses": 0,
+      "voids": 0,
+      "imputed_losses": 0,
+      "pending": 0,
+      "quarantined": 0,
+      "scope": "prospective_exploratory",
+      "status": "insufficient",
+      "stake_per_game": 1,
+      "resolved_stake_units": 0,
+      "profit_advertised": 0,
+      "profit_odds_minus_2pct": 0,
+      "roi_advertised": null,
+      "roi_odds_minus_2pct": null,
+      "confirmed_hit_rate": null,
+      "expected_profit": null
+     },
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Betfair | Antecedência = mais de 60 min & Faixa de odd = odd 2,00 a 3,00 & Seleção = equipa da casa",
     "family": "Betfair",
     "conditions": [
@@ -30484,101 +30570,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 9,
-    "signals": 10,
-    "hits": 5,
-    "misses": 4,
-    "hit_rate": 0.5556,
-    "ci95": [
-     0.2666,
-     0.8112
-    ],
-    "break_even": 0.4607,
-    "roi": 0.1838,
-    "games": 8,
-    "bets": 9,
-    "unidentified": 0,
-    "prudent_rate": 0.4808,
-    "prob_above": 0.5487,
-    "edge": 0.0153,
-    "edge_ci": [
-     -0.1724,
-     0.2056
-    ],
-    "prob_above_cut": 0.5171,
-    "prob_adds": 0.438,
-    "id": "Polymarket | Mercado = golos (mais/menos) & Minuto = 31 a 60 & Quota de mercado = menos de 80 %",
-    "family": "Polymarket",
-    "conditions": [
-     [
-      "Mercado",
-      "golos (mais/menos)"
-     ],
-     [
-      "Minuto",
-      "31 a 60"
-     ],
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-18T17:56:37+00:00",
-    "reason": "Golos em jogo equilibrado",
-    "expect": "acima",
-    "mode": "novas",
-    "experimental": false,
-    "tradable": true,
-    "open": 1,
-    "born_verified": true,
-    "game_set": "4dc2dab0b8216854",
-    "prospective": {
-     "games": 8,
-     "hits": 4.0,
-     "misses": 4.0,
-     "prob_above": 0.5487,
-     "roi": 0.1838,
-     "economics": {
-      "admitted": 8,
-      "results_confirmed": 8,
-      "wins": 4,
-      "losses": 4,
-      "voids": 0,
-      "imputed_losses": 0,
-      "pending": 0,
-      "quarantined": 0,
-      "scope": "prospective_exploratory",
-      "status": "positive_exploratory",
-      "stake_per_game": 1,
-      "resolved_stake_units": 8,
-      "profit_advertised": 1.47,
-      "profit_odds_minus_2pct": 1.2806,
-      "roi_advertised": 0.1838,
-      "roi_odds_minus_2pct": 0.1601,
-      "confirmed_hit_rate": 0.5,
-      "expected_profit": null
-     },
-     "categories": {
-      "prospective": 8,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 92,
+  "llm_total": 93,
   "watch": [
    {
     "date_utc": "2026-11-22T07:00:21+00:00",
@@ -55113,15 +55107,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 226,
-  "llm_last_run_utc": "2026-11-22T10:23:56+00:00",
+  "llm_runs": 227,
+  "llm_last_run_utc": "2026-11-22T11:20:28+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-22",
-   "calls_today": 10,
-   "neurons_today": 2572.4,
-   "accepted_today": 1,
-   "last_mode": "refinar"
+   "calls_today": 11,
+   "neurons_today": 2805.2,
+   "accepted_today": 2,
+   "last_mode": "evitar"
   },
   "notes": [
    {
@@ -55372,8 +55366,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 92,
-   "groups": 92,
+   "llm_hypotheses": 93,
+   "groups": 93,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }

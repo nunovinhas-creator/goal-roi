@@ -172897,6 +172897,35 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Mercado e seleção exatos = Asian Total / Under 2.5 / regulation & Número de apostas = várias & Quota de mercado = 80 % ou mais": {
+  "born_utc": "2026-11-22T11:20:27.893769+00:00",
+  "conditions": [
+   [
+    "Mercado e seleção exatos",
+    "Asian Total / Under 2.5 / regulation"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ],
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ]
+  ],
+  "expect": "abaixo",
+  "family": "Polymarket",
+  "mode": "evitar",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "ecf9822a8430411980d50363b6ed7e12ac0fa746004e98aeb4706eca5fccd1a9",
+   "registry_size": 12832,
+   "report_generated_at_utc": "2026-11-22T11:19:24+00:00",
+   "response_sha256": "824fd81627d5345ca24323ff79677c394ffe6e77a4defaca0c5e681d7dc178d6"
+  },
+  "reason": "mercados com alta quota e várias apostas podem ser mais arriscados",
+  "source": "llm"
+ },
  "Polymarket | Mercado e seleção exatos = Asian Total / Under 3.5 / regulation & Momento = antes do jogo": {
   "born_utc": "2026-11-20T14:12:00+00:00",
   "conditions": [
