@@ -440,13 +440,15 @@
    "attempt_utc": "2026-11-22T16:44:10+00:00",
    "chars": 190,
    "created_utc": "2026-11-22T16:44:10+00:00",
+   "done_utc": "2026-11-22T16:44:10+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "81b2bd48d07a0afaf13f1c17b4c15d210fa373db40075818271a3df3e3784f55",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:ac-savoia-1908-vs-sorrento-20261121|311f1ec6d355": {
    "attempt_utc": "2026-11-21T17:53:42+00:00",
@@ -3109,12 +3111,16 @@
    "state": "delivered"
   },
   "game|id:manta-vs-delfin-20261122|0fc16f6927e5": {
+   "attempt_utc": "2026-11-22T16:44:10+00:00",
+   "chars": 194,
    "created_utc": "2026-11-22T16:44:10+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "21e4a4870ea21f128648bc965bf950cf0fa616ad97deb58b28570a517da66fd6",
+   "state": "in_flight"
   },
   "game|id:manta-vs-delfin-20261122|b97de0b6d6f3": {
    "attempt_utc": "2026-11-22T16:00:32+00:00",
@@ -5058,7 +5064,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 325,
+  "delivered": 326,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-22T16:38:49+00:00",
@@ -5273,6 +5279,7 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 58,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 29,
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 30,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
@@ -5298,7 +5305,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 83,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 53,
-  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 48,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 50,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 60,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 48,
@@ -5940,6 +5947,9 @@
   "item|id:manta-vs-delfin-20261122|Asian Total|Over 2.5": {
    "at_utc": "2026-11-22T16:00:32+00:00"
   },
+  "item|id:manta-vs-delfin-20261122|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-22T16:44:10+00:00"
+  },
   "item|id:mauritania-vs-burkina-faso-20261117|Asian Total|Over 3": {
    "at_utc": "2026-11-17T19:52:09+00:00"
   },
@@ -6341,7 +6351,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 637,
+ "sent_total": 638,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Dia = fim de semana": "abandonada",
@@ -7024,6 +7034,7 @@
   "2026-11-22T16:08:01+00:00|Augsburg — Mainz|Under 4.5",
   "2026-11-22T16:08:01+00:00|Liverpool — Manchester United|Over 3.5",
   "2026-11-22T16:16:37+00:00|Liverpool — Manchester United|BTTS: Yes",
-  "2026-11-22T16:40:22+00:00|AC Milan — Frosinone|Over 3.5"
+  "2026-11-22T16:40:22+00:00|AC Milan — Frosinone|Over 3.5",
+  "2026-11-22T16:40:22+00:00|Manta — Delfin|Under 2.5"
  ]
 }
