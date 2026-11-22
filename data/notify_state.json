@@ -930,13 +930,15 @@
    "attempt_utc": "2026-11-22T13:16:08+00:00",
    "chars": 207,
    "created_utc": "2026-11-22T13:16:08+00:00",
+   "done_utc": "2026-11-22T13:16:08+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "ee307aa7dd17d9da4af28f05cd4b859d2463492da17d26b3d0d8d3180b8e6461",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:barcelona-vs-villarreal-20261122|fd5588327c75": {
    "attempt_utc": "2026-11-22T11:55:48+00:00",
@@ -3780,6 +3782,18 @@
    "sha256": "9719cc541026e59d4fa0e27fa620ec5ac6df2d9695599a41ed4e7276d1519b36",
    "state": "delivered"
   },
+  "game|id:sassuolo-vs-genoa-20261122|7d7b19a42c72": {
+   "attempt_utc": "2026-11-22T13:18:08+00:00",
+   "chars": 183,
+   "created_utc": "2026-11-22T13:18:08+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "a566c17497902674e6c9cd14389a82ddb48c47e1295efdecd86d00a20ee053fa",
+   "state": "in_flight"
+  },
   "game|id:saudi-arabia-vs-uzbekistan-20261117|149d3c612f9b": {
    "attempt_utc": "2026-11-17T16:11:00+00:00",
    "chars": 146,
@@ -4804,17 +4818,17 @@
   }
  },
  "delivery_counts": {
-  "delivered": 309,
+  "delivered": 310,
   "uncertain": 3
  },
- "format_last_run_utc": "2026-11-22T13:14:08+00:00",
+ "format_last_run_utc": "2026-11-22T13:16:08+00:00",
  "health": {
   "reference": {
    "bsd_results": 45,
-   "eligible": 1647,
+   "eligible": 1650,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 108,
-   "hypotheses": 13032,
+   "hypotheses": 13046,
    "settled_bets": 1292,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 185,
@@ -4822,7 +4836,7 @@
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-22T13:14:08+00:00",
+ "last_run_utc": "2026-11-22T13:16:08+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -5851,6 +5865,9 @@
   "item|id:sao-paulo-vs-fluminense-rj-20261120|Goal Range|2-3": {
    "at_utc": "2026-11-19T19:20:19+00:00"
   },
+  "item|id:sassuolo-vs-genoa-20261122|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-22T13:18:08+00:00"
+  },
   "item|id:saudi-arabia-vs-uzbekistan-20261117|1X2|1": {
    "at_utc": "2026-11-17T16:11:00+00:00"
   },
@@ -6036,7 +6053,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 621,
+ "sent_total": 622,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -6660,6 +6677,7 @@
   "2026-11-22T13:08:22+00:00|Paris F.C. — Angers|Over 3.5",
   "2026-11-22T13:08:23+00:00|Juventus — Venezia|Under 4.5",
   "2026-11-22T13:10:43+00:00|Barcelona — Villarreal|AH1(-0.5)",
-  "2026-11-22T13:12:57+00:00|Barcelona — Villarreal|Over 5.5"
+  "2026-11-22T13:12:57+00:00|Barcelona — Villarreal|Over 5.5",
+  "2026-11-22T13:15:41+00:00|Sassuolo — Genoa|Under 2.5"
  ]
 }
