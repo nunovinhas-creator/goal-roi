@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-22T17:36:09+00:00",
+ "generated_at_utc": "2026-11-22T17:38:30+00:00",
  "messages": 3900,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 6228,
+  "versions": 6231,
   "edits_changing_signal": 5,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-22T17:36:09+00:00",
+  "last_collected_at_utc": "2026-11-22T17:38:26+00:00",
   "hl_results": 108,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 63,
@@ -44,12 +44,12 @@
   "bsd_results": 46,
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 25,
-  "bsd_last_run_utc": "2026-11-22T16:37:04+00:00",
+  "bsd_last_run_utc": "2026-11-22T17:38:27+00:00",
   "goal_minutes_matches": 113,
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-22T17:36:09+00:00",
+  "collector_last_run_utc": "2026-11-22T17:38:26+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,11 +448,11 @@
   "stake_original_seen": 608,
   "stake_no_score_after_kickoff": 84,
   "stake_sent_45_after_kickoff": 179,
-  "goal_lists": 964,
-  "goal_lists_consistent": 438
+  "goal_lists": 965,
+  "goal_lists_consistent": 439
  },
  "unique_bets": 1807,
- "settled_bets": 1421,
+ "settled_bets": 1423,
  "unsettled_market": 227,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
@@ -735,32 +735,32 @@
   },
   "OPEN_GAME": {
    "bets": 321,
-   "settled": 315,
-   "matches": 315,
-   "wins": 132,
+   "settled": 317,
+   "matches": 317,
+   "wins": 133,
    "pushes": 87,
-   "units": 7.23,
-   "avg_odds": 1.776,
+   "units": 7.19,
+   "avg_odds": 1.777,
    "roi": {
     "odd-0%": {
-     "roi": 0.023,
+     "roi": 0.0227,
      "ci95": [
-      -0.0618,
-      0.1077
+      -0.062,
+      0.1073
      ]
     },
     "odd-2%": {
-     "roi": 0.0082,
+     "roi": 0.0079,
      "ci95": [
-      -0.0748,
-      0.0913
+      -0.075,
+      0.0909
      ]
     },
     "odd-5%": {
-     "roi": -0.0138,
+     "roi": -0.0142,
      "ci95": [
-      -0.0944,
-      0.0667
+      -0.0946,
+      0.0662
      ]
     }
    },
@@ -1079,7 +1079,9 @@
     7.23,
     6.23,
     6.83,
-    7.23
+    7.23,
+    6.23,
+    7.19
    ],
    "conclusive": true,
    "note": "ok"
@@ -2389,40 +2391,40 @@
   },
   "OPEN_GAME": {
    "signals": 341,
-   "with_result": 335,
-   "hits": 146,
-   "misses": 100,
+   "with_result": 337,
+   "hits": 147,
+   "misses": 101,
    "pushes": 89,
-   "eff_hits": 143.0,
-   "eff_misses": 98.5,
-   "vote_hits": 143.0,
-   "vote_misses": 98.5,
-   "vote_break_even": 0.5754,
-   "games": 246,
+   "eff_hits": 144.0,
+   "eff_misses": 99.5,
+   "vote_hits": 144.0,
+   "vote_misses": 99.5,
+   "vote_break_even": 0.5751,
+   "games": 248,
    "no_source": 0,
    "unsettleable": 0,
-   "hit_rate": 0.5921,
+   "hit_rate": 0.5914,
    "ci95": [
-    0.5292,
-    0.6522
+    0.5287,
+    0.6512
    ],
-   "avg_odds": 1.777,
-   "break_even": 0.5754,
+   "avg_odds": 1.778,
+   "break_even": 0.5751,
    "baseline": false,
-   "roi_announced_odds": 0.0481,
+   "roi_announced_odds": 0.0477,
    "seen_late": 20,
    "by_bot_mark": 0,
-   "per_day": 22.2,
+   "per_day": 22.4,
    "days_to_hint": 0,
    "days_to_conclusion": 3,
-   "prudent_rate": 0.5915,
-   "prob_above": 0.6998,
-   "edge": 0.0161,
+   "prudent_rate": 0.5907,
+   "prob_above": 0.6955,
+   "edge": 0.0156,
    "edge_ci": [
-    -0.0352,
-    0.0665
+    -0.0355,
+    0.0659
    ],
-   "prob_above_cut": 0.5585
+   "prob_above_cut": 0.5532
   },
   "OPEN_GAME_NO_ODDS": {
    "signals": 20,
@@ -2676,20 +2678,20 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 246,
+    "n": 248,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 206,
-     "hit_rate": 0.6005,
-     "break_even": 0.5694,
-     "roi": 0.0891
+     "n": 208,
+     "hit_rate": 0.5995,
+     "break_even": 0.569,
+     "roi": 0.0871
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.55,
-     "break_even": 0.6064,
-     "roi": -0.0563
+     "break_even": 0.6066,
+     "roi": -0.051
     },
     "z": -1.02
    },
@@ -2784,15 +2786,15 @@
    },
    {
     "band": "100 %",
-    "n": 120,
-    "hits": 72,
-    "hit_rate": 0.6,
-    "break_even": 0.5765,
+    "n": 122,
+    "hits": 73,
+    "hit_rate": 0.5983,
+    "break_even": 0.5758,
     "stated": 1.0
    }
   ],
   "next_goal": {
-   "n": 236,
+   "n": 237,
    "median_min": 14
   },
   "segments": [
@@ -3094,28 +3096,28 @@
     "value": "liga"
    },
    {
-    "n": 185,
+    "n": 187,
     "signals": 246,
-    "hits": 115,
-    "misses": 70,
-    "hit_rate": 0.6219,
+    "hits": 116,
+    "misses": 71,
+    "hit_rate": 0.6206,
     "ci95": [
-     0.5497,
-     0.6891
+     0.5488,
+     0.6875
     ],
-    "break_even": 0.5763,
-    "roi": 0.0699,
-    "games": 185,
-    "bets": 185,
+    "break_even": 0.5758,
+    "roi": 0.0691,
+    "games": 187,
+    "bets": 187,
     "unidentified": 0,
-    "prudent_rate": 0.6195,
-    "prob_above": 0.8907,
-    "edge": 0.0432,
+    "prudent_rate": 0.6183,
+    "prob_above": 0.8877,
+    "edge": 0.0425,
     "edge_ci": [
-     -0.0149,
-     0.0999
+     -0.0154,
+     0.0989
     ],
-    "prob_above_cut": 0.8164,
+    "prob_above_cut": 0.8117,
     "family": "Jogo aberto",
     "dimension": "Outros sinais no mesmo jogo",
     "value": "jogo com um só tipo de sinal"
@@ -3148,28 +3150,28 @@
     "value": "durante o jogo"
    },
    {
-    "n": 143,
+    "n": 145,
     "signals": 193,
-    "hits": 89,
-    "misses": 54,
-    "hit_rate": 0.6228,
+    "hits": 90,
+    "misses": 55,
+    "hit_rate": 0.6211,
     "ci95": [
-     0.5404,
-     0.6986
+     0.5392,
+     0.6965
     ],
-    "break_even": 0.5715,
-    "roi": 0.0621,
-    "games": 143,
-    "bets": 143,
+    "break_even": 0.5709,
+    "roi": 0.0612,
+    "games": 145,
+    "bets": 145,
     "unidentified": 0,
-    "prudent_rate": 0.6194,
-    "prob_above": 0.886,
-    "edge": 0.0479,
+    "prudent_rate": 0.6178,
+    "prob_above": 0.8824,
+    "edge": 0.0469,
     "edge_ci": [
-     -0.0179,
-     0.1119
+     -0.0185,
+     0.1105
     ],
-    "prob_above_cut": 0.8206,
+    "prob_above_cut": 0.8153,
     "family": "Jogo aberto",
     "dimension": "Confiança indicada pelo bot",
     "value": "95 % ou mais"
@@ -3418,28 +3420,28 @@
     "value": "odd acima de 3,00"
    },
    {
-    "n": 141,
+    "n": 143,
     "signals": 192,
-    "hits": 87,
-    "misses": 54,
-    "hit_rate": 0.6159,
+    "hits": 88,
+    "misses": 55,
+    "hit_rate": 0.6143,
     "ci95": [
-     0.5327,
-     0.6929
+     0.5316,
+     0.6908
     ],
-    "break_even": 0.5802,
-    "roi": 0.0733,
-    "games": 141,
-    "bets": 141,
+    "break_even": 0.5795,
+    "roi": 0.0722,
+    "games": 143,
+    "bets": 143,
     "unidentified": 0,
-    "prudent_rate": 0.6135,
-    "prob_above": 0.7987,
-    "edge": 0.0334,
+    "prudent_rate": 0.612,
+    "prob_above": 0.794,
+    "edge": 0.0325,
     "edge_ci": [
-     -0.0331,
-     0.0981
+     -0.0336,
+     0.0969
     ],
-    "prob_above_cut": 0.7075,
+    "prob_above_cut": 0.7012,
     "family": "Jogo aberto",
     "dimension": "Ritmo indicado pelo bot",
     "value": "menos de 90"
@@ -3472,28 +3474,28 @@
     "value": "durante o jogo"
    },
    {
-    "n": 177,
+    "n": 179,
     "signals": 259,
-    "hits": 107,
-    "misses": 70,
-    "hit_rate": 0.6046,
+    "hits": 108,
+    "misses": 71,
+    "hit_rate": 0.6034,
     "ci95": [
-     0.5305,
-     0.6741
+     0.5298,
+     0.6726
     ],
-    "break_even": 0.5766,
-    "roi": 0.0393,
-    "games": 177,
-    "bets": 177,
+    "break_even": 0.5761,
+    "roi": 0.0388,
+    "games": 179,
+    "bets": 179,
     "unidentified": 0,
-    "prudent_rate": 0.6031,
-    "prob_above": 0.77,
-    "edge": 0.0265,
+    "prudent_rate": 0.6019,
+    "prob_above": 0.7655,
+    "edge": 0.0258,
     "edge_ci": [
-     -0.0333,
-     0.0849
+     -0.0336,
+     0.084
     ],
-    "prob_above_cut": 0.6613,
+    "prob_above_cut": 0.6554,
     "family": "Jogo aberto",
     "dimension": "Faixa de odd",
     "value": "odd 1,50 a 2,00"
@@ -3661,28 +3663,28 @@
     "value": "seleções"
    },
    {
-    "n": 202,
+    "n": 204,
     "signals": 286,
-    "hits": 122,
-    "misses": 80,
-    "hit_rate": 0.601,
+    "hits": 123,
+    "misses": 81,
+    "hit_rate": 0.6,
     "ci95": [
-     0.5315,
-     0.6667
+     0.5308,
+     0.6654
     ],
-    "break_even": 0.5826,
-    "roi": 0.0378,
-    "games": 202,
-    "bets": 202,
+    "break_even": 0.5821,
+    "roi": 0.0374,
+    "games": 204,
+    "bets": 204,
     "unidentified": 0,
-    "prudent_rate": 0.6001,
-    "prob_above": 0.6994,
-    "edge": 0.0175,
+    "prudent_rate": 0.5991,
+    "prob_above": 0.6952,
+    "edge": 0.0171,
     "edge_ci": [
-     -0.0388,
-     0.0727
+     -0.039,
+     0.072
     ],
-    "prob_above_cut": 0.5695,
+    "prob_above_cut": 0.5643,
     "family": "Jogo aberto",
     "dimension": "Parte do jogo",
     "value": "2.ª parte"
@@ -4017,28 +4019,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 750,
+    "n": 752,
     "signals": 1023,
-    "hits": 437,
-    "misses": 313,
-    "hit_rate": 0.5714,
+    "hits": 438,
+    "misses": 314,
+    "hit_rate": 0.5712,
     "ci95": [
-     0.5352,
-     0.6069
+     0.5351,
+     0.6067
     ],
-    "break_even": 0.5806,
+    "break_even": 0.5805,
     "roi": -0.0118,
-    "games": 492,
-    "bets": 738,
+    "games": 494,
+    "bets": 740,
     "unidentified": 0,
-    "prudent_rate": 0.5831,
-    "prob_above": 0.5786,
-    "edge": 0.0043,
+    "prudent_rate": 0.5827,
+    "prob_above": 0.5758,
+    "edge": 0.0042,
     "edge_ci": [
-     -0.0328,
-     0.0411
+     -0.0329,
+     0.0409
     ],
-    "prob_above_cut": 0.3717,
+    "prob_above_cut": 0.3687,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -4093,9 +4095,9 @@
    }
   ],
   "luck": {
-   "n": 1421,
-   "units": -5.83,
-   "luck_sd": 44.95,
+   "n": 1423,
+   "units": -5.87,
+   "luck_sd": 44.97,
    "z": -0.13,
    "max_drawdown": 54.45,
    "longest_losing_run": 9
@@ -4103,7 +4105,7 @@
   "narrative": [
    "O tipo de sinal com melhor evidência é dinheiro na Betfair durante o jogo: acertou 39 em 102, precisa de 34 %, e a probabilidade de estar acima do mínimo é 79 %.",
    "O mais fraco é aposta grande na Stake: 177 em 349, precisa de 54 %, probabilidade de estar acima do mínimo 15 %.",
-   "Saldo de -5,83 unidades em 1421 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±89,9 unidades).",
+   "Saldo de -5,87 unidades em 1423 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±89,9 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 7 de 32 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 85 em 103 (82 % contra 60 % necessários). Indício positivo.",
    "Forma de golos, dia = fim de semana: 152 em 215 (69 % contra 60 % necessários). Indício positivo.",
@@ -5673,26 +5675,7 @@
      "missing": 1
     }
    ],
-   "open": [
-    {
-     "date_utc": "2026-11-22T16:40:14+00:00",
-     "kickoff_utc": "2026-11-22T15:00+00:00",
-     "match": "Kortrijk — Union St Gilloise",
-     "selection": "Union Saint Gilloise",
-     "market": "1x2",
-     "odds": 2.15,
-     "tactic": "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Marcador no momento = empatado"
-    },
-    {
-     "date_utc": "2026-11-22T16:37:45+00:00",
-     "kickoff_utc": "2026-11-22T16:30+00:00",
-     "match": "Liverpool — Manchester United",
-     "selection": "Over 1.5",
-     "market": "Manchester United Total Goals",
-     "odds": 2.43,
-     "tactic": "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Marcador no momento = empatado"
-    }
-   ],
+   "open": [],
    "min_results": 8,
    "hint_at": 30
   },
@@ -6002,13 +5985,13 @@
        "prob_above": 0.9794,
        "roi": 0.4429,
        "economics": {
-        "admitted": 11,
+        "admitted": 12,
         "results_confirmed": 9,
         "wins": 6,
         "losses": 3,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6048,13 +6031,13 @@
        "prob_above": 0.9783,
        "roi": 0.454,
        "economics": {
-        "admitted": 32,
+        "admitted": 34,
         "results_confirmed": 29,
         "wins": 20,
         "losses": 9,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 5,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6094,13 +6077,13 @@
        "prob_above": 0.9617,
        "roi": 0.3224,
        "economics": {
-        "admitted": 48,
+        "admitted": 50,
         "results_confirmed": 43,
         "wins": 28,
         "losses": 15,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 5,
+        "pending": 7,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6143,13 +6126,13 @@
        "prob_above": 0.0599,
        "roi": -0.4627,
        "economics": {
-        "admitted": 4,
+        "admitted": 6,
         "results_confirmed": 4,
         "wins": 2,
         "losses": 2,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 2,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6189,13 +6172,13 @@
        "prob_above": 0.0933,
        "roi": -0.6627,
        "economics": {
-        "admitted": 8,
+        "admitted": 9,
         "results_confirmed": 8,
         "wins": 1,
         "losses": 7,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -6266,13 +6249,13 @@
        "prob_above": 0.9783,
        "roi": 0.454,
        "economics": {
-        "admitted": 32,
+        "admitted": 34,
         "results_confirmed": 29,
         "wins": 20,
         "losses": 9,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 5,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6312,13 +6295,13 @@
        "prob_above": 0.9763,
        "roi": 0.4667,
        "economics": {
-        "admitted": 15,
+        "admitted": 16,
         "results_confirmed": 15,
         "wins": 11,
         "losses": 4,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6354,13 +6337,13 @@
        "prob_above": 0.9752,
        "roi": 0.5161,
        "economics": {
-        "admitted": 18,
+        "admitted": 19,
         "results_confirmed": 18,
         "wins": 14,
         "losses": 4,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6403,13 +6386,13 @@
        "prob_above": 0.0599,
        "roi": -0.4627,
        "economics": {
-        "admitted": 4,
+        "admitted": 6,
         "results_confirmed": 4,
         "wins": 2,
         "losses": 2,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 2,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6449,13 +6432,13 @@
        "prob_above": 0.1168,
        "roi": -0.4818,
        "economics": {
-        "admitted": 6,
+        "admitted": 7,
         "results_confirmed": 6,
         "wins": 1,
         "losses": 5,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -6523,13 +6506,13 @@
        "prob_above": 0.9617,
        "roi": 0.3224,
        "economics": {
-        "admitted": 48,
+        "admitted": 50,
         "results_confirmed": 43,
         "wins": 28,
         "losses": 15,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 5,
+        "pending": 7,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6569,13 +6552,13 @@
        "prob_above": 0.9036,
        "roi": 0.2456,
        "economics": {
-        "admitted": 58,
+        "admitted": 60,
         "results_confirmed": 49,
         "wins": 29,
         "losses": 20,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 9,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6615,13 +6598,13 @@
        "prob_above": 0.8645,
        "roi": 0.1512,
        "economics": {
-        "admitted": 78,
+        "admitted": 79,
         "results_confirmed": 65,
         "wins": 42,
         "losses": 23,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 13,
+        "pending": 14,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6784,13 +6767,13 @@
        "prob_above": 0.9617,
        "roi": 0.3224,
        "economics": {
-        "admitted": 48,
+        "admitted": 50,
         "results_confirmed": 43,
         "wins": 28,
         "losses": 15,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 5,
+        "pending": 7,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6830,13 +6813,13 @@
        "prob_above": 0.9036,
        "roi": 0.2456,
        "economics": {
-        "admitted": 58,
+        "admitted": 60,
         "results_confirmed": 49,
         "wins": 29,
         "losses": 20,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 9,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -6876,13 +6859,13 @@
        "prob_above": 0.8645,
        "roi": 0.1512,
        "economics": {
-        "admitted": 78,
+        "admitted": 79,
         "results_confirmed": 65,
         "wins": 42,
         "losses": 23,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 13,
+        "pending": 14,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7045,13 +7028,13 @@
        "prob_above": 0.9036,
        "roi": 0.2456,
        "economics": {
-        "admitted": 58,
+        "admitted": 60,
         "results_confirmed": 49,
         "wins": 29,
         "losses": 20,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 9,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7137,13 +7120,13 @@
        "prob_above": 0.8645,
        "roi": 0.1512,
        "economics": {
-        "admitted": 78,
+        "admitted": 79,
         "results_confirmed": 65,
         "wins": 42,
         "losses": 23,
         "voids": 0,
         "imputed_losses": 0,
-        "pending": 13,
+        "pending": 14,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7309,13 +7292,13 @@
        "prob_above": 0.9026,
        "roi": 0.1212,
        "economics": {
-        "admitted": 77,
+        "admitted": 78,
         "results_confirmed": 76,
         "wins": 33,
         "losses": 16,
         "voids": 27,
         "imputed_losses": 0,
-        "pending": 1,
+        "pending": 2,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7355,13 +7338,13 @@
        "prob_above": 0.8848,
        "roi": 0.117,
        "economics": {
-        "admitted": 67,
+        "admitted": 68,
         "results_confirmed": 65,
         "wins": 30,
         "losses": 16,
         "voids": 19,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7401,13 +7384,13 @@
        "prob_above": 0.8822,
        "roi": 0.1401,
        "economics": {
-        "admitted": 68,
+        "admitted": 69,
         "results_confirmed": 66,
         "wins": 31,
         "losses": 16,
         "voids": 19,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -7450,13 +7433,13 @@
        "prob_above": 0.0523,
        "roi": -0.1071,
        "economics": {
-        "admitted": 63,
+        "admitted": 64,
         "results_confirmed": 61,
         "wins": 18,
         "losses": 24,
         "voids": 19,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -7500,13 +7483,13 @@
        "prob_above": 0.0543,
        "roi": -0.1822,
        "economics": {
-        "admitted": 43,
+        "admitted": 44,
         "results_confirmed": 41,
         "wins": 11,
         "losses": 15,
         "voids": 15,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -8486,13 +8469,13 @@
        "prob_above": 0.8205,
        "roi": 0.0691,
        "economics": {
-        "admitted": 96,
+        "admitted": 98,
         "results_confirmed": 94,
         "wins": 41,
         "losses": 23,
         "voids": 30,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 4,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -8532,13 +8515,13 @@
        "prob_above": 0.8187,
        "roi": 0.1994,
        "economics": {
-        "admitted": 8,
+        "admitted": 9,
         "results_confirmed": 8,
         "wins": 5,
         "losses": 1,
         "voids": 2,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -8581,13 +8564,13 @@
        "prob_above": 0.0779,
        "roi": -0.0855,
        "economics": {
-        "admitted": 104,
+        "admitted": 106,
         "results_confirmed": 101,
         "wins": 39,
         "losses": 37,
         "voids": 25,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 5,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -8627,13 +8610,13 @@
        "prob_above": 0.0912,
        "roi": -0.3469,
        "economics": {
-        "admitted": 5,
+        "admitted": 6,
         "results_confirmed": 5,
         "wins": 1,
         "losses": 2,
         "voids": 2,
         "imputed_losses": 0,
-        "pending": 0,
+        "pending": 1,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -8704,13 +8687,13 @@
        "prob_above": 0.8205,
        "roi": 0.0691,
        "economics": {
-        "admitted": 96,
+        "admitted": 98,
         "results_confirmed": 94,
         "wins": 41,
         "losses": 23,
         "voids": 30,
         "imputed_losses": 0,
-        "pending": 2,
+        "pending": 4,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
@@ -8753,13 +8736,13 @@
        "prob_above": 0.0779,
        "roi": -0.0855,
        "economics": {
-        "admitted": 104,
+        "admitted": 106,
         "results_confirmed": 101,
         "wins": 39,
         "losses": 37,
         "voids": 25,
         "imputed_losses": 0,
-        "pending": 3,
+        "pending": 5,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
@@ -9561,124 +9544,6 @@
      "bad_total": 55
     },
     {
-     "match_id": "ac-milan-vs-frosinone-20261122",
-     "match": "AC Milan — Frosinone",
-     "league": "Italian Serie A",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "pre",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-22T17:00+00:00",
-     "date_utc": "2026-11-22T17:08:29+00:00",
-     "minute": null,
-     "score_at_signal": null,
-     "market": "Asian Handicap",
-     "selection": "Frosinone (2.5)",
-     "odds": 1.43,
-     "odds_last": 1.43,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "evitar",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd até 1,50",
-     "odds_band_n": 38,
-     "good": [],
-     "good_total": 0,
-     "bad": [
-      {
-       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Mercado",
-         "outros mercados"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "sim"
-        ]
-       ],
-       "n": 69,
-       "games": 37,
-       "hits": 22,
-       "break_even": 0.497,
-       "prob_above": 0.0054,
-       "roi": -0.534,
-       "economics": {
-        "admitted": 51,
-        "results_confirmed": 27,
-        "wins": 7,
-        "losses": 19,
-        "voids": 1,
-        "imputed_losses": 5,
-        "pending": 19,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 32,
-        "profit_advertised": -18.02,
-        "profit_odds_minus_2pct": -18.2796,
-        "roi_advertised": -0.5631,
-        "roi_odds_minus_2pct": -0.5712,
-        "confirmed_hit_rate": 0.2692,
-        "expected_profit": null
-       },
-       "edge": -0.182,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Hora (UTC) = tarde & Mercado = outros mercados",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "tarde"
-        ],
-        [
-         "Mercado",
-         "outros mercados"
-        ]
-       ],
-       "n": 87,
-       "games": 52,
-       "hits": 29,
-       "break_even": 0.4981,
-       "prob_above": 0.0065,
-       "roi": -0.4388,
-       "economics": {
-        "admitted": 83,
-        "results_confirmed": 37,
-        "wins": 12,
-        "losses": 24,
-        "voids": 1,
-        "imputed_losses": 16,
-        "pending": 30,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 53,
-        "profit_advertised": -29.99,
-        "profit_odds_minus_2pct": -30.4302,
-        "roi_advertised": -0.5658,
-        "roi_odds_minus_2pct": -0.5742,
-        "confirmed_hit_rate": 0.3333,
-        "expected_profit": null
-       },
-       "edge": -0.1553,
-       "status": "abandonada",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 58
-    },
-    {
      "match_id": "atletico-paranaense-vs-remo-20261122",
      "match": "Atletico Paranaense — Remo",
      "league": "Brazilian BRAZIL SERIE A",
@@ -10168,9 +10033,9 @@
     "misto": 13,
     "sem evidência": 0,
     "contraditório": 3,
-    "evitar": 5
+    "evitar": 4
    },
-   "generated_utc": "2026-11-22T17:37:15+00:00",
+   "generated_utc": "2026-11-22T17:40:16+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -10214,13 +10079,13 @@
      "games": 88,
      "roi": 0.003,
      "economics": {
-      "admitted": 134,
+      "admitted": 135,
       "results_confirmed": 132,
       "wins": 51,
       "losses": 37,
       "voids": 44,
       "imputed_losses": 0,
-      "pending": 2,
+      "pending": 3,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -10511,13 +10376,13 @@
      "games": 34,
      "roi": -0.0693,
      "economics": {
-      "admitted": 53,
+      "admitted": 54,
       "results_confirmed": 51,
       "wins": 18,
       "losses": 16,
       "voids": 17,
       "imputed_losses": 0,
-      "pending": 2,
+      "pending": 3,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -11736,13 +11601,13 @@
      "prob_above": 0.8834,
      "roi": 0.45,
      "economics": {
-      "admitted": 11,
+      "admitted": 12,
       "results_confirmed": 9,
       "wins": 6,
       "losses": 3,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 2,
+      "pending": 3,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -11821,13 +11686,13 @@
      "prob_above": 0.9819,
      "roi": 0.4962,
      "economics": {
-      "admitted": 32,
+      "admitted": 34,
       "results_confirmed": 29,
       "wins": 20,
       "losses": 9,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 3,
+      "pending": 5,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -12000,13 +11865,13 @@
      "prob_above": 0.9267,
      "roi": 0.32,
      "economics": {
-      "admitted": 15,
+      "admitted": 16,
       "results_confirmed": 15,
       "wins": 11,
       "losses": 4,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -12162,13 +12027,13 @@
      "prob_above": 0.97,
      "roi": 0.4606,
      "economics": {
-      "admitted": 18,
+      "admitted": 19,
       "results_confirmed": 18,
       "wins": 14,
       "losses": 4,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -13089,13 +12954,13 @@
      "prob_above": null,
      "roi": 0.2867,
      "economics": {
-      "admitted": 3,
+      "admitted": 4,
       "results_confirmed": 3,
       "wins": 2,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -13340,13 +13205,13 @@
      "prob_above": 0.9612,
      "roi": 0.5575,
      "economics": {
-      "admitted": 12,
+      "admitted": 13,
       "results_confirmed": 12,
       "wins": 10,
       "losses": 2,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -13761,13 +13626,13 @@
      "prob_above": 0.9358,
      "roi": 0.529,
      "economics": {
-      "admitted": 38,
+      "admitted": 39,
       "results_confirmed": 31,
       "wins": 21,
       "losses": 10,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 7,
+      "pending": 8,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -14442,13 +14307,13 @@
      "prob_above": 0.9714,
      "roi": 0.3626,
      "economics": {
-      "admitted": 48,
+      "admitted": 50,
       "results_confirmed": 43,
       "wins": 28,
       "losses": 15,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 5,
+      "pending": 7,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -14613,13 +14478,13 @@
      "prob_above": null,
      "roi": 0.0833,
      "economics": {
-      "admitted": 3,
+      "admitted": 4,
       "results_confirmed": 3,
       "wins": 2,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -14868,13 +14733,13 @@
      "prob_above": 0.954,
      "roi": 0.2222,
      "economics": {
-      "admitted": 60,
+      "admitted": 62,
       "results_confirmed": 53,
       "wins": 31,
       "losses": 22,
       "voids": 0,
       "imputed_losses": 2,
-      "pending": 5,
+      "pending": 7,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -16309,13 +16174,13 @@
      "prob_above": null,
      "roi": 0.56,
      "economics": {
-      "admitted": 5,
+      "admitted": 6,
       "results_confirmed": 5,
       "wins": 4,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -16814,13 +16679,13 @@
      "prob_above": 0.9523,
      "roi": 0.3095,
      "economics": {
-      "admitted": 41,
+      "admitted": 42,
       "results_confirmed": 36,
       "wins": 22,
       "losses": 14,
       "voids": 0,
       "imputed_losses": 1,
-      "pending": 4,
+      "pending": 5,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -16902,13 +16767,13 @@
      "prob_above": null,
      "roi": null,
      "economics": {
-      "admitted": 0,
+      "admitted": 1,
       "results_confirmed": 0,
       "wins": 0,
       "losses": 0,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "insufficient",
@@ -16987,13 +16852,13 @@
      "prob_above": 0.8887,
      "roi": 0.5962,
      "economics": {
-      "admitted": 8,
+      "admitted": 9,
       "results_confirmed": 8,
       "wins": 7,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -17072,13 +16937,13 @@
      "prob_above": 0.7513,
      "roi": 0.0112,
      "economics": {
-      "admitted": 19,
+      "admitted": 20,
       "results_confirmed": 16,
       "wins": 9,
       "losses": 7,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 3,
+      "pending": 4,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -18007,13 +17872,13 @@
      "prob_above": null,
      "roi": 0.64,
      "economics": {
-      "admitted": 8,
+      "admitted": 9,
       "results_confirmed": 6,
       "wins": 4,
       "losses": 2,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 2,
+      "pending": 3,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -18262,13 +18127,13 @@
      "prob_above": 0.9199,
      "roi": 0.1054,
      "economics": {
-      "admitted": 55,
+      "admitted": 56,
       "results_confirmed": 50,
       "wins": 28,
       "losses": 22,
       "voids": 0,
       "imputed_losses": 2,
-      "pending": 3,
+      "pending": 4,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -18360,13 +18225,13 @@
      "prob_above": 0.9471,
      "roi": 0.3059,
      "economics": {
-      "admitted": 30,
+      "admitted": 31,
       "results_confirmed": 27,
       "wins": 17,
       "losses": 10,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 3,
+      "pending": 4,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -18777,13 +18642,13 @@
      "prob_above": null,
      "roi": 0.69,
      "economics": {
-      "admitted": 1,
+      "admitted": 2,
       "results_confirmed": 1,
       "wins": 1,
       "losses": 0,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -18943,13 +18808,13 @@
      "prob_above": 0.8743,
      "roi": 0.3792,
      "economics": {
-      "admitted": 12,
+      "admitted": 13,
       "results_confirmed": 12,
       "wins": 9,
       "losses": 3,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -19282,13 +19147,13 @@
      "prob_above": 0.9882,
      "roi": 0.6821,
      "economics": {
-      "admitted": 14,
+      "admitted": 15,
       "results_confirmed": 14,
       "wins": 12,
       "losses": 2,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -21147,13 +21012,13 @@
      "prob_above": 0.9512,
      "roi": 0.1296,
      "economics": {
-      "admitted": 80,
+      "admitted": 82,
       "results_confirmed": 71,
       "wins": 43,
       "losses": 28,
       "voids": 0,
       "imputed_losses": 1,
-      "pending": 8,
+      "pending": 10,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -21235,13 +21100,13 @@
      "prob_above": null,
      "roi": -0.155,
      "economics": {
-      "admitted": 2,
+      "admitted": 3,
       "results_confirmed": 2,
       "wins": 1,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -21405,13 +21270,13 @@
      "prob_above": 0.92,
      "roi": 0.3707,
      "economics": {
-      "admitted": 15,
+      "admitted": 16,
       "results_confirmed": 15,
       "wins": 11,
       "losses": 4,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -23108,13 +22973,13 @@
      "prob_above": null,
      "roi": 0.5829,
      "economics": {
-      "admitted": 7,
+      "admitted": 8,
       "results_confirmed": 7,
       "wins": 6,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -23270,13 +23135,13 @@
      "prob_above": 0.8577,
      "roi": 0.1471,
      "economics": {
-      "admitted": 24,
+      "admitted": 25,
       "results_confirmed": 21,
       "wins": 13,
       "losses": 8,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 3,
+      "pending": 4,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -23525,13 +23390,13 @@
      "prob_above": null,
      "roi": -0.155,
      "economics": {
-      "admitted": 2,
+      "admitted": 3,
       "results_confirmed": 2,
       "wins": 1,
       "losses": 1,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 0,
+      "pending": 1,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -25957,13 +25822,13 @@
      "prob_above": null,
      "roi": -0.2714,
      "economics": {
-      "admitted": 15,
+      "admitted": 16,
       "results_confirmed": 14,
       "wins": 2,
       "losses": 5,
       "voids": 7,
       "imputed_losses": 0,
-      "pending": 1,
+      "pending": 2,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
@@ -26265,13 +26130,13 @@
      "prob_above": 0.9471,
      "roi": 0.3059,
      "economics": {
-      "admitted": 30,
+      "admitted": 31,
       "results_confirmed": 27,
       "wins": 17,
       "losses": 10,
       "voids": 0,
       "imputed_losses": 0,
-      "pending": 3,
+      "pending": 4,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "positive_exploratory",
@@ -58713,30 +58578,30 @@
    },
    "OPEN_GAME": {
     "signals": 321,
-    "with_result": 315,
-    "hits": 132,
-    "misses": 96,
+    "with_result": 317,
+    "hits": 133,
+    "misses": 97,
     "pushes": 87,
-    "eff_hits": 129.5,
-    "eff_misses": 95.0,
-    "vote_hits": 129.5,
-    "vote_misses": 95.0,
-    "vote_break_even": 0.578,
-    "games": 228,
+    "eff_hits": 130.5,
+    "eff_misses": 96.0,
+    "vote_hits": 130.5,
+    "vote_misses": 96.0,
+    "vote_break_even": 0.5776,
+    "games": 230,
     "no_source": 0,
     "unsettleable": 0,
-    "hit_rate": 0.5768,
+    "hit_rate": 0.5762,
     "ci95": [
-     0.5114,
-     0.6396
+     0.5111,
+     0.6387
     ],
-    "avg_odds": 1.77,
-    "break_even": 0.578,
+    "avg_odds": 1.771,
+    "break_even": 0.5776,
     "baseline": false,
-    "roi_announced_odds": 0.023,
+    "roi_announced_odds": 0.0227,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 22.5,
+    "per_day": 22.7,
     "days_to_hint": 0,
     "days_to_conclusion": 4
    },
@@ -58885,22 +58750,22 @@
    },
    {
     "type": "OPEN_GAME",
-    "n": 228,
+    "n": 230,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 188,
-     "hit_rate": 0.5827,
-     "break_even": 0.5719,
-     "roi": 0.0504
+     "n": 190,
+     "hit_rate": 0.5818,
+     "break_even": 0.5715,
+     "roi": 0.0486
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.55,
-     "break_even": 0.6064,
-     "roi": -0.0563
+     "break_even": 0.6066,
+     "roi": -0.051
     },
-    "z": -0.78
+    "z": -0.77
    },
    {
     "type": "POLYMARKET",
@@ -59255,32 +59120,32 @@
   },
   "Q6 Open game: sinal do minuto 46 em diante": {
    "bets": 258,
-   "settled": 252,
-   "matches": 252,
-   "wins": 103,
+   "settled": 254,
+   "matches": 254,
+   "wins": 104,
    "pushes": 76,
-   "units": 4.44,
-   "avg_odds": 1.753,
+   "units": 4.4,
+   "avg_odds": 1.754,
    "roi": {
     "odd-0%": {
-     "roi": 0.0176,
+     "roi": 0.0173,
      "ci95": [
-      -0.0735,
-      0.1088
+      -0.0737,
+      0.1084
      ]
     },
     "odd-2%": {
-     "roi": 0.0035,
+     "roi": 0.0032,
      "ci95": [
-      -0.0858,
-      0.0928
+      -0.086,
+      0.0924
      ]
     },
     "odd-5%": {
-     "roi": -0.0176,
+     "roi": -0.018,
      "ci95": [
-      -0.1042,
-      0.069
+      -0.1045,
+      0.0685
      ]
     }
    },
@@ -59289,12 +59154,12 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 1807,
-   "settled": 1421,
-   "matches": 723,
-   "wins": 677,
+   "settled": 1423,
+   "matches": 725,
+   "wins": 678,
    "pushes": 97,
-   "units": -5.83,
-   "avg_odds": 2.422,
+   "units": -5.87,
+   "avg_odds": 2.421,
    "roi": {
     "odd-0%": {
      "roi": -0.0041,
@@ -59311,7 +59176,7 @@
      ]
     },
     "odd-5%": {
-     "roi": -0.0495,
+     "roi": -0.0496,
      "ci95": [
       -0.0976,
       -0.0015
@@ -59603,9 +59468,12 @@
    "match": "UTA Arad — CS Universitatea Craiova",
    "selection": "Over 5",
    "odds": 1.96,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    2,
+    6
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -59616,9 +59484,12 @@
    "match": "Brommapojkarna — Halmstads Bk",
    "selection": "Over 4",
    "odds": 1.79,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    3
+   ],
+   "w": -1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -62315,7 +62186,10 @@
    ],
    "goals": null,
    "goals_source": null,
-   "ft": null
+   "ft": [
+    0,
+    3
+   ]
   },
   "uta-arad-vs-cs-universitatea-craiova-20261122": {
    "teams": [
@@ -62339,9 +62213,29 @@
      "market": "Asian Total"
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     66,
+     "1-4"
+    ],
+    [
+     72,
+     "2-4"
+    ],
+    [
+     76,
+     "2-5"
+    ],
+    [
+     86,
+     "2-6"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    2,
+    6
+   ]
   },
   "alashkert-vs-fc-noah-20261122": {
    "teams": [
@@ -62570,26 +62464,6 @@
   }
  },
  "timeline": [
-  {
-   "d": "2026-11-20T14:56:05+00:00",
-   "u": 22.98,
-   "g": 0.0,
-   "w": 0.0,
-   "t": "OPEN_GAME",
-   "m": "MC El Bayadh — JRB Taghit",
-   "s": "Over 3",
-   "o": 1.75
-  },
-  {
-   "d": "2026-11-20T15:24:37+00:00",
-   "u": 22.98,
-   "g": 0.0,
-   "w": 0.0,
-   "t": "OPEN_GAME",
-   "m": "GC Mascara — MC Saida",
-   "s": "Over 3",
-   "o": 1.89
-  },
   {
    "d": "2026-11-20T15:35:27+00:00",
    "u": 24.03,
@@ -68569,6 +68443,26 @@
    "m": "SonderjyskE — Odense BK",
    "s": "Polymarket: X",
    "o": 1.49
+  },
+  {
+   "d": "2026-11-22T16:49:39+00:00",
+   "u": -6.83,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "OPEN_GAME",
+   "m": "Brommapojkarna — Halmstads Bk",
+   "s": "Over 4",
+   "o": 1.79
+  },
+  {
+   "d": "2026-11-22T16:49:56+00:00",
+   "u": -5.87,
+   "g": 0.96,
+   "w": 1.0,
+   "t": "OPEN_GAME",
+   "m": "UTA Arad — CS Universitatea Craiova",
+   "s": "Over 5",
+   "o": 1.96
   }
  ],
  "daily": [
@@ -68651,9 +68545,9 @@
   },
   {
    "bets": 263,
-   "settled": 152,
-   "wins": 79,
-   "units": 0.79,
+   "settled": 154,
+   "wins": 80,
+   "units": 0.75,
    "day": "2026-11-22"
   }
  ]
