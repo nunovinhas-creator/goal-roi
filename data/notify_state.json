@@ -916,13 +916,15 @@
    "attempt_utc": "2026-11-22T14:26:22+00:00",
    "chars": 210,
    "created_utc": "2026-11-22T14:26:22+00:00",
+   "done_utc": "2026-11-22T14:26:22+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d91e8fe09413989472b029f5847872af03fbaaf681e8e97e93e919175676415e",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:barcelona-vs-villarreal-20261122|7381d156b0cf": {
    "attempt_utc": "2026-11-22T12:57:22+00:00",
@@ -2883,6 +2885,18 @@
    "kind": "hint",
    "sha256": "b1e17d2a996fbdb9066627eadea2dd23bc8485261799b169cda20fc3ff857251",
    "state": "delivered"
+  },
+  "game|id:liverpool-vs-manchester-united-20261122|137df20dec87": {
+   "attempt_utc": "2026-11-22T14:32:24+00:00",
+   "chars": 222,
+   "created_utc": "2026-11-22T14:32:24+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "8addbd1b217c8db2b97bb2ed6ea1d56820b87aaf808084249ea4d8a65308b38e",
+   "state": "in_flight"
   },
   "game|id:liverpool-vs-manchester-united-20261122|13adbc7cc433": {
    "attempt_utc": "2026-11-22T07:04:10+00:00",
@@ -4888,25 +4902,25 @@
   }
  },
  "delivery_counts": {
-  "delivered": 315,
+  "delivered": 316,
   "uncertain": 3
  },
- "format_last_run_utc": "2026-11-22T14:22:35+00:00",
+ "format_last_run_utc": "2026-11-22T14:30:21+00:00",
  "health": {
   "reference": {
    "bsd_results": 45,
-   "eligible": 1703,
+   "eligible": 1707,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 108,
-   "hypotheses": 13246,
+   "hypotheses": 13259,
    "settled_bets": 1314,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 188,
+   "statuses": 192,
    "validation_state": "not_activated"
   }
  },
  "hello": true,
- "last_run_utc": "2026-11-22T14:22:35+00:00",
+ "last_run_utc": "2026-11-22T14:30:21+00:00",
  "migrations": {
   "eligible_statuses_v1": {
    "at_utc": "2026-11-15T09:27:59+00:00",
@@ -5716,6 +5730,9 @@
   "item|id:lille-vs-lyon-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T14:35:18+00:00"
   },
+  "item|id:liverpool-vs-manchester-united-20261122|Asian Total|Under 3.5": {
+   "at_utc": "2026-11-22T14:32:24+00:00"
+  },
   "item|id:liverpool-vs-manchester-united-20261122|Polymarket|AH1(-0.5)": {
    "at_utc": "2026-11-22T07:04:10+00:00"
   },
@@ -6138,7 +6155,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 627,
+ "sent_total": 628,
  "statuses": {
   "Forma de golos | Competição = liga": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum": "abandonada",
@@ -6240,6 +6257,7 @@
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
+  "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": "promissora",
   "Stake | Dia = fim de semana": "abandonada",
@@ -6310,12 +6328,14 @@
   "Stake | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Hora (UTC) = tarde & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Mercado = golos (total asiático) & Momento do aviso = mais de 45 min depois do início": "abandonada",
+  "Stake | Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início": "abandonada",
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
   "Stake | Mercado = outros mercados & Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Momento do aviso = antes do início": "abandonada",
   "Stake | Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
+  "Stake | Momento do aviso = antes do início & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Momento do aviso = antes do início & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Momento do aviso = antes do início & Valor da aposta = 10 mil $ ou mais": "abandonada",
@@ -6327,6 +6347,7 @@
   "Stake | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
+  "Stake | Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Sinal anterior de outro tipo no mesmo jogo = sim & Valor da aposta = menos de 10 mil $": "abandonada"
  },
  "summary_counts": {
@@ -6771,6 +6792,7 @@
   "2026-11-22T13:45:37+00:00|Paris F.C. — Angers|Under 2.5",
   "2026-11-22T13:49:34+00:00|Bologna — Udinese|AH1(-0.5)",
   "2026-11-22T13:59:31+00:00|Karlsruhe — Osnabruck|AH2(+0.5)",
-  "2026-11-22T14:22:41+00:00|Barcelona — Villarreal|Under 3.5"
+  "2026-11-22T14:22:41+00:00|Barcelona — Villarreal|Under 3.5",
+  "2026-11-22T14:30:26+00:00|Liverpool — Manchester United|Under 3.5"
  ]
 }
