@@ -890,11 +890,13 @@
    "created_utc": "2026-11-22T16:10:32+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "uncertain"
    ],
    "kind": "hint",
+   "reason": "interrupted",
    "sha256": "4cb9f8eb1a9a6ba8e2b729faeead2163ee4046c6df01a2118f842e536ed87e3f",
-   "state": "in_flight"
+   "state": "uncertain"
   },
   "game|id:augsburg-vs-mainz-20261122|eb9228cfb0cc": {
    "attempt_utc": "2026-11-22T11:48:54+00:00",
@@ -2969,12 +2971,16 @@
    "state": "delivered"
   },
   "game|id:liverpool-vs-manchester-united-20261122|e094f2424168": {
+   "attempt_utc": "2026-11-22T16:12:38+00:00",
+   "chars": 223,
    "created_utc": "2026-11-22T16:10:32+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "7c83b9159f560b5b57391169902221d731c320758a7d7945467e47dd986437a5",
+   "state": "in_flight"
   },
   "game|id:malawi-vs-egypt-20261117|9fcc2fe8c526": {
    "attempt_utc": "2026-11-17T14:47:46+00:00",
@@ -5009,17 +5015,17 @@
  },
  "delivery_counts": {
   "delivered": 323,
-  "uncertain": 3
+  "uncertain": 4
  },
  "format_last_run_utc": "2026-11-22T16:08:34+00:00",
  "health": {
   "reference": {
    "bsd_results": 45,
-   "eligible": 1752,
+   "eligible": 1754,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 108,
-   "hypotheses": 13442,
-   "settled_bets": 1383,
+   "hypotheses": 13462,
+   "settled_bets": 1397,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 223,
    "validation_state": "not_activated"
@@ -5844,6 +5850,9 @@
   },
   "item|id:lille-vs-lyon-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T14:35:18+00:00"
+  },
+  "item|id:liverpool-vs-manchester-united-20261122|Asian Total|Over 3.5": {
+   "at_utc": "2026-11-22T16:12:38+00:00"
   },
   "item|id:liverpool-vs-manchester-united-20261122|Asian Total|Under 2.5": {
    "at_utc": "2026-11-22T16:04:31+00:00"
@@ -6958,6 +6967,7 @@
   "2026-11-22T15:22:26+00:00|Trabzonspor — Eyupspor|Over 3.5",
   "2026-11-22T15:57:57+00:00|Manta — Delfin|Over 2.5",
   "2026-11-22T16:03:08+00:00|Liverpool — Manchester United|Under 2.5",
-  "2026-11-22T16:08:01+00:00|Augsburg — Mainz|Under 4.5"
+  "2026-11-22T16:08:01+00:00|Augsburg — Mainz|Under 4.5",
+  "2026-11-22T16:08:01+00:00|Liverpool — Manchester United|Over 3.5"
  ]
 }
