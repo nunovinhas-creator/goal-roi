@@ -4038,6 +4038,19 @@
    "sha256": "484eae75a2e71eefc77bb8ee19c65acd4f0c456c7681db2a2205171b13a33d8b",
    "state": "delivered"
   },
+  "game|id:monza-vs-fiorentina-20261123|686d7d72267f": {
+   "attempt_id": "36e8550c76ed48e2ba99c4700fd4c820",
+   "attempt_utc": "2026-11-23T19:57:20+00:00",
+   "chars": 201,
+   "created_utc": "2026-11-23T19:57:20+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "511dd1f0d188dd0b5cd5ca5ee6bcc0471add077d5a995f1cf38bfc5457cf8d3e",
+   "state": "in_flight"
+  },
   "game|id:monza-vs-fiorentina-20261123|8f5f0fd09ecb": {
    "attempt_id": "8c162a95cc564eba88f232408145c192",
    "attempt_utc": "2026-11-23T17:33:20+00:00",
@@ -6221,7 +6234,8 @@
   "2026-11-23T19:16:07+00:00|Sepsi OSK — Rapid Bucharest|Over 4": true,
   "2026-11-23T19:23:11+00:00|AD Ceuta FC — Almeria|AH1(+0.5)": true,
   "2026-11-23T19:25:02+00:00|Brentford — Everton|Over 2.5": true,
-  "2026-11-23T19:45:19+00:00|Real Oruro — Guabira Montero|Under 3.5": true
+  "2026-11-23T19:45:19+00:00|Real Oruro — Guabira Montero|Under 3.5": true,
+  "2026-11-23T19:53:59+00:00|Monza — Fiorentina|Over 2.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -6428,9 +6442,9 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 78,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
-  "Polymarket | Competição = liga & Momento = durante o jogo": 46,
-  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 37,
-  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 66,
+  "Polymarket | Competição = liga & Momento = durante o jogo": 47,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 38,
+  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 68,
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 38,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
@@ -6462,8 +6476,8 @@
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos) & Número de apostas = várias": 37,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
   "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": 43,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 55,
-  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 50,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 57,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 52,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 60,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 48,
@@ -7310,6 +7324,9 @@
   "item|id:monza-vs-fiorentina-20261123|1x2|Fiorentina": {
    "at_utc": "2026-11-23T08:11:12+00:00"
   },
+  "item|id:monza-vs-fiorentina-20261123|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-23T19:57:20+00:00"
+  },
   "item|id:monza-vs-fiorentina-20261123|Polymarket|AH1(+0.5)": {
    "at_utc": "2026-11-23T19:03:28+00:00"
   },
@@ -7834,6 +7851,7 @@
   "Polymarket | Hora (UTC) = noite & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": "promissora",
   "Polymarket | Hora (UTC) = tarde & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Hora (UTC) = tarde & Número de apostas = uma": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Número de apostas = uma & Quota de mercado = menos de 80 %": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -7888,7 +7906,6 @@
   "Stake | Competição = liga & Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Mercado = outros mercados & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Competição = liga & Momento do aviso = antes do início & Número de apostas = uma": "abandonada",
-  "Stake | Competição = liga & Número de apostas = uma": "abandonada",
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Competição = liga & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Stake | Competição = liga & Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
@@ -8542,6 +8559,7 @@
   "2026-11-23T19:16:07+00:00|Sepsi OSK — Rapid Bucharest|Over 4",
   "2026-11-23T19:23:11+00:00|AD Ceuta FC — Almeria|AH1(+0.5)",
   "2026-11-23T19:25:02+00:00|Brentford — Everton|Over 2.5",
-  "2026-11-23T19:45:19+00:00|Real Oruro — Guabira Montero|Under 3.5"
+  "2026-11-23T19:45:19+00:00|Real Oruro — Guabira Montero|Under 3.5",
+  "2026-11-23T19:53:59+00:00|Monza — Fiorentina|Over 2.5"
  ]
 }
