@@ -66,7 +66,7 @@ def main(argv=None):
             store.append_versions([row])
             appended = datetime.now(timezone.utc)
             deadline = time.monotonic() + 60
-            while not list(spool.glob('*.json')) and time.monotonic() < deadline:
+            while not list(spool.glob('[0-9a-f]*.json')) and time.monotonic() < deadline:
                 time.sleep(0.2)
             po.main(['ingest', '--stop-first', '--spool', str(spool)], environ={po.FLAG: 'on'})
             log, _ = follower.communicate(timeout=30)
@@ -74,6 +74,7 @@ def main(argv=None):
             if follower.poll() is None:
                 follower.kill()
         _, rows = po.journal_rows(data / po.JOURNAL)
+        _, runs = po.journal_rows(data / po.RUNS_JOURNAL)
         from scangoal import report
         from scripts import polymarket_p2_audit as audit
         messages, *_ = report.load(result_observations={}, as_of=datetime.now(timezone.utc))
@@ -83,8 +84,9 @@ def main(argv=None):
             'message_appended_utc': po.iso(appended), 'follower_exit_code': follower.returncode,
             'follower_log': [line for line in log.splitlines() if line.startswith('POLYMARKET_SHADOW')],
             'records': rows,
+            'observer_runs': runs,
             'audit': audit.audit(messages, po.first_versions(data / 'messages.jsonl'), rows,
-                                 as_of=datetime.now(timezone.utc)),
+                                 as_of=datetime.now(timezone.utc), runs=runs),
         }
     text = json.dumps(result, ensure_ascii=False, indent=1, sort_keys=True) + '\n'
     if out:

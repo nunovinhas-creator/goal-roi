@@ -1,16 +1,18 @@
 {
  "audit": {
-  "as_of_utc": "2026-11-23T20:15:32.803Z",
+  "as_of_utc": "2026-11-23T20:53:13.117Z",
   "bot_vs_net_odds_10_usdc": {
+   "excluded_not_fresh": 0,
    "median_ratio_net_over_bot": 0.7873,
    "n": 1,
    "net_at_least_bot": 0,
-   "note": "descriptive only; a contemporaneous quote is not an executed bet"
+   "note": "descriptive only; fresh book proof required; a contemporaneous quote is not an executed bet"
   },
   "contract_identified": 1,
-  "coverage_games_pct": 100.0,
-  "coverage_signals_pct": 100.0,
-  "depth_filled_within_120s": {
+  "coverage_fresh_price_pct": 100.0,
+  "coverage_games_fresh_pct": 100.0,
+  "coverage_responses_within_120s_pct": 100.0,
+  "depth_filled_fresh": {
    "100_usdc": 1,
    "10_usdc": 1,
    "500_usdc": 1,
@@ -19,13 +21,22 @@
   "eligible_games": 1,
   "eligible_signals": 1,
   "execution_proven": false,
-  "games_without_proof": 0,
-  "observed_within_120s": 1,
-  "observed_within_120s_fresh_book": 1,
+  "fresh_book_max_age_seconds": 300.0,
+  "fresh_price_within_120s": 1,
+  "games_without_fresh_proof": 0,
+  "observer": {
+   "requests": 5,
+   "runs": 1,
+   "runs_with_zero_observations": 0,
+   "runs_without_recorded_stop": 0
+  },
+  "responses_within_120s": 1,
   "roi_net_proven": null,
-  "schema": "goal-roi/polymarket-p2-audit/v1",
+  "schema": "goal-roi/polymarket-p2-audit/v2",
   "scientific_claim": "none",
-  "since_utc": "2026-11-23T20:15:21.150Z",
+  "since_source": "observer_runs",
+  "since_utc": "2026-11-23T20:53:01.643Z",
+  "stale_book_within_120s": 0,
   "status": "activated",
   "statuses": {
    "contemporaneous": 1,
@@ -37,18 +48,59 @@
    "technical_failure": 0
   },
   "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.",
-  "without_observation": 0
+  "without_observation": 0,
+  "without_observation_by_observer": {
+   "observer_absent": 0,
+   "observer_running": 0
+  }
  },
  "follower_exit_code": 0,
  "follower_log": [
   "POLYMARKET_SHADOW_RECORD 1 contemporaneous ",
   "POLYMARKET_SHADOW_FOLLOW_DONE observations 1 requests 5"
  ],
- "message_appended_utc": "2026-11-23T20:15:21.171Z",
+ "message_appended_utc": "2026-11-23T20:53:01.657Z",
  "note": "synthetic bot-format message for a real Polymarket fixture; not a ScanGoal signal",
+ "observer_runs": [
+  {
+   "at_utc": "2026-11-23T20:53:01.643Z",
+   "event": "start",
+   "github_run_attempt": null,
+   "github_run_id": null,
+   "key": "b824765af3fd4ba49ab43397c08cccb7:start",
+   "limits": {
+    "fresh_book_max_age_seconds": 300.0,
+    "lifetime_seconds": 90,
+    "max_observations": 12,
+    "max_requests": 80,
+    "window_seconds": 120.0
+   },
+   "orders_sent": 0,
+   "run_id": "b824765af3fd4ba49ab43397c08cccb7",
+   "schema": "goal-roi/polymarket-observer-run/v1"
+  },
+  {
+   "at_utc": "2026-11-23T20:53:13.078Z",
+   "circuit": null,
+   "cpu_seconds": 0.028,
+   "event": "stop",
+   "full_reads": 1,
+   "history_skipped": 0,
+   "incremental_reads": 0,
+   "key": "b824765af3fd4ba49ab43397c08cccb7:stop",
+   "observations": 1,
+   "orders_sent": 0,
+   "peak_rss_mb": 28.2,
+   "reason": "stop_requested",
+   "requests": 5,
+   "run_id": "b824765af3fd4ba49ab43397c08cccb7",
+   "schema": "goal-roi/polymarket-observer-run/v1",
+   "ticks": 2
+  }
+ ],
  "records": [
   {
-   "attempted_utc": "2026-11-23T20:15:26.185Z",
+   "attempted_utc": "2026-11-23T20:53:06.650Z",
    "condition_id": "0xd498606dbc67bfb38abb5856bb51eeb0256fd65f0cd9d44587ff6a64a0bb2621",
    "credentials_used": false,
    "detail": null,
@@ -59,21 +111,23 @@
     "rate": "0.05",
     "source": "clob /clob-markets fd (taker only)"
    },
-   "first_read_utc": "2026-11-23T20:15:21.167648+00:00",
+   "first_read_utc": "2026-11-23T20:53:01.654887+00:00",
+   "fresh_book_max_age_seconds": 300.0,
+   "fresh_book_proven": true,
    "key": "1:03968162112b779684d630c626c14d9aa9e93780d649cc6fc8be4d6e895dfae1",
    "kickoff_utc": "2026-11-24T20:00+00:00",
-   "lag_after_first_read_seconds": 6.227,
+   "lag_after_first_read_seconds": 6.218,
    "league": "UEFA Champions League",
    "market_slug": "ucl-rma-psv-2026-11-24-total-2pt5",
    "match_id": "real-madrid-vs-psv-eindhoven-20261124",
    "message_id": 1,
    "orders_sent": 0,
    "quote": {
-    "ask_depth_usdc_top5": "30308.34",
+    "ask_depth_usdc_top5": "35676.16",
     "best_ask": "0.84",
-    "best_ask_size": "1580.47",
+    "best_ask_size": "1585.47",
     "best_bid": "0.83",
-    "book_hash": "924cfa3ffebf44e2ce18b6d4319701f145c61e47",
+    "book_hash": "2c274d314d16749b37a601cea85895769167605d",
     "fills": [
      {
       "fee_usdc": "0.08000",
@@ -121,31 +175,32 @@
      }
     ],
     "mirror_consistent": true,
-    "received_utc": "2026-11-23T20:15:27.395Z",
-    "source_utc": "2026-11-23T20:14:41.179Z"
+    "received_utc": "2026-11-23T20:53:07.873Z",
+    "source_utc": "2026-11-23T20:53:05.482Z"
    },
    "reason": null,
+   "received_within_window": true,
    "responses": [
     {
-     "bytes": 23230,
+     "bytes": 23233,
      "headers": {
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:26 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:07 GMT"
      },
-     "received_utc": "2026-11-23T20:15:26.700Z",
-     "requested_utc": "2026-11-23T20:15:26.185Z",
-     "sha256": "c93ea29f8437a882b544a6b0233fd8c9ae1d265731a278d9fccfb42f9822621b",
+     "received_utc": "2026-11-23T20:53:07.190Z",
+     "requested_utc": "2026-11-23T20:53:06.651Z",
+     "sha256": "e6c435408875114165bda081b0f0cc8496ea8cb40749380c97ea448b99a275f8",
      "url": "https://gamma-api.polymarket.com/public-search?q=Real+Madrid+vs+PSV+Eindhoven&limit_per_type=10&events_status=active"
     },
     {
-     "bytes": 309909,
+     "bytes": 310249,
      "headers": {
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:26 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:07 GMT"
      },
-     "received_utc": "2026-11-23T20:15:26.988Z",
-     "requested_utc": "2026-11-23T20:15:26.701Z",
-     "sha256": "340fa1e7b013176f6affd6d6396b67a10fb2de335888d8bc7110099811876982",
+     "received_utc": "2026-11-23T20:53:07.465Z",
+     "requested_utc": "2026-11-23T20:53:07.191Z",
+     "sha256": "6b0f7439648630363f35ba3ae24ba0ed276c882f3d432139a947a3c9411add0d",
      "url": "https://gamma-api.polymarket.com/events/slug/ucl-rma-psv-2026-11-24-more-markets"
     },
     {
@@ -153,10 +208,10 @@
      "headers": {
       "cf-cache-status": "DYNAMIC",
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:27 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:07 GMT"
      },
-     "received_utc": "2026-11-23T20:15:27.196Z",
-     "requested_utc": "2026-11-23T20:15:26.990Z",
+     "received_utc": "2026-11-23T20:53:07.667Z",
+     "requested_utc": "2026-11-23T20:53:07.467Z",
      "sha256": "6f34d6e66be28b3cc0c7a09f1d5c1790efe8263291424296dcefae0cdfa7fc15",
      "url": "https://clob.polymarket.com/clob-markets/0xd498606dbc67bfb38abb5856bb51eeb0256fd65f0cd9d44587ff6a64a0bb2621"
     },
@@ -165,11 +220,11 @@
      "headers": {
       "cf-cache-status": "DYNAMIC",
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:27 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:07 GMT"
      },
-     "received_utc": "2026-11-23T20:15:27.395Z",
-     "requested_utc": "2026-11-23T20:15:27.196Z",
-     "sha256": "747fddf58a4f27b720c3bdf42ce46a0e1cb22aba660ddff133af392fa3d34229",
+     "received_utc": "2026-11-23T20:53:07.873Z",
+     "requested_utc": "2026-11-23T20:53:07.667Z",
+     "sha256": "05918db3c0170c46613ecf37fbd0e58e271d9b987a6a86186ef8a461eb516277",
      "url": "https://clob.polymarket.com/book?token_id=39785679154975343612249952562446678426298711490518063300989887771108217897798"
     },
     {
@@ -177,11 +232,11 @@
      "headers": {
       "cf-cache-status": "DYNAMIC",
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:27 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:08 GMT"
      },
-     "received_utc": "2026-11-23T20:15:27.596Z",
-     "requested_utc": "2026-11-23T20:15:27.395Z",
-     "sha256": "2032fd941949295e5d7f0b3e1a526b75c0262ebbdf9f8fc1dc51bed6e2a44492",
+     "received_utc": "2026-11-23T20:53:08.073Z",
+     "requested_utc": "2026-11-23T20:53:07.873Z",
+     "sha256": "dc417d1a2f7ee58e5befd77dc419858e37d58585dee27e4e547da2efeb85451f",
      "url": "https://clob.polymarket.com/book?token_id=11450436426998229846550669535076924873365577760530794065620060859463170187280"
     }
    ],
@@ -189,15 +244,16 @@
    "run": {
     "github_run_attempt": null,
     "github_run_id": null,
-    "started_utc": "2026-11-23T20:15:21.150Z"
+    "run_id": "b824765af3fd4ba49ab43397c08cccb7",
+    "started_utc": "2026-11-23T20:53:01.643Z"
    },
    "schema": "goal-roi/polymarket-observation/v1",
-   "seconds_to_kickoff": 85472.605,
+   "seconds_to_kickoff": 83212.126,
    "share": 70.0,
    "signal_odds": 1.5,
-   "signal_sent_utc": "2026-11-23T20:15:01+00:00",
-   "signal_sha256": "ec15c2a6d2d4714e14f9b4e4122da3a037ea32efb48a9faa80cd66786f6af332",
-   "source_age_seconds": 46.216,
+   "signal_sent_utc": "2026-11-23T20:52:41+00:00",
+   "signal_sha256": "4d932a17fc92b75401f3f6b46e767144e7f71d6d7baee44de3b941d05df35d20",
+   "source_age_seconds": 2.392,
    "status": "contemporaneous",
    "teams": [
     "Real Madrid",

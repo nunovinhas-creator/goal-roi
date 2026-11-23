@@ -1,16 +1,18 @@
 {
  "audit": {
-  "as_of_utc": "2026-11-23T20:15:44.495Z",
+  "as_of_utc": "2026-11-23T20:53:24.451Z",
   "bot_vs_net_odds_10_usdc": {
+   "excluded_not_fresh": 0,
    "median_ratio_net_over_bot": null,
    "n": 0,
    "net_at_least_bot": 0,
-   "note": "descriptive only; a contemporaneous quote is not an executed bet"
+   "note": "descriptive only; fresh book proof required; a contemporaneous quote is not an executed bet"
   },
   "contract_identified": 0,
-  "coverage_games_pct": 0.0,
-  "coverage_signals_pct": 0.0,
-  "depth_filled_within_120s": {
+  "coverage_fresh_price_pct": 0.0,
+  "coverage_games_fresh_pct": 0.0,
+  "coverage_responses_within_120s_pct": 0.0,
+  "depth_filled_fresh": {
    "100_usdc": 0,
    "10_usdc": 0,
    "500_usdc": 0,
@@ -19,13 +21,22 @@
   "eligible_games": 1,
   "eligible_signals": 1,
   "execution_proven": false,
-  "games_without_proof": 1,
-  "observed_within_120s": 0,
-  "observed_within_120s_fresh_book": 0,
+  "fresh_book_max_age_seconds": 300.0,
+  "fresh_price_within_120s": 0,
+  "games_without_fresh_proof": 1,
+  "observer": {
+   "requests": 2,
+   "runs": 1,
+   "runs_with_zero_observations": 0,
+   "runs_without_recorded_stop": 0
+  },
+  "responses_within_120s": 0,
   "roi_net_proven": null,
-  "schema": "goal-roi/polymarket-p2-audit/v1",
+  "schema": "goal-roi/polymarket-p2-audit/v2",
   "scientific_claim": "none",
-  "since_utc": "2026-11-23T20:15:33.046Z",
+  "since_source": "observer_runs",
+  "since_utc": "2026-11-23T20:53:13.383Z",
+  "stale_book_within_120s": 0,
   "status": "activated",
   "statuses": {
    "contemporaneous": 0,
@@ -37,25 +48,68 @@
    "technical_failure": 0
   },
   "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.",
-  "without_observation": 0
+  "without_observation": 0,
+  "without_observation_by_observer": {
+   "observer_absent": 0,
+   "observer_running": 0
+  }
  },
  "follower_exit_code": 0,
  "follower_log": [
   "POLYMARKET_SHADOW_RECORD 1 identity_unproven identity_not_found",
   "POLYMARKET_SHADOW_FOLLOW_DONE observations 1 requests 2"
  ],
- "message_appended_utc": "2026-11-23T20:15:33.058Z",
+ "message_appended_utc": "2026-11-23T20:53:13.413Z",
  "note": "synthetic bot-format message for a real Polymarket fixture; not a ScanGoal signal",
+ "observer_runs": [
+  {
+   "at_utc": "2026-11-23T20:53:13.383Z",
+   "event": "start",
+   "github_run_attempt": null,
+   "github_run_id": null,
+   "key": "b8be5bf351fb4590bc34ba4eaca5171c:start",
+   "limits": {
+    "fresh_book_max_age_seconds": 300.0,
+    "lifetime_seconds": 90,
+    "max_observations": 12,
+    "max_requests": 80,
+    "window_seconds": 120.0
+   },
+   "orders_sent": 0,
+   "run_id": "b8be5bf351fb4590bc34ba4eaca5171c",
+   "schema": "goal-roi/polymarket-observer-run/v1"
+  },
+  {
+   "at_utc": "2026-11-23T20:53:24.410Z",
+   "circuit": null,
+   "cpu_seconds": 0.03,
+   "event": "stop",
+   "full_reads": 1,
+   "history_skipped": 0,
+   "incremental_reads": 0,
+   "key": "b8be5bf351fb4590bc34ba4eaca5171c:stop",
+   "observations": 1,
+   "orders_sent": 0,
+   "peak_rss_mb": 32.6,
+   "reason": "stop_requested",
+   "requests": 2,
+   "run_id": "b8be5bf351fb4590bc34ba4eaca5171c",
+   "schema": "goal-roi/polymarket-observer-run/v1",
+   "ticks": 2
+  }
+ ],
  "records": [
   {
-   "attempted_utc": "2026-11-23T20:15:38.077Z",
+   "attempted_utc": "2026-11-23T20:53:18.387Z",
    "condition_id": null,
    "credentials_used": false,
    "detail": null,
    "evidence_for_signal": false,
    "execution_proven": false,
    "fee": null,
-   "first_read_utc": "2026-11-23T20:15:33.055746+00:00",
+   "first_read_utc": "2026-11-23T20:53:13.405110+00:00",
+   "fresh_book_max_age_seconds": 300.0,
+   "fresh_book_proven": false,
    "key": "1:bb4ffd3dc6c487d0e05f4e8660b92358b46faaeaa10dded2f392fee30e0e9425",
    "kickoff_utc": "2026-11-24T20:00+00:00",
    "lag_after_first_read_seconds": null,
@@ -66,27 +120,28 @@
    "orders_sent": 0,
    "quote": null,
    "reason": "identity_not_found",
+   "received_within_window": false,
    "responses": [
     {
-     "bytes": 23465,
+     "bytes": 23478,
      "headers": {
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:38 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:18 GMT"
      },
-     "received_utc": "2026-11-23T20:15:38.551Z",
-     "requested_utc": "2026-11-23T20:15:38.078Z",
-     "sha256": "a78728d53b99af83b25af6fcb7d51212d516fa8a76890a7e876ee0fb3b82a90d",
+     "received_utc": "2026-11-23T20:53:18.896Z",
+     "requested_utc": "2026-11-23T20:53:18.387Z",
+     "sha256": "e2fdac91265dd566764bd703d196bb4f30b9b04b79d37a3d1b775284542e3196",
      "url": "https://gamma-api.polymarket.com/public-search?q=Feyenoord+vs+Porto&limit_per_type=10&events_status=active"
     },
     {
-     "bytes": 1247443,
+     "bytes": 1249000,
      "headers": {
       "content-type": "application/json",
-      "date": "Mon, 23 Nov 2026 20:15:38 GMT"
+      "date": "Mon, 23 Nov 2026 20:53:19 GMT"
      },
-     "received_utc": "2026-11-23T20:15:39.316Z",
-     "requested_utc": "2026-11-23T20:15:38.552Z",
-     "sha256": "af8615dcdd510026f25a887bf2bb491dda5d7c8617f5a5da86915ee89ee0b794",
+     "received_utc": "2026-11-23T20:53:19.395Z",
+     "requested_utc": "2026-11-23T20:53:18.896Z",
+     "sha256": "4578f299d2a72a44463579a68dd545d9a667a73eada079c627643ae1b9744ac5",
      "url": "https://gamma-api.polymarket.com/public-search?q=Feyenoord+Porto&limit_per_type=10&events_status=active"
     }
    ],
@@ -94,14 +149,15 @@
    "run": {
     "github_run_attempt": null,
     "github_run_id": null,
-    "started_utc": "2026-11-23T20:15:33.046Z"
+    "run_id": "b8be5bf351fb4590bc34ba4eaca5171c",
+    "started_utc": "2026-11-23T20:53:13.383Z"
    },
    "schema": "goal-roi/polymarket-observation/v1",
    "seconds_to_kickoff": null,
    "share": 70.0,
    "signal_odds": 1.8,
-   "signal_sent_utc": "2026-11-23T20:15:13+00:00",
-   "signal_sha256": "fb8e49338f15086b120c4b87d4c13260730c2751248101aa44917e412dc35e80",
+   "signal_sent_utc": "2026-11-23T20:52:53+00:00",
+   "signal_sha256": "0343762085f9f974c7e8ecb1417909d2f7bd9ff495132b2dac1b68ae6f55d48d",
    "source_age_seconds": null,
    "status": "identity_unproven",
    "teams": [

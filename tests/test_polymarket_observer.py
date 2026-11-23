@@ -59,12 +59,18 @@ class Harness(unittest.TestCase):
                'text': body or text(), 'buttons': None, 'collected_at_utc': seen.isoformat(), 'receipt_version': 1}
         return store.append_versions([row])
 
-    def follower(self, **kwargs):
+    def follower(self, ago=300, **kwargs):
+        """Como na produção, o seguidor arranca antes das leituras (por defeito 300 s antes do relógio do teste)."""
         kwargs.setdefault('get', self.remote)
-        return po.Follower(self.data, self.spool, clock=self.clock, **kwargs)
+        now, self.clock.now = self.clock.now, self.clock.now - timedelta(seconds=ago)
+        try:
+            return po.Follower(self.data, self.spool, clock=self.clock, **kwargs)
+        finally:
+            self.clock.now = now
 
     def spooled(self):
-        return [json.loads(p.read_text()) for p in sorted(self.spool.glob('*.json'))]
+        rows = [json.loads(p.read_text()) for p in sorted(self.spool.glob('*.json'))]
+        return [r for r in rows if r.get('schema') == po.SCHEMA]
 
     def journal(self):
         return po.journal_rows(self.data / po.JOURNAL)[1]
@@ -268,7 +274,6 @@ class Failures(Harness):
         follower = self.follower(get=broken)
         self.add(2)
         follower.tick()
-        follower.stamp = None
         follower.tick()
         [record] = self.spooled()
         self.assertEqual((record['reason'], record['detail']), ('internal_error', 'KeyError'))
@@ -312,7 +317,6 @@ class Replays(Harness):
         follower.tick()
         # A recolha completa relê a mesma mensagem, com outra hora de leitura: nenhuma versão nova, nenhum pedido.
         self.assertEqual(self.add(2, seen=self.clock.now), 0)
-        follower.stamp = None
         follower.tick()
         self.assertEqual(len(self.spooled()), 1)
         self.assertEqual(len(self.remote.urls), 5)
@@ -333,7 +337,6 @@ class Replays(Harness):
         self.add(2)
         follower.tick()
         restarted = self.follower()                        # mesma execução, spool ainda presente
-        restarted.stamp = None
         self.assertEqual(restarted.tick(), 0)
         po.ingest(self.data, self.spool)
         rerun = self.follower()                            # execução seguinte: spool vazio, diário com a chave
@@ -365,9 +368,8 @@ class Storage(Harness):
         self.observed()
         po.ingest(self.data, self.spool)
         before = (self.data / po.JOURNAL).read_bytes()
-        self.add(3)
         follower = self.follower()
-        follower.known.discard(3)
+        self.add(3)
         follower.tick()
         po.ingest(self.data, self.spool)
         after = (self.data / po.JOURNAL).read_bytes()
@@ -389,7 +391,7 @@ class Storage(Harness):
         (self.spool / '.abc.json.123.tmp').write_text('{"schema": "goal-roi/polym')
         (self.spool / 'truncated.json').write_text('{"schema": "goal-roi/polym')
         stats = po.ingest(self.data, self.spool)
-        self.assertEqual(stats, {'added': 0, 'duplicates': 0, 'rejected': 1})
+        self.assertEqual(stats, {'added': 0, 'duplicates': 0, 'rejected': 1, 'runs_added': 0})
         self.assertTrue((self.spool / 'rejected' / 'truncated.json').exists())
         self.assertFalse((self.data / po.JOURNAL).exists())
 
@@ -552,43 +554,314 @@ class GitPublication(unittest.TestCase):
 
 
 class ProspectiveAudit(Harness):
-    def rows(self, seen=None):
-        follower = self.follower()
-        self.add(2, seen=seen or self.clock.now)
-        follower.tick()
-        po.ingest(self.data, self.spool)
+    """Relatório P2: denominador completo, prova de preço fresco separada de resposta na janela, sem dados futuros."""
+
+    def snapshot(self, as_of=None):
         from scangoal import report
-        messages, *_ = report.load(result_observations={}, as_of=self.clock.now)
-        return messages, po.first_versions(self.data / 'messages.jsonl'), self.journal()
+        as_of = as_of or self.clock.now + timedelta(seconds=1)
+        messages, *_ = report.load(result_observations={}, as_of=as_of)
+        runs = po.journal_rows(self.data / po.RUNS_JOURNAL)[1]
+        return messages, po.first_versions(self.data / 'messages.jsonl'), self.journal(), runs
+
+    def audit(self, as_of=None, **kwargs):
+        messages, first, rows, runs = self.snapshot(as_of)
+        kwargs.setdefault('runs', runs)
+        return audit.audit(messages, first, rows, as_of=as_of or self.clock.now + timedelta(seconds=1), **kwargs)
+
+    def run_observer(self, during=None, ticks=2):
+        """Uma execução real de `follow` (relógio e espera simulados); `during` corre antes da 1.ª passagem."""
+        steps = iter(range(0, 10_000, 5))
+        calls = []
+
+        def sleep(_):
+            if during and not calls:
+                during()
+            calls.append(1)
+
+        follower = po.follow(self.data, self.spool, seconds=5 * ticks + 1, sleep=sleep, monotonic=lambda: next(steps),
+                             get=self.remote, clock=self.clock)
+        po.ingest(self.data, self.spool)
+        return follower
+
+    def stale_book(self):
+        self.remote.data['book_over'] = dict(self.remote.data['book_over'],
+                                             timestamp=str(int((RECEIVED - timedelta(minutes=6)).timestamp() * 1000)))
 
     def test_denominator_keeps_unobserved_signals(self):
-        messages, first, rows = self.rows()
+        follower = self.follower()
+        self.add(2, seen=self.clock.now)
+        follower.tick()
+        po.ingest(self.data, self.spool)
         self.add(3, seen=self.clock.now)
-        from scangoal import report
-        messages, *_ = report.load(result_observations={}, as_of=self.clock.now)
-        first = po.first_versions(self.data / 'messages.jsonl')
-        result = audit.audit(messages, first, rows, as_of=self.clock.now + timedelta(seconds=1))
-        self.assertEqual((result['eligible_signals'], result['observed_within_120s'], result['without_observation']),
-                         (2, 1, 1))
-        self.assertEqual(result['coverage_signals_pct'], 50.0)
-        self.assertEqual(result['depth_filled_within_120s'], {'10_usdc': 1, '50_usdc': 1, '100_usdc': 1, '500_usdc': 1})
+        result = self.audit()
+        self.assertEqual((result['eligible_signals'], result['responses_within_120s'],
+                          result['fresh_price_within_120s'], result['without_observation']), (2, 1, 1, 1))
+        self.assertEqual(result['coverage_fresh_price_pct'], 50.0)
+        self.assertEqual(result['depth_filled_fresh'], {'10_usdc': 1, '50_usdc': 1, '100_usdc': 1, '500_usdc': 1})
         self.assertEqual(result['bot_vs_net_odds_10_usdc']['n'], 1)
         self.assertEqual(result['verdict'], 'RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.')
         self.assertIsNone(result['roi_net_proven'])
         self.assertFalse(result['execution_proven'])
 
-    def test_historical_cut_ignores_future_data(self):
-        messages, first, rows = self.rows(seen=RECEIVED - timedelta(seconds=2))
-        earlier = RECEIVED - timedelta(seconds=1)       # sinal já lido, cotação ainda não recebida
-        result = audit.audit(messages, first, rows, as_of=earlier, since=RECEIVED - timedelta(hours=1))
-        self.assertEqual((result['observed_within_120s'], result['without_observation']), (0, 1))
-        before_signal = RECEIVED - timedelta(minutes=5)
-        result = audit.audit(messages, first, rows, as_of=before_signal, since=RECEIVED - timedelta(hours=1))
-        self.assertEqual(result['eligible_signals'], 0)
+    def test_stale_book_is_a_response_not_a_fresh_price(self):
+        self.stale_book()
+        follower = self.follower()
+        self.add(2, seen=self.clock.now)
+        follower.tick()
+        [record] = self.spooled()
+        self.assertEqual(record['status'], 'stale_book')
+        self.assertTrue(record['received_within_window'])
+        self.assertFalse(record['fresh_book_proven'])
+        self.assertFalse(record['evidence_for_signal'])
+        po.ingest(self.data, self.spool)
+        result = self.audit()
+        self.assertEqual(result['statuses']['stale_book'], 1)                     # continua na auditoria
+        self.assertEqual((result['responses_within_120s'], result['stale_book_within_120s']), (1, 1))
+        self.assertEqual(result['fresh_price_within_120s'], 0)                     # nunca prova de preço fresco
+        self.assertEqual(result['coverage_fresh_price_pct'], 0.0)
+        self.assertEqual(result['depth_filled_fresh'], {'10_usdc': 0, '50_usdc': 0, '100_usdc': 0, '500_usdc': 0})
+        self.assertEqual(result['bot_vs_net_odds_10_usdc']['n'], 0)                 # fora da comparação económica
+        self.assertEqual(result['bot_vs_net_odds_10_usdc']['excluded_not_fresh'], 1)
 
-    def test_not_activated_without_observer_runs(self):
+    def test_fresh_boundary_is_inclusive_at_300s(self):
+        for age, fresh in ((300, True), (301, False)):
+            with self.subTest(age=age):
+                record = {'status': 'contemporaneous', 'source_age_seconds': age, 'condition_id': 'c',
+                          'first_read_utc': RECEIVED.isoformat(), 'quote': {'received_utc': RECEIVED.isoformat()}}
+                m = {'collected_at_utc': RECEIVED.isoformat(), 'kickoff_utc': KICKOFF.isoformat()}
+                self.assertEqual(audit.fresh_price(record, m), fresh)
+                self.assertEqual(po.freshness({'relation_to_signal': 'contemporaneous',
+                                               'source_age_seconds': age})[1], fresh)
+
+    def test_tampered_records_cannot_claim_a_fresh_price(self):
+        self.stale_book()
+        follower = self.follower()
+        self.add(2, seen=self.clock.now)
+        follower.tick()
+        [record] = self.spooled()
+        self.assertFalse(po.valid_record(dict(record, evidence_for_signal=True)))    # o ingest recusa-o
+        messages, first, _, runs = self.snapshot()
+        good = self.fresh_record()
+        cases = {
+            'stale relabelled': dict(record, status='contemporaneous'),
+            'stale with a young age': dict(good, status='stale_book'),
+            'old book': dict(good, source_age_seconds=400),
+            'book from the future': dict(good, source_age_seconds=-10),
+            'other first read': dict(good, first_read_utc=(RECEIVED - timedelta(minutes=1)).isoformat()),
+            'after kickoff': dict(good, quote=dict(good['quote'], received_utc=(KICKOFF + timedelta(seconds=1)).isoformat())),
+            'after 120 s': dict(good, quote=dict(good['quote'], received_utc=(RECEIVED + timedelta(seconds=121)).isoformat())),
+            'no contract': dict(good, condition_id=None),
+            'flag only': dict(record, evidence_for_signal=True, fresh_book_proven=True),
+        }
+        for name, row in cases.items():
+            with self.subTest(case=name):
+                result = audit.audit(messages, first, [row], as_of=KICKOFF + timedelta(hours=1),
+                                     since=RECEIVED - timedelta(hours=1))
+                self.assertEqual(result['fresh_price_within_120s'], 0)
+                self.assertEqual(result['bot_vs_net_odds_10_usdc']['n'], 0)
+
+    def fresh_record(self):
+        self.remote = FakeRemote()
+        for p in self.spool.glob('*.json'):
+            p.unlink()
+        follower = self.follower()
+        self.add(4, seen=self.clock.now)
+        follower.tick()
+        [record] = [r for r in self.spooled() if r['message_id'] == 4]
+        self.assertTrue(record['evidence_for_signal'])
+        return dict(record, message_id=2, key=record['key'].replace('4:', '2:', 1),
+                    first_read_utc=next(m for m in self.snapshot()[0] if m['message_id'] == 2)['collected_at_utc'])
+
+    def test_since_required_without_verifiable_activation(self):
+        self.add(2, seen=self.clock.now)
+        result = self.audit()
+        self.assertEqual(result['status'], 'since_required')
+        self.assertIsNone(result['eligible_signals'])                                # nunca "zero elegíveis"
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(audit.main(['--as-of', (self.clock.now + timedelta(seconds=1)).isoformat()]), 2)
+        self.assertEqual(json.loads(out.getvalue())['status'], 'since_required')
+        explicit = self.audit(since=self.clock.now - timedelta(hours=1))
+        self.assertEqual((explicit['status'], explicit['eligible_signals'], explicit['without_observation']),
+                         ('explicit_period_no_observer_runs', 1, 1))
+        self.assertEqual(explicit['without_observation_by_observer'], {'observer_running': 0, 'observer_absent': 1})
+
+    def test_successive_runs_without_observations_keep_the_denominator(self):
+        start = self.clock.now
+        self.clock.now = start - timedelta(minutes=30)
+        first = self.run_observer()
+        self.clock.now = start - timedelta(minutes=20)
+        self.run_observer()
+        self.assertEqual(first.observations, 0)
+        self.clock.now = start
+        self.add(2, seen=start - timedelta(minutes=10))                   # lido entre execuções: observador ausente
+        self.assertEqual(self.journal(), [])                              # nenhuma evidência guardada
+        result = self.audit()
+        self.assertEqual((result['status'], result['since_source']), ('activated', 'observer_runs'))
+        self.assertEqual(result['since_utc'], po.iso(start - timedelta(minutes=30)))
+        self.assertEqual((result['eligible_signals'], result['without_observation']), (1, 1))
+        self.assertEqual(result['without_observation_by_observer'], {'observer_running': 0, 'observer_absent': 1})
+        self.assertEqual(result['observer']['runs'], 2)
+        self.assertEqual(result['observer']['runs_with_zero_observations'], 2)
+        self.assertEqual(result['coverage_fresh_price_pct'], 0.0)
+
+    def test_total_failure_keeps_failed_signals_in_the_denominator(self):
+        self.remote.fail = 'network_error'
+        follower = self.run_observer(during=lambda: [self.add(mid, seen=self.clock.now) for mid in (2, 3, 4)])
+        self.assertEqual(follower.budget.requests, 2)
+        result = self.audit()
+        self.assertEqual(result['eligible_signals'], 3)
+        self.assertEqual(result['statuses']['technical_failure'], 3)
+        self.assertEqual((result['fresh_price_within_120s'], result['without_observation']), (0, 0))
+        self.assertEqual(result['coverage_fresh_price_pct'], 0.0)
+        self.assertEqual(result['observer']['requests'], 2)
+
+    def test_run_killed_without_stop_is_bounded(self):
+        self.clock.now = RECEIVED - timedelta(hours=2)
+        follower = self.follower(ago=0)
+        start = po.run_event(follower.run, 'start', at_utc=follower.run['started_utc'])
+        (self.spool / 'run-start.json').write_text(json.dumps(start))
+        po.ingest(self.data, self.spool)                                     # sem evento "stop": processo morto
+        self.clock.now = RECEIVED
+        self.add(2, seen=RECEIVED - timedelta(hours=2) + timedelta(minutes=5))
+        self.add(3, seen=RECEIVED - timedelta(hours=1))
+        result = self.audit()
+        self.assertEqual(result['observer']['runs_without_recorded_stop'], 1)
+        self.assertEqual(result['without_observation_by_observer'], {'observer_running': 1, 'observer_absent': 1})
+
+    def test_historical_cut_ignores_future_data(self):
+        follower = self.follower()
+        self.add(2, seen=RECEIVED - timedelta(seconds=2))
+        follower.tick()
+        po.ingest(self.data, self.spool)
+        earlier = RECEIVED - timedelta(seconds=1)                           # sinal já lido, cotação ainda não recebida
+        result = self.audit(as_of=earlier, since=RECEIVED - timedelta(hours=1))
+        self.assertEqual((result['responses_within_120s'], result['without_observation']), (0, 1))
+        result = self.audit(as_of=RECEIVED - timedelta(minutes=5), since=RECEIVED - timedelta(hours=1))
+        self.assertEqual(result['eligible_signals'], 0)
+        self.clock.now = RECEIVED + timedelta(hours=1)
+        self.run_observer()                                                  # execução posterior ao corte
+        result = self.audit(as_of=RECEIVED + timedelta(minutes=30))
+        self.assertNotEqual(result.get('since_source'), 'observer_runs')
+
+    def test_not_activated_without_anything(self):
         result = audit.audit([], {}, [], as_of=RECEIVED)
-        self.assertEqual((result['status'], result['eligible_signals']), ('not_activated', 0))
+        self.assertEqual((result['status'], result['eligible_signals']), ('since_required', None))
+
+
+class IncrementalJournal(Harness):
+    """Leitura incremental: só o acréscimo, nunca histórico retroativo, equivalente a report.load."""
+
+    def row(self, mid, seen, body=None):
+        return {'message_id': mid, 'date_utc': (seen - timedelta(seconds=30)).isoformat(timespec='seconds'),
+                'edit_date_utc': None, 'text': body or text(), 'buttons': None, 'collected_at_utc': seen.isoformat(),
+                'receipt_version': 1}
+
+    def test_first_signal_matches_report_load_on_the_real_journal(self):
+        real = ROOT / 'data' / 'messages.jsonl'
+        if not real.exists():
+            self.skipTest('real journal not available')
+        from scangoal import report
+        with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(real.parent)}):
+            loaded = {m['message_id']: m for m in report.load(result_observations={})[0]}
+        rows = po.JournalCursor(real).read()
+        fields = ('type', 'phase', 'market', 'selection', 'market_scope', 'period', 'bet', 'odds', 'teams', 'league',
+                  'kickoff_utc', 'match_id', 'explicit_match_ids', 'share', 'total', 'had_ft_at_first_sight',
+                  'edited_at_first_sight', 'collected_at_utc', 'date_utc', 'burst')
+        compared = eligible = first_sight_ft = 0
+        for row in rows:
+            ours, theirs = po.first_signal(row), loaded.get(row['message_id'])
+            self.assertIsNotNone(theirs, row['message_id'])
+            self.assertEqual(po.eligible_signal(ours), po.eligible_signal(theirs), row['message_id'])
+            eligible += po.eligible_signal(ours)
+            for flag in ('type', 'had_ft_at_first_sight', 'edited_at_first_sight', 'collected_at_utc', 'date_utc'):
+                self.assertEqual(ours.get(flag), theirs.get(flag), (row['message_id'], flag))
+            first_sight_ft += bool(theirs['had_ft_at_first_sight'])
+            if theirs['type'] == 'POLYMARKET':
+                compared += 1
+                self.assertEqual({k: ours.get(k) for k in fields}, {k: theirs.get(k) for k in fields}, row['message_id'])
+        self.assertEqual(len(rows), len(loaded))
+        self.assertGreater(compared, 1000)
+        self.assertGreater(first_sight_ft, 0)                                # o caso "lido já com resultado" existe
+        self.assertGreater(eligible, 50)
+
+    def test_first_sight_flags_match_report_load(self):
+        from scangoal import report
+        bodies = {2: text(), 3: text() + '\n🏁 FT 3:1', 4: text()}
+        store.append_versions([dict(self.row(mid, RECEIVED, body), edit_date_utc=RECEIVED.isoformat() if mid == 4 else None)
+                               for mid, body in bodies.items()])
+        loaded = {m['message_id']: m for m in report.load(result_observations={})[0]}
+        rows = {r['message_id']: r for r in po.JournalCursor(self.data / 'messages.jsonl').read()}
+        for mid in bodies:
+            ours = po.first_signal(rows[mid])
+            for flag in ('had_ft_at_first_sight', 'edited_at_first_sight', 'bet', 'match_id', 'kickoff_utc', 'odds'):
+                self.assertEqual(ours.get(flag), loaded[mid].get(flag), (mid, flag))
+            self.assertEqual(po.eligible_signal(ours), po.eligible_signal(loaded[mid]), mid)
+        self.assertTrue(loaded[3]['had_ft_at_first_sight'])
+        self.assertTrue(loaded[4]['edited_at_first_sight'])
+        self.assertEqual([mid for mid in bodies if po.eligible_signal(po.first_signal(rows[mid]))], [2])
+
+    def test_tick_never_calls_report_load(self):
+        follower = self.follower()
+        self.add(2, seen=self.clock.now)
+        with patch('scangoal.report.load', side_effect=AssertionError('full reload')):
+            self.assertEqual(follower.tick(), 1)
+
+    def test_cursor_reads_only_the_appended_bytes(self):
+        path = self.data / 'messages.jsonl'
+        store.append_versions([self.row(1, RECEIVED)])
+        cursor = po.JournalCursor(path)
+        self.assertEqual([r['message_id'] for r in cursor.read()], [1])
+        store.append_versions([self.row(2, RECEIVED)])
+        opened = []
+        original = Path.open
+
+        def spy(self_path, *args, **kwargs):
+            handle = original(self_path, *args, **kwargs)
+            opened.append(handle)
+            return handle
+
+        with patch.object(Path, 'open', spy):
+            self.assertEqual([r['message_id'] for r in cursor.read()], [2])
+        self.assertEqual((cursor.full_reads, cursor.incremental_reads), (1, 1))
+        self.assertEqual(cursor.read(), [])                                  # sem alteração: nem abre o ficheiro
+        self.assertEqual(cursor.offset, path.stat().st_size)
+
+    def test_incomplete_line_waits_for_completion(self):
+        path = self.data / 'messages.jsonl'
+        store.append_versions([self.row(1, RECEIVED)])
+        cursor = po.JournalCursor(path)
+        cursor.read()
+        line = (json.dumps(dict(self.row(2, RECEIVED), sha256='x' * 64)) + '\n').encode()
+        with path.open('ab') as handle:
+            handle.write(line[:40])
+        self.assertEqual(cursor.read(), [])
+        with path.open('ab') as handle:
+            handle.write(line[40:])
+        self.assertEqual([r['message_id'] for r in cursor.read()], [2])
+
+    def test_rewrite_or_shrink_rescans_without_reemitting(self):
+        path = self.data / 'messages.jsonl'
+        store.append_versions([self.row(1, RECEIVED), self.row(2, RECEIVED)])
+        cursor = po.JournalCursor(path)
+        cursor.read()
+        prior = path.read_bytes()
+        path.write_bytes(prior.replace(b'"message_id": 1', b'"message_id": 1 ', 1)
+                         + (json.dumps(self.row(3, RECEIVED)) + '\n').encode())
+        self.assertEqual([r['message_id'] for r in cursor.read()], [3])     # prefixo mudou: releitura completa
+        path.write_bytes((json.dumps(self.row(2, RECEIVED)) + '\n').encode())
+        self.assertEqual(cursor.read(), [])                                  # encolheu: nada de repetido
+        self.assertEqual(cursor.full_reads, 3)
+
+    def test_history_injected_later_is_never_observed(self):
+        follower = self.follower(ago=0)
+        # Um checkout/rebase traz uma mensagem lida antes do arranque: é histórico, nunca uma observação nova.
+        store.append_versions([self.row(7, self.clock.now - timedelta(seconds=30))])
+        self.assertEqual(follower.tick(), 0)
+        self.assertEqual(follower.history_skipped, 1)
+        self.assertEqual(self.remote.urls, [])
+        store.append_versions([self.row(8, self.clock.now)])                 # a seguinte é nova e é observada
+        self.assertEqual(follower.tick(), 1)
 
 
 class ProductionIsolation(unittest.TestCase):
@@ -741,7 +1014,7 @@ class ContinuityUnderSystematicFailure(unittest.TestCase):
                                  [1, 2, 3, 4, 5])
                 journal = (data / 'messages.jsonl').read_bytes()
                 deadline = time.monotonic() + 20
-                while len(list(spool.glob('*.json'))) < 5 and time.monotonic() < deadline:
+                while len(list(spool.glob('[0-9a-f]*.json'))) < 5 and time.monotonic() < deadline:
                     time.sleep(0.2)
             po.main(['stop', '--spool', str(spool)], environ={po.FLAG: 'on'})
             output, _ = follower.communicate(timeout=30)
@@ -752,7 +1025,7 @@ class ContinuityUnderSystematicFailure(unittest.TestCase):
         self.assertLess(elapsed, 10)
         self.assertEqual((data / 'messages.jsonl').read_bytes(), journal)
         self.assertFalse((data / po.JOURNAL).exists())               # o seguidor nunca escreve em data/
-        records = [json.loads(p.read_text()) for p in spool.glob('*.json')]
+        records = [json.loads(p.read_text()) for p in spool.glob('[0-9a-f]*.json')]
         self.assertEqual(len(records), 5, output)
         self.assertTrue(all(r['status'] == 'technical_failure' for r in records))
         self.assertGreaterEqual(sum(r['reason'] == 'circuit_open' for r in records), 3)
