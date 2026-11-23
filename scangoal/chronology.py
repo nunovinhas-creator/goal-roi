@@ -156,8 +156,8 @@ def archive_snapshot(current, previous, *fields):
     return dict(current, snapshots=versions) if versions else current
 
 
-def iso(dt):
-    return dt.astimezone(UTC).isoformat(timespec='seconds') if dt else None
+def iso(dt, *, timespec='seconds'):
+    return dt.astimezone(UTC).isoformat(timespec=timespec) if dt else None
 
 
 def as_of_view(signals, as_of):
