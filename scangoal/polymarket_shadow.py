@@ -496,8 +496,8 @@ def observe(signal, *, get=http_get, aliases=None, stakes=STAKES_USDC):
         record['timing'] = classify_timing(signal, received, over['source_utc'], kickoff)
         best_ask, best_bid = over['asks'][0], (over['bids'][0] if over['bids'] else None)
         record['quote'] = {
-            'token': 'Over', 'book_hash': over['hash'], 'source_utc': iso(over['source_utc']),
-            'received_utc': iso(received),
+            'token': 'Over', 'book_hash': over['hash'], 'source_utc': over['source_utc'].isoformat(),
+            'received_utc': received.isoformat(),
             'best_ask': str(best_ask[0]), 'best_ask_size': str(best_ask[1]),
             'best_bid': str(best_bid[0]) if best_bid else None,
             'ask_depth_usdc_top5': str(sum(p * s for p, s in over['asks'][:5]).quantize(Decimal('0.01'))),

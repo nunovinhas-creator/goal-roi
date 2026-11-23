@@ -278,6 +278,8 @@ def valid_record(record):
             and record.get('status') in STATUSES and isinstance(record.get('message_id'), int)
             and record.get('execution_proven') is False and record.get('orders_sent') == 0
             and record['key'] == '%d:%s' % (record['message_id'], record.get('version_sha256'))
+            and (not (record.get('fresh_book_proven') or record.get('status') == 'contemporaneous')
+                 or fresh_book(record.get('quote'), record.get('source_age_seconds')))
             # prova de preço só com resposta na janela E livro fresco
             and (record.get('evidence_for_signal') is not True
                  or (record['status'] == 'contemporaneous' and record.get('fresh_book_proven') is True)))
@@ -353,8 +355,8 @@ def classify(obs):
         timing = obs['timing']
         if timing['relation_to_signal'] != 'contemporaneous':
             return 'outside_window', timing['relation_to_signal']
-        if timing['quiet_book']:
-            return 'stale_book', 'source_age_over_%ds' % ps.QUIET_BOOK.total_seconds()
+        if timing['quiet_book'] or not fresh_book(obs.get('quote'), timing.get('source_age_seconds')):
+            return 'stale_book', 'book_freshness_unproven'
         return 'contemporaneous', None
     reason = obs.get('reason')
     if reason in IDENTITY:
@@ -396,20 +398,24 @@ class Budget:
             self.open_reason = '%s:%s' % (obs.get('reason'), detail)
 
 
-def freshness(timing):
-    """Duas provas distintas: resposta recebida na janela de 120 s, e livro alterado há <= FRESH_BOOK_MAX_AGE."""
-    within = bool(timing) and timing.get('relation_to_signal') == 'contemporaneous'
-    age = timing.get('source_age_seconds') if timing else None
-    fresh = (within and isinstance(age, (int, float)) and not isinstance(age, bool)
-             and -ps.CLOCK_SKEW.total_seconds() <= age <= FRESH_BOOK_MAX_AGE.total_seconds())
-    return within, fresh
+def fresh_book(quote, reported_age):
+    """Check the original clocks and the millisecond precision of the stored age."""
+    if not isinstance(quote, dict) or type(reported_age) not in (int, float):
+        return False
+    received = chronology.parse_utc(quote.get('received_utc'))
+    source = chronology.parse_utc(quote.get('source_utc'))
+    if received is None or source is None:
+        return False
+    age = received - source
+    return timedelta(0) <= age <= FRESH_BOOK_MAX_AGE and round(age.total_seconds(), 3) == reported_age
 
 
 def build_record(m, version_sha, obs, status, reason, *, attempted, run):
     quote, timing, clob, contract = (obs.get(k) or {} for k in ('quote', 'timing', 'clob', 'contract'))
     first_read = chronology.parse_utc(m.get('collected_at_utc'))
     received = chronology.parse_utc(quote.get('received_utc'))
-    within, fresh = freshness(timing)
+    within = timing.get('relation_to_signal') == 'contemporaneous'
+    fresh = within and fresh_book(quote, timing.get('source_age_seconds'))
     return {
         'schema': SCHEMA, 'key': '%d:%s' % (m['message_id'], version_sha), 'run': run,
         'message_id': m['message_id'], 'version_sha256': version_sha, 'signal_sha256': signal_hash(m),

@@ -424,6 +424,9 @@ class Steps(unittest.TestCase):
         self.assertEqual(tolerated, ['Fast reads every 2 minutes until the next collection (read-only)',
                                      'Results from BSD (hourly at most; skipped without key)',
                                      'Results from Highlightly (every 90 minutes at most; skipped without key)',
+                                     # P2 Polymarket (ativação): observador sombra, só leitura, nunca bloqueia a recolha.
+                                     'Start the Polymarket shadow observer (inactive by default)',
+                                     'Stop the Polymarket shadow observer and add its observations (inactive by default)',
                                      "Telegram notices through the user's bot (skipped without keys)"])
 
 

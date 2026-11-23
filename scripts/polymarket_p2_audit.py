@@ -57,11 +57,9 @@ def within_window(record, m):
 
 def fresh_price(record, m):
     """Prova de preço fresco: resposta na janela E livro alterado há no máximo FRESH_BOOK_MAX_AGE. stale_book nunca."""
-    age = record.get('source_age_seconds')
     return (record.get('status') == 'contemporaneous' and within_window(record, m)
             and bool(record.get('condition_id')) and bool(record.get('quote'))
-            and isinstance(age, (int, float)) and not isinstance(age, bool)
-            and -2 <= age <= po.FRESH_BOOK_MAX_AGE.total_seconds())
+            and po.fresh_book(record.get('quote'), record.get('source_age_seconds')))
 
 
 def depth(record, stake):

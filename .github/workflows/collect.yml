@@ -52,6 +52,19 @@ jobs:
             gh run download "$artifact_run" -n goal-roi-publication -D "$GOAL_ROI_PUBLICATION_DIR"
           fi
           python -u -m scangoal.publication resume
+      # P2 Polymarket shadow (INACTIVE unless the repository variable GOAL_ROI_POLYMARKET_SHADOW is 'on'). A background
+      # process reads data/messages.jsonl and the public Polymarket book (GET only, no secrets) and writes ONLY to
+      # $RUNNER_TEMP. Its records reach data/ only through the ingest step before the last commit, never during a
+      # publication. Never blocks. Activation: set the variable to 'on'. For subsequent runs: unset it or set it to 'off'.
+      - name: Start the Polymarket shadow observer (inactive by default)
+        if: ${{ !cancelled() && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}
+        continue-on-error: true
+        timeout-minutes: 1
+        env:
+          GOAL_ROI_POLYMARKET_SHADOW: ${{ vars.GOAL_ROI_POLYMARKET_SHADOW }}
+        run: |
+          ulimit -t 60 -v 524288
+          nohup timeout --signal=TERM --kill-after=10s 870s python -u -m scangoal.polymarket_observer follow --spool "$RUNNER_TEMP/goal-roi-polymarket" --seconds 840 > "$RUNNER_TEMP/goal-roi-polymarket.log" 2>&1 < /dev/null &
       - name: Read bot conversation (read-only)
         if: ${{ !cancelled() }}
         env:
@@ -115,6 +128,19 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NOTIFY_DURABLE: git
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
+      - name: Stop the Polymarket shadow observer and add its observations (inactive by default)
+        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}
+        continue-on-error: true
+        timeout-minutes: 1
+        env:
+          GOAL_ROI_POLYMARKET_SHADOW: ${{ vars.GOAL_ROI_POLYMARKET_SHADOW }}
+        run: |
+          if [[ -e "$GOAL_ROI_PUBLICATION_DIR/pending.json" ]]; then
+            python -u -m scangoal.polymarket_observer stop --spool "$RUNNER_TEMP/goal-roi-polymarket"
+            exit 0
+          fi
+          timeout --signal=TERM --kill-after=5s 25s python -u -m scangoal.polymarket_observer ingest --stop-first --spool "$RUNNER_TEMP/goal-roi-polymarket"
+          tail -n 40 "$RUNNER_TEMP/goal-roi-polymarket.log" || true
       - name: Commit data from the fast reads
         if: ${{ !cancelled() && steps.fast.outcome != 'skipped' }}
         run: python -u -m scangoal.publication publish
