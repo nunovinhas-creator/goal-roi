@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-23T05:52:13+00:00",
+ "generated_at_utc": "2026-11-23T05:56:47+00:00",
  "messages": 4114,
  "types": {
   "SERVICE": 10,
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 6686,
+  "versions": 6687,
   "edits_changing_signal": 5,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-23T05:25:34+00:00",
+  "last_collected_at_utc": "2026-11-23T05:56:47+00:00",
   "hl_results": 113,
   "hl_vs_bot_disagreements": 0,
   "hl_near_misses": 70,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-23T05:50:48+00:00",
+  "collector_last_run_utc": "2026-11-23T05:56:47+00:00",
   "name_review": [
    {
     "bot": [
@@ -448,11 +448,11 @@
   "stake_original_seen": 651,
   "stake_no_score_after_kickoff": 92,
   "stake_sent_45_after_kickoff": 199,
-  "goal_lists": 1067,
+  "goal_lists": 1068,
   "goal_lists_consistent": 473
  },
  "unique_bets": 1910,
- "settled_bets": 1561,
+ "settled_bets": 1563,
  "unsettled_market": 262,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
  "min_settled": 300,
@@ -1713,32 +1713,32 @@
   },
   "STAKE_LOAD/live": {
    "bets": 283,
-   "settled": 151,
-   "matches": 108,
-   "wins": 84,
+   "settled": 153,
+   "matches": 109,
+   "wins": 85,
    "pushes": 3,
-   "units": 0.53,
-   "avg_odds": 1.94,
+   "units": 0.13,
+   "avg_odds": 1.936,
    "roi": {
     "odd-0%": {
-     "roi": 0.0035,
+     "roi": 0.0008,
      "ci95": [
-      -0.139,
-      0.146
+      -0.1399,
+      0.1416
      ]
     },
     "odd-2%": {
-     "roi": -0.016,
+     "roi": -0.0186,
      "ci95": [
-      -0.1556,
-      0.1237
+      -0.1565,
+      0.1194
      ]
     },
     "odd-5%": {
-     "roi": -0.0452,
+     "roi": -0.0477,
      "ci95": [
-      -0.1806,
-      0.0902
+      -0.1815,
+      0.086
      ]
     }
    },
@@ -1893,7 +1893,9 @@
     0.26,
     -0.74,
     -0.02,
-    0.53
+    0.53,
+    -0.47,
+    0.13
    ],
    "conclusive": false,
    "note": "sem conclusão (<300 liquidadas)"
@@ -2630,40 +2632,40 @@
   },
   "STAKE_LOAD": {
    "signals": 661,
-   "with_result": 406,
-   "hits": 206,
-   "misses": 190,
+   "with_result": 408,
+   "hits": 207,
+   "misses": 191,
    "pushes": 10,
-   "eff_hits": 203.0,
-   "eff_misses": 188.5,
-   "vote_hits": 98.28,
-   "vote_misses": 94.47,
-   "vote_break_even": 0.5441,
-   "games": 195,
+   "eff_hits": 204.0,
+   "eff_misses": 189.5,
+   "vote_hits": 98.78,
+   "vote_misses": 94.97,
+   "vote_break_even": 0.5445,
+   "games": 196,
    "no_source": 0,
    "unsettleable": 247,
-   "hit_rate": 0.5185,
+   "hit_rate": 0.5184,
    "ci95": [
     0.4691,
-    0.5676
+    0.5674
    ],
-   "avg_odds": 2.687,
-   "break_even": 0.539,
+   "avg_odds": 2.681,
+   "break_even": 0.5395,
    "baseline": false,
-   "roi_announced_odds": -0.0392,
+   "roi_announced_odds": -0.04,
    "seen_late": 9,
    "by_bot_mark": 115,
-   "per_day": 33.8,
+   "per_day": 34.0,
    "days_to_hint": 0,
    "days_to_conclusion": 0,
-   "prudent_rate": 0.5116,
-   "prob_above": 0.1771,
-   "edge": -0.0325,
+   "prudent_rate": 0.5115,
+   "prob_above": 0.1733,
+   "edge": -0.033,
    "edge_ci": [
-    -0.0902,
-    0.025
+    -0.0905,
+    0.0244
    ],
-   "prob_above_cut": 0.1067
+   "prob_above_cut": 0.1038
   },
   "TOTALS_FORM": {
    "signals": 144,
@@ -2844,22 +2846,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 396,
+    "n": 398,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 356,
+     "n": 358,
      "hit_rate": 0.5092,
-     "break_even": 0.5393,
-     "roi": -0.059
+     "break_even": 0.5384,
+     "roi": -0.0586
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.6,
-     "break_even": 0.5364,
-     "roi": 0.127
+     "break_even": 0.5487,
+     "roi": 0.1162
     },
-    "z": 1.14
+    "z": 0.98
    },
    {
     "type": "TOTALS_FORM",
@@ -3602,33 +3604,6 @@
     "value": "seleções"
    },
    {
-    "n": 96,
-    "signals": 202,
-    "hits": 57,
-    "misses": 39,
-    "hit_rate": 0.5916,
-    "ci95": [
-     0.4914,
-     0.6848
-    ],
-    "break_even": 0.559,
-    "roi": 0.0272,
-    "games": 77,
-    "bets": 96,
-    "unidentified": 0,
-    "prudent_rate": 0.5911,
-    "prob_above": 0.7946,
-    "edge": 0.0433,
-    "edge_ci": [
-     -0.0444,
-     0.1286
-    ],
-    "prob_above_cut": 0.7306,
-    "family": "Stake",
-    "dimension": "Momento do aviso",
-    "value": "até 45 min depois do início"
-   },
-   {
     "n": 102,
     "signals": 157,
     "hits": 39,
@@ -3708,6 +3683,33 @@
     "family": "Jogo aberto",
     "dimension": "Parte do jogo",
     "value": "2.ª parte"
+   },
+   {
+    "n": 97,
+    "signals": 202,
+    "hits": 57,
+    "misses": 40,
+    "hit_rate": 0.5855,
+    "ci95": [
+     0.4858,
+     0.6787
+    ],
+    "break_even": 0.5599,
+    "roi": 0.0166,
+    "games": 78,
+    "bets": 97,
+    "unidentified": 0,
+    "prudent_rate": 0.5845,
+    "prob_above": 0.7511,
+    "edge": 0.0354,
+    "edge_ci": [
+     -0.0519,
+     0.1205
+    ],
+    "prob_above_cut": 0.6802,
+    "family": "Stake",
+    "dimension": "Momento do aviso",
+    "value": "até 45 min depois do início"
    },
    {
     "n": 23,
@@ -3818,33 +3820,6 @@
     "value": "liga"
    },
    {
-    "n": 128,
-    "signals": 205,
-    "hits": 74,
-    "misses": 54,
-    "hit_rate": 0.5787,
-    "ci95": [
-     0.4918,
-     0.6611
-    ],
-    "break_even": 0.532,
-    "roi": 0.0982,
-    "games": 74,
-    "bets": 128,
-    "unidentified": 0,
-    "prudent_rate": 0.5824,
-    "prob_above": 0.7016,
-    "edge": 0.0282,
-    "edge_ci": [
-     -0.0614,
-     0.1155
-    ],
-    "prob_above_cut": 0.6264,
-    "family": "Stake",
-    "dimension": "Dia",
-    "value": "dia de semana"
-   },
-   {
     "n": 12,
     "signals": 12,
     "hits": 8,
@@ -3872,31 +3847,31 @@
     "value": "seleções"
    },
    {
-    "n": 64,
-    "signals": 107,
-    "hits": 36,
-    "misses": 28,
-    "hit_rate": 0.5591,
+    "n": 130,
+    "signals": 205,
+    "hits": 75,
+    "misses": 55,
+    "hit_rate": 0.5775,
     "ci95": [
-     0.4371,
-     0.6743
+     0.4912,
+     0.6593
     ],
-    "break_even": 0.5436,
-    "roi": -0.0091,
-    "games": 47,
-    "bets": 64,
+    "break_even": 0.5335,
+    "roi": 0.0937,
+    "games": 75,
+    "bets": 130,
     "unidentified": 0,
-    "prudent_rate": 0.5826,
-    "prob_above": 0.6944,
-    "edge": 0.0327,
+    "prudent_rate": 0.5816,
+    "prob_above": 0.6902,
+    "edge": 0.0262,
     "edge_ci": [
-     -0.076,
-     0.1381
+     -0.0628,
+     0.1131
     ],
-    "prob_above_cut": 0.633,
+    "prob_above_cut": 0.6133,
     "family": "Stake",
-    "dimension": "Outros sinais no mesmo jogo",
-    "value": "jogo com um só tipo de sinal"
+    "dimension": "Dia",
+    "value": "dia de semana"
    },
    {
     "n": 202,
@@ -3951,6 +3926,33 @@
     "family": "Betfair",
     "dimension": "Competição",
     "value": "feminino"
+   },
+   {
+    "n": 66,
+    "signals": 107,
+    "hits": 37,
+    "misses": 29,
+    "hit_rate": 0.5573,
+    "ci95": [
+     0.4371,
+     0.671
+    ],
+    "break_even": 0.5464,
+    "roi": -0.0147,
+    "games": 48,
+    "bets": 66,
+    "unidentified": 0,
+    "prudent_rate": 0.5814,
+    "prob_above": 0.6803,
+    "edge": 0.0298,
+    "edge_ci": [
+     -0.078,
+     0.1344
+    ],
+    "prob_above_cut": 0.617,
+    "family": "Stake",
+    "dimension": "Outros sinais no mesmo jogo",
+    "value": "jogo com um só tipo de sinal"
    },
    {
     "n": 225,
@@ -4147,28 +4149,28 @@
     "band": "odd até 1,50"
    },
    {
-    "n": 824,
+    "n": 826,
     "signals": 1082,
-    "hits": 487,
-    "misses": 337,
-    "hit_rate": 0.5797,
+    "hits": 488,
+    "misses": 338,
+    "hit_rate": 0.5795,
     "ci95": [
-     0.5452,
-     0.6135
+     0.5451,
+     0.6133
     ],
-    "break_even": 0.5805,
-    "roi": 0.0016,
-    "games": 529,
-    "bets": 810,
+    "break_even": 0.5806,
+    "roi": 0.0011,
+    "games": 530,
+    "bets": 812,
     "unidentified": 0,
-    "prudent_rate": 0.5878,
-    "prob_above": 0.6709,
-    "edge": 0.0095,
+    "prudent_rate": 0.5876,
+    "prob_above": 0.6664,
+    "edge": 0.0092,
     "edge_ci": [
-     -0.0263,
-     0.0449
+     -0.0265,
+     0.0446
     ],
-    "prob_above_cut": 0.4597,
+    "prob_above_cut": 0.4545,
     "band": "odd 1,50 a 2,00"
    },
    {
@@ -4223,17 +4225,17 @@
    }
   ],
   "luck": {
-   "n": 1561,
-   "units": 7.72,
-   "luck_sd": 46.51,
-   "z": 0.17,
+   "n": 1563,
+   "units": 7.32,
+   "luck_sd": 46.52,
+   "z": 0.16,
    "max_drawdown": 56.53,
    "longest_losing_run": 9
   },
   "narrative": [
    "O tipo de sinal com melhor evidência é jogo aberto com odd: acertou 162 em 268, precisa de 58 %, e a probabilidade de estar acima do mínimo é 79 %.",
-   "O mais fraco é aposta grande na Stake: 206 em 396, precisa de 54 %, probabilidade de estar acima do mínimo 18 %.",
-   "Saldo de +7,72 unidades em 1561 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±93,0 unidades).",
+   "O mais fraco é aposta grande na Stake: 207 em 398, precisa de 54 %, probabilidade de estar acima do mínimo 17 %.",
+   "Saldo de +7,32 unidades em 1563 apostas, dentro do que a sorte explica (a oscilação normal nesta amostra é de cerca de ±93,0 unidades).",
    "Antes do jogo, a odd desceu depois do sinal em 7 de 33 apostas Betfair com reforço: o mercado não tem acompanhado o sinal.",
    "Forma de golos, parte do jogo = 1.ª parte: 89 em 108 (82 % contra 61 % necessários). Indício positivo.",
    "Forma de golos, dia = fim de semana: 166 em 234 (69 % contra 60 % necessários). Indício positivo.",
@@ -5810,262 +5812,6 @@
   "agenda": {
    "items": [
     {
-     "match_id": "albirex-niigata-women-vs-sanfrecce-hiroshima-women-20261123",
-     "match": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
-     "league": "Japanese Japan Women Empowerment League",
-     "family": "Stake",
-     "type": "STAKE_LOAD",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": "2026-11-23T04:00+00:00",
-     "date_utc": "2026-11-23T05:24:42+00:00",
-     "minute": null,
-     "score_at_signal": [
-      0,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Over 0.5",
-     "odds": 1.6,
-     "odds_last": 1.6,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd 1,50 a 2,00",
-     "odds_band_n": 219,
-     "good": [
-      {
-       "id": "Stake | Faixa de odd = odd 1,50 a 2,00 & Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd 1,50 a 2,00"
-        ],
-        [
-         "Golos até ao sinal",
-         "nenhum"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 17,
-       "games": 17,
-       "hits": 14,
-       "break_even": 0.5806,
-       "prob_above": 0.9559,
-       "roi": 0.4129,
-       "economics": {
-        "admitted": 17,
-        "results_confirmed": 12,
-        "wins": 9,
-        "losses": 3,
-        "voids": 0,
-        "imputed_losses": 1,
-        "pending": 4,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 13,
-        "profit_advertised": 2.07,
-        "profit_odds_minus_2pct": 1.7686,
-        "roi_advertised": 0.1592,
-        "roi_odds_minus_2pct": 0.136,
-        "confirmed_hit_rate": 0.75,
-        "expected_profit": null
-       },
-       "edge": 0.1529,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Golos até ao sinal = nenhum & Sinal anterior de outro tipo no mesmo jogo = não",
-       "conditions": [
-        [
-         "Golos até ao sinal",
-         "nenhum"
-        ],
-        [
-         "Sinal anterior de outro tipo no mesmo jogo",
-         "não"
-        ]
-       ],
-       "n": 22,
-       "games": 22,
-       "hits": 17,
-       "break_even": 0.5774,
-       "prob_above": 0.9466,
-       "roi": 0.4435,
-       "economics": {
-        "admitted": 23,
-        "results_confirmed": 14,
-        "wins": 11,
-        "losses": 3,
-        "voids": 0,
-        "imputed_losses": 4,
-        "pending": 5,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 18,
-        "profit_advertised": 0.62,
-        "profit_odds_minus_2pct": 0.2476,
-        "roi_advertised": 0.0344,
-        "roi_odds_minus_2pct": 0.0138,
-        "confirmed_hit_rate": 0.7857,
-        "expected_profit": null
-       },
-       "edge": 0.1343,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Dia = dia de semana & Golos até ao sinal = nenhum & Mercado = golos (total asiático)",
-       "conditions": [
-        [
-         "Dia",
-         "dia de semana"
-        ],
-        [
-         "Golos até ao sinal",
-         "nenhum"
-        ],
-        [
-         "Mercado",
-         "golos (total asiático)"
-        ]
-       ],
-       "n": 9,
-       "games": 9,
-       "hits": 8,
-       "break_even": 0.5976,
-       "prob_above": 0.9072,
-       "roi": 0.4778,
-       "economics": {
-        "admitted": 2,
-        "results_confirmed": 1,
-        "wins": 1,
-        "losses": 0,
-        "voids": 0,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 1,
-        "profit_advertised": 0.8,
-        "profit_odds_minus_2pct": 0.764,
-        "roi_advertised": 0.8,
-        "roi_odds_minus_2pct": 0.764,
-        "confirmed_hit_rate": 1.0,
-        "expected_profit": null
-       },
-       "edge": 0.138,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 8,
-     "bad": [
-      {
-       "id": "Stake | Mercado = golos (total asiático) & Momento do aviso = mais de 45 min depois do início",
-       "conditions": [
-        [
-         "Mercado",
-         "golos (total asiático)"
-        ],
-        [
-         "Momento do aviso",
-         "mais de 45 min depois do início"
-        ]
-       ],
-       "n": 47,
-       "games": 40,
-       "hits": 22,
-       "break_even": 0.5946,
-       "prob_above": 0.0662,
-       "roi": -0.1738,
-       "economics": {
-        "admitted": 34,
-        "results_confirmed": 33,
-        "wins": 14,
-        "losses": 17,
-        "voids": 2,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 33,
-        "profit_advertised": -8.4,
-        "profit_odds_minus_2pct": -8.822,
-        "roi_advertised": -0.2545,
-        "roi_odds_minus_2pct": -0.2673,
-        "confirmed_hit_rate": 0.4516,
-        "expected_profit": null
-       },
-       "edge": -0.1074,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Stake | Marcador no momento = empatado & Mercado = golos (total asiático) & Momento do aviso = mais de 45 min depois do início",
-       "conditions": [
-        [
-         "Marcador no momento",
-         "empatado"
-        ],
-        [
-         "Mercado",
-         "golos (total asiático)"
-        ],
-        [
-         "Momento do aviso",
-         "mais de 45 min depois do início"
-        ]
-       ],
-       "n": 18,
-       "games": 14,
-       "hits": 6,
-       "break_even": 0.6069,
-       "prob_above": 0.0663,
-       "roi": -0.3214,
-       "economics": {
-        "admitted": 9,
-        "results_confirmed": 8,
-        "wins": 2,
-        "losses": 6,
-        "voids": 0,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "resolved_stake_units": 8,
-        "profit_advertised": -4.3,
-        "profit_odds_minus_2pct": -4.374,
-        "roi_advertised": -0.5375,
-        "roi_odds_minus_2pct": -0.5468,
-        "confirmed_hit_rate": 0.25,
-        "expected_profit": null
-       },
-       "edge": -0.1524,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 9
-    },
-    {
      "match_id": "brentford-vs-everton-20261123",
      "match": "Brentford — Everton",
      "league": "England Premier League",
@@ -7192,12 +6938,12 @@
    ],
    "counts": {
     "favorável": 0,
-    "misto": 3,
+    "misto": 2,
     "sem evidência": 0,
     "contraditório": 0,
     "evitar": 5
    },
-   "generated_utc": "2026-11-23T05:53:24+00:00",
+   "generated_utc": "2026-11-23T05:57:58+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -23879,37 +23625,6 @@
   ],
   "llm_total": 96,
   "watch": [
-   {
-    "date_utc": "2026-11-23T05:24:42+00:00",
-    "match": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
-    "match_id": "albirex-niigata-women-vs-sanfrecce-hiroshima-women-20261123",
-    "type": "STAKE_LOAD",
-    "market": "Asian Total",
-    "selection": "Over 0.5",
-    "odds": 1.6,
-    "kickoff_utc": "2026-11-23T04:00+00:00",
-    "phase": "live",
-    "finished": false,
-    "reasons": [
-     {
-      "id": "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma",
-      "status": "promissora",
-      "n": 55,
-      "games": 40,
-      "hit_rate": 0.6909,
-      "prob_above": 0.9293,
-      "edge": 0.0989,
-      "edge_ci": [
-       -0.0124,
-       0.2018
-      ],
-      "prob_above_cut": 0.9036,
-      "prudent_rate": 0.6836,
-      "break_even": 0.5851,
-      "certified": false
-     }
-    ]
-   },
    {
     "date_utc": "2026-11-23T03:35:36+00:00",
     "match": "Brentford — Everton",
@@ -63350,30 +63065,30 @@
    },
    "STAKE_LOAD": {
     "signals": 651,
-    "with_result": 397,
-    "hits": 203,
-    "misses": 184,
+    "with_result": 399,
+    "hits": 204,
+    "misses": 185,
     "pushes": 10,
-    "eff_hits": 200.0,
-    "eff_misses": 182.5,
-    "vote_hits": 95.78,
-    "vote_misses": 89.97,
-    "vote_break_even": 0.5427,
-    "games": 188,
+    "eff_hits": 201.0,
+    "eff_misses": 183.5,
+    "vote_hits": 96.28,
+    "vote_misses": 90.47,
+    "vote_break_even": 0.5432,
+    "games": 189,
     "no_source": 0,
     "unsettleable": 246,
-    "hit_rate": 0.5229,
+    "hit_rate": 0.5228,
     "ci95": [
-     0.4728,
-     0.5725
+     0.4729,
+     0.5722
     ],
-    "avg_odds": 2.709,
-    "break_even": 0.5381,
+    "avg_odds": 2.703,
+    "break_even": 0.5386,
     "baseline": false,
-    "roi_announced_odds": -0.0301,
+    "roi_announced_odds": -0.031,
     "seen_late": 0,
     "by_bot_mark": 114,
-    "per_day": 36.5,
+    "per_day": 36.7,
     "days_to_hint": 0,
     "days_to_conclusion": 0
    },
@@ -63502,22 +63217,22 @@
    },
    {
     "type": "STAKE_LOAD",
-    "n": 387,
+    "n": 389,
     "needed": 80,
     "state": "estável",
     "before": {
-     "n": 347,
-     "hit_rate": 0.5139,
-     "break_even": 0.5383,
-     "roi": -0.0491
+     "n": 349,
+     "hit_rate": 0.5138,
+     "break_even": 0.5374,
+     "roi": -0.0488
     },
     "recent": {
      "n": 40,
      "hit_rate": 0.6,
-     "break_even": 0.5364,
-     "roi": 0.127
+     "break_even": 0.5487,
+     "roi": 0.1162
     },
-    "z": 1.07
+    "z": 0.91
    },
    {
     "type": "TOTALS_FORM",
@@ -63868,32 +63583,32 @@
   },
   "Q7 Todas as apostas (referência)": {
    "bets": 1910,
-   "settled": 1561,
-   "matches": 778,
-   "wins": 756,
+   "settled": 1563,
+   "matches": 779,
+   "wins": 757,
    "pushes": 104,
-   "units": 7.72,
-   "avg_odds": 2.386,
+   "units": 7.32,
+   "avg_odds": 2.385,
    "roi": {
     "odd-0%": {
-     "roi": 0.0049,
+     "roi": 0.0047,
      "ci95": [
-      -0.0429,
-      0.0528
+      -0.0431,
+      0.0525
      ]
     },
     "odd-2%": {
-     "roi": -0.0134,
+     "roi": -0.0137,
      "ci95": [
-      -0.0603,
-      0.0334
+      -0.0605,
+      0.0331
      ]
     },
     "odd-5%": {
-     "roi": -0.041,
+     "roi": -0.0412,
      "ci95": [
-      -0.0864,
-      0.0044
+      -0.0866,
+      0.0041
      ]
     }
    },
@@ -63909,9 +63624,12 @@
    "match": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
    "selection": "Over 0.5",
    "odds": 1.6,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    1
+   ],
+   "w": 1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -63922,9 +63640,12 @@
    "match": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
    "selection": "Over 1.5",
    "odds": 1.55,
-   "ft": null,
-   "w": null,
-   "settled_by": null,
+   "ft": [
+    0,
+    1
+   ],
+   "w": -1.0,
+   "settled_by": "resultado",
    "n_signals": 1,
    "max_mult": 1
   },
@@ -67471,32 +67192,20 @@
      "total": 5300.0
     }
    ],
-   "goals": null,
-   "goals_source": null,
-   "ft": null
+   "goals": [
+    [
+     64,
+     "0-1"
+    ]
+   ],
+   "goals_source": "bot",
+   "ft": [
+    0,
+    1
+   ]
   }
  },
  "timeline": [
-  {
-   "d": "2026-11-21T08:05:54+00:00",
-   "u": 24.53,
-   "g": -1.0,
-   "w": -1.0,
-   "t": "STAKE_LOAD",
-   "m": "Manchester City — Fulham",
-   "s": "Over 3.5",
-   "o": 1.96
-  },
-  {
-   "d": "2026-11-21T08:07:41+00:00",
-   "u": 26.98,
-   "g": 2.45,
-   "w": 1.0,
-   "t": "POLYMARKET",
-   "m": "Manchester City — Fulham",
-   "s": "Polymarket: AH2(+0.5)",
-   "o": 3.45
-  },
   {
    "d": "2026-11-21T08:17:36+00:00",
    "u": 27.4,
@@ -73476,6 +73185,26 @@
    "m": "Vancouver — Salt Lake",
    "s": "Under 3",
    "o": 1.55
+  },
+  {
+   "d": "2026-11-23T04:24:08+00:00",
+   "u": 6.72,
+   "g": -1.0,
+   "w": -1.0,
+   "t": "STAKE_LOAD",
+   "m": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
+   "s": "Over 1.5",
+   "o": 1.55
+  },
+  {
+   "d": "2026-11-23T05:24:42+00:00",
+   "u": 7.32,
+   "g": 0.6,
+   "w": 1.0,
+   "t": "STAKE_LOAD",
+   "m": "Albirex Niigata Women — Sanfrecce Hiroshima Women",
+   "s": "Over 0.5",
+   "o": 1.6
   }
  ],
  "daily": [
@@ -73565,9 +73294,9 @@
   },
   {
    "bets": 10,
-   "settled": 2,
-   "wins": 1,
-   "units": 0.55,
+   "settled": 4,
+   "wins": 2,
+   "units": 0.15,
    "day": "2026-11-23"
   }
  ]
