@@ -13,7 +13,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from .opportunity_results import remember_provider_results
+from . import chronology
+from .opportunity_results import ft_time_valid, remember_provider_results
 from .store import data_dir
 
 ROOT = 'https://sports.bzzoiro.com/api/v2/events/'
@@ -79,10 +80,13 @@ def kickoff_of(event):
 def time_ok(target, ko):
     if ko is None:
         return False
-    if target.get('kickoff_utc'):
-        return abs((ko - datetime.fromisoformat(target['kickoff_utc'])).total_seconds()) <= 90 * 60
-    signal = datetime.fromisoformat(target['date_utc'])
-    return timedelta(0) <= signal - ko <= timedelta(minutes=150)
+    scheduled = chronology.kickoff_time(target)
+    if scheduled is not None:
+        return abs(ko - scheduled) <= timedelta(minutes=15)
+    signal, minute = chronology.signal_time(target), target.get('minute')
+    return (target.get('phase') == 'live' and signal is not None and timedelta(0) <= signal - ko <= timedelta(minutes=150)
+            and (minute is None or (type(minute) is int and 0 <= minute <= 120
+                                    and timedelta(minutes=-5) <= signal - ko - timedelta(minutes=minute) <= timedelta(minutes=45))))
 
 
 def score_of(event):
@@ -92,9 +96,17 @@ def score_of(event):
     return [h, a] if all(type(n) is int and n >= 0 for n in (h, a)) and type(event.get('id')) is int else None
 
 
+def competition_ok(target, event, *, provider_id=None):
+    expected = norm_team(target.get('league'))
+    observed = norm_team(name_of(event, 'league') or name_of(event, 'competition'))
+    if expected and observed:
+        return expected == observed
+    return type(provider_id) is int and provider_id == event.get('id')
+
+
 def match_events(targets, events, aliases, unfinished=None):
     """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
-    names = lambda name: {norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}
+    names = lambda name: ({norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}) - {''}
     found, near = {}, {}
     index = {}
     for ev in events:
@@ -102,37 +114,57 @@ def match_events(targets, events, aliases, unfinished=None):
             index.setdefault((norm_team(name_of(ev, 'home_team')), norm_team(name_of(ev, 'away_team'))), []).append(ev)
     for mid, t in targets.items():
         homes, aways = names(t['teams'][0]), names(t['teams'][1])
-        cands = [ev for h in homes for a in aways for ev in index.get((h, a), []) if time_ok(t, kickoff_of(ev))]
+        provider_id = t.get('provider_id')
+        candidates = [ev for h in homes for a in aways for ev in index.get((h, a), []) if time_ok(t, kickoff_of(ev))]
+        cands = [ev for ev in candidates if (provider_id is None or provider_id == ev.get('id'))
+                 and competition_ok(t, ev, provider_id=provider_id)]
         scored = [(ev, score_of(ev)) for ev in cands]
         if len(cands) == 1 and scored[0][1]:
             ev = cands[0]
-            found[mid] = {'ft': scored[0][1], 'bsd_id': ev['id'], 'home': name_of(ev, 'home_team'), 'away': name_of(ev, 'away_team'),
-                          'event_date': kickoff_of(ev).isoformat(timespec='minutes')}
+            found[mid] = dict(event_binding(mid, t, ev), ft=scored[0][1])
         elif len(cands) == 1 and unfinished is not None:
-            unfinished[mid] = {'status': str(cands[0].get('status')), 'id': cands[0].get('id')}
+            unfinished[mid] = dict(event_binding(mid, t, cands[0]), status=str(cands[0].get('status')), id=cands[0].get('id'))
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
             n = [[name_of(ev, 'home_team'), name_of(ev, 'away_team')] for (h, a), evs in index.items() if (h in homes) != (a in aways)
                  for ev in evs if time_ok(t, kickoff_of(ev))]
-            if n:
-                near[mid] = {'bot': t['teams'], 'bsd_candidates': n[:3]}
+            if n or candidates:
+                near[mid] = {'bot': t['teams'], 'bsd_candidates': n[:3], 'competition_review': [
+                    {'provider_id': ev.get('id'), 'league': name_of(ev, 'league') or name_of(ev, 'competition') or None,
+                     'event_date': kickoff_of(ev).isoformat()} for ev in candidates[:3]]}
     return found, near
+
+
+def event_binding(mid, target, event):
+    return {'fixture_id': mid, 'bsd_id': event.get('id'), 'home': name_of(event, 'home_team'),
+            'away': name_of(event, 'away_team'), 'event_date': kickoff_of(event).isoformat(),
+            'league': name_of(event, 'league') or name_of(event, 'competition') or None,
+            'target_league': target.get('league'), 'target_teams': target.get('teams'),
+            'identity_method': 'provider_id' if type(target.get('provider_id')) is int else 'competition_participants_kickoff',
+            'link': event.get('url')}
 
 
 def capture_result_versions(state, found, events, observed_at):
     """Capture every FT version returned by the ordinary quota-limited queries."""
+    found = {mid: row for mid, row in found.items()
+             if ft_time_valid(chronology.parse_utc(row.get('event_date')), observed_at, observed_at, None, observed_at)}
     remember_provider_results(state, found, observed_at)
     by_provider_id = {}
     for event in events:
         if isinstance(event, dict) and type(event.get('id')) is int:
             by_provider_id.setdefault(event['id'], []).append(event)
     for match_id, stored in state['results'].items():
+        bound_id = stored.get('bsd_id') if match_id in found or stored.get('identity_method') == 'provider_id' else None
         for event in by_provider_id.get(stored.get('bsd_id'), ()):
             score, kickoff = score_of(event), kickoff_of(event)
-            if (score is not None and kickoff is not None
-                    and kickoff.isoformat(timespec='minutes') == stored.get('event_date')
+            if (score is not None and ft_time_valid(kickoff, observed_at, observed_at, None, observed_at)
+                    and kickoff == chronology.parse_utc(stored.get('event_date'))
+                    and competition_ok(stored, event, provider_id=bound_id)
                     and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
                             for side in ('home', 'away'))):
-                remember_provider_results(state, {match_id: dict(stored, ft=score)}, observed_at)
+                update = dict(stored, ft=score, home=name_of(event, 'home_team'), away=name_of(event, 'away_team'))
+                if 'url' in event:
+                    update['link'] = event['url']
+                remember_provider_results(state, {match_id: update}, observed_at)
 
 
 def load_result_state(path):
@@ -160,9 +192,10 @@ def save_result_state(path, state):
 def pending_targets(now, max_age_days=MAX_AGE_DAYS):
     """Jogos com apostas, sem resultado guardado da BSD, já terminados há tempo suficiente e não demasiado antigos."""
     from .report import build_bets, load
-    msgs, ft, marks, notes, _ = load()
+    chron = {}
+    msgs, ft, marks, notes, _ = load(chron, as_of=now)
     out = {}
-    for b in build_bets(msgs, ft, marks, notes, strict=False):
+    for b in build_bets(msgs, ft, marks, notes, strict=False, chronology=chron, now=now):
         # Betfair: sempre (o bot nunca dá o resultado). Outros tipos: só se o bot não o deu.
         if not (b['type'] == 'BETFAIR' or b['ft'] is None) or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
             continue
@@ -170,7 +203,8 @@ def pending_targets(now, max_age_days=MAX_AGE_DAYS):
         # Só o estado "terminado" da fonte liquida; por isso pode pedir-se cedo e repetir: 1h50 depois do início, ou 1h45 depois de um sinal ao vivo.
         wait = timedelta(minutes=110) if b['kickoff_utc'] else timedelta(minutes=105)
         if wait <= now - ref <= timedelta(days=max_age_days):
-            out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'],
+            out.setdefault(b['match_id'], {'teams': b['teams'], 'date_utc': b['date_utc'], 'kickoff_utc': b['kickoff_utc'], 'league': b.get('league'),
+                                             'phase': b.get('phase'), 'minute': b.get('minute'),
                                              'days': sorted({ref.date().isoformat(), (ref - timedelta(minutes=150)).date().isoformat()})})
     return out
 

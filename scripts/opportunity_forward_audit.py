@@ -11,7 +11,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scangoal import opportunity_forward, opportunity_results, report
+from scangoal import details_hl, opportunity_forward, opportunity_results, report
 from scangoal.store import data_dir
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,11 +25,15 @@ def read_json(path, default):
         return default
 
 
-def sourced_results(observed, directory):
+def sourced_results(observed, directory, as_of=None):
     """Collect independent, timestamped versions without choosing a score yet."""
     providers = {"highlightly": read_json(directory / "results_hl.json", {}),
                  "bsd": read_json(directory / "results_bsd.json", {})}
-    return opportunity_results.merge_sources(observed, providers)
+    merged = opportunity_results.merge_sources(observed, providers)
+    now = as_of if as_of is not None else datetime.now(timezone.utc)
+    for mid, versions in details_hl.observations(details_hl.load_state(directory), now).items():
+        merged.setdefault(mid, []).extend(versions)
+    return merged
 
 
 def audit_clock():
@@ -50,7 +54,7 @@ def main():
     activation = ((state.get("migrations") or {}).get("polymarket_over25_v1") or {}).get("at_utc")
     observed = {}
     messages, _, _, _, _ = report.load(result_observations=observed, as_of=now)
-    results = sourced_results(observed, directory)
+    results = sourced_results(observed, directory, now)
     result = opportunity_forward.evaluate(
         messages, results, protocol,
         activation_utc=activation,

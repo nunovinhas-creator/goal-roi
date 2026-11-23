@@ -43,6 +43,19 @@ Spartak Trnava Women 1
 Goal in 15′: 50% · usual 37%"""
 
 
+def received_row(mid, text, date, earliest):
+    sent = datetime.fromisoformat(date)
+    received = max(sent + timedelta(seconds=30), datetime.fromisoformat(earliest))
+    edited = None
+    if '🏁 FT ' in text:
+        kickoff = parse(text).get('kickoff_utc')
+        latest_start = max(sent, datetime.fromisoformat(kickoff)) if kickoff else sent
+        edited = (latest_start + timedelta(hours=2)).isoformat()
+        received = max(received, datetime.fromisoformat(edited))
+    return {'message_id': mid, 'date_utc': date, 'edit_date_utc': edited,
+            'collected_at_utc': received.isoformat(), 'text': text}
+
+
 class Parser(unittest.TestCase):
     def test_betfair_pre(self):
         p = parse(BETFAIR_PRE)
@@ -133,7 +146,7 @@ class Report(unittest.TestCase):
                 del os.environ['SCANGOAL_DATA_DIR']
 
     def row(self, mid, text, date='2026-11-11T17:49:00+00:00'):
-        return {'message_id': mid, 'date_utc': date, 'edit_date_utc': None, 'collected_at_utc': '2026-11-11T18:00:00+00:00', 'text': text}
+        return received_row(mid, text, date, '2026-11-11T18:00:00+00:00')
 
     def test_first_signal_rule_reinforcement_and_exclusions(self):
         x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
@@ -164,8 +177,8 @@ class Report(unittest.TestCase):
         no_odds = OPEN.replace('💰 O 5: 1.81\n', '').replace('czarni-sosnowiec-women-vs-sk-brann-women', 'a-vs-b')
         odd_market = STAKE.replace('Asian Total → Under 3.25 @ 1.70', '2nd Team to Score → Bosnia @ 2.10')
         rows = [self.row(1, STAKE_FT),                                                    # vista já com resultado: fora do ROI, dentro do acerto
-                self.row(2, no_odds + '\n\n🏁 FT 0:4'),                                    # sem odd e sem mais golos -> falha
-                self.row(3, OPEN + '\n\n🏁 FT 1:4 · Over 5 ✅'),                            # devolvida
+                self.row(2, no_odds), self.row(2, no_odds + '\n\n🏁 FT 0:4'),                                    # sem odd e sem mais golos -> falha
+                self.row(3, OPEN), self.row(3, OPEN + '\n\n🏁 FT 1:4 · Over 5 ✅'),                            # devolvida
                 self.row(4, odd_market.replace('bosnia-u19-vs-san-marino-u19', 'c-vs-d')),
                 self.row(4, odd_market.replace('bosnia-u19-vs-san-marino-u19', 'c-vs-d') + '\n\n🏁 FT 2:1 · 2nd Team to Score → Bosnia ✅'),
                 self.row(5, BETFAIR_PRE), self.row(6, '🏁 Full time: Barnsley 0:0 Oldham\nNote.', '2026-11-11T21:00:00+00:00')]
@@ -196,7 +209,9 @@ class BSD(unittest.TestCase):
         self.dir.cleanup()
 
     def ev(self, i, home, away, when, h=2, a=0, status='finished'):
-        return {'id': i, 'status': status, 'event_date': when, 'home_team': {'name': home}, 'away_team': away, 'home_score': h, 'away_score': a}
+        league = parse(BETFAIR_PRE if home.startswith('Barnsley') else BETFAIR_LIVE)['league']
+        return {'id': i, 'status': status, 'event_date': when, 'home_team': {'name': home}, 'away_team': away,
+                'home_score': h, 'away_score': a, 'league': league}
 
     def run_bsd(self, pages, **kw):
         from datetime import datetime, timezone
@@ -234,7 +249,7 @@ class BSD(unittest.TestCase):
     def test_unfinished_ambiguous_throttle_and_missing_key(self):
         from datetime import datetime, timezone
         from scangoal import results_bsd
-        dup = {'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z'), self.ev(13, 'Barnsley', 'Oldham', '2026-11-11T19:30:00Z'),
+        dup = {'results': [self.ev(10, 'Barnsley', 'Oldham', '2026-11-11T19:00:00Z'), self.ev(13, 'Barnsley', 'Oldham', '2026-11-11T19:10:00Z'),
                            self.ev(14, 'Sheff Wed', 'Accrington', '2026-11-11T19:00:00Z', status='inprogress')], 'next': None}
         state, _ = self.run_bsd([dup])
         self.assertEqual(state['results'], {})                                   # dois candidatos / não terminado: fica em aberto
@@ -304,7 +319,7 @@ class Hardening(unittest.TestCase):
                 del os.environ['SCANGOAL_DATA_DIR']
 
     def row(self, i, text, date):
-        return {'message_id': i, 'date_utc': date, 'edit_date_utc': None, 'collected_at_utc': '2026-11-11T12:00:00+00:00', 'text': text}
+        return received_row(i, text, date, '2026-11-11T12:00:00+00:00')
 
     def test_stake_phase_comes_from_time_not_from_layout(self):
         pre_layout = STAKE.replace('Bosnia U19     0\nSan Marino U19 0', 'Bosnia U19 — San Marino U19')       # o bot reescreve ao editar
@@ -431,11 +446,12 @@ Liverpool Women — Aston Villa Women
                  'results_hl.json': {'results': {}, 'last_run_utc': '2026-11-12T11:00:00+00:00', 'near_misses': {}, 'not_regular_time': {'m': {'status': 'Finished after extra time', 'id': 1}}}}
         r, _ = self.build([self.row(1, old, '2026-01-01T12:00:00+00:00')], extra)
         self.assertEqual((r['accuracy']['BETFAIR/live']['no_source'], r['audit']['deleted_by_bot'], r['audit']['ended_after_90']), (1, 2, 1))
-        target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None}}
-        ev = {'id': 1, 'status': 'Finished after extra time', 'event_date': '2026-11-11T12:00:00+00:00', 'home_team': 'A', 'away_team': 'B', 'home_score': None, 'away_score': None}
+        target = {'m': {'teams': ['A', 'B'], 'date_utc': '2026-11-11T12:30:00+00:00', 'kickoff_utc': None, 'phase': 'live', 'league': 'Cup A'}}
+        ev = {'id': 1, 'status': 'Finished after extra time', 'event_date': '2026-11-11T12:00:00+00:00', 'home_team': 'A', 'away_team': 'B', 'league': 'Cup A', 'home_score': None, 'away_score': None}
         unfinished = {}
         found, near = results_bsd.match_events(target, [ev], {}, unfinished)
-        self.assertEqual((found, near, unfinished), ({}, {}, {'m': {'status': 'Finished after extra time', 'id': 1}}))
+        self.assertEqual((found, near), ({}, {}))
+        self.assertEqual((unfinished['m']['status'], unfinished['m']['id']), ('Finished after extra time', 1))
         wf = Path('.github/workflows/collect.yml').read_text(encoding='utf-8')
         self.assertNotIn("github.event_name == 'workflow_dispatch' && '0'", wf)                         # execução manual já não gasta quota sozinha
         self.assertIn('timeout 85s python scripts/dispatch_collection.py', wf)
@@ -646,7 +662,9 @@ class GoalMinutes(Hardening):
         self.assertEqual(r['accuracy']['GOAL_BREWING']['misses'], 1)                                    # golo aos 41: fora da janela
         r, _ = self.build([self.row(1, brew, '2026-11-11T16:00:00+00:00')])
         self.assertEqual(r['accuracy']['GOAL_BREWING']['with_result'], 0)                               # sem minutos dos golos: fica em aberto
-        live = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'petrzalka-vs-trnava-20261111')
+        live = BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor-20261111', 'petrzalka-vs-trnava-20261111').replace(
+            'Kucukcekmece Sinopspor — Fatsa Belediyespor · 🇹🇷 Turkish 3 Lig',
+            'FC Petrzalka Women — Spartak Trnava Women · Slovakian 1 Liga Women')
         r, _ = self.build([self.row(1, live, '2026-11-11T16:00:00+00:00')], details([[10, 0, 'home'], [80, 0, 'away'], [105, 0, 'home']], 'Finished after extra time', [1, 1]))
         self.assertEqual((r['recent_bets'][0]['ft'], r['recent_bets'][0]['w'], r['recent_bets'][0]['settled_by']), ([1, 1], 1.0, 'resultado HL aos 90 min'))   # empate aos 90
 
@@ -715,8 +733,8 @@ class LanguageModel(Hardening):
 
     def test_modes_rotate_notes_are_anchored_and_budget_stops_the_day(self):
         from scangoal import llm, report
-        live = [BETFAIR_LIVE.replace('kucukcekmece-sinopspor-vs-fatsa-belediyespor', f'm{i}')
-                .replace('Kucukcekmece Sinopspor', f'Home {i}') for i in range(9)]
+        live = [BETFAIR_PRE.replace('barnsley-vs-oldham', f'm{i}').replace('Barnsley — Oldham', f'Home {i} — Oldham')
+                .replace('1 · Barnsley @', 'X · Draw @') for i in range(9)]
         prompts = []
         def call(account, key, model, prompt):
             prompts.append(prompt)
@@ -728,8 +746,9 @@ class LanguageModel(Hardening):
             try:
                 rows = [self.row(i, live[i], '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
                 rows += [self.row(i, live[i] + '\n\n🏁 FT 1:1', '2026-11-11T12:%02d:00+00:00' % i) for i in range(9)]
-                for r in rows:   # PR 3 (P2-K): each version is read after it was sent (the shared helper reads all at 12:00)
-                    r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
+                for r in rows:
+                    if r['edit_date_utc'] is None:
+                        r['collected_at_utc'] = (datetime.fromisoformat(r['date_utc']) + timedelta(minutes=1)).isoformat()
                 store.append_versions(rows)
                 t0, modes = datetime.fromisoformat('2026-11-12T01:00:00+00:00'), []
                 report.build(register=True, now=t0 - timedelta(minutes=1))
@@ -984,8 +1003,7 @@ class Insights(unittest.TestCase):
                 empty = report.build()
                 self.assertEqual(empty['insights']['narrative'], ['Ainda não há resultados suficientes para interpretar.'])
                 x4 = BETFAIR_PRE.replace('×8', '×4').replace('@1.60', '@1.83')
-                row = lambda i, t: {'message_id': i, 'date_utc': '2026-11-11T17:%02d:00+00:00' % i, 'edit_date_utc': None,
-                                    'collected_at_utc': '2026-11-11T17:05:00+00:00', 'text': t}
+                row = lambda i, t: received_row(i, t, '2026-11-11T17:%02d:00+00:00' % i, '2026-11-11T17:05:00+00:00')
                 store.append_versions([row(1, x4), row(2, BETFAIR_PRE), row(3, OPEN), row(3, OPEN + '\n\n🏁 FT 1:5 · Over 5 ✅')])
                 r = report.build()
             finally:
