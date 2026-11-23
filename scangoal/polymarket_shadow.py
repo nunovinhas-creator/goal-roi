@@ -95,14 +95,14 @@ def utc_now():
     return datetime.now(timezone.utc)
 
 
-def http_get(url, *, opener=None, clock=utc_now):
+def http_get(url, *, opener=None, clock=utc_now, timeout=TIMEOUT):
     """GET público. Devolve corpo, hash e as duas horas locais (pedido e receção)."""
     guard_url(url)
     request = Request(url, headers=dict(REQUEST_HEADERS), method='GET')
     open_url = opener if opener is not None else OPENER.open
     requested = clock()
     try:
-        with open_url(request, timeout=TIMEOUT) as response:
+        with open_url(request, timeout=timeout) as response:
             final = response.geturl() if hasattr(response, 'geturl') else url
             if final != url:
                 raise Refusal('redirect_refused', {'location': final})
@@ -430,15 +430,18 @@ def locate(signal, fetch, aliases, statuses=('active',)):
     if not in_scope(signal):
         raise Refusal('signal_not_in_scope')
     utc(signal.get('kickoff_utc'), 'signal.kickoff_utc')
-    teams = signal.get('teams') or []
+    teams = [str(t) for t in signal.get('teams') or []]
+    # A pesquisa só encontra candidatos; a identidade continua a ser decidida por main_event (igualdade exata).
+    # "casa vs fora" evita que mercados de longo prazo de equipas populares tapem o jogo; depois, "casa fora".
+    attempts = [(status, text) for status in statuses for text in (' vs '.join(teams), ' '.join(teams))]
     parent = None
-    for status in statuses:
-        query = urlencode({'q': ' '.join(teams), 'limit_per_type': 10, 'events_status': status})
+    for index, (status, text) in enumerate(attempts):
+        query = urlencode({'q': text, 'limit_per_type': 10, 'events_status': status})
         try:
             parent = main_event(fetch(GAMMA + '/public-search?' + query)['payload'], signal, aliases)
             break
         except Refusal as exc:
-            if exc.code != 'identity_not_found' or status == statuses[-1]:
+            if exc.code != 'identity_not_found' or index == len(attempts) - 1:
                 raise
     child = fetch(GAMMA + '/events/slug/' + quote(str(parent.get('slug')) + '-more-markets', safe=''))['payload']
     verify_child(child, parent, signal, aliases)

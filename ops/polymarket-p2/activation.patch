@@ -1,0 +1,66 @@
+diff --git a/.github/workflows/collect.yml b/.github/workflows/collect.yml
+index ec67a02..b44663c 100644
+--- a/.github/workflows/collect.yml
++++ b/.github/workflows/collect.yml
+@@ -52,6 +52,18 @@ jobs:
+             gh run download "$artifact_run" -n goal-roi-publication -D "$GOAL_ROI_PUBLICATION_DIR"
+           fi
+           python -u -m scangoal.publication resume
++      # P2 Polymarket shadow (INACTIVE unless the repository variable GOAL_ROI_POLYMARKET_SHADOW is 'on'). A background
++      # process reads data/messages.jsonl and the public Polymarket book (GET only, no secrets) and writes ONLY to
++      # $RUNNER_TEMP. Its records reach data/ only through the ingest step before the last commit, never during a
++      # publication. Never blocks. Activation: set the variable to 'on'. Immediate rollback: unset it or set it to 'off'.
++      - name: Start the Polymarket shadow observer (inactive by default)
++        if: ${{ !cancelled() && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}
++        continue-on-error: true
++        timeout-minutes: 1
++        env:
++          GOAL_ROI_POLYMARKET_SHADOW: ${{ vars.GOAL_ROI_POLYMARKET_SHADOW }}
++        run: |
++          nohup timeout --signal=TERM --kill-after=10s 870s python -u -m scangoal.polymarket_observer follow --spool "$RUNNER_TEMP/goal-roi-polymarket" --seconds 840 > "$RUNNER_TEMP/goal-roi-polymarket.log" 2>&1 < /dev/null &
+       - name: Read bot conversation (read-only)
+         if: ${{ !cancelled() }}
+         env:
+@@ -115,6 +127,15 @@ jobs:
+           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+           NOTIFY_DURABLE: git
+         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
++      - name: Stop the Polymarket shadow observer and add its observations (inactive by default)
++        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}
++        continue-on-error: true
++        timeout-minutes: 1
++        env:
++          GOAL_ROI_POLYMARKET_SHADOW: ${{ vars.GOAL_ROI_POLYMARKET_SHADOW }}
++        run: |
++          timeout --signal=TERM --kill-after=5s 25s python -u -m scangoal.polymarket_observer ingest --stop-first --spool "$RUNNER_TEMP/goal-roi-polymarket"
++          tail -n 40 "$RUNNER_TEMP/goal-roi-polymarket.log" || true
+       - name: Commit data from the fast reads
+         if: ${{ !cancelled() && steps.fast.outcome != 'skipped' }}
+         run: python -u -m scangoal.publication publish
+diff --git a/tests/test_git_persistence.py b/tests/test_git_persistence.py
+index 95746ee..c6e16e0 100644
+--- a/tests/test_git_persistence.py
++++ b/tests/test_git_persistence.py
+@@ -503,6 +503,8 @@ def simulate_job(text, failing):
+             "steps.fast.outcome != 'skipped'": 'Fast reads every 2 minutes until the next collection (read-only)' in ran,
+             "steps.publication.outputs.pending == 'true'": pending,
+             "steps.publication.outputs.pending != 'true'": not pending,
++            # P2 Polymarket (ativação): simula o observador ligado; os seus passos toleram falhas.
++            "vars.GOAL_ROI_POLYMARKET_SHADOW == 'on'": True,
+         }
+         go = all(facts[part] for part in cond.split(' && '))
+         if not go:
+diff --git a/tests/test_silent_failures.py b/tests/test_silent_failures.py
+index c76fcc9..f637617 100644
+--- a/tests/test_silent_failures.py
++++ b/tests/test_silent_failures.py
+@@ -424,6 +424,9 @@ class Steps(unittest.TestCase):
+         self.assertEqual(tolerated, ['Fast reads every 2 minutes until the next collection (read-only)',
+                                      'Results from BSD (hourly at most; skipped without key)',
+                                      'Results from Highlightly (every 90 minutes at most; skipped without key)',
++                                     # P2 Polymarket (ativação): observador sombra, só leitura, nunca bloqueia a recolha.
++                                     'Start the Polymarket shadow observer (inactive by default)',
++                                     'Stop the Polymarket shadow observer and add its observations (inactive by default)',
+                                      "Telegram notices through the user's bot (skipped without keys)"])
+ 
+ 
