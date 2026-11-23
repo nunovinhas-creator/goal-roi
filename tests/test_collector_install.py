@@ -119,7 +119,12 @@ class WorkflowInstall(unittest.TestCase):
         workflows = ROOT/'.github/workflows'
         initializer = 'initialize-workers-ai-budget.yml'
         self.assertEqual(sorted(p.name for p in workflows.iterdir()),
-                         ['collect.yml', 'continuity.yml', initializer, 'tests.yml'])
+                         ['collect.yml', 'continuity.yml', initializer, 'polymarket-rehearsal.yml', 'tests.yml'])
+        rehearsal = (workflows/'polymarket-rehearsal.yml').read_text(encoding='utf-8')
+        self.assertIn('permissions:\n  contents: read\njobs:', rehearsal)
+        self.assertIn('persist-credentials: false', rehearsal)
+        self.assertNotIn('secrets.', rehearsal)
+        self.assertNotIn('pull_request_target', rehearsal)
         text = (workflows/initializer).read_text(encoding='utf-8')
         self.assertEqual(re.findall(r'^on: (.+)$', text, re.M), ['workflow_dispatch'])
         self.assertIn('permissions:\n  contents: write\n\njobs:', text)

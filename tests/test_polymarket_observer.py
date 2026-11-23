@@ -1,6 +1,7 @@
 """P2 — testes adversariais e de continuidade do observador Polymarket (offline; nenhum pedido de rede real)."""
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -627,11 +628,11 @@ class ProspectiveAudit(Harness):
         for age, fresh in ((300, True), (301, False)):
             with self.subTest(age=age):
                 record = {'status': 'contemporaneous', 'source_age_seconds': age, 'condition_id': 'c',
-                          'first_read_utc': RECEIVED.isoformat(), 'quote': {'received_utc': RECEIVED.isoformat()}}
+                          'first_read_utc': RECEIVED.isoformat(), 'quote': {'received_utc': RECEIVED.isoformat(),
+                                                                           'source_utc': (RECEIVED - timedelta(seconds=age)).isoformat()}}
                 m = {'collected_at_utc': RECEIVED.isoformat(), 'kickoff_utc': KICKOFF.isoformat()}
                 self.assertEqual(audit.fresh_price(record, m), fresh)
-                self.assertEqual(po.freshness({'relation_to_signal': 'contemporaneous',
-                                               'source_age_seconds': age})[1], fresh)
+                self.assertEqual(po.fresh_book(record['quote'], age), fresh)
 
     def test_tampered_records_cannot_claim_a_fresh_price(self):
         self.stale_book()
@@ -643,6 +644,10 @@ class ProspectiveAudit(Harness):
         messages, first, _, runs = self.snapshot()
         good = self.fresh_record()
         cases = {
+            'forged age': dict(record, status='contemporaneous', source_age_seconds=0),
+            'missing source': dict(good, quote=dict(good['quote'], source_utc=None)),
+            'future source': dict(good, source_age_seconds=0, quote=dict(good['quote'],
+                source_utc=(RECEIVED + timedelta(microseconds=1)).isoformat())),
             'stale relabelled': dict(record, status='contemporaneous'),
             'stale with a young age': dict(good, status='stale_book'),
             'old book': dict(good, source_age_seconds=400),
@@ -865,10 +870,9 @@ class IncrementalJournal(Harness):
 
 
 class ProductionIsolation(unittest.TestCase):
-    """Esta PR não toca no workflow de produção; a ativação é um patch separado, provado aqui com os testes do projeto."""
+    """Compara os passos existentes com o workflow anterior à ativação."""
 
     MARKER = 'GOAL_ROI_POLYMARKET_SHADOW'
-    PATCH = ROOT / 'ops/polymarket-p2/activation.patch'
     FILES = ('.github/workflows/collect.yml', 'tests/test_silent_failures.py', 'tests/test_git_persistence.py')
     START = 'Start the Polymarket shadow observer (inactive by default)'
     STOP = 'Stop the Polymarket shadow observer and add its observations (inactive by default)'
@@ -878,9 +882,11 @@ class ProductionIsolation(unittest.TestCase):
         for name in self.FILES:
             (self.tmp / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, self.tmp / name)
-        subprocess.run(['git', 'apply', str(self.PATCH)], cwd=self.tmp, check=True, capture_output=True, timeout=20)
-        self.original = (ROOT / self.FILES[0]).read_text(encoding='utf-8')
-        self.patched = (self.tmp / self.FILES[0]).read_text(encoding='utf-8')
+        self.patched = (ROOT / self.FILES[0]).read_text()
+        self.original = re.sub(r'^      # P2 Polymarket shadow.*?(?=^      - name: Read bot conversation)',
+                               '', self.patched, flags=re.M | re.S)
+        self.original = re.sub('^      - name: ' + re.escape(self.STOP) + r'.*?(?=^      - name: Commit data)',
+                               '', self.original, flags=re.M | re.S)
 
     @staticmethod
     def blocks(text):
@@ -904,10 +910,8 @@ class ProductionIsolation(unittest.TestCase):
     def test_production_workflow_untouched(self):
         self.assertNotIn(self.MARKER, self.original)
         self.assertNotIn('polymarket', self.original.lower())
-        base = subprocess.run(['git', '-C', str(ROOT), 'show', 'origin/main:' + self.FILES[0]],
-                              capture_output=True, text=True)
-        if base.returncode == 0 and self.MARKER not in base.stdout:
-            self.assertEqual(self.original, base.stdout)
+        self.assertEqual(hashlib.sha256(self.original.encode()).hexdigest(),
+                         '1146e7e68f2034c1970c42b5c28a94db07c018bcb2fa1b9298d8a2dd9d129e7d')
 
     def test_patch_only_adds_gated_bounded_non_blocking_steps(self):
         blocks, names = self.blocks(self.patched)
@@ -939,7 +943,6 @@ class ProductionIsolation(unittest.TestCase):
     def test_simulated_runs_are_identical_with_the_observer_on_or_failing(self):
         """Simulador do próprio projeto: cada passo a falhar, incluindo os do observador."""
         base = self.load('test_git_persistence')
-        disabled = self.patched.replace(" && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}", ' && false-flag }}')
         _, old_names = self.blocks(self.original)
         for failing in [None, *old_names, self.START, self.STOP]:
             with self.subTest(failing=failing):
@@ -951,8 +954,9 @@ class ProductionIsolation(unittest.TestCase):
                 if failing is None:
                     self.assertIn(self.START, active[1])
                     self.assertIn(self.STOP, active[1])
-        with self.assertRaises(KeyError):                  # desligado = condição desconhecida, nunca verdadeira
-            base.simulate_job(disabled, None)
+                state, ran, skipped = base.simulate_job(self.patched, failing, shadow=False)
+                self.assertTrue({self.START, self.STOP}.issubset(skipped))
+                self.assertEqual((state, ran, strip(skipped)), reference)
 
     def test_project_continuity_tests_pass_on_the_patched_workflow(self):
         silent, persistence = self.load('test_silent_failures'), self.load('test_git_persistence')

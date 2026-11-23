@@ -1,0 +1,81 @@
+name: Polymarket isolated rehearsal
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/polymarket-rehearsal.yml'
+      - '.github/workflows/collect.yml'
+      - 'scangoal/polymarket*.py'
+      - 'scripts/polymarket_p2_audit.py'
+      - 'tests/test_collector_install.py'
+      - 'tests/test_polymarket*.py'
+permissions:
+  contents: read
+jobs:
+  rehearsal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate workflows
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.9
+          "$(go env GOPATH)/bin/actionlint" -shellcheck="" .github/workflows/{collect,polymarket-rehearsal}.yml
+      - name: Start empty synthetic run
+        run: |
+          echo "SCANGOAL_DATA_DIR=$RUNNER_TEMP/synthetic" >> "$GITHUB_ENV"
+          mkdir "$RUNNER_TEMP/synthetic"
+          export SCANGOAL_DATA_DIR="$RUNNER_TEMP/synthetic"
+          export GOAL_ROI_POLYMARKET_SHADOW=on
+          ulimit -t 60 -v 524288
+          nohup timeout --kill-after=5s 90s python3 -u -m scangoal.polymarket_observer follow --seconds 80 --spool "$RUNNER_TEMP/spool" > "$RUNNER_TEMP/follow.log" 2>&1 < /dev/null &
+          for i in {1..50}; do
+            [[ -s "$RUNNER_TEMP/spool/follower.pid" ]] && break
+            sleep 0.1
+          done
+          test -s "$RUNNER_TEMP/spool/follower.pid"
+      - name: Verify survival, stop and recover temporary journal twice
+        run: |
+          kill -0 "$(cat "$RUNNER_TEMP/spool/follower.pid")"
+          test -z "$(ls -A "$SCANGOAL_DATA_DIR")"
+          export GOAL_ROI_POLYMARKET_SHADOW=on
+          for i in 1 2; do
+            timeout 25s python3 -m scangoal.polymarket_observer ingest --stop-first --spool "$RUNNER_TEMP/spool"
+          done
+          test ! -e "$RUNNER_TEMP/spool/follower.pid"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          journal = Path(os.environ['SCANGOAL_DATA_DIR']) / 'polymarket_observer_runs.jsonl'
+          start, stop = sorted(map(json.loads, journal.read_text().splitlines()), key=lambda r: r['event'])
+          assert start['event'] == 'start' and stop['reason'] == 'stop_requested'
+          assert start['run_id'] == stop['run_id'] and stop['requests'] == 0
+          assert stop['cpu_seconds'] < 60 and 0 < stop['peak_rss_mb'] < 512
+          print(stop)
+          PY
+      - name: Public read-only API reachability
+        run: |
+          python3 - <<'PY'
+          import json
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+          from scangoal.polymarket_shadow import REQUEST_HEADERS
+          failed = []
+          for url in ('https://gamma-api.polymarket.com/public-search?q=p3-synthetic-nomatch-79411',
+                      'https://clob.polymarket.com/time'):
+              try:
+                  with urlopen(Request(url, headers=REQUEST_HEADERS), timeout=8) as r:
+                      body = r.read(65537)
+                      print(url, r.status, r.headers.get('Server'), r.headers.get('CF-Ray'), len(body))
+                      assert r.status == 200 and len(body) <= 65536
+                      assert isinstance(json.loads(body), dict if 'gamma-api' in url else int)
+              except HTTPError as exc:
+                  print(url, exc.code, exc.headers.get('Server'), exc.headers.get('CF-Ray'))
+                  failed.append(url)
+              except (AssertionError, ValueError, URLError, TimeoutError) as exc:
+                  print(url, type(exc).__name__)
+                  failed.append(url)
+          if failed:
+              raise SystemExit('Public API check failed: ' + ', '.join(failed))
+          PY
