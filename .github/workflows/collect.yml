@@ -1,7 +1,5 @@
 name: Collect ScanGoal
 on:
-  push:
-    branches: ['recovery/c-delivery', 'recovery/d-dashboard']
   workflow_dispatch:
     inputs:
       force_results:
@@ -16,21 +14,19 @@ permissions:
   # BSD recovery tail only: OIDC attestation of journal events. Adds no repository access.
   id-token: write
 concurrency:
-  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}
+  group: scangoal-write
   cancel-in-progress: false
 jobs:
   collect:
-    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' && github.event_name != 'push' }}
+    # Single writer: only `main` of this repository runs the collector (a dispatch on another ref is a no-op).
+    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
     # a run that fits 15 min without the tail can never be cut because of it.
     timeout-minutes: 18
-    env:
-      GOAL_ROI_DURABLE_REQUIRED: '1'
-      GOAL_ROI_DURABLE_URL: ${{ vars.GOAL_ROI_DURABLE_URL }}
     steps:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
-      - run: &init_runner |
+      - run: |
           echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
           printf 'GOAL_ROI_PUBLICATION_DIR=%s/goal-roi-publication\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
@@ -42,11 +38,12 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install -r requirements.txt
+      # Git is the only durable store. A transaction left by a lost runner is replayed (or, after its attempts, set
+      # aside) before anything else writes. Its failure blocks notices for this run, never the reads below.
       - name: Resume pending publication
         id: resume
         env:
           GH_TOKEN: ${{ github.token }}
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
         run: |
           artifact_run=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=goal-roi-publication&per_page=30" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "main")] | max_by(.id) | .workflow_run.id // empty')
           if [ -n "$artifact_run" ] && [ "$artifact_run" != "$GITHUB_RUN_ID" ]; then
@@ -56,8 +53,8 @@ jobs:
           fi
           python -u -m scangoal.publication resume
       - name: Read bot conversation (read-only)
+        if: ${{ !cancelled() }}
         env:
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION: ${{ secrets.TG_SESSION }}
@@ -65,29 +62,35 @@ jobs:
         run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
       # Fontes complementares: uma falha da API sai com código 3 e fica assinalada no passo, sem parar a recolha.
       - name: Results from Highlightly (every 90 minutes at most; skipped without key)
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           HL_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '90' }}
         run: python -u -m scangoal.results_hl
       - name: Goal minutes from Highlightly (every 2 hours at most, 5 matches per run)
+        if: ${{ !cancelled() }}
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
         run: python -u -m scangoal.details_hl
       - name: Results from BSD (hourly at most; skipped without key)
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
           BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
       - name: Report (fixed rules)
+        if: ${{ !cancelled() }}
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      # Notices only on top of a published state: an intent is claimed by a fast-forward push from this exact tip.
       - name: Publish the report before sending notices
-        env:
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
+        id: published
+        if: ${{ !cancelled() && steps.resume.outcome == 'success' }}
         run: python -u -m scangoal.publication publish
       # Entrega falhada, incerta ou não publicada: código 3 (já gravada, nunca reenviada); o commit de dados continua.
       - name: Telegram notices through the user's bot (skipped without keys)
+        if: ${{ !cancelled() && steps.published.outcome == 'success' }}
         continue-on-error: true
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
@@ -95,18 +98,15 @@ jobs:
           NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify
       - name: Commit data
-        if: ${{ !cancelled() && steps.resume.outcome == 'success' }}
-        env:
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
+        if: ${{ !cancelled() }}
         run: python -u -m scangoal.publication publish
       # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
       # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
       - name: Fast reads every 2 minutes until the next collection (read-only)
         id: fast
-        if: ${{ !cancelled() && success() && steps.resume.outcome == 'success' && github.ref_name == 'main' }}
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION: ${{ secrets.TG_SESSION }}
@@ -116,16 +116,14 @@ jobs:
           NOTIFY_DURABLE: git
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
       - name: Commit data from the fast reads
-        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' && steps.resume.outcome == 'success' }}
-        env:
-          GOAL_ROI_DURABLE_TOKEN: ${{ secrets.GOAL_ROI_DURABLE_TOKEN }}
+        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' }}
         run: python -u -m scangoal.publication publish
       - name: Check for an unpublished transaction
         id: publication
         if: ${{ always() && !cancelled() }}
         run: |
           if [ '${{ steps.resume.outcome }}' = failure ]; then
-            echo 'Publication resume failed. Ingestion did not start. See the Resume pending publication log.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Publication resume failed: reads ran, notices were not sent. See the Resume pending publication log.' >> "$GITHUB_STEP_SUMMARY"
           fi
           if [ -f "$GOAL_ROI_PUBLICATION_DIR/pending.json" ]; then
             echo 'pending=true' >> "$GITHUB_OUTPUT"
@@ -164,38 +162,3 @@ jobs:
           NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify --failure
 
-  validate:
-    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.event_name == 'push' }}
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - run: *init_runner
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          persist-credentials: false
-          sparse-checkout: scangoal
-      - name: Verify runner setup and fail-closed publication resume
-        env:
-          GOAL_ROI_DURABLE_REQUIRED: '1'
-        run: |
-          test "$GOAL_ROI_PUBLICATION_DIR" = "$RUNNER_TEMP/goal-roi-publication"
-          export PYTHONPATH="$GITHUB_WORKSPACE"
-          mkdir "$RUNNER_TEMP/collect-validation"
-          cd "$RUNNER_TEMP/collect-validation"
-          mkdir data
-          printf '%s\n' '{"synthetic_checkpoint":42}' > data/ingestion_checkpoint.json
-          sha256sum data/ingestion_checkpoint.json > checkpoint.sha256
-          check_missing_config() {
-            local status=0
-            GOAL_ROI_DURABLE_URL="$1" GOAL_ROI_DURABLE_TOKEN="$2" \
-              python3 -u -m scangoal.publication resume > resume.log 2>&1 || status=$?
-            cat resume.log
-            test "$status" = 3
-            grep -Fx 'PUBLICATION_FAILED invalid durable journal configuration' resume.log
-            sha256sum --check checkpoint.sha256
-            test ! -e "$GOAL_ROI_PUBLICATION_DIR/pending.json"
-          }
-          check_missing_config '' synthetic-token
-          check_missing_config 'https://journal.invalid/journal' ''
-          echo 'COLLECT_VALIDATION_OK runner path and fail-closed resume'

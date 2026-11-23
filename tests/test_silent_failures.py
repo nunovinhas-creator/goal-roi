@@ -42,7 +42,7 @@ def exit_code(fn):
 def steps():
     """{step name: its lines}, in production collection order."""
     out, name = {}, None
-    production = WORKFLOW.read_text(encoding='utf-8').split('\n  validate:\n', 1)[0]
+    production = WORKFLOW.read_text(encoding='utf-8')
     for line in production.splitlines():
         if line.startswith('      - name: '):
             name = line[len('      - name: '):]
@@ -239,7 +239,8 @@ class Telegram(unittest.TestCase):
         self.assertIn('        continue-on-error: true', s[notify_step])
         self.assertEqual(names[names.index(notify_step) + 1], 'Commit data')
         self.assertIn('scangoal.publication publish', '\n'.join(s['Commit data']))
-        self.assertIn("steps.resume.outcome == 'success'", '\n'.join(s['Commit data']))
+        self.assertNotIn("steps.resume.outcome", '\n'.join(s['Commit data']))          # data is published even after a failed resume
+        self.assertIn("steps.published.outcome == 'success'", '\n'.join(s[notify_step]))  # notices only on a published state
         self.assertLess(names.index('Publish the report before sending notices'), names.index(notify_step))
 
 
@@ -365,7 +366,7 @@ class NextCollection(unittest.TestCase):
         self.assertEqual(re.findall(r"cron: '([^']+)'", text), ['3,13,23,33,43,53 * * * *'])
         self.assertEqual(text.count('python scripts/dispatch_collection.py'), 1)
         self.assertIn('concurrency:\n'
-                      "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n"
+                      "  group: scangoal-write\n"
                       '  cancel-in-progress: false', text)
 
     @unittest.skipUnless(shutil.which('bash'), 'bash required')

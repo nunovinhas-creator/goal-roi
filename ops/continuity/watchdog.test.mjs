@@ -2,57 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import worker, {inspect,RecoveryGuard} from './watchdog.mjs';
 import {DatabaseSync} from 'node:sqlite';
-import {mkdtempSync, rmSync} from 'node:fs';
-import {tmpdir} from 'node:os';
-import {join} from 'node:path';
 
 const now = Date.now();
-
-test('journal rejects unauthenticated access without touching durable storage', async () => {
-  const env = {GOAL_ROI_DURABLE_TOKEN:'synthetic', GUARD:{get(){throw Error('accessed without authentication');}}};
-  const url = 'https://test.invalid/journal?key=publication';
-  for (const headers of [{}, {Authorization:'Bearer incorrect'}]) {
-    assert.equal((await worker.fetch(new Request(url, {headers}), env)).status, 403);
-  }
-  assert.equal((await worker.fetch(new Request('https://test.invalid/check'), env)).status, 404);
-});
-
-test('journal acknowledges a single compare-and-set and retains it after eviction', async () => {
-  const directory = mkdtempSync(join(tmpdir(), 'goal-roi-journal-'));
-  let db;
-  try {
-    function open() {
-      db = new DatabaseSync(join(directory, 'journal.sqlite'));
-      return new RecoveryGuard({storage:{sql:{exec(query, ...args) {
-        const stmt = db.prepare(query);
-        if (query.startsWith('SELECT')) return {toArray:() => stmt.all(...args)};
-        stmt.run(...args);
-      }}}}, {});
-    }
-    let guard = open();
-    const env = {RECOVERY_MODE:'observe', RECOVERY_ENABLED:'false', GOAL_ROI_DURABLE_TOKEN:'synthetic',
-      GUARD:{idFromName(name){assert.equal(name, 'goal-roi-journal-main'); return name;}, get(){return guard;}}};
-    const url = 'https://test.invalid/journal';
-    const headers = {Authorization:'Bearer synthetic'};
-    const read = () => worker.fetch(new Request(url + '?key=publication', {headers}), env);
-    const write = value => worker.fetch(new Request(url, {method:'PUT', headers,
-      body:JSON.stringify({key:'publication', revision:0, value})}), env);
-    assert.deepEqual(await (await read()).json(), {revision:0, value:null});
-    const receipts = [{phase:'persisted', bundle:'copy preserved after eviction'}, {phase:'different receipt'}];
-    const responses = await Promise.all(receipts.map(write));
-    assert.deepEqual(responses.map(r => r.status).sort(), [200, 409]);
-    const accepted = responses.findIndex(response => response.ok);
-    assert.deepEqual(await responses[accepted].json(), {revision:1});
-    db.close();
-    db = undefined;
-    guard = open();
-    assert.deepEqual(await (await read()).json(), {revision:1, value:receipts[accepted]});
-  } finally {
-    db?.close();
-    rmSync(directory, {recursive:true, force:true});
-  }
-});
-
 const ago = minutes => new Date(now - minutes * 60000).toISOString();
 function fixture(status='completed', readMinutes=40, jobMinutes=40) {
   let posts = 0;

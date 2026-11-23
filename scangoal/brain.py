@@ -627,8 +627,9 @@ def confirmation(match, since, alpha, as_of=None, *, hypothesis=None, receipt_di
             if (proven is None or proven[0]['available_utc'] != known.isoformat()
                     or proven[0]['ft'] != b.get('ft') or proven[0]['profit'] != y):
                 proof_problems.append('admission %d lacks a subsequent outcome receipt' % admitted)
-            else:
-                known = proven[1]
+                open_until, pending = deadline, True
+                continue
+            known = proven[1]
         open_until = known
         close(y, known)
     if pending and as_of is not None and as_of >= open_until:   # o prazo passou no relógio do relatório: perda, nesse prazo

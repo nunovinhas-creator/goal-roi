@@ -106,19 +106,13 @@ async def recover_page(client, entity, directory, state, now):
 
 
 async def collect():
-    from . import durable_journal, ingestion
     from .store import append_versions, data_dir, load_seen
     directory = data_dir()
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / 'state.json'
     previous = json.loads(path.read_text()) if path.exists() else {}
-    _, last_id = load_seen(data_dir() / 'messages.jsonl')
-    journal = durable_journal.configured()
-    receipt = ingestion.Receipt(journal, directory, 'full') if journal is not None else None
-    if receipt is not None and receipt.captured:
-        receipt.apply()
-        return 0
     client = make_client()
+    _, last_id = load_seen(data_dir() / 'messages.jsonl')
     windows = directory / 'collection_windows.json'
     if not windows.exists():
         write_json(windows, {'full_high_id': last_id, 'intervals': []})
@@ -130,18 +124,10 @@ async def collect():
             return 1
         entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         async with asyncio.timeout(150):
-            if receipt is not None:
-                await receipt.receive(client, entity, RECENT)
-            else:
-                rows, oldest, present = await fetch(client, entity, RECENT, now)
-        if receipt is not None:
-            receipt.apply()
-            state = json.loads(windows.read_bytes())
-            now = receipt.entry['received_utc']
-        else:
-            now = stamp_receipt(rows)
-            added = append_versions(rows)
-            state = record_window(directory, previous, last_id, oldest, present, now)
+            rows, oldest, present = await fetch(client, entity, RECENT, now)
+        now = stamp_receipt(rows)
+        added = append_versions(rows)
+        state = record_window(directory, previous, last_id, oldest, present, now)
         try:
             async with asyncio.timeout(15):
                 await recover_page(client, entity, directory, state, now)
@@ -149,8 +135,6 @@ async def collect():
             print('SCANGOAL_BACKFILL_PENDING', type(exc).__name__)
     finally:
         await client.disconnect()
-    if receipt is not None:
-        return 0
     # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
     stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
     missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
@@ -163,12 +147,8 @@ async def collect():
 
 
 def main():
-    from .durable_journal import DurabilityError
     try:
         sys.exit(asyncio.run(collect()))
-    except DurabilityError as exc:
-        print('SCANGOAL_DURABILITY_FAILED', exc)
-        sys.exit(1)
     except Exception as exc:  # o tipo basta; nunca imprimir segredos
         print('SCANGOAL_READ_FAILED', type(exc).__name__)
         sys.exit(1)

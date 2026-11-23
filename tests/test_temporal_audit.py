@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from scangoal import brain, certification, chronology, llm, llm_eval, opportunity_results, report, store
+from scangoal import brain, certification, chronology, llm, llm_eval, opportunity_results, report, scientific_receipts, store
 
 
 T = datetime(2026, 11, 20, 12, tzinfo=timezone.utc)
@@ -39,6 +39,37 @@ class TemporalAudit(unittest.TestCase):
         status = brain.build([], {}, 300, ledger, as_of=T, history_problems=[])['validation']
         self.assertFalse(status['ledger_valid'])
         self.assertEqual(status['certified'], [])
+
+    def test_later_signed_selection_preserves_the_previous_ledger_cut(self):
+        registry = {key: {'family': 'Betfair', 'conditions': []} for key in ('a', 'b')}
+        ledger = certification.activate({}, T)
+        certification.append(ledger, ['a'], registry, T + timedelta(minutes=5))
+        extended = dict(ledger, entries=list(ledger['entries']))
+        certification.append(extended, ['b'], registry, T + timedelta(minutes=20))
+        signed = [T + timedelta(minutes=m) for m in (1, 6, 28)]
+
+        def witness(_, domain, content, *, as_of):
+            length = len(content['entries'])
+            if signed[length] <= as_of:
+                return scientific_receipts.Receipt(str(length), scientific_receipts.digest(domain, content), signed[length])
+
+        earlier = signed[2] - timedelta(seconds=1)
+        with patch.object(scientific_receipts, 'verify', witness):
+            before = certification.witnessed_selections(ledger, registry, None, earlier)
+            replay = certification.witnessed_selections(extended, registry, None, earlier)
+            at_receipt = certification.witnessed_selections(extended, registry, None, signed[2])
+        self.assertEqual(before, replay)
+        self.assertEqual(list(replay[1]), ['a'])
+        self.assertEqual((at_receipt[1]['b'][2], at_receipt[2]), (signed[2], []))
+
+        def unsigned_extension(directory, domain, content, *, as_of):
+            if len(content['entries']) < 2:
+                return witness(directory, domain, content, as_of=as_of)
+
+        with patch.object(scientific_receipts, 'verify', unsigned_extension):
+            _, selections, problems, receipts = certification.witnessed_selections(extended, registry, None, earlier)
+        self.assertEqual((selections, receipts), ({}, []))
+        self.assertTrue(problems)
 
     def test_N05_all_consumers_at_the_same_cut(self):
         with TemporaryDirectory() as temp, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': temp}):

@@ -135,20 +135,20 @@ class WorkflowInstall(unittest.TestCase):
         self.assertLess(steps.index('GOAL_ROI_JOB_STARTED_UTC'), steps.index('actions/checkout@'))
 
     def test_external_actions_pinned_to_audited_shas_and_credentials_persisted(self):
-        production, validation = self.text.split('\n  validate:\n', 1)
+        production = self.text
+        self.assertNotIn('\n  validate:\n', production)   # the journal validation job left with the external journal
         uses = re.findall(r'uses: ([^\s#]+)', production)
         self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA,
                                 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'])
         self.assertNotIn('persist-credentials', production)     # default true: notify durability pushes
-        self.assertIn('actions/checkout@'+CHECKOUT_SHA, validation)
-        self.assertIn('persist-credentials: false', validation)
-        self.assertIn('permissions:\n      contents: read', validation)
-        self.assertNotIn('secrets.', validation)
+        self.assertNotIn('DURABLE_URL', production)
+        self.assertNotIn('DURABLE_TOKEN', production)
+        self.assertNotIn('\n  push:', production)
 
     def test_schedule_chain_and_normal_steps_unchanged(self):
         for line in ("    - cron: '3,13,23,33,43,53 * * * *'",
-                     "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n  cancel-in-progress: false",
-                     "github.ref == 'refs/heads/main' && github.event_name != 'push'",
+                     "  group: scangoal-write\n  cancel-in-progress: false",
+                     "github.ref == 'refs/heads/main' }}",
                      'run: python -u -m scangoal.results_bsd',
                      'run: python -u -m scangoal.notify',
                      'timeout 85s python scripts/dispatch_collection.py',

@@ -40,8 +40,9 @@ class ObserverTests(unittest.TestCase):
         restart, observe = workflow.split('\n  observe:\n')
         self.assertIn("cron: '7,22,37,52 * * * *'", restart)
         self.assertIn("if: >-\n      github.event_name == 'workflow_run' &&", restart)
-        self.assertIn("vars.GOAL_ROI_RECOVERY_MODE == 'active' &&", restart)
-        self.assertIn("vars.GOAL_ROI_RECOVERY_ENABLED == 'true' &&", restart)
+        # The restart after a failed collection stays a pure GitHub safety net (no Worker, no variable gate).
+        self.assertNotIn('vars.', restart)
+        self.assertIn('group: scangoal-write', restart)
         self.assertIn("if: github.event_name == 'schedule'", observe)
         self.assertIn('permissions:\n      actions: read\n      contents: read\n', observe)
         self.assertIn('group: scangoal-continuity-observer', observe)

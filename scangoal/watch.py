@@ -19,22 +19,38 @@ WATCH_SECONDS = int(os.environ.get('WATCH_SECONDS', '480'))
 INTERVAL = int(os.environ.get('WATCH_INTERVAL', '120'))
 FAST_RECENT = int(os.environ.get('WATCH_RECENT', '40'))
 FAILED_EXIT = 3
+# The workflow kills this step at 540 s. A refresh (report + notices) starts only when its measured duration still fits
+# before HARD_SECONDS; otherwise the read data is published by the next step and the next collection reports it.
+# A refresh killed mid-way leaves a pushed intent unsent (`uncertain`): never a duplicate, but a lost notice.
+HARD_SECONDS = int(os.environ.get('WATCH_HARD_SECONDS', '525'))
+REFRESH_ESTIMATE = int(os.environ.get('WATCH_REFRESH_ESTIMATE', '240'))
 
 
 class WatchStopped(RuntimeError):
     """As leituras rápidas pararam (falhas seguidas) ou o relatório/avisos falharam; a espera e a cadência mantêm-se."""
 
 
-async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None):
+async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None,
+                 hard=None, estimate=REFRESH_ESTIMATE):
     """Chama read() a cada `every` segundos até `total`; on_new() quando read() devolve linhas novas. -> leituras feitas.
     problems (lista, opcional): recebe 'reads_stopped' e/ou 'report_failed' para o código de saída."""
     total, every = WATCH_SECONDS if total is None else total, INTERVAL if every is None else every
     start, done, fails, k = clock(), 0, 0, 1
     refreshed = pending = False
     failures = 0
+    longest = estimate
+
+    def fits():
+        if hard is None or clock() - start + longest <= hard:
+            return True
+        print('WATCH_REFRESH_DEFERRED')
+        return False
 
     def update():
-        nonlocal refreshed, pending, failures
+        nonlocal refreshed, pending, failures, longest
+        if not fits():
+            return
+        began = clock()
         try:
             on_new()
         except Exception as exc:
@@ -44,6 +60,8 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
         else:
             refreshed, pending, failures = True, False, 0
             print('WATCH_REPORT_COMPLETED')
+        finally:
+            longest = max(longest, clock() - began)
 
     while k * every <= total and fails < 2:
         wait = start + k * every - clock()
@@ -95,36 +113,26 @@ def refresh(publisher=None):
 
 
 async def watch():
-    from . import durable_journal, ingestion
-    from .publication import Publisher
+    from .publication import Publisher, PublicationError
 
     publisher = Publisher() if os.environ.get('NOTIFY_DURABLE') == 'git' else None
-    journal = durable_journal.configured()
-    if journal is not None and publisher is None:
-        raise durable_journal.DurabilityError('fast reads require the durable publisher')
     if publisher is not None:
-        publisher.resume()
+        try:
+            publisher.resume()
+        except PublicationError as exc:
+            # Reads stay independent of publication. Every refresh retries the publication first and sends nothing
+            # while it fails, so a pending transaction can never be overtaken by a notice.
+            print('WATCH_PUBLICATION_PENDING', exc)
     client = reader.make_client()
     state = {'entity': None}
 
     async def read():
-        receipt = ingestion.Receipt(journal, data_dir(), 'fast') if journal is not None else None
-        if receipt is not None and receipt.captured:
-            receipt.apply()
-            return 1  # A restored read still needs publication and acknowledgement.
         if not client.is_connected():
             await asyncio.wait_for(client.connect(), 30)
         if state['entity'] is None:
             if not await client.is_user_authorized():
                 raise RuntimeError('session not authorized')
             state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
-        if receipt is not None:
-            await asyncio.wait_for(receipt.receive(client, state['entity'], FAST_RECENT), 45)
-            added = receipt.apply()
-            if not added and receipt.entry['kind'] == 'fast':
-                publisher.publish()  # Close the receipt without rebuilding an unchanged report.
-                return 0
-            return 1
         now = reader.iso(datetime.now(timezone.utc))
         rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
         now = reader.stamp_receipt(rows)
@@ -141,7 +149,7 @@ async def watch():
 
     problems = []
     try:
-        done = await rounds(read, lambda: refresh(publisher), problems=problems)
+        done = await rounds(read, lambda: refresh(publisher), problems=problems, hard=HARD_SECONDS)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)

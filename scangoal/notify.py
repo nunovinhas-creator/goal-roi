@@ -593,6 +593,16 @@ def item_key(w):
     return 'item|%s|%s|%s' % (game_key(w), market, w.get('selection') or '')
 
 
+def item_claimed(w, claims):
+    if item_key(w) in claims:
+        return True
+    # Claims made before fixture canonicalization were recorded under the source ID.
+    raw = text_identity(w.get('match_id'))
+    canonical = text_identity(w.get('canonical_match_id'))
+    return bool(raw and canonical and raw != canonical
+                and item_key(dict(w, canonical_match_id=raw)) in claims)
+
+
 def legacy_pairs(watch_sent):
     out = {}
     for k in watch_sent:
@@ -601,6 +611,24 @@ def legacy_pairs(watch_sent):
             t = parse_time(parts[0])
             if t:
                 out.setdefault(('|'.join(parts[1:-1]), parts[-1]), []).append(t)
+    return out
+
+
+def legacy_sent(state):
+    """`watch_sent` entries that may stand for a notice without an item claim: only those whose signal predates the
+    `telegram_format_v2` migration. From that migration on, every notice records its item (fixture, market, selection),
+    which is the authoritative identity; matching later entries by team names and selection suppressed a second,
+    distinct fixture between the same teams and the same selection in another market. Without a readable migration
+    date every entry stays legacy (conservative: suppress rather than repeat)."""
+    entries = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
+    cutoff = parse_time(((state.get('migrations') or {}).get(FORMAT_MIGRATION) or {}).get('at_utc'))
+    if cutoff is None:
+        return entries
+    out = set()
+    for k in entries:
+        t = parse_time(k.split('|', 1)[0]) if isinstance(k, str) else None
+        if t is None or t < cutoff:
+            out.add(k)
     return out
 
 
@@ -615,7 +643,8 @@ def game_notices(report, state, now, excluded_items=()):
     indício a alerta da mesma aposta nunca geram outro aviso. Uma seleção genuinamente nova num jogo já avisado gera uma
     atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
     notified = state.get('notified_items') or {}
-    sent = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
+    claims = set(notified).union(excluded_items)
+    sent = legacy_sent(state)
     pairs, games = legacy_pairs(sent), {}
     candidates = list((report.get('brain') or {}).get('watch') or [])
     activation = (state.get('migrations') or {}).get(polymarket_alerts.ACTIVATION) or {}
@@ -630,7 +659,7 @@ def game_notices(report, state, now, excluded_items=()):
             #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
         ik = item_key(w)
-        if ik in notified or ik in excluded_items or legacy_key(w) in sent or legacy_hit(pairs, w):
+        if item_claimed(w, claims) or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
         g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or '', 'sample': w})
         it = g['items'].setdefault(ik, {'level': 'indício', 'entries': []})
