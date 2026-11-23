@@ -1071,6 +1071,8 @@ function validateReport(next, previous) {
   // The core comes from scangoal/report.py. Optional sections may be absent
   // on first load, and published sections may be explicitly empty.
   if (!hasFields(next, reportShape)) return false;
+  const generated = Date.parse(next.generated_at_utc);
+  if (generated > Date.now() + 5000) return false;
   const reference = next.questions[REFERENCE], groups = Object.values(next.groups);
   if (reference?.bets !== next.unique_bets || reference.settled !== next.settled_bets ||
       next.timeline.length !== Math.min(next.settled_bets, 600) ||
@@ -1079,7 +1081,7 @@ function validateReport(next, previous) {
       groups.reduce((sum, group) => sum + group.settled, 0) !== next.settled_bets ||
       (next.unique_bets > 0 && (!next.first_signal_utc || !next.daily.length))) return false;
   if (!previous) return true;
-  if (Date.parse(next.generated_at_utc) < Date.parse(previous.generated_at_utc)) return false;
+  if (generated < Date.parse(previous.generated_at_utc)) return false;
   // A response must not silently drop sections already supplied by the producer.
   return ['brain', 'operational', 'insights', 'matches', 'unsettled'].every(key => !Object.hasOwn(previous, key) || Object.hasOwn(next, key)) &&
     ['agenda', 'validation', 'top', 'counts', 'presentation', 'board', 'track', 'walk_forward', 'llm', 'notes', 'watch', 'entry_points']

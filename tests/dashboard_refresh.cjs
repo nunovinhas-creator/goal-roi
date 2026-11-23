@@ -189,6 +189,7 @@ async function refreshRegression(page) {
 
   const reject = [
     {abort:true}, {status:500,body:'{}'}, {body:'{"truncated'}, {body:'{}'},
+    {report:{...C,generated_at_utc:new Date(+date+86400000).toISOString()}},
     {report:incomplete}, {report:{...B,timeline:[]}}, {report:{...B,timeline:[...B.timeline.slice(0,-1),{}]}},
     {report:{...B,questions:{}}}, {report:{...B,brain:{...B.brain,agenda:{...B.brain.agenda,items:{}}}}},
     {report:{...B,brain:{...B.brain,agenda:undefined}}}, {report:{...B,brain:undefined}}
