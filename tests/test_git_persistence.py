@@ -187,8 +187,15 @@ class WorkflowScriptTests(unittest.TestCase):
         fast = text[text.index('- name: Commit data from the fast reads'):text.index('- name: Start the next collection')]
         self.assertNotIn('continue-on-error', main)          # a recolha principal falha de forma visível
         self.assertNotIn('continue-on-error', fast)          # P2: uma falha de persistência deixa a execução vermelha
-        self.assertIn("steps.resume.outcome == 'success'", fast)
-        self.assertIn("group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}", text)
+        guard = fast.split('\n')[1]
+        self.assertNotIn("steps.resume.outcome", guard)     # the data of the fast reads is published even after a failed resume
+        notices = text[text.index("- name: Telegram notices through the user's bot"):text.index('- name: Commit data\n')]
+        self.assertIn("steps.published.outcome == 'success'", notices)
+        published = text[text.index('- name: Publish the report before sending notices'):text.index("- name: Telegram notices")]
+        self.assertIn("steps.resume.outcome == 'success'", published)
+        self.assertIn('group: scangoal-write\n', text)
+        self.assertNotIn('DURABLE_URL', text)
+        self.assertNotIn('DURABLE_TOKEN', text)
         self.assertIn('cancel-in-progress: false', text)
         self.assertIn("cron: '3,13,23,33,43,53 * * * *'", text)
 
@@ -484,12 +491,13 @@ def simulate_job(text, failing):
         block = text.split('      - name: %s\n' % name, 1)[1].split('\n      - ', 1)[0]
         cond = re.search(r'^        if: \$\{\{ (.+) \}\}$', block, re.M)
         steps[name] = (cond.group(1) if cond else 'success()', '        continue-on-error: true' in block.split('\n'))
-    failed, ran, skipped = False, [], []
+    failed, ran, skipped, outcome = False, [], [], {}
     resume_completed = failing != 'Resume pending publication'
     pending = failing in STEPS
     for name in names:
         cond, tolerated = steps[name]
         facts = {
+            "steps.published.outcome == 'success'": outcome.get('Publish the report before sending notices') == 'success',
             'success()': not failed, 'failure()': failed, 'always()': True, '!cancelled()': True,
             "github.ref_name == 'main'": True, "steps.resume.outcome == 'success'": resume_completed,
             "steps.fast.outcome != 'skipped'": 'Fast reads every 2 minutes until the next collection (read-only)' in ran,
@@ -501,6 +509,7 @@ def simulate_job(text, failing):
             skipped.append(name)
             continue
         ran.append(name)
+        outcome[name] = 'failure' if name == failing else 'success'
         if name == failing and not tolerated:
             failed = True
     return ('failure' if failed else 'success'), ran, skipped
@@ -516,10 +525,28 @@ class ChainContinuityTests(unittest.TestCase):
         self.assertIn('Preserve pending data and intent for the next runner', ran)
         self.assertNotIn(self.TELL, ran)
 
-    def test_failed_resume_blocks_new_reads_and_still_launches_next_job(self):
+    NOTICES, READ = "Telegram notices through the user's bot (skipped without keys)", 'Read bot conversation (read-only)'
+
+    def test_failed_resume_keeps_reading_blocks_notices_and_still_launches_next_job(self):
         conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), 'Resume pending publication')
         self.assertEqual(conclusion, 'failure')
-        self.assertIn('Read bot conversation (read-only)', skipped)
+        for step in (self.READ, 'Report (fixed rules)', STEPS[0], 'Fast reads every 2 minutes until the next collection (read-only)'):
+            self.assertIn(step, ran)
+        self.assertIn('Publish the report before sending notices', skipped)
+        self.assertIn(self.NOTICES, skipped)
+        self.assertIn(self.NEXT, ran)
+
+    def test_failed_report_publication_blocks_notices_only(self):
+        conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), 'Publish the report before sending notices')
+        self.assertEqual(conclusion, 'failure')
+        self.assertIn(self.NOTICES, skipped)
+        self.assertIn(STEPS[0], ran)
+        self.assertIn(self.NEXT, ran)
+
+    def test_failed_telegram_read_still_publishes_and_continues(self):
+        conclusion, ran, _ = simulate_job(WORKFLOW.read_text(encoding='utf-8'), self.READ)
+        self.assertEqual(conclusion, 'failure')
+        self.assertIn(STEPS[0], ran)
         self.assertIn(self.NEXT, ran)
 
     def test_a_successful_run_stays_green_and_does_not_warn(self):

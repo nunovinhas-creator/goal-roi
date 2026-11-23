@@ -95,36 +95,26 @@ def refresh(publisher=None):
 
 
 async def watch():
-    from . import durable_journal, ingestion
-    from .publication import Publisher
+    from .publication import Publisher, PublicationError
 
     publisher = Publisher() if os.environ.get('NOTIFY_DURABLE') == 'git' else None
-    journal = durable_journal.configured()
-    if journal is not None and publisher is None:
-        raise durable_journal.DurabilityError('fast reads require the durable publisher')
     if publisher is not None:
-        publisher.resume()
+        try:
+            publisher.resume()
+        except PublicationError as exc:
+            # Reads stay independent of publication. Every refresh retries the publication first and sends nothing
+            # while it fails, so a pending transaction can never be overtaken by a notice.
+            print('WATCH_PUBLICATION_PENDING', exc)
     client = reader.make_client()
     state = {'entity': None}
 
     async def read():
-        receipt = ingestion.Receipt(journal, data_dir(), 'fast') if journal is not None else None
-        if receipt is not None and receipt.captured:
-            receipt.apply()
-            return 1  # A restored read still needs publication and acknowledgement.
         if not client.is_connected():
             await asyncio.wait_for(client.connect(), 30)
         if state['entity'] is None:
             if not await client.is_user_authorized():
                 raise RuntimeError('session not authorized')
             state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
-        if receipt is not None:
-            await asyncio.wait_for(receipt.receive(client, state['entity'], FAST_RECENT), 45)
-            added = receipt.apply()
-            if not added and receipt.entry['kind'] == 'fast':
-                publisher.publish()  # Close the receipt without rebuilding an unchanged report.
-                return 0
-            return 1
         now = reader.iso(datetime.now(timezone.utc))
         rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
         now = reader.stamp_receipt(rows)

@@ -16,13 +16,3 @@ Registar na PR o SHA integrado, hora UTC, IDs e ligações das execuções. Os t
 3. Correlacionar o evento collection_restart_requested e os IDs assinalados com o aparecimento de um sucessor em main. Confirmar a conclusão, a leitura e a exclusividade do coletor. Um pedido pode ficar em fila enquanto o GitHub mantiver o bloqueio anterior. Medir separadamente o tempo até ao despacho e até à primeira leitura.
 4. No tick seguinte confirmar que um sucessor recente inibe um novo pedido, inclusive se tiver havido erro de comunicação no despacho. Repetir a verificação dos avisos e do histórico do ponto 1.2. Se o GitHub ainda não mostrar o pedido aceite, a atribuição fica pendente. A deduplicação após resposta perdida depende da visibilidade do sucessor na API.
 5. Fechar a validação com data, evidência e resultado por mecanismo: observado, pendente ou inconclusivo. Guardar apenas metadados operacionais, sem tokens, conteúdo das mensagens ou sessões.
-
-## 3. Diário de ingestão e publicação
-
-O candidato usa o Durable Object SQLite da continuidade com uma identidade separada para o diário. Cada leitura marca a tentativa antes de contactar o Telegram. O leitor aplica o lote localmente depois de receber a confirmação do diário. A publicação guarda um bundle Git antes do primeiro push e confirma o checkpoint após verificar o commit remoto. As lacunas conhecidas ficam em `data/ingestion_checkpoint.json`, no resumo do job e na auditoria do relatório.
-
-O workflow candidato exige `GOAL_ROI_DURABLE_URL` com o endpoint HTTPS `/journal` e o segredo `GOAL_ROI_DURABLE_TOKEN` no Worker e no Actions. O endpoint autentica apenas operações do diário. A configuração da rota e dos segredos depende de autorização de produção. O agendamento do Worker mantém a observação e `RECOVERY_ENABLED=false`.
-
-O despacho suplementar após `workflow_run` requer `GOAL_ROI_RECOVERY_MODE=active` e `GOAL_ROI_RECOVERY_ENABLED=true` nas variáveis do Actions. A observação e a próxima recolha normal têm percursos próprios.
-
-O diário limita cada pedido a 1 800 000 bytes. Uma falha de acesso ou de capacidade impede o avanço do checkpoint. Os artefactos do Actions continuam disponíveis para reconciliação de transações antigas e diagnóstico de falhas. Uma interrupção antes de gravar uma leitura pode deixar versões editadas ou apagadas indisponíveis no Telegram.

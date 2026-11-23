@@ -335,9 +335,9 @@ class WorkflowActivation(unittest.TestCase):
         text, steps = self.steps()
         self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
         self.assertIn('concurrency:\n'
-                      "  group: ${{ github.event_name == 'push' && format('scangoal-validate-{0}', github.ref) || 'scangoal-write' }}\n"
+                      "  group: scangoal-write\n"
                       '  cancel-in-progress: false', text)   # production keeps a single writer
-        production = text.split('\n  validate:\n', 1)[0]
+        production = text
         # The publishing job requires persisted credentials from the reviewed checkout action.
         self.assertRegex(production, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
         self.assertNotIn('persist-credentials: false', production)
