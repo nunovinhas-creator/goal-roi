@@ -870,10 +870,9 @@ class IncrementalJournal(Harness):
 
 
 class ProductionIsolation(unittest.TestCase):
-    """Esta PR não toca no workflow de produção; a ativação é um patch separado, provado aqui com os testes do projeto."""
+    """Compara os passos existentes com o workflow anterior à ativação."""
 
     MARKER = 'GOAL_ROI_POLYMARKET_SHADOW'
-    PATCH = ROOT / 'ops/polymarket-p2/activation.patch'
     FILES = ('.github/workflows/collect.yml', 'tests/test_silent_failures.py', 'tests/test_git_persistence.py')
     START = 'Start the Polymarket shadow observer (inactive by default)'
     STOP = 'Stop the Polymarket shadow observer and add its observations (inactive by default)'

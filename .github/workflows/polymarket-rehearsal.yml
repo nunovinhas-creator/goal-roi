@@ -56,13 +56,24 @@ jobs:
         run: |
           python3 - <<'PY'
           import json
-          from urllib.request import urlopen
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+          from scangoal.polymarket_shadow import REQUEST_HEADERS
+          failed = []
           for url in ('https://gamma-api.polymarket.com/public-search?q=p3-synthetic-nomatch-79411',
                       'https://clob.polymarket.com/time'):
-              with urlopen(url, timeout=8) as r:
-                  body = r.read(65537)
-                  print(url, r.status, r.headers.get('Server'), r.headers.get('CF-Ray'), len(body))
-                  assert r.status == 200 and len(body) <= 65536
-                  value = json.loads(body)
-                  assert isinstance(value, dict if 'gamma-api' in url else int)
+              try:
+                  with urlopen(Request(url, headers=REQUEST_HEADERS), timeout=8) as r:
+                      body = r.read(65537)
+                      print(url, r.status, r.headers.get('Server'), r.headers.get('CF-Ray'), len(body))
+                      assert r.status == 200 and len(body) <= 65536
+                      assert isinstance(json.loads(body), dict if 'gamma-api' in url else int)
+              except HTTPError as exc:
+                  print(url, exc.code, exc.headers.get('Server'), exc.headers.get('CF-Ray'))
+                  failed.append(url)
+              except (AssertionError, ValueError, URLError, TimeoutError) as exc:
+                  print(url, type(exc).__name__)
+                  failed.append(url)
+          if failed:
+              raise SystemExit('Public API check failed: ' + ', '.join(failed))
           PY

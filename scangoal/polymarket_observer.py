@@ -567,7 +567,6 @@ def follow(directory, spool, *, seconds=LIFETIME_SECONDS, sleep=time.sleep, mono
         reason = 'terminated'
         raise
     finally:
-        pid.unlink(missing_ok=True)
         try:
             atomic_write(spool / ('run-%s-stop.json' % run['run_id']), (canonical(run_event(
                 run, 'stop', at_utc=iso(follower.clock()), reason=reason, ticks=follower.ticks,
@@ -578,6 +577,8 @@ def follow(directory, spool, *, seconds=LIFETIME_SECONDS, sleep=time.sleep, mono
                 peak_rss_mb=peak_rss_mb())) + '\n').encode('utf-8'))
         except Exception as exc:
             print('POLYMARKET_SHADOW_RUN_STOP_NOT_RECORDED', type(exc).__name__)
+        finally:
+            pid.unlink(missing_ok=True)
     return follower
 
 
@@ -621,7 +622,10 @@ def main(argv=None, environ=None):
             print('POLYMARKET_SHADOW_STOPPED', stop(spool))
         else:
             if args.stop_first:
-                print('POLYMARKET_SHADOW_STOPPED', stop(spool))
+                stopped = stop(spool)
+                print('POLYMARKET_SHADOW_STOPPED', stopped)
+                if not stopped:
+                    return 0
             print('POLYMARKET_SHADOW_INGEST', canonical(ingest(directory, spool)))
     except SystemExit:
         pass
