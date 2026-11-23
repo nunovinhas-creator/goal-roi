@@ -4,10 +4,15 @@ import copy
 import json
 import os
 import re
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from email.message import Message
+from io import BytesIO
+from urllib.request import HTTPSHandler, ProxyHandler
+from urllib.response import addinfourl
 from pathlib import Path
 from unittest.mock import patch
 
@@ -475,6 +480,81 @@ class Transport(unittest.TestCase):
             self.assertNotIn(forbidden, source)
 
 
+class Redirects(unittest.TestCase):
+    """O opener real (NoRedirect) com um transporte simulado: nenhum pedido sai do contentor."""
+
+    def opener(self, code, location):
+        requested = []
+
+        class FakeHTTPS(HTTPSHandler):
+            def https_open(self, req):
+                requested.append(req.full_url)
+                headers = Message()
+                if req.full_url.startswith('https://clob.polymarket.com/book'):
+                    headers['Location'] = location
+                    status, body = code, b''
+                else:                                       # o destino do redirecionamento
+                    status, body = 200, b'{"hijacked": true}'
+                response = addinfourl(BytesIO(body), headers, req.full_url, status)
+                response.msg = 'redirect' if status != 200 else 'OK'
+                return response
+
+        return ps.make_opener(ProxyHandler({}), FakeHTTPS()), requested
+
+    def test_external_redirects_are_never_followed(self):
+        for code in (301, 302, 303, 307, 308):
+            for location in ('https://evil.example/book', 'http://clob.polymarket.com/book',
+                             'https://data-api.polymarket.com/v2/x', 'https://clob.polymarket.com.evil.test/',
+                             'https://user:pw@clob.polymarket.com/book', '//evil.example/book'):
+                with self.subTest(code=code, location=location):
+                    opener, requested = self.opener(code, location)
+                    with self.assertRaises(ps.Refusal) as ctx:
+                        ps.http_get('https://clob.polymarket.com/book?token_id=1', opener=opener.open)
+                    self.assertEqual(ctx.exception.code, 'redirect_host_not_allowed')
+                    self.assertEqual(requested, ['https://clob.polymarket.com/book?token_id=1'])
+
+    def test_redirects_inside_the_allowlist_are_also_refused(self):
+        for code in (301, 302, 307, 308):
+            with self.subTest(code=code):
+                opener, requested = self.opener(code, 'https://gamma-api.polymarket.com/markets')
+                with self.assertRaises(ps.Refusal) as ctx:
+                    ps.http_get('https://clob.polymarket.com/book?token_id=1', opener=opener.open)
+                self.assertEqual(ctx.exception.code, 'redirect_refused')
+                self.assertEqual(len(requested), 1)
+
+    def test_default_opener_refuses_redirects(self):
+        self.assertTrue(any(isinstance(h, ps.NoRedirect) for h in ps.OPENER.handlers))
+        self.assertFalse(any(type(h).__name__ == 'HTTPRedirectHandler' for h in ps.OPENER.handlers))
+
+    def test_response_from_another_url_is_refused(self):
+        class Moved:
+            status = 200
+            headers = {}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def geturl(self):
+                return 'https://evil.example/book'
+
+            def read(self, n):
+                return b'{}'
+
+        with self.assertRaises(ps.Refusal) as ctx:
+            ps.http_get('https://clob.polymarket.com/book', opener=lambda r, timeout: Moved())
+        self.assertEqual(ctx.exception.code, 'redirect_refused')
+
+    def test_redirect_in_observe_is_a_refusal_not_a_crash(self):
+        remote = FakeRemote()
+        remote.fail = 'redirect_host_not_allowed'
+        obs = ps.observe(signal(), get=remote)
+        self.assertEqual((obs['status'], obs['reason']), ('refused', 'redirect_host_not_allowed'))
+        self.assertNotIn('quote', obs)
+
+
 class NoProductionCoupling(unittest.TestCase):
     def test_not_wired_into_workflows_alerts_or_reports(self):
         for path in list((ROOT / '.github/workflows').glob('*.yml')) + [
@@ -485,19 +565,99 @@ class NoProductionCoupling(unittest.TestCase):
 
 
 class Cli(unittest.TestCase):
-    def test_refuses_protected_outputs(self):
-        for target in ('data/x.json', 'docs/report.json', 'data', '.github/workflows/x.yml',
-                       'audits/strategy-lab/x.json'):
+    def test_refuses_every_path_inside_the_repository(self):
+        tracked = subprocess.run(['git', '-C', str(ROOT), 'ls-files'], capture_output=True, text=True,
+                                 check=True).stdout.split()
+        self.assertIn('scangoal/polymarket_shadow.py', tracked)
+        targets = ['.', 'README.md', 'scangoal/polymarket_shadow.py', 'scangoal/report.py', 'scripts/polymarket_shadow.py',
+                   'tests/test_polymarket_shadow.py', '.github/workflows/collect.yml', 'data/messages.jsonl', 'data',
+                   'docs/report.json', 'audits/strategy-lab/shortlist-v1.json', 'requirements.txt',
+                   'new-untracked-file.json', 'scangoal/new_module.py', 'deep/new/dir/x.json', '.git/config',
+                   'scangoal/../README.md'] + tracked[::25]
+        for target in targets:
             with self.subTest(target=target):
                 with self.assertRaises(SystemExit):
                     cli.safe_output(ROOT / target)
         with tempfile.TemporaryDirectory() as tmp:
+            sneaky = Path(tmp) / '..' / os.path.relpath(ROOT / 'README.md', Path(tmp).parent)
+            with self.assertRaises(SystemExit):
+                cli.safe_output(sneaky)
+
+    def test_relative_paths_resolve_against_cwd(self):
+        cwd = os.getcwd()
+        try:
+            os.chdir(ROOT / 'scangoal')
+            for target in ('report.py', '../README.md', 'x.json'):
+                with self.subTest(target=target):
+                    with self.assertRaises(SystemExit):
+                        cli.safe_output(target)
+        finally:
+            os.chdir(cwd)
+
+    def test_refuses_symlinks_into_the_repository(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            link = Path(tmp) / 'out.json'
+            link.symlink_to(ROOT / 'scangoal/report.py')
+            with self.assertRaises(SystemExit):
+                cli.safe_output(link)
+            dir_link = Path(tmp) / 'repo'
+            dir_link.symlink_to(ROOT)
+            with self.assertRaises(SystemExit):
+                cli.safe_output(dir_link / 'new.json')
+            dangling = Path(tmp) / 'dangling.json'
+            dangling.symlink_to(Path(tmp) / 'missing.json')
+            with self.assertRaises(SystemExit):
+                cli.safe_output(dangling)
+
+    def test_refuses_hard_links_and_directories(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            original = Path(tmp) / 'a.json'
+            original.write_text('{}')
+            os.link(original, Path(tmp) / 'b.json')
+            with self.assertRaises(SystemExit):
+                cli.safe_output(Path(tmp) / 'b.json')
+            with self.assertRaises(SystemExit):
+                cli.safe_output(tmp)
+
+    def test_accepts_plain_path_outside(self):
+        with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(cli.safe_output(Path(tmp) / 'o.json'), (Path(tmp) / 'o.json').resolve())
+            existing = Path(tmp) / 'e.json'
+            existing.write_text('old')
+            cli.write_output(cli.safe_output(existing), 'new')
+            self.assertEqual(existing.read_text(), 'new')
+
+    def test_writer_does_not_follow_a_late_symlink(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            victim = Path(tmp) / 'victim.txt'
+            victim.write_text('keep')
+            target = cli.safe_output(Path(tmp) / 'o.json')
+            target.symlink_to(victim)                       # troca entre a verificação e a escrita
+            with self.assertRaises(OSError):
+                cli.write_output(target, 'overwrite')
+            self.assertEqual(victim.read_text(), 'keep')
+
+    def test_main_refuses_before_reading_data_or_network(self):
+        with patch.object(cli.report, 'load', side_effect=AssertionError('data read')), \
+                patch.object(cli.polymarket_shadow, 'http_get', side_effect=AssertionError('network')):
+            for argv in (['--coverage', '--out', str(ROOT / 'scangoal/report.py')],
+                         ['--upcoming', '--out', str(ROOT / 'out.json')]):
+                with self.subTest(argv=argv):
+                    with self.assertRaises(SystemExit):
+                        cli.main(argv)
 
     def test_refuses_custom_data_dir(self):
         with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': tmp}):
-            with self.assertRaises(SystemExit):
-                cli.safe_output(Path(tmp) / 'o.json')
+            for target in (Path(tmp) / 'o.json', Path(tmp) / 'sub' / 'o.json', Path(tmp)):
+                with self.subTest(target=target):
+                    with self.assertRaises(SystemExit):
+                        cli.safe_output(target)
+            with tempfile.TemporaryDirectory() as other:
+                link = Path(other) / 'd'
+                link.symlink_to(tmp)
+                with self.assertRaises(SystemExit):
+                    cli.safe_output(link / 'o.json')
+                self.assertTrue(cli.safe_output(Path(other) / 'o.json'))
 
     def test_first_signal_per_future_match(self):
         now = datetime(2026, 11, 23, 12, 0, tzinfo=timezone.utc)

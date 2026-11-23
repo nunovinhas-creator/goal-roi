@@ -5,12 +5,13 @@ Uso (raiz do repositório):
     python -m scripts.polymarket_shadow --match-id ID [...]   # encontros escolhidos
     python -m scripts.polymarket_shadow --upcoming --out /tmp/obs.json
 
-Lê data/messages.jsonl e data/team_aliases.json; nunca escreve em data/ nem em docs/. Só faz GET a
-gamma-api.polymarket.com e clob.polymarket.com, sem credenciais. Não envia ordens, Telegram nem altera alertas,
+Lê data/messages.jsonl e data/team_aliases.json. --out só aceita caminhos fora do repositório e do diretório de
+dados. Só faz GET a gamma-api.polymarket.com e clob.polymarket.com, sem credenciais nem redirecionamentos. Não envia ordens, Telegram nem altera alertas,
 estratégias, certificação ou histórico. Não está ligado a nenhum workflow.
 """
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -20,7 +21,6 @@ from scangoal.eligibility import game_identity
 from scangoal.store import data_dir
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTECTED = ('data', 'docs', '.github', 'audits/strategy-lab', 'audits/opportunity-lab')
 
 
 def first_signals(messages, now, wanted=None, *, upcoming_only=True):
@@ -40,15 +40,35 @@ def first_signals(messages, now, wanted=None, *, upcoming_only=True):
     return [first[k] for k in sorted(first, key=lambda k: first[k]['kickoff_utc'])]
 
 
+def inside(target, directory):
+    directory = directory.resolve()
+    return target == directory or directory in target.parents
+
+
 def safe_output(path):
-    target = Path(path).resolve()
-    for name in PROTECTED:
-        protected = (ROOT / name).resolve()
-        if target == protected or protected in target.parents:
-            raise SystemExit('refusing to write inside %s/' % name)
-    if target == data_dir().resolve() or data_dir().resolve() in target.parents:
+    """Só fora do repositório e fora do diretório de dados (incluindo SCANGOAL_DATA_DIR).
+
+    O caminho é resolvido (`..` e symlinks nos diretórios); um symlink ou hardlink no próprio destino é recusado,
+    porque poderia apontar para um ficheiro do repositório.
+    """
+    raw = Path(path).expanduser().absolute()
+    target = raw.resolve()
+    if inside(target, ROOT):
+        raise SystemExit('refusing to write inside the repository')
+    if inside(target, data_dir()):
         raise SystemExit('refusing to write inside the data directory')
+    if raw.is_symlink() or target.is_dir():
+        raise SystemExit('refusing a symlink or directory as output')
+    if target.exists() and target.stat().st_nlink > 1:
+        raise SystemExit('refusing a hard-linked output file')
     return target
+
+
+def write_output(target, text):
+    """Escreve sem seguir um symlink criado entre a verificação e a escrita."""
+    fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_NOFOLLOW', 0), 0o644)
+    with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+        handle.write(text)
 
 
 def main(argv=None):
@@ -86,7 +106,7 @@ def main(argv=None):
                   'observations': [polymarket_shadow.observe(s, aliases=aliases) for s in signals]}
     text = json.dumps(result, ensure_ascii=False, indent=1, sort_keys=True)
     if out:
-        out.write_text(text + '\n', encoding='utf-8')
+        write_output(out, text + '\n')
     else:
         sys.stdout.write(text + '\n')
 

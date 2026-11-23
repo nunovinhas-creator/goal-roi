@@ -108,5 +108,10 @@ python -B -m scripts.polymarket_shadow --upcoming --out /tmp/obs.json     # só 
 python -B -m scripts.polymarket_shadow --coverage --out /tmp/cov.json     # identidade, sem preços
 ```
 
-`--out` recusa `data/`, `docs/`, `.github/`, `audits/strategy-lab/` e `audits/opportunity-lab/`. As fixtures de teste
-(`tests/fixtures/polymarket_p1/`) são as respostas públicas reais deste piloto, reduzidas aos campos usados.
+`--out` só aceita caminhos fora do repositório e fora do diretório de dados (também `SCANGOAL_DATA_DIR`). Recusa
+symlinks, hardlinks e diretórios, e escreve sem seguir symlinks. Os pedidos HTTP nunca seguem redirecionamentos
+(301/302/303/307/308). As fixtures de teste (`tests/fixtures/polymarket_p1/`) são as respostas públicas reais deste
+piloto, reduzidas aos campos usados.
+
+Os ficheiros `observation-*.json` e `coverage-58.json` deste diretório foram gravados antes desta regra, com uma versão
+anterior do comando; não foram regenerados.

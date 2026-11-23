@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import ROUND_UP, Decimal, InvalidOperation
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from . import chronology
 from .results_bsd import norm_team
@@ -68,17 +68,44 @@ def guard_url(url):
     return url
 
 
+class NoRedirect(HTTPRedirectHandler):
+    """Nunca segue redirecionamentos (301/302/303/307/308): o pedido ao destino não chega a ser feito.
+
+    Um destino fora de ALLOWED_HOSTS dá `redirect_host_not_allowed`; mesmo dentro da lista o redirecionamento é
+    recusado (`redirect_refused`), porque as APIs usadas não redirecionam e a observação tem de vir do URL pedido.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        try:
+            guard_url(newurl)
+        except Refusal:
+            raise Refusal('redirect_host_not_allowed', {'code': code, 'location': newurl}) from None
+        raise Refusal('redirect_refused', {'code': code, 'location': newurl})
+
+
+def make_opener(*handlers):
+    """Opener urllib com NoRedirect sempre presente (os handlers extra servem só para testes)."""
+    return build_opener(NoRedirect, *handlers)
+
+
+OPENER = make_opener()
+
+
 def utc_now():
     return datetime.now(timezone.utc)
 
 
-def http_get(url, *, opener=urlopen, clock=utc_now):
+def http_get(url, *, opener=None, clock=utc_now):
     """GET público. Devolve corpo, hash e as duas horas locais (pedido e receção)."""
     guard_url(url)
     request = Request(url, headers=dict(REQUEST_HEADERS), method='GET')
+    open_url = opener if opener is not None else OPENER.open
     requested = clock()
     try:
-        with opener(request, timeout=TIMEOUT) as response:
+        with open_url(request, timeout=TIMEOUT) as response:
+            final = response.geturl() if hasattr(response, 'geturl') else url
+            if final != url:
+                raise Refusal('redirect_refused', {'location': final})
             body = response.read(MAX_BODY + 1)
             status = getattr(response, 'status', 200)
             headers = {k.lower(): v for k, v in response.headers.items()
