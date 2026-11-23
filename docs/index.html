@@ -123,16 +123,18 @@
 <details class="disclosure" id="simulador">
   <summary>Simulador de banca</summary>
   <div class="disclosure-body">
-<p class="note">Simulação histórica, sem valor preditivo. Usa até 600 apostas liquidadas do relatório, por ordem do sinal.</p>
+<p class="note">Simulação histórica a preços anunciados, sem custos e sem prova de preço executável. A stake fica reservada até à liquidação comprovada. Uma correção do resultado só altera o saldo a partir do instante em que foi conhecida. Não demonstra rentabilidade.</p>
+<p class="note" id="sim-evidence"></p>
 <div class="panel">
   <div class="sim">
     <label>Banca inicial (€)<input type="number" id="simbank" value="1000" min="10" step="10"></label>
     <label>Regra<select id="simmode"><option value="flat">Valor fixo por aposta</option><option value="pct">Percentagem da banca</option></select></label>
     <label><span id="simvallabel">Valor por aposta (€)</span><input type="number" id="simval" value="10" min="0.1" step="0.1"></label>
-    <label>Odd conseguida<select id="simcut"><option value="0">A anunciada</option><option value="0.02">2 % abaixo</option><option value="0.05">5 % abaixo</option></select></label>
+    <label>Odd simulada<select id="simcut"><option value="0">A anunciada</option><option value="0.02">2 % abaixo</option><option value="0.05">5 % abaixo</option></select></label>
   </div>
   <fieldset class="sim-group"><legend>Tipos de sinal a incluir</legend><div class="simtypes" id="simtypes" role="group" aria-label="Tipos de sinal a incluir"></div></fieldset>
   <dl class="simout" id="simout"></dl>
+  <p class="note" id="sim-exposure"></p>
   <div id="simchart"></div>
 </div>
   </div>

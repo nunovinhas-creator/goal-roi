@@ -137,6 +137,23 @@ class Votes:
             u[3] += 1 / r['odds']
             u[4] += 1
 
+    def remove(self, r):
+        """Remove the previously counted version when its result is corrected."""
+        key, bet = game_identity(r), bet_identity(r)
+        game = self.m[key]
+        u = game[bet]
+        if u[2] == 1:
+            del game[bet]
+            if not game:
+                del self.m[key]
+            return
+        u[0] -= max(r['w'], 0)
+        u[1] -= max(-r['w'], 0)
+        u[2] -= 1
+        if r['odds']:
+            u[3] -= 1 / r['odds']
+            u[4] -= 1
+
     def totals(self):
         """-> (acertos, falhas, taxa necessária, jogos). A soma segue uma ordem fixa: o resultado não depende da ordem de entrada."""
         hits = misses = 0.0
