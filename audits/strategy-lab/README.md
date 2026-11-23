@@ -19,8 +19,14 @@ Estado: **experimental**. Nenhuma certificação, nenhum alerta novo, nenhuma ap
   Cronologia honesta: os limiares estavam escritos às 14:01Z; a lista curta foi selecionada com dados até às 14:00Z;
   o registo final das 14:32Z só acrescentou regras de falha fechada e corrigiu a contagem de Bonferroni (defeitos
   encontrados pela revisão independente), sem mudar nenhum limiar nem a seleção.
-- `audits/strategy-lab/shortlist-v1.json` — lista curta congelada (SHA em `SHORTLIST_SHA256`). Só contam apostas
-  decididas **depois** de `registered_utc`; os resultados que serviram para a escolher nunca contam como prova.
+- `audits/strategy-lab/shortlist-v1.json` — lista curta congelada (SHA em `SHORTLIST_SHA256`). O ficheiro declara
+  `registered_utc` = 14:00Z, mas esse instante não tem prova Git imutável anterior. A evidência começa no **primeiro marco
+  atestado pelo GitHub**: a criação da PR #76 (`2026-11-23T14:40:13Z`, relógio do servidor; cabeça `c3f9a29`, que já
+  continha o mesmo blob `074231b` do ficheiro, idêntico em `7021ce9`). Constante `SHORTLIST_PROOF` em
+  `scangoal/strategy_board.py`; início efetivo = o mais tardio dos dois instantes. Apostas decididas no intervalo
+  14:00–14:40:13Z nunca contam. Uma consulta `--as-of` anterior ao marco não revela as estratégias selecionadas
+  (`status: not_registered_at_as_of`, sem entradas). A regra PR #55 mantém a sua janela original (desde 19/11).
+  Os resultados que serviram para escolher a lista nunca contam como prova.
   Correção de Bonferroni só sobre o tamanho da lista (2), em vez de sobre as ~5 000 candidatas do quadro.
 - `python -m scripts.strategy_board [--as-of ISO] [--select-shortlist]` — só leitura; `--select-shortlist` reproduz a
   regra de seleção da lista curta no mesmo relógio.
@@ -65,6 +71,16 @@ fase e de condições, ausência de dados pessoais no pedido à LLM.
 
 Pontos plausíveis registados, não alterados: a regra PR #55 mantém a sua janela própria (desde 19/11) dentro da lista
 curta; a redundância é por conjunto de jogos, não por apostas; a candidata selecionada está exatamente no mínimo de 10 dias.
+
+## Segunda revisão (2026-11-23, pontos da auditoria)
+
+1. CI vermelha (`test_one_coherent_snapshot_across_refreshes`): depende só do snapshot `docs/report.json`. O código de
+   `main@9b17889` e o da PR passam ambos com o snapshot desse commit e falham ambos com qualquer snapshot desde
+   `47bd47b` (12:53Z, a primeira recolha com `simulation.entries` da PR #75). O dashboard usa `simulation.entries`; o
+   oráculo do teste usa sempre `timeline` com a semântica legada. Não é regressão desta PR; não foi alterado.
+2. Integridade temporal: ver a lista curta acima (`ShortlistTemporalIntegrity`).
+3. Fases: `pre`/`live`/`unknown` têm de somar os jogos admitidos; outra chave ou outra soma é evidência malformada e
+   falha fechada (`PhaseConsistency`). Os testes falhavam antes da correção (validada com 5 de 1 000 jogos com fase).
 
 ## Limitações conhecidas
 

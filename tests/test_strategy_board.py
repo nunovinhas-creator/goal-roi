@@ -335,6 +335,82 @@ class IndependentReviewRegressions(unittest.TestCase):
         self.assertTrue(all('x ->' not in line for line in sb.llm_feedback(broken)))
 
 
+SHORT_ID = ('Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00 '
+            '& Parte do jogo = 2.ª parte')
+SHORT_HID = brain.hyp_id('Jogo aberto', [('Confiança indicada pelo bot', '95 % ou mais'),
+                                          ('Faixa de odd', 'odd 1,50 a 2,00'), ('Parte do jogo', '2.ª parte')])
+
+
+def short_signal(match, minute_of_23rd, w=1.0):
+    """A signal matching the frozen shortlist entry, sent on 2026-11-23 at the given minute (UTC), read at once."""
+    return sig(match, w, 3 * 1440 + minute_of_23rd, odds=1.8, bot_over_pct=96)
+
+
+class ShortlistTemporalIntegrity(unittest.TestCase):
+    """Review 2 (23/11): the shortlist only counts from a GitHub-attested instant, never from its self-declared 14:00."""
+
+    def board_at(self, signals, as_of):
+        return brain.build(signals, {}, 300, as_of=as_of)['strategy_board']
+
+    def test_ids_match_the_registered_file(self):
+        self.assertEqual(SHORT_HID, SHORT_ID)
+        self.assertIn(SHORT_ID, [e['id'] for e in sb.load_shortlist()['entries']])
+
+    def test_evidence_starts_at_the_attested_marker_not_at_the_declared_time(self):
+        self.assertEqual(sb.SHORTLIST_PROOF['created_at_utc'], '2026-11-23T14:40:13Z')
+        self.assertEqual(sb.shortlist_evidence_start(sb.load_shortlist()).isoformat(), '2026-11-23T14:40:13+00:00')
+
+    def test_bets_in_the_unverifiable_interval_never_count(self):
+        gap = [short_signal('gap%d' % i, 14 * 60 + 5 + 3 * i) for i in range(10)]      # 14:05 … 14:32, before the marker
+        after = [short_signal('aft%d' % i, 15 * 60 + 180 * i, w=-1.0) for i in range(4)]
+        result = self.board_at(gap + after, T0 + timedelta(days=10))
+        entry = {e['id']: e for e in result['shortlist']['entries']}[SHORT_ID]
+        self.assertEqual(entry['admitted'], 4)
+        self.assertEqual(entry['wins'], 0)
+
+    def test_as_of_before_the_marker_reveals_no_selected_strategy(self):
+        signals = [short_signal('aft0', 15 * 60)]
+        for as_of in (T0 + timedelta(days=3, hours=14, minutes=10), T0 + timedelta(days=3, hours=14, minutes=40)):
+            result = self.board_at(signals, as_of)
+            self.assertEqual(result['shortlist']['entries'], [])
+            self.assertEqual(result['shortlist']['status'], 'not_registered_at_as_of')
+            self.assertNotIn(SHORT_ID, json.dumps(result, ensure_ascii=False))
+        later = self.board_at(signals, T0 + timedelta(days=3, hours=14, minutes=41))
+        self.assertEqual(len(later['shortlist']['entries']), 2)
+
+    def test_pr55_rule_keeps_its_original_window(self):
+        rule = copy.deepcopy(RuleAndShortlist.RULE)
+        before = sb.build([], NO_VALIDATION, as_of_dimensions=AS_OF, post_dimensions=POST, rule=rule,
+                          as_of=T0 + timedelta(days=3, hours=14))
+        self.assertEqual(before['rule_pr55']['confirmed'], 5)       # 19/11 window still visible on its own
+
+
+class PhaseConsistency(unittest.TestCase):
+    """Review 3 (23/11): pre/live/unknown counts must add up to the admitted games, or the evidence fails closed."""
+
+    def certified(self, **kw):
+        return row(economics=econ(1000, 0.3, se=0.01, days=100, share=0.01, **kw),
+                   confirmation={'certified_utc': '2026-11-22T00:00:00+00:00'})
+
+    def test_phase_counts_that_do_not_add_up_never_validate(self):
+        with patch.object(sb, 'EXECUTABLE_PRICE_EVIDENCE', True), patch.object(sb, 'COSTS_KNOWN', True):
+            for phases in ({'live': 5}, {'live': 1001}, {'pre': 0, 'live': 1000, 'unknown': 3}, {'other': 1000}):
+                card = classify_one(self.certified(phases=phases), validation={'state': 'active'})
+                self.assertEqual(card['state'], sb.C, phases)
+                self.assertIn('malformed_evidence', card['reasons'], phases)
+            ok = classify_one(self.certified(phases={'live': 1000}), validation={'state': 'active'})
+            self.assertEqual(ok['state'], sb.D)
+
+    def test_pr55_phase_count_covers_every_admitted_game(self):
+        card = board([], rule=RuleAndShortlist.RULE)['rule_pr55']
+        self.assertEqual(card['reasons'], ['below_observe_minimum'])
+
+    def test_brain_phase_counts_match_admitted_on_real_economics(self):
+        signals = series([1.0, -1.0, None] * 8, every=180) + [sig('pre%d' % i, 1.0, 40 * 60 + i, phase='pre') for i in range(3)]
+        e = brain.economic_summary(signals, brain.chronology.parse_utc('2026-01-01T00:00:00+00:00'), T0 + timedelta(days=1))
+        self.assertEqual(sum(e['phases'].values()), e['admitted'])
+
+
 class BrainIntegration(unittest.TestCase):
     def test_brain_build_publishes_the_board_without_validation(self):
         signals = series([1.0, -1.0, 1.0] * 15, every=180)

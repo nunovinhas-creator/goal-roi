@@ -13,6 +13,7 @@ Os limites estatísticos são aproximações normais descritivas; nunca substitu
 import hashlib
 import json
 import math
+from datetime import datetime, timezone
 from pathlib import Path
 from statistics import NormalDist
 
@@ -54,6 +55,16 @@ CRITERIA_SHA256 = 'dedf0eb3dd1ce73dbb999bdd56f6d0108fa3f69fe39bb5156da662b4c8452
 SHORTLIST_PATH = Path(__file__).resolve().parents[1] / 'audits/strategy-lab/shortlist-v1.json'
 SHORTLIST_SHA256 = '2a9b648f3235a8fd95b6b3dcf8179a6963ea15c4a9b33f4de4cc82a190e3e0ee'
 RULE_PR55_ID = 'polymarket_pre_over25_share_lt80_total_lt10000_v1'
+# O instante declarado no ficheiro (14:00Z) não tem prova Git imutável anterior. O primeiro marco atestado pelo GitHub
+# (relógio do servidor, não do autor do commit) é a criação da PR #76, cuja cabeça já continha este mesmo blob. A
+# evidência só começa no mais tardio dos dois instantes: o intervalo não verificável nunca entra. Nunca recuar.
+SHORTLIST_PROOF = {
+    'kind': 'github_pull_request_created_at',
+    'url': 'https://github.com/nunovinhas-creator/goal-roi/pull/76',
+    'created_at_utc': '2026-11-23T14:40:13Z',
+    'head_sha': 'c3f9a29acd7f1064c75fca2d73d5b1e18f46c2b4',
+    'file_blob_sha1': '074231bde9f1a915237d1debf99711ddd5222902',
+}
 
 # Não há no repositório nenhuma prova de execução (fills, profundidade do livro, apostas aceites) nem de comissões.
 # Não inventar: enquanto não existir uma fonte auditável, estes dois requisitos ficam por cumprir.
@@ -99,6 +110,22 @@ def load_shortlist(path=None):
     if digest != SHORTLIST_SHA256:
         raise ValueError('changed shortlist registration')
     return data
+
+
+def _utc(text):
+    try:
+        value = datetime.fromisoformat(str(text).replace('Z', '+00:00'))
+    except ValueError:
+        return None
+    return value.astimezone(timezone.utc) if value.utcoffset() is not None else None
+
+
+def shortlist_evidence_start(shortlist):
+    """Primeiro instante em que a lista curta pode contar evidência: o mais tardio entre o declarado e o atestado."""
+    declared, proven = _utc((shortlist or {}).get('registered_utc')), _utc(SHORTLIST_PROOF['created_at_utc'])
+    if declared is None or proven is None:
+        return None
+    return max(declared, proven)
 
 
 def select_shortlist(cards, limit=4):
@@ -149,7 +176,9 @@ def shortlist_section(shortlist, rows_by_id, rule_card, validation, as_of_dimens
             card = _card(row, ev, state, why, bounds)
         card.update(state=state, label=LABELS[state], reasons=why, **bounds)
         cards.append(card)
-    return {'registered_utc': shortlist.get('registered_utc'), 'sha256': SHORTLIST_SHA256,
+    start = shortlist_evidence_start(shortlist)
+    return {'status': 'registered', 'registered_utc': shortlist.get('registered_utc'), 'sha256': SHORTLIST_SHA256,
+            'evidence_start_utc': start.isoformat() if start else None, 'proof': SHORTLIST_PROOF,
             'pr55_window': 'the PR #55 rule keeps its own forward window, preregistered on 2026-11-19',
             'size': len(entries), 'z_corrected': round(z, 4), 'entries': cards,
             'validation_window': shortlist.get('validation_window')}
@@ -169,6 +198,7 @@ def bonferroni_z(m, alpha=None):
     return NormalDist().inv_cdf(1 - alpha / max(1, m))
 
 
+PHASES = frozenset({'pre', 'live', 'unknown'})
 COUNT_FIELDS = ('admitted', 'confirmed', 'wins', 'losses', 'voids', 'pending', 'quarantined', 'imputed_losses', 'days')
 
 
@@ -192,6 +222,10 @@ def normalize(raw):
     phases = raw.get('phases')
     if not isinstance(phases, dict) or not all(isinstance(k, str) and _count(v) is not None for k, v in phases.items()):
         phases, bad = {}, True
+    # Cada jogo admitido tem exatamente uma fase (pre, live ou unknown): as contagens têm de somar os admitidos.
+    phases = {k: v for k, v in phases.items() if v}
+    if not set(phases) <= PHASES or sum(phases.values()) != ev['admitted']:
+        bad = True
     ev['phases'] = phases
     if ev['se'] is not None and ev['se'] < 0:
         ev['se'], bad = None, True
@@ -311,7 +345,7 @@ def _card(row, ev, state, reasons, bounds, baseline=None):
 
 
 def build(rows, validation, *, as_of_dimensions, post_dimensions, baseline=None, rule=None, full=None,
-          shortlist=None, shortlist_rows=None):
+          shortlist=None, shortlist_rows=None, as_of=None):
     """rows: linhas do cérebro (brain.evaluate). validation: brain.validation(). baseline(família, fase, born_utc) -> dict
     descritivo opcional. rule: resultado de opportunity_ranking.build (regra PR #55), opcional."""
     active = (validation or {}).get('state') == 'active'
@@ -376,8 +410,15 @@ def build(rows, validation, *, as_of_dimensions, post_dimensions, baseline=None,
             if len(chosen) >= CRITERIA['listing_limit']:
                 break
         out[state] = chosen
-    short = shortlist_section(shortlist, {r['id']: r for r in shortlist_rows or ()}, rule_card, validation,
-                             as_of_dimensions, post_dimensions)
+    start = shortlist_evidence_start(shortlist) if isinstance(shortlist, dict) else None
+    clock = as_of if as_of is not None else datetime.now(timezone.utc)
+    if isinstance(shortlist, dict) and (start is None or clock < start):
+        # Antes do marco atestado a lista ainda não existia de forma comprovável: não revelar as estratégias escolhidas.
+        short = {'status': 'not_registered_at_as_of', 'entries': [], 'size': 0,
+                 'evidence_start_utc': start.isoformat() if start else None}
+    else:
+        short = shortlist_section(shortlist, {r['id']: r for r in shortlist_rows or ()}, rule_card, validation,
+                                  as_of_dimensions, post_dimensions)
     if rule_card is not None:
         rule_card.pop('_ev')
     validated = out.get(D, [])
@@ -432,7 +473,8 @@ def _rule_entry(rule):
                     'roi_advertised': r.get('roi_advertised'), 'roi': r.get('roi_odds_minus_2pct'),
                     'se': r.get('se_day_clustered_odds_minus_2pct'), 'days': min(groups),
                     'largest_day_share': None if any(x is None for x in shares) else max(shares),
-                    'phases': {'pre': settled} if settled else {},
+                    # A regra só admite sinais pré-jogo (opportunity_forward.baseline_signal): todos os admitidos são pre.
+                    'phases': {'pre': r.get('forward_games', 0)},
                     'hit_rate': r.get('confirmed_hit_rate'), 'mean_odds': None})
     baseline = rule.get('baseline') if isinstance(rule.get('baseline'), dict) else {}
     return {'id': r.get('rule_id'), 'family': 'Polymarket', 'source': 'PR #55 (regra fixa congelada)',

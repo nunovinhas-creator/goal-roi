@@ -1112,17 +1112,21 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
                 'confirmed': econ['results_confirmed'], 'roi_odds_minus_2pct': econ['roi_odds_minus_2pct']}
 
     # Lista curta congelada: as mesmas condições, avaliadas só com apostas decididas depois do registo da lista.
+    # Começa no marco atestado pelo GitHub, nunca no instante declarado no ficheiro (strategy_board.SHORTLIST_PROOF).
     try:
         shortlist = strategy_board.load_shortlist()
     except (OSError, ValueError):
         shortlist = None
+    clock = as_of if as_of is not None else datetime.now(timezone.utc)
+    start = strategy_board.shortlist_evidence_start(shortlist)
     short_registry = {e['id']: {'family': e['family'], 'conditions': e['conditions'], 'source': 'shortlist',
-                                'born_utc': shortlist['registered_utc']}
-                      for e in (shortlist or {}).get('entries', ()) if e.get('conditions')}
+                                'born_utc': start.isoformat()}
+                      for e in (shortlist or {}).get('entries', ())
+                      if e.get('conditions') and start is not None and clock >= start}
     short_rows = evaluate(signals, short_registry, min_settled, as_of=as_of)[0] if short_registry else []
     strategies = strategy_board.build(rows, valid, as_of_dimensions=AS_OF_DIMENSIONS, post_dimensions=POST,
                                       baseline=family_baseline, rule=opportunity_rule,
-                                      shortlist=shortlist, shortlist_rows=short_rows)
+                                      shortlist=shortlist, shortlist_rows=short_rows, as_of=clock)
     for r in rows:
         r['open'] = len(r['open'])
         r.pop('_games', None)

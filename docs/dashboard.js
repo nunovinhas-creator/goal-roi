@@ -572,7 +572,7 @@ function strategyUI(d){
   const line=c=>{const li=el('li');li.append(el('b',{},c.id||'—'),chip(c.state==='validada'?'good':c.state==='rejeitada'?'bad':'wait',c.label||c.state||'—'));
     li.append(el('span',{class:'why'},`${count(c.confirmed||0)} resultados prospetivos comprovados`+(c.roi_odds_minus_2pct==null?'':`, ROI com odd ×0,98 ${pct(c.roi_odds_minus_2pct,1)}`)+(c.lower_corrected==null?'':`, limite inferior corrigido ${pct(c.lower_corrected,1)}`)+`. Falta: ${(c.reasons||[]).slice(0,3).map(r=>labels[r]||r).join('; ')||'—'}.`));return li};
   for (const c of S.shortlist?.entries||[]) $('strategy-shortlist').append(line(c));
-  emptyList('strategy-shortlist','Lista curta indisponível.');
+  emptyList('strategy-shortlist',S.shortlist?.status==='not_registered_at_as_of'?'Lista curta ainda sem registo comprovável neste instante.':'Lista curta indisponível.');
   for (const c of (S.insufficient||[]).slice(0,5)) $('strategy-insufficient').append(line(c));
   emptyList('strategy-insufficient','Nenhuma candidata com evidência suficiente para leitura.');
   for (const [code,n] of Object.entries(S.reasons||{}).filter(([c])=>c!=='avoid_hypothesis').sort((a,b)=>b[1]-a[1]).slice(0,6)) $('strategy-reasons').append(el('li',{},`${labels[code]||code}: ${count(n)}`));
