@@ -16,6 +16,16 @@ Acrescentar `--summary` para omitir as decisões por encontro ou `--hypothesis '
 - Os seis estados são exclusivos. Uma liquidação confirmada inclui devoluções e meias liquidações. Um FT verificável sem um pagamento calculável tem categoria própria mesmo depois do prazo. Uma ausência de resultado passa de pendente a perda imputada no prazo. Conflitos são apresentados como quarentena, e evidência inválida ou sem tempo verificável fica como desconhecida. Reconciliações tardias aparecem em separado.
 - O cenário adverso usa uma unidade por jogo admitido, aplica o fator 0,98 às odds anunciadas de liquidações confirmadas e debita uma unidade a cada jogo por resolver. Inclui pendências, quarentenas, FT sem liquidação, desconhecidos e perdas imputadas. O denominador é todo o conjunto admitido em cada coluna. O retorno é teórico e os custos e a execução continuam por demonstrar.
 
+### Interpretação das marcas temporais
+
+| Evidência | Leitura do JSON |
+|---|---|
+| Incompatibilidade temporal demonstrada face ao kickoff registado | Uma primeira leitura comprovada em `signal_version.first_read_utc` a partir de `time_window.kickoff_utc` impede uma decisão pré-jogo com esse sinal. `decision_window_reaches_kickoff` sozinho indica apenas que o limite superior da decisão atingiu o kickoff. A leitura pode ter ocorrido antes. |
+| Exequibilidade por demonstrar | `live_minute_unproven` e `pre_kickoff_unproven` identificam informação em falta. `live_window_may_reach_regulation_end` e `live_window_may_reach_first_half_end` indicam risco com base no limite conservador de 90 ou 45 minutos, incluindo o exemplo do minuto 89. |
+| Janela ainda em curso no corte | `decision_window_after_cutoff` indica que `decision_by_utc` é posterior a `--as-of`. Se `available_from_utc` já tiver sido atingido, a avaliação permanece provisória até ao limite da janela. |
+
+As marcas podem coexistir. A exclusão do diagnóstico por uma janela conservadora, informação em falta ou corte prematuro tem uma justificação diferente de uma incompatibilidade demonstrada pelos carimbos.
+
 ## Reprodução com dados fixos
 
 A referência seguinte fixa o histórico do registo, o diário, a ativação da PR #55 e as versões de resultados fora do diretório de trabalho. O comando de auditoria lê a cópia e escreve apenas para stdout.
@@ -37,11 +47,24 @@ SCANGOAL_DATA_DIR="$snapshot/data" python -B -m scripts.decision_audit \
 | Jogo aberto, segunda parte, registo geral | 277 / 277 | 268 / 268 | +0,51% sobre 271 | −1,66% / −1,66% |
 | Stake, outros mercados, registo geral | 148 / 91 | 72 / 47 | −38,41% sobre 106 | −55,89% / −59,36% |
 
-Na PR #55, o cenário adverso imputa uma perda ao jogo pendente. Em Jogo aberto, o cálculo atual já inclui três imputações e o cenário adverso acrescenta seis pendentes no denominador e nas perdas. Na hipótese Stake, 57 encontros deixam de ser admitidos pelo diagnóstico por falta de minuto LIVE comprovado. Dos 148 admitidos pelo cálculo atual, 67 tinham FT mas continuavam sem uma liquidação calculável do contrato. Os testes sintéticos reproduzem diferenças de admissão, incluindo o minuto 89, o pré-jogo sem kickoff e o reaproveitamento de uma mensagem posterior ao marco.
+Na PR #55, o cenário adverso imputa uma perda ao jogo pendente. Em Jogo aberto, o cálculo atual já inclui três imputações e o cenário adverso acrescenta seis pendentes no denominador e nas perdas. Na hipótese Stake, os 57 encontros a menos no diagnóstico têm `live_minute_unproven`. A exequibilidade desses 57 permanece indeterminada. Dos 148 admitidos pelo cálculo atual, 67 tinham FT mas continuavam sem uma liquidação calculável do contrato. Os testes sintéticos reproduzem diferenças de admissão, incluindo o minuto 89, o pré-jogo sem kickoff e o reaproveitamento de uma mensagem posterior ao marco.
 
 O replay usa os carimbos observados no diário e as versões de resultados visíveis no corte. Testes acrescentam um sinal e uma edição futuros, um conflito de identidade e correções de resultados. No mesmo corte, as decisões e a evidência ficam idênticas. Num corte posterior, a liquidação pode evoluir com a evidência disponível. Para reproduzir uma auditoria mesmo que alguém reescreva um ficheiro ou fabrique carimbos anteriores, conservar o SHA da revisão dos dados além do corte. Git local e uma hora anunciada pelo bot têm garantias limitadas sobre o tempo real de publicação ou sobre a possibilidade de execução.
 
 ## Testes
+
+Para verificar o relatório de produção, o teste manual seguinte usa a revisão imediatamente anterior à P0 e a revisão que alterou `scangoal/report.py`. Para cada snapshot, as duas versões leem o mesmo `data/` e usam o `generated_at_utc` do relatório publicado nesse snapshot. O teste compara todos os campos e valores do JSON, incluindo valores aninhados, e imprime o SHA-256 da representação canónica. O relatório publicado fornece o relógio de referência. Os valores esperados vêm da reexecução com o código anterior à P0.
+
+```sh
+python -B tests/verify_report_invariance.py \
+  e886cfc83763fe215aa867108028bb39f446994d 82715d614a047999aeb7e48fa3d5dba996779788 \
+  021391a4259e463aa679f440b8c85666125a3361 254f7703756ef543939b46261fab23768a2247ba \
+  890cc96858271696fa55f4f7a38875d627907529
+```
+
+A revisão `021391a4` antecede o merge e o marco atestado da PR #76. As outras duas cobrem a primeira publicação do quadro e uma recolha posterior.
+
+Suite do repositório:
 
 ```sh
 python -B -m unittest discover -s tests -v

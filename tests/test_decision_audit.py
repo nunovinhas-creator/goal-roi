@@ -38,11 +38,12 @@ def journal_row(message_id, minute, *, observed, edit=None, price=1.9, score=Non
 
 
 class TemporalDecisions(unittest.TestCase):
-    def compare(self, rows, *, reg=None):
-        hypothesis = hyp(conditions=(), born=at(-30))
+    def compare(self, rows, *, reg=None, family='Jogo aberto', clock=None):
+        hypothesis = hyp(conditions=(), born=at(-30), family=family)
         reg = reg or Registration(when(-30), when(-30), when(-30))
         return decision_audit.compare_hypothesis('h', hypothesis, reg, rows, rows,
-                                                 {b['message_id']: version(b) for b in rows}, when(60))
+                                                 {b['message_id']: version(b) for b in rows},
+                                                 when(60) if clock is None else clock)
 
     def test_minute_89_and_missing_prematch_kickoff(self):
         rows = [dict(sig('live', None, 0, message_id=1, seen=1), minute=89),
@@ -54,8 +55,55 @@ class TemporalDecisions(unittest.TestCase):
         self.assertEqual(out['current']['reconciled']['adverse']['roi'], -1)
         self.assertEqual(out['proposed']['admitted'], 0)
         decisions = {row['fixture_id']: row for row in out['decisions']}
-        self.assertIn('live_window_may_reach_regulation_end', decisions['live']['difference_reasons'])
-        self.assertIn('pre_kickoff_unproven', decisions['pre']['difference_reasons'])
+        self.assertEqual(decisions['live']['difference_reasons'], ['live_window_may_reach_regulation_end'])
+        self.assertEqual(decisions['pre']['difference_reasons'], ['pre_kickoff_unproven'])
+
+    def test_read_after_recorded_kickoff_has_incompatible_clocks(self):
+        bet = sig('pre', None, 0, message_id=1, seen=7, phase='pre', kickoff_utc=at(5))
+        out = self.compare([bet])
+        decision, = out['decisions']
+        attempt, = decision['signals']
+        self.assertEqual(attempt['time_window']['kickoff_utc'], at(5))
+        self.assertEqual(attempt['time_window']['available_from_utc'], at(7))
+        self.assertEqual(attempt['flags'], ['decision_window_reaches_kickoff', 'outside_current_time_window'])
+        self.assertIsNone(decision['current'])
+        self.assertIsNone(decision['proposed'])
+
+    def test_window_reaching_kickoff_can_still_begin_before_it(self):
+        bet = sig('pre', None, 0, message_id=1, seen=1, phase='pre', kickoff_utc=at(5))
+        decision, = self.compare([bet])['decisions']
+        attempt, = decision['signals']
+        window = attempt['time_window']
+        self.assertIn('decision_window_reaches_kickoff', attempt['flags'])
+        self.assertLess(window['available_from_utc'], window['kickoff_utc'])
+        self.assertGreaterEqual(window['decision_by_utc'], window['kickoff_utc'])
+        self.assertIsNone(decision['proposed'])
+
+    def test_stake_live_without_observed_minute_is_unproven(self):
+        bet = dict(sig('live', None, 0, typ='STAKE_LOAD', message_id=1,
+                       kickoff_utc=at(-50), after_kickoff_min=50), minute=None)
+        out = self.compare([bet], family='Stake')
+        decision, = out['decisions']
+        attempt, = decision['signals']
+        self.assertIsNone(attempt['time_window']['live_minute'])
+        self.assertEqual(attempt['flags'], ['live_minute_unproven'])
+        self.assertEqual(out['comparison']['fixtures_with_timing_flags'], {'live_minute_unproven': 1})
+        self.assertIsNotNone(decision['current'])
+        self.assertIsNone(decision['proposed'])
+
+    def test_as_of_inside_an_open_decision_window_is_provisional(self):
+        bet = sig('live', None, 0, message_id=1)
+        before = self.compare([bet], clock=when(14))
+        open_decision, = before['decisions']
+        self.assertEqual(open_decision['signals'][0]['flags'], ['decision_window_after_cutoff'])
+        self.assertIsNone(open_decision['current'])
+        self.assertIsNone(open_decision['proposed'])
+
+        after = self.compare([bet], clock=when(15))
+        closed_decision, = after['decisions']
+        self.assertEqual(closed_decision['signals'][0]['flags'], [])
+        self.assertEqual(closed_decision['current'], closed_decision['proposed'])
+        self.assertEqual(after['comparison']['admission']['same_signal'], 1)
 
     def test_declared_timestamp_before_git_proof_does_not_open_proposed_window(self):
         bet = sig('live', None, 0, message_id=1, canonical_match_id='live')
