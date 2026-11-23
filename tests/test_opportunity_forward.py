@@ -149,7 +149,8 @@ class ResultSourceTests(unittest.TestCase):
         observed = chronology.parse_utc(stamp)
         available = (observed + timedelta(minutes=5)).isoformat() if observed else None
         row = {"ft": score, "period": "regulation", "observed_at": stamp, "available_at": available,
-               "kickoff_utc": self.KO, "snapshot": {"home": "A", "away": "B", "league": "Example"}, **extra}
+               "kickoff_utc": self.KO, "snapshot": {"home": "A", "away": "B", "league": "Example",
+                                                  "event_date": self.KO, "ft": score}, **extra}
         (self.directory / ("results_" + name + ".json")).write_text(
             json.dumps({"ft_versions": {self.MATCH: [row]}}), encoding="utf-8",
         )

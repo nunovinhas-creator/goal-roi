@@ -200,20 +200,17 @@ def provider_observations(state, source):
     if not isinstance(versions, dict):
         return {}
     return {
-        mid: [Observation(source, mid, row.get("period"), score_pair(row.get("ft")),
-                          utc(row.get("observed_at")), utc(row.get("available_at")),
-                          kickoff=utc(row.get("kickoff_utc")), fixture_id=mid,
-                          link=(row.get("snapshot") or {}).get("link"), provider_record=row.get("snapshot") or {})
-              for row in rows if isinstance(row, dict) and row.get("fixture_id", mid) == mid]
+        mid: [observation for row in rows if isinstance(row, dict)
+              and (observation := _provider_observation(mid, row, source)) is not None]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
 
 
-def _provider_record(mid, version, source, as_of):
+def _provider_observation(mid, version, source, as_of=None):
     score = score_pair(version.get("ft"))
     kickoff = utc(version.get("kickoff_utc"))
     observed, available = utc(version.get("observed_at")), utc(version.get("available_at"))
-    if (score is None or not ft_time_valid(kickoff, observed, available, None, as_of)
+    if (score is None or not ft_time_valid(kickoff, observed, available, None, available if as_of is None else as_of)
             or version.get("period") != "regulation" or version.get("fixture_id", mid) != mid):
         return None
     snapshot = version.get("snapshot")
@@ -223,9 +220,18 @@ def _provider_record(mid, version, source, as_of):
     if (not isinstance(snapshot, dict) or snapshot.get("fixture_id", mid) != mid or score_pair(snapshot.get("ft")) != score
             or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
         return None
+    return Observation(source, mid, "regulation", score, observed, available, kickoff=kickoff, fixture_id=mid,
+                       link=snapshot.get("link"), provider_record=snapshot)
+
+
+def _provider_record(mid, version, source, as_of):
+    row = _provider_observation(mid, version, source, as_of)
+    if row is None:
+        return None
+    snapshot = row.provider_record
     return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
-                provider=snapshot.get("provider", source), observed_at=observed.isoformat(),
-                available_at=available.isoformat(), matched_at_utc=available.isoformat())
+                provider=snapshot.get("provider", source), observed_at=row.observed_at.isoformat(),
+                available_at=row.available_at.isoformat(), matched_at_utc=row.available_at.isoformat())
 
 
 def provider_snapshot(state, source, as_of):
