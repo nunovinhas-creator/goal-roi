@@ -46,6 +46,11 @@ def statistics(first, results, now):
                                      for mid, (_, status) in profits.items() if status in ("win", "loss"))
     score = None
     n, days = len(profits), len(by_day)
+    se = None
+    if n and days >= 2:
+        mean = sum(profit for profit, _ in profits.values()) / n
+        se = round(math.sqrt(days / (days - 1) * sum(
+            (sum(returns) - len(returns) * mean) ** 2 for returns in by_day.values()) / n ** 2), 4)
     if (counts["ft_confirmed"] >= MIN_RANK_GAMES and confirmed_spread["groups"] >= MIN_RANK_DAYS
             and max(settled_spread["largest_share"], confirmed_spread["largest_share"]) <= MAX_DAY_SHARE):
         mean = sum(profit for profit, _ in profits.values()) / n
@@ -56,6 +61,7 @@ def statistics(first, results, now):
         score = round(mean - math.sqrt(variance) * TWO_STANDARD_ERRORS, 4)
     return dict(counts, concentration=spread, liquidated_by_decision_day_utc=settled_spread,
                 confirmed_ft_by_decision_day_utc=confirmed_spread,
+                se_day_clustered_odds_minus_2pct=se,
                 descriptive_two_se_score=score)
 
 

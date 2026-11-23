@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from . import brain, chronology, equivalence, insights
+from . import brain, chronology, equivalence, insights, strategy_board
 from .eligibility import game_identity
 from .llm_budget import BudgetUnavailable, GitBudget
 from .results_bsd import load_json
@@ -136,7 +136,8 @@ REJECTION_CODES = ('malformed_response', 'malformed', 'vocabulary', 'support',
                    'duplicate', 'equivalent', 'invalid_parent', 'over_limit', 'invalid_note')
 
 
-def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None, opportunity=None, rejections=None):
+def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None, opportunity=None, rejections=None,
+                 strategies=None):
     lines = ['Medimos sinais de apostas de futebol de um bot. Cada sinal tem características. Uma hipótese é uma família de sinal',
              'mais 1 a %d condições (característica = valor). Queremos hipóteses NOVAS que possam acertar acima do que a odd exige.' % MAX_CONDITIONS, '',
              'Características disponíveis por família (valor: número de sinais):']
@@ -169,6 +170,9 @@ def build_prompt(vocab, top, existing, mode='novas', weak=(), track=None, opport
                     if type(rejections.get(code)) is int and rejections[code] > 0]
         if feedback:
             lines.append('Rejeições da avaliação anterior (motivos e contagens) — ' + ', '.join(feedback))
+    verdicts = strategy_board.llm_feedback(strategies)
+    if verdicts:
+        lines += ['', 'Decisão do motor científico (determinística; explica o que falta a cada proposta tua):', *verdicts]
     digest = opportunity_prompt(opportunity)
     if digest:
         lines += ['', 'Evidência prospetiva PR #55 (filtro pré-registado, sem certificação):', *digest]
@@ -438,7 +442,7 @@ def _run_locked(call, account, key, directory, now, budget, *, live):
     if vocab:
         digest = opportunity_digest(started)
         prompt = build_prompt(vocab, top, len(visible_registry), mode, weak, rep['brain'].get('track'), digest,
-                              state.get('last_rejection_reasons'))
+                              state.get('last_rejection_reasons'), rep['brain'].get('strategy_board'))
         raw = None
         outcome = 'skipped_no_affordable_model'
         for model in dict.fromkeys(MODELS):

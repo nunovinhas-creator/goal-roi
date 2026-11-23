@@ -559,6 +559,26 @@ function boardUI(d, certified){
   $('boardllm').textContent=n?`Última nota do modelo de linguagem, sobre "${n.id.replace(' | ',': ')}": ${n.note}`:'';
 }
 
+function strategyUI(d){
+  const S=d.brain?.strategy_board;
+  if (!S || S.schema !== 'goal_roi_strategy_board_v1') { $('strategy-verdict').textContent='Quadro de estratégias indisponível neste relatório.'; return; }
+  $('strategy-verdict').append(el('b',{},S.verdict || '—'));
+  const m=S.multiplicity||{};
+  $('strategy-note').textContent=`Critérios ${S.criteria?.version||'—'} fixados antes dos resultados; só contam jogos posteriores ao registo, uma unidade por jogo, odd ×0,98. Correção de Bonferroni sobre ${count(m.candidates_tested||0)} candidatas. Sem prova de odds executáveis nem de custos: nenhuma estratégia pode ser validada.`;
+  for (const [key,label] of [['em_observacao','Em observação'],['evidencia_insuficiente','Evidência insuficiente'],['rejeitada','Rejeitadas'],['validada','Validadas']]) {
+    const li=el('li'); li.append(el('b',{},count(S.counts?.[key]||0)),document.createTextNode(' '+label)); $('strategy-counts').append(li);
+  }
+  const labels=S.reason_labels||{};
+  const line=c=>{const li=el('li');li.append(el('b',{},c.id||'—'),chip(c.state==='validada'?'good':c.state==='rejeitada'?'bad':'wait',c.label||c.state||'—'));
+    li.append(el('span',{class:'why'},`${count(c.confirmed||0)} resultados prospetivos comprovados`+(c.roi_odds_minus_2pct==null?'':`, ROI com odd ×0,98 ${pct(c.roi_odds_minus_2pct,1)}`)+(c.lower_corrected==null?'':`, limite inferior corrigido ${pct(c.lower_corrected,1)}`)+`. Falta: ${(c.reasons||[]).slice(0,3).map(r=>labels[r]||r).join('; ')||'—'}.`));return li};
+  for (const c of S.shortlist?.entries||[]) $('strategy-shortlist').append(line(c));
+  emptyList('strategy-shortlist','Lista curta indisponível.');
+  for (const c of (S.insufficient||[]).slice(0,5)) $('strategy-insufficient').append(line(c));
+  emptyList('strategy-insufficient','Nenhuma candidata com evidência suficiente para leitura.');
+  for (const [code,n] of Object.entries(S.reasons||{}).filter(([c])=>c!=='avoid_hypothesis').sort((a,b)=>b[1]-a[1]).slice(0,6)) $('strategy-reasons').append(el('li',{},`${labels[code]||code}: ${count(n)}`));
+}
+function emptyList(id,text){if(!$(id).children.length)$(id).append(el('li',{},text))}
+
 let sortCol=5, sortDir=-1, showAll=false;
 function brainUI(d, certified, panel){
   const B=d.brain || {}, rules=B.rules || {};
@@ -891,6 +911,7 @@ function recent(d){
 const panels = {
   simulador: {draw:simulator},
   'dados-resultados': {clear:['groups','daily'], draw:d => { tables(d,'dados-resultados'); recent(d); }},
+  estrategias: {clear:['strategy-verdict','strategy-note','strategy-counts','strategy-shortlist','strategy-insufficient','strategy-reasons'], draw:strategyUI},
   taticas: {clear:['best','avoid','boardopen','boardllm'], draw:boardUI},
   hipoteses: {draw:(d, cert) => brainUI(d,cert,'hipoteses')},
   'estudo-chronologico': {clear:['wfnote','wf'], draw:(d, cert) => brainUI(d,cert,'estudo-chronologico')},

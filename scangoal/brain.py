@@ -33,7 +33,8 @@ Disciplina (fixada a 12/11/2026):
 import hashlib, itertools, json, math, re
 from datetime import datetime, timedelta, timezone
 
-from . import certification, chronology, freshness, insights, match_identity, opportunity_results, scientific_commitments
+from . import (certification, chronology, freshness, insights, match_identity, opportunity_results, scientific_commitments,
+               strategy_board)
 from .parser import competition_kind
 from .eligibility import bet_identity, eligible, exclusion_reasons, game_identity
 
@@ -439,6 +440,7 @@ def economic_summary(rows, born, as_of=None):
     counts = dict(admitted=0, results_confirmed=0, wins=0, losses=0, voids=0, imputed_losses=0, pending=0,
                   quarantined=0)
     advertised, stressed = [], []
+    phases, by_day, odds_seen = {}, {}, []
     for bet in committed_fixtures(rows, as_of):
         if not operational_signal(bet, born):
             continue
@@ -451,6 +453,8 @@ def economic_summary(rows, born, as_of=None):
             continue
 
         counts['admitted'] += 1
+        phase = bet.get('phase') if bet.get('phase') in ('pre', 'live') else 'unknown'
+        phases[phase] = phases.get(phase, 0) + 1
         if bet.get('result_quarantined'):
             counts['quarantined'] += 1
             continue
@@ -465,10 +469,13 @@ def economic_summary(rows, born, as_of=None):
             counts['wins' if w > 0 else 'losses' if w < 0 else 'voids'] += 1
             advertised.append(w * (bet['odds'] - 1) if w > 0 else float(w))
             stressed.append(profit)
+            odds_seen.append(bet['odds'])
+            by_day.setdefault(decision.date(), []).append(profit)
         elif as_of is not None and as_of >= deadline:
             counts['imputed_losses'] += 1
             advertised.append(-1.0)
             stressed.append(-1.0)
+            by_day.setdefault(decision.date(), []).append(-1.0)
         else:
             counts['pending'] += 1
 
@@ -478,7 +485,20 @@ def economic_summary(rows, born, as_of=None):
     status = ('insufficient' if not counts['results_confirmed']
               else 'positive_exploratory' if roi > 0 else 'nonpositive_exploratory')
     decided = counts['wins'] + counts['losses']
+    # Erro-padrão agrupado por dia UTC de decisão (jogos do mesmo dia podem estar correlacionados). Só descritivo; None com
+    # menos de dois dias. Usado pelo quadro de estratégias (strategy_board) com critérios fixados antes de o ler.
+    se = None
+    if resolved and len(by_day) >= 2:
+        mean = cut / resolved
+        variance = len(by_day) / (len(by_day) - 1) * sum(
+            (sum(day) - len(day) * mean) ** 2 for day in by_day.values()) / resolved ** 2
+        se = round(math.sqrt(variance), 4)
+    largest = max((len(day) for day in by_day.values()), default=0)
     return dict(counts, scope='prospective_exploratory', status=status, stake_per_game=1,
+                phases=dict(sorted(phases.items())), decision_days=len(by_day),
+                largest_day_share=round(largest / resolved, 4) if resolved else None,
+                se_day_clustered_odds_minus_2pct=se,
+                mean_advertised_odds=round(sum(odds_seen) / len(odds_seen), 4) if odds_seen else None,
                 resolved_stake_units=resolved, profit_advertised=round(sum(advertised), 4),
                 profit_odds_minus_2pct=round(cut, 4), roi_advertised=round(sum(advertised) / resolved, 4) if resolved else None,
                 roi_odds_minus_2pct=roi, confirmed_hit_rate=round(counts['wins'] / decided, 4) if decided else None,
@@ -1015,7 +1035,7 @@ def presentation(rows, watched=()):
 
 
 def build(signals, registry, min_settled, ledger=None, *, history_problems=None, as_of=None, receipt_dir=None,
-          archive_commitments=False):
+          archive_commitments=False, opportunity_rule=None):
     """ledger: registo de seleções para certificação (certification.load); None = não ativado: nenhuma tática validada.
 
     `receipt_dir` contém os recibos assinados do registo, das admissões e dos resultados. `as_of` estabelece a informação
@@ -1081,6 +1101,28 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
     mult, valid = multiplicity(rows, tested), validation(rows, ledger, problems, registry, history_unverified)
     valid['ledger_receipts'] = receipts
     shown = presentation(rows, {x['id'] for w in watch.values() for x in w['reasons']})
+
+    def family_baseline(fam, phase, born_utc):
+        born = chronology.parse_utc(born_utc)
+        if born is None:
+            return None
+        pool = [b for b in signals if insights.family(b) == fam and b.get('phase') == phase]
+        econ = economic_summary(pool, born, as_of)
+        return {'description': '%s/%s sem condições, mesma janela' % (fam, phase), 'overlapping': True,
+                'confirmed': econ['results_confirmed'], 'roi_odds_minus_2pct': econ['roi_odds_minus_2pct']}
+
+    # Lista curta congelada: as mesmas condições, avaliadas só com apostas decididas depois do registo da lista.
+    try:
+        shortlist = strategy_board.load_shortlist()
+    except (OSError, ValueError):
+        shortlist = None
+    short_registry = {e['id']: {'family': e['family'], 'conditions': e['conditions'], 'source': 'shortlist',
+                                'born_utc': shortlist['registered_utc']}
+                      for e in (shortlist or {}).get('entries', ()) if e.get('conditions')}
+    short_rows = evaluate(signals, short_registry, min_settled, as_of=as_of)[0] if short_registry else []
+    strategies = strategy_board.build(rows, valid, as_of_dimensions=AS_OF_DIMENSIONS, post_dimensions=POST,
+                                      baseline=family_baseline, rule=opportunity_rule,
+                                      shortlist=shortlist, shortlist_rows=short_rows)
     for r in rows:
         r['open'] = len(r['open'])
         r.pop('_games', None)
@@ -1103,7 +1145,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
             'llm': sorted((r for r in rows if r['source'] == 'llm'), key=lambda r: r['born_utc'], reverse=True)[:20],
             'llm_total': sum(1 for r in rows if r['source'] == 'llm'),
             'watch': sorted(watch.values(), key=lambda w: w['date_utc'], reverse=True)[:30],
-            'presentation': shown,
+            'presentation': shown, 'strategy_board': strategies,
             'rules': {'min_support': MIN_SUPPORT, 'max_conditions': MAX_CONDITIONS, 'hint_at': HINT_AT, 'strong_at': STRONG_AT, 'confirm_at': min_settled,
                       'unit': 'independent_games', 'status_rules': STATUS_RULES, 'promote_at': PROMOTE_AT, 'keep_promising': KEEP_PROMISING,
                       'abandon_at': ABANDON_AT, 'keep_abandoned': KEEP_ABANDONED, 'confirm_steps': CONFIRM_STEPS,

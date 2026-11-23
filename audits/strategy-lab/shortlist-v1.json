@@ -1,0 +1,28 @@
+{
+  "schema": "goal_roi_strategy_shortlist_v1",
+  "registered_utc": "2026-11-23T14:00:00Z",
+  "selection_data_as_of_utc": "2026-11-23T14:00:00Z",
+  "criteria_version": "strategy_board_criteria_v1",
+  "selection_rule": "From the strategy board at selection_data_as_of_utc: state evidencia_insuficiente, no gate reason, single phase, every condition known at the first signal (AS_OF_DIMENSIONS), not experimental, >= 30 confirmed prospective results spread over >= 10 decision days, ROI at odds x0.98 > 0. At most one per (family, phase), at most 4, ordered by ROI - 1.6449 x day-clustered SE. Plus the frozen PR #55 rule, which keeps its own earlier forward window.",
+  "validation_window": "only bets decided strictly after registered_utc; the discovery results used for selection never count as evidence",
+  "multiplicity": "Bonferroni over the entries below (alpha 0.05 / 2)",
+  "entries": [
+    {
+      "id": "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte",
+      "family": "Jogo aberto",
+      "phase": "live",
+      "conditions": [["Confiança indicada pelo bot", "95 % ou mais"], ["Faixa de odd", "odd 1,50 a 2,00"], ["Parte do jogo", "2.ª parte"]],
+      "discovery_snapshot": {"confirmed": 102, "roi_odds_minus_2pct": 0.0667, "se_day_clustered": 0.0451, "decision_days": 10, "use": "selection only, never evidence"}
+    },
+    {
+      "id": "polymarket_pre_over25_share_lt80_total_lt10000_v1",
+      "family": "Polymarket",
+      "phase": "pre",
+      "protocol": "audits/opportunity-lab/polymarket-over25-v1.json",
+      "discovery_snapshot": {"confirmed": 5, "use": "already preregistered on 2026-11-19; its forward window is unchanged"}
+    }
+  ],
+  "status": "experimental",
+  "scientific_certification": "not_activated",
+  "automatic_alerts_created": false
+}
