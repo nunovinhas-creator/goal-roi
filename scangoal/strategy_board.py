@@ -18,13 +18,13 @@ from statistics import NormalDist
 
 SCHEMA = 'goal_roi_strategy_board_v1'
 
-# Critérios congelados. Registados a 2026-11-23T14:01:25Z, com os valores já existentes no código sempre que havia um
+# Critérios congelados. Registados a 2026-11-23T14:32:19Z (v1 final, após revisão independente; limiares inalterados desde 14:01Z), com os valores já existentes no código sempre que havia um
 # (TRACK_MIN=10, HINT_AT=30, MIN_SETTLED=300, FWER_ALPHA=0.05, MIN_RANK_DAYS=10, MAX_DAY_SHARE=0.20, odd ×0,98).
 # Qualquer alteração muda CRITERIA_SHA256 e faz falhar tests/test_strategy_board.py: um critério novo exige versão nova,
 # data nova e só vale para jogos posteriores a essa data.
 CRITERIA = {
     'version': 'strategy_board_criteria_v1',
-    'registered_utc': '2026-11-23T14:01:25Z',
+    'registered_utc': '2026-11-23T14:32:19Z',
     'unit': 'one committed unit per independent fixture, decided after registration and before any result',
     'return': 'profit at announced odds x 0.98',
     'observe_min_results': 10,
@@ -36,7 +36,10 @@ CRITERIA = {
     'family_alpha': 0.05,
     'reject_upper_z': 1.6449,
     'bounds_require_min_decision_days': True,
-    'multiplicity': 'bonferroni over every candidate with >= observe_min_results confirmed results in this run',
+    'multiplicity': 'bonferroni over every candidate with >= observe_min_results confirmed results in this run, '
+                    'rejected ones included (only avoid hypotheses are not candidates)',
+    'fail_closed': 'malformed or inconsistent evidence is rejected; validated also needs exactly one known phase '
+                   '(pre or live) and a known day concentration',
     'phases': 'pre and live never pooled; a candidate whose committed bets mix them is rejected',
     'requires_for_validated': ['brain certification active and certified', 'executable price evidence',
                                'known costs and commissions', 'bonferroni lower bound > 0',
@@ -45,7 +48,7 @@ CRITERIA = {
     'listing_per_family': 3,
     'listing_excludes_non_positive_return': True,
 }
-CRITERIA_SHA256 = 'e56167cc53eb86e8826cab1d28473244560a533168dbb567553fc9dc494fedd4'
+CRITERIA_SHA256 = 'dedf0eb3dd1ce73dbb999bdd56f6d0108fa3f69fe39bb5156da662b4c84525e0'
 
 # Lista curta congelada (descoberta -> registo -> jogos futuros). Só apostas decididas depois de registered_utc contam.
 SHORTLIST_PATH = Path(__file__).resolve().parents[1] / 'audits/strategy-lab/shortlist-v1.json'
@@ -85,6 +88,7 @@ REASONS = {
     'no_executable_prices': 'sem prova de odds executáveis (só odds anunciadas)',
     'costs_unknown': 'custos e comissões desconhecidos',
     'unknown_phase': 'fase (pré-jogo/LIVE) desconhecida em parte da amostra',
+    'malformed_evidence': 'evidência malformada ou inconsistente (falha fechada)',
 }
 
 
@@ -100,7 +104,7 @@ def load_shortlist(path=None):
 def select_shortlist(cards, limit=4):
     """Regra de seleção fixada no registo da lista curta. Só escolhe o que testar no futuro; nunca é evidência."""
     k = CRITERIA
-    pool = [c for c in cards if c['state'] == B and len(c['phases']) == 1
+    pool = [c for c in cards if c['state'] == B and set(c['phases']) in ({'pre'}, {'live'})
             and 'experimental_profile' not in c['reasons'] and c['confirmed'] >= k['decision_min_results']
             and c['decision_days'] >= k['min_decision_days'] and _finite(c['roi_odds_minus_2pct'])
             and c['roi_odds_minus_2pct'] > 0 and _finite(c['se_day_clustered'])]
@@ -146,6 +150,7 @@ def shortlist_section(shortlist, rows_by_id, rule_card, validation, as_of_dimens
         card.update(state=state, label=LABELS[state], reasons=why, **bounds)
         cards.append(card)
     return {'registered_utc': shortlist.get('registered_utc'), 'sha256': SHORTLIST_SHA256,
+            'pr55_window': 'the PR #55 rule keeps its own forward window, preregistered on 2026-11-19',
             'size': len(entries), 'z_corrected': round(z, 4), 'entries': cards,
             'validation_window': shortlist.get('validation_window')}
 
@@ -164,20 +169,56 @@ def bonferroni_z(m, alpha=None):
     return NormalDist().inv_cdf(1 - alpha / max(1, m))
 
 
+COUNT_FIELDS = ('admitted', 'confirmed', 'wins', 'losses', 'voids', 'pending', 'quarantined', 'imputed_losses', 'days')
+
+
+def _count(value):
+    return value if type(value) is int and value >= 0 else None
+
+
+def normalize(raw):
+    """Evidência com tipos garantidos. Contagens inválidas viram 0 e marcam `malformed`; números não finitos viram None."""
+    ev, bad = {}, False
+    for key in COUNT_FIELDS:
+        value = raw.get(key, 0)
+        value = 0 if value is None else value
+        ev[key] = _count(value)
+        if ev[key] is None:
+            ev[key], bad = 0, True
+    for key in ('roi_advertised', 'roi', 'se', 'hit_rate', 'mean_odds'):
+        ev[key] = raw.get(key) if _finite(raw.get(key)) else None
+    share = raw.get('largest_day_share')
+    ev['largest_day_share'] = share if _finite(share) and 0 <= share <= 1 else None
+    phases = raw.get('phases')
+    if not isinstance(phases, dict) or not all(isinstance(k, str) and _count(v) is not None for k, v in phases.items()):
+        phases, bad = {}, True
+    ev['phases'] = phases
+    if ev['se'] is not None and ev['se'] < 0:
+        ev['se'], bad = None, True
+    # Cada jogo admitido está numa e uma só situação; vitórias, derrotas e devoluções somam os confirmados.
+    if (ev['confirmed'] + ev['pending'] + ev['quarantined'] + ev['imputed_losses'] != ev['admitted']
+            or ev['wins'] + ev['losses'] + ev['voids'] != ev['confirmed']
+            or (ev['confirmed'] and ev['roi'] is None)):
+        bad = True
+    ev['malformed'] = bad
+    return ev
+
+
 def evidence_of(row):
     """Normaliza uma linha do cérebro: só a evidência PROSPETIVA (economics), nunca a histórica."""
     econ = ((row.get('prospective') or {}).get('economics')) or {}
-    return {
-        'admitted': econ.get('admitted', 0) or 0,
-        'confirmed': econ.get('results_confirmed', 0) or 0,
-        'wins': econ.get('wins', 0) or 0, 'losses': econ.get('losses', 0) or 0, 'voids': econ.get('voids', 0) or 0,
-        'pending': econ.get('pending', 0) or 0, 'quarantined': econ.get('quarantined', 0) or 0,
-        'imputed_losses': econ.get('imputed_losses', 0) or 0,
+    if not isinstance(econ, dict):
+        econ = {'admitted': None}
+    return normalize({
+        'admitted': econ.get('admitted', 0), 'confirmed': econ.get('results_confirmed', 0),
+        'wins': econ.get('wins', 0), 'losses': econ.get('losses', 0), 'voids': econ.get('voids', 0),
+        'pending': econ.get('pending', 0), 'quarantined': econ.get('quarantined', 0),
+        'imputed_losses': econ.get('imputed_losses', 0),
         'roi_advertised': econ.get('roi_advertised'), 'roi': econ.get('roi_odds_minus_2pct'),
-        'se': econ.get('se_day_clustered_odds_minus_2pct'), 'days': econ.get('decision_days', 0) or 0,
+        'se': econ.get('se_day_clustered_odds_minus_2pct'), 'days': econ.get('decision_days', 0),
         'largest_day_share': econ.get('largest_day_share'), 'phases': econ.get('phases') or {},
         'hit_rate': econ.get('confirmed_hit_rate'), 'mean_odds': econ.get('mean_advertised_odds'),
-    }
+    })
 
 
 def gate_reasons(row, as_of_dimensions, post_dimensions):
@@ -194,7 +235,10 @@ def gate_reasons(row, as_of_dimensions, post_dimensions):
         out.append('not_known_at_decision')
     if row.get('prospective') is None:
         out.append('no_prospective_evidence_possible')
-    phases = evidence_of(row)['phases']
+    ev = evidence_of(row)
+    if ev['malformed']:
+        out.append('malformed_evidence')
+    phases = ev['phases']
     if phases.get('pre') and phases.get('live'):
         out.append('mixed_pre_live')
     if row.get('status') == 'abandonada':
@@ -211,6 +255,8 @@ def classify(ev, *, gates=(), z_corrected, certified=False, experimental=False):
     if _finite(roi) and _finite(se) and ev['days'] >= k['min_decision_days']:
         bounds = {'upper_95': round(roi + k['reject_upper_z'] * se, 4), 'lower_corrected': round(roi - z_corrected * se, 4)}
     reasons = list(gates)
+    if ev.get('malformed') and 'malformed_evidence' not in reasons:
+        reasons.append('malformed_evidence')
     unresolved = ev['imputed_losses'] + ev['quarantined']
     if ev['admitted'] >= k['decision_min_results'] and unresolved > k['max_unresolved_share'] * ev['admitted']:
         reasons.append('result_coverage')
@@ -223,7 +269,8 @@ def classify(ev, *, gates=(), z_corrected, certified=False, experimental=False):
     blocking = []
     if n < k['decision_min_results']:
         blocking.append('below_decision_minimum')
-    if ev['days'] < k['min_decision_days'] or (ev['largest_day_share'] or 0) > k['max_day_share']:
+    if (ev['days'] < k['min_decision_days'] or ev['largest_day_share'] is None
+            or ev['largest_day_share'] > k['max_day_share']):
         blocking.append('concentrated_in_few_days')
     if bounds['lower_corrected'] is None:
         if ev['days'] >= k['min_decision_days']:
@@ -234,7 +281,7 @@ def classify(ev, *, gates=(), z_corrected, certified=False, experimental=False):
         blocking.append('non_positive_return')
     if n < k['confirmation_min_results']:
         blocking.append('below_confirmation_sample')
-    if ev['phases'].get('unknown'):
+    if set(ev['phases']) not in ({'pre'}, {'live'}):
         blocking.append('unknown_phase')
     if experimental:
         blocking.append('experimental_profile')
@@ -273,7 +320,8 @@ def build(rows, validation, *, as_of_dimensions, post_dimensions, baseline=None,
         ev = evidence_of(row)
         gates = gate_reasons(row, as_of_dimensions, post_dimensions)
         prepared.append((row, ev, gates))
-    m = sum(1 for _, ev, gates in prepared if not gates and ev['confirmed'] >= CRITERIA['observe_min_results'])
+    m = sum(1 for _, ev, gates in prepared
+            if gates != ['avoid_hypothesis'] and ev['confirmed'] >= CRITERIA['observe_min_results'])
     rule_card = rule_entry(rule)
     if rule_card is not None and rule_card['confirmed'] >= CRITERIA['observe_min_results']:
         m += 1
@@ -322,7 +370,7 @@ def build(rows, validation, *, as_of_dimensions, post_dimensions, baseline=None,
             if per_family.get(fam, 0) >= CRITERIA['listing_per_family']:
                 continue
             per_family[fam] = per_family.get(fam, 0) + 1
-            phase = next(iter(ev['phases'])) if len(ev['phases']) == 1 else None
+            phase = next(iter(ev['phases'])) if set(ev['phases']) in ({'pre'}, {'live'}) else None
             base = baseline(fam, phase, row.get('born_utc')) if baseline is not None and st == B and phase else None
             chosen.append(_card(row, ev, st, why, bounds, base))
             if len(chosen) >= CRITERIA['listing_limit']:
@@ -353,24 +401,40 @@ def build(rows, validation, *, as_of_dimensions, post_dimensions, baseline=None,
 
 
 def rule_entry(rule):
-    """Converte o ranking da regra PR #55 (opportunity_ranking.build) para a mesma evidência normalizada. None sem dados."""
+    """Converte o ranking da regra PR #55 (opportunity_ranking.build) para a mesma evidência normalizada. None sem dados
+    ou com dados malformados (falha fechada: nunca interrompe o relatório)."""
+    try:
+        return _rule_entry(rule)
+    except (TypeError, ValueError, AttributeError, KeyError, ArithmeticError):
+        return None
+
+
+def _rule_entry(rule):
     if not isinstance(rule, dict) or rule.get('status') != 'exploratory_only':
         return None
     rows = rule.get('ranking')
     if not isinstance(rows, list) or len(rows) != 1 or not isinstance(rows[0], dict):
         return None
     r = rows[0]
-    days = (r.get('liquidated_by_decision_day_utc') or {})
-    timeouts = r.get('timeouts_counted_as_losses', 0) or 0
-    settled = r.get('settled', 0) or 0
-    ev = {'admitted': r.get('forward_games', 0) or 0, 'confirmed': r.get('ft_confirmed', 0) or 0,
-          'wins': r.get('wins', 0) or 0, 'losses': max(0, (r.get('losses', 0) or 0) - timeouts), 'voids': 0,
-          'pending': r.get('pending', 0) or 0, 'quarantined': r.get('quarantined', 0) or 0, 'imputed_losses': timeouts,
-          'roi_advertised': r.get('roi_advertised'), 'roi': r.get('roi_odds_minus_2pct'),
-          'se': r.get('se_day_clustered_odds_minus_2pct'), 'days': days.get('groups', 0) or 0,
-          'largest_day_share': days.get('largest_share'), 'phases': {'pre': settled} if settled else {},
-          'hit_rate': r.get('confirmed_hit_rate'), 'mean_odds': None}
-    baseline = rule.get('baseline') or {}
+    # Mesma concentração que o próprio ranking: o pior dos dois agrupamentos (liquidados e FT confirmados).
+    spreads = [r.get('liquidated_by_decision_day_utc'), r.get('confirmed_ft_by_decision_day_utc')]
+    if not all(isinstance(x, dict) for x in spreads):
+        return None
+    shares = [x.get('largest_share') for x in spreads]
+    groups = [x.get('groups') for x in spreads]
+    timeouts, settled = r.get('timeouts_counted_as_losses', 0), r.get('settled', 0)
+    losses = r.get('losses', 0)
+    if not all(_count(v) is not None for v in (timeouts, settled, losses, *groups)):
+        return None
+    ev = normalize({'admitted': r.get('forward_games', 0), 'confirmed': r.get('ft_confirmed', 0),
+                    'wins': r.get('wins', 0), 'losses': max(0, losses - timeouts), 'voids': 0,
+                    'pending': r.get('pending', 0), 'quarantined': r.get('quarantined', 0), 'imputed_losses': timeouts,
+                    'roi_advertised': r.get('roi_advertised'), 'roi': r.get('roi_odds_minus_2pct'),
+                    'se': r.get('se_day_clustered_odds_minus_2pct'), 'days': min(groups),
+                    'largest_day_share': None if any(x is None for x in shares) else max(shares),
+                    'phases': {'pre': settled} if settled else {},
+                    'hit_rate': r.get('confirmed_hit_rate'), 'mean_odds': None})
+    baseline = rule.get('baseline') if isinstance(rule.get('baseline'), dict) else {}
     return {'id': r.get('rule_id'), 'family': 'Polymarket', 'source': 'PR #55 (regra fixa congelada)',
             'admitted': ev['admitted'], 'confirmed': ev['confirmed'], 'wins': ev['wins'], 'losses': ev['losses'],
             'pending': ev['pending'], 'quarantined': ev['quarantined'], 'imputed_losses': ev['imputed_losses'],
@@ -385,7 +449,15 @@ def rule_entry(rule):
 
 
 def llm_feedback(board, limit=8):
-    """Linhas curtas para a LLM: o veredicto do motor sobre as propostas da própria LLM e porquê. Só agregados."""
+    """Linhas curtas para a LLM: o veredicto do motor sobre as propostas da própria LLM e porquê. Só agregados.
+    Falha fechada: [] com um quadro malformado (o pedido à LLM segue sem esta secção)."""
+    try:
+        return _llm_feedback(board, limit)
+    except (TypeError, ValueError, AttributeError, KeyError, ArithmeticError):
+        return []
+
+
+def _llm_feedback(board, limit):
     if not isinstance(board, dict) or board.get('schema') != SCHEMA:
         return []
     lines = ['Quadro de estratégias (critérios %s, fixados antes dos resultados): em observação %d, evidência insuficiente %d, '
@@ -396,6 +468,8 @@ def llm_feedback(board, limit=8):
     if verdicts:
         lines.append('As tuas propostas (resultados prospetivos comprovados; motivo do estado):')
     for v in verdicts[:limit]:
+        if not isinstance(v.get('id'), str) or _count(v.get('confirmed', 0)) is None:
+            continue
         lines.append('- %s -> %s, %d; %s' % (v['id'], LABELS[v['state']], v.get('confirmed', 0),
                                               '; '.join(labels.get(code, code) for code in (v.get('reasons') or [])[:3])))
     top = [code for code in board.get('reasons') or {} if code not in ('avoid_hypothesis',)][:4]

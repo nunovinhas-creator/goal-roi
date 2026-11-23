@@ -564,7 +564,7 @@ function strategyUI(d){
   if (!S || S.schema !== 'goal_roi_strategy_board_v1') { $('strategy-verdict').textContent='Quadro de estratégias indisponível neste relatório.'; return; }
   $('strategy-verdict').append(el('b',{},S.verdict || '—'));
   const m=S.multiplicity||{};
-  $('strategy-note').textContent=`Critérios ${S.criteria?.version||'—'} fixados antes dos resultados; só contam jogos posteriores ao registo, uma unidade por jogo, odd ×0,98. Correção de Bonferroni sobre ${count(m.candidates_tested||0)} candidatas. Sem prova de odds executáveis nem de custos: nenhuma estratégia pode ser validada.`;
+  $('strategy-note').textContent=`Critérios ${S.criteria?.version||'—'} fixados antes dos resultados; só contam jogos posteriores ao registo, uma unidade por jogo, odd ×0,98. Correção de Bonferroni sobre ${count(m.candidates_tested||0)} candidatas (rejeitadas incluídas). Sem prova de odds executáveis nem de custos: nenhuma estratégia pode ser validada.`;
   for (const [key,label] of [['em_observacao','Em observação'],['evidencia_insuficiente','Evidência insuficiente'],['rejeitada','Rejeitadas'],['validada','Validadas']]) {
     const li=el('li'); li.append(el('b',{},count(S.counts?.[key]||0)),document.createTextNode(' '+label)); $('strategy-counts').append(li);
   }

@@ -252,7 +252,8 @@ class RuleAndShortlist(unittest.TestCase):
             'ranking': [{'rule_id': sb.RULE_PR55_ID, 'forward_games': 6, 'ft_confirmed': 5, 'settled': 5, 'wins': 3,
                          'losses': 2, 'pending': 1, 'quarantined': 0, 'timeouts_counted_as_losses': 0,
                          'roi_advertised': 0.23, 'roi_odds_minus_2pct': 0.2054, 'se_day_clustered_odds_minus_2pct': 0.4,
-                         'liquidated_by_decision_day_utc': {'groups': 3, 'largest_share': 0.6}}]}
+                         'liquidated_by_decision_day_utc': {'groups': 3, 'largest_share': 0.6},
+                         'confirmed_ft_by_decision_day_utc': {'groups': 3, 'largest_share': 0.6}}]}
 
     def test_pr55_rule_with_five_games_is_observation_only(self):
         result = board([], rule=self.RULE, shortlist=sb.load_shortlist())
@@ -279,6 +280,59 @@ class RuleAndShortlist(unittest.TestCase):
                  dict(id='d', family='Betfair', phases={'pre': 40}, state=sb.B, reasons=[], confirmed=40,
                       decision_days=12, roi_odds_minus_2pct=-0.1, se_day_clustered=0.03)]
         self.assertEqual([c['id'] for c in sb.select_shortlist(cards)], ['b'])
+
+
+class IndependentReviewRegressions(unittest.TestCase):
+    """Defects found by the independent adversarial review (23/11/2026); each must stay fixed."""
+
+    def open_gates(self):
+        return [patch.object(sb, 'EXECUTABLE_PRICE_EVIDENCE', True), patch.object(sb, 'COSTS_KNOWN', True)]
+
+    def certified(self, economics):
+        return row(economics=economics, confirmation={'certified_utc': '2026-11-22T00:00:00+00:00'})
+
+    def test_rejected_candidates_still_count_in_the_multiplicity_family(self):
+        good = row(economics=econ(400, 0.05, se=0.02, days=40, share=0.05), game_set='g0')
+        failed = [row('Jogo aberto | Minuto = %d' % i, conditions=(('Minuto', str(i)),), status='abandonada',
+                      economics=econ(400, -0.2, se=0.02, days=40, share=0.05), game_set='g%d' % (i + 1)) for i in range(30)]
+        result = board([good] + failed)
+        self.assertEqual(result['multiplicity']['candidates_tested'], 31)
+        self.assertLessEqual(result['insufficient'][0]['lower_corrected'], 0)
+
+    def test_malformed_or_inconsistent_evidence_never_validates(self):
+        cases = [econ(float('nan'), 0.3, se=0.01, days=float('nan')),
+                 econ(1000, 0.3, se=0.01, days=100, share=None),
+                 econ(1000, 0.3, se=0.01, days=100, share=0.01, phases={}),
+                 econ(1000, 0.3, se=0.01, days=100, share=0.01, phases={'live': 999, 'x': 1}),
+                 econ(1000, 0.3, se=0.01, days=100, share=0.01, admitted=0, quarantined=900),
+                 econ(1000, '0.3', se=0.01, days=100, share=0.01),
+                 econ(1000, 0.3, se=float('inf'), days=100, share=0.01)]
+        with self.open_gates()[0], self.open_gates()[1]:
+            for economics in cases:
+                card = classify_one(self.certified(economics), validation={'state': 'active'})
+                self.assertNotEqual(card['state'], sb.D, economics)
+            sane = econ(1000, 0.3, se=0.01, days=100, share=0.01)
+            self.assertEqual(classify_one(self.certified(sane), validation={'state': 'active'})['state'], sb.D)
+
+    def test_unknown_phase_is_never_shortlisted(self):
+        cards = [dict(id='u', family='Stake', phases={'unknown': 100}, state=sb.B, reasons=['unknown_phase'],
+                      confirmed=100, decision_days=20, roi_odds_minus_2pct=0.2, se_day_clustered=0.02)]
+        self.assertEqual(sb.select_shortlist(cards), [])
+
+    def test_malformed_pr55_input_fails_closed_without_crashing(self):
+        for change in ({'liquidated_by_decision_day_utc': [1, 2]}, {'losses': '3'}):
+            rule = copy.deepcopy(RuleAndShortlist.RULE)
+            rule['ranking'][0].update(change)
+            self.assertIsNone(board([], rule=rule)['rule_pr55'])
+        rule = copy.deepcopy(RuleAndShortlist.RULE)
+        rule['baseline'] = [1]
+        self.assertIsNotNone(board([], rule=rule)['rule_pr55'])
+
+    def test_llm_feedback_fails_closed(self):
+        self.assertEqual(sb.llm_feedback({'schema': sb.SCHEMA}), [])
+        broken = board([])
+        broken['llm_verdicts'] = [{'id': 'x', 'state': sb.A, 'confirmed': float('nan')}]
+        self.assertTrue(all('x ->' not in line for line in sb.llm_feedback(broken)))
 
 
 class BrainIntegration(unittest.TestCase):
