@@ -90,6 +90,13 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - "Seguir o cérebro teria compensado?": cada sinal com odd é decidido quando o sistema o leu, só com os resultados que já tinha observado e só com as táticas já registadas (PR 3; antes, 150 minutos depois do início do jogo). Segue-se quando encaixa numa tática apostável com 8 jogos e 80 % de probabilidade nessa altura. Sinais lidos tarde demais para apostar são "não reconstituíveis". Compara seguidos com não seguidos.
 - Balanço das propostas (PR 4): só descritivo, por origem, com evidência prospetiva (jogos independentes depois do registo) e lucro por jogo. Nenhuma hipótese é dada como confirmada ou falhada por acertar mais ou menos de metade; o modelo de linguagem recebe só estes números descritivos.
 
+## Quadro de estratégias (issue #56, 23/11/2026)
+`scangoal/strategy_board.py` reduz as milhares de hipóteses a quatro estados, só com evidência prospetiva (uma unidade por jogo, decidida depois do registo e antes do resultado, odd ×0,98): **em observação**, **evidência insuficiente**, **rejeitada** (motivo explícito: condição posterior ao sinal ou não provada na decisão, mistura pré-jogo/LIVE, cobertura de resultados, retorno negativo, jogos repetidos) e **validada**.
+- Critérios congelados por hash; correção de Bonferroni sobre todas as candidatas com ≥ 10 resultados; limites só com ≥ 10 dias de decisão.
+- "Validada" exige também certificação ativa, odds executáveis e custos conhecidos. Como nenhuma destas provas existe, fica vazia: **rentabilidade não demonstrada**.
+- Lista curta congelada em `audits/strategy-lab/shortlist-v1.json`: só jogos posteriores ao registo contam. Ver `audits/strategy-lab/README.md`.
+- A LLM recebe o veredicto e os motivos sobre as suas propostas; não decide nada.
+
 ## Avaliação científica da LLM (PR 4)
 `scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol-v5.md` (`llm_incremental_v5`; o código recusa outra versão do ficheiro). O v1 (`audits/pr4-llm-protocol.md`) e os v2 a v4 (`-v2.md` a `-v4.md`) ficam como registo histórico, substituídos depois da revisão e das auditorias independentes da PR #27.
 - Pergunta: as hipóteses do modelo escolhem jogos com mais lucro por jogo (odd −2 %), depois do registo, do que hipóteses comparáveis do gerador (20 controlos pré-selecionados sem ler resultados), no mesmo intervalo?

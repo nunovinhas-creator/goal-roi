@@ -410,7 +410,7 @@ async function realReport(browser) {
     assert.deepEqual(await page.locator('#groups tr td:nth-child(6)').allTextContents(),groups.map(g=>g.roi ? percent(g.roi['odd-0%'].roi) : '—'));
     await expand(page,'simulador');
     await page.waitForSelector('#simout dd');
-    await verifySimulator(page,base.timeline);
+    await verifySimulator(page,base);
     await noOverflow(page);
 
     await go(page,'laboratorio');
@@ -438,32 +438,102 @@ async function realReport(browser) {
   }
 }
 
-// The legacy fixture has no settlement clocks. All commitments reserve cash
-// before any payout is available, then the observed outcomes are applied.
-async function verifySimulator(page, rows) {
+// Exact decimal arithmetic for the simulator oracle, written apart from the dashboard's decimal class:
+// a value is {c, k} = c / 10^k with BigInt c. Every input is a finite decimal, so nothing is ever rounded
+// until the final display.
+const D=(c,k=0)=>({c,k});
+const q=value=>{const [, sign, int, frac='', exp='0']=String(value).trim().match(/^([+-]?)(\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/i);
+  const e=Number(exp)-frac.length, c=BigInt((sign==='-'?'-':'')+((int+frac)||'0'));
+  return e>=0?D(c*10n**BigInt(e)):D(c,-e)};
+const lift=(a,k)=>a.c*10n**BigInt(k-a.k);
+const add=(a,b)=>{const k=Math.max(a.k,b.k);return D(lift(a,k)+lift(b,k),k)};
+const sub=(a,b)=>add(a,D(-b.c,b.k)), mul=(a,b)=>D(a.c*b.c,a.k+b.k);
+const cmp=(a,b)=>{const k=Math.max(a.k,b.k), x=lift(a,k)-lift(b,k);return x<0n?-1:x>0n?1:0};
+const qmin=(a,b)=>cmp(a,b)<=0?a:b, qmax=(a,b)=>cmp(a,b)>=0?a:b;
+const ZERO=D(0n), ONE=D(1n);
+// Euros rounded half away from zero to the cent, grouped as pt-PT.
+const qEuro=v=>{const neg=v.c<0n, m=neg?-v.c:v.c;
+  const cents=v.k<=2?m*10n**BigInt(2-v.k):(m*2n/10n**BigInt(v.k-2)+1n)/2n;
+  return `${neg&&cents?'-':''}${(cents/100n).toLocaleString('pt-PT')},${String(cents%100n).padStart(2,'0')} €`};
+const toNumber=v=>Number(`${v.c}e-${v.k}`);
+
+// Independent chronological reconstruction of the simulator from simulation.entries:
+// each position reserves its stake when placed (d); each settlement version ([at, w] in s, or the single
+// proven (z, w)) moves cash by the payoff difference at the instant it became known; a version back to
+// null reserves the stake again. Placements precede settlements at the same instant; nothing after `until` counts.
+function chronologicalOracle(entries, {start, value, cut, fractional, excluded}, until) {
+  const begin=qmax(q(start),ONE), amount=qmax(q(value),ZERO), share=mul(amount,D(1n,2)), keep=sub(ONE,q(cut));
+  const events=[];
+  entries.forEach((row,index)=>{
+    if(row.t===excluded) return;
+    const placed=Date.parse(row.d);
+    if(!(placed<=until)) return;
+    events.push({at:placed,order:0,index,sub:0,row});
+    const versions=Array.isArray(row.s)?row.s:(row.z&&row.w!=null?[[row.z,row.w]]:[]);
+    versions.forEach(([at,w],sub)=>{const when=Date.parse(at);
+      if(when>placed&&when<=until) events.push({at:when,order:1,index,sub,row,w:w==null?null:w})});
+  });
+  events.sort((a,b)=>a.at-b.at||a.order-b.order||a.index-b.index||a.sub-b.sub);
+  const payoff=(stake,w,odds)=>w>0?mul(stake,add(ONE,mul(q(w),sub(mul(q(odds),keep),ONE)))):mul(stake,add(ONE,q(w)));
+  let cash=begin, held=ZERO, staked=ZERO, peak=begin, low=begin, drop=ZERO, placedCount=0, points=1;
+  const open=new Map();
+  for(const e of events){
+    if(e.order===0){
+      const stake=qmin(cash,fractional?mul(cash,share):amount);
+      if(cmp(stake,ZERO)<=0) continue;
+      cash=sub(cash,stake); held=add(held,stake); staked=add(staked,stake); placedCount++;
+      open.set(e.index,{stake,w:null});
+      continue;
+    }
+    const position=open.get(e.index);
+    if(!position||position.w===e.w) continue;
+    if(position.w===null){held=sub(held,position.stake);cash=add(cash,payoff(position.stake,e.w,e.row.o))}
+    else if(e.w===null){cash=sub(cash,payoff(position.stake,position.w,e.row.o));held=add(held,position.stake)}
+    else cash=add(sub(cash,payoff(position.stake,position.w,e.row.o)),payoff(position.stake,e.w,e.row.o));
+    position.w=e.w;
+    const balance=add(cash,held);
+    peak=qmax(peak,balance); low=qmin(low,balance); drop=qmax(drop,sub(peak,balance)); points++;
+  }
+  const bank=add(cash,held), profit=sub(bank,begin);
+  return {texts:[String(placedCount),qEuro(bank),(profit.c>=0n?'+':'')+qEuro(profit),
+                 staked.c?percent(toNumber(profit)/toNumber(staked)):'—',
+                 qEuro(drop),qEuro(low)], points};
+}
+
+// Legacy reports (no simulation clocks): all commitments reserve cash before any payout is
+// available, then the observed outcomes are applied at the end.
+function legacyOracle(rows, {start, value, cut, fractional, excluded}) {
+  let uncommitted=start;
+  const positions=[];
+  for(const row of rows) {
+    if(row.t===excluded || row.w==null) continue;
+    const stake=Math.min(uncommitted,fractional ? uncommitted*value/100 : value);
+    if(stake<=0) break;
+    uncommitted -= stake;
+    positions.push([row,stake]);
+  }
+  const n=positions.length, staked=start-uncommitted;
+  let bank=start, peak=start, drawdown=0, low=start;
+  for(const [row,stake] of positions) {
+    bank += stake * (row.w>0 ? row.w*(row.o*(1-cut)-1) : row.w);
+    peak=Math.max(peak,bank);
+    low=Math.min(low,bank);
+    drawdown=Math.max(drawdown,peak-bank);
+  }
+  return {texts:[String(n),euro(bank),(bank>=start?'+':'')+euro(bank-start),
+                 staked ? percent((bank-start)/staked) : '—',euro(drawdown),euro(low)], points:n+1};
+}
+
+// The published report decides the oracle: with simulation.entries the dashboard replays settlement
+// clocks, so the expectation is reconstructed chronologically from the same entries up to the report cut.
+async function verifySimulator(page, report) {
+  const entries=report.simulation?.entries;
+  const until=Date.parse(report.generated_at_utc);
   async function compare(start, value, cut, fractional, excluded) {
-    let uncommitted=start;
-    const positions=[];
-    for(const row of rows) {
-      if(row.t===excluded || row.w==null) continue;
-      const stake=Math.min(uncommitted,fractional ? uncommitted*value/100 : value);
-      if(stake<=0) break;
-      uncommitted -= stake;
-      positions.push([row,stake]);
-    }
-    const n=positions.length, staked=start-uncommitted;
-    let bank=start, peak=start, drawdown=0, low=start;
-    for(const [row,stake] of positions) {
-      bank += stake * (row.w>0 ? row.w*(row.o*(1-cut)-1) : row.w);
-      peak=Math.max(peak,bank);
-      low=Math.min(low,bank);
-      drawdown=Math.max(drawdown,peak-bank);
-    }
-    assert.deepEqual(await page.locator('#simout dd').allTextContents(),[
-      String(n),euro(bank),(bank>=start?'+':'')+euro(bank-start),
-      staked ? percent((bank-start)/staked) : '—',euro(drawdown),euro(low)
-    ]);
-    if(n>=2) assert.equal((await page.locator('#simchart polyline').getAttribute('points')).split(' ').length,n+1);
+    const options={start,value,cut,fractional,excluded};
+    const expected=Array.isArray(entries) ? chronologicalOracle(entries,options,until) : legacyOracle(report.timeline||[],options);
+    assert.deepEqual(await page.locator('#simout dd').allTextContents(),expected.texts);
+    if(expected.points>=3) assert.equal((await page.locator('#simchart polyline').getAttribute('points')).split(' ').length,expected.points);
   }
   await compare(1000,10,0,false);
   await page.fill('#simbank','257');

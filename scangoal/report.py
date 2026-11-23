@@ -787,6 +787,21 @@ def research_bets(signals, observations, now, *, bindings=None):
         yield opportunity_results.settle_research_bet(dict(b, _ft_observations=tuple(versions)), now)
 
 
+def opportunity_rule(msgs, observations, now):
+    """Ranking só de leitura da regra congelada PR #55, para o quadro de estratégias. Falha fechada: None."""
+    from . import opportunity_ranking
+    root = pathlib.Path(__file__).resolve().parents[1]
+    try:
+        protocol = json.loads((root / 'audits/opportunity-lab/polymarket-over25-v1.json').read_text(encoding='utf-8'))
+        state = json.loads((data_dir() / 'notify_state.json').read_text(encoding='utf-8'))
+        activation = ((state.get('migrations') or {}).get('polymarket_over25_v1') or {}).get('at_utc')
+        if not activation:
+            return None
+        return opportunity_ranking.build(msgs, observations, protocol, activation_utc=activation, as_of=now)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, IndexError, ArithmeticError):
+        return None
+
+
 def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
     """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
     now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
@@ -891,7 +906,8 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
     brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now,
-                     archive_commitments=register_certification)
+                     archive_commitments=register_certification,
+                     opportunity_rule=opportunity_rule(msgs, observations, now))
     ledger_summary(brn['validation'])
     llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
