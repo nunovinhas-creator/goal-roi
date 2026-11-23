@@ -171,7 +171,7 @@ def _deliver(candidates, now, env, sender, path, publisher, token, chat, clock):
     verify_state(state, intents)
     general = notify.claimed_items(path.parent)
     pending = [m for m in candidates if m['key'] not in intents
-               and notify.item_key(m['b']) not in general
+               and not notify.item_claimed(m['b'], general)
                and '|'.join(str(m['b'][k]) for k in ('match_id', 'market', 'selection')) not in intents]
     if not pending:
         print('STAKE_ALERTS sent 0')

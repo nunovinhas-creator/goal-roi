@@ -62,6 +62,35 @@ class StakeAlerts(unittest.TestCase):
                         deliver()
                 self.assertEqual(calls, [first])
 
+    def test_both_alert_paths_honor_claims_under_a_previous_raw_fixture_key(self):
+        for first in ('general', 'stake'):
+            with self.subTest(first=first), tempfile.TemporaryDirectory() as folder:
+                directory = Path(folder)
+                path = directory / stake_alerts.STATE_NAME
+                initialize(path)
+                raw = sig()
+                resolved = dict(raw, canonical_match_id='alpha-vs-beta-20261119')
+                store = notify.FileStore(directory)
+                store.save_state({
+                    'hello': True, 'sent_total': 0, 'watch_sent': [], 'statuses': {},
+                    'migrations': {notify.STATUS_MIGRATION: {'at_utc': NOW.isoformat()},
+                                   notify.FORMAT_MIGRATION: {'at_utc': NOW.isoformat(), 'sent_total': 0}},
+                })
+                calls = []
+                with patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+                    def general(signal):
+                        watch = dict(signal, match='A — B', reasons=[{'id': 'test', 'status': 'promissora'}])
+                        (directory / 'report.json').write_text(json.dumps({'brain': {'watch': [watch]}}))
+                        notify.run(lambda *_: calls.append('general'), NOW, ENV)
+
+                    def stake(signal):
+                        stake_alerts.deliver([signal], NOW, ENV, lambda *_: calls.append('stake'), path, lambda _: True)
+
+                    ordered = (general, stake) if first == 'general' else (stake, general)
+                    ordered[0](raw)
+                    ordered[1](resolved)
+                self.assertEqual(calls, [first])
+
     def test_a_signal_that_expires_during_the_git_push_never_reaches_telegram(self):
         now = NOW
         with tempfile.TemporaryDirectory() as folder:

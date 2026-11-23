@@ -593,6 +593,16 @@ def item_key(w):
     return 'item|%s|%s|%s' % (game_key(w), market, w.get('selection') or '')
 
 
+def item_claimed(w, claims):
+    if item_key(w) in claims:
+        return True
+    # Claims made before fixture canonicalization were recorded under the source ID.
+    raw = text_identity(w.get('match_id'))
+    canonical = text_identity(w.get('canonical_match_id'))
+    return bool(raw and canonical and raw != canonical
+                and item_key(dict(w, canonical_match_id=raw)) in claims)
+
+
 def legacy_pairs(watch_sent):
     out = {}
     for k in watch_sent:
@@ -615,6 +625,7 @@ def game_notices(report, state, now, excluded_items=()):
     indício a alerta da mesma aposta nunca geram outro aviso. Uma seleção genuinamente nova num jogo já avisado gera uma
     atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
     notified = state.get('notified_items') or {}
+    claims = set(notified).union(excluded_items)
     sent = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
     pairs, games = legacy_pairs(sent), {}
     candidates = list((report.get('brain') or {}).get('watch') or [])
@@ -630,7 +641,7 @@ def game_notices(report, state, now, excluded_items=()):
             #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
         ik = item_key(w)
-        if ik in notified or ik in excluded_items or legacy_key(w) in sent or legacy_hit(pairs, w):
+        if item_claimed(w, claims) or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
         g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or '', 'sample': w})
         it = g['items'].setdefault(ik, {'level': 'indício', 'entries': []})
