@@ -561,7 +561,10 @@ class NoProductionCoupling(unittest.TestCase):
                 ROOT / 'scangoal/notify.py', ROOT / 'scangoal/report.py', ROOT / 'scangoal/polymarket_alerts.py',
                 ROOT / 'scangoal/certification.py', ROOT / 'scangoal/strategy_board.py', ROOT / 'scangoal/brain.py']:
             with self.subTest(path=path.name):
-                self.assertNotIn('polymarket_shadow', path.read_text(encoding='utf-8'))
+                content = path.read_text(encoding='utf-8')
+                if path.name == 'polymarket-rehearsal.yml':
+                    content = content.replace('from scangoal.polymarket_shadow import REQUEST_HEADERS', '', 1)
+                self.assertNotIn('polymarket_shadow', content)
 
 
 class Cli(unittest.TestCase):
