@@ -5747,6 +5747,19 @@
    "sha256": "f941b0edf403c268dfdc52796c39bc72a5e5d9cab3740a505e247371c5e72727",
    "state": "delivered"
   },
+  "game|id:universitario-de-vinto-vs-cd-gualberto-villarroel-20261124|7883fe858daa": {
+   "attempt_id": "55a1ad331df64124aa494001dade6635",
+   "attempt_utc": "2026-11-23T21:48:44+00:00",
+   "chars": 246,
+   "created_utc": "2026-11-23T21:48:44+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "d4b4ca835b2223d141b385f65e0e280f25a43e21cdac1f4d6cdb8b3727a4a602",
+   "state": "in_flight"
+  },
   "game|id:utc-cajamarca-vs-cd-los-chankas-20261116|357eeb3ae864": {
    "attempt_utc": "2026-11-16T19:22:36+00:00",
    "chars": 600,
@@ -6382,7 +6395,8 @@
   "2026-11-23T21:07:08+00:00|Monza — Fiorentina|Over 4": true,
   "2026-11-23T21:16:09+00:00|Levante — Elche|Under 1.5": true,
   "2026-11-23T21:21:32+00:00|Gimnasia La Plata — Newells|Over 2.5": true,
-  "2026-11-23T21:30:29+00:00|Levante — Elche|AH1(+0.5)": true
+  "2026-11-23T21:30:29+00:00|Levante — Elche|AH1(+0.5)": true,
+  "2026-11-23T21:46:14+00:00|Universitario de Vinto — Cd Gualberto Villarroel|AH2(+0.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -6589,9 +6603,9 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 78,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
-  "Polymarket | Competição = liga & Momento = durante o jogo": 48,
-  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 39,
-  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 68,
+  "Polymarket | Competição = liga & Momento = durante o jogo": 49,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 40,
+  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 69,
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 38,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
@@ -7861,6 +7875,9 @@
   "item|id:union-berlin-vs-leipzig-20261121|1x2|RB Leipzig": {
    "at_utc": "2026-11-21T14:52:32+00:00"
   },
+  "item|id:universitario-de-vinto-vs-cd-gualberto-villarroel-20261124|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-23T21:48:44+00:00"
+  },
   "item|id:utc-cajamarca-vs-cd-los-chankas-20261116|Asian Total|Over 5": {
    "at_utc": "2026-11-16T19:22:36+00:00"
   },
@@ -8002,6 +8019,7 @@
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": "promissora",
   "Polymarket | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Momento = antes do jogo": "abandonada",
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Momento = antes do jogo": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": "abandonada",
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Momento = antes do jogo": "abandonada",
@@ -8206,7 +8224,9 @@
   "Stake | Número de apostas = uma & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Stake | Número de apostas = várias": "abandonada",
   "Stake | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Stake | Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Número de apostas = várias & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
+  "Stake | Número de apostas = várias & Valor da aposta = menos de 10 mil $": "abandonada",
   "Stake | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Valor da aposta = menos de 10 mil $": "promissora",
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Stake | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Valor da aposta = menos de 10 mil $": "abandonada",
@@ -8752,6 +8772,7 @@
   "2026-11-23T21:07:08+00:00|Monza — Fiorentina|Over 4",
   "2026-11-23T21:16:09+00:00|Levante — Elche|Under 1.5",
   "2026-11-23T21:21:32+00:00|Gimnasia La Plata — Newells|Over 2.5",
-  "2026-11-23T21:30:29+00:00|Levante — Elche|AH1(+0.5)"
+  "2026-11-23T21:30:29+00:00|Levante — Elche|AH1(+0.5)",
+  "2026-11-23T21:46:14+00:00|Universitario de Vinto — Cd Gualberto Villarroel|AH2(+0.5)"
  ]
 }
