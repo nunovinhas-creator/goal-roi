@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
@@ -73,3 +74,63 @@ class ScientificSettlements(unittest.TestCase):
         self.assertIsNone(result['settlement_events'][1]['receipt'])
         self.assertTrue(result['proof_problems'])
         self.assertIsNone(result['certified_at'])
+
+    def test_delayed_settlement_receipt_cannot_remove_an_admission(self):
+        first = expected_bet(False, at(145))
+        second = dict(first, match_id='b', teams=['Gamma', 'Delta'], key='2',
+                      date_utc=at(125).isoformat(), signal_seen_utc=at(126).isoformat(),
+                      kickoff_utc=at(180).isoformat(), _ft_observations=())
+
+        def witnessed(_, domain, content, *, as_of):
+            if domain == scientific_commitments.ADMISSION:
+                stamp = at(-20 if content['commitment']['fixture'] == 'a' else 127)
+            elif domain == scientific_commitments.SETTLEMENT:
+                stamp = at(150)
+            else:
+                return None
+            if stamp <= as_of:
+                return scientific_receipts.Receipt('synthetic', scientific_receipts.digest(domain, content), stamp)
+
+        def replay(as_of):
+            bets = [opportunity_results.settle_research_bet(bet, as_of) for bet in (first, second)]
+            return brain.confirmation(bets, at(-60), 0.05, as_of, hypothesis='hypothesis')
+
+        with patch.object(scientific_receipts, 'verify', witnessed):
+            before = replay(at(145))
+            after = replay(at(151))
+        self.assertEqual([row['fixture'] for row in before['commitments']], ['a'])
+        self.assertEqual(before['commitments'], after['commitments'])
+        self.assertEqual((before['games'], before['pending'], before['e_value']), (0, 1, 1.0))
+        self.assertEqual((after['games'], after['pending'], after['proof_problems']), (1, 0, []))
+
+    def test_unwitnessed_result_closes_as_loss_at_deadline(self):
+        def witnessed(_, domain, content, *, as_of):
+            if domain == scientific_commitments.ADMISSION:
+                return scientific_receipts.Receipt('synthetic', scientific_receipts.digest(domain, content), at(-20))
+
+        deadline = at(-24) + timedelta(days=brain.OPEN_TIMEOUT_DAYS)
+        with patch.object(scientific_receipts, 'verify', witnessed):
+            before = brain.confirmation([expected_bet(False, deadline)], at(-60), 0.05,
+                                        deadline - timedelta(seconds=1), hypothesis='hypothesis')
+            expired = brain.confirmation([expected_bet(False, deadline)], at(-60), 0.05,
+                                         deadline, hypothesis='hypothesis')
+        self.assertEqual((before['games'], before['pending'], before['e_value']), (0, 1, 1.0))
+        self.assertEqual((expired['games'], expired['pending'], expired['voided_as_loss']), (1, 0, 1))
+        self.assertLess(expired['e_value'], 1.0)
+
+    def test_receipt_matches_subsecond_provider_availability(self):
+        cutoff = at(130)
+        first = expected_bet(False, cutoff)
+        observed = at(120).replace(microsecond=250000)
+        first['_ft_observations'] = (replace(first['_ft_observations'][0], source='bsd',
+                                             published_at=None, observed_at=observed, available_at=observed),)
+
+        def witnessed(_, domain, content, *, as_of):
+            stamp = at(-20) if domain == scientific_commitments.ADMISSION else at(121)
+            return scientific_receipts.Receipt('synthetic', scientific_receipts.digest(domain, content), stamp)
+
+        with patch.object(scientific_receipts, 'verify', witnessed):
+            bet = opportunity_results.settle_research_bet(first, cutoff)
+            result = brain.confirmation([bet], at(-60), 0.05, cutoff, hypothesis='hypothesis')
+        self.assertEqual(result['settlement_events'][0]['content']['available_utc'], observed.isoformat())
+        self.assertEqual((result['games'], result['proof_problems']), (1, []))
