@@ -686,11 +686,59 @@ function simulationEuros(value){
 }
 
 const simOff=new Set();
+// Payoff versions of one position: [[instant, payoff|null], ...]. Without `s`, the single proven settlement (z, w).
+function settlementEvents(p){
+  const rows=Array.isArray(p.s)?p.s:(p.z&&p.w!==null&&p.w!==undefined?[[p.z,p.w]]:[]);
+  return rows.map(([at,w])=>({at:Date.parse(at),w:w===null||w===undefined?null:w}));
+}
+// Chronological replay of the historical positions. Uses only what each instant knew:
+// a stake is reserved from placement until a payoff is proven; a later correction moves the
+// available balance by the payoff difference; a result back in quarantine reserves the stake again.
+// `until` cuts the replay at an instant (normally the report cut): nothing after it is used.
+function simulatePortfolio(rows, {start, mode, val, cut, on}, until=Infinity){
+  const zero=SimulationDecimal.from(0), one=SimulationDecimal.from(1);
+  start=SimulationDecimal.from(start).max(one);
+  const value=SimulationDecimal.from(val).max(zero), fraction=value.percent();
+  const oddsMultiplier=one.minus(SimulationDecimal.from(cut));
+  const positions=rows.map((p,i)=>({p,i,placed:Date.parse(p.d),events:settlementEvents(p)}))
+    .filter(x=>(!on||on.has(x.p.t))&&x.placed<=until);
+  const queue=[];
+  for(const x of positions){
+    queue.push({at:x.placed,kind:1,i:x.i,k:0,x});
+    x.events.forEach((e,k)=>{if(e.at>x.placed&&e.at<=until)queue.push({at:e.at,kind:0,i:x.i,k,x,w:e.w})});
+  }
+  // Settlements before placements at the same instant would use a payoff not yet visible to the decision: placements first.
+  queue.sort((a,b)=>a.at-b.at||b.kind-a.kind||a.i-b.i||a.k-b.k);
+  let cash=start, reserved=zero, peak=start, dd=zero, low=start, staked=zero, n=0, maxReserved=zero, skipped=0, revisions=0;
+  const curve=[{at:null,balance:start}], stakes=new Map();
+  const pay=(stake,w,o)=>{const weight=SimulationDecimal.from(w);
+    return stake.times(one.plus(w>0?weight.times(SimulationDecimal.from(o).times(oddsMultiplier).minus(one)):weight))};
+  const mark=at=>{const balance=cash.plus(reserved);peak=peak.max(balance);dd=dd.max(peak.minus(balance));low=low.min(balance);curve.push({at,balance})};
+  for(const item of queue){
+    const {x}=item;
+    if(item.kind===1){
+      const stake=cash.min(mode==='flat'?value:cash.times(fraction));
+      if(stake.coefficient<=0n){skipped++;continue}
+      cash=cash.minus(stake);reserved=reserved.plus(stake);staked=staked.plus(stake);n++;
+      maxReserved=maxReserved.max(reserved);
+      stakes.set(x.i,{stake,w:null});
+      continue;
+    }
+    const held=stakes.get(x.i);
+    if(!held||held.w===item.w)continue;
+    if(held.w===null){reserved=reserved.minus(held.stake);cash=cash.plus(pay(held.stake,item.w,x.p.o))}
+    else if(item.w===null){cash=cash.minus(pay(held.stake,held.w,x.p.o));reserved=reserved.plus(held.stake);maxReserved=maxReserved.max(reserved);revisions++}
+    else{cash=cash.plus(pay(held.stake,item.w,x.p.o)).minus(pay(held.stake,held.w,x.p.o));revisions++}
+    held.w=item.w;
+    mark(item.at);
+  }
+  const realized=cash.plus(reserved);
+  return {start,cash,reserved,realized,profit:realized.minus(start),peak,dd,low,staked,n,maxReserved,skipped,revisions,curve};
+}
 function simulator(d){
   const evidence=d.simulation, rows=evidence?.entries || d.timeline || [];
-  const entries=rows.map(p=>({...p, placed:Date.parse(p.d), settled:p.z ? Date.parse(p.z) : Infinity}))
-    .sort((a,b)=>a.placed-b.placed);
-  const types=[...new Set(entries.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t)));
+  const until=Date.parse(d.generated_at_utc);
+  const types=[...new Set(rows.map(p=>p.t))], on=new Set(types.filter(t=>!simOff.has(t)));
   $('sim-evidence').textContent=evidence ?
     `${count(evidence.timed_settlements)} liquidações com hora comprovada em ${count(evidence.total_bets)} apostas. ${count(evidence.committed_games)} jogos identificados, com até ${count(evidence.max_units_per_game)} unidades por jogo. Preços executáveis e custos sem observação.` :
     'Série histórica sem horários de liquidação. O saldo dos resultados só fica disponível no fim da simulação.';
@@ -698,47 +746,16 @@ function simulator(d){
   typeBox.replaceChildren();
   for(const t of types){const l=el('label'),c=el('input',{type:'checkbox',value:t});c.checked=on.has(t);c.addEventListener('change',()=>{c.checked?(on.add(t),simOff.delete(t)):(on.delete(t),simOff.add(t));run()});l.append(c,document.createTextNode((NAMES[t]||[t])[0]));typeBox.appendChild(l);if(t===focusedType)c.focus({preventScroll:true})}
   const run=()=>{
-    const zero=SimulationDecimal.from(0), one=SimulationDecimal.from(1), eur=simulationEuros;
-    const start=SimulationDecimal.from($('simbank').value).max(one), mode=$('simmode').value;
-    const val=SimulationDecimal.from($('simval').value).max(zero);
-    const oddsMultiplier=one.minus(SimulationDecimal.from($('simcut').value));
-    const fraction=val.percent();
+    const eur=simulationEuros, mode=$('simmode').value;
     $('simvallabel').textContent=mode==='flat'?'Valor por aposta (€)':'Percentagem da banca (%)';
-    let cash=start, reserved=zero, peak=start, dd=zero, low=start, staked=zero, n=0, maxReserved=zero, skipped=0;
-    let open=[];
-    const curve=[start];
-    function release(before) {
-      const remaining=[];
-      for (const bet of open) {
-        if (bet.w == null || (before !== Infinity && bet.settled >= before)) {
-          remaining.push(bet);
-          continue;
-        }
-        reserved=reserved.minus(bet.stake);
-        const weight=SimulationDecimal.from(bet.w);
-        const gain=bet.w>0?weight.times(SimulationDecimal.from(bet.o).times(oddsMultiplier).minus(one)):weight;
-        cash=cash.plus(bet.stake.times(one.plus(gain)));
-        const balance=cash.plus(reserved);
-        peak=peak.max(balance);
-        dd=dd.max(peak.minus(balance));
-        low=low.min(balance);
-        curve.push(balance);
-      }
-      open=remaining;
-    }
-    for(const p of entries){
-      if(!on.has(p.t))continue;
-      release(p.placed);
-      const stake=cash.min(mode==='flat'?val:cash.times(fraction));
-      if(stake.coefficient<=0n){skipped++;continue}
-      cash=cash.minus(stake);reserved=reserved.plus(stake);staked=staked.plus(stake);n++;
-      maxReserved=maxReserved.max(reserved);
-      open.push({...p,stake});
-      open.sort((a,b)=>a.settled-b.settled);
-    }
-    release(Infinity);
-    const bank=cash.plus(reserved), profit=bank.minus(start);
-    $('sim-exposure').textContent=`Saldo máximo reservado ${eur(maxReserved)} · em aberto no fim ${eur(reserved)} · ${count(skipped)} oportunidades sem saldo disponível.`;
+    // The timeline fallback has no settlement instants: its results only count at the end (after every placement).
+    const history=evidence?rows:rows.map(p=>({...p,z:p.w!==null&&p.w!==undefined?new Date(until+1).toISOString():null}));
+    const r=simulatePortfolio(history,{start:$('simbank').value,mode,val:$('simval').value,cut:$('simcut').value,on},evidence?until:Infinity);
+    const {start,peak,dd,low,staked,n,maxReserved,reserved,skipped}=r, val=SimulationDecimal.from($('simval').value).max(SimulationDecimal.from(0));
+    const bank=r.realized, profit=r.profit, curve=r.curve.map(point=>point.balance);
+    $('sim-exposure').textContent=`Saldo máximo reservado ${eur(maxReserved)} · em aberto no fim ${eur(reserved)} · ${count(skipped)} oportunidades sem saldo disponível.`+
+      ` Saldo realizado ${eur(r.realized)} · capital reservado ${eur(reserved)} · saldo disponível ${eur(r.cash)}`+
+      (r.revisions?` · ${count(r.revisions)} correções de resultado aplicadas na data em que foram conhecidas.`:'.');
     const out=$('simout');out.textContent='';
     [[n,'apostas simuladas'],[eur(bank),'banca final'],[(profit.coefficient>=0n?'+':'')+eur(profit),'lucro ou perda simulados'],[staked.coefficient?pct(profit.toNumber()/staked.toNumber(),1):'—','retorno sobre o apostado'],[eur(dd),'maior queda'],[eur(low),'banca mais baixa']]
       .forEach(([v,l])=>{const w=el('div');w.append(el('dt',{},l),el('dd',{},String(v)));out.appendChild(w)});
@@ -1013,6 +1030,14 @@ const signal = value => hasFields(value, {
 }) && (value.when !== 'por começar' || isTimestamp(value.kickoff_utc));
 
 const collectionTime = value => value === null || value === '' || isTimestamp(value);
+// Payoff versions: strictly increasing instants, consecutive payoffs distinct, the last one in force.
+const settlementHistory = value => Array.isArray(value) && value.length > 0 && value.every(event =>
+  Array.isArray(event) && event.length === 2 && isTimestamp(event[0]) && isNullableNumber(event[1])) &&
+  value.every((event, i) => i === 0 || (Date.parse(event[0]) > Date.parse(value[i - 1][0]) && event[1] !== value[i - 1][1]));
+const settlementHistoryMatches = row => {
+  const [at, w] = row.s[row.s.length - 1];
+  return Date.parse(row.s[0][0]) > Date.parse(row.d) && w === row.w && (w === null || Date.parse(at) === Date.parse(row.z));
+};
 const reportShape = {
   generated_at_utc:isTimestamp, messages:isCount, unique_bets:isCount, settled_bets:isCount,
   min_settled:isPositive, first_signal_utc:value => value === null || isTimestamp(value),
@@ -1026,8 +1051,9 @@ const reportShape = {
   simulation:optional(value => hasFields(value, {
     total_bets:isCount, timed_settlements:isCount, committed_games:isCount, max_units_per_game:isCount,
     entries:listOf(row => hasFields(row, {d:isTimestamp, z:time => time === null || isTimestamp(time),
-      w:isNullableNumber, o:isPositive, t:isText}) &&
-      (row.w === null ? row.z === null : Date.parse(row.z) > Date.parse(row.d)))
+      w:isNullableNumber, o:isPositive, t:isText, s:optional(settlementHistory)}) &&
+      (row.w === null ? row.z === null : Date.parse(row.z) > Date.parse(row.d)) &&
+      (row.s === undefined || settlementHistoryMatches(row)))
   })),
   daily:listOf(value => hasFields(value, {day:isText, bets:isCount, settled:isCount, wins:isCount, units:isNumber})),
   recent_bets:listOf(value => hasFields(value, {
@@ -1081,7 +1107,8 @@ function validateReport(next, previous) {
       groups.reduce((sum, group) => sum + group.settled, 0) !== next.settled_bets ||
       (next.unique_bets > 0 && (!next.first_signal_utc || !next.daily.length))) return false;
   if (next.simulation?.entries.some(row =>
-      Date.parse(row.d) > generated || (row.z !== null && Date.parse(row.z) > generated))) return false;
+      Date.parse(row.d) > generated || (row.z !== null && Date.parse(row.z) > generated) ||
+      (row.s || []).some(([at]) => Date.parse(at) > generated))) return false;
   if (!previous) return true;
   if (generated < Date.parse(previous.generated_at_utc)) return false;
   // A response must not silently drop sections already supplied by the producer.

@@ -230,16 +230,63 @@ def settlement_kickoff(bet, external, fixture_times=()):
     return None
 
 
-def _unchanged_payoff_since(bet, versions, kickoff, proof, payoff):
-    """Keep the release time across score revisions that leave the payoff unchanged."""
-    known = proof.available_at
-    cuts = {row.available_at for row in versions if row.available_at is not None and row.available_at < known}
-    for cutoff in sorted(cuts, reverse=True):
-        earlier = opportunity_results.resolve(versions, kickoff=kickoff, as_of=cutoff)
-        if earlier.score is None or settle(bet['market'], bet['selection'], earlier.score, bet['teams']) != payoff:
-            break
-        known = earlier.available_at
-    return known
+def _observation_times(embedded, notes, legacy_stamp, ext, observed):
+    """Every instant at which a new result observation for this fixture became available."""
+    times = set()
+    for row in list(embedded) + list(notes):
+        stamp = observed(row.get('known_utc')) if isinstance(row, dict) else getattr(row, 'available_at', None)
+        if stamp is not None:
+            times.add(stamp)
+    if legacy_stamp is not None:
+        times.add(legacy_stamp)
+    if ext:
+        stamp = observed(ext.get('available_at') or ext.get('known_utc') or ext.get('matched_at_utc'))
+        if stamp is not None:
+            times.add(stamp)
+    return sorted(times)
+
+
+def _payoff(bet, score):
+    """Payoff of a priced or goal-rule bet for a regulation score; None where this rule does not settle it."""
+    if score is None or bet['type'] == 'GOAL_BREWING':
+        return None
+    if bet['market'] is None:
+        return 1.0 if sum(score) > sum(bet['score_at_signal']) else -1.0
+    if bet['market'].strip().lower() == 'asian handicap' and bet['phase'] == 'live':
+        return None
+    return settle(bet['market'], bet['selection'], list(score), bet['teams'])
+
+
+SETTLED_BY_SCORE = ('resultado', 'regra: mais um golo')
+
+
+def settlement_events(bet, as_of):
+    """Payoff versions of one bet, each with the instant it became known, using only observations up to `as_of`.
+
+    A transition to None means the result became contradictory or left quarantine undecided: the stake is reserved
+    again until a payoff is known. Returns None when this bet is settled by a source without versions (a bot mark,
+    Highlightly goal minutes): the caller then uses its single proven settlement instant.
+    """
+    decision = chronology.decision_time(bet)
+    cuts = bet.get('_result_cuts')
+    if decision is None or not cuts:
+        return None
+    current = bet['w'] if (bet['settled_by'] or '').startswith(SETTLED_BY_SCORE) else None
+    if bet['w'] is not None and current is None:
+        return None
+    resolve_score, times = cuts
+    events, last = [], None
+    for cut in times:
+        if cut <= decision or cut > as_of:
+            continue
+        f, _, _, _, _, conflict, _ = resolve_score(cut)
+        payoff = _payoff(bet, f) if f and not conflict else None
+        if payoff != last:
+            events.append((cut, payoff))
+            last = payoff
+    if last != current:
+        return None   # the walk does not reproduce the payoff the report uses: never invent a history
+    return events
 
 
 def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(),
@@ -310,31 +357,37 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
                                      {parts[0] for parts in fixtures[mid] if parts[0] is not None})
         observed = opportunity_results.utc
         embedded = (chronology.get('telegram') or {}).get(mid, ()) if mid not in ambiguous else ()
-        result_versions = embedded
-        proof = opportunity_results.resolve(result_versions, kickoff=kickoff, as_of=now)
-        f, source, known = proof.score, 'bot_message', proof.available_at
-        raw = proof.observed_at
-        first_seen, conflict = proof.first_available_at, proof.conflict
-        if not f and not conflict and mid not in ambiguous:
-            result_versions = [row for row in note_versions[mid] if row.kickoff == kickoff]
-            proof = opportunity_results.resolve(result_versions, kickoff=kickoff, as_of=now)
-            f, source, known = proof.score, 'bot_full_time_note', proof.available_at
-            raw = proof.observed_at
-            first_seen, conflict = proof.first_available_at, proof.conflict
-        if not f and not conflict and mid not in ambiguous and not embedded:
-            legacy = opportunity_results.score_pair(ft.get(mid))
-            legacy_stamp = observed((chronology.get('ft') or {}).get(mid))
-            if legacy and opportunity_results.ft_time_valid(kickoff, legacy_stamp, legacy_stamp, None, now):
-                f, source, known, raw, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp, legacy_stamp
-        from_bsd = False
-        if ext:
-            stamp = observed(ext.get('available_at') or ext.get('known_utc') or ext.get('matched_at_utc'))
-            seen = observed(ext.get('observed_at')) if 'observed_at' in ext else stamp
-            score = opportunity_results.score_pair(ext.get('ft'))
-            if score and opportunity_results.ft_time_valid(kickoff, seen, stamp, None, now):
-                first_seen = min(first_seen, stamp) if first_seen is not None else stamp
-                if not f and not conflict:
-                    f, source, known, raw, from_bsd = score, ext.get('provider', 'BSD'), stamp, seen, True
+        notes_here = [row for row in note_versions[mid] if row.kickoff == kickoff] if mid not in ambiguous else []
+        legacy_stamp = observed((chronology.get('ft') or {}).get(mid))
+
+        def resolve_score(cut, embedded=embedded, notes_here=notes_here, legacy_stamp=legacy_stamp, mid=mid,
+                          kickoff=kickoff, ext=ext):
+            """The score known at `cut`, using only observations available by then (the same rules for every cut)."""
+            proof = opportunity_results.resolve(embedded, kickoff=kickoff, as_of=cut)
+            f, source, known = proof.score, 'bot_message', proof.available_at
+            raw, first_seen, conflict = proof.observed_at, proof.first_available_at, proof.conflict
+            if not f and not conflict and mid not in ambiguous:
+                proof = opportunity_results.resolve(notes_here, kickoff=kickoff, as_of=cut)
+                f, source, known = proof.score, 'bot_full_time_note', proof.available_at
+                raw, first_seen, conflict = proof.observed_at, proof.first_available_at, proof.conflict
+            if not f and not conflict and mid not in ambiguous and not embedded:
+                legacy = opportunity_results.score_pair(ft.get(mid))
+                if legacy and opportunity_results.ft_time_valid(kickoff, legacy_stamp, legacy_stamp, None, cut):
+                    f, source, known, raw, first_seen = legacy, 'bot_message', legacy_stamp, legacy_stamp, legacy_stamp
+            from_bsd = False
+            if ext:
+                stamp = observed(ext.get('available_at') or ext.get('known_utc') or ext.get('matched_at_utc'))
+                seen = observed(ext.get('observed_at')) if 'observed_at' in ext else stamp
+                score = opportunity_results.score_pair(ext.get('ft'))
+                if score and opportunity_results.ft_time_valid(kickoff, seen, stamp, None, cut):
+                    first_seen = min(first_seen, stamp) if first_seen is not None else stamp
+                    if not f and not conflict:
+                        f, source, known, raw, from_bsd = score, ext.get('provider', 'BSD'), stamp, seen, True
+            return f, source, known, raw, first_seen, conflict, from_bsd
+
+        f, source, known, raw, first_seen, conflict, from_bsd = resolve_score(now)
+        if strict:
+            b['_result_cuts'] = (resolve_score, _observation_times(embedded, notes_here, legacy_stamp, ext, observed))
         f = list(f) if f is not None else None
         b['ft'], b['w'], b['settled_by'] = f, None, None
         b['result_known_utc'], b['result_known_source'] = None, None
@@ -377,8 +430,6 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if own is not None:
             b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
             b['result_known_utc'], b['result_known_source'] = known, source
-            if strict and proof.score is not None and len(result_versions) > 1:
-                b['_simulation_available_at'] = _unchanged_payoff_since(b, result_versions, kickoff, proof, own)
             if from_bsd and source == 'HL aos 90 min':
                 b['result_provenance'] = {'source': 'highlightly_detail', 'provider_id': ext.get('hl_id'),
                                           'fixture_id': mid, 'kickoff_utc': ext.get('event_date'),
@@ -584,7 +635,12 @@ def timeline(bets):
 
 
 def portfolio(bets, as_of):
-    """Summarize unit exposure and retain the clock for each simulated position."""
+    """Unit exposure and, per simulated position, every payoff version with the instant it became known.
+
+    `s` lists [instant, payoff] transitions (payoff None: result contradictory or quarantined again), all strictly after
+    the decision and no later than `as_of`; `z`/`w` are the payoff in force at `as_of` and the instant it took effect.
+    Cutting a later report at an earlier instant reproduces the earlier report: no observation leaks backwards.
+    """
     by_fixture = collections.Counter()
     entries = []
     proved = 0
@@ -595,18 +651,26 @@ def portfolio(bets, as_of):
         decision = chronology.decision_time(b)
         if decision is None or decision > as_of:
             continue
-        known = b.get('_simulation_available_at') or chronology.result_known(b)
-        known = known if b['w'] is not None and known is not None and decision < known <= as_of else None
-        proved += known is not None
-        entries.append({'d': decision.isoformat(), 'z': known.isoformat() if known else None,
-                        'w': b['w'] if known else None, 'o': b['odds'],
-                        't': b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase']})
+        events = settlement_events(b, as_of)
+        if events is None:
+            known = chronology.result_known(b)
+            known = known if b['w'] is not None and known is not None and decision < known <= as_of else None
+            events = [(known, b['w'])] if known else []
+        last_at, last_w = events[-1] if events else (None, None)
+        proved += last_w is not None
+        entry = {'d': decision.isoformat(), 'z': last_at.isoformat() if last_w is not None else None,
+                 'w': last_w, 'o': b['odds'],
+                 't': b['type'] if b['type'] != 'BETFAIR' else 'BETFAIR/%s' % b['phase']}
+        if len(events) > 1 or (events and last_w is None):
+            entry['s'] = [[at.isoformat(), w] for at, w in events]
+        entries.append(entry)
     return {'basis': 'one_advertised_unit_per_historical_bet',
             'total_bets': len(bets), 'settled_bets': sum(b['w'] is not None for b in bets),
             'committed_games': len(by_fixture), 'bets_with_fixture': sum(by_fixture.values()),
             'max_units_per_game': max(by_fixture.values(), default=0),
             'games_with_multiple_units': sum(units > 1 for units in by_fixture.values()),
-            'timed_settlements': proved, 'priced_at_execution': None, 'known_costs': None,
+            'timed_settlements': proved, 'payoff_revisions': sum(len(e.get('s', ())) - 1 for e in entries if e.get('s')),
+            'priced_at_execution': None, 'known_costs': None,
             'entries': entries}
 
 

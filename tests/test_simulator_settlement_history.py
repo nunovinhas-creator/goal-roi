@@ -53,3 +53,79 @@ class SimulatorSettlementHistory(unittest.TestCase):
         after_conflict = report.build(as_of=at(300))
         self.assertIsNone(during_conflict['simulation']['entries'][0]['z'])
         self.assertEqual(after_conflict['simulation']['entries'][0]['z'], at(195).isoformat())
+
+
+def truncated(entry, cut):
+    """What a report published at `cut` would hold for this position, derived from a later report."""
+    events = entry.get('s') or ([[entry['z'], entry['w']]] if entry['z'] else [])
+    kept = [event for event in events if datetime.fromisoformat(event[0]) <= cut]
+    at, w = kept[-1] if kept else (None, None)
+    out = {key: entry[key] for key in ('d', 'o', 't')}
+    out.update(z=at if w is not None else None, w=w)
+    if len(kept) > 1 or (kept and w is None):
+        out['s'] = kept
+    return out
+
+
+class SettlementCorrections(unittest.TestCase):
+    """A later FT correction moves the payoff on the day it became known, never before."""
+
+    def setUp(self):
+        directory = self.enterContext(TemporaryDirectory())
+        self.enterContext(patch.dict('os.environ', {'SCANGOAL_DATA_DIR': directory}))
+        self.bet = message(1, 'fixture-a', 'Alpha — Beta', '15:00', -40)
+
+    def entry(self, minutes):
+        entries = report.build(as_of=at(minutes))['simulation']['entries']
+        self.assertEqual(len(entries), 1)
+        return entries[0]
+
+    def assert_invariant(self, cuts, final):
+        later = self.entry(final)
+        for cut in cuts:
+            self.assertEqual(truncated(later, at(cut)), self.entry(cut), 'cut at minute %d' % cut)
+
+    def test_won_then_corrected_to_lost(self):
+        store.append_versions([self.bet, result(self.bet, 110, '1:0'), result(self.bet, 150, '0:1')])
+        entry = self.entry(300)
+        self.assertEqual(entry['s'], [[at(115).isoformat(), 1.0], [at(155).isoformat(), -1.0]])
+        self.assertEqual((entry['z'], entry['w']), (at(155).isoformat(), -1.0))
+        self.assertEqual(self.entry(130), {'d': entry['d'], 'z': at(115).isoformat(), 'w': 1.0, 'o': 2.0,
+                                          't': 'BETFAIR/pre'})
+        self.assert_invariant((100, 115, 130, 155, 200), 300)
+
+    def test_lost_then_corrected_to_won(self):
+        store.append_versions([self.bet, result(self.bet, 110, '0:2'), result(self.bet, 150, '3:2')])
+        entry = self.entry(300)
+        self.assertEqual(entry['s'], [[at(115).isoformat(), -1.0], [at(155).isoformat(), 1.0]])
+        self.assertEqual(self.entry(130)['w'], -1.0)
+        self.assert_invariant((100, 130, 160), 300)
+
+    def test_settled_result_in_quarantine_reserves_the_stake_again(self):
+        store.append_versions([self.bet, result(self.bet, 110, '1:0')])
+        challenger = dict(self.bet, message_id=3, date_utc=at(140).isoformat())
+        store.append_versions([result(challenger, 150, '0:1')])
+        entry = self.entry(300)
+        self.assertEqual(entry['s'], [[at(115).isoformat(), 1.0], [at(155).isoformat(), None]])
+        self.assertEqual((entry['z'], entry['w']), (None, None))
+        self.assert_invariant((120, 155, 200), 300)
+        built = report.build(as_of=at(300))
+        self.assertIsNone(built['recent_bets'][-1]['w'])
+        self.assertEqual(built['simulation']['timed_settlements'], 0)
+
+    def test_score_revision_without_payoff_change_adds_no_event(self):
+        store.append_versions([self.bet, result(self.bet, 110, '1:0'), result(self.bet, 150, '2:0')])
+        entry = self.entry(300)
+        self.assertNotIn('s', entry)
+        self.assertEqual(entry['z'], at(115).isoformat())
+
+    def test_rebuilding_is_deterministic(self):
+        store.append_versions([self.bet, result(self.bet, 110, '1:0'), result(self.bet, 150, '0:1')])
+        self.assertEqual(report.build(as_of=at(300))['simulation'], report.build(as_of=at(300))['simulation'])
+        self.assertEqual(report.build(as_of=at(300))['simulation']['payoff_revisions'], 1)
+
+    def test_unsettled_bet_has_no_history(self):
+        store.append_versions([self.bet])
+        entry = self.entry(300)
+        self.assertEqual((entry['z'], entry['w']), (None, None))
+        self.assertNotIn('s', entry)

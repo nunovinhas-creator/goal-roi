@@ -649,6 +649,90 @@ async function monetaryPrecision(browser) {
   } finally { await page.close(); }
 }
 
+async function settlementCorrections(browser) {
+  // Adversarial FT corrections: every figure below is worked out by hand from a 100 € bank,
+  // 100 % stakes, decimal odds 2 and no odds cut.
+  const page = await browser.newPage();
+  try {
+    const stamp = minutes => new Date(+date + minutes * 60_000).toISOString();
+    const remote = await setup(page, {report:snapshot(0)});
+    await page.goto(root + '#simulador');
+    await ready(page, base.unique_bets);
+    const run = (rows, until) => page.evaluate(([rows, until]) => {
+      const r = simulatePortfolio(rows, {start:'100', mode:'pct', val:'100', cut:'0'}, until === null ? Infinity : Date.parse(until));
+      const e = v => (Number(v.rounded(2)) / 100).toFixed(2);
+      return {cash:e(r.cash), reserved:e(r.reserved), realized:e(r.realized), n:r.n, skipped:r.skipped,
+              revisions:r.revisions, curve:r.curve.map(p => [p.at, e(p.balance)])};
+    }, [rows, until]);
+    const A = s => ({d:stamp(-90), z:s.at(-1)[1] === null ? null : s.at(-1)[0], w:s.at(-1)[1], o:2, t:'A', s});
+    const B = {d:stamp(-40), z:stamp(-30), w:1, o:2, t:'B'};
+
+    // 1. Won, then corrected to lost. At -40 the system knew A had won: B is staked with 200 € and wins.
+    const winToLoss = A([[stamp(-60), 1], [stamp(-20), -1]]);
+    let r = await run([winToLoss, B], null);
+    assert.deepEqual([r.realized, r.cash, r.reserved, r.n, r.skipped, r.revisions], ['200.00', '200.00', '0.00', 2, 0, 1]);
+    // The same report cut before the correction equals the report published before it existed.
+    const published = {...winToLoss, z:stamp(-60), w:1}; delete published.s;
+    const before = await run([published, B], stamp(-25)), cut = await run([winToLoss, B], stamp(-25));
+    assert.deepEqual(cut, before);
+    assert.equal(before.realized, '400.00');
+    assert.deepEqual(r.curve.slice(0, before.curve.length), before.curve, 'a correction must not rewrite the past curve');
+
+    // 2. Lost, then corrected to won. At -40 nothing was available: B is skipped; the win arrives at -20.
+    r = await run([A([[stamp(-60), -1], [stamp(-20), 1]]), B], null);
+    assert.deepEqual([r.realized, r.cash, r.reserved, r.n, r.skipped, r.revisions], ['200.00', '200.00', '0.00', 1, 1, 1]);
+
+    // 3. Settled, then contradictory (quarantine), then lost: the stake is reserved again, never paid twice.
+    const quarantined = A([[stamp(-60), 1], [stamp(-20), null], [stamp(-10), -1]]);
+    assert.deepEqual(await run([quarantined], stamp(-15)).then(x => [x.cash, x.reserved, x.realized]), ['0.00', '100.00', '100.00']);
+    r = await run([quarantined], null);
+    assert.deepEqual([r.cash, r.reserved, r.realized], ['0.00', '0.00', '0.00']);
+    const stillOpen = await run([A([[stamp(-60), 1], [stamp(-20), null]])], null);
+    assert.deepEqual([stillOpen.cash, stillOpen.reserved, stillOpen.realized], ['0.00', '100.00', '100.00']);
+
+    // 4. Winnings already staked, then reversed: the available balance goes negative and blocks new stakes;
+    // the realized balance counts the open stake at cost.
+    const C = {d:stamp(-15), z:stamp(-5), w:1, o:2, t:'C'};
+    const pendingB = {...B, z:null, w:null};
+    r = await run([winToLoss, pendingB, C], null);
+    assert.deepEqual([r.cash, r.reserved, r.realized, r.n, r.skipped], ['-200.00', '200.00', '0.00', 2, 1]);
+
+    // 5. A payoff known at the very instant of another decision is not visible to it.
+    r = await run([{...winToLoss, s:[[stamp(-40), 1]], z:stamp(-40), w:1}, B], null);
+    assert.deepEqual([r.n, r.skipped, r.realized], [1, 1, '200.00']);
+
+    // 6. Deterministic: repeated and reordered replays (distinct instants) give the same result.
+    const rows = [winToLoss, B, C];
+    const once = await run(rows, null);
+    assert.deepEqual(await run([...rows].reverse(), null), once);
+    assert.deepEqual(await run(rows, null), once);
+
+    // 7. The dashboard shows realized, reserved and available balances, and the correction count.
+    const simulation = {total_bets:2, timed_settlements:2, committed_games:2, max_units_per_game:1, entries:[winToLoss, B]};
+    const report = snapshot(0, {simulation});
+    remote.respond({report});
+    await refresh(page);
+    await page.locator('#simbank').fill('100');
+    await page.locator('#simmode').selectOption('pct');
+    await page.locator('#simval').fill('100');
+    assert.equal(await page.locator('#simout dd').nth(1).textContent(), euro(200));
+    await hasText(page, '#sim-exposure', 'Saldo realizado 200,00 € · capital reservado 0,00 € · saldo disponível 200,00 €');
+    await hasText(page, '#sim-exposure', '1 correções de resultado aplicadas na data em que foram conhecidas');
+
+    // 8. Histories that do not match the payoff in force, go backwards or repeat a payoff are rejected.
+    for (const bad of [{...winToLoss, w:1, z:stamp(-60)}, {...winToLoss, s:[[stamp(-20), 1], [stamp(-60), -1]]},
+                       {...winToLoss, s:[[stamp(-60), -1], [stamp(-20), -1]]}, {...winToLoss, s:[[stamp(-95), -1]], z:stamp(-95)},
+                       {...winToLoss, s:[[stamp(-60), 1], [stamp(10), -1]], z:stamp(10)}]) {
+      remote.respond({report:{...report, simulation:{...simulation, entries:[bad, B]}}});
+      await refresh(page);
+      await hasText(page, '#fresh', 'Falha ao atualizar');
+      assert.equal(await page.locator('#simout dd').nth(1).textContent(), euro(200));
+    }
+    assert.deepEqual(remote.errors, []);
+    console.log('Settlement corrections passed (win to loss, loss to win, quarantine, negative balance, invariance)');
+  } finally { await page.close(); }
+}
+
 async function simulationReportClock(browser) {
   const page = await browser.newPage();
   try {
@@ -709,6 +793,7 @@ async function simulationReportClock(browser) {
     await simultaneousExposure(browser);
     await w09TimedEntries(browser);
     await monetaryPrecision(browser);
+    await settlementCorrections(browser);
     await simulationReportClock(browser);
     for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
