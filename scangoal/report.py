@@ -230,6 +230,18 @@ def settlement_kickoff(bet, external, fixture_times=()):
     return None
 
 
+def _unchanged_payoff_since(bet, versions, kickoff, proof, payoff):
+    """Keep the release time across score revisions that leave the payoff unchanged."""
+    known = proof.available_at
+    cuts = {row.available_at for row in versions if row.available_at is not None and row.available_at < known}
+    for cutoff in sorted(cuts, reverse=True):
+        earlier = opportunity_results.resolve(versions, kickoff=kickoff, as_of=cutoff)
+        if earlier.score is None or settle(bet['market'], bet['selection'], earlier.score, bet['teams']) != payoff:
+            break
+        known = earlier.available_at
+    return known
+
+
 def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(),
                chronology=None, group_aliases=True, now=None):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto.
@@ -298,16 +310,17 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
                                      {parts[0] for parts in fixtures[mid] if parts[0] is not None})
         observed = opportunity_results.utc
         embedded = (chronology.get('telegram') or {}).get(mid, ()) if mid not in ambiguous else ()
-        proof = opportunity_results.resolve(embedded, kickoff=kickoff, as_of=now)
+        result_versions = embedded
+        proof = opportunity_results.resolve(result_versions, kickoff=kickoff, as_of=now)
         f, source, known = proof.score, 'bot_message', proof.available_at
         raw = proof.observed_at
         first_seen, conflict = proof.first_available_at, proof.conflict
         if not f and not conflict and mid not in ambiguous:
-            notes_for_bet = [row for row in note_versions[mid] if row.kickoff == kickoff]
-            note = opportunity_results.resolve(notes_for_bet, kickoff=kickoff, as_of=now)
-            f, source, known = note.score, 'bot_full_time_note', note.available_at
-            raw = note.observed_at
-            first_seen, conflict = note.first_available_at, note.conflict
+            result_versions = [row for row in note_versions[mid] if row.kickoff == kickoff]
+            proof = opportunity_results.resolve(result_versions, kickoff=kickoff, as_of=now)
+            f, source, known = proof.score, 'bot_full_time_note', proof.available_at
+            raw = proof.observed_at
+            first_seen, conflict = proof.first_available_at, proof.conflict
         if not f and not conflict and mid not in ambiguous and not embedded:
             legacy = opportunity_results.score_pair(ft.get(mid))
             legacy_stamp = observed((chronology.get('ft') or {}).get(mid))
@@ -364,6 +377,8 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         if own is not None:
             b['w'], b['settled_by'] = own, ('resultado ' + bsd[b['match_id']].get('provider', 'BSD')) if from_bsd else 'resultado'
             b['result_known_utc'], b['result_known_source'] = known, source
+            if strict and proof.score is not None and len(result_versions) > 1:
+                b['_simulation_available_at'] = _unchanged_payoff_since(b, result_versions, kickoff, proof, own)
             if from_bsd and source == 'HL aos 90 min':
                 b['result_provenance'] = {'source': 'highlightly_detail', 'provider_id': ext.get('hl_id'),
                                           'fixture_id': mid, 'kickoff_utc': ext.get('event_date'),
@@ -580,7 +595,7 @@ def portfolio(bets, as_of):
         decision = chronology.decision_time(b)
         if decision is None or decision > as_of:
             continue
-        known = chronology.result_known(b)
+        known = b.get('_simulation_available_at') or chronology.result_known(b)
         known = known if b['w'] is not None and known is not None and decision < known <= as_of else None
         proved += known is not None
         entries.append({'d': decision.isoformat(), 'z': known.isoformat() if known else None,
