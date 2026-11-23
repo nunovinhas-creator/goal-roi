@@ -5,7 +5,7 @@ Sinal = primeira versão da mensagem; resultado = FT em qualquer versão de qual
 Secção "questions": cortes escritos ANTES de haver dados (exploratórios; nunca contam como conclusão).
 """
 import collections, csv, json, math, pathlib, re
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 
 from . import brain, certification, details_hl, insights, llm_eval, polymarket_alerts
@@ -290,7 +290,7 @@ def settlement_events(bet, as_of):
 
 
 def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=None, not_covered=(),
-               chronology=None, group_aliases=True, now=None):
+               chronology=None, group_aliases=True, now=None, *, per_message=False):
     """strict=True: regra do ROI (exclui sinais vistos já com resultado). strict=False: todos os sinais, para a taxa de acerto.
 
     PR 3: cada aposta guarda signal_seen_utc (primeira recolha da mensagem do sinal) e result_known_utc/result_known_source
@@ -314,6 +314,8 @@ def build_bets(msgs, ft, marks=None, notes=(), strict=True, bsd=None, details=No
         identity = {name: m[name] for name in ('canonical_match_id', 'match_identity_exclusion') if name in m}
         fixture = (identity.get('canonical_match_id') if group_aliases else None) or m.get('match_id')
         cohort = (fixture, *k[1:], identity.get('match_identity_exclusion'))
+        if per_message:
+            cohort = (*cohort, m['message_id'])
         if strict and (cohort in dead or (cohort not in out and not provenance_ok(m))):
             dead.add(cohort)
             continue
@@ -802,9 +804,23 @@ def opportunity_rule(msgs, observations, now):
         return None
 
 
-def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
-    """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
-    now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
+@dataclass
+class BetInputs:
+    messages: list
+    identified: list
+    bindings: dict
+    bet_options: dict
+    observations: dict
+    audit: dict
+
+    def research(self, *, per_message=False):
+        ordered = sorted(self.identified, key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
+        rows = build_bets(ordered, strict=False, group_aliases=False, per_message=per_message, **self.bet_options)
+        return list(research_bets(rows, self.observations, self.bet_options['now'], bindings=self.bindings))
+
+
+def load_bet_inputs(now):
+    """Load report inputs at an explicit clock without running discovery or writing state."""
     chron = {}
     bot_observations, providers = {}, {}
     msgs, ft, marks, notes, audit = load(chron, result_observations=bot_observations, as_of=now)
@@ -868,8 +884,22 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     audit['ended_after_90'] = len(st_hl.get('not_regular_time') or {})
     audit['hl_vs_bsd_disagreements'] = sum(1 for m, r in ext['hl'].items() if m in ext['bsd'] and ext['bsd'][m]['ft'] != r['ft'])
     identified, bindings = match_identity.resolve(msgs, now)
-    bets = build_bets(identified, ft, marks, notes, bsd=bsd, details=details, not_covered=not_covered, chronology=chron, now=now)
-    signals = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details, not_covered=not_covered, chronology=chron, now=now)
+    observations = opportunity_results.merge_sources(bot_observations, providers)
+    for mid, versions in details_hl.observations(detail_state, now).items():
+        observations.setdefault(mid, []).extend(versions)
+    return BetInputs(msgs, identified, bindings,
+                     dict(ft=ft, marks=marks, notes=notes, bsd=bsd, details=details,
+                          not_covered=not_covered, chronology=chron, now=now), observations, audit)
+
+
+def build(csv_path=None, register=False, now=None, *, as_of=None, register_certification=False, capture=None):
+    """now: relógio do relatório, um só instante para avaliar (prazos da certificação) e para registar seleções."""
+    now = as_of if as_of is not None else (now or datetime.now(timezone.utc))
+    inputs = load_bet_inputs(now)
+    msgs, audit = inputs.messages, inputs.audit
+    options = inputs.bet_options
+    bets = build_bets(inputs.identified, **options)
+    signals = build_bets(inputs.identified, strict=False, **options)
     finished_matches = {b['match_id'] for b in signals if b['ft'] or b['match_result_first_seen_utc']}
     by = collections.OrderedDict()
     for b in bets:
@@ -894,20 +924,14 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         reg_path.write_text(json.dumps(registry, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     captured = LAST if capture is None else capture
     captured['signals'] = [b for b in signals if eligible(b)]
-    observations = opportunity_results.merge_sources(bot_observations, providers)
-    for mid, versions in details_hl.observations(detail_state, now).items():
-        observations.setdefault(mid, []).extend(versions)
-    identified.sort(key=lambda row: match_identity.signal_seen(row) or match_identity.UNPROVEN)
-    research_input = build_bets(identified, ft, marks, notes, strict=False, bsd=bsd, details=details,
-                                not_covered=not_covered, chronology=chron, group_aliases=False, now=now)
-    research = list(research_bets(research_input, observations, now, bindings=bindings))
+    research = inputs.research()
     captured['research_signals'] = [b for b in research if eligible(b)]
     ledger_path = data_dir() / certification.FILE
     ledger = certification.load(ledger_path)          # None até à ativação explícita: nenhuma tática pode ser validada
     receipt_dir = data_dir() / certification.scientific_receipts.DIRECTORY
     brn = brain.build(research, registry, MIN_SETTLED, ledger, receipt_dir=receipt_dir, as_of=now,
                      archive_commitments=register_certification,
-                     opportunity_rule=opportunity_rule(msgs, observations, now))
+                     opportunity_rule=opportunity_rule(msgs, inputs.observations, now))
     ledger_summary(brn['validation'])
     llm_state = chronology.snapshot_at(brain.load_registry(data_dir() / 'llm_state.json'), now)
     brn['llm_runs'], brn['llm_last_run_utc'], brn['llm_last_outcome'] = llm_state.get('runs', 0), llm_state.get('last_run_utc'), llm_state.get('last_outcome')
@@ -938,7 +962,7 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
         'simulation': portfolio(bets, now),
         'operational': operational_evidence(signals, now),
         polymarket_alerts.REPORT_KEY: polymarket_alerts.candidates(msgs, finished_matches, now),
-        'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals, now), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **ft), bsd, details), 'timeline': timeline(bets), 'daily': daily(bets),
+        'questions': questions(bets), 'recent_bets': recent, 'unsettled': unsettled(signals, now), 'matches': match_stories({b['match_id'] for b in bets[-60:]}, msgs, dict({b['match_id']: b['ft'] for b in signals if b['ft']}, **options['ft']), options['bsd'], options['details']), 'timeline': timeline(bets), 'daily': daily(bets),
     }
 
 
