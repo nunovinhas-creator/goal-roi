@@ -633,12 +633,17 @@
    "state": "delivered"
   },
   "game|id:ad-ceuta-fc-vs-almeria-20261123|c9062ced39ce": {
+   "attempt_id": "469979d63ba643aa9e40c109c00bce11",
+   "attempt_utc": "2026-11-23T19:27:11+00:00",
+   "chars": 207,
    "created_utc": "2026-11-23T19:27:07+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "fad01f4b29994204e37222b64e2c6ef787f19c1e84b0862b1619ff0604a13235",
+   "state": "in_flight"
   },
   "game|id:ad-ceuta-fc-vs-almeria-20261123|d1e57a1ce1d4": {
    "attempt_id": "7b709b8336c64ed2b0047fd43c1245cf",
@@ -1769,13 +1774,15 @@
    "attempt_utc": "2026-11-23T19:27:07+00:00",
    "chars": 283,
    "created_utc": "2026-11-23T19:27:07+00:00",
+   "done_utc": "2026-11-23T19:27:07+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "343dfc5545d03a0cbd9ce99c29fe8214e78737cb297301adad2ff7efdc315a0c",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:brentford-vs-everton-20261123|e9b78bf0e6e1": {
    "attempt_id": "36967bae084f43a5966f6c4aa8cac591",
@@ -6149,7 +6156,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 393,
+  "delivered": 394,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-23T19:21:03+00:00",
@@ -6195,6 +6202,7 @@
   "2026-11-23T18:43:15+00:00|Istanbul Basaksehir — Corum Belediyespor|Over 4.5": true,
   "2026-11-23T18:57:55+00:00|Monza — Fiorentina|AH1(+0.5)": true,
   "2026-11-23T19:16:07+00:00|Sepsi OSK — Rapid Bucharest|Over 4": true,
+  "2026-11-23T19:23:11+00:00|AD Ceuta FC — Almeria|AH1(+0.5)": true,
   "2026-11-23T19:25:02+00:00|Brentford — Everton|Over 2.5": true
  },
  "migrations": {
@@ -6505,6 +6513,9 @@
   },
   "item|id:ad-ceuta-fc-vs-almeria-20261123|Asian Total|Over 2.5": {
    "at_utc": "2026-11-23T12:43:19+00:00"
+  },
+  "item|id:ad-ceuta-fc-vs-almeria-20261123|Polymarket|AH1(+0.5)": {
+   "at_utc": "2026-11-23T19:27:07+00:00"
   },
   "item|id:agf-aarhus-vs-lyngby-20261120|Asian Total|Over 4": {
    "at_utc": "2026-11-20T19:26:35+00:00"
@@ -7717,7 +7728,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 705,
+ "sent_total": 706,
  "statuses": {
   "Forma de golos | Competição = liga & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Competição = liga & Parte do jogo = 2.ª parte": "abandonada",
@@ -8507,6 +8518,7 @@
   "2026-11-23T18:43:15+00:00|Istanbul Basaksehir — Corum Belediyespor|Over 4.5",
   "2026-11-23T18:57:55+00:00|Monza — Fiorentina|AH1(+0.5)",
   "2026-11-23T19:16:07+00:00|Sepsi OSK — Rapid Bucharest|Over 4",
+  "2026-11-23T19:23:11+00:00|AD Ceuta FC — Almeria|AH1(+0.5)",
   "2026-11-23T19:25:02+00:00|Brentford — Everton|Over 2.5"
  ]
 }
