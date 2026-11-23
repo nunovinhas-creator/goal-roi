@@ -19,22 +19,38 @@ WATCH_SECONDS = int(os.environ.get('WATCH_SECONDS', '480'))
 INTERVAL = int(os.environ.get('WATCH_INTERVAL', '120'))
 FAST_RECENT = int(os.environ.get('WATCH_RECENT', '40'))
 FAILED_EXIT = 3
+# The workflow kills this step at 540 s. A refresh (report + notices) starts only when its measured duration still fits
+# before HARD_SECONDS; otherwise the read data is published by the next step and the next collection reports it.
+# A refresh killed mid-way leaves a pushed intent unsent (`uncertain`): never a duplicate, but a lost notice.
+HARD_SECONDS = int(os.environ.get('WATCH_HARD_SECONDS', '525'))
+REFRESH_ESTIMATE = int(os.environ.get('WATCH_REFRESH_ESTIMATE', '240'))
 
 
 class WatchStopped(RuntimeError):
     """As leituras rápidas pararam (falhas seguidas) ou o relatório/avisos falharam; a espera e a cadência mantêm-se."""
 
 
-async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None):
+async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None,
+                 hard=None, estimate=REFRESH_ESTIMATE):
     """Chama read() a cada `every` segundos até `total`; on_new() quando read() devolve linhas novas. -> leituras feitas.
     problems (lista, opcional): recebe 'reads_stopped' e/ou 'report_failed' para o código de saída."""
     total, every = WATCH_SECONDS if total is None else total, INTERVAL if every is None else every
     start, done, fails, k = clock(), 0, 0, 1
     refreshed = pending = False
     failures = 0
+    longest = estimate
+
+    def fits():
+        if hard is None or clock() - start + longest <= hard:
+            return True
+        print('WATCH_REFRESH_DEFERRED')
+        return False
 
     def update():
-        nonlocal refreshed, pending, failures
+        nonlocal refreshed, pending, failures, longest
+        if not fits():
+            return
+        began = clock()
         try:
             on_new()
         except Exception as exc:
@@ -44,6 +60,8 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
         else:
             refreshed, pending, failures = True, False, 0
             print('WATCH_REPORT_COMPLETED')
+        finally:
+            longest = max(longest, clock() - began)
 
     while k * every <= total and fails < 2:
         wait = start + k * every - clock()
@@ -131,7 +149,7 @@ async def watch():
 
     problems = []
     try:
-        done = await rounds(read, lambda: refresh(publisher), problems=problems)
+        done = await rounds(read, lambda: refresh(publisher), problems=problems, hard=HARD_SECONDS)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)
