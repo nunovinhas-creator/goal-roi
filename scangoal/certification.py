@@ -242,10 +242,15 @@ def witnessed_selections(ledger, registry, directory, as_of):
     prior, effective, receipts = None, {}, []
     for length in range(len(visible) + 1):
         start = activated if length == 0 else selected[visible[length - 1]['id']][2]
-        proof = scientific_receipts.verify(directory, 'certification-ledger', dict(ledger, entries=visible[:length]), as_of=as_of)
-        if (proof is None or not start <= proof.at <= start + timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+        prefix = dict(ledger, entries=visible[:length])
+        deadline = start + timedelta(minutes=PUBLISH_TOLERANCE_MIN)
+        proof = scientific_receipts.verify(directory, 'certification-ledger', prefix, as_of=deadline)
+        if (proof is None or not start <= proof.at <= deadline
                 or (prior is not None and proof.at <= prior)):
             return ledger, {}, ['ledger prefix %d lacks an independent receipt in order' % length], []
+        if proof.at > as_of:
+            # A signed extension takes effect only when its receipt becomes visible.
+            return dict(ledger, entries=visible[:length - 1]) if length else None, effective, [], receipts
         receipts.append(proof.identifier)
         prior = proof.at
         if length:
