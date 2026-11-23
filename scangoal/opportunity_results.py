@@ -139,17 +139,17 @@ def settle_research_bet(bet, as_of):
 
     won = payout(result.score)
     row = dict(bet, ft=list(result.score) if result.score is not None else None, w=won,
-               result_known_utc=None, result_available_utc=chronology.iso(result.available_at),
+               result_known_utc=None, result_available_utc=chronology.iso(result.available_at, timespec='auto'),
                result_known_source="versioned_ft" if result.score is not None else None,
                settled_by="versioned_ft" if won is not None else None,
-               match_result_first_seen_utc=chronology.iso(result.first_available_at),
+               match_result_first_seen_utc=chronology.iso(result.first_available_at, timespec='auto'),
                result_quarantined=result.conflict,
-               result_quarantined_utc=chronology.iso(result.available_at) if result.conflict else None,
+               result_quarantined_utc=chronology.iso(result.available_at, timespec='auto') if result.conflict else None,
                first_confirmed_ft=list(result.first_score) if result.first_score is not None else None,
                first_confirmed_w=payout(result.first_score),
-               first_confirmed_utc=chronology.iso(result.first_consensus_at))
+               first_confirmed_utc=chronology.iso(result.first_consensus_at, timespec='auto'))
     row["result_reconciliation"] = (
-        {"ft": late.score, "conflict": late.conflict, "available_utc": chronology.iso(late.available_at)}
+        {"ft": late.score, "conflict": late.conflict, "available_utc": chronology.iso(late.available_at, timespec='auto')}
         if late is not None else None)
     return row
 
