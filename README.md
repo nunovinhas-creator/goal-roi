@@ -97,6 +97,8 @@ Os sinais Betfair não recebem resultado do bot. `scangoal/results_bsd.py` vai b
 - Lista curta congelada em `audits/strategy-lab/shortlist-v1.json`: só jogos posteriores ao registo contam. Ver `audits/strategy-lab/README.md`.
 - A LLM recebe o veredicto e os motivos sobre as suas propostas; não decide nada.
 
+A [auditoria temporal de decisões](audits/decision-audit.md) compara offline as decisões atuais com um diagnóstico de disponibilidade e reconciliação de resultados por encontro.
+
 ## Avaliação científica da LLM (PR 4)
 `scangoal/llm_eval.py` aplica o protocolo pré-registado `audits/pr4-llm-protocol-v5.md` (`llm_incremental_v5`; o código recusa outra versão do ficheiro). O v1 (`audits/pr4-llm-protocol.md`) e os v2 a v4 (`-v2.md` a `-v4.md`) ficam como registo histórico, substituídos depois da revisão e das auditorias independentes da PR #27.
 - Pergunta: as hipóteses do modelo escolhem jogos com mais lucro por jogo (odd −2 %), depois do registo, do que hipóteses comparáveis do gerador (20 controlos pré-selecionados sem ler resultados), no mesmo intervalo?
