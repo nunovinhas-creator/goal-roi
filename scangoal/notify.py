@@ -614,6 +614,24 @@ def legacy_pairs(watch_sent):
     return out
 
 
+def legacy_sent(state):
+    """`watch_sent` entries that may stand for a notice without an item claim: only those whose signal predates the
+    `telegram_format_v2` migration. From that migration on, every notice records its item (fixture, market, selection),
+    which is the authoritative identity; matching later entries by team names and selection suppressed a second,
+    distinct fixture between the same teams and the same selection in another market. Without a readable migration
+    date every entry stays legacy (conservative: suppress rather than repeat)."""
+    entries = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
+    cutoff = parse_time(((state.get('migrations') or {}).get(FORMAT_MIGRATION) or {}).get('at_utc'))
+    if cutoff is None:
+        return entries
+    out = set()
+    for k in entries:
+        t = parse_time(k.split('|', 1)[0]) if isinstance(k, str) else None
+        if t is None or t < cutoff:
+            out.add(k)
+    return out
+
+
 def legacy_hit(pairs, w):
     t = parse_time(w.get('date_utc'))
     return bool(t) and any(abs(t - x) <= timedelta(days=LEGACY_PAIR_DAYS) for x in pairs.get((w.get('match'), w.get('selection')), ()))
@@ -626,7 +644,7 @@ def game_notices(report, state, now, excluded_items=()):
     atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
     notified = state.get('notified_items') or {}
     claims = set(notified).union(excluded_items)
-    sent = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
+    sent = legacy_sent(state)
     pairs, games = legacy_pairs(sent), {}
     candidates = list((report.get('brain') or {}).get('watch') or [])
     activation = (state.get('migrations') or {}).get(polymarket_alerts.ACTIVATION) or {}
