@@ -69146,6 +69146,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Dia = fim de semana & Golos até ao sinal = 3 ou mais & Minuto = 61 em diante": {
+  "born_utc": "2026-11-23T01:42:27.491333+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "2409dbf11421262dbbc25e40930da56385514c23042809f00f9eb77e1d1a8f47",
+   "registry_size": 13962,
+   "report_generated_at_utc": "2026-11-23T01:40:35+00:00",
+   "response_sha256": "ad6e3031199afbed1595688ebd53d084b82c5f2cd895db8a06e9e0a6f76413a3"
+  },
+  "reason": "Jogos de liga em fim de semana com muitos golos tendem a ter mais gols no final",
+  "source": "llm"
+ },
  "Jogo aberto | Competição = liga & Dia = fim de semana & Golos em falta para ganhar = até 1 golo": {
   "born_utc": "2026-11-14T14:34:09+00:00",
   "conditions": [
