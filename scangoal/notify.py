@@ -21,6 +21,8 @@ Segredos: TG_BOT_TOKEN e TG_CHAT_ID (o token só vai no endereço do pedido e nu
 nada. `--preview` nunca os lê, nunca abre ligações e nunca grava estado.
 """
 import copy, hashlib, json, os, re, socket, subprocess, sys, tempfile, time, unicodedata
+import uuid
+import fcntl
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -77,6 +79,10 @@ class StateRegressed(NotifyError):
 class DeliveryFailed(NotifyError):
     """Falha confirmada: a mensagem não foi publicada (o Telegram recusou, ou a ligação nunca chegou a fazer-se)."""
 
+    def __init__(self, message='', *, retryable=None):
+        super().__init__(message)
+        self.retryable = message.endswith(' 429') if retryable is None else retryable
+
 
 class DeliveryUncertain(NotifyError):
     """Não se sabe se a mensagem foi publicada (tempo esgotado, ligação cortada, resposta ilegível, erro 5xx)."""
@@ -88,7 +94,7 @@ class DeliveryIncomplete(NotifyError):
 
 
 FAILED_EXIT = 3     # falha efetiva: o passo fica assinalado (continue-on-error no workflow), a recolha continua
-PROBLEMS = ('failed', 'uncertain', 'withdrawn')
+PROBLEMS = ('failed', 'uncertain', 'withdrawn', 'rejected')
 
 
 def send(token, chat, text):
@@ -100,7 +106,7 @@ def send(token, chat, text):
             body = json.loads(r.read(200_000))
     except HTTPError as exc:                     # nunca imprimir o endereço: contém o token
         if 400 <= exc.code < 500:
-            raise DeliveryFailed('HTTP %d' % exc.code) from None
+            raise DeliveryFailed('HTTP %d' % exc.code, retryable=exc.code == 429) from None
         raise DeliveryUncertain('HTTP %d' % exc.code) from None
     except URLError as exc:
         if isinstance(exc.reason, (socket.gaierror, ConnectionRefusedError)):
@@ -108,8 +114,10 @@ def send(token, chat, text):
         raise DeliveryUncertain('connection interrupted') from None
     except (TimeoutError, OSError, ValueError):
         raise DeliveryUncertain('no readable answer') from None
+    if isinstance(body, dict) and body.get('ok') is False:
+        raise DeliveryFailed('Telegram rejected the request')
     if not isinstance(body, dict) or body.get('ok') is not True:
-        raise DeliveryFailed('not ok')
+        raise DeliveryUncertain('no readable confirmation')
 
 
 def pct(v):
@@ -559,7 +567,7 @@ def legacy_key(w):
 
 
 def game_key(w):
-    mid = text_identity(w.get('match_id'))
+    mid = text_identity(w.get('canonical_match_id') or w.get('match_id'))
     if mid:
         return 'id:' + mid
     return 'legacy:%s|%s' % (w.get('match'), (w.get('kickoff_utc') or w.get('date_utc') or '')[:10])
@@ -578,7 +586,21 @@ def item_key(w):
     """Identidade da APOSTA (jogo, mercado, seleção). O nível (indício ou alerta) não faz parte dela: a mesma aposta nunca é
     avisada duas vezes, nem quando a hipótese que a sustenta passa a certificada (essa mudança é outro acontecimento, o aviso
     de estado "✅ Tática validada"). Revisão #5920565094, P1."""
-    return 'item|%s|%s|%s' % (game_key(w), w.get('market') or '', w.get('selection') or '')
+    market = w.get('market') or ''
+    period = w.get('period')
+    if period and period != 'regulation':
+        market += ':' + period
+    return 'item|%s|%s|%s' % (game_key(w), market, w.get('selection') or '')
+
+
+def item_claimed(w, claims):
+    if item_key(w) in claims:
+        return True
+    # Claims made before fixture canonicalization were recorded under the source ID.
+    raw = text_identity(w.get('match_id'))
+    canonical = text_identity(w.get('canonical_match_id'))
+    return bool(raw and canonical and raw != canonical
+                and item_key(dict(w, canonical_match_id=raw)) in claims)
 
 
 def legacy_pairs(watch_sent):
@@ -592,17 +614,37 @@ def legacy_pairs(watch_sent):
     return out
 
 
+def legacy_sent(state):
+    """`watch_sent` entries that may stand for a notice without an item claim: only those whose signal predates the
+    `telegram_format_v2` migration. From that migration on, every notice records its item (fixture, market, selection),
+    which is the authoritative identity; matching later entries by team names and selection suppressed a second,
+    distinct fixture between the same teams and the same selection in another market. Without a readable migration
+    date every entry stays legacy (conservative: suppress rather than repeat)."""
+    entries = set(state.get('watch_sent') or []) - set(state.get('market_scoped_watch') or {})
+    cutoff = parse_time(((state.get('migrations') or {}).get(FORMAT_MIGRATION) or {}).get('at_utc'))
+    if cutoff is None:
+        return entries
+    out = set()
+    for k in entries:
+        t = parse_time(k.split('|', 1)[0]) if isinstance(k, str) else None
+        if t is None or t < cutoff:
+            out.add(k)
+    return out
+
+
 def legacy_hit(pairs, w):
     t = parse_time(w.get('date_utc'))
     return bool(t) and any(abs(t - x) <= timedelta(days=LEGACY_PAIR_DAYS) for x in pairs.get((w.get('match'), w.get('selection')), ()))
 
 
-def game_notices(report, state, now):
+def game_notices(report, state, now, excluded_items=()):
     """Contrato (revisão #5920565094): cada APOSTA (jogo, mercado, seleção) é avisada no máximo uma vez; as apostas novas
     de um mesmo jogo numa recolha saem numa só mensagem. Reforços (outra hora de sinal, outra multiplicidade) e a passagem de
     indício a alerta da mesma aposta nunca geram outro aviso. Uma seleção genuinamente nova num jogo já avisado gera uma
     atualização desse jogo, só com a(s) aposta(s) nova(s), identificada como tal."""
-    notified, sent = state.get('notified_items') or {}, set(state.get('watch_sent') or [])
+    notified = state.get('notified_items') or {}
+    claims = set(notified).union(excluded_items)
+    sent = legacy_sent(state)
     pairs, games = legacy_pairs(sent), {}
     candidates = list((report.get('brain') or {}).get('watch') or [])
     activation = (state.get('migrations') or {}).get(polymarket_alerts.ACTIVATION) or {}
@@ -617,7 +659,7 @@ def game_notices(report, state, now):
             #                   de `brain.watch`: nunca é marcado como avisado, por isso nunca fica em fila para execuções seguintes.
         level = item_level(report, w)
         ik = item_key(w)
-        if ik in notified or legacy_key(w) in sent or legacy_hit(pairs, w):
+        if item_claimed(w, claims) or legacy_key(w) in sent or legacy_hit(pairs, w):
             continue          # aposta já avisada (também no formato antigo, com outra hora de sinal)
         g = games.setdefault(game_key(w), {'items': {}, 'alert': False, 'last': w.get('date_utc') or '', 'sample': w})
         it = g['items'].setdefault(ik, {'level': 'indício', 'entries': []})
@@ -967,7 +1009,7 @@ def hello_notice(report):
                                             'alertas de apostas e, às 22:00 (Lisboa), um resumo diário com as mudanças de estado das táticas.', PAGE], [['hello']])
 
 
-def plan(report, state, now):
+def plan(report, state, now, excluded_items=()):
     """Relatório + estado -> avisos por esta ordem. Aplica ao estado só o que não depende de uma entrega (migrações
     silenciosas, referência de saúde, `statuses` a seguir o relatório, regimes sem aviso, oscilações). Os efeitos de cada
     aviso (o que fica marcado como avisado) só são aplicados quando a intenção de envio é gravada."""
@@ -977,7 +1019,7 @@ def plan(report, state, now):
     if isinstance(report.get(polymarket_alerts.REPORT_KEY), list):
         state.setdefault('migrations', {}).setdefault(polymarket_alerts.ACTIVATION, {'at_utc': now.isoformat()})
     out = [] if state.get('hello') else [hello_notice(report)]
-    out += game_notices(report, state, now)
+    out += game_notices(report, state, now, excluded_items)
     new = eligible_statuses(report)
     changes = []
     due = summary_day(now)
@@ -995,17 +1037,21 @@ def plan(report, state, now):
 
 
 def apply_effects(state, effects, now):
+    item = None
     for e in effects:
         op = e[0]
         if op == 'hello':
             state['hello'] = True
         elif op == 'item':
+            item = e[1]
             state.setdefault('notified_items', {})[e[1]] = {'at_utc': iso(now)}
         elif op == 'watch_sent':
             ws = state.setdefault('watch_sent', [])
             if e[1] not in ws:
                 ws.append(e[1])
                 ws.sort()
+            if item is not None:
+                state.setdefault('market_scoped_watch', {})[e[1]] = True
         elif op == 'notice_games':
             state.setdefault('notice_games', {})[e[1]] = e[2]
         elif op == 'announce':
@@ -1114,6 +1160,8 @@ def parse_log(raw):
 
 def log_entry(now, key, event, rec, **extra):
     e = {'v': 1, 'at_utc': iso(now), 'key': key, 'event': event, 'kind': rec.get('kind')}
+    if rec.get('attempt_id'):
+        e['attempt_id'] = rec['attempt_id']
     e.update({k: v for k, v in extra.items() if v is not None})
     return e
 
@@ -1191,11 +1239,19 @@ def reconcile(store, state, now):
             continue
         names = [e['event'] for e in evs]
         terminal = [x for x in names if x in TERMINAL]
-        open_intent = 'intent' in names and names[::-1].index('intent') < (names[::-1].index('withdrawn') if 'withdrawn' in names else len(names))
+        last = next((e for e in reversed(evs) if e['event'] in {'intent', 'withdrawn', 'rejected', *TERMINAL}), {})
+        open_intent = last.get('event') == 'intent'
+        if last.get('event') == 'rejected':
+            r = recs.setdefault(key, {'kind': evs[0].get('kind'), 'created_utc': evs[0].get('at_utc')})
+            if not r.get('rejected_attempts'):
+                r.update(state='pending', rejected_attempts=1, events=names)
+                _bump(state, 'rejected')
+                changed = True
+            continue
         outcome = terminal[-1] if terminal else ('uncertain' if open_intent else None)
         if outcome is None or (r is not None and (r.get('events') or [''])[-1] == 'withdrawn' and not terminal):
             continue                       # intenção retirada (não publicada, nada enviado): continua pendente
-        intent = next((e for e in evs if e['event'] == 'intent'), {})
+        intent = next((e for e in reversed(evs) if e['event'] == 'intent'), {})
         r = recs.setdefault(key, {'kind': evs[0].get('kind'), 'created_utc': evs[0].get('at_utc')})
         r.update(state=outcome, reconstructed=True, events=[x for x in names if x != outcome] + [outcome], sha256=intent.get('sha256'))
         if isinstance(intent.get('effects'), list):
@@ -1240,7 +1296,7 @@ def _expire(store, state, now, n, rec, t, reason):
     print('NOTIFY_EXPIRED_BEFORE_SEND' if reason == 'signal_expired_before_send' else 'NOTIFY_EXPIRED_BEFORE_INTENT')
 
 
-def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None, clock=None):
+def deliver(store, report, state, now, sender, token, chat, checkpoint=None, publish=None, clock=None, *, excluded_items=()):
     """Planeia e envia. Para cada aviso: intenção (efeitos + `in_flight`) gravada no estado e no registo ANTES do envio;
     resultado gravado depois. Uma falha ou incerteza para os envios desta execução (os seguintes ficam pendentes e só saem
     se ainda forem válidos na execução seguinte). publish (P0, `GitPublisher`): depois de gravar a intenção e ANTES de contactar
@@ -1256,7 +1312,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
     clock = clock or run_clock(now)
     reconcile(store, state, now)
     recs = state.setdefault('deliveries', {})
-    notices = [n for n in plan(report, state, now) if recs.get(n.key, {}).get('state') in (None, 'pending')]
+    notices = [n for n in plan(report, state, now, excluded_items) if recs.get(n.key, {}).get('state') in (None, 'pending')]
     keys, new_log = {n.key for n in notices}, []
     for key, r in recs.items():
         if r.get('state') == 'pending' and key not in keys:
@@ -1289,7 +1345,8 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
             continue
         before = copy.deepcopy(state)
         apply_effects(state, n.effects, now)
-        rec.update(state='in_flight', attempt_utc=iso(now), sha256=sha(n.text), chars=len(n.text))
+        rec.update(state='in_flight', attempt_utc=iso(t), attempt_id=uuid.uuid4().hex,
+                   sha256=sha(n.text), chars=len(n.text))
         rec['events'].append('intent')
         store.save_state(state)
         cp('after_intent_state')
@@ -1315,13 +1372,28 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
             cp('after_expired')
             continue
         cp('before_send')
+        retryable = False
         try:
             sender(token, chat, n.text)
             outcome = 'delivered'
-        except DeliveryFailed:
+        except DeliveryFailed as exc:
             outcome = 'failed'
+            retryable = exc.retryable
         except Exception:                 # qualquer outra exceção: não se sabe se saiu
             outcome = 'uncertain'
+        if retryable and n.bets and not rec.get('rejected_attempts') and n.still_current(clock()):
+            rejected_record = dict(rec)
+            state.clear()
+            state.update(before)
+            recs = state['deliveries']
+            rec = recs[n.key]
+            rec.update(state='pending', rejected_attempts=1, attempt_id=rejected_record['attempt_id'])
+            rec['events'] += ['intent', 'rejected']
+            _bump(state, 'rejected')
+            store.save_state(state)
+            store.append_log([log_entry(clock(), n.key, 'rejected', rec, reason='telegram_confirmed_rejection')])
+            print('NOTIFY_DELIVERY_FAILED')
+            break
         if outcome == 'delivered':
             cp('after_response')
         rec.update(state=outcome, done_utc=iso(now))
@@ -1343,11 +1415,7 @@ def deliver(store, report, state, now, sender, token, chat, checkpoint=None, pub
 
 
 class GitPublisher:
-    """Barreira P0 (revisão #5920565094): torna a intenção de envio visível a qualquer runner seguinte ANTES de contactar o
-    Telegram — commit só de `notify_state.json` e `notify_log.jsonl`, `pull --rebase --autostash` e `push` para o ramo do
-    workflow. Devolve True só quando o push foi aceite. Qualquer falha (comando, conflito, tempo esgotado) devolve False e o
-    aviso NÃO é enviado. Um push aceite mas dado como falhado (resposta perdida) também devolve False: no pior caso o
-    acontecimento fica `in_flight` no remoto e a execução seguinte marca-o como incerto — nunca é enviado duas vezes."""
+    """Claim an intent with a unique commit and a single fast-forward push."""
 
     def __init__(self, root, branch, paths, timeout=60, attempts=3, runner=subprocess.run):
         self.root, self.branch, self.paths, self.timeout, self.attempts, self.runner = str(root), branch, list(paths), timeout, attempts, runner
@@ -1368,16 +1436,13 @@ class GitPublisher:
 
     def __call__(self, key):
         try:
+            nonce = uuid.uuid4().hex
             if not (self.git('add', '--', *self.paths)
-                    and self.git('commit', '-q', '-m', 'notify: intent %s [skip ci]' % sha(key)[:12], '--', *self.paths)):
+                    and self.git('commit', '-q', '-m', 'notify: intent %s [skip ci]' % sha(key)[:12],
+                                 '-m', 'attempt ' + nonce, '--', *self.paths)):
                 return False
-            for _ in range(self.attempts):
-                if not self.git('pull', '-q', '--rebase', '--autostash', 'origin', self.branch):
-                    self.git('rebase', '--abort')
-                    return False
-                if self.git('push', '-q', 'origin', 'HEAD:%s' % self.branch):
-                    return True
-            return False
+            # Any intervening writer invalidates this checkout's claim. Replanning requires a fresh checkout.
+            return self.git('push', '-q', 'origin', 'HEAD:refs/heads/%s' % self.branch)
         except (OSError, subprocess.SubprocessError):
             return False
 
@@ -1390,13 +1455,43 @@ def durability(env, store):
         print('NOTIFY_DURABILITY local')
         return None
     branch = (env.get('GITHUB_REF_NAME') or '').strip()
-    if mode != 'git' or not branch:
-        raise NotifyError('NOTIFY_DURABLE must be "git" with GITHUB_REF_NAME set')    # mal configurado: não envia nada
+    if mode != 'git' or branch != 'main':
+        raise NotifyError('NOTIFY_DURABLE=git requires main')
     print('NOTIFY_DURABILITY git')
     return GitPublisher.for_store(store, branch)
 
 
+@contextmanager
+def outbox_lock(directory):
+    directory = Path(directory).resolve()
+    with (directory.parent / ('.' + directory.name + '.outbox.lock')).open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        yield
+
+
+def claimed_items(directory):
+    """Read the active claims from both general outbox files."""
+    store = FileStore(directory)
+    if not store.state_path.exists() and not store.log_path.exists():
+        return set()
+    state = store.load_state()
+    events, malformed = store.read_log()
+    check_integrity(state, events)
+    if malformed:
+        raise StateRegressed('notification log contains unreadable entries')
+    live = {}
+    for event in events:
+        key = event['key']
+        if event['event'] == 'intent':
+            live[key] = {effect[1] for effect in event.get('effects', ()) if effect[0] == 'item'}
+        elif event['event'] in ('rejected', 'withdrawn'):
+            live.pop(key, None)
+    return set(state.get('notified_items') or {}).union(*live.values())
+
+
 def run(sender=send, now=None, env=None, checkpoint=None):
+    from . import stake_alerts
+
     env = os.environ if env is None else env
     token, chat = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip()
     if not token or not chat:
@@ -1409,12 +1504,14 @@ def run(sender=send, now=None, env=None, checkpoint=None):
         return None
     store = FileStore(data_dir())
     publish = durability(env, store)
-    try:
-        state = store.load_state()
-    except StateMissing:
-        print('NOTIFY_STATE_MISSING')        # nada é enviado; repor o estado do histórico git ou, só numa instalação nova, --init-state
-        raise
-    state, done = deliver(store, report, state, now, sender, token, chat, checkpoint, publish)
+    with outbox_lock(data_dir()):
+        try:
+            state = store.load_state()
+        except StateMissing:
+            print('NOTIFY_STATE_MISSING')
+            raise
+        state, done = deliver(store, report, state, now, sender, token, chat, checkpoint, publish,
+                              excluded_items=stake_alerts.claimed_items(data_dir()))
     print('NOTIFY_OK sent', done)
     return state
 
@@ -1441,10 +1538,26 @@ def failure(sender=send, now=None, env=None):
     falhou o lançamento da execução seguinte (NEXT_COLLECTION_FAILED=1): aí a cadeia parou e não haverá outra oportunidade."""
     env = os.environ if env is None else env
     token, chat, now = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip(), now or datetime.now(UTC)
-    if token and chat and (now.minute < 10 or env.get('NEXT_COLLECTION_FAILED', '').strip() == '1'):
+    if not token or not chat or (now.minute >= 10 and env.get('NEXT_COLLECTION_FAILED', '').strip() != '1'):
+        return False
+    directory = data_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / 'notify_health.json'
+    stamp = iso(now)
+    with outbox_lock(directory):
+        previous = json.loads(path.read_text()) if path.exists() else {}
+        last = parse_time(previous.get('claimed_at_utc'))
+        if last is not None and now - last < timedelta(hours=1):
+            return False
+        save_state(path, {'claimed_at_utc': stamp})
+        if env.get('NOTIFY_DURABLE'):
+            store = FileStore(directory)
+            publish = durability(env, store)
+            publish.paths = [os.path.relpath(path.resolve(), Path(publish.root).resolve())]
+            if not publish('health|' + stamp):
+                return False
         sender(token, chat, 'A recolha do goal-roi falhou às %s UTC. Vê as execuções em https://github.com/nunovinhas-creator/goal-roi/actions' % now.strftime('%H:%M'))
         return True
-    return False
 
 
 # ---------------------------------------------------------------------------------------------------------------------

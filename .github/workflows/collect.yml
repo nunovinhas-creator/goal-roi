@@ -18,22 +18,42 @@ concurrency:
   cancel-in-progress: false
 jobs:
   collect:
+    # Single writer: only `main` of this repository runs the collector (a dispatch on another ref is a no-op).
+    if: ${{ github.repository == 'nunovinhas-creator/goal-roi' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
     # a run that fits 15 min without the tail can never be cut because of it.
     timeout-minutes: 18
     steps:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
-      - run: echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - run: |
+          echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          printf 'GOAL_ROI_PUBLICATION_DIR=%s/goal-roi-publication\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
         with:
-          ref: ${{ github.ref_name }}
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0 (= tag v5, 2026-11-16)
         with:
           python-version: '3.11'
           cache: pip
       - run: pip install -r requirements.txt
+      # Git is the only durable store. A transaction left by a lost runner is replayed (or, after its attempts, set
+      # aside) before anything else writes. Its failure blocks notices for this run, never the reads below.
+      - name: Resume pending publication
+        id: resume
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact_run=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=goal-roi-publication&per_page=30" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "main")] | max_by(.id) | .workflow_run.id // empty')
+          if [ -n "$artifact_run" ] && [ "$artifact_run" != "$GITHUB_RUN_ID" ]; then
+            origin=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$artifact_run" --jq '.head_repository.full_name + ":" + .path + ":" + .head_branch')
+            test "$origin" = "$GITHUB_REPOSITORY:.github/workflows/collect.yml:main"
+            gh run download "$artifact_run" -n goal-roi-publication -D "$GOAL_ROI_PUBLICATION_DIR"
+          fi
+          python -u -m scangoal.publication resume
       - name: Read bot conversation (read-only)
+        if: ${{ !cancelled() }}
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
@@ -42,32 +62,35 @@ jobs:
         run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader
       # Fontes complementares: uma falha da API sai com código 3 e fica assinalada no passo, sem parar a recolha.
       - name: Results from Highlightly (every 90 minutes at most; skipped without key)
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           HL_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '90' }}
         run: python -u -m scangoal.results_hl
       - name: Goal minutes from Highlightly (every 2 hours at most, 5 matches per run)
+        if: ${{ !cancelled() }}
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
         run: python -u -m scangoal.details_hl
       - name: Results from BSD (hourly at most; skipped without key)
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
           BSD_MIN_INTERVAL_MIN: ${{ inputs.force_results && '0' || '50' }}
         run: python -u -m scangoal.results_bsd
-      - name: Language model investigation (publish quota reservation before each call)
-        env:
-          LLM_BUDGET_MODE: ${{ github.ref_name == 'main' && vars.GOAL_ROI_LLM_FREE_CONFIRMED == 'true' && 'git' || 'off' }}
-          GOAL_ROI_LLM_FREE_CONFIRMED: ${{ vars.GOAL_ROI_LLM_FREE_CONFIRMED }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          MASTER_BRAIN_LLM_API_KEY: ${{ secrets.MASTER_BRAIN_LLM_API_KEY }}
-        run: python -u -m scangoal.llm
       - name: Report (fixed rules)
+        if: ${{ !cancelled() }}
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      # Notices only on top of a published state: an intent is claimed by a fast-forward push from this exact tip.
+      - name: Publish the report before sending notices
+        id: published
+        if: ${{ !cancelled() && steps.resume.outcome == 'success' }}
+        run: python -u -m scangoal.publication publish
       # Entrega falhada, incerta ou não publicada: código 3 (já gravada, nunca reenviada); o commit de dados continua.
       - name: Telegram notices through the user's bot (skipped without keys)
+        if: ${{ !cancelled() && steps.published.outcome == 'success' }}
         continue-on-error: true
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
@@ -75,19 +98,13 @@ jobs:
           NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify
       - name: Commit data
-        run: |
-          git add data docs/report.json docs/bets.csv
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          # Identidade local do repositório (não global): o `pull --rebase` também cria commits quando o remoto avançou.
-          git config user.name "scangoal-collector"
-          git config user.email "actions@users.noreply.github.com"
-          git commit -q -m "data: collect [skip ci]"
-          git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+        if: ${{ !cancelled() }}
+        run: python -u -m scangoal.publication publish
       # Leitura rápida: no tempo em que a execução antes ficava parada (8 minutos), relê o bot de 2 em 2 minutos com uma só
       # ligação, refaz o relatório e envia os avisos quando há mensagens novas. Nunca falha a execução; sem leituras, só espera.
       - name: Fast reads every 2 minutes until the next collection (read-only)
         id: fast
-        if: ${{ !cancelled() && github.ref_name == 'main' }}
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
@@ -98,24 +115,33 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NOTIFY_DURABLE: git
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
-      # Sem continue-on-error: uma falha de commit, rebase ou push deixa a execução vermelha (a recolha seguinte é lançada
-      # na mesma, `!cancelled()`). Push recusado: uma só nova tentativa, que reaplica o MESMO commit por cima do remoto, sem
-      # reler o bot nem recalcular avisos. Um conflito no rebase falha logo (bash -e), sem resolução automática; nunca force-push.
       - name: Commit data from the fast reads
-        if: ${{ !cancelled() && github.ref_name == 'main' }}
+        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' }}
+        run: python -u -m scangoal.publication publish
+      - name: Check for an unpublished transaction
+        id: publication
+        if: ${{ always() && !cancelled() }}
         run: |
-          git add data docs/report.json docs/bets.csv
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          # Identidade local do repositório (não global): o `pull --rebase` também cria commits quando o remoto avançou.
-          git config user.name "scangoal-collector"
-          git config user.email "actions@users.noreply.github.com"
-          git commit -q -m "data: collect [skip ci]"
-          git pull -q --rebase origin "${GITHUB_REF_NAME}"
-          if ! git push -q origin "HEAD:${GITHUB_REF_NAME}"; then
-            echo "::warning::push rejected; one more rebase and push of the same commit"
-            git pull -q --rebase origin "${GITHUB_REF_NAME}"
-            git push -q origin "HEAD:${GITHUB_REF_NAME}"
+          if [ '${{ steps.resume.outcome }}' = failure ]; then
+            echo 'Publication resume failed: reads ran, notices were not sent. See the Resume pending publication log.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -f "$GOAL_ROI_PUBLICATION_DIR/pending.json" ]; then
+            echo 'pending=true' >> "$GITHUB_OUTPUT"
+            echo 'Collection publication degraded. Review the pending transaction artifact.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ '${{ steps.fast.outcome }}' = failure ]; then
+            echo 'Fast reads ended in a degraded state. See WATCH_PROBLEMS in the job log.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Preserve pending data and intent for the next runner
+        if: ${{ always() && !cancelled() && steps.publication.outputs.pending == 'true' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: goal-roi-publication
+          path: |
+            ${{ env.GOAL_ROI_PUBLICATION_DIR }}/pending.json
+            ${{ env.GOAL_ROI_PUBLICATION_DIR }}/pending.bundle
+          if-no-files-found: error
+          retention-days: 7
       # O agendamento do GitHub não dispara neste repositório. Cada execução lança a seguinte (permitido ao GITHUB_TOKEN
       # para workflow_dispatch). O grupo de concorrência garante uma só cadeia: uma execução nova substitui a que estiver à espera.
       - name: Start the next collection
@@ -128,9 +154,11 @@ jobs:
           timeout 85s python scripts/dispatch_collection.py
       # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
       - name: Tell the user when a collection fails (at most once an hour)
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}
+          NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify --failure
+

@@ -135,23 +135,31 @@ class WorkflowInstall(unittest.TestCase):
         self.assertLess(steps.index('GOAL_ROI_JOB_STARTED_UTC'), steps.index('actions/checkout@'))
 
     def test_external_actions_pinned_to_audited_shas_and_credentials_persisted(self):
-        uses = re.findall(r'uses: ([^\s#]+)', self.text)
-        self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA])
-        self.assertNotIn('persist-credentials', self.text)       # default true: notify durability pushes
+        production = self.text
+        self.assertNotIn('\n  validate:\n', production)   # the journal validation job left with the external journal
+        uses = re.findall(r'uses: ([^\s#]+)', production)
+        self.assertEqual(uses, ['actions/checkout@'+CHECKOUT_SHA, 'actions/setup-python@'+SETUP_PYTHON_SHA,
+                                'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'])
+        self.assertNotIn('persist-credentials', production)     # default true: notify durability pushes
+        self.assertNotIn('DURABLE_URL', production)
+        self.assertNotIn('DURABLE_TOKEN', production)
+        self.assertNotIn('\n  push:', production)
 
     def test_schedule_chain_and_normal_steps_unchanged(self):
         for line in ("    - cron: '3,13,23,33,43,53 * * * *'",
-                     '  group: scangoal-write\n  cancel-in-progress: false',
+                     "  group: scangoal-write\n  cancel-in-progress: false",
+                     "github.ref == 'refs/heads/main' }}",
                      'run: python -u -m scangoal.results_bsd',
                      'run: python -u -m scangoal.notify',
                      'timeout 85s python scripts/dispatch_collection.py',
                      'run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch'):
             self.assertIn(line, self.text)
-        code = [l.split('#', 1)[0] for l in self.text.splitlines() if not l.lstrip().startswith('#')]
+        steps = self.text.split('    steps:\n', 1)[1]
+        code = [l.split('#', 1)[0] for l in steps.splitlines() if not l.lstrip().startswith('#')]
         self.assertFalse([l for l in code if 'recovery' in l])   # no step runs recovery code
 
     def test_requirements_add_only_pinned_cryptography(self):
-        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==44.0.3'])
+        self.assertEqual((ROOT/'requirements.txt').read_text().split(), ['Telethon==1.45.0', 'cryptography==50.0.0'])
 
 
 if __name__ == '__main__':

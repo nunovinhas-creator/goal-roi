@@ -1067,6 +1067,7 @@ def build(signals, registry, min_settled, ledger=None, *, history_problems=None,
             w = watch.get(b['key'])
             if w is None:
                 w = {'date_utc': b['date_utc'], 'match': ' — '.join(b['teams'] or []), 'match_id': b['match_id'], 'type': b['type'], 'market': b['market'],
+                     'canonical_match_id': game_identity(b), 'period': b.get('period'),
                      'selection': b['selection'], 'odds': b['odds'], 'kickoff_utc': b['kickoff_utc'], 'phase': b.get('phase'),
                      'finished': bool(b.get('ft')) or bool(b.get('had_ft_at_first_sight')) or b.get('match_result_first_seen_utc') is not None,
                      'reasons': []}

@@ -40,9 +40,10 @@ def exit_code(fn):
 
 
 def steps():
-    """{step name: its lines}, in workflow order."""
+    """{step name: its lines}, in production collection order."""
     out, name = {}, None
-    for line in WORKFLOW.read_text(encoding='utf-8').split('\n'):
+    production = WORKFLOW.read_text(encoding='utf-8')
+    for line in production.splitlines():
         if line.startswith('      - name: '):
             name = line[len('      - name: '):]
             out[name] = []
@@ -237,7 +238,10 @@ class Telegram(unittest.TestCase):
         notify_step = "Telegram notices through the user's bot (skipped without keys)"
         self.assertIn('        continue-on-error: true', s[notify_step])
         self.assertEqual(names[names.index(notify_step) + 1], 'Commit data')
-        self.assertFalse([l for l in s['Commit data'] if l.startswith('        if:')])   # unchanged: runs while the job succeeds
+        self.assertIn('scangoal.publication publish', '\n'.join(s['Commit data']))
+        self.assertNotIn("steps.resume.outcome", '\n'.join(s['Commit data']))          # data is published even after a failed resume
+        self.assertIn("steps.published.outcome == 'success'", '\n'.join(s[notify_step]))  # notices only on a published state
+        self.assertLess(names.index('Publish the report before sending notices'), names.index(notify_step))
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -349,7 +353,10 @@ class NextCollection(unittest.TestCase):
         self.assertEqual(names[-1], notice)                                       # last step
         self.assertEqual(names[-2], 'Start the next collection')
         self.assertIn('        id: next', s['Start the next collection'])
-        self.assertIn('        if: ${{ failure() }}', s[notice])
+        condition, = (line for line in s[notice] if line.strip().startswith('if:'))
+        self.assertIn('failure()', condition)
+        self.assertIn("steps.resume.outcome == 'success'", condition)
+        self.assertIn("steps.publication.outputs.pending != 'true'", condition)
         self.assertIn("          NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}", s[notice])
         self.assertIn('        run: python -u -m scangoal.notify --failure', s[notice])
         self.assertEqual(sum(n.startswith('Tell the user') for n in names), 1)       # one mechanism, not two
@@ -358,7 +365,9 @@ class NextCollection(unittest.TestCase):
         text = WORKFLOW.read_text(encoding='utf-8')
         self.assertEqual(re.findall(r"cron: '([^']+)'", text), ['3,13,23,33,43,53 * * * *'])
         self.assertEqual(text.count('python scripts/dispatch_collection.py'), 1)
-        self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)
+        self.assertIn('concurrency:\n'
+                      "  group: scangoal-write\n"
+                      '  cancel-in-progress: false', text)
 
     @unittest.skipUnless(shutil.which('bash'), 'bash required')
     def test_a_failed_launch_fails_the_step(self):
@@ -382,11 +391,13 @@ class NextCollection(unittest.TestCase):
         sent = []
         sender = lambda token, chat, text: sent.append((token, chat, text))
         at = datetime(2026, 11, 17, 14, 37, tzinfo=timezone.utc)                  # outside the first 10 minutes
-        self.assertFalse(notify.failure(sender, at, ENV))
-        self.assertFalse(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='')))
-        self.assertTrue(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='1')))
-        self.assertTrue(notify.failure(sender, at.replace(minute=4), ENV))       # unchanged hourly rule
-        self.assertFalse(notify.failure(sender, at, {'NEXT_COLLECTION_FAILED': '1'}))   # no keys: nothing
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            self.assertFalse(notify.failure(sender, at, ENV))
+            self.assertFalse(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='')))
+            self.assertTrue(notify.failure(sender, at, dict(ENV, NEXT_COLLECTION_FAILED='1')))
+            self.assertFalse(notify.failure(sender, at.replace(hour=15, minute=4), ENV))
+            self.assertTrue(notify.failure(sender, at.replace(hour=16, minute=4), ENV))
+            self.assertFalse(notify.failure(sender, at, {'NEXT_COLLECTION_FAILED': '1'}))
         self.assertEqual(len(sent), 2)
         self.assertEqual(sent[0], (TOKEN, CHAT, 'A recolha do goal-roi falhou às 14:37 UTC. Vê as execuções em '
                                                 'https://github.com/nunovinhas-creator/goal-roi/actions'))   # same text

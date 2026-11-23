@@ -193,11 +193,13 @@ class AcrossRunners(GitWorld):
         dirty = (stale / 'data' / 'report.json').read_text() + '\n'
         (stale / 'data' / 'report.json').write_text(dirty)             # a dirty tree, as during a run
         sent = []
-        self.notify(stale, lambda t, c, text: sent.append(text))
+        self.assertIn('NOTIFY_PUBLISH_FAILED', self.notify(stale, lambda t, c, text: sent.append(text)))
+        self.assertEqual(sent, [])
+        self.notify(self.runner(), lambda t, c, text: sent.append(text))
         self.assertEqual(len(sent), 2)
         st = self.remote_state()
         self.assertEqual(sorted(r['state'] for r in st['deliveries'].values()), ['delivered', 'in_flight'])   # last outcome: local
-        self.assertEqual((stale / 'data' / 'report.json').read_text(), dirty)                          # autostash restored it
+        self.assertEqual((stale / 'data' / 'report.json').read_text(), dirty)
 
     def test_conflicting_remote_state_blocks_the_send(self):
         a = self.runner()
@@ -317,26 +319,28 @@ class WorkflowActivation(unittest.TestCase):
                 out[name].append(line)
         return text, out
 
-    def test_barrier_enabled_exactly_in_the_two_notifying_steps(self):
+    def test_barrier_enabled_in_all_three_notifying_steps(self):
         text, steps = self.steps()
-        self.assertEqual(text.count('NOTIFY_DURABLE'), 2)
+        self.assertEqual(text.count('NOTIFY_DURABLE'), 3)
         with_barrier = sorted(n for n, lines in steps.items() if '          NOTIFY_DURABLE: git' in lines)
         self.assertEqual(with_barrier, ["Fast reads every 2 minutes until the next collection (read-only)",
-                                        "Telegram notices through the user's bot (skipped without keys)"])
+                                        "Telegram notices through the user's bot (skipped without keys)",
+                                        "Tell the user when a collection fails (at most once an hour)"])
         for name in with_barrier:
             lines = steps[name]
             self.assertLess(lines.index('        env:'), lines.index('          NOTIFY_DURABLE: git'))
             self.assertTrue(any('scangoal.notify' in l or 'scangoal.watch' in l for l in lines))
-        failure = next(n for n in steps if n.startswith('Tell the user when a collection fails'))
-        self.assertNotIn('          NOTIFY_DURABLE: git', steps[failure])          # --failure stays outside the barrier
 
     def test_prerequisites_of_the_barrier_are_in_the_workflow(self):
         text, steps = self.steps()
         self.assertIn('permissions:\n  contents: write', text)                       # push with GITHUB_TOKEN
-        self.assertIn('concurrency:\n  group: scangoal-write\n  cancel-in-progress: false', text)   # single writer
-        # persisted credentials: v4 tag or its reviewed SHA (v4.4.0), never persist-credentials: false
-        self.assertRegex(text, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
-        self.assertNotIn('persist-credentials: false', text)
+        self.assertIn('concurrency:\n'
+                      "  group: scangoal-write\n"
+                      '  cancel-in-progress: false', text)   # production keeps a single writer
+        production = text
+        # The publishing job requires persisted credentials from the reviewed checkout action.
+        self.assertRegex(production, r'uses: actions/checkout@(v4|11d5960a326750d5838078e36cf38b85af677262)\b')
+        self.assertNotIn('persist-credentials: false', production)
         self.assertTrue(any('scangoal.watch' in l for l in steps['Fast reads every 2 minutes until the next collection (read-only)']))
 
     def test_fast_reads_go_through_the_same_run(self):

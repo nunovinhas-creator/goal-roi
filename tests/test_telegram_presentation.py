@@ -192,7 +192,10 @@ def consistent(test, data):
         test.assertNotEqual(r['state'], 'in_flight', key)
         for ev in r['events']:
             test.assertIn((key, ev), seen, (key, ev))
-        test.assertEqual(r['events'][-1], 'withdrawn' if r['state'] == 'pending' and r['events'][-1] == 'withdrawn' else r['state'], key)
+        if r['state'] == 'pending':
+            test.assertIn(r['events'][-1], ('pending', 'withdrawn', 'rejected'), key)
+        else:
+            test.assertEqual(r['events'][-1], r['state'], key)
     counts = st.get('delivery_counts') or {}
     for k in notify.COUNTERS:
         test.assertEqual(counts.get(k, 0), sum(1 for r in recs.values() if r['state'] == k), k)
@@ -1128,7 +1131,7 @@ class U19_LateAlert(unittest.TestCase):
         d.run(now=NOW + timedelta(minutes=45))                                            # too late for the second
         st = consistent(self, d)
         self.assertEqual(d.sent, [])
-        self.assertEqual(sorted(r['state'] for r in st['deliveries'].values()), ['expired', 'failed'])
+        self.assertEqual(sorted(r['state'] for r in st['deliveries'].values()), ['expired', 'expired'])
 
 
 class U20_Log(unittest.TestCase):
@@ -1147,7 +1150,7 @@ class U20_Log(unittest.TestCase):
         self.assertNotIn(TOKEN, raw)
         self.assertNotIn(CHAT, raw)
         for e in d.log():
-            self.assertLessEqual(set(e), {'v', 'at_utc', 'key', 'event', 'kind', 'sha256', 'effects', 'reason', 'reconstructed'})
+            self.assertLessEqual(set(e), {'v', 'at_utc', 'key', 'event', 'kind', 'sha256', 'effects', 'reason', 'reconstructed', 'attempt_id'})
 
 
 class X_Sender(unittest.TestCase):

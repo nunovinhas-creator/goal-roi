@@ -19,22 +19,57 @@ WATCH_SECONDS = int(os.environ.get('WATCH_SECONDS', '480'))
 INTERVAL = int(os.environ.get('WATCH_INTERVAL', '120'))
 FAST_RECENT = int(os.environ.get('WATCH_RECENT', '40'))
 FAILED_EXIT = 3
+# The workflow kills this step at 540 s. A refresh (report + notices) starts only when its measured duration still fits
+# before HARD_SECONDS; otherwise the read data is published by the next step and the next collection reports it.
+# A refresh killed mid-way leaves a pushed intent unsent (`uncertain`): never a duplicate, but a lost notice.
+HARD_SECONDS = int(os.environ.get('WATCH_HARD_SECONDS', '525'))
+REFRESH_ESTIMATE = int(os.environ.get('WATCH_REFRESH_ESTIMATE', '240'))
 
 
 class WatchStopped(RuntimeError):
     """As leituras rápidas pararam (falhas seguidas) ou o relatório/avisos falharam; a espera e a cadência mantêm-se."""
 
 
-async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None):
+async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=None, every=None, problems=None,
+                 hard=None, estimate=REFRESH_ESTIMATE):
     """Chama read() a cada `every` segundos até `total`; on_new() quando read() devolve linhas novas. -> leituras feitas.
     problems (lista, opcional): recebe 'reads_stopped' e/ou 'report_failed' para o código de saída."""
     total, every = WATCH_SECONDS if total is None else total, INTERVAL if every is None else every
     start, done, fails, k = clock(), 0, 0, 1
+    refreshed = pending = False
+    failures = 0
+    longest = estimate
+
+    def fits():
+        if hard is None or clock() - start + longest <= hard:
+            return True
+        print('WATCH_REFRESH_DEFERRED')
+        return False
+
+    def update():
+        nonlocal refreshed, pending, failures, longest
+        if not fits():
+            return
+        began = clock()
+        try:
+            on_new()
+        except Exception as exc:
+            pending = True
+            failures += 1
+            print('WATCH_REPORT_FAILED', type(exc).__name__)
+        else:
+            refreshed, pending, failures = True, False, 0
+            print('WATCH_REPORT_COMPLETED')
+        finally:
+            longest = max(longest, clock() - began)
+
     while k * every <= total and fails < 2:
         wait = start + k * every - clock()
         if wait > 0:
             await sleep(wait)
         k += 1
+        if pending and failures < 2:
+            update()
         try:
             added = await read()
         except Exception as exc:      # o tipo basta; nunca imprimir segredos
@@ -42,35 +77,52 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
             print('WATCH_READ_FAILED', type(exc).__name__)
             continue
         fails, done = 0, done + 1
-        if added:
-            try:
-                on_new()
-            except Exception as exc:
-                print('WATCH_REPORT_FAILED', type(exc).__name__)
-                if problems is not None:
-                    problems.append('report_failed')
+        if added and failures < 2:
+            update()
     if fails >= 2 and problems is not None:
         problems.append('reads_stopped')
+    if done and (not refreshed or pending) and failures < 2:
+        update()
+    if pending and problems is not None:
+        problems.append('report_failed')
     return done
 
 
-def refresh():
+def refresh(publisher=None):
     """Relatório e avisos, como os passos da recolha completa."""
-    from . import notify, report
+    from . import notify, report, stake_alerts
+    if publisher is not None:
+        publisher.resume()
     docs = pathlib.Path('docs')
     rep = report.build(docs / 'bets.csv' if docs.is_dir() else None, register=True)
     out = data_dir() / 'report.json'
-    out.write_text(json.dumps(rep, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
+    reader.write_json(out, rep)
     if docs.is_dir():
-        shutil.copyfile(out, docs / 'report.json')
-    notify.run_checked()          # entregas falhadas/incertas/retiradas -> WATCH_REPORT_FAILED (nunca reenvia)
-    # Se a publicação remota falhar, rounds() regista report_failed;
-    # o workflow preserva a recolha com continue-on-error e não envia o aviso.
-    from . import stake_alerts
-    stake_alerts.deliver(report.LAST.get('signals') or [])
+        target = docs / 'report.json'
+        temporary = target.with_suffix('.tmp')
+        shutil.copyfile(out, temporary)
+        temporary.replace(target)
+    if publisher is not None:
+        publisher.publish()
+    try:
+        notify.run_checked()
+        stake_alerts.deliver(report.LAST.get('signals') or [])
+    finally:
+        if publisher is not None:
+            publisher.publish()
 
 
 async def watch():
+    from .publication import Publisher, PublicationError
+
+    publisher = Publisher() if os.environ.get('NOTIFY_DURABLE') == 'git' else None
+    if publisher is not None:
+        try:
+            publisher.resume()
+        except PublicationError as exc:
+            # Reads stay independent of publication. Every refresh retries the publication first and sends nothing
+            # while it fails, so a pending transaction can never be overtaken by a notice.
+            print('WATCH_PUBLICATION_PENDING', exc)
     client = reader.make_client()
     state = {'entity': None}
 
@@ -83,20 +135,21 @@ async def watch():
             state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         now = reader.iso(datetime.now(timezone.utc))
         rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
+        now = reader.stamp_receipt(rows)
         added = append_versions(rows)
         path = data_dir() / 'state.json'
         try:
             st = json.loads(path.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             st = {}
-        st.update(last_run_utc=now, last_fast_read_utc=now)
-        path.write_text(json.dumps(st) + '\n', encoding='utf-8')
+        latest = dict(st, last_run_utc=now, last_fast_read_utc=now)
+        reader.write_collection_state(path, st, latest)
         print('WATCH_READ_OK read', len(rows), 'new_versions', added)
         return added
 
     problems = []
     try:
-        done = await rounds(read, refresh, problems=problems)
+        done = await rounds(read, lambda: refresh(publisher), problems=problems, hard=HARD_SECONDS)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)
