@@ -49,7 +49,7 @@ def main():
     state = read_json(directory / "notify_state.json", {})
     activation = ((state.get("migrations") or {}).get("polymarket_over25_v1") or {}).get("at_utc")
     observed = {}
-    messages, _, _, _, _ = report.load(result_observations=observed)
+    messages, _, _, _, _ = report.load(result_observations=observed, as_of=now)
     results = sourced_results(observed, directory)
     result = opportunity_forward.evaluate(
         messages, results, protocol,

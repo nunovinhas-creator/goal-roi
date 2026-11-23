@@ -1,5 +1,6 @@
 """Regulation-time result observations for the prospective opportunity study."""
 
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -7,6 +8,7 @@ from . import chronology
 
 
 REGULATION_TIME = timedelta(minutes=90)
+SETTLEMENT_WINDOW_DAYS = 3
 
 
 @dataclass(frozen=True)
@@ -55,6 +57,8 @@ class Resolution:
     conflict: bool = False
     available_at: datetime | None = None
     first_available_at: datetime | None = None
+    first_score: tuple[int, int] | None = None
+    first_consensus_at: datetime | None = None
 
 
 def settlement(evidence, *, kickoff, as_of, deadline):
@@ -71,29 +75,18 @@ def settlement(evidence, *, kickoff, as_of, deadline):
 def resolve(evidence, *, kickoff, as_of):
     """Resolve each record's latest valid version visible at the evaluation cutoff."""
     earliest_ft = kickoff + REGULATION_TIME if kickoff is not None else None
-    if isinstance(evidence, dict):
-        # Existing callers can supply an already observed result with explicit availability.
-        known = utc(evidence.get("known_utc"))
-        if known is None or known > as_of or (earliest_ft is not None and known < earliest_ft):
-            return Resolution()
-        if evidence.get("conflict") is True:
-            return Resolution(conflict=True, available_at=known, first_available_at=known)
-        score = score_pair(evidence.get("ft"))
-        return Resolution(score, available_at=known, first_available_at=known) if score is not None else Resolution()
-
-    if not isinstance(evidence, (list, tuple)):
+    rows = [evidence] if isinstance(evidence, dict) else evidence
+    if not isinstance(rows, (list, tuple)):
         return Resolution()
-    latest, first_by_score = {}, {}
-    legacy_scores, legacy_conflicts = set(), []
-    for row in evidence:
+
+    events = {}
+    for i, row in enumerate(rows):
         if isinstance(row, dict):
-            legacy = resolve(row, kickoff=kickoff, as_of=as_of)
-            if legacy.conflict:
-                legacy_conflicts.append(legacy.available_at)
-            if legacy.score is not None:
-                legacy_scores.add(legacy.score)
-                first_by_score[legacy.score] = min(legacy.available_at,
-                                                    first_by_score.get(legacy.score, legacy.available_at))
+            known = utc(row.get("known_utc"))
+            score = score_pair(row.get("ft"))
+            if (known is not None and known <= as_of and (earliest_ft is None or known >= earliest_ft)
+                    and (score is not None or row.get("conflict") is True)):
+                events.setdefault(known, []).append((("legacy", i), known, None if row.get("conflict") else score))
             continue
         if (not isinstance(row, Observation) or row.period != "regulation" or row.score is None or row.observed_at is None
                 or row.available_at is None or (kickoff is not None and row.observed_at <= kickoff)
@@ -101,36 +94,85 @@ def resolve(evidence, *, kickoff, as_of):
                 or (earliest_ft is not None and (row.available_at < earliest_ft
                     or (row.published_at is not None and row.published_at < earliest_ft)))):
             continue
-        first_by_score[row.score] = min(row.available_at, first_by_score.get(row.score, row.available_at))
-        key = (row.source, row.record_id)
-        # A late read of an older Telegram edit cannot supersede a newer edit.
-        version = row.published_at or row.observed_at
-        current = latest.get(key)
-        if current is None or version > current[0]:
-            latest[key] = (version, {row.score})
-        elif version == current[0]:
-            current[1].add(row.score)
+        events.setdefault(row.available_at, []).append(
+            ((row.source, row.record_id), row.published_at or row.observed_at, row.score))
 
-    scores = {score for _, values in latest.values() for score in values} | legacy_scores
-    if not scores and not legacy_conflicts:
-        return Resolution()
-    score = next(iter(scores)) if len(scores) == 1 and not legacy_conflicts else None
-    return Resolution(score, conflict=score is None, available_at=first_by_score.get(score),
-                      first_available_at=min([*first_by_score.values(), *legacy_conflicts]))
+    latest, score, conflict, since = {}, None, False, None
+    first_score, first_consensus = None, None
+    for available, versions in sorted(events.items()):
+        for key, version, value in versions:
+            current = latest.get(key)
+            if current is None or version > current[0]:
+                latest[key] = (version, {value})
+            elif version == current[0]:
+                current[1].add(value)
+        scores = {value for _, values in latest.values() for value in values}
+        now_conflict = len(scores) != 1 or None in scores
+        now_score = None if now_conflict else next(iter(scores))
+        if (score, conflict) != (now_score, now_conflict):
+            score, conflict, since = now_score, now_conflict, available
+        if first_consensus is None and score is not None:
+            first_score, first_consensus = score, available
+    return Resolution(score, conflict, since, min(events, default=None), first_score, first_consensus)
+
+
+def settle_research_bet(bet, as_of):
+    """Materialize a versioned research row at a cutoff, including its first confirmed payoff."""
+    from .parser import settle
+
+    versions = bet["_ft_observations"]
+    decision = chronology.decision_time(bet)
+    deadline = decision + timedelta(days=SETTLEMENT_WINDOW_DAYS) if decision is not None else None
+    cutoff = min(as_of, deadline) if deadline is not None else as_of
+    kickoff = chronology.kickoff_time(bet)
+    if kickoff is None:
+        visible = {v.kickoff for v in versions if isinstance(v, Observation) and v.kickoff is not None
+                   and v.available_at is not None and v.available_at <= cutoff}
+        kickoff = next(iter(visible)) if len(visible) == 1 else None
+    result, late = settlement(versions, kickoff=kickoff, as_of=as_of, deadline=deadline)
+
+    def payout(score):
+        market = bet.get("market")
+        if score is not None and market and not (bet.get("phase") == "live" and market.strip().lower() == "asian handicap"):
+            return settle(market, bet["selection"], score, bet.get("teams"))
+        return None
+
+    won = payout(result.score)
+    row = dict(bet, ft=list(result.score) if result.score is not None else None, w=won,
+               result_known_utc=None, result_available_utc=chronology.iso(result.available_at, timespec='auto'),
+               result_known_source="versioned_ft" if result.score is not None else None,
+               settled_by="versioned_ft" if won is not None else None,
+               match_result_first_seen_utc=chronology.iso(result.first_available_at, timespec='auto'),
+               result_quarantined=result.conflict,
+               result_quarantined_utc=chronology.iso(result.available_at, timespec='auto') if result.conflict else None,
+               first_confirmed_ft=list(result.first_score) if result.first_score is not None else None,
+               first_confirmed_w=payout(result.first_score),
+               first_confirmed_utc=chronology.iso(result.first_consensus_at, timespec='auto'))
+    row["result_reconciliation"] = (
+        {"ft": late.score, "conflict": late.conflict, "available_utc": chronology.iso(late.available_at, timespec='auto')}
+        if late is not None else None)
+    return row
 
 
 def remember_provider_results(state, matched, stamp):
-    """Preserve the operational first result and append each observed FT version."""
+    """Archive the score and its full provider record in the same observation."""
     for match_id, info in matched.items():
         score = score_pair(info.get("ft"))
         if score is None:
             continue
+        snapshot = deepcopy({k: v for k, v in info.items() if k != "matched_at_utc"})
+        snapshot["ft"] = list(score)
         row = {"ft": list(score), "period": info.get("period", "regulation"),
-               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date")}
+               "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date"),
+               "fixture_id": match_id, "snapshot": snapshot}
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
-        if not history or any(history[-1].get(key) != value for key, value in row.items()):
-            history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
-        state["results"].setdefault(match_id, dict(info, matched_at_utc=stamp.isoformat(timespec="seconds")))
+        if history and all(history[-1].get(key) == value for key, value in row.items()):
+            continue
+        history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
+        previous = state["results"].get(match_id)
+        if previous is not None:
+            state.setdefault("first_results", {}).setdefault(match_id, previous)
+        state["results"][match_id] = dict(deepcopy(snapshot), matched_at_utc=stamp.isoformat())
 
 
 def provider_observations(state, source):
@@ -142,9 +184,59 @@ def provider_observations(state, source):
         mid: [Observation(source, mid, row.get("period"), score_pair(row.get("ft")),
                           utc(row.get("observed_at")), utc(row.get("available_at")),
                           kickoff=utc(row.get("kickoff_utc")))
-              for row in rows if isinstance(row, dict)]
+              for row in rows if isinstance(row, dict) and row.get("fixture_id", mid) == mid]
         for mid, rows in versions.items() if isinstance(rows, list)
     }
+
+
+def _provider_record(mid, version, source, as_of):
+    score = score_pair(version.get("ft"))
+    kickoff = utc(version.get("kickoff_utc"))
+    observed, available = utc(version.get("observed_at")), utc(version.get("available_at"))
+    if (score is None or kickoff is None or observed is None or available is None
+            or not kickoff + REGULATION_TIME <= observed <= available <= as_of
+            or version.get("period") != "regulation" or version.get("fixture_id", mid) != mid):
+        return None
+    snapshot = version.get("snapshot")
+    if snapshot is None:
+        # Old journals only attest these fields. The current snapshot may be a later version.
+        snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
+    if (not isinstance(snapshot, dict) or snapshot.get("fixture_id", mid) != mid or score_pair(snapshot.get("ft")) != score
+            or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
+        return None
+    return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
+                provider=snapshot.get("provider", source), observed_at=observed.isoformat(),
+                available_at=available.isoformat(), matched_at_utc=available.isoformat())
+
+
+def provider_snapshot(state, source, as_of):
+    """Return one complete, temporally valid provider record per fixture at the cutoff."""
+    snapshots, first = state.get("results") or {}, state.get("first_results") or {}
+    histories, visible = state.get("ft_versions") or {}, {}
+    for mid in snapshots.keys() | histories.keys() | first.keys():
+        versions = histories.get(mid, [])
+        versions = [row for row in versions if isinstance(row, dict)] if isinstance(versions, list) else []
+        records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
+        # The original snapshot is immutable once updates start. Only restore its own fields.
+        legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
+        if isinstance(legacy, dict):
+            stamp = legacy.get("matched_at_utc")
+            observed = utc(stamp)
+            if observed is not None and not any(utc(row.get("observed_at")) == observed for row in versions):
+                records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                                                       "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                                                       "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
+        candidates = [row for row in records if row is not None]
+        if not candidates:
+            continue
+        def order(row):
+            return utc(row["observed_at"]), utc(row["available_at"])
+        latest = max(candidates, key=order)
+        # Two different versions at the same observation leave the result in conflict.
+        tied = [row for row in candidates if order(row) == order(latest)]
+        if all(row == latest for row in tied):
+            visible[mid] = latest
+    return visible
 
 
 def merge_sources(bot, providers):

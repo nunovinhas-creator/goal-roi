@@ -68,9 +68,9 @@ def overlap(candidate, baseline):
             "shared_different_quote": len(shared) - same}
 
 
-def build(messages, results, protocol, *, activation_utc, now):
+def build(messages, results, protocol, *, activation_utc, now=None, as_of=None):
     """Rank the predeclared rule against the wider, overlapping, forward baseline."""
-    _, _, cutoff, as_of = opportunity_forward.evaluation_window(protocol, activation_utc, now)
+    _, _, cutoff, as_of = opportunity_forward.evaluation_window(protocol, activation_utc, as_of if as_of is not None else now)
     if cutoff is None:
         return {
             "schema": "goal_roi_exploratory_ranking_v1",
