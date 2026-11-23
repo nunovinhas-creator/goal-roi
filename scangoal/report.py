@@ -831,7 +831,7 @@ def build(csv_path=None, register=False, now=None, *, as_of=None, register_certi
     brn['entry_points'] = brain.entry_points(signals)
     brn['llm_evaluation'] = llm_eval.page_summary(research, registry, as_of=now)
     return {
-        'generated_at_utc': now.isoformat(timespec='seconds'),
+        'generated_at_utc': now.isoformat(),
         'messages': len(msgs), 'types': dict(collections.Counter(str(m.get('type')) for m in msgs)),
         'unparsed': len(unparsed), 'unparsed_samples': [m['head'] for m in unparsed[-10:]],
         'excluded_first_seen_with_result': sum(1 for m in msgs if m.get('bet') and m['had_ft_at_first_sight']),

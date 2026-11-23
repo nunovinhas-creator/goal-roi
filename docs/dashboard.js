@@ -1080,10 +1080,12 @@ function validateReport(next, previous) {
       groups.reduce((sum, group) => sum + group.bets, 0) !== next.unique_bets ||
       groups.reduce((sum, group) => sum + group.settled, 0) !== next.settled_bets ||
       (next.unique_bets > 0 && (!next.first_signal_utc || !next.daily.length))) return false;
+  if (next.simulation?.entries.some(row =>
+      Date.parse(row.d) > generated || (row.z !== null && Date.parse(row.z) > generated))) return false;
   if (!previous) return true;
   if (generated < Date.parse(previous.generated_at_utc)) return false;
   // A response must not silently drop sections already supplied by the producer.
-  return ['brain', 'operational', 'insights', 'matches', 'unsettled'].every(key => !Object.hasOwn(previous, key) || Object.hasOwn(next, key)) &&
+  return ['brain', 'operational', 'insights', 'matches', 'unsettled', 'simulation'].every(key => !Object.hasOwn(previous, key) || Object.hasOwn(next, key)) &&
     ['agenda', 'validation', 'top', 'counts', 'presentation', 'board', 'track', 'walk_forward', 'llm', 'notes', 'watch', 'entry_points']
       .every(key => previous.brain?.[key] === undefined || next.brain?.[key] !== undefined) &&
     Object.keys(previous.insights || {}).every(key => Object.hasOwn(next.insights, key)) &&

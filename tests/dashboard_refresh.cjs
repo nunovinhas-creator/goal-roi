@@ -649,6 +649,42 @@ async function monetaryPrecision(browser) {
   } finally { await page.close(); }
 }
 
+async function simulationReportClock(browser) {
+  const page = await browser.newPage();
+  try {
+    const stamp = minutes => new Date(+date + minutes * 60_000).toISOString();
+    const settled = {d:stamp(-30), z:stamp(-20), w:1, o:2, t:'Teste'};
+    const simulation = {total_bets:1, timed_settlements:1, committed_games:1, max_units_per_game:1, entries:[settled]};
+    const report = snapshot(0, {simulation});
+    const remote = await setup(page, {report});
+    await page.goto(root + '#simulador');
+    await ready(page, report.unique_bets);
+    await page.locator('#simbank').fill('100');
+    await page.locator('#simmode').selectOption('pct');
+    await page.locator('#simval').fill('100');
+    const balance = () => page.locator('#simout dd').nth(1).textContent();
+    const legacy = {...report};
+    delete legacy.simulation;
+    const invalid = [
+      {...report, simulation:{...simulation, entries:[{...settled, z:stamp(10)}]}},
+      {...report, simulation:{...simulation, timed_settlements:0, entries:[{...settled, d:stamp(10), z:null, w:null}]}},
+      legacy,
+    ];
+    for (const rejected of invalid) {
+      assert.equal(await balance(), euro(200));
+      remote.respond({report:rejected});
+      await refresh(page);
+      await hasText(page, '#fresh', 'Falha ao atualizar');
+      await hasText(page, '#sim-evidence', '1 liquidações com hora comprovada');
+      assert.equal(await balance(), euro(200));
+      remote.respond({report});
+      await refresh(page);
+      await hasText(page, '#fresh', 'Atualizado em');
+    }
+    assert.deepEqual(remote.errors, []);
+  } finally { await page.close(); }
+}
+
 (async () => {
   const browser=await chromium.launch(process.env.DASHBOARD_CHROMIUM ?
     {executablePath:process.env.DASHBOARD_CHROMIUM} : {});
@@ -673,6 +709,7 @@ async function monetaryPrecision(browser) {
     await simultaneousExposure(browser);
     await w09TimedEntries(browser);
     await monetaryPrecision(browser);
+    await simulationReportClock(browser);
     for (const [width,height] of sizes) await missingAndCertificates(browser,width,height);
     console.log('Dashboard refresh regressions passed');
   } finally { await browser.close(); }
