@@ -71131,6 +71131,39 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Golos até ao sinal = 3 ou mais & Minuto = 61 em diante & Ritmo indicado pelo bot = 90 ou mais": {
+  "born_utc": "2026-11-23T09:53:54.749446+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Golos até ao sinal",
+    "3 ou mais"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "90 ou mais"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Jogo aberto",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "a193c55dd8fcafae27b45fd7d6ad5401a4d8a95383ff6e4f0e243ac2a33a06e1",
+   "registry_size": 14043,
+   "report_generated_at_utc": "2026-11-23T09:52:03+00:00",
+   "response_sha256": "33f01d7acc72cd31e38d3546eaf29c69eefbc1815f86b982416569b14b2dc9c8"
+  },
+  "reason": "Jogos de liga com mais de 3 golos e ritmo alto tendem a ter mais gols",
+  "source": "llm"
+ },
  "Jogo aberto | Competição = liga & Golos até ao sinal = 3 ou mais & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T10:09:20+00:00",
   "conditions": [
@@ -222346,6 +222379,39 @@
   ],
   "family": "Stake",
   "source": "gerador"
+ },
+ "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = várias": {
+  "born_utc": "2026-11-23T09:53:54.749446+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "noite"
+   ],
+   [
+    "Mercado",
+    "outros mercados"
+   ],
+   [
+    "Número de apostas",
+    "várias"
+   ]
+  ],
+  "expect": "acima",
+  "family": "Stake",
+  "mode": "novas",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provenance": {
+   "prompt_sha256": "a193c55dd8fcafae27b45fd7d6ad5401a4d8a95383ff6e4f0e243ac2a33a06e1",
+   "registry_size": 14043,
+   "report_generated_at_utc": "2026-11-23T09:52:03+00:00",
+   "response_sha256": "33f01d7acc72cd31e38d3546eaf29c69eefbc1815f86b982416569b14b2dc9c8"
+  },
+  "reason": "",
+  "source": "llm"
  },
  "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Momento do aviso = antes do início": {
   "born_utc": "2026-11-17T22:50:08+00:00",

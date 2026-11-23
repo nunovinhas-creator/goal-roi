@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-23T09:40:31+00:00",
+ "generated_at_utc": "2026-11-23T09:53:55+00:00",
  "messages": 4127,
  "types": {
   "SERVICE": 10,
@@ -49,7 +49,7 @@
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-23T09:40:29+00:00",
+  "collector_last_run_utc": "2026-11-23T09:52:00+00:00",
   "name_review": [
    {
     "bot": [
@@ -2474,7 +2474,7 @@
    "by_bot_mark": 0,
    "per_day": 3.6,
    "days_to_hint": 0,
-   "days_to_conclusion": 71,
+   "days_to_conclusion": 72,
    "prudent_rate": 0.3444,
    "prob_above": 0.2366,
    "edge": -0.0463,
@@ -2510,8 +2510,8 @@
    "seen_late": 0,
    "by_bot_mark": 0,
    "per_day": 0.3,
-   "days_to_hint": 107,
-   "days_to_conclusion": 1177,
+   "days_to_hint": 108,
+   "days_to_conclusion": 1178,
    "prudent_rate": 0.3564,
    "prob_above": 0.4574,
    "edge": -0.0069,
@@ -2620,7 +2620,7 @@
    "roi_announced_odds": 0.0107,
    "seen_late": 0,
    "by_bot_mark": 300,
-   "per_day": 49.7,
+   "per_day": 49.6,
    "days_to_hint": 0,
    "days_to_conclusion": 0,
    "prudent_rate": 0.524,
@@ -4273,7 +4273,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 13651,
+    "em observação": 13653,
     "promissora": 135,
     "abandonada": 257
    },
@@ -5330,11 +5330,11 @@
     }
    ]
   },
-  "hypotheses": 14043,
+  "hypotheses": 14045,
   "tested": 2786,
   "corrected_bar": null,
   "counts": {
-   "em observação": 13792,
+   "em observação": 13794,
    "abandonada": 229,
    "promissora": 22
   },
@@ -8602,7 +8602,7 @@
     "contraditório": 2,
     "evitar": 5
    },
-   "generated_utc": "2026-11-23T09:42:02+00:00",
+   "generated_utc": "2026-11-23T09:55:24+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -8625,7 +8625,7 @@
      "prospective_games": 877
     },
     "llm/novas": {
-     "hypotheses": 25,
+     "hypotheses": 27,
      "with_prospective_evidence": 16,
      "prospective_games": 440
     },
@@ -23607,6 +23607,186 @@
     "edge_ci": null,
     "prob_above_cut": null,
     "prob_adds": null,
+    "id": "Jogo aberto | Competição = liga & Golos até ao sinal = 3 ou mais & Minuto = 61 em diante & Ritmo indicado pelo bot = 90 ou mais",
+    "family": "Jogo aberto",
+    "conditions": [
+     [
+      "Competição",
+      "liga"
+     ],
+     [
+      "Golos até ao sinal",
+      "3 ou mais"
+     ],
+     [
+      "Minuto",
+      "61 em diante"
+     ],
+     [
+      "Ritmo indicado pelo bot",
+      "90 ou mais"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-23T09:53:54.749446+00:00",
+    "reason": "Jogos de liga com mais de 3 golos e ritmo alto tendem a ter mais gols",
+    "expect": "acima",
+    "mode": "novas",
+    "experimental": false,
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "economics": {
+      "admitted": 0,
+      "results_confirmed": 0,
+      "wins": 0,
+      "losses": 0,
+      "voids": 0,
+      "imputed_losses": 0,
+      "pending": 0,
+      "quarantined": 0,
+      "scope": "prospective_exploratory",
+      "status": "insufficient",
+      "stake_per_game": 1,
+      "resolved_stake_units": 0,
+      "profit_advertised": 0,
+      "profit_odds_minus_2pct": 0,
+      "roi_advertised": null,
+      "roi_odds_minus_2pct": null,
+      "confirmed_hit_rate": null,
+      "expected_profit": null
+     },
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
+    "id": "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Mercado = outros mercados & Número de apostas = várias",
+    "family": "Stake",
+    "conditions": [
+     [
+      "Faixa de odd",
+      "odd 2,00 a 3,00"
+     ],
+     [
+      "Hora (UTC)",
+      "noite"
+     ],
+     [
+      "Mercado",
+      "outros mercados"
+     ],
+     [
+      "Número de apostas",
+      "várias"
+     ]
+    ],
+    "source": "llm",
+    "born_utc": "2026-11-23T09:53:54.749446+00:00",
+    "reason": "",
+    "expect": "acima",
+    "mode": "novas",
+    "experimental": false,
+    "tradable": true,
+    "open": 0,
+    "born_verified": true,
+    "game_set": null,
+    "prospective": {
+     "games": 0,
+     "hits": 0.0,
+     "misses": 0.0,
+     "prob_above": null,
+     "roi": null,
+     "economics": {
+      "admitted": 0,
+      "results_confirmed": 0,
+      "wins": 0,
+      "losses": 0,
+      "voids": 0,
+      "imputed_losses": 0,
+      "pending": 0,
+      "quarantined": 0,
+      "scope": "prospective_exploratory",
+      "status": "insufficient",
+      "stake_per_game": 1,
+      "resolved_stake_units": 0,
+      "profit_advertised": 0,
+      "profit_odds_minus_2pct": 0,
+      "roi_advertised": null,
+      "roi_odds_minus_2pct": null,
+      "confirmed_hit_rate": null,
+      "expected_profit": null
+     },
+     "categories": {
+      "prospective": 0,
+      "mixed": 0,
+      "before_registration": 0,
+      "after_registration_not_operational": 0,
+      "result_known_before_decision": 0,
+      "result_time_unproven": 0
+     }
+    },
+    "evidence_level": "exploratória",
+    "status": "em observação",
+    "pending_status": null,
+    "status_changes": [],
+    "confirmation": null,
+    "entry_status": "em observação"
+   },
+   {
+    "n": 0,
+    "signals": 0,
+    "hits": 0,
+    "misses": 0,
+    "hit_rate": null,
+    "ci95": null,
+    "break_even": null,
+    "roi": null,
+    "games": 0,
+    "bets": 0,
+    "unidentified": 0,
+    "prudent_rate": null,
+    "prob_above": null,
+    "edge": null,
+    "edge_ci": null,
+    "prob_above_cut": null,
+    "prob_adds": null,
     "id": "Jogo aberto | Competição = liga & Dia = fim de semana & Golos até ao sinal = 3 ou mais & Minuto = 61 em diante",
     "family": "Jogo aberto",
     "conditions": [
@@ -25117,195 +25297,9 @@
     "status_changes": [],
     "confirmation": null,
     "entry_status": "em observação"
-   },
-   {
-    "n": 0,
-    "signals": 0,
-    "hits": 0,
-    "misses": 0,
-    "hit_rate": null,
-    "ci95": null,
-    "break_even": null,
-    "roi": null,
-    "games": 0,
-    "bets": 0,
-    "unidentified": 0,
-    "prudent_rate": null,
-    "prob_above": null,
-    "edge": null,
-    "edge_ci": null,
-    "prob_above_cut": null,
-    "prob_adds": null,
-    "id": "Polymarket | Competição = seleções & Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $",
-    "family": "Polymarket",
-    "conditions": [
-     [
-      "Competição",
-      "seleções"
-     ],
-     [
-      "Mercado",
-      "golos (mais/menos)"
-     ],
-     [
-      "Quota de mercado",
-      "menos de 80 %"
-     ],
-     [
-      "Valor da aposta",
-      "menos de 10 mil $"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-19T07:14:08+00:00",
-    "reason": "Apostas em mercados de golos, com quota baixa e baixo valor, podem ser vantajosas em competições de seleções",
-    "expect": "acima",
-    "mode": "refinar",
-    "experimental": false,
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": null,
-    "prospective": {
-     "games": 0,
-     "hits": 0.0,
-     "misses": 0.0,
-     "prob_above": null,
-     "roi": null,
-     "economics": {
-      "admitted": 0,
-      "results_confirmed": 0,
-      "wins": 0,
-      "losses": 0,
-      "voids": 0,
-      "imputed_losses": 0,
-      "pending": 0,
-      "quarantined": 0,
-      "scope": "prospective_exploratory",
-      "status": "insufficient",
-      "stake_per_game": 1,
-      "resolved_stake_units": 0,
-      "profit_advertised": 0,
-      "profit_odds_minus_2pct": 0,
-      "roi_advertised": null,
-      "roi_odds_minus_2pct": null,
-      "confirmed_hit_rate": null,
-      "expected_profit": null
-     },
-     "categories": {
-      "prospective": 0,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
-   },
-   {
-    "n": 9,
-    "signals": 15,
-    "hits": 8,
-    "misses": 1,
-    "hit_rate": 0.8889,
-    "ci95": [
-     0.565,
-     0.9801
-    ],
-    "break_even": 0.5834,
-    "roi": 0.318,
-    "games": 9,
-    "bets": 9,
-    "unidentified": 0,
-    "prudent_rate": 0.7281,
-    "prob_above": 0.9149,
-    "edge": 0.1447,
-    "edge_ci": [
-     -0.0323,
-     0.2937
-    ],
-    "prob_above_cut": 0.898,
-    "prob_adds": 0.9651,
-    "id": "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais",
-    "family": "Jogo aberto",
-    "conditions": [
-     [
-      "Golos até ao sinal",
-      "3 ou mais"
-     ],
-     [
-      "Marcador no momento",
-      "diferença de 2 ou mais golos"
-     ],
-     [
-      "Parte do jogo",
-      "2.ª parte"
-     ],
-     [
-      "Ritmo indicado pelo bot",
-      "90 ou mais"
-     ]
-    ],
-    "source": "llm",
-    "born_utc": "2026-11-18T23:06:28+00:00",
-    "reason": "Jogos com muitos gols e diferença grande na 2ª parte podem ter um ritmo alto",
-    "expect": "acima",
-    "mode": "refinar",
-    "experimental": false,
-    "tradable": true,
-    "open": 0,
-    "born_verified": true,
-    "game_set": "04318270d90b74b1",
-    "prospective": {
-     "games": 9,
-     "hits": 8.0,
-     "misses": 1.0,
-     "prob_above": 0.9149,
-     "roi": 0.318,
-     "economics": {
-      "admitted": 15,
-      "results_confirmed": 15,
-      "wins": 8,
-      "losses": 1,
-      "voids": 6,
-      "imputed_losses": 0,
-      "pending": 0,
-      "quarantined": 0,
-      "scope": "prospective_exploratory",
-      "status": "positive_exploratory",
-      "stake_per_game": 1,
-      "resolved_stake_units": 15,
-      "profit_advertised": 4.77,
-      "profit_odds_minus_2pct": 4.4946,
-      "roi_advertised": 0.318,
-      "roi_odds_minus_2pct": 0.2996,
-      "confirmed_hit_rate": 0.8889,
-      "expected_profit": null
-     },
-     "categories": {
-      "prospective": 9,
-      "mixed": 0,
-      "before_registration": 0,
-      "after_registration_not_operational": 0,
-      "result_known_before_decision": 0,
-      "result_time_unproven": 0
-     }
-    },
-    "evidence_level": "exploratória",
-    "status": "em observação",
-    "pending_status": null,
-    "status_changes": [],
-    "confirmation": null,
-    "entry_status": "em observação"
    }
   ],
-  "llm_total": 96,
+  "llm_total": 98,
   "watch": [
    {
     "date_utc": "2026-11-23T08:55:49+00:00",
@@ -64696,15 +64690,15 @@
    "observation_margin_min": 5,
    "decisions_from": "born_utc"
   },
-  "llm_runs": 248,
-  "llm_last_run_utc": "2026-11-23T08:52:57+00:00",
+  "llm_runs": 249,
+  "llm_last_run_utc": "2026-11-23T09:53:55+00:00",
   "llm_last_outcome": "ok",
   "llm_today": {
    "day": "2026-11-23",
-   "calls_today": 9,
-   "neurons_today": 2107.9,
-   "accepted_today": 1,
-   "last_mode": "notas"
+   "calls_today": 10,
+   "neurons_today": 2363.0,
+   "accepted_today": 3,
+   "last_mode": "novas"
   },
   "notes": [
    {
@@ -64955,8 +64949,8 @@
   "llm_evaluation": {
    "protocol": "llm_incremental_v5",
    "verdict": "não verificada",
-   "llm_hypotheses": 96,
-   "groups": 96,
+   "llm_hypotheses": 98,
+   "groups": 98,
    "reason": "the production report has no full git history: scientific evaluation only in scripts/audit_pr4_llm.py",
    "report": "audits/pr4-llm-evaluation.md"
   }
@@ -65047,7 +65041,7 @@
     "roi_announced_odds": 0.0337,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 23.3,
+    "per_day": 23.2,
     "days_to_hint": 0,
     "days_to_conclusion": 3
    },
@@ -65076,7 +65070,7 @@
     "roi_announced_odds": 0.0107,
     "seen_late": 0,
     "by_bot_mark": 300,
-    "per_day": 49.7,
+    "per_day": 49.6,
     "days_to_hint": 0,
     "days_to_conclusion": 0
    },
