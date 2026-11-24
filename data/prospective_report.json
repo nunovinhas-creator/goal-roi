@@ -4,9 +4,9 @@
   "status": "diagnostic_only"
  },
  "H1": {
-  "expected": 0,
-  "games_in_population": 11,
-  "games_with_result": 0,
+  "expected": 3.133,
+  "games_in_population": 15,
+  "games_with_result": 5,
   "minute_bands": {
    "0-29": {
     "expected": 0,
@@ -14,41 +14,57 @@
     "observed": 0
    },
    "30-59": {
-    "expected": 0,
-    "games": 0,
-    "observed": 0
+    "expected": 2.069,
+    "games": 3,
+    "observed": 3
    },
    "60-89": {
-    "expected": 0,
-    "games": 0,
-    "observed": 0
+    "expected": 1.064,
+    "games": 2,
+    "observed": 2
    }
   },
   "note": "predictive information relative to a generic rate; not profitability",
-  "observed": 0,
-  "score_strata": {},
+  "observed": 5,
+  "score_strata": {
+   "margin_level|goals_0": {
+    "expected": 0.434,
+    "games": 1,
+    "observed": 1
+   },
+   "margin_level|goals_2+": {
+    "expected": 0.759,
+    "games": 1,
+    "observed": 1
+   },
+   "margin_two_plus|goals_2+": {
+    "expected": 1.941,
+    "games": 3,
+    "observed": 3
+   }
+  },
   "status": "insufficient_games",
-  "z": null
+  "z": 1.77
  },
  "H2": {
-  "games_in_population": 4,
-  "games_settled": 0,
+  "games_in_population": 6,
+  "games_settled": 3,
   "losses": 0,
-  "mean_implied": null,
+  "mean_implied": 0.5794,
   "note": "earlier edge did not replicate; no ROI validation without executable prices and known costs",
   "status": "insufficient_games",
-  "wins": 0
+  "wins": 2
  },
  "activated_utc": "2026-11-24T19:12:40.715876+00:00",
- "games_registered": 20,
+ "games_registered": 22,
  "games_with_conflicting_results": 0,
- "games_with_independent_result": 0,
+ "games_with_independent_result": 5,
  "games_without_result_after_72h": 0,
- "independent_result_share": 0.0,
- "ledger_entries": 51,
+ "independent_result_share": 0.2273,
+ "ledger_entries": 61,
  "schema": "goal_roi_prospective_report_v1",
- "signals_registered": 47,
- "signals_registered_before_result": 47,
+ "signals_registered": 52,
+ "signals_registered_before_result": 52,
  "signals_result_known_at_registration": 0,
  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
 }
