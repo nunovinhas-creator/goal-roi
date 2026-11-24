@@ -1,0 +1,76 @@
+{
+  "schema": "goal_roi_proposed_temporal_protocol_v1",
+  "status": "proposed",
+  "confirmatory_fixtures": 0,
+  "discovery_reference": {
+    "snapshot_commit": "82198c0af45270c6028e58255c21a46c55b19aa1",
+    "audit_commit": "df4d31d961376195d0a87e20cff87bc39057952b",
+    "audit_cutoff_utc": "2026-11-24T08:22:00Z",
+    "role": "Amostra exploratória. Excluir os IDs canónicos e os aliases de jogos do inventário de descoberta."
+  },
+  "registration": {
+    "definition": "Fixar os bytes deste JSON, o SHA-256, a versão do código e as fontes autorizadas num registo público com hora verificável do lado do servidor. Anexar aprovação explícita e referência ao registo. Fixar cada revisão num novo registo com contador a zero.",
+    "window_start": "Primeira meia-noite UTC estritamente posterior a 24 horas após a mais tardia entre a publicação verificável do registo e a aprovação. Só ativar com fonte de odds autorizada documentada e validação offline do replay em recibos sintéticos.",
+    "window_days": 90,
+    "decision_follow_up_hours": 72,
+    "window_rules": "Incluir apenas emissões e primeiras observações em [início, fim), e jogos cujo início anunciado pertença a esse intervalo. Para cada decisão, congelar o FT ao fim de 72 horas. Fechar avaliação após o seguimento da última decisão. Janela fixa, sem extensões ou seleção com base em resultados intercalares."
+  },
+  "shared_population": {
+    "sport": "Futebol",
+    "phase": "Pré-jogo nas cotações do par e na decisão",
+    "period": "90 minutos de jogo, incluindo compensação",
+    "market": "Total de golos da partida, Over ou Under 2,5. Identidade do contrato e do jogo provadas. Cotações pontuais, com odd anunciada entre 1,10 e 3,50, inclusive.",
+    "lead_time_minutes_at_decision": {"minimum": 20, "maximum": 360},
+    "publication_lag_minutes_max": 10,
+    "receipts": "Primeiras versões originais com prova de página concluída e hash. Emissão e leitura em UTC. Decisão no máximo das disponibilidades exigidas. Aplicar os filtros de identidade, elegibilidade e FT já conhecido no instante.",
+    "game_cardinality": "Uma decisão por fixture_id e hipótese. Ordenar por decisão UTC, emissão da âncora e ID numérico da âncora. Para empate no antecedente usar a ordenação definida na hipótese. Reservar a primeira âncora elegível antes de consultar preço da 1xBet ou o desfecho."
+  },
+  "hypotheses": {
+    "H1_under_to_over": {
+      "question": "A presença de um Under anterior está associada a maior lucro unitário do primeiro Over elegível, face a um Over comparável sem Under anterior?",
+      "sources": ["Polymarket"],
+      "index": "Primeiro alerta Over 2,5 elegível da partida. Classificar com base no último alerta anterior emitido e recebido do mesmo contrato até à decisão do Over. Ordenar o antecedente por emissão e ID. Uma emissão empatada com direções diferentes deixa a oportunidade indeterminada.",
+      "exposed": "O antecedente mais recente é Under 2,5 emitido entre 15 e 120 minutos antes do Over, inclusive. O Under tinha recibo e cumpria a janela pré-jogo na sua própria leitura. Ambas as versões já estão disponíveis no instante da decisão do Over.",
+      "control": "Primeiro Over elegível no mesmo universo, sem qualquer Under 2,5 do mesmo contrato emitido e observado até à decisão. Um Under visível fora do intervalo de exposição deixa a oportunidade fora dos dois grupos.",
+      "contrast": "Lucro líquido unitário da exposição menos o do comparador. Hipótese de diferença no sentido positivo. O sentido inverso, outras linhas, LIVE e outras fontes são descrições exploratórias."
+    },
+    "H2_volume_and_move": {
+      "question": "O lucro unitário após um alerta de grande volume difere entre queda ou subida da odd anunciada e estabilidade, dadas oportunidades similares?",
+      "sources": ["Polymarket", "Stake"],
+      "index": "Primeiro alerta de volume anunciado de pelo menos 10.000 USD da partida, com comparação de odds pontuais comprovada à decisão. Reter uma oportunidade no conjunto dos três braços.",
+      "reference": "Última cotação do mesmo operador, mercado nativo, seleção, linha e período, com emissão estritamente anterior e recibo já disponível. A idade desta cotação deve ser de 1 a 30 minutos inclusive face à emissão da âncora. Uma cotação mais recente fora dos limites impede a comparação. Uma última emissão com cotações discordantes torna a oportunidade indeterminada.",
+      "arms": {"down": "odd atual < referência", "stable": "odd atual = referência", "up": "odd atual > referência"},
+      "contrasts": ["down − stable", "up − stable"],
+      "direction": "Contrastes bilaterais. Restringir a comparação a cada fonte e agregar pares válidos."
+    }
+  },
+  "comparison": {
+    "shared_strata": [
+      "Mesmo dia UTC de início anunciado",
+      "Mesma fonte, mercado nativo, seleção, período e linha",
+      "Mesma categoria de competição segundo parser.competition_kind da versão registada",
+      "Mesma classe de minutos até ao início [20,30), [30,120), [120,361)"
+    ],
+    "h1_strata": ["Mesma classe de odd pontual anunciada no Over [1.10, 1.50), [1.50, 2.00), [2.00, 2.50), [2.50, 3.50]"],
+    "h2_strata": [
+      "Mesmas classes de odd pontual inicial [1.10, 1.50), [1.50, 2.00), [2.00, 2.50), [2.50, 3.50]",
+      "Mesma classe de volume USD [10000,25000), [25000,50000), >=50000",
+      "Mesma classe de minutos da comparação [1,5), [5,15), [15,30]"
+    ],
+    "assignment": "Por hipótese e dia de início, ordenar exposições pelo relógio da decisão e pelas chaves de desempate acima. Associar o comparador ainda livre da mesma classe, mais próximo no tempo e já observado, com limite de 72 horas. Usar cada jogo uma vez por hipótese, incluindo os comparadores estáveis partilhados entre os dois contrastes. Concluir a afetação com base nas oportunidades e congelá-la antes de revelar os FT."
+  },
+  "outcomes_and_costs": {
+    "primary": "Diferença média pareada de lucro líquido por unidade teórica, usando exclusivamente cotação pontual da 1xBet documentada e disponível para a mesma seleção na decisão.",
+    "quote": "Registo manual documentado ou fornecedor autorizado, com origem, mercado, ID do jogo, preço, carimbo de cotação, recibo, suspensão e disponibilidade para a unidade. Ambos os carimbos devem estar no intervalo [decisão menos 60 s, decisão]. Usar a última cotação disponível. Se faltar prova temporal, contratual ou de disponibilidade, registar preço ausente.",
+    "cost_model": "Vitória q−1, derrota −1. Subtrair 0,02 unidades em ambos os casos como custo conservador fixado. Reportar em separado resultado a custo zero e perda de 2% sobre o ganho potencial com o custo fixo. Modelo teórico sem ordens ou apostas.",
+    "ft": "FT90 coerente de fonte versionada até decisão + 72 h. Sem FT ou preço, conservar o jogo e contabilizar cobertura. Relatar limites pessimista e otimista por resultado de FT ausente quando o preço for válido, e separar todos os casos sem preço.",
+    "secondary": ["Taxa de acerto", "ROI descritivo à odd pontual anunciada", "Cobertura de quotes e FT", "Número de jogos, dias e pares", "Resultados separados por fonte e braço"]
+  },
+  "decision_criteria": {
+    "minimum_per_contrast": {"paired_prices_and_results": 100, "utc_game_days": 30},
+    "coverage_minimum_per_arm": {"ft": 0.9, "authorized_quote": 0.8},
+    "uncertainty": "IC bilateral de 98,3333% para cada um dos três contrastes, com bootstrap percentil pareado por dia UTC de jogo, 100.000 réplicas e semente 20261124. Exibir todos os contrastes e casos sem suporte. H1 só cumpre o critério de diferença se o limite inferior for positivo. H2 procura diferença em qualquer direção.",
+    "interpretation": "Menos cobertura, jogos, pares ou dias do que o mínimo implica resultado inconclusivo. Diferenças descritivas ou ajustadas podem refletir seleção e contexto. Qualquer revisão de braços, custos, população ou comparadores exige novo registo e janela independente."
+  },
+  "operational_mode": "Pesquisa offline. Evidências, hipóteses e contadores mantidos num circuito experimental isolado."
+}

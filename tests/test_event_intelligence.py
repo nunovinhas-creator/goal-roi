@@ -242,6 +242,67 @@ class TemporalReplay(unittest.TestCase):
         self.assertNotIn('payoff', json.dumps(export))
         self.assertTrue(export['experimental'])
 
+    def test_later_live_ft_with_reused_id_cannot_settle_previous_fixture(self):
+        self.save(poly(1, 'Under 2.5', -70), poly(2, 'Over 2.5', -50),
+                  poly(3, 'Under 2.5', 1440, live=62, ft='7:0'))
+        audit = self.build(2000)
+        self.assertIsNone(audit['outcomes']['sequence:1:2']['ft'])
+
+    def test_ft_note_on_an_exact_known_alias_excludes_later_canonical_decision(self):
+        note = record(3, '🏁 Full time: Alpha 3:1 Beta\nhttps://scangoal.com/match/exact-alias', 100)
+        self.save(poly(1, 'Under 2.5', -70), stake(2, 'Over 2.5', -60, fixture='exact-alias'),
+                  note, poly(4, 'Over 2.5', 102, live=65))
+        audit = self.build()
+        self.assertIsNotNone(self.episode(audit, 'sequence:1:2')['decision_utc'])
+        self.assertIn('ft_already_known', self.episode(audit, 'sequence:1:4')['exclusion_reasons'])
+        self.assertEqual(audit['fixture_results']['alpha-beta'][0]['link'], 'https://scangoal.com/match/exact-alias')
+
+    def test_stake_market_and_price_must_come_from_same_unambiguous_row(self):
+        quoted = stake(2, 'Over 2.5', -50)
+        ambiguous = quoted['text'].replace('📊 Asian Total', '📊 1X2 → Alpha @3.00\n📊 Asian Total')
+        self.save(stake(1, 'Under 2.5', -70), record(2, ambiguous, -50))
+        self.assertNotIn('sequence:1:2', self.build()['outcomes'])
+
+    def test_late_live_and_missing_market_clock_do_not_prove_open_window(self):
+        live_stake = stake(3, 'Over 3.5', 60)['text'].replace('Alpha — Beta', 'Alpha 0\nBeta 0')
+        self.save(poly(1, 'Under 2.5', -70), poly(2, 'Over 2.5', 86, live=86),
+                  record(3, live_stake, 60))
+        audit = self.build()
+        self.assertIn('last_live_market_window_elapsed', self.episode(audit, 'sequence:1:2')['exclusion_reasons'])
+        self.assertIn('last_unproven_live_market_window', self.episode(audit, 'quote:3')['exclusion_reasons'])
+
+    def test_stake_price_history_does_not_merge_native_market_labels(self):
+        self.save(stake(1, 'Over 2.5', -70, market='Total Goals', price='2.10'),
+                  stake(2, 'Over 2.5', -50, market='Asian Total', price='1.90'))
+        audit = self.build()
+        self.assertEqual(self.episode(audit, 'quote:2')['pattern'], 'unproven')
+
+    def test_simultaneous_conflicting_quotes_cannot_be_ordered_by_read_clock(self):
+        self.save(poly(1, 'Under 2.5', -74, read=-74, price='1.75'),
+                  poly(2, 'Under 2.5', -74, read=-72, price='2.05'),
+                  poly(3, 'Under 2.5', -61, read=-60, price='1.90'))
+        move = self.episode(self.build(), 'quote:3')['features']['prior_movement']
+        self.assertEqual(move['reason'], 'ambiguous_quote_at_same_time')
+
+    def test_partial_period_cannot_override_conflicting_second_half_scope(self):
+        self.save(stake(1, 'Under 2.5', -70),
+                  stake(2, 'Over 2.5', -50, market='2nd Half Asian Total After 30 Minutes'))
+        audit = self.build()
+        self.assertNotIn('sequence:1:2', audit['outcomes'])
+        self.assertIn('last_unproven_market_period', self.episode(audit, 'quote:2')['exclusion_reasons'])
+
+    def test_unspecified_whole_goal_total_has_no_asian_push_imputed(self):
+        self.save(stake(1, 'Under 2', -70, market='Total Goals'),
+                  poly(2, 'Over 2.5', -60, ft='2:0', edit=100, read=100))
+        label = self.build()['outcomes']['quote:1']
+        self.assertEqual(label['ft'], (2, 0))
+        self.assertIsNone(label['last_payoff'])
+
+    def test_live_totals_already_decided_by_the_score_are_excluded(self):
+        body = poly(1, 'Over 1.5', 28, live=25)['text'].replace("25' 0:0", "25' 2:0")
+        self.save(record(1, body, 28))
+        self.assertIn('last_line_already_decided_by_score', self.episode(self.build(), 'quote:1')['exclusion_reasons'])
+
     def test_external_quotes_are_timestamped_inert_inputs(self):
         args = ('alpha-beta', '1xBet', 'match_goals', 'regulation', 'Over 2.5', '2.5', Decimal('1.9'))
         quote = event_intelligence.ExternalQuote(*args, clock(-45), clock(-42), 'Manual receipt 123')

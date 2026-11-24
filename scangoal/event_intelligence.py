@@ -17,6 +17,8 @@ PERIOD_PREFIX = re.compile(rf'^({parser.FIRST_HALF}|{parser.SECOND_HALF})\s*(?:-
 TOTAL = re.compile(r'(over|under)\s+([0-9]+(?:[.,][0-9]+)?)', re.I)
 PRICE = r'[0-9]+(?:\.[0-9]+)?'
 PRICE_RANGE = re.compile(rf'@\s*({PRICE})(?:[–-]({PRICE}))?(?=\s|$)')
+STAKE_QUOTE = re.compile(rf'📊 (.+?) → (.+?) @ +({PRICE})(?: *[–-] *({PRICE}))?')
+STAKE_VOLUME = re.compile(r'💸+ 🟦 Stake(?: money load|: load growing ×[1-9][0-9]*) — \$(.+)')
 LIVE_TOTAL = re.compile(rf'^💰\s+(?:(1H|2H)\s+)?(O|U|Over|Under)\s+({PRICE}):\s*({PRICE})\s*$', re.M)
 VOLUME_SOURCES = {'Polymarket', 'Stake'}
 HANDICAP = re.compile(r'(?:AH[12]|.+ )\(([+−-]?[0-9]+(?:\.[0-9]+)?)\)', re.I)
@@ -106,9 +108,15 @@ def quote(version):
     market, selection, period = p.get('market'), p.get('selection'), p.get('period')
     if market is None or selection is None:
         return market, period, selection, None
-    line = body.strip().splitlines()
-    quoted = (line[2] if len(line) > 2 and kind in ('POLYMARKET', 'BETFAIR') else
-              next((row for row in line if row.startswith('📊 ') and ' → ' in row), ''))
+    lines = body.strip().splitlines()
+    if kind == 'STAKE_LOAD':
+        quotes = [row.strip() for row in lines if row.startswith('📊 ') and ' → ' in row]
+        parsed = STAKE_QUOTE.fullmatch(quotes[0]) if len(quotes) == 1 else None
+        if not parsed or parsed.group(1, 2) != (market, selection) or not p.get('bet'):
+            return None, None, None, None
+        low, high = parsed.group(3, 4)
+        return market, period, selection, (low, high or low)
+    quoted = lines[2] if len(lines) > 2 and kind in ('POLYMARKET', 'BETFAIR') else ''
     spans = PRICE_RANGE.findall(quoted)
     if len(spans) == 1 and p.get('bet'):
         low, high = spans[0]
@@ -132,7 +140,8 @@ def market_identity(market, period, scope, selection):
         base = base[prefix.end():]
     suffix = re.fullmatch(r'.+ after ([0-9]+) minutes', base)
     if suffix:
-        period = f'first_{suffix[1]}_minutes'
+        # A partial absolute clock cannot disambiguate a simultaneous half label.
+        return base, f'first_{int(suffix[1])}_minutes' if not prefix and 0 < int(suffix[1]) <= 90 else None
     canonical = {'asian total': 'match_goals', 'total goals': 'match_goals',
                  'total corners': 'corners', '1x2': 'winner', 'match result': 'winner',
                  'half time result': 'winner', 'both teams to score': 'both_teams_to_score',
@@ -158,12 +167,18 @@ def event_of(version):
     direction = total[1].lower() if total else selection.lower() if selection in ('Over', 'Under') else None
     handicap = HANDICAP.fullmatch(selection or '') if market_key == 'asian_handicap' else None
     line = parser.decimal_label(total[2]) if total else handicap[1].replace('−', '-') if handicap else None
+    if (market_key == 'match_goals' and line is not None and Decimal(line) % 1 != Decimal('0.5')
+            and (p['type'] == 'POLYMARKET' or match_identity.normalized(market) == 'total goals')):
+        market_key = 'goal_total_unspecified_settlement'
     low, high = (Decimal(price) for price in prices) if prices else (None, None)
     odds = None if low is None or low <= 1 or high < low else [format(value.normalize(), 'f') for value in (low, high)]
     phase, kind = p.get('phase'), p['type'].removesuffix('_NO_ODDS')
     header = version.text.strip().splitlines()[0]
     multiplier = re.search(r'×([1-9][0-9]*)', header)
     volume = p.get('sel_volume' if kind == 'BETFAIR' else 'total')
+    if kind == 'STAKE_LOAD':
+        amount = STAKE_VOLUME.fullmatch(header)
+        volume = parser.polymarket_amount(amount[1]) if amount else None
     if type(volume) not in (float, int) or not 0 <= volume < float('inf'):
         volume = None
     minute = p.get('minute')
@@ -278,7 +293,8 @@ def selection_key(event):
         selected = match_identity.normalized(selection)
     if selected is None:
         return None
-    return event['fixture_id'], event['source'], market, period, selected
+    return (event['fixture_id'], event['source'], market, match_identity.normalized(event['market']),
+            period, selected)
 
 
 def movement(older, newer, missing):

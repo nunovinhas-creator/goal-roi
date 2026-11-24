@@ -2,10 +2,12 @@
 
 import argparse
 from collections import Counter, defaultdict
+from dataclasses import replace
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_FLOOR
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from . import chronology, details_hl, match_identity, opportunity_forward, opportunity_results, parser, report
@@ -37,8 +39,12 @@ def result_evidence(groups, signals, bindings, directory, as_of):
             note = p['type'] == 'FULL_TIME_NOTE'
             if not note:
                 binding = bindings.get(mid)
-                if (binding is None or not all(identity[1:])
-                        or any(a and b and a != b for a, b in zip(binding.parts, identity))):
+                sent = chronology.signal_time(initial)
+                start = end = identity[0]
+                if start is None and initial.get('phase') == 'live':
+                    start, end = sent - match_identity.LIVE_WINDOW, sent
+                if (binding is None or start is None or not all(identity[1:])
+                        or not match_identity.compatible(binding, identity, start, end)):
                     continue
             result = opportunity_results.collected(
                 'telegram_note' if note else 'telegram', version.message_id, p['ft'],
@@ -57,6 +63,15 @@ def result_evidence(groups, signals, bindings, directory, as_of):
     note_inputs = [dict(e, date_utc=e['emitted_utc'], signal_seen_utc=e['available_utc']) for e in signals
                    if not e.get('exclusion')]
     for row in report.link_ft_notes(note_inputs, notes, as_of=as_of):
+        binding = bindings.get(row.fixture_id)
+        if binding and row.link and row.fixture_id != binding.canonical:
+            # link_ft_notes already established the note's explicit ID from a
+            # signal known before publication. Exact aliases can carry that
+            # observation to the canonical fixture, with the original link.
+            if (binding.parts[0] != row.kickoff or binding.available > row.available_at
+                    or (binding.collision is not None and binding.collision <= row.available_at)):
+                continue
+            row = replace(row, fixture_id=binding.canonical)
         raw[row.fixture_id].append(row)
     for file, source in (('results_hl.json', 'highlightly'), ('results_bsd.json', 'bsd')):
         path = directory / file
@@ -127,15 +142,27 @@ def timely(event, available, known_kickoff):
                kickoff_utc=events.iso(events.kickoff(event) or known_kickoff))
     if event['phase'] not in ('pre', 'live') or (event['phase'] == 'pre' and not row['kickoff_utc']):
         return 'unproven_decision_window'
-    if event['period'] == 'first_half' and event['phase'] == 'live':
+    period = event['period']
+    partial = re.fullmatch(r'first_([0-9]+)_minutes', period or '')
+    end_minute = int(partial[1]) if partial else {'first_half': 45, 'second_half': 90, 'regulation': 90}.get(period)
+    if end_minute is None:
+        return 'unproven_market_period'
+    if event['phase'] == 'live':
         minute = event['minute']
-        if minute is None or minute >= 45:
+        if period == 'first_half' and (minute is None or minute >= 45):
             return 'unproven_first_half_window'
-        window_end = events.emitted(event) + timedelta(minutes=45 - minute)
+        if period == 'second_half' and (minute is None or minute < 46):
+            return 'unproven_second_half_window'
+        if type(minute) is not int or minute < 0:
+            return 'unproven_live_market_window'
+        window_end = events.emitted(event) + timedelta(minutes=end_minute - minute)
         if available + timedelta(minutes=chronology.DECISION_DELAY_MAX_MIN) >= window_end:
-            return 'first_half_window_elapsed'
-    if event['period'] == 'second_half' and event['phase'] == 'live' and (event['minute'] or 0) < 46:
-        return 'unproven_second_half_window'
+            return 'first_half_window_elapsed' if period == 'first_half' else 'live_market_window_elapsed'
+        if period == 'regulation' and event['market_key'] == 'match_goals' and event['direction']:
+            score_payoff = payoff(event, event['score'])
+            # A full Over win or Under loss at the visible score is already decided.
+            if score_payoff == (1 if event['direction'] == 'over' else -1):
+                return 'line_already_decided_by_score'
     return None if chronology.decidable(row) else 'signal_outside_decision_window'
 
 
@@ -200,8 +227,8 @@ def quote_reference(quotes, anchor, timing):
     candidates = [q for q in quotes if qualifies(q)]
     if not candidates:
         return None, 'no_comparable_quote'
-    order = ((lambda q: (events.seen(q), events.emitted(q))) if timing != 'prior' else
-             (lambda q: (events.emitted(q), events.seen(q))))
+    order = (events.emitted if timing == 'prior' else
+             lambda q: (events.seen(q), events.emitted(q)))
     timestamp = (max if timing == 'prior' else min)(map(order, candidates))
     chosen = [q for q in candidates if order(q) == timestamp]
     if any(q['odds'] != chosen[0]['odds'] for q in chosen[1:]):
