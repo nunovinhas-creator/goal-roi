@@ -99,6 +99,54 @@ class Beacon(unittest.TestCase):
         self.assertIsNone(beacon.agreed(b, {'r1': good, 'r2': bad}, 7))
 
 
+VERIFICATION = json.loads((K0 / 'beacon-verification.json').read_bytes())
+
+
+class BeaconVerification(unittest.TestCase):
+    def test_relays_agree_and_match_the_locked_protocol(self):
+        self.assertTrue(VERIFICATION['relays_agree'])
+        self.assertEqual(set(VERIFICATION['matches_protocol'].values()), {True})
+        self.assertEqual(VERIFICATION['info']['hash'], PROTOCOL['beacon']['chain_hash'])
+        self.assertEqual(VERIFICATION['info']['schemeID'], 'bls-unchained-g1-rfc9380')
+
+    def test_fetch_sends_an_explicit_user_agent(self):
+        from unittest.mock import patch
+        seen = []
+
+        def fake(request, timeout):
+            seen.append(request.get_header('User-agent'))
+            raise OSError('offline test')
+
+        with patch.object(beacon.urllib.request, 'urlopen', side_effect=fake):
+            out = beacon.fetch(PROTOCOL['beacon'], 1)
+        self.assertEqual(set(seen), {beacon.USER_AGENT})
+        self.assertTrue(all('error' in e for e in out.values()))
+
+
+@unittest.skipUnless(importlib.util.find_spec('py_ecc'), 'requirements-verification.txt not installed')
+class BLS(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.bls = _load('bls')
+        cls.info = VERIFICATION['info']
+
+    def test_relay_vectors_verify(self):
+        for v in VERIFICATION['test_vectors']:
+            self.assertTrue(self.bls.verify_entry(self.info, v), v['round'])
+
+    def test_tampering_is_rejected(self):
+        v = VERIFICATION['test_vectors'][1]
+        key = self.info['public_key']
+        self.assertFalse(self.bls.verify(key, v['round'] + 1, v['signature']))
+        flipped = format(int(v['signature'], 16) ^ (1 << 7), '096x')
+        self.assertFalse(self.bls.verify(key, v['round'], flipped))
+        other = VERIFICATION['test_vectors'][0]['signature']
+        self.assertFalse(self.bls.verify(key, v['round'], other))
+        self.assertFalse(self.bls.verify(key[:-2] + format(int(key[-2:], 16) ^ 1, '02x'), v['round'], v['signature']))
+        self.assertFalse(self.bls.verify_entry(dict(self.info, schemeID='pedersen-bls-chained'), v))
+        self.assertFalse(self.bls.verify_entry(self.info, dict(v, randomness='00' * 32)))
+
+
 class Commitment(unittest.TestCase):
     def test_commitment_binds_content_salt_role_and_protocol(self):
         with tempfile.TemporaryDirectory() as tmp:

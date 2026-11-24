@@ -14,6 +14,8 @@ from pathlib import Path
 import urllib.request
 
 PROTOCOL = Path(__file__).resolve().parents[1] / 'protocol.json'
+# drand.cloudflare.com answers 403 to Python's default User-Agent (checked 2026-11-24).
+USER_AGENT = 'goal-roi-k0-verifier/1'
 
 
 def load(path=PROTOCOL):
@@ -71,7 +73,8 @@ def fetch(beacon, number, timeout=20):
     for relay in beacon['relays']:
         url = f'{relay}/{beacon["chain_hash"]}/public/{number}'
         try:
-            with urllib.request.urlopen(url, timeout=timeout) as response:
+            request = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+            with urllib.request.urlopen(request, timeout=timeout) as response:
                 out[relay] = json.loads(response.read())
         except Exception as error:  # recorded, never retried with another round by hand
             out[relay] = dict(error=type(error).__name__)
