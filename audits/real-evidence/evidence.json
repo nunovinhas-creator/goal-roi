@@ -1,0 +1,450 @@
+{
+  "confirmatory": false,
+  "coverage": {
+    "clock_utc": "2026-11-24T18:35:00+00:00",
+    "distinct_games": 1206,
+    "eligible_signals": 2121,
+    "evaluable_without_future_information": {
+      "games": 724,
+      "rule": "eligible, settled, seen before the result was known and, if pre-match, before kick-off",
+      "signals": 1471
+    },
+    "exclusion_reasons": {
+      "burst": 10,
+      "edited_at_first_sight": 40,
+      "had_ft_at_first_sight": 39,
+      "no_market": 293,
+      "no_selection": 293,
+      "no_valid_odds": 293,
+      "provenance_not_verified": 50,
+      "reused_match_id": 5
+    },
+    "games_with_final_score": 914,
+    "games_with_independent_provider_result": 0,
+    "games_with_odds": 976,
+    "messages_parsed": 4550,
+    "period": [
+      "2026-11-12T09:34:15+00:00",
+      "2026-11-24T18:29:03.243262+00:00"
+    ],
+    "prospective_ledger_entries": 0,
+    "result_sources": {
+      "None": 313,
+      "bot_full_time_note": 11,
+      "bot_mark": 436,
+      "bot_message": 1343
+    },
+    "settled_signals": 1790,
+    "signal_records": 2467,
+    "signals_with_explicit_odds": 2174,
+    "unique_bets": 2126
+  },
+  "groups": {
+    "BETFAIR/live/mkt<10K": {
+      "games": 11,
+      "implied": 0.3159,
+      "n": 11,
+      "roi": 0.4355,
+      "roi_ci95": [
+        -0.5555,
+        1.4265
+      ],
+      "wins": 5
+    },
+    "BETFAIR/live/mkt>=10K": {
+      "games": 28,
+      "implied": 0.2642,
+      "n": 30,
+      "roi": 0.1563,
+      "roi_ci95": [
+        -0.5622,
+        0.8749
+      ],
+      "wins": 9
+    },
+    "BETFAIR/pre/mkt<10K": {
+      "games": 24,
+      "implied": 0.3371,
+      "n": 24,
+      "roi": -0.3204,
+      "roi_ci95": [
+        -0.8231,
+        0.1823
+      ],
+      "wins": 6
+    },
+    "BETFAIR/pre/mkt>=10K": {
+      "games": 8,
+      "implied": 0.3601,
+      "n": 8,
+      "roi": 0.36,
+      "roi_ci95": [
+        -0.6478,
+        1.3678
+      ],
+      "wins": 4
+    },
+    "OPEN_GAME": {
+      "games": 358,
+      "implied": 0.5782,
+      "n": 358,
+      "roi": 0.0337,
+      "roi_ci95": [
+        -0.044,
+        0.1114
+      ],
+      "wins": 147
+    },
+    "POLYMARKET/live": {
+      "games": 85,
+      "implied": 0.4875,
+      "n": 131,
+      "roi": 0.1034,
+      "roi_ci95": [
+        -0.0944,
+        0.3013
+      ],
+      "wins": 70
+    },
+    "POLYMARKET/pre": {
+      "games": 191,
+      "implied": 0.5014,
+      "n": 447,
+      "roi": -0.0667,
+      "roi_ci95": [
+        -0.1764,
+        0.0431
+      ],
+      "wins": 206
+    },
+    "STAKE_LOAD/live": {
+      "games": 115,
+      "implied": 0.5628,
+      "n": 161,
+      "roi": -0.0169,
+      "roi_ci95": [
+        -0.1588,
+        0.125
+      ],
+      "wins": 85
+    },
+    "STAKE_LOAD/pre": {
+      "games": 135,
+      "implied": 0.5259,
+      "n": 261,
+      "roi": -0.0219,
+      "roi_ci95": [
+        -0.1507,
+        0.1069
+      ],
+      "wins": 126
+    },
+    "TOTALS_FORM": {
+      "games": 139,
+      "implied": 0.6034,
+      "n": 139,
+      "roi": -0.0372,
+      "roi_ci95": [
+        -0.1597,
+        0.0852
+      ],
+      "wins": 46
+    },
+    "WEAKENED_LINEUP": {
+      "games": 11,
+      "implied": 0.5128,
+      "n": 11,
+      "roi": -0.1027,
+      "roi_ci95": [
+        -0.6716,
+        0.4662
+      ],
+      "wins": 4
+    }
+  },
+  "hypotheses": {
+    "check_signals": 892,
+    "discovery_signals": 689,
+    "rule": "n >= 30, ROI > 5% and 95% lower bound > -5% in discovery",
+    "segments_scanned": 25,
+    "selected": [
+      {
+        "check": {
+          "games": 155,
+          "implied": 0.5698,
+          "n": 155,
+          "roi": 0.013,
+          "roi_ci95": [
+            -0.0976,
+            0.1237
+          ],
+          "wins": 59
+        },
+        "discovery": {
+          "games": 155,
+          "implied": 0.5581,
+          "n": 155,
+          "roi": 0.1119,
+          "roi_ci95": [
+            -0.0095,
+            0.2333
+          ],
+          "wins": 69
+        },
+        "segment": [
+          "OPEN_GAME",
+          "live",
+          "1.50-2.50"
+        ]
+      },
+      {
+        "check": {
+          "games": 58,
+          "implied": 0.5651,
+          "n": 75,
+          "roi": -0.062,
+          "roi_ci95": [
+            -0.2631,
+            0.1391
+          ],
+          "wins": 37
+        },
+        "discovery": {
+          "games": 36,
+          "implied": 0.562,
+          "n": 42,
+          "roi": 0.3393,
+          "roi_ci95": [
+            0.0859,
+            0.5927
+          ],
+          "wins": 31
+        },
+        "segment": [
+          "STAKE_LOAD/live",
+          "live",
+          "1.50-2.50"
+        ]
+      }
+    ],
+    "split_utc": "2026-11-20T00:00:00+00:00",
+    "status": "exploratory: single check, no multiplicity correction, no prospective registration"
+  },
+  "relations": {
+    "betfair_market_volume": {
+      "<10K": {
+        "games": 35,
+        "implied": 0.3304,
+        "n": 35,
+        "roi": -0.0829,
+        "roi_ci95": [
+          -0.5539,
+          0.3882
+        ],
+        "wins": 11
+      },
+      ">=10K": {
+        "games": 36,
+        "implied": 0.2844,
+        "n": 38,
+        "roi": 0.1992,
+        "roi_ci95": [
+          -0.4013,
+          0.7998
+        ],
+        "wins": 13
+      },
+      "prospective": true
+    },
+    "odds_move_after_signal": {
+      "drifted": {
+        "games": 80,
+        "implied": 0.5286,
+        "n": 132,
+        "roi": -0.089,
+        "roi_ci95": [
+          -0.2581,
+          0.0801
+        ],
+        "wins": 63
+      },
+      "note": "odds_last is a later edit with no reliable time: future information",
+      "prospective": false,
+      "shortened": {
+        "games": 89,
+        "implied": 0.4669,
+        "n": 151,
+        "roi": 0.0507,
+        "roi_ci95": [
+          -0.1879,
+          0.2894
+        ],
+        "wins": 69
+      }
+    },
+    "repeated_signal": {
+      "note": "repetitions arrive after the first signal",
+      "prospective": false,
+      "repeated": {
+        "games": 147,
+        "implied": 0.5008,
+        "n": 369,
+        "roi": -0.0256,
+        "roi_ci95": [
+          -0.1503,
+          0.0992
+        ],
+        "wins": 174
+      },
+      "single": {
+        "games": 726,
+        "implied": 0.5363,
+        "n": 1212,
+        "roi": -0.004,
+        "roi_ci95": [
+          -0.0593,
+          0.0513
+        ],
+        "wins": 534
+      }
+    },
+    "score_after_live_signal": {
+      "baseline_more_goals": 0.6593,
+      "n": 633,
+      "note": "score and minute are known at the signal",
+      "observed_more_goals": 0.7235,
+      "prospective": true
+    },
+    "signal_types_per_game": {
+      "first_type_in_multi_type_games": {
+        "BETFAIR": 32,
+        "OPEN_GAME": 9,
+        "POLYMARKET": 94,
+        "STAKE_LOAD": 97,
+        "TOTALS_FORM": 5
+      },
+      "games": 942,
+      "games_with_several_types": 237,
+      "note": "only earlier signals can inform a decision",
+      "opposite_total_directions": {
+        "opposite": 331,
+        "pairs": 741
+      },
+      "prospective": true,
+      "top_pairs": [
+        [
+          "POLYMARKET+STAKE_LOAD",
+          143
+        ],
+        [
+          "OPEN_GAME+POLYMARKET",
+          58
+        ],
+        [
+          "OPEN_GAME+STAKE_LOAD",
+          58
+        ],
+        [
+          "BETFAIR+POLYMARKET",
+          32
+        ],
+        [
+          "BETFAIR+STAKE_LOAD",
+          31
+        ],
+        [
+          "BETFAIR+OPEN_GAME",
+          22
+        ],
+        [
+          "STAKE_LOAD+TOTALS_FORM",
+          8
+        ],
+        [
+          "POLYMARKET+TOTALS_FORM",
+          6
+        ]
+      ]
+    }
+  },
+  "result_verification": {
+    "bsd": {
+      "agree_with_bot_score": 13,
+      "bound_by_report": 0,
+      "comparable_with_bot_score": 13,
+      "last_run": "2026-11-24T17:44:50+00:00",
+      "records": 48,
+      "records_with_league": 0,
+      "stats": {
+        "event_names_sample": [
+          "1. FC Kaiserslautern — SG Dynamo Dresden",
+          "1. FC Köln — SV Werder Bremen",
+          "1. FC Nürnberg — Eintracht Braunschweig",
+          "1. FC Slovácko — FC Hradec Králové",
+          "1. FC Union Berlin — RB Leipzig",
+          "1. FSV Mainz 05 — 1. FC Nürnberg",
+          "AC Horsens — Silkeborg IF",
+          "AC Milan — Frosinone",
+          "AC Sparta Praha — FC Slovan Liberec",
+          "AD Camacha — CD Cinfães",
+          "AD Ceuta — Almería",
+          "AD Sanjoanense — Académica Coimbra",
+          "AFC Ajax — ADO Den Haag",
+          "AIK — Degerfors IF",
+          "APO Levadiakos — APS Atromitos Athinon"
+        ],
+        "events_seen": 419,
+        "matched_this_run": 0,
+        "page_cap_reached": false,
+        "per_day": {
+          "2026-11-21": {
+            "count_reported": 231,
+            "events_read": 231
+          },
+          "2026-11-22": {
+            "count_reported": 157,
+            "events_read": 157
+          },
+          "2026-11-23": {
+            "count_reported": 29,
+            "events_read": 29
+          },
+          "2026-11-24": {
+            "count_reported": 2,
+            "events_read": 2
+          }
+        },
+        "requests": 5,
+        "targets": 32
+      },
+      "would_bind_on_teams_and_time": 22
+    },
+    "cause": "report.external_matches requires a league on the provider record; stored provider records have none",
+    "hl": {
+      "agree_with_bot_score": 34,
+      "bound_by_report": 0,
+      "comparable_with_bot_score": 34,
+      "last_run": "2026-11-24T17:44:49+00:00",
+      "records": 113,
+      "records_with_league": 0,
+      "stats": {
+        "events_seen": 100,
+        "matched_this_run": 0,
+        "not_covered": 119,
+        "per_day": {
+          "2026-11-24": {
+            "count_reported": 178,
+            "events_read": 100
+          }
+        },
+        "quota_remaining": 12,
+        "requests": 1,
+        "stopped": "daily_quota_low",
+        "targets": 8
+      },
+      "would_bind_on_teams_and_time": 87
+    }
+  },
+  "schema": "goal_roi_real_evidence_v1",
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}
