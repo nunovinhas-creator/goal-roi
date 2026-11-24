@@ -1711,13 +1711,15 @@
    "attempt_utc": "2026-11-24T18:46:05+00:00",
    "chars": 192,
    "created_utc": "2026-11-24T18:46:05+00:00",
+   "done_utc": "2026-11-24T18:46:05+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "7ad9506da50a16437e04e73392f2f91c2a65e4b80ece5839dd10a96086799305",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:boca-juniors-de-cali-vs-quindio-20261124|231480cc2678": {
    "attempt_id": "ad676ab4ecdd48caa324832ea7ce797a",
@@ -1750,12 +1752,17 @@
    "state": "delivered"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|760661ed9a99": {
+   "attempt_id": "34bf2067745d4e79982aa8a8c2ed881a",
+   "attempt_utc": "2026-11-24T18:46:08+00:00",
+   "chars": 201,
    "created_utc": "2026-11-24T18:46:05+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "5886cd758ec4d312fb406f6d797ed754fbe12039de42c7c1cbb153d4299d542c",
+   "state": "in_flight"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|c53de40e793c": {
    "attempt_id": "3625b1296d204f7fa31b65db66c1ac50",
@@ -7027,7 +7034,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 451,
+  "delivered": 452,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:40:29+00:00",
@@ -7128,6 +7135,7 @@
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)": true,
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)": true,
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5": true,
+  "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2": true,
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5": true
  },
  "migrations": {
@@ -7400,7 +7408,7 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
   "Stake | Golos até ao sinal = nenhum & Momento do aviso = até 45 min depois do início": 32,
-  "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 18,
+  "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 19,
   "Stake | Hora (UTC) = noite & Número de apostas = uma": 35,
   "Stake | Hora (UTC) = noite & Valor da aposta = menos de 10 mil $": 38,
   "Stake | Marcador no momento = empatado & Momento do aviso = até 45 min depois do início": 33,
@@ -7699,6 +7707,9 @@
   },
   "item|id:bodo-glimt-vs-lask-linz-20261124|Asian Total|Over 2.5": {
    "at_utc": "2026-11-24T18:15:37+00:00"
+  },
+  "item|id:bodo-glimt-vs-lask-linz-20261124|Asian Total|Under 2": {
+   "at_utc": "2026-11-24T18:46:05+00:00"
   },
   "item|id:bodo-glimt-vs-lask-linz-20261124|Polymarket|AH2(+1.5)": {
    "at_utc": "2026-11-24T09:28:53+00:00"
@@ -8830,7 +8841,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 763,
+ "sent_total": 764,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9736,6 +9747,7 @@
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)",
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)",
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5",
+  "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2",
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5"
  ]
 }
