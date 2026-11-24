@@ -1,0 +1,4323 @@
+{
+  "algorithm_lock_sha256": "58f56a6da9f4cc971aec2ced4ca0586acd3027a33e8fb1a47057fa6233e63248",
+  "confirmatory": false,
+  "criteria": {
+    "exact_path_recall": 0.75,
+    "holdout_negative_mechanisms": 5,
+    "holdout_target_fixtures": 6,
+    "terminal_precision": 0.9,
+    "terminal_recall": 0.8
+  },
+  "decision": {
+    "offline_research": "GO",
+    "prospective_confirmation": "NO-GO",
+    "synthetic_transfer": "NO-GO"
+  },
+  "evaluator_sha256": {
+    "banks.py": "a7f5545ff44080e1be8b95ade3dad9151453a122deea03e6476eada00d743456",
+    "run.py": "3905163bd47558da031593716db9e6bbb526a81f6dde2dadfc94dcea00a4f403"
+  },
+  "model": {
+    "model_basename": null,
+    "status": "local_model_or_runtime_unavailable"
+  },
+  "pre_holdout_algorithm_commit": "85c3c7ff9d73c0e6a1b7324979811b0ee3bc4f2c",
+  "previous_regression": {
+    "best_historical": {
+      "development": {
+        "cases": 18,
+        "exact_terminal": 6,
+        "exact_witness": 0,
+        "exact_witness_share": 0.0,
+        "false_motifs": {
+          "price_rises": 6,
+          "wrong_period": 6
+        },
+        "gate_passed": false,
+        "precision_at_t": 0.3333333333333333,
+        "recall_at_t": 1.0,
+        "search_complete": true,
+        "target_games": 6,
+        "wrong_time": 0
+      },
+      "holdout": [
+        {
+          "cases": 18,
+          "exact_terminal": 6,
+          "exact_witness": 0,
+          "exact_witness_share": 0.0,
+          "false_motifs": {
+            "price_rises": 6,
+            "wrong_period": 6
+          },
+          "gate_passed": false,
+          "precision_at_t": 0.3333333333333333,
+          "recall_at_t": 1.0,
+          "search_complete": true,
+          "seed": 59219,
+          "target_games": 6,
+          "wrong_time": 0
+        },
+        {
+          "cases": 18,
+          "exact_terminal": 6,
+          "exact_witness": 0,
+          "exact_witness_share": 0.0,
+          "false_motifs": {
+            "price_rises": 6,
+            "wrong_period": 6
+          },
+          "gate_passed": false,
+          "precision_at_t": 0.3333333333333333,
+          "recall_at_t": 1.0,
+          "search_complete": true,
+          "seed": 80657,
+          "target_games": 6,
+          "wrong_time": 0
+        }
+      ],
+      "id": "tr32:77141ceaad61e6b1a1b0aaa146419bb682ec7df7cf7cd175803f09e978776d27",
+      "origin": "legacy_projection",
+      "steps": 4
+    },
+    "candidates": 47,
+    "frozen_discovery_entrypoint": {
+      "candidates": null,
+      "status": "invalid_literal_on_mixed_trajectory"
+    },
+    "holdout_passes": 0,
+    "max_typed_overlay": 1,
+    "reproduced": true
+  },
+  "schema": "goal_roi_autonomous_generalization_v1",
+  "selection_sha256": "39900e21c5fdde45d3b4ac7485fb117e391f69ab62b26a9dfcec5276d5dbd736",
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.",
+  "worlds": {
+    "live_equaliser_reversal": {
+      "development": [
+        {
+          "complete": false,
+          "development_seed": 31051,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 6,
+              "detections_sha256": "b22ab251a764f9da891bb9acc41babbb840634561df6fd2b4560834029c1aa0d",
+              "exact_path_recall": 0.0,
+              "exact_paths": 0,
+              "exact_terminals": 4,
+              "false_detections_by_mechanism": {
+                "middle_period_switch": 1,
+                "weak_alert": 1
+              },
+              "gate": false,
+              "matching_operations": 575,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "middle_period_switch": 1,
+                "weak_alert": 1
+              },
+              "negative_fixtures_not_detected": 16,
+              "negatives_with_indeterminate_decisions": 0,
+              "precision": 0.6666666666666666,
+              "search_complete": true,
+              "states": {
+                "ineligible_terminal": 72,
+                "present": 6
+              },
+              "targets": 9,
+              "terminal_recall": 0.4444444444444444
+            },
+            "diversity": {
+              "count": 51,
+              "lengths": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "max_link_span": 3,
+              "max_predicates_in_rule": 12,
+              "relation_fields": [
+                "gap_seconds",
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "odds_delta_bp",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_score_state",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 6,
+              "unary_fields": [
+                "event_kind",
+                "goals",
+                "minute",
+                "period",
+                "point_odds",
+                "price_high",
+                "price_kind",
+                "price_low",
+                "score_state",
+                "signal_type",
+                "source"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 40,
+                  "detections_sha256": "96efa9139937d21c32e4225aafdce58d25343d64a6a11008c79b64a090f3ace6",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 5,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 5,
+                    "late_equaliser": 5,
+                    "middle_period_switch": 2,
+                    "weak_alert": 4,
+                    "wrong_time_on_target": 9
+                  },
+                  "gate": false,
+                  "matching_operations": 788,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 1,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.175,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 38,
+                    "present": 40
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 3,
+                  "detections_sha256": "d9dcb5e19d08fed7127d1c896aac68494294066e71ab74c00c3fd55361cbc927",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 1,
+                    "middle_period_switch": 1,
+                    "weak_alert": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 574,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 1,
+                    "middle_period_switch": 1,
+                    "weak_alert": 1
+                  },
+                  "negative_fixtures_not_detected": 15,
+                  "negatives_with_indeterminate_decisions": 1,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 1,
+                    "ineligible_terminal": 74,
+                    "present": 3
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 37,
+                  "detections_sha256": "3e6acfc95b478a6d675e0e3156389b4ca8af70cb773124acc58d7c52a61eafbb",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 4,
+                    "continued_price_drop": 2,
+                    "contradictory_marker": 5,
+                    "late_equaliser": 4,
+                    "middle_period_switch": 4,
+                    "weak_alert": 3,
+                    "wrong_time_on_target": 9
+                  },
+                  "gate": false,
+                  "matching_operations": 772,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 2,
+                    "continued_price_drop": 2,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 3,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.16216216216216217,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 42,
+                    "present": 37
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 3,
+                  "detections_sha256": "8c28780ac8287dbe885bab344b2cf6370c04a669d0e7875ee5104eea8beb8976",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 1,
+                  "false_detections_by_mechanism": {
+                    "contradictory_marker": 1,
+                    "late_equaliser": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 604,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "contradictory_marker": 1,
+                    "late_equaliser": 1
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 2,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 2,
+                    "ineligible_terminal": 74,
+                    "present": 3
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.1111111111111111
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 38,
+                  "detections_sha256": "acb378216565a89234f591f110a993daf198012919ddd60d982d3d679444ee6d",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 5,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 5,
+                    "middle_period_switch": 5,
+                    "weak_alert": 4,
+                    "wrong_time_on_target": 7
+                  },
+                  "gate": false,
+                  "matching_operations": 775,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 2,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 3,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 2,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.15789473684210525,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 40,
+                    "present": 38
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 1,
+                  "detections_sha256": "595e754860e7a8c7596f2863cd530016d9dbca9720c48e46e26422310713c91b",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 1,
+                  "false_detections_by_mechanism": {},
+                  "gate": false,
+                  "matching_operations": 554,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {},
+                  "negative_fixtures_not_detected": 18,
+                  "negatives_with_indeterminate_decisions": 1,
+                  "precision": 1.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 1,
+                    "ineligible_terminal": 76,
+                    "present": 1
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.1111111111111111
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:94e351c7600b215f60ba36b5f1c029446eb85755f74af7db696627e7b82fd2a8",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "same_score_state",
+                  "from": 0,
+                  "op": "eq",
+                  "to": 1,
+                  "value": false
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 30
+                  }
+                ],
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 37
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 15,
+              "detections_sha256": "fce096e1fcb718ea8c64cce4a93234995b381ea9de70a0dad7b130ce79d8ac31",
+              "exact_path_recall": 1.0,
+              "exact_paths": 9,
+              "exact_terminals": 9,
+              "false_detections_by_mechanism": {
+                "contradictory_marker": 3,
+                "weak_alert": 3
+              },
+              "gate": false,
+              "matching_operations": 975,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "contradictory_marker": 3,
+                "weak_alert": 3
+              },
+              "negative_fixtures_not_detected": 12,
+              "negatives_with_indeterminate_decisions": 12,
+              "precision": 0.6,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 63,
+                "present": 15
+              },
+              "targets": 9,
+              "terminal_recall": 1.0
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                5,
+                7,
+                8
+              ],
+              "max_link_span": 6,
+              "max_predicates_in_rule": 12,
+              "relation_fields": [
+                "goal_difference_delta",
+                "odds_delta_bp"
+              ],
+              "typed_shapes": 13,
+              "unary_fields": [
+                "event_kind",
+                "minute",
+                "point_odds",
+                "source",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 21,
+                  "detections_sha256": "76bd46b17c55608c8150bb87aabd8fcac173a0bf96224ff0057e75e4d5dc7e1f",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 966,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 6,
+                  "negatives_with_indeterminate_decisions": 6,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 21
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 15,
+                  "detections_sha256": "1f1261cb399c960582d1e707d7b7fa23270efd69e6c98bf8252fcb351e8b9bf5",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 972,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.6,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 63,
+                    "present": 15
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 21,
+                  "detections_sha256": "4123e28f85b2d3da911b108190c789710bd8f977e934a629675583ce7a9bfbee",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 979,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 6,
+                  "negatives_with_indeterminate_decisions": 6,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 58,
+                    "present": 21
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 15,
+                  "detections_sha256": "8d8bf50cb36b8e554fc960dd6ee1d1a8347317bf2e8be0363ddd128ad8f42444",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 985,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.6,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 64,
+                    "present": 15
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 21,
+                  "detections_sha256": "2b9b618ba971fa49d353b672e7237096cff97616d3203e8142f9295149057b38",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 969,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 6,
+                  "negatives_with_indeterminate_decisions": 6,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 21
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 15,
+                  "detections_sha256": "baa752057ccbc086aea400e91a8155422c5f95f72dad1d3419db12c625cc91bc",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 975,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.6,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 63,
+                    "present": 15
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:9a8fac2c9391bdd7f76462dbf13ca3dbffb9a6cbeafdf8ef4d2fada642ae7f2b",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "lt",
+                  "to": 4,
+                  "value": 0
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 4,
+                  "op": "ge",
+                  "to": 7,
+                  "value": 0
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "goal"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "goal"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 78,
+            "beam_survivors": 3212,
+            "beam_width": 12,
+            "equivalent_features": 3284,
+            "exhausted": true,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 184,
+            "stages": {
+              "beam": 538283,
+              "features": 1250309,
+              "observations": 1513,
+              "paths": 9890
+            },
+            "tail_issue_batches": 12,
+            "used": 1799995
+          }
+        },
+        {
+          "complete": false,
+          "development_seed": 82519,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 4,
+              "detections_sha256": "d161e7bc869cb78327d9fc404741aa538aca9a3a2a62e9617ff250fefb0b348a",
+              "exact_path_recall": 0.0,
+              "exact_paths": 0,
+              "exact_terminals": 2,
+              "false_detections_by_mechanism": {
+                "continued_price_drop": 1,
+                "contradictory_marker": 1
+              },
+              "gate": false,
+              "matching_operations": 631,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "continued_price_drop": 1,
+                "contradictory_marker": 1
+              },
+              "negative_fixtures_not_detected": 16,
+              "negatives_with_indeterminate_decisions": 3,
+              "precision": 0.5,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 3,
+                "ineligible_terminal": 72,
+                "present": 4
+              },
+              "targets": 9,
+              "terminal_recall": 0.2222222222222222
+            },
+            "diversity": {
+              "count": 44,
+              "lengths": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "max_link_span": 4,
+              "max_predicates_in_rule": 9,
+              "relation_fields": [
+                "gap_seconds",
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "odds_delta_bp",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_score_state",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 6,
+              "unary_fields": [
+                "event_kind",
+                "goals",
+                "minute",
+                "point_odds",
+                "price_high",
+                "price_kind",
+                "price_low",
+                "score_state",
+                "signal_type",
+                "source"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 40,
+                  "detections_sha256": "96efa9139937d21c32e4225aafdce58d25343d64a6a11008c79b64a090f3ace6",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 5,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 5,
+                    "late_equaliser": 5,
+                    "middle_period_switch": 2,
+                    "weak_alert": 4,
+                    "wrong_time_on_target": 9
+                  },
+                  "gate": false,
+                  "matching_operations": 788,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 1,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.175,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 38,
+                    "present": 40
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 1,
+                  "detections_sha256": "6be9a9a11bbd3ddcb5bce757c4b55c4946daf3f829fa2d6bb3c4afd451e31d5c",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 607,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 1
+                  },
+                  "negative_fixtures_not_detected": 17,
+                  "negatives_with_indeterminate_decisions": 1,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 3,
+                    "ineligible_terminal": 74,
+                    "present": 1
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 37,
+                  "detections_sha256": "3e6acfc95b478a6d675e0e3156389b4ca8af70cb773124acc58d7c52a61eafbb",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 4,
+                    "continued_price_drop": 2,
+                    "contradictory_marker": 5,
+                    "late_equaliser": 4,
+                    "middle_period_switch": 4,
+                    "weak_alert": 3,
+                    "wrong_time_on_target": 9
+                  },
+                  "gate": false,
+                  "matching_operations": 772,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 2,
+                    "continued_price_drop": 2,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 3,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.16216216216216217,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 42,
+                    "present": 37
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 3,
+                  "detections_sha256": "442174edc29b89475c1887974b14e051c5cb3a0e0da972b8f1cb88e95355ee09",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 2,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 604,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 1
+                  },
+                  "negative_fixtures_not_detected": 17,
+                  "negatives_with_indeterminate_decisions": 2,
+                  "precision": 0.6666666666666666,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 2,
+                    "ineligible_terminal": 74,
+                    "present": 3
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.2222222222222222
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 38,
+                  "detections_sha256": "acb378216565a89234f591f110a993daf198012919ddd60d982d3d679444ee6d",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 5,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "late_equaliser": 5,
+                    "middle_period_switch": 5,
+                    "weak_alert": 4,
+                    "wrong_time_on_target": 7
+                  },
+                  "gate": false,
+                  "matching_operations": 775,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 2,
+                    "late_equaliser": 3,
+                    "middle_period_switch": 3,
+                    "weak_alert": 2
+                  },
+                  "negative_fixtures_not_detected": 2,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.15789473684210525,
+                  "search_complete": true,
+                  "states": {
+                    "ineligible_terminal": 40,
+                    "present": 38
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 2,
+                  "detections_sha256": "d96b3778a363ee02bb3a2d67028188847cbdb1c2abe78b7782b0af9126156852",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 1,
+                    "weak_alert": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 560,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 1,
+                    "weak_alert": 1
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 1,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 1,
+                    "ineligible_terminal": 75,
+                    "present": 2
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:19dc096eb1ae681fa9e752ed80235369189c157d251f648bd0cc710901005d9c",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "same_score_state",
+                  "from": 0,
+                  "op": "eq",
+                  "to": 1,
+                  "value": false
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 36
+                  }
+                ],
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 43
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 16,
+              "detections_sha256": "bce76dc440556b67678973b485480f3c512bd121739071d11e6e929ff2859a91",
+              "exact_path_recall": 0.8888888888888888,
+              "exact_paths": 8,
+              "exact_terminals": 8,
+              "false_detections_by_mechanism": {
+                "continued_price_drop": 3,
+                "contradictory_marker": 3,
+                "weak_alert": 2
+              },
+              "gate": false,
+              "matching_operations": 1008,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "continued_price_drop": 3,
+                "contradictory_marker": 3,
+                "weak_alert": 2
+              },
+              "negative_fixtures_not_detected": 10,
+              "negatives_with_indeterminate_decisions": 10,
+              "precision": 0.5,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 63,
+                "present": 16
+              },
+              "targets": 9,
+              "terminal_recall": 0.8888888888888888
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                7,
+                8
+              ],
+              "max_link_span": 7,
+              "max_predicates_in_rule": 14,
+              "relation_fields": [
+                "goal_difference_delta",
+                "odds_delta_bp"
+              ],
+              "typed_shapes": 13,
+              "unary_fields": [
+                "event_kind",
+                "minute",
+                "source"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 15,
+                  "detections_sha256": "f3efb5ef203a9e970486c45ba71bc3c3de92454bb5054279ac9f01160e9a5058",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 1020,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 1
+                  },
+                  "negative_fixtures_not_detected": 8,
+                  "negatives_with_indeterminate_decisions": 8,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 63,
+                    "present": 15
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 12,
+                  "detections_sha256": "f5711c93135697d036a44f1b405ec56200d7c73c63590e04e3d751013e859758",
+                  "exact_path_recall": 0.5555555555555556,
+                  "exact_paths": 5,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 1068,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 1
+                  },
+                  "negative_fixtures_not_detected": 11,
+                  "negatives_with_indeterminate_decisions": 11,
+                  "precision": 0.4166666666666667,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 66,
+                    "present": 12
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 17,
+                  "detections_sha256": "d148088f49f3736e1d317d090d99363ee54b1d22934e7d612a5d06148935bf5d",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 1025,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 6,
+                  "negatives_with_indeterminate_decisions": 6,
+                  "precision": 0.29411764705882354,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 62,
+                    "present": 17
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 14,
+                  "detections_sha256": "ce3d19cd5ce11bd99e559bd9eec6b89c0bd184aca20e2b8adc13540d9916a10f",
+                  "exact_path_recall": 0.5555555555555556,
+                  "exact_paths": 5,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 1049,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.35714285714285715,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 65,
+                    "present": 14
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 19,
+                  "detections_sha256": "64bda4841d6afa90ff68a1ea7981467991f7571519c4e8e1edaab183cd1d0b7d",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 1005,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "alert_before_first_goal": 3,
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 6,
+                  "negatives_with_indeterminate_decisions": 6,
+                  "precision": 0.3684210526315789,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 59,
+                    "present": 19
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 16,
+                  "detections_sha256": "089b26643e478c29614f98d5417f856a0bc6f16c1262f26129f6099380d88f4d",
+                  "exact_path_recall": 0.7777777777777778,
+                  "exact_paths": 7,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 1007,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "continued_price_drop": 3,
+                    "contradictory_marker": 3,
+                    "weak_alert": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.4375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 62,
+                    "present": 16
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:5a9f36ada479db57b2c9aff67759a5f73e7ed88f90494b74c9b8d46f8c64924b",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "lt",
+                  "to": 4,
+                  "value": 0
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "lt",
+                  "to": 7,
+                  "value": 0
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "goal"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "goal"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 79,
+            "beam_survivors": 2804,
+            "beam_width": 12,
+            "equivalent_features": 2522,
+            "exhausted": true,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 184,
+            "stages": {
+              "beam": 598683,
+              "features": 1189751,
+              "observations": 1491,
+              "paths": 10053
+            },
+            "tail_issue_batches": 12,
+            "used": 1799978
+          }
+        }
+      ],
+      "stability": {
+        "llm": null,
+        "previous": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            0.0,
+            0.0
+          ],
+          "same_rule_across_development_seeds": false,
+          "terminal_precision_range": [
+            0.0,
+            1.0
+          ]
+        },
+        "successor": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            0.5555555555555556,
+            1.0
+          ],
+          "same_rule_across_development_seeds": false,
+          "terminal_precision_range": [
+            0.35714285714285715,
+            0.6
+          ]
+        }
+      }
+    },
+    "live_pressure_and_price": {
+      "development": [
+        {
+          "complete": true,
+          "development_seed": 31051,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 4,
+              "detections_sha256": "c979f3a2063404e65d4ff96bb8ae21f405dc575a0c3301e44555c2d153530f75",
+              "exact_path_recall": 0.0,
+              "exact_paths": 0,
+              "exact_terminals": 2,
+              "false_detections_by_mechanism": {
+                "pressure_increases": 1,
+                "wrong_alert_period": 1
+              },
+              "gate": false,
+              "matching_operations": 380,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "pressure_increases": 1,
+                "wrong_alert_period": 1
+              },
+              "negative_fixtures_not_detected": 16,
+              "negatives_with_indeterminate_decisions": 0,
+              "precision": 0.5,
+              "search_complete": true,
+              "states": {
+                "ineligible_terminal": 50,
+                "present": 4
+              },
+              "targets": 9,
+              "terminal_recall": 0.2222222222222222
+            },
+            "diversity": {
+              "count": 40,
+              "lengths": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "max_link_span": 4,
+              "max_predicates_in_rule": 11,
+              "relation_fields": [
+                "gap_seconds",
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_score_state",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 5,
+              "unary_fields": [
+                "event_kind",
+                "goals",
+                "line",
+                "minute",
+                "period",
+                "point_odds",
+                "price_kind",
+                "score_state",
+                "source",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "6a7c2d6c2e22a081584508472182c099eb6a50bee9f813a3789cd698f7fcfb27",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 636,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 0,
+                  "detections_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {},
+                  "gate": false,
+                  "matching_operations": 411,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {},
+                  "negative_fixtures_not_detected": 18,
+                  "negatives_with_indeterminate_decisions": 2,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 3,
+                    "ineligible_terminal": 51
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "e5621093512ac06930ba055798c163865835508afbbaddea4b031f9c1497b846",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 624,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 0,
+                  "detections_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {},
+                  "gate": false,
+                  "matching_operations": 368,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {},
+                  "negative_fixtures_not_detected": 18,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 1,
+                    "ineligible_terminal": 53
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "63ce147ec09d47db2101ba4f02627d84b264cc34f3c08ac5a3c24352757e0b86",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 624,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 3,
+                  "detections_sha256": "6e5aa46daa4dfc0aafae9071bc976e76a977216196424d4e531738deaa23efa3",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 1,
+                  "false_detections_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "wrong_alert_period": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 407,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "wrong_alert_period": 1
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 2,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 2,
+                    "ineligible_terminal": 49,
+                    "present": 3
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.1111111111111111
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:ecf643cd073c48d023ad3ae538270ccd6d22e996cd351a6903343440b5a82e16",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "same_line",
+                  "from": 0,
+                  "op": "eq",
+                  "to": 1,
+                  "value": true
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 35
+                  }
+                ],
+                [
+                  {
+                    "field": "minute",
+                    "op": "eq",
+                    "value": 41
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 17,
+              "detections_sha256": "7dcd8858bfd95828975f4f0a4eefdf42dafeee300421ecf9f09a67e2b1fc31b3",
+              "exact_path_recall": 0.8888888888888888,
+              "exact_paths": 8,
+              "exact_terminals": 8,
+              "false_detections_by_mechanism": {
+                "marker_changes_lead": 3,
+                "pressure_increases": 3,
+                "wrong_alert_period": 3
+              },
+              "gate": false,
+              "matching_operations": 732,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "marker_changes_lead": 3,
+                "pressure_increases": 3,
+                "wrong_alert_period": 3
+              },
+              "negative_fixtures_not_detected": 9,
+              "negatives_with_indeterminate_decisions": 9,
+              "precision": 0.47058823529411764,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 37,
+                "present": 17
+              },
+              "targets": 9,
+              "terminal_recall": 0.8888888888888888
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_link_span": 5,
+              "max_predicates_in_rule": 12,
+              "relation_fields": [
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "odds_delta_bp",
+                "volume_ratio"
+              ],
+              "typed_shapes": 12,
+              "unary_fields": [
+                "event_kind",
+                "minute",
+                "point_odds",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 13,
+                  "detections_sha256": "fb8c2f3eaca3a3960a0c5c3c4bde91b94d7e98f4eeb1f2018c23091405c6817d",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 663,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.38461538461538464,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 41,
+                    "present": 13
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 16,
+                  "detections_sha256": "7c812f7f33c3fc5acb958a02387ba8a073b78c713791e005b377d5efafb448b4",
+                  "exact_path_recall": 0.7777777777777778,
+                  "exact_paths": 7,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 736,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.4375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 38,
+                    "present": 16
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 13,
+                  "detections_sha256": "5d061ce4356f1d0466e113c5da75d62ebb282287165e3d7274658678c86ca0c9",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 644,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 2
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.5384615384615384,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 41,
+                    "present": 13
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 17,
+                  "detections_sha256": "1d0f916f9811d309fc321b830cad5d3aca0ddd131828bc7b67de414c4e21afae",
+                  "exact_path_recall": 0.8888888888888888,
+                  "exact_paths": 8,
+                  "exact_terminals": 8,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 723,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.47058823529411764,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 37,
+                    "present": 17
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.8888888888888888
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 13,
+                  "detections_sha256": "892de5638de27c6d54d8365459ba4ab7841feb1f197d31aca1b21a7af2246ed9",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 1,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 644,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 1,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 11,
+                  "negatives_with_indeterminate_decisions": 11,
+                  "precision": 0.46153846153846156,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 41,
+                    "present": 13
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 18,
+                  "detections_sha256": "105f05bfa07c70229a1a6b800b0a4041da49fda8856aab23b0f7933bf95447fe",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 720,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 36,
+                    "present": 18
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:e1b9b02997c21b24937c2d8b16eb25e3ae1447707d15bbf27af6c57f3e423a33",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "goal_delta",
+                  "from": 0,
+                  "op": "eq",
+                  "to": 5,
+                  "value": 0
+                },
+                {
+                  "field": "line_delta",
+                  "from": 2,
+                  "op": "eq",
+                  "to": 5,
+                  "value": 0
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 2,
+                  "op": "ge",
+                  "to": 5,
+                  "value": 1100
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 54,
+            "beam_survivors": 4265,
+            "beam_width": 12,
+            "equivalent_features": 2825,
+            "exhausted": false,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 62,
+            "stages": {
+              "beam": 570058,
+              "features": 886000,
+              "observations": 1017,
+              "paths": 4948
+            },
+            "tail_issue_batches": 12,
+            "used": 1462023
+          }
+        },
+        {
+          "complete": true,
+          "development_seed": 82519,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 15,
+              "detections_sha256": "f0c36910d589ef4cfe66d8003b60f3eb543ceb9b5c0c66898a86088b751c7473",
+              "exact_path_recall": 0.0,
+              "exact_paths": 0,
+              "exact_terminals": 7,
+              "false_detections_by_mechanism": {
+                "late_pressure_revision": 3,
+                "marker_changes_lead": 1,
+                "pressure_increases": 2,
+                "wrong_alert_period": 2
+              },
+              "gate": false,
+              "matching_operations": 1185,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "late_pressure_revision": 3,
+                "marker_changes_lead": 1,
+                "pressure_increases": 2,
+                "wrong_alert_period": 2
+              },
+              "negative_fixtures_not_detected": 10,
+              "negatives_with_indeterminate_decisions": 10,
+              "precision": 0.4666666666666667,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 39,
+                "present": 15
+              },
+              "targets": 9,
+              "terminal_recall": 0.7777777777777778
+            },
+            "diversity": {
+              "count": 41,
+              "lengths": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "max_link_span": 4,
+              "max_predicates_in_rule": 11,
+              "relation_fields": [
+                "gap_seconds",
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "odds_delta_bp",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_score_state",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 5,
+              "unary_fields": [
+                "event_kind",
+                "goals",
+                "line",
+                "minute",
+                "period",
+                "point_odds",
+                "price_kind",
+                "score_state",
+                "signal_type",
+                "source",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "6a7c2d6c2e22a081584508472182c099eb6a50bee9f813a3789cd698f7fcfb27",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 636,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 11,
+                  "detections_sha256": "a10e0a1f276915cc234b15c3fae51ef88e338aa68e2da22bcb4590c3a81def48",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 4,
+                  "false_detections_by_mechanism": {
+                    "late_pressure_revision": 2,
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 1214,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "late_pressure_revision": 2,
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 1
+                  },
+                  "negative_fixtures_not_detected": 11,
+                  "negatives_with_indeterminate_decisions": 11,
+                  "precision": 0.36363636363636365,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 43,
+                    "present": 11
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.4444444444444444
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "e5621093512ac06930ba055798c163865835508afbbaddea4b031f9c1497b846",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 624,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 12,
+                  "detections_sha256": "c14172bde3a9b3b608fdafa9f275f4aed452826839802299e21e02e2fae0c827",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 3,
+                  "false_detections_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 1178,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.25,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 42,
+                    "present": 12
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.3333333333333333
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 27,
+                  "detections_sha256": "63ce147ec09d47db2101ba4f02627d84b264cc34f3c08ac5a3c24352757e0b86",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 624,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "late_pressure_revision": 3,
+                    "marker_changes_lead": 3,
+                    "opening_line_changes": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 0,
+                  "negatives_with_indeterminate_decisions": 0,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 27,
+                    "present": 27
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 14,
+                  "detections_sha256": "2efa6defba358fcdafe49a8c98c83a37e79eca8408cd56c24b428462df591de6",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 1154,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "late_pressure_revision": 1,
+                    "marker_changes_lead": 2,
+                    "pressure_increases": 2,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 40,
+                    "present": 14
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:2be499991fad913b923d9f014887ea958f19d19c9232c80650c96fe32ab04df7",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "gt",
+                  "to": 1,
+                  "value": 0
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "minute",
+                    "op": "ge",
+                    "value": 29
+                  },
+                  {
+                    "field": "signal_type",
+                    "op": "eq",
+                    "value": "LAB"
+                  }
+                ],
+                [
+                  {
+                    "field": "signal_type",
+                    "op": "eq",
+                    "value": "LAB"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 18,
+              "detections_sha256": "5ad54edd132be41c0d4f69045cc7ae9a5f4b26eb40555a456eb644ae59e8fbee",
+              "exact_path_recall": 1.0,
+              "exact_paths": 9,
+              "exact_terminals": 9,
+              "false_detections_by_mechanism": {
+                "falling_quotation": 3,
+                "pressure_increases": 3,
+                "wrong_alert_period": 3
+              },
+              "gate": false,
+              "matching_operations": 747,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "falling_quotation": 3,
+                "pressure_increases": 3,
+                "wrong_alert_period": 3
+              },
+              "negative_fixtures_not_detected": 9,
+              "negatives_with_indeterminate_decisions": 9,
+              "precision": 0.5,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 36,
+                "present": 18
+              },
+              "targets": 9,
+              "terminal_recall": 1.0
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                3,
+                4,
+                6,
+                7,
+                8
+              ],
+              "max_link_span": 6,
+              "max_predicates_in_rule": 11,
+              "relation_fields": [
+                "goal_delta",
+                "goal_difference_delta",
+                "line_delta",
+                "odds_delta_bp",
+                "volume_ratio"
+              ],
+              "typed_shapes": 14,
+              "unary_fields": [
+                "event_kind",
+                "minute",
+                "point_odds",
+                "volume_cumulative_usd",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 14,
+                  "detections_sha256": "7bdf60447d28eb3b2a544e1d5a6d632cd4520dc29cb58da2f84aca15ec040da1",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 677,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 2
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 40,
+                    "present": 14
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 18,
+                  "detections_sha256": "964b394aa807dfc1c71ed9cb8244a7afe7ce69f5b5c2a32dd130e807492faeb2",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 738,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 36,
+                    "present": 18
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 17,
+                  "detections_sha256": "c5198a30f0374dfb4fa5116aaee0a2418bb0d7fa37a92397210881e0495bcb07",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 8,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 697,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.47058823529411764,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 37,
+                    "present": 17
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.8888888888888888
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 18,
+                  "detections_sha256": "c701ace31a372b3fa1a828c46df7cdb665b270c6e89f47c66411675c7cd5288a",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 726,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 36,
+                    "present": 18
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 18,
+                  "detections_sha256": "8d9003f5a4e35573bae04f735e837b271d4a444095311db0c47ecd61c021066c",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 704,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "marker_changes_lead": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 36,
+                    "present": 18
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 18,
+                  "detections_sha256": "51d48c68db075dd2570543383e5dbfcac6847b05a566060a159e781923ba92ba",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 726,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "falling_quotation": 3,
+                    "pressure_increases": 3,
+                    "wrong_alert_period": 3
+                  },
+                  "negative_fixtures_not_detected": 9,
+                  "negatives_with_indeterminate_decisions": 9,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 36,
+                    "present": 18
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:d97e802148d2905e1984892b07c7cab583d9a8fcf4fc85e3c450ec02085dd4ad",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "goal_delta",
+                  "from": 0,
+                  "op": "eq",
+                  "to": 5,
+                  "value": 0
+                },
+                {
+                  "field": "goal_difference_delta",
+                  "from": 1,
+                  "op": "eq",
+                  "to": 4,
+                  "value": 0
+                },
+                {
+                  "field": "line_delta",
+                  "from": 2,
+                  "op": "eq",
+                  "to": 5,
+                  "value": 0
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "score"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 54,
+            "beam_survivors": 4828,
+            "beam_width": 12,
+            "equivalent_features": 2803,
+            "exhausted": false,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 62,
+            "stages": {
+              "beam": 549995,
+              "features": 940143,
+              "observations": 1053,
+              "paths": 5194
+            },
+            "tail_issue_batches": 12,
+            "used": 1496385
+          }
+        }
+      ],
+      "stability": {
+        "llm": null,
+        "previous": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            0.0,
+            0.0
+          ],
+          "same_rule_across_development_seeds": false,
+          "terminal_precision_range": [
+            0.0,
+            0.42857142857142855
+          ]
+        },
+        "successor": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            0.7777777777777778,
+            1.0
+          ],
+          "same_rule_across_development_seeds": false,
+          "terminal_precision_range": [
+            0.4375,
+            0.5
+          ]
+        }
+      }
+    },
+    "pre_market_reversal": {
+      "development": [
+        {
+          "complete": true,
+          "development_seed": 31051,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 24,
+              "detections_sha256": "f9573b612e3ac4798ac1dcbd6ce9690ceccfc71b2f62767273c582f14df1a064",
+              "exact_path_recall": 1.0,
+              "exact_paths": 9,
+              "exact_terminals": 9,
+              "false_detections_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "initial_fall": 3,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 3,
+                "wrong_opening_period": 3
+              },
+              "gate": false,
+              "matching_operations": 720,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "initial_fall": 3,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 3,
+                "wrong_opening_period": 3
+              },
+              "negative_fixtures_not_detected": 3,
+              "negatives_with_indeterminate_decisions": 3,
+              "precision": 0.375,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 57,
+                "present": 24
+              },
+              "targets": 9,
+              "terminal_recall": 1.0
+            },
+            "diversity": {
+              "count": 41,
+              "lengths": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_link_span": 4,
+              "max_predicates_in_rule": 9,
+              "relation_fields": [
+                "gap_seconds",
+                "line_delta",
+                "odds_delta_bp",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 7,
+              "unary_fields": [
+                "direction",
+                "event_kind",
+                "line",
+                "market_key",
+                "period",
+                "phase",
+                "price_kind",
+                "signal_type",
+                "source",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "df1847d52001cb7d99f06efcc34f7b988bdc97ade8fb639b9b275acf85e7fa8b",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 771,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "b70e314a5339e6dee5833451207adfdb37f737e799014d4eb016f3bc0664b3fe",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 735,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "5a1b4f28e5d45a48fdf9e3815d254e507b29e455f901a62e3dfad12910e3d147",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 759,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "d9ab1d1c60698f88b42118d308b1c204030d10d69d6ae736e1418d921b8bb7d9",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 723,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "5e3860d72b603de7a61661007f152d0ef6ebe4306efcded06f901cacbad903d8",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 762,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "45c70a8a39adffa62b92b11de9ec52575341f8ce4bc520583ecd3d3157d58851",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 726,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:0cdfe0dc5b82352c812ef27138e44d699cf0de7cfddb21607c9b189b08282538",
+            "selected_rule": {
+              "relations": [],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  },
+                  {
+                    "field": "price_kind",
+                    "op": "eq",
+                    "value": "point"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 11,
+              "detections_sha256": "9a2a7c27a0877fa26323a3d5253d4a56cb8a3be07e1dcb7fc6c8ec0ee1e9f25b",
+              "exact_path_recall": 0.5555555555555556,
+              "exact_paths": 5,
+              "exact_terminals": 5,
+              "false_detections_by_mechanism": {
+                "flat_cumulative_volume": 2,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 1
+              },
+              "gate": false,
+              "matching_operations": 847,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "flat_cumulative_volume": 2,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 1
+              },
+              "negative_fixtures_not_detected": 12,
+              "negatives_with_indeterminate_decisions": 12,
+              "precision": 0.45454545454545453,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 70,
+                "present": 11
+              },
+              "targets": 9,
+              "terminal_recall": 0.5555555555555556
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_link_span": 5,
+              "max_predicates_in_rule": 12,
+              "relation_fields": [
+                "gap_seconds",
+                "odds_delta_bp",
+                "same_period",
+                "volume_cumulative_usd_delta"
+              ],
+              "typed_shapes": 13,
+              "unary_fields": [
+                "event_kind",
+                "point_odds",
+                "source",
+                "volume_cumulative_usd",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 14,
+                  "detections_sha256": "a8a1f70c9100b676a5e2b47e1d459a2dc32c40e8be432f7892a0b5bce4a98434",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 8,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2,
+                    "volume_receipt_conflict": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 829,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2,
+                    "volume_receipt_conflict": 1
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.5714285714285714,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 67,
+                    "present": 14
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.8888888888888888
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 10,
+                  "detections_sha256": "fcb257d06298343b7e78008712d1de31d530c9fc46d6366ce547e62581a2aa54",
+                  "exact_path_recall": 0.5555555555555556,
+                  "exact_paths": 5,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 917,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2
+                  },
+                  "negative_fixtures_not_detected": 13,
+                  "negatives_with_indeterminate_decisions": 13,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 71,
+                    "present": 10
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 14,
+                  "detections_sha256": "c6453e79292a9c58dbaac87311e791b2104376fd92a52c4707df3bcb7ae40d1c",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 6,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 2,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 817,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 2,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.42857142857142855,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 67,
+                    "present": 14
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.6666666666666666
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 9,
+                  "detections_sha256": "5471ba7aa29eba37f6af6e491d87565db03ecc6f8ef6704ff891ce02c7fedf74",
+                  "exact_path_recall": 0.3333333333333333,
+                  "exact_paths": 3,
+                  "exact_terminals": 3,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 2,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 888,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 2,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 1
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.3333333333333333,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 72,
+                    "present": 9
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.3333333333333333
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 13,
+                  "detections_sha256": "52a68ece3833fb8f484e927004a2c4ee32b7008e96a87fabec6d493e126d1eaf",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2,
+                    "volume_receipt_conflict": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 818,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 2,
+                    "volume_receipt_conflict": 3
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.38461538461538464,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 68,
+                    "present": 13
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 15,
+                  "detections_sha256": "170c11f39abde224d19750d7badec5c16894b4ff21306a5da317e5184c63c752",
+                  "exact_path_recall": 0.7777777777777778,
+                  "exact_paths": 7,
+                  "exact_terminals": 7,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 899,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 2
+                  },
+                  "negative_fixtures_not_detected": 10,
+                  "negatives_with_indeterminate_decisions": 10,
+                  "precision": 0.4666666666666667,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 66,
+                    "present": 15
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.7777777777777778
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:f28e5d4f6a8fb38445709cb8bbabfff3b6df5a1eb2792bc7e70202c4f39c79e0",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "gt",
+                  "to": 2,
+                  "value": 0
+                },
+                {
+                  "field": "volume_cumulative_usd_delta",
+                  "from": 0,
+                  "op": "gt",
+                  "to": 2,
+                  "value": 0
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "ge",
+                  "to": 5,
+                  "value": -350
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 2,
+                  "op": "ge",
+                  "to": 5,
+                  "value": -1550
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  },
+                  {
+                    "field": "volume_usd",
+                    "op": "ge",
+                    "value": 5500
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 81,
+            "beam_survivors": 3148,
+            "beam_width": 12,
+            "equivalent_features": 2073,
+            "exhausted": false,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 58,
+            "stages": {
+              "beam": 476869,
+              "features": 841107,
+              "observations": 993,
+              "paths": 4883
+            },
+            "tail_issue_batches": 12,
+            "used": 1323852
+          }
+        },
+        {
+          "complete": true,
+          "development_seed": 82519,
+          "generation_invariant": true,
+          "llm": null,
+          "llm_refused": 0,
+          "llm_status": "local_model_or_runtime_unavailable",
+          "previous": {
+            "candidates": null,
+            "development": {
+              "detections": 24,
+              "detections_sha256": "9726c2239d04a889335801612f40b336fcc8099c65354cf149612176826a86a8",
+              "exact_path_recall": 1.0,
+              "exact_paths": 9,
+              "exact_terminals": 9,
+              "false_detections_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "initial_fall": 3,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 3,
+                "wrong_opening_period": 3
+              },
+              "gate": false,
+              "matching_operations": 732,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "initial_fall": 3,
+                "terminal_rise": 3,
+                "volume_receipt_conflict": 3,
+                "wrong_opening_period": 3
+              },
+              "negative_fixtures_not_detected": 3,
+              "negatives_with_indeterminate_decisions": 3,
+              "precision": 0.375,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 57,
+                "present": 24
+              },
+              "targets": 9,
+              "terminal_recall": 1.0
+            },
+            "diversity": {
+              "count": 40,
+              "lengths": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_link_span": 3,
+              "max_predicates_in_rule": 11,
+              "relation_fields": [
+                "gap_seconds",
+                "line_delta",
+                "odds_delta_bp",
+                "same_direction",
+                "same_line",
+                "same_native_market",
+                "same_period",
+                "same_phase",
+                "same_selection",
+                "same_source"
+              ],
+              "typed_shapes": 7,
+              "unary_fields": [
+                "direction",
+                "event_kind",
+                "line",
+                "market_key",
+                "period",
+                "price_kind",
+                "signal_type",
+                "source",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "df1847d52001cb7d99f06efcc34f7b988bdc97ade8fb639b9b275acf85e7fa8b",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 771,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "b70e314a5339e6dee5833451207adfdb37f737e799014d4eb016f3bc0664b3fe",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 735,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "5a1b4f28e5d45a48fdf9e3815d254e507b29e455f901a62e3dfad12910e3d147",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 759,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "d9ab1d1c60698f88b42118d308b1c204030d10d69d6ae736e1418d921b8bb7d9",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 723,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 24,
+                  "detections_sha256": "5e3860d72b603de7a61661007f152d0ef6ebe4306efcded06f901cacbad903d8",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 762,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 24,
+                  "detections_sha256": "45c70a8a39adffa62b92b11de9ec52575341f8ce4bc520583ecd3d3157d58851",
+                  "exact_path_recall": 1.0,
+                  "exact_paths": 9,
+                  "exact_terminals": 9,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 726,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "initial_fall": 3,
+                    "terminal_rise": 3,
+                    "volume_receipt_conflict": 3,
+                    "wrong_opening_period": 3
+                  },
+                  "negative_fixtures_not_detected": 3,
+                  "negatives_with_indeterminate_decisions": 3,
+                  "precision": 0.375,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 57,
+                    "present": 24
+                  },
+                  "targets": 9,
+                  "terminal_recall": 1.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:0cdfe0dc5b82352c812ef27138e44d699cf0de7cfddb21607c9b189b08282538",
+            "selected_rule": {
+              "relations": [],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  },
+                  {
+                    "field": "price_kind",
+                    "op": "eq",
+                    "value": "point"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor": {
+            "candidates": null,
+            "development": {
+              "detections": 11,
+              "detections_sha256": "660ab5893240e9718a3f813b80ae4dfd191b792cd2d65c9917cd44c007f90bf4",
+              "exact_path_recall": 0.7777777777777778,
+              "exact_paths": 7,
+              "exact_terminals": 7,
+              "false_detections_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "volume_receipt_conflict": 1
+              },
+              "gate": false,
+              "matching_operations": 902,
+              "negative_fixtures": 18,
+              "negative_fixtures_detected_by_mechanism": {
+                "flat_cumulative_volume": 3,
+                "volume_receipt_conflict": 1
+              },
+              "negative_fixtures_not_detected": 14,
+              "negatives_with_indeterminate_decisions": 14,
+              "precision": 0.6363636363636364,
+              "search_complete": true,
+              "states": {
+                "indeterminate": 70,
+                "present": 11
+              },
+              "targets": 9,
+              "terminal_recall": 0.7777777777777778
+            },
+            "diversity": {
+              "count": 24,
+              "lengths": [
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ],
+              "max_link_span": 5,
+              "max_predicates_in_rule": 11,
+              "relation_fields": [
+                "odds_delta_bp",
+                "same_direction",
+                "same_period",
+                "volume_cumulative_usd_delta"
+              ],
+              "typed_shapes": 14,
+              "unary_fields": [
+                "event_kind",
+                "point_odds",
+                "source",
+                "volume_cumulative_usd",
+                "volume_usd"
+              ]
+            },
+            "holdout": [
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 8,
+                  "detections_sha256": "96629d85ceb05c37e3eb17ceaac69006fa99bc59cf4ba7f94de3e1814c854a1b",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 2,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "volume_receipt_conflict": 3
+                  },
+                  "gate": false,
+                  "matching_operations": 796,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 3,
+                    "volume_receipt_conflict": 3
+                  },
+                  "negative_fixtures_not_detected": 12,
+                  "negatives_with_indeterminate_decisions": 12,
+                  "precision": 0.25,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 73,
+                    "present": 8
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.2222222222222222
+                },
+                "noise_invariant": true,
+                "seed": 202927,
+                "selected": {
+                  "detections": 2,
+                  "detections_sha256": "30901448867fa3753b2a37dfcad168000ea391a743ede2f2dc8d130ab650cec8",
+                  "exact_path_recall": 0.1111111111111111,
+                  "exact_paths": 1,
+                  "exact_terminals": 1,
+                  "false_detections_by_mechanism": {
+                    "volume_receipt_conflict": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 877,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "volume_receipt_conflict": 1
+                  },
+                  "negative_fixtures_not_detected": 17,
+                  "negatives_with_indeterminate_decisions": 17,
+                  "precision": 0.5,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 79,
+                    "present": 2
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.1111111111111111
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 6,
+                  "detections_sha256": "90648225787fe0411385a0592ba64790934c47d758efe66acd8e492cd122db68",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 4,
+                  "false_detections_by_mechanism": {
+                    "volume_receipt_conflict": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 780,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "volume_receipt_conflict": 2
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 16,
+                  "precision": 0.6666666666666666,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 75,
+                    "present": 6
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.4444444444444444
+                },
+                "noise_invariant": true,
+                "seed": 577531,
+                "selected": {
+                  "detections": 2,
+                  "detections_sha256": "9bce25ec00be70844e22ebe903ff5c27ba263feec9ca4cf26156d969a0eca713",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 1,
+                    "volume_receipt_conflict": 1
+                  },
+                  "gate": false,
+                  "matching_operations": 837,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 1,
+                    "volume_receipt_conflict": 1
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 16,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 79,
+                    "present": 2
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              },
+              {
+                "all_candidates": null,
+                "intrinsic_first": {
+                  "detections": 8,
+                  "detections_sha256": "86298fcbd0d5fa7201afd87fdb9a649a362a34d897f09cbacc9af3e248c08270",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 5,
+                  "false_detections_by_mechanism": {
+                    "flat_cumulative_volume": 1,
+                    "volume_receipt_conflict": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 787,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "flat_cumulative_volume": 1,
+                    "volume_receipt_conflict": 2
+                  },
+                  "negative_fixtures_not_detected": 15,
+                  "negatives_with_indeterminate_decisions": 15,
+                  "precision": 0.625,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 73,
+                    "present": 8
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.5555555555555556
+                },
+                "noise_invariant": true,
+                "seed": 819149,
+                "selected": {
+                  "detections": 2,
+                  "detections_sha256": "2b42b710f7404a80cc5337134f7451cae5116a199bdf1850d37657cf784d16fe",
+                  "exact_path_recall": 0.0,
+                  "exact_paths": 0,
+                  "exact_terminals": 0,
+                  "false_detections_by_mechanism": {
+                    "volume_receipt_conflict": 2
+                  },
+                  "gate": false,
+                  "matching_operations": 854,
+                  "negative_fixtures": 18,
+                  "negative_fixtures_detected_by_mechanism": {
+                    "volume_receipt_conflict": 2
+                  },
+                  "negative_fixtures_not_detected": 16,
+                  "negatives_with_indeterminate_decisions": 16,
+                  "precision": 0.0,
+                  "search_complete": true,
+                  "states": {
+                    "indeterminate": 79,
+                    "present": 2
+                  },
+                  "targets": 9,
+                  "terminal_recall": 0.0
+                },
+                "shortlist_passes": 0
+              }
+            ],
+            "selected_id": "td32:aedb83c046cedae5d8a4daa79d99519a9106263a5cbfe851ba672959645ad4b1",
+            "selected_rule": {
+              "relations": [
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "ge",
+                  "to": 2,
+                  "value": 0
+                },
+                {
+                  "field": "volume_cumulative_usd_delta",
+                  "from": 0,
+                  "op": "gt",
+                  "to": 2,
+                  "value": 0
+                },
+                {
+                  "field": "odds_delta_bp",
+                  "from": 0,
+                  "op": "lt",
+                  "to": 5,
+                  "value": 0
+                }
+              ],
+              "steps": [
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  },
+                  {
+                    "field": "point_odds",
+                    "op": "lt",
+                    "value": 2.29
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "revision"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "alert"
+                  }
+                ],
+                [
+                  {
+                    "field": "event_kind",
+                    "op": "eq",
+                    "value": "quote"
+                  }
+                ]
+              ],
+              "version": 32,
+              "within_seconds": 21600
+            },
+            "shortlist_passes_every_seed": 0
+          },
+          "successor_work": {
+            "anchor_scan_capped": false,
+            "anchors": 81,
+            "beam_survivors": 4110,
+            "beam_width": 12,
+            "equivalent_features": 2016,
+            "exhausted": false,
+            "limit": 1800000,
+            "paths_per_length": 8,
+            "shapes": 65,
+            "stages": {
+              "beam": 523269,
+              "features": 883783,
+              "observations": 1029,
+              "paths": 5129
+            },
+            "tail_issue_batches": 12,
+            "used": 1413210
+          }
+        }
+      ],
+      "stability": {
+        "llm": null,
+        "previous": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            1.0,
+            1.0
+          ],
+          "same_rule_across_development_seeds": true,
+          "terminal_precision_range": [
+            0.375,
+            0.375
+          ]
+        },
+        "successor": {
+          "every_selected_fold_passed": false,
+          "exact_path_recall_range": [
+            0.0,
+            0.7777777777777778
+          ],
+          "same_rule_across_development_seeds": false,
+          "terminal_precision_range": [
+            0.0,
+            0.5
+          ]
+        }
+      }
+    }
+  }
+}
