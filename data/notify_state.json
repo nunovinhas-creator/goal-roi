@@ -1756,13 +1756,15 @@
    "attempt_utc": "2026-11-24T18:46:08+00:00",
    "chars": 201,
    "created_utc": "2026-11-24T18:46:05+00:00",
+   "done_utc": "2026-11-24T18:46:05+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "5886cd758ec4d312fb406f6d797ed754fbe12039de42c7c1cbb153d4299d542c",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|c53de40e793c": {
    "attempt_id": "3625b1296d204f7fa31b65db66c1ac50",
@@ -2811,12 +2813,17 @@
    "state": "delivered"
   },
   "game|id:ec-flamengo-women-vs-fluminense-women-20261124|e01504554fac": {
+   "attempt_id": "272856aa90044350bc26a48962f54a3c",
+   "attempt_utc": "2026-11-24T18:46:09+00:00",
+   "chars": 219,
    "created_utc": "2026-11-24T18:46:05+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "89fbaf1282ba5ab0cf7a6f24c234658c235f22f7aea1d9928788905f9799ef45",
+   "state": "in_flight"
   },
   "game|id:ecuador-vs-bolivia-20261118|42ff6fdbbe8d": {
    "attempt_utc": "2026-11-18T01:02:42+00:00",
@@ -7034,7 +7041,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 452,
+  "delivered": 453,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:40:29+00:00",
@@ -7135,6 +7142,7 @@
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)": true,
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)": true,
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5": true,
+  "2026-11-24T18:40:27+00:00|EC Flamengo Women — Fluminense Women|Over 3": true,
   "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2": true,
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5": true
  },
@@ -7325,7 +7333,7 @@
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 44,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": 36,
-  "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 24,
+  "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 25,
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": 26,
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": 84,
@@ -7935,6 +7943,9 @@
   },
   "item|id:ec-flamengo-women-vs-botafogo-rj-women-20261118|Asian Total|Over 3.5": {
    "at_utc": "2026-11-18T20:32:22+00:00"
+  },
+  "item|id:ec-flamengo-women-vs-fluminense-women-20261124|Asian Total|Over 3": {
+   "at_utc": "2026-11-24T18:46:05+00:00"
   },
   "item|id:ecuador-vs-bolivia-20261118|Asian Total|Over 3": {
    "at_utc": "2026-11-18T01:02:42+00:00"
@@ -8841,7 +8852,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 764,
+ "sent_total": 765,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9747,6 +9758,7 @@
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)",
   "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)",
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5",
+  "2026-11-24T18:40:27+00:00|EC Flamengo Women — Fluminense Women|Over 3",
   "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2",
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5"
  ]
