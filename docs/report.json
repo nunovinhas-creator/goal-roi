@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-24T22:34:40.487356+00:00",
- "messages": 4852,
+ "generated_at_utc": "2026-11-24T22:49:11.417385+00:00",
+ "messages": 4853,
  "types": {
   "SERVICE": 11,
   "GOAL_BREWING": 98,
@@ -11,7 +11,7 @@
   "WEAKENED_LINEUP": 31,
   "OPEN_GAME_NO_ODDS": 22,
   "FULL_TIME_NOTE": 73,
-  "POLYMARKET": 1458,
+  "POLYMARKET": 1459,
   "None": 718,
   "TOTALS_FORM_NO_ODDS": 183
  },
@@ -33,10 +33,10 @@
  "excluded_burst": 12,
  "excluded_low_odds": 2,
  "audit": {
-  "versions": 7898,
+  "versions": 7899,
   "edits_changing_signal": 5,
   "bot_mark_disagreements": 0,
-  "last_collected_at_utc": "2026-11-24T22:30:46.586256+00:00",
+  "last_collected_at_utc": "2026-11-24T22:46:40.121452+00:00",
   "impossible_ft_observations": 9,
   "hl_results": 128,
   "hl_vs_bot_disagreements": 0,
@@ -50,7 +50,7 @@
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-24T22:34:38.588201+00:00",
+  "collector_last_run_utc": "2026-11-24T22:49:10.992034+00:00",
   "name_review": [
    {
     "bot": [
@@ -463,7 +463,7 @@
   "goal_lists": 1232,
   "goal_lists_consistent": 485
  },
- "unique_bets": 2232,
+ "unique_bets": 2233,
  "settled_bets": 1699,
  "unsettled_market": 334,
  "first_signal_utc": "2026-11-11T13:26:30+00:00",
@@ -1279,7 +1279,7 @@
    "note": "sem conclusão (<300 liquidadas)"
   },
   "POLYMARKET/pre": {
-   "bets": 533,
+   "bets": 534,
    "settled": 494,
    "matches": 211,
    "wins": 225,
@@ -2652,7 +2652,7 @@
    "prob_above_cut": 0.4706
   },
   "POLYMARKET": {
-   "signals": 689,
+   "signals": 690,
    "with_result": 641,
    "hits": 304,
    "misses": 337,
@@ -4195,7 +4195,7 @@
    },
    {
     "n": 897,
-    "signals": 1253,
+    "signals": 1254,
     "hits": 513,
     "misses": 384,
     "hit_rate": 0.561,
@@ -4299,8 +4299,8 @@
   "evidence_scope": "eligible_bets_only",
   "status_rules": "chronological_eprocess_v3",
   "eligibility": {
-   "total": 2581,
-   "eligible": 2227,
+   "total": 2582,
+   "eligible": 2228,
    "excluded": 354,
    "reasons": {
     "no_valid_odds": 301,
@@ -4316,7 +4316,7 @@
   "exploratory": {
    "scope": "all_signals_not_for_recommendations",
    "counts": {
-    "em observação": 14672,
+    "em observação": 14674,
     "promissora": 98,
     "abandonada": 378
    },
@@ -5373,11 +5373,11 @@
     }
    ]
   },
-  "hypotheses": 15148,
+  "hypotheses": 15150,
   "tested": 3248,
   "corrected_bar": null,
   "counts": {
-   "em observação": 14746,
+   "em observação": 14748,
    "abandonada": 372,
    "promissora": 30
   },
@@ -6143,19 +6143,19 @@
        "prob_above": 0.0232,
        "roi": -0.1337,
        "economics": {
-        "admitted": 103,
+        "admitted": 104,
         "results_confirmed": 68,
         "wins": 34,
         "losses": 32,
         "voids": 2,
         "imputed_losses": 25,
-        "pending": 10,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
         "stake_per_game": 1,
         "phases": {
-         "live": 47,
+         "live": 48,
          "pre": 56
         },
         "decision_days": 10,
@@ -6229,6 +6229,197 @@
       }
      ],
      "bad_total": 25
+    },
+    {
+     "match_id": "lille-vs-bayern-munchen-20261125",
+     "match": "Lille — Bayern Munchen",
+     "league": "UEFA Champions League",
+     "family": "Polymarket",
+     "type": "POLYMARKET",
+     "phase": "pre",
+     "when": "por começar",
+     "kickoff_utc": "2026-11-25T20:00+00:00",
+     "date_utc": "2026-11-24T22:45:44+00:00",
+     "minute": null,
+     "score_at_signal": null,
+     "market": "Polymarket",
+     "selection": "AH2(-0.5)",
+     "odds": 1.64,
+     "odds_last": 1.64,
+     "max_mult": 1,
+     "share": 100.0,
+     "share_last": 100.0,
+     "verdict": "misto",
+     "conflict": false,
+     "validated": false,
+     "odds_band": "odd 1,50 a 2,00",
+     "odds_band_n": 312,
+     "good": [
+      {
+       "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim",
+       "conditions": [
+        [
+         "Faixa de odd",
+         "odd 1,50 a 2,00"
+        ],
+        [
+         "Mercado",
+         "outro mercado"
+        ],
+        [
+         "Sinal anterior de outro tipo no mesmo jogo",
+         "sim"
+        ]
+       ],
+       "n": 79,
+       "games": 62,
+       "hits": 51,
+       "break_even": 0.5906,
+       "prob_above": 0.9694,
+       "roi": 0.2525,
+       "economics": {
+        "admitted": 44,
+        "results_confirmed": 43,
+        "wins": 34,
+        "losses": 9,
+        "voids": 0,
+        "imputed_losses": 0,
+        "pending": 1,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "positive_exploratory",
+        "stake_per_game": 1,
+        "phases": {
+         "live": 17,
+         "pre": 27
+        },
+        "decision_days": 10,
+        "largest_day_share": 0.2326,
+        "se_day_clustered_odds_minus_2pct": 0.1514,
+        "mean_advertised_odds": 1.7116,
+        "resolved_stake_units": 43,
+        "profit_advertised": 14.69,
+        "profit_odds_minus_2pct": 13.5362,
+        "roi_advertised": 0.3416,
+        "roi_odds_minus_2pct": 0.3148,
+        "confirmed_hit_rate": 0.7907,
+        "expected_profit": null
+       },
+       "edge": 0.1051,
+       "status": "promissora",
+       "source": "gerador"
+      }
+     ],
+     "good_total": 1,
+     "bad": [
+      {
+       "id": "Polymarket | Dia = dia de semana & Momento = antes do jogo & Quota de mercado = 80 % ou mais",
+       "conditions": [
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Momento",
+         "antes do jogo"
+        ],
+        [
+         "Quota de mercado",
+         "80 % ou mais"
+        ]
+       ],
+       "n": 89,
+       "games": 68,
+       "hits": 33,
+       "break_even": 0.5346,
+       "prob_above": 0.0045,
+       "roi": -0.3431,
+       "economics": {
+        "admitted": 62,
+        "results_confirmed": 55,
+        "wins": 22,
+        "losses": 33,
+        "voids": 0,
+        "imputed_losses": 3,
+        "pending": 4,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "phases": {
+         "pre": 62
+        },
+        "decision_days": 7,
+        "largest_day_share": 0.3103,
+        "se_day_clustered_odds_minus_2pct": 0.0891,
+        "mean_advertised_odds": 1.9273,
+        "resolved_stake_units": 58,
+        "profit_advertised": -19.44,
+        "profit_odds_minus_2pct": -20.2112,
+        "roi_advertised": -0.3352,
+        "roi_odds_minus_2pct": -0.3485,
+        "confirmed_hit_rate": 0.4,
+        "expected_profit": null
+       },
+       "edge": -0.1469,
+       "status": "abandonada",
+       "source": "gerador"
+      },
+      {
+       "id": "Polymarket | Competição = liga & Dia = dia de semana & Momento = antes do jogo",
+       "conditions": [
+        [
+         "Competição",
+         "liga"
+        ],
+        [
+         "Dia",
+         "dia de semana"
+        ],
+        [
+         "Momento",
+         "antes do jogo"
+        ]
+       ],
+       "n": 125,
+       "games": 63,
+       "hits": 48,
+       "break_even": 0.5008,
+       "prob_above": 0.0166,
+       "roi": -0.2168,
+       "economics": {
+        "admitted": 64,
+        "results_confirmed": 53,
+        "wins": 22,
+        "losses": 31,
+        "voids": 0,
+        "imputed_losses": 2,
+        "pending": 9,
+        "quarantined": 0,
+        "scope": "prospective_exploratory",
+        "status": "nonpositive_exploratory",
+        "stake_per_game": 1,
+        "phases": {
+         "pre": 64
+        },
+        "decision_days": 4,
+        "largest_day_share": 0.4545,
+        "se_day_clustered_odds_minus_2pct": 0.0585,
+        "mean_advertised_odds": 1.9983,
+        "resolved_stake_units": 55,
+        "profit_advertised": -13.89,
+        "profit_odds_minus_2pct": -14.7122,
+        "roi_advertised": -0.2525,
+        "roi_odds_minus_2pct": -0.2675,
+        "confirmed_hit_rate": 0.4151,
+        "expected_profit": null
+       },
+       "edge": -0.1236,
+       "status": "abandonada",
+       "source": "gerador"
+      }
+     ],
+     "bad_total": 93
     },
     {
      "match_id": "sabah-baku-vs-barcelona-20261125",
@@ -6528,293 +6719,6 @@
       }
      ],
      "bad_total": 4
-    },
-    {
-     "match_id": "chapecoense-vs-palmeiras-20261125",
-     "match": "Chapecoense — Palmeiras",
-     "league": "Brazilian BRAZIL SERIE A",
-     "family": "Jogo aberto",
-     "type": "OPEN_GAME",
-     "phase": "live",
-     "when": "a decorrer",
-     "kickoff_utc": null,
-     "date_utc": "2026-11-24T22:06:04+00:00",
-     "minute": 45,
-     "score_at_signal": [
-      2,
-      0
-     ],
-     "market": "Asian Total",
-     "selection": "Over 2.75",
-     "odds": 1.25,
-     "odds_last": 1.25,
-     "max_mult": 1,
-     "share": null,
-     "share_last": null,
-     "verdict": "misto",
-     "conflict": false,
-     "validated": false,
-     "odds_band": "odd até 1,50",
-     "odds_band_n": 42,
-     "good": [
-      {
-       "id": "Jogo aberto | Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = 90 ou mais",
-       "conditions": [
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Ritmo indicado pelo bot",
-         "90 ou mais"
-        ]
-       ],
-       "n": 24,
-       "games": 24,
-       "hits": 18,
-       "break_even": 0.5999,
-       "prob_above": 0.8968,
-       "roi": 0.1777,
-       "economics": {
-        "admitted": 30,
-        "results_confirmed": 29,
-        "wins": 17,
-        "losses": 4,
-        "voids": 8,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "phases": {
-         "live": 30
-        },
-        "decision_days": 10,
-        "largest_day_share": 0.2069,
-        "se_day_clustered_odds_minus_2pct": 0.0848,
-        "mean_advertised_odds": 1.6962,
-        "resolved_stake_units": 29,
-        "profit_advertised": 7.37,
-        "profit_odds_minus_2pct": 6.8126,
-        "roi_advertised": 0.2541,
-        "roi_odds_minus_2pct": 0.2349,
-        "confirmed_hit_rate": 0.8095,
-        "expected_profit": null
-       },
-       "edge": 0.1016,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 1.ª parte",
-       "conditions": [
-        [
-         "Golos até ao sinal",
-         "1 ou 2"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ],
-        [
-         "Parte do jogo",
-         "1.ª parte"
-        ]
-       ],
-       "n": 15,
-       "games": 15,
-       "hits": 12,
-       "break_even": 0.5855,
-       "prob_above": 0.8909,
-       "roi": 0.4006,
-       "economics": {
-        "admitted": 14,
-        "results_confirmed": 10,
-        "wins": 7,
-        "losses": 1,
-        "voids": 2,
-        "imputed_losses": 3,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "phases": {
-         "live": 14
-        },
-        "decision_days": 5,
-        "largest_day_share": 0.4615,
-        "se_day_clustered_odds_minus_2pct": 0.0794,
-        "mean_advertised_odds": 1.775,
-        "resolved_stake_units": 13,
-        "profit_advertised": 1.18,
-        "profit_odds_minus_2pct": 0.9564,
-        "roi_advertised": 0.0908,
-        "roi_odds_minus_2pct": 0.0736,
-        "confirmed_hit_rate": 0.875,
-        "expected_profit": null
-       },
-       "edge": 0.1168,
-       "status": "em observação",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos",
-       "conditions": [
-        [
-         "Golos em falta para ganhar",
-         "até 1 golo"
-        ],
-        [
-         "Hora (UTC)",
-         "noite"
-        ],
-        [
-         "Marcador no momento",
-         "diferença de 2 ou mais golos"
-        ]
-       ],
-       "n": 44,
-       "games": 44,
-       "hits": 31,
-       "break_even": 0.6056,
-       "prob_above": 0.8868,
-       "roi": 0.1392,
-       "economics": {
-        "admitted": 57,
-        "results_confirmed": 55,
-        "wins": 28,
-        "losses": 12,
-        "voids": 15,
-        "imputed_losses": 1,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "positive_exploratory",
-        "stake_per_game": 1,
-        "phases": {
-         "live": 57
-        },
-        "decision_days": 10,
-        "largest_day_share": 0.2321,
-        "se_day_clustered_odds_minus_2pct": 0.0903,
-        "mean_advertised_odds": 1.6636,
-        "resolved_stake_units": 56,
-        "profit_advertised": 4.92,
-        "profit_odds_minus_2pct": 4.0116,
-        "roi_advertised": 0.0879,
-        "roi_odds_minus_2pct": 0.0716,
-        "confirmed_hit_rate": 0.7,
-        "expected_profit": null
-       },
-       "edge": 0.0777,
-       "status": "em observação",
-       "source": "gerador"
-      }
-     ],
-     "good_total": 5,
-     "bad": [
-      {
-       "id": "Jogo aberto | Faixa de odd = odd até 1,50",
-       "conditions": [
-        [
-         "Faixa de odd",
-         "odd até 1,50"
-        ]
-       ],
-       "n": 42,
-       "games": 42,
-       "hits": 23,
-       "break_even": 0.7161,
-       "prob_above": 0.0086,
-       "roi": -0.2492,
-       "economics": {
-        "admitted": 37,
-        "results_confirmed": 36,
-        "wins": 17,
-        "losses": 17,
-        "voids": 2,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "phases": {
-         "live": 37
-        },
-        "decision_days": 8,
-        "largest_day_share": 0.3056,
-        "se_day_clustered_odds_minus_2pct": 0.0701,
-        "mean_advertised_odds": 1.3931,
-        "resolved_stake_units": 36,
-        "profit_advertised": -10.995,
-        "profit_odds_minus_2pct": -11.4151,
-        "roi_advertised": -0.3054,
-        "roi_odds_minus_2pct": -0.3171,
-        "confirmed_hit_rate": 0.5,
-        "expected_profit": null
-       },
-       "edge": -0.1618,
-       "status": "abandonada",
-       "source": "gerador"
-      },
-      {
-       "id": "Jogo aberto | Competição = liga & Faixa de odd = odd até 1,50",
-       "conditions": [
-        [
-         "Competição",
-         "liga"
-        ],
-        [
-         "Faixa de odd",
-         "odd até 1,50"
-        ]
-       ],
-       "n": 35,
-       "games": 35,
-       "hits": 19,
-       "break_even": 0.7174,
-       "prob_above": 0.012,
-       "roi": -0.2601,
-       "economics": {
-        "admitted": 30,
-        "results_confirmed": 29,
-        "wins": 13,
-        "losses": 14,
-        "voids": 2,
-        "imputed_losses": 0,
-        "pending": 1,
-        "quarantined": 0,
-        "scope": "prospective_exploratory",
-        "status": "nonpositive_exploratory",
-        "stake_per_game": 1,
-        "phases": {
-         "live": 30
-        },
-        "decision_days": 6,
-        "largest_day_share": 0.3448,
-        "se_day_clustered_odds_minus_2pct": 0.029,
-        "mean_advertised_odds": 1.3876,
-        "resolved_stake_units": 29,
-        "profit_advertised": -9.685,
-        "profit_odds_minus_2pct": -9.9913,
-        "roi_advertised": -0.334,
-        "roi_odds_minus_2pct": -0.3445,
-        "confirmed_hit_rate": 0.4815,
-        "expected_profit": null
-       },
-       "edge": -0.1657,
-       "status": "abandonada",
-       "source": "gerador"
-      }
-     ],
-     "bad_total": 41
     },
     {
      "match_id": "shakhtar-donetsk-vs-fenerbahce-20261125",
@@ -7653,19 +7557,19 @@
        "prob_above": 0.8616,
        "roi": 0.7417,
        "economics": {
-        "admitted": 7,
+        "admitted": 8,
         "results_confirmed": 3,
         "wins": 3,
         "losses": 0,
         "voids": 0,
         "imputed_losses": 3,
-        "pending": 1,
+        "pending": 2,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
         "stake_per_game": 1,
         "phases": {
-         "live": 4,
+         "live": 5,
          "pre": 3
         },
         "decision_days": 2,
@@ -7703,18 +7607,19 @@
        "prob_above": 0.8071,
        "roi": 0.6667,
        "economics": {
-        "admitted": 4,
+        "admitted": 5,
         "results_confirmed": 1,
         "wins": 1,
         "losses": 0,
         "voids": 0,
         "imputed_losses": 1,
-        "pending": 2,
+        "pending": 3,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "positive_exploratory",
         "stake_per_game": 1,
         "phases": {
+         "live": 1,
          "pre": 4
         },
         "decision_days": 2,
@@ -7751,19 +7656,19 @@
        "prob_above": 0.0232,
        "roi": -0.1337,
        "economics": {
-        "admitted": 103,
+        "admitted": 104,
         "results_confirmed": 68,
         "wins": 34,
         "losses": 32,
         "voids": 2,
         "imputed_losses": 25,
-        "pending": 10,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
         "stake_per_game": 1,
         "phases": {
-         "live": 47,
+         "live": 48,
          "pre": 56
         },
         "decision_days": 10,
@@ -7801,19 +7706,19 @@
        "prob_above": 0.0298,
        "roi": -0.2976,
        "economics": {
-        "admitted": 76,
+        "admitted": 77,
         "results_confirmed": 46,
         "wins": 17,
         "losses": 26,
         "voids": 3,
         "imputed_losses": 21,
-        "pending": 9,
+        "pending": 10,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
         "stake_per_game": 1,
         "phases": {
-         "live": 47,
+         "live": 48,
          "pre": 29
         },
         "decision_days": 10,
@@ -8959,19 +8864,19 @@
        "prob_above": 0.0232,
        "roi": -0.1337,
        "economics": {
-        "admitted": 103,
+        "admitted": 104,
         "results_confirmed": 68,
         "wins": 34,
         "losses": 32,
         "voids": 2,
         "imputed_losses": 25,
-        "pending": 10,
+        "pending": 11,
         "quarantined": 0,
         "scope": "prospective_exploratory",
         "status": "nonpositive_exploratory",
         "stake_per_game": 1,
         "phases": {
-         "live": 47,
+         "live": 48,
          "pre": 56
         },
         "decision_days": 10,
@@ -9054,7 +8959,7 @@
     "contraditório": 2,
     "evitar": 4
    },
-   "generated_utc": "2026-11-24T22:34:40+00:00",
+   "generated_utc": "2026-11-24T22:49:11+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -9067,7 +8972,7 @@
   "track": {
    "by_source": {
     "gerador": {
-     "hypotheses": 15050,
+     "hypotheses": 15052,
      "with_prospective_evidence": 5705,
      "prospective_games": 189603
     },
@@ -9302,19 +9207,19 @@
      "games": 59,
      "roi": -0.4709,
      "economics": {
-      "admitted": 116,
+      "admitted": 117,
       "results_confirmed": 54,
       "wins": 28,
       "losses": 26,
       "voids": 0,
       "imputed_losses": 43,
-      "pending": 19,
+      "pending": 20,
       "quarantined": 0,
       "scope": "prospective_exploratory",
       "status": "nonpositive_exploratory",
       "stake_per_game": 1,
       "phases": {
-       "live": 51,
+       "live": 52,
        "pre": 65
       },
       "decision_days": 11,
@@ -26220,7 +26125,7 @@
    },
    {
     "n": 32,
-    "signals": 36,
+    "signals": 37,
     "hits": 13,
     "misses": 19,
     "hit_rate": 0.4062,
@@ -26269,7 +26174,7 @@
     "mode": "evitar",
     "experimental": false,
     "tradable": true,
-    "open": 4,
+    "open": 5,
     "born_verified": true,
     "game_set": "d6c3f08620ff5e59",
     "prospective": {
@@ -27282,6 +27187,39 @@
   ],
   "llm_total": 98,
   "watch": [
+   {
+    "date_utc": "2026-11-24T22:45:44+00:00",
+    "match": "Lille — Bayern Munchen",
+    "match_id": "lille-vs-bayern-munchen-20261125",
+    "type": "POLYMARKET",
+    "market": "Polymarket",
+    "canonical_match_id": "lille-vs-bayern-munchen-20261125",
+    "period": "regulation",
+    "selection": "AH2(-0.5)",
+    "odds": 1.64,
+    "kickoff_utc": "2026-11-25T20:00+00:00",
+    "phase": "pre",
+    "finished": false,
+    "reasons": [
+     {
+      "id": "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim",
+      "status": "promissora",
+      "n": 79,
+      "games": 62,
+      "hit_rate": 0.6456,
+      "prob_above": 0.9694,
+      "edge": 0.1051,
+      "edge_ci": [
+       0.0134,
+       0.1906
+      ],
+      "prob_above_cut": 0.9524,
+      "prudent_rate": 0.6954,
+      "break_even": 0.5906,
+      "certified": false
+     }
+    ]
+   },
    {
     "date_utc": "2026-11-23T10:11:46+00:00",
     "match": "Sabah Baku — Barcelona",
@@ -86851,15 +86789,15 @@
    },
    "criteria_sha256": "dedf0eb3dd1ce73dbb999bdd56f6d0108fa3f69fe39bb5156da662b4c84525e0",
    "counts": {
-    "em_observacao": 3491,
+    "em_observacao": 3488,
     "evidencia_insuficiente": 1807,
-    "rejeitada": 9839,
+    "rejeitada": 9844,
     "validada": 0
    },
    "reasons": {
-    "mixed_pre_live": 4195,
-    "post_signal_condition": 3815,
-    "below_observe_minimum": 2521,
+    "mixed_pre_live": 4202,
+    "post_signal_condition": 3816,
+    "below_observe_minimum": 2520,
     "not_known_at_decision": 2448,
     "costs_unknown": 1807,
     "no_executable_prices": 1807,
@@ -86869,7 +86807,7 @@
     "redundant_game_set": 1205,
     "non_positive_return": 1167,
     "below_decision_minimum": 1050,
-    "no_prospective_results": 969,
+    "no_prospective_results": 967,
     "result_coverage": 880,
     "not_significant_after_multiplicity": 378,
     "abandoned_by_brain": 372,
@@ -89302,12 +89240,12 @@
  },
  "simulation": {
   "basis": "one_advertised_unit_per_historical_bet",
-  "total_bets": 2232,
+  "total_bets": 2233,
   "settled_bets": 1699,
   "committed_games": 964,
-  "bets_with_fixture": 2227,
+  "bets_with_fixture": 2228,
   "max_units_per_game": 35,
-  "games_with_multiple_units": 316,
+  "games_with_multiple_units": 317,
   "timed_settlements": 1699,
   "payoff_revisions": 0,
   "priced_at_execution": null,
@@ -104936,6 +104874,13 @@
     "w": null,
     "o": 1.4,
     "t": "STAKE_LOAD"
+   },
+   {
+    "d": "2026-11-24T22:46:40.121452+00:00",
+    "z": null,
+    "w": null,
+    "o": 1.64,
+    "t": "POLYMARKET"
    }
   ]
  },
@@ -105025,12 +104970,12 @@
     "roi_announced_odds": 0.0255,
     "seen_late": 0,
     "by_bot_mark": 0,
-    "per_day": 21.7,
+    "per_day": 21.6,
     "days_to_hint": 0,
     "days_to_conclusion": 2
    },
    "POLYMARKET": {
-    "signals": 689,
+    "signals": 690,
     "with_result": 641,
     "hits": 304,
     "misses": 337,
@@ -105564,7 +105509,7 @@
    "note": "ok"
   },
   "Q7 Todas as apostas (referência)": {
-   "bets": 2232,
+   "bets": 2233,
    "settled": 1699,
    "matches": 776,
    "wins": 822,
@@ -105599,6 +105544,19 @@
   }
  },
  "recent_bets": [
+  {
+   "date_utc": "2026-11-24T22:45:44+00:00",
+   "match_id": "lille-vs-bayern-munchen-20261125",
+   "group": "POLYMARKET/pre",
+   "match": "Lille — Bayern Munchen",
+   "selection": "Polymarket: AH2(-0.5)",
+   "odds": 1.64,
+   "ft": null,
+   "w": null,
+   "settled_by": null,
+   "n_signals": 1,
+   "max_mult": 1
+  },
   {
    "date_utc": "2026-11-24T22:26:51+00:00",
    "match_id": "chapecoense-vs-palmeiras-20261125",
@@ -106524,22 +106482,6 @@
    "settled_by": "resultado",
    "n_signals": 4,
    "max_mult": 1
-  },
-  {
-   "date_utc": "2026-11-24T19:55:35+00:00",
-   "match_id": "slovan-bratislava-vs-real-betis-20261124",
-   "group": "STAKE_LOAD/pre",
-   "match": "Slovan Bratislava — Real Betis",
-   "selection": "Asian Handicap: SK Slovan Bratislava (1.75)",
-   "odds": 1.73,
-   "ft": [
-    0,
-    2
-   ],
-   "w": null,
-   "settled_by": null,
-   "n_signals": 1,
-   "max_mult": 1
   }
  ],
  "unsettled": [
@@ -107085,6 +107027,36 @@
   }
  ],
  "matches": {
+  "lille-vs-bayern-munchen-20261125": {
+   "teams": [
+    "Lille",
+    "Bayern Munchen"
+   ],
+   "events": [
+    {
+     "d": "2026-11-22T09:19:58+00:00",
+     "k": "STAKE_LOAD",
+     "phase": "pre",
+     "selection": "Bayern Munich",
+     "odds": 1.54,
+     "market": "1x2",
+     "total": 58000.0
+    },
+    {
+     "d": "2026-11-24T22:45:44+00:00",
+     "k": "POLYMARKET",
+     "phase": "pre",
+     "selection": "AH2(-0.5)",
+     "odds": 1.64,
+     "share": 100.0,
+     "market": "Polymarket",
+     "total": 6100.0
+    }
+   ],
+   "goals": null,
+   "goals_source": null,
+   "ft": null
+  },
   "real-madrid-vs-psv-eindhoven-20261124": {
    "teams": [
     "Real Madrid",
@@ -115322,7 +115294,7 @@
    "day": "2026-11-23"
   },
   {
-   "bets": 196,
+   "bets": 197,
    "settled": 141,
    "wins": 64,
    "units": -9.78,
