@@ -427,13 +427,15 @@ class Quarantine(unittest.TestCase):
             self.assertEqual(report['investigations'][0], dict(id='x', status='experimental'))
             with self.assertRaises(quarantine.ConfirmatoryClaimBlocked):
                 quarantine.require_confirmatory(digest)
-        quarantine.require_confirmatory(protocol.PROTOCOL_SHA256)
+        with self.assertRaises(quarantine.ConfirmatoryClaimBlocked):
+            quarantine.require_confirmatory(protocol.PROTOCOL_SHA256)
         notice = quarantine.notice(protocol.V3_0_SHA256)
         self.assertEqual((notice['protocol'], notice['successor']), ('temporal-risk-set-v3', 'temporal-risk-set-v3.1'))
         self.assertIn('prediction_layer_counts_asian_half_settlements_as_full_outcomes', notice['defects'])
         with self.assertRaises(quarantine.ConfirmatoryClaimBlocked):
             quarantine.require_confirmatory(protocol.V3_0_SHA256)
-        self.assertIs(quarantine.annotate(dict(protocol_sha256=protocol.PROTOCOL_SHA256)).get('quarantine'), None)
+        marked = quarantine.annotate(dict(protocol_sha256=protocol.PROTOCOL_SHA256))
+        self.assertEqual(marked['quarantine']['successor'], 'temporal-risk-set-v3.2')
 
     def test_cli_marks_v2_evaluation_as_blocked(self):
         fake = dict(schema='temporal_discovery_report_v2', protocol_sha256=engine_v2.PROTOCOL_SHA256,

@@ -1,0 +1,271 @@
+{
+  "confirmatory": false,
+  "pair_expectations": {
+    "0": 15,
+    "1": 5
+  },
+  "protocol_sha256": "28f5e47f23e052e55d4a75481cdc23a0b9b1611e3e441933038ffaa01ed9c8ad",
+  "scenarios": [
+    {
+      "admissible_sha256": "b67065c82b3552061a814046cbf5becca20a98584f3cc6111d64965b37847094",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "matched_pairs": 1
+      },
+      "expected_pairs": 1,
+      "pairing_sha256": "4adead1c959de74a71661e1afb841c84c542fdae1b1d57cabaf278b8b4427c2d",
+      "pairs_at_t": 1,
+      "scenario": "clean_negative"
+    },
+    {
+      "admissible_sha256": "b67065c82b3552061a814046cbf5becca20a98584f3cc6111d64965b37847094",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "matched_pairs": 1
+      },
+      "expected_pairs": 1,
+      "pairing_sha256": "72240efc05007ca76e4b667e2fca4599fa0bfe0f4a0d27b836997ef8fd48ab56",
+      "pairs_at_t": 1,
+      "scenario": "atomic_receipt"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 2,
+        "cases": 2
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "old_quote_new_antecedent"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 2,
+        "cases": 2
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "proved_present_with_incomplete_coverage"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "feed_silent"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "one_second_gap"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "coverage_arrives_after_decision"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "coverage_missing_stream"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_present": 1,
+        "cases": 1,
+        "price_not_explicit_unambiguous_point": 2
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "contradictory_points"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_present": 1,
+        "cases": 1,
+        "price_not_explicit_unambiguous_point": 2
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "same_number_interval"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "incompatible_period"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_ineligible_terminal": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "incompatible_provider"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_ineligible_terminal": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "incompatible_selection"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "incompatible_kickoff"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "identity_ambiguous": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "identity_collision_known"
+    },
+    {
+      "admissible_sha256": "b67065c82b3552061a814046cbf5becca20a98584f3cc6111d64965b37847094",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "matched_pairs": 1
+      },
+      "expected_pairs": 1,
+      "pairing_sha256": "4adead1c959de74a71661e1afb841c84c542fdae1b1d57cabaf278b8b4427c2d",
+      "pairs_at_t": 1,
+      "scenario": "identity_collision_not_yet_known"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "future_antecedent_no_proof_of_absence"
+    },
+    {
+      "admissible_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "counts": {
+        "antecedent_indeterminate": 2,
+        "antecedent_present": 1,
+        "cases": 1
+      },
+      "expected_pairs": 0,
+      "pairing_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "pairs_at_t": 0,
+      "scenario": "unknown_feature"
+    },
+    {
+      "admissible_sha256": "b67065c82b3552061a814046cbf5becca20a98584f3cc6111d64965b37847094",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "matched_pairs": 1
+      },
+      "expected_pairs": 1,
+      "pairing_sha256": "4adead1c959de74a71661e1afb841c84c542fdae1b1d57cabaf278b8b4427c2d",
+      "pairs_at_t": 1,
+      "scenario": "overlapping_complete_intervals"
+    },
+    {
+      "admissible_sha256": "b67065c82b3552061a814046cbf5becca20a98584f3cc6111d64965b37847094",
+      "counts": {
+        "antecedent_absent": 1,
+        "antecedent_indeterminate": 1,
+        "antecedent_present": 1,
+        "cases": 1,
+        "matched_pairs": 1
+      },
+      "expected_pairs": 1,
+      "pairing_sha256": "4adead1c959de74a71661e1afb841c84c542fdae1b1d57cabaf278b8b4427c2d",
+      "pairs_at_t": 1,
+      "scenario": "out_of_order_newer_price_retained"
+    }
+  ],
+  "schema": "v32_falsification_bank",
+  "seeds": [
+    10937,
+    38119,
+    54869,
+    70493,
+    96181
+  ],
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}

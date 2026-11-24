@@ -9,6 +9,7 @@ from .. import chronology, event_audit
 from . import dsl_v2, engine, engine_v2, ledger, miner, miner_v2, quarantine, researcher, study
 from .replay import Replay
 from .v3 import engine as engine_v3, registry as registry_v3
+from .v32 import engine as engine_v32, mining as mining_v32, registry as registry_v32, source as source_v32
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 
@@ -63,7 +64,8 @@ def _blocked_banner(report):
 
 
 def _summary_v3(report):
-    lines = ['# Inferência temporal v3 · conjunto de risco', '', f"Corte UTC · {report['as_of_utc']}",
+    version = '3.2' if report.get('schema') == 'temporal_risk_set_report_v32' else '3.1'
+    lines = [f'# Inferência temporal v{version} · conjunto de risco', '', f"Corte UTC · {report['as_of_utc']}",
              'Confirmatório' if report.get('confirmatory') else 'Exploratório (sem valor confirmatório)', '',
              '| Hipótese | Estado | Pares | Previsão Δ (p) | Odd anunciada Δ (p) | Execução |',
              '| --- | --- | ---: | ---: | ---: | --- |']
@@ -78,7 +80,7 @@ def _summary_v3(report):
         evidence = row.get('evidence', {})
         found = evidence.get('layers', {})
         lines.append(f"| {row.get('hypothesis_id', row.get('id', ''))[:20]} | {row.get('status')} · "
-                     f"{row.get('reason', '')} | {evidence.get('counts', {}).get('matched_pairs', 0)} "
+                     f"{row.get('reason', '')} | {evidence.get('counts', row.get('counts', {})).get('matched_pairs', 0)} "
                      f"| {cell(found.get('prediction'))} | {cell(found.get('announced'))} | não demonstrada |")
     lines += ['', 'Execução real não medida: sem odds executáveis nem registos de colocação.', '',
               engine_v3.VERDICT]
@@ -96,11 +98,15 @@ def _path(directory, inputs, *, write=False):
     return resolved
 
 
+def _version(value):
+    return 32 if value == '3.2' else int(value)
+
+
 def main(argv=None):
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument('command', choices=('discover', 'evaluate', 'registry', 'prompt'))
-    cli.add_argument('--version', type=int, choices=(1, 2, 3), default=1,
-                     help='keep the legacy protocol by default; v2 and v3 are explicit')
+    cli.add_argument('--version', type=_version, choices=(1, 2, 3, 32), default=1,
+                     help='3 is archived v3.1; select 3.2 (or 32) for v3.2')
     cli.add_argument('--evidence-dir', type=Path, help='optional immutable external archive for evaluate --version 2')
     cli.add_argument('--data-dir', type=Path, default=Path('data'))
     cli.add_argument('--as-of', required=True)
@@ -116,8 +122,8 @@ def main(argv=None):
     cli.add_argument('--work', type=int)
     cli.add_argument('--emissions', type=int)
     args = cli.parse_args(argv)
-    discovery = engine_v2 if args.version in (2, 3) else engine
-    generator = miner_v2 if args.version in (2, 3) else miner
+    discovery = engine_v2 if args.version in (2, 3, 32) else engine
+    generator = miner_v2 if args.version in (2, 3, 32) else miner
     args.work = generator.MAX_REPLAY_WORK if args.work is None else args.work
     args.emissions = generator.MAX_EMISSIONS if args.emissions is None else args.emissions
     as_of = chronology.parse_utc(args.as_of)
@@ -140,10 +146,12 @@ def main(argv=None):
                 or args.receipts and (evidence.is_relative_to(args.receipts.resolve())
                                        or args.receipts.resolve().is_relative_to(evidence))):
             raise ValueError('proposal ledger, receipts and evidence must have separate directories')
-        if args.version == 3:
-            report = _run_v3(args, as_of, location)
+        if args.version in (3, 32):
+            report = (_run_v3(args, as_of, location) if args.version == 3 else _run_v32(args, as_of, location))
+            if report is None:  # prompt is plain text
+                return
             if args.format == 'summary' and args.command != 'registry':
-                print(_summary_v3(report))
+                print(_blocked_banner(report) + _summary_v3(report))
             else:
                 print(json.dumps(report, sort_keys=True, ensure_ascii=False, indent=2, allow_nan=False))
             return
@@ -183,7 +191,7 @@ def main(argv=None):
             print(_blocked_banner(report) + (_summary_v2(report) if args.version == 2 else _summary(report)))
         else:
             print(json.dumps(report, sort_keys=True, ensure_ascii=False, indent=2, allow_nan=False))
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, quarantine.ConfirmatoryClaimBlocked) as exc:
         cli.error(str(exc))
 
 
@@ -194,12 +202,21 @@ def _run_v3(args, as_of, location):
         plans = registry_v3.visible(registry_v3.read(location), as_of)
         return dict(as_of_utc=as_of.isoformat(), protocol=engine_v3.protocol.PROTOCOL,
                     protocol_sha256=engine_v3.protocol.PROTOCOL_SHA256, receipt_domain=registry_v3.DOMAIN,
+                    archive_only=True, quarantine=quarantine.notice(engine_v3.protocol.PROTOCOL_SHA256),
                     plans=[dict(content=p, sha256=registry_v3.digest(p)) for p in plans])
+    if args.commit:
+        quarantine.require_confirmatory(engine_v3.protocol.PROTOCOL_SHA256)
+    if args.command == 'evaluate':
+        plans = registry_v3.visible(registry_v3.read(location), as_of)
+        history = [dict(id=h['id'], rule=h['rule'], wave=plan['number'], status='historical_only',
+                        reason='archived_protocol', plan_sha256=registry_v3.digest(plan))
+                   for plan in plans for h in plan['hypotheses']]
+        return quarantine.annotate(dict(schema='temporal_risk_set_report_v3', as_of_utc=as_of.isoformat(),
+                                        protocol_sha256=engine_v3.protocol.PROTOCOL_SHA256,
+                                        confirmatory=False, investigations=history, verdict=engine_v3.VERDICT))
     replay = Replay(event_audit.build(args.data_dir, as_of, quote_only=True))
     if args.command == 'prompt':
         raise ValueError('v3 reuses the v2 proposal language; use prompt --version 2')
-    if args.command == 'evaluate':
-        return engine_v3.evaluate(replay, registry_v3.read(location), args.receipts)
     reply = None
     if args.llm_reply is not None:
         with args.llm_reply.open('rb') as handle:
@@ -208,11 +225,36 @@ def _run_v3(args, as_of, location):
                                         work=args.work, emissions=args.emissions)
     report = engine_v3.discover(replay, candidates=[r for r in records if 'rule' in r])
     report['mining'] = dict(engine='miner_v2', work=mined['work'], candidates=len(records))
+    report['historical_registration_candidates'] = report.pop('proposed_registration')
+    return quarantine.annotate(report)
+
+
+def _run_v32(args, as_of, location):
+    protocol = engine_v32.protocol
+    plans = registry_v32.read(location, expected_head=args.expect_head) if location is not None else []
+    visible = [plan for plan in plans if chronology.parse_utc(plan['published_utc']) <= as_of]
+    if args.command == 'registry':
+        return dict(as_of_utc=as_of.isoformat(), protocol=protocol.PROTOCOL,
+                    protocol_sha256=protocol.PROTOCOL_SHA256, receipt_domain=registry_v32.DOMAIN,
+                    plans=[dict(content=plan, sha256=registry_v32.digest(plan)) for plan in visible])
+    tape = source_v32.journal(args.data_dir, as_of)
+    if args.command == 'prompt':
+        print(mining_v32.prompt(mining_v32.Timeline(tape)))
+        return None
+    if args.command == 'evaluate':
+        return engine_v32.evaluate(tape, visible, args.receipts, outcomes=source_v32.Outcomes(args.data_dir, tape),
+                                   wave=args.wave)
+    reply = None
+    if args.llm_reply is not None:
+        with args.llm_reply.open('rb') as handle:
+            reply = handle.read(researcher.MAX_REPLY_BYTES + 1)
+    known = {h['id'] for plan in visible for h in plan['hypotheses']}
+    report = engine_v32.discover(tape, model=args.llm_model, reply=reply,
+                                 work=args.work, emissions=args.emissions, known=known)
     if args.commit:
-        report['registration'] = registry_v3.append(
-            location, discovery_as_of=as_of, snapshot_sha256=replay.snapshot_sha256,
-            protocol_sha256=engine_v3.protocol.PROTOCOL_SHA256, interpreter_sha256=engine_v3.INTERPRETER_SHA256,
-            hypotheses=report['proposed_registration'])
+        report['registration'] = registry_v32.append(
+            location, cutoff=as_of, snapshot=tape.snapshot_sha256, interpreter=engine_v32.INTERPRETER_SHA256,
+            hypotheses=report['proposed_registration'], expected_head=args.expect_head)
     return report
 
 

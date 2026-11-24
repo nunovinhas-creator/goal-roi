@@ -27,13 +27,21 @@ DEFECTS = (
 )
 V3_0_AUDIT = 'audits/temporal-discovery-v3/HALF-SETTLEMENT.md'
 V3_0_DEFECTS = ('prediction_layer_counts_asian_half_settlements_as_full_outcomes',)
+V3_1_AUDIT = 'audits/quote-observability/AUDIT-PR86.md'
+V3_1_DEFECTS = ('control_prefix_stops_at_old_quote', 'same_receipt_order_changes_support',
+                'absence_without_coverage_proof')
 BLOCKED = {
     '659d7de3788657abfed2b6a07170f16381e3b7acca202084f67a6af18ed98f3a': 'temporal-day-contract-v2',
     '1c49b4d9a4d5bba54a1d7b05c2a4eec821dbb05bd834fcc1f6e2c87fde081041': 'temporal-v1',
     # Superseded by temporal-risk-set-v3.1; no plan was ever registered under it.
     '1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939': 'temporal-risk-set-v3',
+    'b26e9e14479bd3ef80f4ce8c072768108c62ba9ddb136d3503a13a5bd2bc3e71': 'temporal-risk-set-v3.1',
 }
-_DETAILS = {'temporal-risk-set-v3': (V3_0_AUDIT, None, V3_0_DEFECTS, 'temporal-risk-set-v3.1')}
+_DETAILS = {
+    'temporal-risk-set-v3': (V3_0_AUDIT, None, V3_0_DEFECTS, 'temporal-risk-set-v3.1'),
+    'temporal-risk-set-v3.1': (V3_1_AUDIT, 'ce7629a11aefe0b655893ffab5390427d25fc1de',
+                              V3_1_DEFECTS, 'temporal-risk-set-v3.2'),
+}
 
 
 class ConfirmatoryClaimBlocked(RuntimeError):
