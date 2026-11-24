@@ -2553,13 +2553,15 @@
    "attempt_utc": "2026-11-24T19:33:15+00:00",
    "chars": 197,
    "created_utc": "2026-11-24T19:33:15+00:00",
+   "done_utc": "2026-11-24T19:33:15+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "c2c31706d86c6c80a77ee26d51d79112cdd3948ec9f0d55336a5e67e4ada06b9",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:como-vs-aek-athens-20261124|b2bd1da87e37": {
    "attempt_id": "2cde22ca82a541588c7523a956f29e74",
@@ -4759,12 +4761,17 @@
    "state": "delivered"
   },
   "game|id:middlesbrough-vs-swansea-20261124|bc77bd54f86a": {
+   "attempt_id": "376babc6918c49439b23f9566408c3a2",
+   "attempt_utc": "2026-11-24T19:33:17+00:00",
+   "chars": 194,
    "created_utc": "2026-11-24T19:33:15+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "250209dec40151097135f8bc6e66f670989d60b5dc5fd4690ef5ee39bc86e981",
+   "state": "in_flight"
   },
   "game|id:monaco-vs-aj-auxerre-20261121|abb1505033e1": {
    "attempt_utc": "2026-11-20T15:37:50+00:00",
@@ -7274,7 +7281,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 468,
+  "delivered": 469,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T19:31:10+00:00",
@@ -7394,7 +7401,8 @@
   "2026-11-24T19:17:30+00:00|Galatasaray — Aston Villa|Over 0.5": true,
   "2026-11-24T19:17:39+00:00|Galatasaray — Aston Villa|X": true,
   "2026-11-24T19:19:53+00:00|Manchester City — Napoli|Over 3.5": true,
-  "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)": true
+  "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)": true,
+  "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -8633,6 +8641,9 @@
   "item|id:metz-vs-boulogne-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T20:20:59+00:00"
   },
+  "item|id:middlesbrough-vs-swansea-20261124|Polymarket|AH1(-1.5)": {
+   "at_utc": "2026-11-24T19:33:15+00:00"
+  },
   "item|id:monaco-vs-aj-auxerre-20261121|Asian Total|Under 3": {
    "at_utc": "2026-11-20T15:37:50+00:00"
   },
@@ -9154,7 +9165,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 780,
+ "sent_total": 781,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -10079,6 +10090,7 @@
   "2026-11-24T19:17:30+00:00|Galatasaray — Aston Villa|Over 0.5",
   "2026-11-24T19:17:39+00:00|Galatasaray — Aston Villa|X",
   "2026-11-24T19:19:53+00:00|Manchester City — Napoli|Over 3.5",
-  "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)"
+  "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)",
+  "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)"
  ]
 }
