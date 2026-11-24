@@ -2359,13 +2359,15 @@
    "attempt_utc": "2026-11-24T20:58:59+00:00",
    "chars": 195,
    "created_utc": "2026-11-24T20:58:59+00:00",
+   "done_utc": "2026-11-24T20:58:59+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "ed0d14dd98bc6f2211758f7f19407d7a46afe831351ac98c9053781220b3b7bf",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:chelsea-vs-leeds-20261121|360ba00581b0": {
    "attempt_utc": "2026-11-21T16:00:17+00:00",
@@ -4708,12 +4710,17 @@
    "state": "delivered"
   },
   "game|id:manchester-city-vs-napoli-20261124|cb54ff451617": {
+   "attempt_id": "e95c8c11aa5f497fa795fe6e0e2d99c6",
+   "attempt_utc": "2026-11-24T20:59:01+00:00",
+   "chars": 205,
    "created_utc": "2026-11-24T20:58:59+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "4481a5b30ccb37832cbce7c2ee2045a66a855493533b15bab13ee3c7028a4414",
+   "state": "in_flight"
   },
   "game|id:manta-vs-delfin-20261122|0fc16f6927e5": {
    "attempt_utc": "2026-11-22T16:44:10+00:00",
@@ -7514,7 +7521,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 484,
+  "delivered": 485,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T20:52:46+00:00",
@@ -7649,6 +7656,7 @@
   "2026-11-24T20:35:16+00:00|Real Madrid — PSV Eindhoven|AH1(-0.5)": true,
   "2026-11-24T20:43:14+00:00|Real Madrid — PSV Eindhoven|Over 3.5": true,
   "2026-11-24T20:48:56+00:00|Real Madrid — PSV Eindhoven|PSV Eindhoven": true,
+  "2026-11-24T20:52:38+00:00|Manchester City — Napoli|Manchester City": true,
   "2026-11-24T20:56:37+00:00|Charlton — Lincoln|Over 4": true
  },
  "migrations": {
@@ -8867,6 +8875,9 @@
   "item|id:manchester-city-vs-napoli-20261124|1st Half - Manchester City Exact Corners|4+": {
    "at_utc": "2026-11-24T16:26:11+00:00"
   },
+  "item|id:manchester-city-vs-napoli-20261124|1x2|Manchester City": {
+   "at_utc": "2026-11-24T20:58:59+00:00"
+  },
   "item|id:manchester-city-vs-napoli-20261124|Asian Total|Over 3.5": {
    "at_utc": "2026-11-24T19:25:19+00:00"
   },
@@ -9454,7 +9465,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 796,
+ "sent_total": 797,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -10410,6 +10421,7 @@
   "2026-11-24T20:35:16+00:00|Real Madrid — PSV Eindhoven|AH1(-0.5)",
   "2026-11-24T20:43:14+00:00|Real Madrid — PSV Eindhoven|Over 3.5",
   "2026-11-24T20:48:56+00:00|Real Madrid — PSV Eindhoven|PSV Eindhoven",
+  "2026-11-24T20:52:38+00:00|Manchester City — Napoli|Manchester City",
   "2026-11-24T20:56:37+00:00|Charlton — Lincoln|Over 4"
  ]
 }
