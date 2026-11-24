@@ -28,10 +28,11 @@ def _provenance(version: journal.Version) -> dict:
 
 
 def _fixture(version: journal.Version, bindings: dict[str, match_identity.Binding],
-             original: dict | None) -> str | None:
+             original: dict | None, event: dict) -> str | None:
     parsed = version.parsed
     if original is not None and (parsed['match_id'] != original['match_id']
-                                 or version.evidence['emitted_utc'] != original['emitted_utc']):
+                                 or version.evidence['emitted_utc'] != original['emitted_utc']
+                                 or event['source'] != original['source']):
         return None
     binding = bindings.get(parsed['match_id'])
     if (binding is None or binding.available > version.available
@@ -65,6 +66,7 @@ class Timeline:
     quotes: tuple[QuoteObservation, ...]
     versions: tuple[ContextObservation, ...]
     input_exclusions: tuple[tuple[str, int], ...]
+    receipt_format_anomalies: int = 0
 
     def _check_clock(self, at: datetime) -> None:
         if at.utcoffset() is None or at > self.as_of_utc:
@@ -87,22 +89,31 @@ class Timeline:
 
         No carry-forward of fields removed by an edit. Use history for evidence
         of what was previously reported, and for quote/event relationships.
+        A completed-only view still observes supersession of the older state.
         """
         self._check_clock(at)
         by_message = defaultdict(list)
         for row in self.versions:
             if row.available_utc > at:
                 break
-            if not completed_only or row.receipt == 'completed_page':
-                by_message[row.message_id].append(row)
+            by_message[row.message_id].append(row)
         result = []
         for rows in by_message.values():
             publication = max(row.published_utc for row in rows)
             latest = [row for row in rows if row.published_utc == publication]
             variants = {(row.text_sha256, row.fixture_id, row.contract_key) for row in latest}
-            if len(variants) == 1 and latest[0].fixture_id == fixture_id:
-                result.append(latest[0])
+            if len(variants) != 1 or latest[0].fixture_id != fixture_id:
+                continue
+            evidence = next((row for row in latest if not completed_only or row.receipt == 'completed_page'), None)
+            if evidence is not None:
+                result.append(evidence)
         return tuple(sorted(result, key=_order))
+
+
+def invalid_completed_receipt(row: dict) -> bool:
+    """Reject values that only compare equal to the integer receipt version."""
+    value = row.get('receipt_version')
+    return value == 1 and type(value) is not int
 
 
 def read_timeline(data_dir: Path, as_of: datetime) -> Timeline:
@@ -117,14 +128,17 @@ def read_timeline(data_dir: Path, as_of: datetime) -> Timeline:
     # JSON true and 1.0 compare equal to 1 in Python but do not establish
     # a completed-page receipt in the observability schema.
     invalid_receipts = {line for line, row in store.message_rows(path)
-                        if row.get('receipt_version') == 1 and type(row['receipt_version']) is not int}
+                        if invalid_completed_receipt(row)}
     final_stat = path.stat()
     if (original_stat.st_ino, original_stat.st_size, original_stat.st_mtime_ns) != (
             final_stat.st_ino, final_stat.st_size, final_stat.st_mtime_ns):
         raise ValueError('message journal changed during reconstruction; use a stable snapshot')
+    anomalies = 0
     if invalid_receipts:
         verified = [v for v in versions if v.evidence['journal_line'] not in invalid_receipts]
-        exclusions['unknown_receipt_type'] += len(versions) - len(verified)
+        anomalies = len(versions) - len(verified)
+        if anomalies:
+            exclusions['unknown_receipt_type'] += anomalies
         versions = verified
     originals, withheld, _, bindings, _ = journal.reconstruct(versions, as_of, burst_size=report.BURST)
     exclusions.update(row['reason'] for row in withheld)
@@ -152,12 +166,14 @@ def read_timeline(data_dir: Path, as_of: datetime) -> Timeline:
         is_original = original is not None and original['record_sha256'] == proof['record_sha256']
         event = original if is_original else journal.event_of(version)
         key = contract_key(event)
-        fixture = _fixture(version, bindings, original)
+        fixture = _fixture(version, bindings, original, event)
         exchange = exchange_quote(version.text, event['source']) if event['source'] in ('Polymarket', 'Betfair') else None
         native_selection = exchange[1] if exchange and event['source'] == 'Polymarket' else None
         extracted = context(version.text, event['selection'], native_selection=native_selection)
         alert_score = tuple(event['score']) if event['score'] is not None else None
         scores, issues = extracted.scores, extracted.issues
+        if original is not None and event['source'] != original['source']:
+            issues = (*issues, 'revision_source_conflict')
         kickoff = journal.kickoff(event)
         if scores and kickoff is not None and kickoff > version.available:
             scores = ()
@@ -188,4 +204,4 @@ def read_timeline(data_dir: Path, as_of: datetime) -> Timeline:
             kickoff_utc=kickoff, minute=event['minute'], score=alert_score,
             exclusion=exclusion,
         ))
-    return Timeline(as_of, tuple(quotes), tuple(observations), tuple(sorted(exclusions.items())))
+    return Timeline(as_of, tuple(quotes), tuple(observations), tuple(sorted(exclusions.items())), anomalies)

@@ -23,6 +23,7 @@ class PairSample:
     clocks: tuple[float, float]
     # Decisive stake, or None when a settled payoff was unavailable.
     stakes: tuple[float | None, float | None]
+    quarter_line: bool = False
 
 
 def _projection(samples: tuple[PairSample, ...], first: date, span: int, days: int) -> list:
@@ -49,8 +50,6 @@ def _evaluate(rows: list, pp: int, repetitions: int) -> dict:
             for index, (odds, stake) in enumerate(zip(sample.odds, sample.stakes)):
                 probability = min(1., 1 / odds + (pp / 100 if index == 0 else 0))
                 outcome = label(rng, probability, float(stake == 0), float(stake is None))
-                if outcome['payoff'] is not None:
-                    outcome['payoff'] *= stake
                 arms.append(layers.values(outcome, odds))
             case_x, control_x = zip(map(log, sample.odds), sample.clocks)
             simulated.append((arms, clusters, case_x, control_x))
@@ -96,17 +95,30 @@ def calculate(samples: tuple[PairSample, ...], first: date | None, span: int,
         if passes and first_sample_gate is None:
             first_sample_gate = days
         for effect in effects:
-            estimate = _evaluate(rows, effect['effect_pp'], repetitions) if passes else None
-            # A deterministic sample/cluster gate makes retention impossible at
-            # this horizon, even before simulated outcomes or missing FT.
-            if estimate is None:
-                estimate = {name: dict(rate=0., wilson_95=None) for name in ('prediction', 'announced')}
+            pp = effect['effect_pp']
+            if not samples:
+                status = 'no_observed_pairs'
+            elif not passes:
+                status = 'below_sample_or_week_gate'
+            elif any(sample.quarter_line or .5 in sample.stakes for sample, _ in rows):
+                status = 'unsupported_quarter_line_outcome_model'
+            elif any(pp / 100 > 1 - 1 / sample.odds[0] + 1e-12 for sample, _ in rows):
+                status = 'effect_infeasible_at_observed_odds'
+            else:
+                status = 'simulated'
+            if status == 'simulated':
+                estimate = _evaluate(rows, pp, repetitions)
+            else:
+                # Zero only conditional on this schedule failing the gate.
+                conditional_rate = 0. if not passes else None
+                estimate = {name: dict(rate=conditional_rate, wilson_95=None)
+                            for name in ('prediction', 'announced')}
             for name, metrics in estimate.items():
                 target_days = effect['first_tested_days_at_80pct']
-                if target_days[name] is None and metrics['rate'] >= TARGET:
+                if status == 'simulated' and target_days[name] is None and metrics['rate'] >= TARGET:
                     target_days[name] = days
             effect['horizons'].append(dict(days=days, projected_pairs=len(rows), projected_weeks=weeks,
-                                           minimum_sample_and_weeks=passes, layers=estimate))
+                                           minimum_sample_and_weeks=passes, status=status, layers=estimate))
     return dict(observed_pairs=len(samples), exposure_days=span, pairs_per_day=per_day,
                 rate_equivalent_days_for_minimum_pairs=(
                     (protocol.SETTINGS.min_pairs * span + len(samples) - 1) // len(samples) if samples else None),

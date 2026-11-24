@@ -3,24 +3,28 @@
 import argparse
 from collections import Counter, defaultdict
 from datetime import timedelta
+from decimal import Decimal
 import hashlib
 from itertools import groupby
 import json
 from pathlib import Path
 import re
+from shutil import copyfile
 import sys
+from tempfile import TemporaryDirectory
 
 # Import the frozen audit and its power kernel without editing either one.
 sys.path.append(str(Path(__file__).resolve().parents[1] / 'temporal-discovery-v3'))
 import coverage_audit as frozen
 from power import ALPHA, PairSample, calculate
 
-from scangoal import chronology, event_audit, event_intelligence as events
+from scangoal import chronology, event_audit, event_intelligence as events, parser, store
 from scangoal.discovery import dsl, engine_v2
 from scangoal.discovery.replay import Budget, Decision, Replay
 from scangoal.discovery.v3 import engine, protocol, riskset
 from scangoal.observability import ANALYSIS_EQUIVALENCES, contract_key, read_timeline
 from scangoal.observability.contracts import contract_family
+from scangoal.observability.timeline import invalid_completed_receipt
 
 CUTOFF = '2026-11-24T08:22:00Z'
 FROZEN_SNAPSHOT = '1f2bf65d751dc735d2a0688c700e7ff24ad9b41474e87f7768efc38c9e102944'
@@ -45,6 +49,7 @@ SAFE_MARKETS = {
 }
 SAFE_SELECTION = re.compile(r'(?:(?:over|under) [0-9.]+|ah[12]\([+−-]?[0-9.]+\)|'
                             r'[12x]|1x|12|x2|home|away|draw|(?:btts: )?(?:yes|no))\Z', re.I)
+MIN_DECIMAL_ODDS = Decimal(str(parser.MIN_ODDS))
 
 
 def safe_market(market):
@@ -113,33 +118,53 @@ def enrichment(timeline):
                 input_exclusions=dict(timeline.input_exclusions))
 
 
-def density(replay):
-    """Hourly arrival buckets and trailing-hour comparisons at receipt time."""
+def density(replay, timeline):
+    """Arrivals and available prices, with all versions in a receipt visible atomically."""
+    by_proof = {quote.record_sha256: quote for quote in timeline.quotes
+                if quote.fixture_id is not None and quote.contract_key is not None and not quote.exclusion}
     arrivals = defaultdict(lambda: defaultdict(list))
     latest = defaultdict(dict)
     counts = defaultdict(Counter)
+    price_evidence = defaultdict(set)
+    observations = iter(sorted(by_proof.values(), key=lambda q: q.available_utc))
+    following = next(observations, None)
+
+    def point(quote):
+        key = quote.contract_key, quote.fixture_id, quote.emitted_utc
+        return (quote.price_point is not None and quote.price_point >= MIN_DECIMAL_ODDS
+                and len(price_evidence[key]) <= 1)
+
     for at, group in groupby(replay.anchors, key=lambda item: item[0]):
-        at_instant = [(key, event) for _, event in group if (key := contract_key(event)) is not None]
-        # The entire completed page is available at its receipt time.
-        for key, event in at_instant:
-            latest[key][event['fixture_id']] = event
-        for key, event in at_instant:
+        while following is not None and following.available_utc <= at:
+            if following.price_low is not None:
+                key = following.contract_key, following.fixture_id, following.emitted_utc
+                price_evidence[key].add((following.price_low, following.price_high))
+            following = next(observations, None)
+        batch = [quote for _, event in group if (quote := by_proof.get(event['record_sha256'])) is not None]
+        for quote in batch:
+            contract, fixture = quote.contract_key, quote.fixture_id
+            prior = latest[contract].get(fixture)
+            if prior is None or prior.emitted_utc <= quote.emitted_utc:
+                latest[contract][fixture] = quote
+        for quote in batch:
+            contract, fixture = quote.contract_key, quote.fixture_id
             hour = at.replace(minute=0, second=0, microsecond=0)
-            arrivals[key][hour].append(event)
-            counts[key]['reference_observations'] += 1
-            kickoff = replay.kickoff_known(event['fixture_id'], at)
-            fresh = [prior for fixture, prior in latest[key].items() if fixture != event['fixture_id']
-                     and at - events.emitted(prior) <= timedelta(hours=1)]
+            has_point = point(quote)
+            arrivals[contract][hour].append((fixture, has_point))
+            counts[contract]['reference_observations'] += 1
+            kickoff = replay.kickoff_known(fixture, at)
+            fresh = [prior for other, prior in latest[contract].items() if other != fixture
+                     and timedelta(0) <= at - prior.emitted_utc <= timedelta(hours=1)]
             in_window = [prior for prior in fresh if kickoff is not None
-                         and (other_ko := replay.kickoff_known(prior['fixture_id'], at)) is not None
+                         and (other_ko := replay.kickoff_known(prior.fixture_id, at)) is not None
                          and abs(other_ko - kickoff) <= timedelta(minutes=45)]
-            counts[key]['references_with_other_fixture_last_hour'] += bool(fresh)
-            counts[key]['references_with_other_fixture_last_hour_and_kickoff_within_45m'] += bool(in_window)
-            counts[key]['references_with_point_in_both_and_kickoff_within_45m'] += (
-                riskset.priced(event) is not None and any(riskset.priced(prior) is not None for prior in in_window))
+            counts[contract]['references_with_other_fixture_last_hour'] += bool(fresh)
+            counts[contract]['references_with_other_fixture_last_hour_and_kickoff_within_45m'] += bool(in_window)
+            counts[contract]['references_with_point_in_both_and_kickoff_within_45m'] += (
+                has_point and any(point(prior) for prior in in_window))
     return [dict(key_summary(key), **counts[key], hourly_arrivals=[
-        dict(hour_utc=events.iso(hour), observations=len(rows), fixtures=len({r['fixture_id'] for r in rows}),
-             point_observations=sum(frozen.form(r) == 'point' for r in rows))
+        dict(hour_utc=events.iso(hour), observations=len(rows), fixtures=len({fixture for fixture, _ in rows}),
+             point_observations=sum(has_point for _, has_point in rows))
         for hour, rows in sorted(arrivals[key].items())
     ]) for key in sorted(counts, key=dsl.encoded)]
 
@@ -165,14 +190,40 @@ def _span(times, end):
     return (first.date(), (end.date() - first.date()).days + 1) if first is not None else (None, 0)
 
 
-def pair_diagnostics(replay, candidates, horizons, repetitions):
+def _checked_receipt_replay(data_dir, as_of, replay, timeline):
+    if not timeline.receipt_format_anomalies:
+        return replay
+    # Rebuild identity and settlement too. A row dropped only from the
+    # anchors could still create false evidence in the replay prefix.
+    with TemporaryDirectory() as work:
+        directory = Path(work)
+        with (directory / 'messages.jsonl').open('w', encoding='utf-8') as journal:
+            for _, row in store.message_rows(data_dir / 'messages.jsonl'):
+                if not invalid_completed_receipt(row):
+                    journal.write(json.dumps(row, ensure_ascii=False) + '\n')
+        for name in replay.audit['input_sha256'].keys() - {'messages.jsonl'}:
+            copyfile(data_dir / name, directory / name)
+        return Replay(event_audit.build(directory, as_of, quote_only=True))
+
+
+def _control_context_changed(replay, control):
+    """Conservative screen for the gap the frozen comparator never evaluates."""
+    emitted = events.emitted(control.anchor)
+    return any(event['message_id'] != control.anchor['message_id']
+               and emitted <= events.emitted(event) <= control.at and events.seen(event) <= control.at
+               for event in replay.history[control.fixture])
+
+
+def pair_diagnostics(replay, candidates, horizons, repetitions, *, checked_replay=None, timeline=None):
     """Collect ages and actual pairs with the same risk-set implementation."""
     full = riskset.RiskSet(replay)
-    first_complete = min((events.seen(e) for e in replay.by_id.values() if e['receipt'] == 'completed_page'),
+    checked = checked_replay if checked_replay is not None else replay
+    quotes = {quote.record_sha256: quote for quote in timeline.quotes} if timeline is not None else None
+    first_complete = min((events.seen(e) for e in checked.by_id.values() if e['receipt'] == 'completed_page'),
                          default=None)
     end = replay.as_of + timedelta(microseconds=1)
     receipt_day_start = first_complete.replace(hour=0, minute=0, second=0, microsecond=0) if first_complete else None
-    window = riskset.RiskSet(replay, start=receipt_day_start, end=end) if receipt_day_start is not None else None
+    window = riskset.RiskSet(checked, start=receipt_day_start, end=end) if receipt_day_start is not None else None
     first, complete_days = _span((first_complete,) if first_complete is not None else (), replay.as_of)
     _, historical_days = _span((at for at, _ in replay.anchors), replay.as_of)
     index = frozen.Index(replay)
@@ -180,10 +231,13 @@ def pair_diagnostics(replay, candidates, horizons, repetitions):
     by_hypothesis, full_sums, complete_sums = [], Counter(), Counter()
     historical_families = defaultdict(set)
     complete_families = defaultdict(set)
+    historical_receipts = Counter()
+    rejects = Counter()
     for item in candidates:
         rule = item['rule']
         cohort = full.run(rule, Budget(engine.MAX_WORK))
         historical, complete = defaultdict(list), defaultdict(list)
+        receipt_counts = Counter()
         for case in cohort.cases:
             ages.append((case.at - events.emitted(case.anchor)).total_seconds())
             eligible = [e for at, e in index.by_contract.get(contract_key(case.anchor), ())
@@ -196,26 +250,45 @@ def pair_diagnostics(replay, candidates, horizons, repetitions):
             identity = case.anchor['message_id'], control.anchor['message_id']
             historical_families[family].add(identity)
             historical[family].append(identity)
+            historical_receipts[f"{case.anchor['receipt']}/{control.anchor['receipt']}"] += 1
+            full_sums['control_history_changed_since_quote'] += _control_context_changed(replay, control)
             full_sums['with_both_settled'] += all(replay.label(d)['status'] == 'settled' for d in (case, control))
         if window is not None:
             for case, control, match in window.run(rule, Budget(engine.MAX_WORK)).pairs:
                 family = contract_family(contract_key(case.anchor))
                 complete_families[family].add((case.anchor['message_id'], control.anchor['message_id']))
+                receipt_counts[family] += 1
+                if quotes is not None and not all(
+                    (quote := quotes.get(d.anchor['record_sha256'])) is not None
+                    and quote.price_point is not None and quote.fixture_id == d.fixture and not quote.exclusion
+                    for d in (case, control)
+                ):
+                    rejects['explicit_point_or_identity_unproven'] += 1
+                    continue
+                if _control_context_changed(checked, control):
+                    rejects['control_history_changed_since_quote'] += 1
+                    continue
+                line = case.anchor['line']
+                quarter_line = (case.anchor['market_key'] in {'match_goals', 'asian_handicap'} and line is not None
+                                and abs(Decimal(line)) % 1 in (Decimal('.25'), Decimal('.75')))
                 complete[family].append(PairSample(
                     case.at.date(), (case.kickoff or case.at).date(), case.anchor['source'],
                     engine._labels(case, control)['competition'], (match['case_odds'], match['control_odds']),
                     (match['case_clock'], match['control_clock']),
-                    tuple(None if (payoff := replay.label(d)['payoff']) is None else abs(payoff)
+                    tuple(None if (payoff := checked.label(d)['payoff']) is None else abs(payoff)
                           for d in (case, control)),
+                    quarter_line=quarter_line,
                 ))
         full_sums['cases'] += len(cohort.cases)
         full_sums['pairs'] += len(cohort.pairs)
-        complete_sums['pairs'] += sum(map(len, complete.values()))
-        families = sorted(historical.keys() | complete.keys())
+        complete_sums['pairs'] += receipt_counts.total()
+        complete_sums['planning'] += sum(map(len, complete.values()))
+        families = sorted(historical.keys() | receipt_counts.keys())
         by_hypothesis.append(dict(hypothesis_sha256=engine.hypothesis_id(rule), historical_pairs=len(cohort.pairs),
-                                  completed_receipt_pairs=sum(map(len, complete.values())), families=[
+                                  completed_receipt_pairs=receipt_counts.total(), families=[
             dict(family=family, historical_pairs=len(historical[family]),
                  historical_pairs_per_day=len(historical[family]) / historical_days,
+                 completed_receipt_pairs=receipt_counts[family],
                  completed_receipt_power=calculate(tuple(complete[family]), first, complete_days, horizons, repetitions))
             for family in families
         ]))
@@ -223,7 +296,10 @@ def pair_diagnostics(replay, candidates, horizons, repetitions):
     return dict(
         strict_pairs=full_sums['pairs'], strict_pairs_with_both_settled=full_sums['with_both_settled'],
         distinct_historical_pair_identities=sum(map(len, historical_families.values())),
+        historical_pairs_by_receipt=dict(historical_receipts),
+        historical_control_history_changed_since_quote=full_sums['control_history_changed_since_quote'],
         case_decisions=full_sums['cases'], completed_receipt_pairs_summed=complete_sums['pairs'],
+        planning_pairs_summed=complete_sums['planning'], planning_pair_exclusions=dict(rejects),
         age_seconds={name: dict(n=len(values), percentiles=frozen.quantiles(values)) for name, values in (
             ('case_quote', ages), ('nearest_other_fixture_same_contract_available', nearest), ('matched_comparator', comparator))},
         power=dict(alpha_two_layers_single_hypothesis=ALPHA, historical_exposure_utc_days=historical_days,
@@ -236,7 +312,8 @@ def pair_diagnostics(replay, candidates, horizons, repetitions):
                    assumptions='Observed receipt-day schedules repeated with zero days intact. Earliest complete receipt '
                                'through cutoff inclusive; partial UTC days count in full. Synthetic independent outcomes '
                                'at fair price plus case shift on decisive stake. Observed prices, competitions, '
-                               'missing-result and push/half-stake patterns. v3.1 pair-difference kernel and pair, '
+                               'missing-result and push patterns. Quarter-line half settlements and infeasible effects withhold estimates. '
+                               'v3.1 pair-difference kernel and pair, '
                                'cluster, coverage, leave-one-out, lower-bound and two-layer alpha gates. '
                                'Fitted correction and absolute announced-return gate. Sampled effects describe planning only.'),
     )
@@ -250,7 +327,8 @@ def report(data_dir, as_of, horizons=(90, 180, 365), repetitions=100, *, verify_
     _, records = engine_v2.discover(replay)
     candidates = [row for row in records if 'rule' in row]
     waterfall = frozen.waterfall(replay, candidates)
-    details = pair_diagnostics(replay, candidates, horizons, repetitions)
+    checked = _checked_receipt_replay(data_dir, as_of, replay, timeline)
+    details = pair_diagnostics(replay, candidates, horizons, repetitions, checked_replay=checked, timeline=timeline)
     for name, digest in audit['input_sha256'].items():
         if hashlib.sha256((data_dir / name).read_bytes()).hexdigest() != digest:
             raise ValueError('audit inputs changed during reconstruction; use a stable snapshot')
@@ -272,7 +350,9 @@ def report(data_dir, as_of, horizons=(90, 180, 365), repetitions=100, *, verify_
                 price_inventory=inventory(timeline, replay), text_enrichment=enrichment(timeline),
                 cross_source_families=[dict(source=source, native_market=market, scope=scope, family=family)
                                        for (source, market, scope), family in sorted(ANALYSIS_EQUIVALENCES.items())],
-                density_by_contract=density(replay), v3_decision_clock_funnel=frozen.funnel(audit, replay),
+                density_by_contract=density(checked, timeline), v3_decision_clock_funnel=frozen.funnel(audit, replay),
+                receipt_format_anomalies=timeline.receipt_format_anomalies,
+                v3_waterfall_stage_basis='legacy_heuristic_uses_snapshot_lookahead_for_attribution',
                 v3_anchor_price_inventory=frozen.inventory(audit, replay),
                 v3_spacing=frozen.spacing(replay), v3_waterfall=waterfall, v3_waterfall_by_class=dict(failures),
                 unsupported_settlements=unsupported_settlements(replay), v3_results=frozen.results_availability(replay),

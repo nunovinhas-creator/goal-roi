@@ -103,6 +103,11 @@ class Journal(unittest.TestCase):
     def save(self, *rows):
         self.path.write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows), encoding='utf-8')
 
+    def diagnose(self):
+        command = [sys.executable, str(AUDIT / 'diagnose.py'), '--data-dir', str(self.directory),
+                   '--as-of', '2026-11-24T11:00:00Z', '--days', '90', '--repetitions', '2']
+        return subprocess.check_output(command, cwd=ROOT, env=dict(os.environ, PYTHONPATH=str(ROOT)))
+
     def test_delayed_edit_adds_facts_without_mutating_original_quote(self):
         original = alert(odds='1.95–2.05')
         update = alert(odds='2.20', ticket='🧾 9 trades · biggest $12K')
@@ -199,6 +204,59 @@ class Journal(unittest.TestCase):
         self.assertEqual(timeline.context_at('alpha-beta', utc(14)), ())
         self.assertEqual(len(timeline.quotes), 1)
 
+    def test_edit_cannot_turn_one_alert_into_another_provider(self):
+        stake = ('💸 🟦 Stake money load — $20K\nTest League · 24 nov 2026 15:00\nAlpha — Beta\n'
+                 '📊 Asian Total → Over 2.5 @ 2.05\n🧾 1 bet · biggest $20K\n'
+                 'https://scangoal.com/match/alpha-beta')
+        self.save(message(1, alert(), utc(10)),
+                  message(1, stake, utc(10), edited=utc(10, 5), collected=utc(10, 7)))
+        timeline = read_timeline(self.directory, utc(11))
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 6))[0].source, 'Polymarket')
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 7)), ())
+        self.assertIn('revision_source_conflict', timeline.versions[1].issues)
+        self.assertEqual([q.source for q in timeline.quotes], ['Polymarket'])
+
+    def test_completed_context_does_not_resurrect_superseded_fields(self):
+        edited = alert(ticket='🧾 9 trades · biggest $12K')
+        self.save(message(1, alert(), utc(10)),
+                  message(1, edited, utc(10), edited=utc(10, 5), collected=utc(10, 6), receipt=None),
+                  message(1, edited, utc(10), edited=utc(10, 5), collected=utc(10, 15)))
+        timeline = read_timeline(self.directory, utc(11))
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 10), completed_only=True)[0].n_bets, 1)
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 11))[0].n_bets, 9)
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 11), completed_only=True), ())
+        self.assertEqual(timeline.context_at('alpha-beta', utc(10, 15), completed_only=True)[0].n_bets, 9)
+
+    def test_bad_completed_receipt_cannot_set_the_power_window(self):
+        self.save(message(1, alert(), utc(10), receipt=True),
+                  message(2, alert(fixture='other', teams='Charlie — Delta'), utc(10, 1), receipt=1.0))
+        observed = json.loads(self.diagnose())
+        self.assertEqual(observed['receipt_format_anomalies'], 2)
+        self.assertEqual(observed['v3_decision_clock_funnel']['anchors_by_receipt']['completed_page'], 2)
+        self.assertEqual(observed['density_by_contract'], [])
+        self.assertEqual(observed['power']['completed_receipt_exposure_utc_days'], 0)
+        self.assertIsNone(observed['power']['default_zero_pair_power']['pairs_per_day'])
+
+    def test_density_uses_only_points_known_at_that_receipt(self):
+        other = dict(fixture='other', teams='Charlie — Delta')
+        self.save(message(1, alert(), utc(10)),
+                  message(2, alert(**other), utc(10, 1)),
+                  message(3, alert(odds='2.05'), utc(10), collected=utc(10, 2)),
+                  message(4, alert(odds='1.91', **other), utc(10, 3)),
+                  message(5, alert(odds='1.90–1.90'), utc(10, 4)))
+        density, = json.loads(self.diagnose())['density_by_contract']
+        self.assertEqual(density['reference_observations'], 5)
+        self.assertEqual(density['references_with_other_fixture_last_hour_and_kickoff_within_45m'], 4)
+        self.assertEqual(density['references_with_point_in_both_and_kickoff_within_45m'], 1)
+        self.assertEqual(density['hourly_arrivals'][0]['point_observations'], 3)
+
+    def test_delayed_old_quote_does_not_displace_the_latest_emission(self):
+        self.save(message(1, alert(odds='2.10'), utc(10, 10)),
+                  message(2, alert(odds='1.90–2.0'), utc(10, 5), collected=utc(10, 20)),
+                  message(3, alert(fixture='other', teams='Charlie — Delta'), utc(10, 21)))
+        density, = json.loads(self.diagnose())['density_by_contract']
+        self.assertEqual(density['references_with_point_in_both_and_kickoff_within_45m'], 1)
+
     def test_raw_ranges_never_become_points_and_before_kickoff_scores_are_withheld(self):
         self.save(message(1, alert(odds='2.0 - 2.2'), utc(10)),
                   message(2, alert(odds='2.2–1.9'), utc(10)),
@@ -227,11 +285,8 @@ class Journal(unittest.TestCase):
         # Exercise autonomous mining and the waterfall without the historical corpus.
         self.save(*(message(i, alert(fixture=f'{i}-fixture', teams=f'Home {i} — Away {i}'), utc(10))
                     for i in range(1, 5)))
-        command = [sys.executable, str(AUDIT / 'diagnose.py'), '--data-dir', str(self.directory),
-                   '--as-of', '2026-11-24T11:00:00Z', '--days', '90', '--repetitions', '2']
-        env = dict(os.environ, PYTHONPATH=str(ROOT))
-        a = subprocess.check_output(command, cwd=ROOT, env=env)
-        b = subprocess.check_output(command, cwd=ROOT, env=env)
+        a = self.diagnose()
+        b = self.diagnose()
         self.assertEqual(a, b)
         report = json.loads(a)
         self.assertEqual(report['strict_pairs'], 0)
@@ -246,6 +301,60 @@ class Journal(unittest.TestCase):
 
 
 class Power(unittest.TestCase):
+    def run_audit(self, script):
+        subprocess.run([sys.executable, '-c', script, str(AUDIT), str(AUDIT.parent / 'temporal-discovery-v3')],
+                       cwd=ROOT, check=True)
+
+    def test_visible_antecedent_after_control_quote_is_not_planning_support(self):
+        self.run_audit('''
+import sys
+from datetime import timedelta
+sys.path[:0] = sys.argv[1:]
+from diagnose import pair_diagnostics
+from scangoal import event_intelligence as events
+from scangoal.discovery.replay import Replay
+from world import RULE, START, Scenario, World
+
+bank = World(Scenario('late-control-antecedent'))
+at = START + timedelta(hours=10)
+ko = at + timedelta(hours=2)
+bank.emit('case', ko, at - timedelta(minutes=24), source='Polymarket', odds='2.00', volume=90_000, league='L')
+bank.emit('other', ko, at - timedelta(minutes=10), source='Stake', odds='2.00', league='L')
+bank.emit('other', ko, at - timedelta(minutes=4), source='Polymarket', odds='2.00', volume=90_000, league='L')
+bank.emit('case', ko, at, source='Stake', odds='2.00', league='L')
+replay = Replay(dict(as_of_utc=events.iso(ko + timedelta(days=1)), events=bank.events,
+                     episodes=bank.episodes, fixture_results={}))
+data = pair_diagnostics(replay, [dict(rule=RULE)], (90,), 2)
+assert data['strict_pairs'] == data['completed_receipt_pairs_summed'] == 1, data
+assert data['planning_pairs_summed'] == 0, data
+assert data['planning_pair_exclusions'] == {'control_history_changed_since_quote': 1}, data
+''')
+
+    def test_frozen_same_receipt_order_counterexample(self):
+        self.run_audit('''
+import sys
+from datetime import timedelta
+sys.path[:0] = sys.argv[1:]
+from scangoal import event_intelligence as events
+from scangoal.discovery.replay import Budget, Replay
+from scangoal.discovery.v3 import riskset
+from world import RULE, START, Scenario, World
+
+def run(order):
+    bank = World(Scenario('same-receipt'))
+    at = START + timedelta(hours=10)
+    ko = at + timedelta(hours=2)
+    bank.emit('case', ko, at - timedelta(minutes=20), source='Polymarket', odds='2.00', volume=90_000, league='L')
+    for fixture in order:
+        bank.emit(fixture, ko, at, source='Stake', odds='2.00', league='L')
+    replay = Replay(dict(as_of_utc=events.iso(ko + timedelta(days=1)), events=bank.events,
+                         episodes=bank.episodes, fixture_results={}))
+    return len(riskset.RiskSet(replay).run(RULE, Budget(10_000)).pairs)
+
+assert run(('case', 'other')) == 0
+assert run(('other', 'case')) == 1
+''')
+
     def test_projection_uses_completed_window_pairs_from_the_strict_cascade(self):
         script = '''
 import sys
@@ -266,8 +375,7 @@ assert legacy_report['strict_pairs'] == completed['strict_pairs']
 assert legacy_report['completed_receipt_pairs_summed'] == 0
 assert legacy_report['power']['default_zero_pair_power']['pairs_per_day'] is None
 '''
-        subprocess.run([sys.executable, '-c', script, str(AUDIT), str(AUDIT.parent / 'temporal-discovery-v3')],
-                       cwd=ROOT, check=True)
+        self.run_audit(script)
 
     def test_power_repeats_only_observed_receipt_days_and_runs_kernel(self):
         script = '''
@@ -278,7 +386,7 @@ from power import PairSample, calculate
 
 first = date(2026, 1, 5)
 sample = tuple(PairSample(first + timedelta(days=i), first + timedelta(days=i), 'Stake',
-                          'bucket' + str(i % 2), (2.0, 2.05), (25., 26.), (.5, 1.))
+                          'bucket' + str(i % 2), (2.0, 2.05), (25., 26.), (1., 1.))
                for i in range(8))
 a = calculate(sample, first, 14, (7, 56, 112), 2)
 assert a == calculate(sample, first, 14, (7, 56, 112), 2)
@@ -290,8 +398,31 @@ assert middle['projected_pairs'] == 32 and not middle['minimum_sample_and_weeks'
 assert last['projected_pairs'] == 64 and last['minimum_sample_and_weeks']
 assert last['layers']['prediction']['n'] == last['layers']['announced']['n'] == 2
 '''
-        subprocess.run([sys.executable, '-c', script, str(AUDIT), str(AUDIT.parent / 'temporal-discovery-v3')],
-                       cwd=ROOT, check=True)
+        self.run_audit(script)
+
+    def test_power_withholds_half_settlements_and_infeasible_effects(self):
+        self.run_audit('''
+import sys
+from datetime import date, timedelta
+from dataclasses import replace
+sys.path[:0] = sys.argv[1:]
+from power import PairSample, calculate
+from scangoal.parser import settle
+
+assert settle('Asian Total', 'Over 2.25', (2, 0)) == -.5
+assert not any(settle('Asian Total', 'Over 2.25', (i, 0)) == .5 for i in range(15))
+first = date(2026, 1, 5)
+sample = tuple(PairSample(first + timedelta(days=i), first + timedelta(days=i), 'Stake',
+                          'L', (1.1, 1.1), (25., 26.), (1., 1.))
+               for i in range(8))
+rows = calculate(sample, first, 8, (64,), 1)['effects']
+assert [e['horizons'][0]['status'] for e in rows] == ['simulated', 'simulated', 'effect_infeasible_at_observed_odds']
+assert rows[-1]['horizons'][0]['layers']['prediction']['rate'] is None
+for quarter in (replace(sample[0], quarter_line=True), replace(sample[0], stakes=(.5, 1.))):
+    rows = calculate((quarter, *sample[1:]), first, 8, (64,), 1)['effects']
+    assert all(e['horizons'][0]['status'] == 'unsupported_quarter_line_outcome_model' for e in rows)
+    assert all(e['horizons'][0]['layers']['announced']['rate'] is None for e in rows)
+''')
 
 
 if __name__ == '__main__':
