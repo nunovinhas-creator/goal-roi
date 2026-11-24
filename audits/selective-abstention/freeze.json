@@ -1,0 +1,105 @@
+{
+  "algorithm_sha256": {
+    "scangoal/discovery/experimental_j/__init__.py": "2d70ce384928c2f4161aef57a1fdf7b4babc4322146b152da1dfcb517b2300a0",
+    "scangoal/discovery/experimental_j/observe.py": "fea25c435e0ce61e74b01b8d9abb98f37b14bafb2650897606e09ef7957d92f0",
+    "scangoal/discovery/experimental_j/refine.py": "3db230777b82f5df1d56d57f8a8591351493db721006b7636adaf4e2f812c372",
+    "scangoal/discovery/experimental_j/selector.py": "cf469a4db4b28369760cba44be3cfb53adf25819f8cc01c072459cbb14c34625"
+  },
+  "base": "0458396c7f9a91365d7c004c09530a481bf80981",
+  "confirmatory": false,
+  "decision": [
+    "every family passes eligibility",
+    "for every family and mining seed J does not abstain and its choice meets all three thresholds in every validation seed",
+    "J choices and their validation measurements are invariant to the transport transformation",
+    "the frozen miner reports a complete search on every mining bank",
+    "otherwise NO-GO; the algorithm is not retuned on these banks"
+  ],
+  "design": {
+    "families": 4,
+    "family_content": "new mechanisms written after this lock; none may reuse a PR G/H/I family; each family has at least six near-miss mechanisms",
+    "labels": "the miner and selector receive only the observation tape; labels stay inside the evaluator",
+    "mining_seeds": [
+      61403,
+      18839
+    ],
+    "nuisance": "distractor rates, an optional unrelated background population and price/volume scale shifts are drawn from the generator RNG, not chosen per family by hand",
+    "phases": {
+      "live": 2,
+      "pre": 2
+    },
+    "transformation_seed_offset": 52937,
+    "validation_seeds": [
+      330217,
+      472883,
+      905161
+    ]
+  },
+  "eligibility": {
+    "correction": "if a family fails eligibility, the generator may be corrected once before any scoring; the failed check, the diff and the re-check are published. A family still failing is not assessable and makes the overall verdict NO-GO",
+    "counterexamples": "each bank has at least 5 near-miss mechanisms with an eligible terminal decision",
+    "denominators": "targets, detections and abstentions are reported for every family, assessable or not; no family is dropped from any table",
+    "targets": "each bank has at least 8 labelled targets with an eligible receipt decision",
+    "timing": "computed and committed for every mining and validation bank before any proposal is matched against labels"
+  },
+  "engines": {
+    "h": "first proposal of the frozen PR H miner",
+    "i": "first phase-filtered proposal of the frozen PR I miner",
+    "j": "J choice; an abstention scores as zero detections"
+  },
+  "frozen_inputs_sha256": {
+    "audits/autonomous-generalization/README.md": "7248474e11158929cf429178a2de48856d199cbc133b7b91b2d3b97d04e1234d",
+    "audits/autonomous-generalization/banks.py": "a7f5545ff44080e1be8b95ade3dad9151453a122deea03e6476eada00d743456",
+    "audits/autonomous-generalization/freeze.json": "58f56a6da9f4cc971aec2ced4ca0586acd3027a33e8fb1a47057fa6233e63248",
+    "audits/autonomous-generalization/investigate.py": "badad0d134c1b50933d6bec18477b4b9c5154507e0148086a8d3cb7281016ef1",
+    "audits/autonomous-generalization/report.json": "90c8b228ff2b9db4abc1afdb934f0cecbbbf401e259a262aa272db3c16e88094",
+    "audits/autonomous-generalization/run.py": "3905163bd47558da031593716db9e6bbb526a81f6dde2dadfc94dcea00a4f403",
+    "audits/autonomous-generalization/runtime-counters.json": "5e29c0c81bd252e7229270501e98881d582c5b71ce0eefda68ab5b0ada561363",
+    "audits/robust-generalization/README.md": "db485dd4147f61d20cb78e1a81c73d5a7f6ebc2006c682f27edc6b2e3e427881",
+    "audits/robust-generalization/bank_i.py": "49d6011e2fe1cb49125705af70a430113fa6d2bb1dfb36a252fb4af50617dc03",
+    "audits/robust-generalization/evaluate.py": "962575bb4d068c21b0a24e3d6542e329656a49aef954a780e9edab6d73414770",
+    "audits/robust-generalization/freeze.json": "7f4692b24651e1d3d5d25c03af2e944888b63af11ce3f778bb852bb48c6093c2",
+    "audits/robust-generalization/history.py": "609b8b0913498e93d0e8e88383690b41b6e390c673ccb8a3476e0fce86822d06",
+    "audits/robust-generalization/investigate.py": "6f2143630da1e1c1bf27b9418d78a03e4a2a616f2a86668f44a74a84a5a07f6e",
+    "audits/robust-generalization/report.json": "e34c2096959216fadbf68d6b7ff3dee944b750d3725312ca9deff1ee1d6a6f30",
+    "audits/selective-abstention/known.json": "64c07bfaaa63ca1faf176f0d05f2103dd5c044494ff9cf446cf4cd9f00c6650a",
+    "audits/selective-abstention/known.py": "a17fae65f3814d5749f13543befc223779bedc34748ee029605664564e2f2b66",
+    "scangoal/discovery/experimental_h/__init__.py": "790a5d7a7bba8352a11af1085e3335ce1048a99be9033c456e0e5dedad3e95a5",
+    "scangoal/discovery/experimental_h/miner.py": "4bcf9cc5c44a2bee30bba56601bf389ec79f36bee7d8eb9b444eeacb54083247",
+    "scangoal/discovery/experimental_h/observed.py": "c6b30bbb5c3d1928952d91efb4e4bf85732c287ac75eb8aa7fc8b2bae84e490c",
+    "scangoal/discovery/experimental_h/research.py": "c68ef69e8bd3cdfed73c0f02b8daa4d9457732ec48108142d9cfba8d64444a91",
+    "scangoal/discovery/experimental_h/rules.py": "f8c57a0b5cb29ca6a299f454ec03aba571e6a69e620fdb61fb8347fbf392f13d",
+    "scangoal/discovery/experimental_i/__init__.py": "20288eda11f7b7543b1e4f5afa6a2b1cb3457971ff25b71cf8f551c80c0170e8",
+    "scangoal/discovery/experimental_i/features.py": "027fb371e0457ba13b4882257cf4b412249d4f7010e1e664cd9341cc8c0e3a83",
+    "scangoal/discovery/experimental_i/miner.py": "458c596933480250230e6f9201e14fd9721eee2d7cd6e40f0a44d50e8b2060de",
+    "scangoal/discovery/experimental_i/paths.py": "e3dec2e67548f1892ab442c9317055b6cd2883d8451d3b7b86793c0497614030"
+  },
+  "order": [
+    "commit this lock",
+    "write bank_j.py and evaluate.py",
+    "publish eligibility before scoring",
+    "freeze H/I/J choices by hash before building validation banks",
+    "score"
+  ],
+  "schema": "goal_roi_pr_j_pre_holdout_lock_v1",
+  "selector": {
+    "ambiguity": "1/2",
+    "consensus": "4/5",
+    "consensus_rounds": 2,
+    "generator": "balanced-trajectory-portfolio-v1 (frozen PR I miner)",
+    "half_share": "1/4",
+    "matcher_work": 300000,
+    "max_terminals_per_fixture": "11/10",
+    "min_days": 2,
+    "min_fixtures": 5,
+    "mining_work": 1800000,
+    "regular": "3/4",
+    "replication": "independent re-selection on each calendar half must return the same shape",
+    "version": "regular-shape-consensus-selector-v1"
+  },
+  "thresholds": {
+    "exact_path_recall": 0.75,
+    "precision": 0.9,
+    "terminal_recall": 0.8
+  },
+  "written_before": "bank_j.py and evaluate.py do not exist when this lock is committed"
+}
