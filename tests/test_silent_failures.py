@@ -422,6 +422,8 @@ class Steps(unittest.TestCase):
         tolerated = sorted(n for n, lines in steps().items() if '        continue-on-error: true' in lines)
         # P2: `Commit data from the fast reads` deixou de ser tolerado (uma falha de persistência deixa a execução vermelha).
         self.assertEqual(tolerated, ['Fast reads every 2 minutes until the next collection (read-only)',
+                                     # B4 (autorizado em 2026-11-24): registo prospetivo, só acrescenta, nunca bloqueia a recolha.
+                                     'Prospective ledger (append-only)',
                                      'Results from BSD (hourly at most; skipped without key)',
                                      'Results from Highlightly (every 90 minutes at most; skipped without key)',
                                      # P2 Polymarket (ativação): observador sombra, só leitura, nunca bloqueia a recolha.
