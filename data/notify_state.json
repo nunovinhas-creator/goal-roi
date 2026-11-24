@@ -2100,13 +2100,15 @@
    "attempt_utc": "2026-11-24T18:55:33+00:00",
    "chars": 207,
    "created_utc": "2026-11-24T18:55:33+00:00",
+   "done_utc": "2026-11-24T18:55:33+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "78bf8b2734cc3b2cd4ca7ec8a9091f812b5cb38743fffda30b101ea11fc9856d",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:brondby-vs-midtjylland-20261123|bfecb0b6e049": {
    "attempt_id": "13d3bfee74064a48a3730213ac88fc11",
@@ -5556,12 +5558,17 @@
    "state": "delivered"
   },
   "game|id:real-madrid-vs-psv-eindhoven-20261124|3babc8bf80dd": {
+   "attempt_id": "5cd990e7b05648039d65792da69d5799",
+   "attempt_utc": "2026-11-24T18:55:35+00:00",
+   "chars": 217,
    "created_utc": "2026-11-24T18:55:33+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "8a86b859d3938309cc254865278eaa49a022e39fcc56d312f3906d43d31057b8",
+   "state": "in_flight"
   },
   "game|id:real-madrid-vs-psv-eindhoven-20261124|7852bfe542e8": {
    "attempt_id": "33351217ac784614bd29b46007af9128",
@@ -7094,7 +7101,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 456,
+  "delivered": 457,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:53:01+00:00",
@@ -7200,7 +7207,8 @@
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5": true,
   "2026-11-24T18:47:16+00:00|Bodo-Glimt — LASK Linz|Bodo Glimt": true,
   "2026-11-24T18:47:20+00:00|Galatasaray — Aston Villa|Over 1.5": true,
-  "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)": true
+  "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)": true,
+  "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -8630,6 +8638,9 @@
   "item|id:real-madrid-vs-psv-eindhoven-20261124|Polymarket|AH1(-2.5)": {
    "at_utc": "2026-11-24T18:04:49+00:00"
   },
+  "item|id:real-madrid-vs-psv-eindhoven-20261124|Polymarket|AH2(+2.5)": {
+   "at_utc": "2026-11-24T18:55:33+00:00"
+  },
   "item|id:real-madrid-vs-psv-eindhoven-20261124|Polymarket|AH2(+3.5)": {
    "at_utc": "2026-11-24T08:13:08+00:00"
   },
@@ -8917,7 +8928,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 768,
+ "sent_total": 769,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9828,6 +9839,7 @@
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5",
   "2026-11-24T18:47:16+00:00|Bodo-Glimt — LASK Linz|Bodo Glimt",
   "2026-11-24T18:47:20+00:00|Galatasaray — Aston Villa|Over 1.5",
-  "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)"
+  "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)",
+  "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)"
  ]
 }
