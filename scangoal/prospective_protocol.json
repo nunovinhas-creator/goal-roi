@@ -1,0 +1,48 @@
+{
+  "schema": "goal_roi_prospective_protocol_v1",
+  "frozen": "before activation; the first ledger entry records the SHA-256 of this file and of the code. A different file stops registration under this protocol.",
+  "scope": "future eligible signals only: signal_seen_utc at or after the activation entry. Historical data never enters this ledger.",
+  "population": {
+    "eligible": "scangoal.eligibility.eligible(signal) is true at registration (valid odds, market and selection, verified provenance, no burst, not edited or already finished at first sight, unique match identity)",
+    "unit_of_registration": "one record per signal key (match_id, type, market, selection), at the first collector run that sees it",
+    "registered_before_result": "no final result known to the system at registration (bot result, bot mark or independent provider); otherwise registered with result_known_at_registration=true and excluded from every analysis"
+  },
+  "independent_result": {
+    "sources": ["Highlightly", "BSD"],
+    "binding": "scangoal.report.external_matches on the registered fixture: exact normalized teams (or reviewed alias), compatible competition, kickoff within 15 minutes, a single provider candidate",
+    "score": "regulation time (90 minutes) only; extra time, penalties, awarded or abandoned games stay without result",
+    "first_confirmation": "the first bound provider record per provider is appended as an outcome entry; it is never replaced",
+    "conflict": "a later different score from the same provider, or providers disagreeing, is appended as outcome_conflict and the game is excluded from the primary analysis",
+    "bot_results": "never used as confirmation; reported separately for comparison",
+    "missing": "no independent result 72 hours after kickoff (or after the signal when kickoff is unknown): an outcome_missing entry; excluded from estimates and counted in every table"
+  },
+  "hypotheses": {
+    "H1": {
+      "status": "primary, exploratory origin (pre-activation archive: 72.4% vs 65.9%, n=633 signals); never confirmed",
+      "population": "first registered eligible live signal of each game, with integer minute 0-89 and a known score at the signal, registered before any result",
+      "unit": "game (one decision per game)",
+      "outcome": "1 if the independent 90-minute total goals exceed the total at the signal, else 0",
+      "reference": "p0 = 1 - exp(-(2.7/95) * max(1, 95 - minute)): a fixed generic football rate decided before activation; it does not depend on the score",
+      "control": "results reported by minute band (0-29, 30-59, 60-89) and by score state (level, one-goal margin, two or more; total goals 0, 1, 2+). The reference controls minute; score is controlled by stratification, not by the reference",
+      "statistic": "z = (O - E) / sqrt(sum p0 (1 - p0)) over games with an independent result",
+      "decision": "no claim before 200 games with independent results. Above that, 'supported' only if z >= 2.576 (one-sided 0.5%) and O > E in every minute band with at least 30 games; otherwise 'not supported'. Predictive information only: not profitability",
+      "limits": "the reference is not a matched control and not a market price; a supported H1 says nothing about odds or ROI"
+    },
+    "H2": {
+      "status": "secondary. The pre-activation edge (+11.2% in discovery) did NOT replicate (+1.3% in the later check). Followed, not expected",
+      "population": "first registered eligible OPEN_GAME live signal of each game with announced odds in [1.50, 2.50), registered before any result",
+      "unit": "game",
+      "outcome": "selection settled on the independent 90-minute score with the repository's own settlement rules (win, push or loss)",
+      "statistic": "hit rate versus mean implied probability 1/odds; units at announced odds reported only as a description",
+      "decision": "no claim before 200 games. No ROI validation: announced odds are not executable prices and costs are unknown"
+    },
+    "D1": {
+      "status": "diagnostic only, no hypothesis test",
+      "definition": "a registered totals signal whose direction (Over/Under) is opposite to an earlier registered totals signal of another type in the same game"
+    }
+  },
+  "evaluation_horizon": "a game is evaluable once its independent outcome entry exists; analysis tables are rebuilt from the ledger at every run",
+  "integrity": "append-only JSON lines; each entry carries seq, prev_sha256 and sha256 over its canonical content; duplicates of signal keys or outcome (game, provider) pairs are refused; the chain is verified before every append and a broken chain stops appends",
+  "reversal": "disable the workflow step or delete the step from collect.yml; the ledger stays as evidence and is never edited",
+  "not_validated": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}

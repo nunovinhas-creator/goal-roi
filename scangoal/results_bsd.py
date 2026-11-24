@@ -96,11 +96,31 @@ def score_of(event):
     return [h, a] if all(type(n) is int and n >= 0 for n in (h, a)) and type(event.get('id')) is int else None
 
 
+LEAGUE_NOISE = frozenset({'league', 'liga', 'division', 'primera', 'premier', 'the'})
+
+
+def leagues_compatible(expected, observed):
+    """Same competition written differently: the shorter name's distinctive words all appear in the longer one.
+
+    'la liga' vs 'spanish la liga primera' and 'ligue 2' vs 'french ligue 2' are compatible; 'superliga' vs
+    'danish super league' is not, and a single generic word ('league', 'liga') never establishes identity.
+    """
+    a, b = set(expected.split()), set(observed.split())
+    short, long = (a, b) if len(a) <= len(b) else (b, a)
+    return short <= long and (len(short) >= 2 or bool(short - LEAGUE_NOISE))
+
+
 def competition_ok(target, event, *, provider_id=None):
+    """Competition check, used together with exact team identity, kickoff compatibility and a single candidate.
+
+    When both leagues are known they must be compatible (leagues_compatible), even for a bound provider id.
+    Without a provider league only an independently bound provider id is accepted (audit N03): teams and
+    kickoff alone never identify a fixture.
+    """
     expected = norm_team(target.get('league'))
     observed = norm_team(name_of(event, 'league') or name_of(event, 'competition'))
     if expected and observed:
-        return expected == observed
+        return leagues_compatible(expected, observed)
     return type(provider_id) is int and provider_id == event.get('id')
 
 
@@ -139,6 +159,7 @@ def event_binding(mid, target, event):
             'away': name_of(event, 'away_team'), 'event_date': kickoff_of(event).isoformat(),
             'league': name_of(event, 'league') or name_of(event, 'competition') or None,
             'target_league': target.get('league'), 'target_teams': target.get('teams'),
+            'target_kickoff_utc': target.get('kickoff_utc'), 'target_phase': target.get('phase'),
             'identity_method': 'provider_id' if type(target.get('provider_id')) is int else 'competition_participants_kickoff',
             'link': event.get('url')}
 
@@ -192,12 +213,16 @@ def save_result_state(path, state):
 def pending_targets(now, max_age_days=MAX_AGE_DAYS):
     """Jogos com apostas, sem resultado guardado da BSD, já terminados há tempo suficiente e não demasiado antigos."""
     from .report import build_bets, load
+    from .prospective import registered_matches
+    prospective = registered_matches()
     chron = {}
     msgs, ft, marks, notes, _ = load(chron, as_of=now)
     out = {}
     for b in build_bets(msgs, ft, marks, notes, strict=False, chronology=chron, now=now):
-        # Betfair: sempre (o bot nunca dá o resultado). Outros tipos: só se o bot não o deu.
-        if not (b['type'] == 'BETFAIR' or b['ft'] is None) or not b['teams'] or len(b['teams']) != 2 or not b['match_id']:
+        # Betfair: sempre (o bot nunca dá o resultado). Outros tipos: só se o bot não o deu, ou se o jogo está no
+        # registo prospetivo, que exige confirmação independente (a consulta é por dia: não gasta pedidos extra).
+        if (not (b['type'] == 'BETFAIR' or b['ft'] is None or b['match_id'] in prospective)
+                or not b['teams'] or len(b['teams']) != 2 or not b['match_id']):
             continue
         ref = datetime.fromisoformat(b['kickoff_utc'] or b['date_utc'])
         # Só o estado "terminado" da fonte liquida; por isso pode pedir-se cedo e repetir: 1h50 depois do início, ou 1h45 depois de um sinal ao vivo.

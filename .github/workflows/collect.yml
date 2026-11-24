@@ -96,6 +96,13 @@ jobs:
       - name: Report (fixed rules)
         if: ${{ !cancelled() }}
         run: python -m scangoal.report > /dev/null && cp data/report.json docs/report.json
+      # B4: append-only prospective ledger of future eligible signals and independent outcomes. Never blocks the
+      # collection, never sends notices, reads no new source. Reversal: remove this step (the ledger is kept as evidence).
+      - name: Prospective ledger (append-only)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python -u -m scangoal.prospective record
       # Notices only on top of a published state: an intent is claimed by a fast-forward push from this exact tip.
       - name: Publish the report before sending notices
         id: published
