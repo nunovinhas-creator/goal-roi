@@ -1,0 +1,107 @@
+{
+  "command": [
+    "unshare",
+    "--net",
+    "--mount",
+    "--pid",
+    "--ipc",
+    "--uts",
+    "--fork",
+    "--kill-child",
+    "sh",
+    "-c",
+    "\nset -eu\nR=\"$1\"; KIT=\"$2\"; OUT=\"$3\"; ENTRY=\"$4\"; PORT=\"$5\"\nmount --make-rprivate /\nmount -t tmpfs -o size=16m,mode=0755 none \"$R\"\nmkdir -p \"$R/usr\" \"$R/kit\" \"$R/out\"\nln -s usr/bin \"$R/bin\"; ln -s usr/lib \"$R/lib\"; ln -s usr/lib64 \"$R/lib64\"\nmount --bind /usr \"$R/usr\"; mount -o remount,bind,ro,nosuid,nodev \"$R/usr\"\nmount --bind \"$KIT\" \"$R/kit\"; mount -o remount,bind,ro,nosuid,nodev,noexec \"$R/kit\"\nmount --bind \"$OUT\" \"$R/out\"; mount -o remount,bind,rw,nosuid,nodev,noexec \"$R/out\"\nmount -o remount,ro \"$R\"\nexec chroot \"$R\" /usr/bin/env -i PATH=/usr/local/bin:/usr/bin LANG=C.UTF-8 \\\n    /usr/local/bin/python3 -I \"$ENTRY\" /out \"$PORT\"\n",
+    "<sandbox script>",
+    "sandbox",
+    "<root>",
+    "<kit>",
+    "<out>",
+    "/kit/probe.py",
+    "<proxy port>"
+  ],
+  "ended_utc": "2026-11-24T18:38:22.584553+00:00",
+  "exit_code": 0,
+  "kit_files": [
+    "bank_author_kit/README.md\t2243\td83df9aa2eef7a3186298801ed4aa2c4d99041c5389178ad99b3793775267274",
+    "bank_author_kit/interface.json\t1954\tf99cbac7d1439f115802dcd48f0461222caa58d95a6a84dc1288c0bb391ff2b2",
+    "bank_author_kit/template.py\t1719\tcb38775454ff4f7b2859b5e64a517959550dd58d4b292b9765acec9d1f376e40",
+    "probe.py\t3309\t45414f1a30057229da8034c3e8d110b2ef065627454188054c7d4e27f24b1880",
+    "protocol.json\t7744\t99611ec64891c7e11b9f0252fb7297d074f70765964f3a77dde68cd2562901f3",
+    "tools/commitment.py\t2292\t1aacbffec0e4c41f8f8948ab9d0e10cad99216e97b7800b508285a97f0dde943"
+  ],
+  "kit_tree_sha256_after": "1dca8837911c91709080f95630f93d01ddf20e86b73100e88b9c8a2df54aa55d",
+  "kit_tree_sha256_before": "1dca8837911c91709080f95630f93d01ddf20e86b73100e88b9c8a2df54aa55d",
+  "mode": "sandbox",
+  "output_files": [
+    "probe.json\t989\td3ebb0674b492346f531d35ea2f24619e2d6d35df20cc9f53e8798ac17c0fa09",
+    "write-check\t5\tba9c736f19e7f60b7f6764adb0b7908c0a2b394e09b6c09863528c7f2bc86095"
+  ],
+  "output_tree_sha256": "23f559371a1a2d4e113a5d8b8a42eadc62a915652deaa5be5890fbad61380499",
+  "probe": {
+    "cwd": "/",
+    "dns_github": {
+      "error": "gaierror",
+      "ok": false
+    },
+    "environment_count": 2,
+    "git_directories": [],
+    "interfaces": {
+      "ok": true,
+      "value": [
+        "lo"
+      ]
+    },
+    "repo_paths_visible": {
+      "/home": false,
+      "/home/user/goal-roi": false,
+      "/proc/1/root": false,
+      "/root": false,
+      "/tmp": false,
+      "/workspace": false
+    },
+    "root_entries": [
+      "bin",
+      "kit",
+      "lib",
+      "lib64",
+      "out",
+      "usr"
+    ],
+    "schema": "goal_roi_b_isolation_probe_v1",
+    "sensitive_environment": 0,
+    "tcp_ip_literal": {
+      "error": "OSError",
+      "ok": false
+    },
+    "tcp_loopback_proxy": {
+      "error": "OSError",
+      "ok": false
+    },
+    "template": "refused_no_mechanism",
+    "uid": 0,
+    "write_kit": {
+      "error": "OSError",
+      "ok": false
+    },
+    "write_out": {
+      "ok": true,
+      "value": "/out/write-check"
+    },
+    "write_root": {
+      "error": "OSError",
+      "ok": false
+    },
+    "write_usr": {
+      "error": "OSError",
+      "ok": false
+    }
+  },
+  "probe_sha256": "45414f1a30057229da8034c3e8d110b2ef065627454188054c7d4e27f24b1880",
+  "record_sha256": "ca512dcd401f04bd4cefc9f71acbfe5c52d39c16f9ee3adaf9f4cc96c20a4a18",
+  "runner_sha256": "780d4a2eba0807dad86b865de6328d72233cdc90f774c0181e6afcfe03bb6bba",
+  "sandbox_script_sha256": "45167db088d7f8cfce0c21788df31d0f6064a10f0d03b58abfdb4b9d888ec146",
+  "schema": "goal_roi_b_isolation_run_v1",
+  "started_utc": "2026-11-24T18:38:22.508624+00:00",
+  "stderr": "",
+  "stdout_sha256": "77b17da75055470493bca737fa1ba4726977ab16b9b06ff2b4276ca857b74434"
+}

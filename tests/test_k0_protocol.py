@@ -5,7 +5,9 @@ from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 
@@ -145,6 +147,50 @@ class BLS(unittest.TestCase):
         self.assertFalse(self.bls.verify(key[:-2] + format(int(key[-2:], 16) ^ 1, '02x'), v['round'], v['signature']))
         self.assertFalse(self.bls.verify_entry(dict(self.info, schemeID='pedersen-bls-chained'), v))
         self.assertFalse(self.bls.verify_entry(self.info, dict(v, randomness='00' * 32)))
+
+
+ISOLATION = K0 / 'isolation'
+
+
+class IsolationB(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        spec = importlib.util.spec_from_file_location('goal_roi_k0_run_b', ISOLATION / 'run_b.py')
+        cls.run_b = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.run_b)
+
+    def test_recorded_run_passed_technically_but_is_not_independent(self):
+        verdict = json.loads((ISOLATION / 'runs/verdict.json').read_bytes())
+        self.assertEqual(verdict['technical_isolation'], 'PASS')
+        self.assertEqual(verdict['scientific_independence'], 'NOT DEMONSTRATED')
+        sandbox = json.loads((ISOLATION / 'runs/sandbox.json').read_bytes())
+        body = {k: v for k, v in sandbox.items() if k != 'record_sha256'}
+        self.assertEqual(hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest(), sandbox['record_sha256'])
+        self.assertEqual(sandbox['probe']['sensitive_environment'], 0)
+        self.assertEqual(sandbox['probe']['root_entries'], ['bin', 'kit', 'lib', 'lib64', 'out', 'usr'])
+
+    def test_verdict_fails_on_any_leak(self):
+        good = json.loads((ISOLATION / 'runs/sandbox.json').read_bytes())
+        control = json.loads((ISOLATION / 'runs/control.json').read_bytes())
+        self.assertEqual(self.run_b.verdict(good, control)['technical_isolation'], 'PASS')
+        for field, value in (('sensitive_environment', 1), ('git_directories', ['/x/.git']),
+                             ('dns_github', dict(ok=True)), ('write_kit', dict(ok=True))):
+            leaky = dict(good, probe=dict(good['probe'], **{field: value}))
+            self.assertEqual(self.run_b.verdict(leaky, control)['technical_isolation'], 'FAIL', field)
+        self.assertEqual(self.run_b.verdict(good, dict(control, probe=None))['technical_isolation'], 'FAIL')
+
+    @unittest.skipUnless(hasattr(os, 'geteuid') and os.geteuid() == 0 and shutil.which('unshare'),
+                         'needs root and util-linux unshare')
+    def test_live_sandbox_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sandbox = self.run_b.run(Path(tmp) / 'sandbox.json', sandbox=True)
+        probe = sandbox['probe']
+        self.assertEqual(sandbox['exit_code'], 0)
+        self.assertFalse(any(probe['repo_paths_visible'].values()))
+        self.assertFalse(probe['dns_github']['ok'])
+        self.assertFalse(probe['tcp_loopback_proxy']['ok'])
+        self.assertTrue(probe['write_out']['ok'])
+        self.assertEqual(probe['template'], 'refused_no_mechanism')
 
 
 class Commitment(unittest.TestCase):

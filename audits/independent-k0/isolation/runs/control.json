@@ -1,0 +1,121 @@
+{
+  "command": [
+    "python",
+    "-I",
+    "<kit>/probe.py",
+    "<out>",
+    "<proxy port>",
+    "control"
+  ],
+  "ended_utc": "2026-11-24T18:38:22.658743+00:00",
+  "exit_code": 0,
+  "kit_files": [
+    "bank_author_kit/README.md\t2243\td83df9aa2eef7a3186298801ed4aa2c4d99041c5389178ad99b3793775267274",
+    "bank_author_kit/interface.json\t1954\tf99cbac7d1439f115802dcd48f0461222caa58d95a6a84dc1288c0bb391ff2b2",
+    "bank_author_kit/template.py\t1719\tcb38775454ff4f7b2859b5e64a517959550dd58d4b292b9765acec9d1f376e40",
+    "probe.py\t3309\t45414f1a30057229da8034c3e8d110b2ef065627454188054c7d4e27f24b1880",
+    "protocol.json\t7744\t99611ec64891c7e11b9f0252fb7297d074f70765964f3a77dde68cd2562901f3",
+    "tools/commitment.py\t2292\t1aacbffec0e4c41f8f8948ab9d0e10cad99216e97b7800b508285a97f0dde943"
+  ],
+  "kit_tree_sha256_after": "1dca8837911c91709080f95630f93d01ddf20e86b73100e88b9c8a2df54aa55d",
+  "kit_tree_sha256_before": "1dca8837911c91709080f95630f93d01ddf20e86b73100e88b9c8a2df54aa55d",
+  "mode": "negative_control",
+  "output_files": [
+    "probe.json\t1460\te054551bdb6ce4f86ce4d8b67498c077df4211b70ca800a2800ff05878bccf26",
+    "write-check\t5\tba9c736f19e7f60b7f6764adb0b7908c0a2b394e09b6c09863528c7f2bc86095"
+  ],
+  "output_tree_sha256": "5d35fbd27955d3ff7b397b081f5d4a5d156c2730ef88c6e6ecc4be4662483ac0",
+  "probe": {
+    "cwd": "/tmp/goal-roi-b-w5_uedcu/out",
+    "dns_github": {
+      "ok": true,
+      "value": "140.82.112.4"
+    },
+    "environment_count": 185,
+    "git_directories": [
+      "/home/user/goal-roi/.git",
+      "/opt/rbenv/plugins/ruby-build/.git"
+    ],
+    "interfaces": {
+      "ok": true,
+      "value": [
+        "lo",
+        "ifb0",
+        "ifb1",
+        "eth0"
+      ]
+    },
+    "repo_paths_visible": {
+      "/home": true,
+      "/home/user/goal-roi": true,
+      "/proc/1/root": false,
+      "/root": true,
+      "/tmp": true,
+      "/workspace": false
+    },
+    "root_entries": [
+      "bin",
+      "bin.usr-is-merged",
+      "boot",
+      "container_info.json",
+      "dev",
+      "etc",
+      "home",
+      "lib",
+      "lib.usr-is-merged",
+      "lib64",
+      "lost+found",
+      "media",
+      "mnt",
+      "nix",
+      "old_root",
+      "opt",
+      "probe-root",
+      "proc",
+      "root",
+      "run",
+      "sbin",
+      "srv",
+      "sys",
+      "tmp",
+      "usr",
+      "var"
+    ],
+    "schema": "goal_roi_b_isolation_probe_v1",
+    "sensitive_environment": 31,
+    "tcp_ip_literal": {
+      "ok": true,
+      "value": "connected"
+    },
+    "tcp_loopback_proxy": {
+      "ok": true,
+      "value": "connected"
+    },
+    "template": "error:ModuleNotFoundError",
+    "uid": 0,
+    "write_kit": {
+      "ok": null,
+      "skipped": "control"
+    },
+    "write_out": {
+      "ok": true,
+      "value": "/tmp/goal-roi-b-w5_uedcu/out/write-check"
+    },
+    "write_root": {
+      "ok": null,
+      "skipped": "control"
+    },
+    "write_usr": {
+      "ok": null,
+      "skipped": "control"
+    }
+  },
+  "probe_sha256": "45414f1a30057229da8034c3e8d110b2ef065627454188054c7d4e27f24b1880",
+  "record_sha256": "54df2d83292a747aefc80ca36552efed0745a5f2aa1aee30d3373222fbe8d6c2",
+  "runner_sha256": "780d4a2eba0807dad86b865de6328d72233cdc90f774c0181e6afcfe03bb6bba",
+  "sandbox_script_sha256": "45167db088d7f8cfce0c21788df31d0f6064a10f0d03b58abfdb4b9d888ec146",
+  "schema": "goal_roi_b_isolation_run_v1",
+  "started_utc": "2026-11-24T18:38:22.589432+00:00",
+  "stderr": "",
+  "stdout_sha256": "e2377ce88cc150a3811db6c3dbdc381abc1b604a574a38c763c47c73296f3435"
+}
