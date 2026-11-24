@@ -47,6 +47,9 @@ def run(*, details=False, try_model=True):
         for metrics in (brain['deterministic'], brain['llm']['metrics']):
             if metrics is not None:
                 metrics.pop('all_candidates')
+                if metrics['selected_on_development'] is not None:
+                    metrics['selected_on_development'].pop('rule')
+        brain['oracle'].pop('rule')
     real = all(gates[key] for key in ('verified_real_catalogue_and_book_envelopes',
                                      'real_terms_and_geography_reviewed'))
     return dict(schema='goal_roi_pr_g_executable_report_v1',

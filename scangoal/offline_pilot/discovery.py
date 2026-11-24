@@ -159,7 +159,7 @@ def run(*, try_model=True):
     trajectory, predictions = _candidates(training_tape)
     model = _available_model() if try_model else None
     model_status = 'local_model_or_runtime_unavailable'
-    optional = []
+    optional = None
     if model is not None:
         raw, model_status = researcher.run_local(model, mining.prompt(trajectory))
         if raw is not None:
@@ -172,27 +172,27 @@ def run(*, try_model=True):
         holdouts.append((seed, riskset.RiskSet(tape), target, families))
 
     def evaluate(candidates):
-        scored = []
-        for row in candidates:
-            metrics = _metrics(development, row['rule'], training_truth, training_families)
-            scored.append(dict(id=row['id'], origin=row['origin'], steps=len(row['rule']['steps']),
-                               development=metrics,
-                               holdout=[dict(seed=seed, **_metrics(design, row['rule'], t, f))
-                                        for seed, design, t, f in holdouts]))
+        scored = [dict(**row, steps=len(row['rule']['steps']),
+                       development=_metrics(development, row['rule'], training_truth, training_families))
+                  for row in candidates]
         ranked = sorted(scored, key=lambda row: (-row['development']['exact_terminal'],
                                                 -row['development']['exact_witness'],
                                                 -row['development']['precision_at_t'], row['id']))
-        return dict(candidates=len(scored), selected_on_development=ranked[0] if ranked else None,
+        selected = ranked[0] if ranked else None
+        for row in scored:
+            row['holdout'] = [dict(seed=seed, **_metrics(design, row['rule'], t, f))
+                              for seed, design, t, f in holdouts]
+        return dict(candidates=len(scored), selected_on_development=selected,
                     all_candidates=scored,
                     holdout_passes=sum(all(value['gate_passed'] for value in row['holdout']) for row in scored),
                     distinct_lengths=sorted({row['steps'] for row in scored}))
 
-    oracle = dict(id=registry.hypothesis_id(ORACLE),
+    oracle = dict(id=registry.hypothesis_id(ORACLE), rule=ORACLE,
                   development=_metrics(development, ORACLE, training_truth, training_families),
                   holdout=[dict(seed=seed, **_metrics(design, ORACLE, t, f)) for seed, design, t, f in holdouts])
     det = evaluate(predictions)
     llm = dict(status=model_status, model_basename=model.name if model else None,
-               metrics=evaluate(optional) if optional else None)
+               metrics=evaluate(optional) if optional is not None else None)
     generalizes = bool(det['selected_on_development']
                        and all(row['gate_passed'] and row['search_complete']
                                for row in det['selected_on_development']['holdout']))

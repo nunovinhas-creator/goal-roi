@@ -12,6 +12,7 @@ import unittest
 from unittest.mock import patch
 
 from scangoal import event_intelligence as events
+from scangoal.discovery.v32 import registry
 from scangoal.discovery.v32.tape import Tape
 from scangoal.offline_pilot import assurance, books, discovery, fixtures, manifest, pilot
 
@@ -286,6 +287,8 @@ class Integrated(unittest.TestCase):
         self.assertEqual(results['candidates'], 47)
         self.assertFalse(self.brain['transfer_gate'])
         self.assertEqual(results['holdout_passes'], 0)
+        for candidate in [*results['all_candidates'], self.brain['oracle']]:
+            self.assertEqual(registry.hypothesis_id(candidate['rule']), candidate['id'])
         for score in self.brain['oracle']['holdout']:
             self.assertEqual((score['exact_terminal'], score['exact_witness']), (6, 6))
             self.assertFalse(score['false_motifs'])

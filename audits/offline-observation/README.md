@@ -75,4 +75,4 @@ python -m unittest discover -s tests -p test_offline_observation.py -v
 node --test ops/continuity/watchdog.test.mjs
 ```
 
-O comando sem `--deterministic-only` usa o modelo local se o encontrar. O replay cria o diário numa diretoria temporária e usa fixtures versionadas ou geradas automaticamente. A suite completa é descoberta pelo workflow de testes existente.
+O modo `--details` inclui as regras canónicas de cada candidato e da referência para permitir a inspeção das hipóteses. O comando sem `--deterministic-only` usa o modelo local se o encontrar. O replay cria o diário numa diretoria temporária e usa fixtures versionadas ou geradas automaticamente. A suite completa é descoberta pelo workflow de testes existente.
