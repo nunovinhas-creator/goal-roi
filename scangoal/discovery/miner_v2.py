@@ -24,6 +24,7 @@ CATEGORICAL = ('signal_type', 'source', 'direction', 'phase', 'market_key', 'per
 JOINT_VIEWS = tuple(combinations(('source', 'direction', 'phase', 'score_state', 'line'), 2))
 TRAJECTORIES = ('odds_delta_bp', 'goal_difference_delta', 'line_delta', 'volume_ratio', 'same_score_state', 'same_direction')
 NUMERIC = ('point_odds', 'volume_usd', 'minute', 'share_pct', 'goals')
+GENERATOR_REVISION = 'joint-line-projection-1'
 
 
 def atom(name, value, op='eq'):
@@ -138,10 +139,20 @@ def curve(value, center):
 
 
 def projections(path, fields, marginals):
+    # Keep continuation and transition families separate. Two fields that
+    # both vary can express a joint trajectory rather than two copies of a
+    # frequent constant path. Project line continuity explicitly so the
+    # replay can distinguish an in-line transition from chance co-occurrence.
+    scope = tuple((e['market'], e['period'], e['line']) for e in path)
+    line_continuous = len(path) <= 4 and all(x is not None for x in scope[0]) and len(set(scope)) == 1
     for names in (*((name,) for name in CATEGORICAL), *JOINT_VIEWS):
         steps = tuple(tuple(atom(name, fields(e, name)) for name in names) for e in path)
         if all(a[-1] is not None for step in steps for a in step):
-            yield ('event',) + names, (steps, ())
+            joint_transition = len(names) == 2 and all(len({a[-1] for a in column}) > 1 for column in zip(*steps))
+            yield ('mixed' if joint_transition else 'event', *names), (steps, ())
+            if joint_transition and line_continuous:
+                edges = tuple(link(i, i + 1, 'same_line', True) for i in range(len(path) - 1))
+                yield ('scoped', *names), (steps, edges)
     # Repeated quantitative values may form a state sequence. Require
     # marginal recurrence rather than enumerating arbitrary decimal cutoffs.
     for name in NUMERIC:
@@ -376,7 +387,8 @@ def mine(timeline, known=(), *, emissions=MAX_EMISSIONS, limit=MAX_CANDIDATES):
                 alternative))
             if len(selected) == limit:
                 break
-    return selected, dict(anchors_available=len(timeline.eligible_anchors), anchors_scanned=scanned,
+    return selected, dict(generator_revision=GENERATOR_REVISION,
+                          anchors_available=len(timeline.eligible_anchors), anchors_scanned=scanned,
                           signature_limit_reached=capped, pattern_observations=primary.used,
                           projection_truncated=primary.exhausted, generator_operations=meter.used,
                           refinements=expansions, generator_truncated=meter.exhausted,

@@ -91,17 +91,18 @@ def heldout(seed):
                 engines=[retrieval(replay, world.planted, v) for v in (1, 2)])
 
 
-def power(seed, version, *, null=False):
+def power(seed, version, *, equalized=False):
     """Power of the fixed evaluator given oracle rules, independent of mining.
 
     At discovery the deceptive motif shares the positive example's effect.
     In the prospective window its target probability returns to baseline.
+    Equalizing target probabilities does not impose a decision-contract null.
     """
     start = perf_counter()
     discovery = BANK.START + timedelta(days=30)
     days = 30 + 1 + study.WINDOW.days + 4
     final = BANK.START + timedelta(days=days)
-    all_games, _ = BANK.build(seed, days=days, false_until=30, effect=.48 if null else .78, as_of=final)
+    all_games, _ = BANK.build(seed, days=days, false_until=30, effect=.48 if equalized else .78, as_of=final)
     prefix = at_cut(all_games.audit, discovery)
     app = engine if version == 1 else engine_v2
     language = dsl if version == 1 else dsl_v2
@@ -133,9 +134,10 @@ def power(seed, version, *, null=False):
                         insufficient=ev.get('insufficiency', matched.get('insufficiency')),
                         p=r['multiplicity']['adjusted_p']))
     supported = [r['pattern'] for r in rows if r['status'] == 'experimental']
-    return dict(seed=seed, version=version, null=null, elapsed_seconds=round(perf_counter() - start, 3), rows=rows,
-                true_retained=len([n for n in supported if n != 'false_promising_2']) if not null else 0,
-                false_retained=len(supported) if null else int('false_promising_2' in supported))
+    return dict(seed=seed, version=version, equalized_targets=equalized,
+                elapsed_seconds=round(perf_counter() - start, 3), rows=rows,
+                true_retained=None if equalized else len([n for n in supported if n != 'false_promising_2']),
+                retained=len(supported), false_retained=int('false_promising_2' in supported))
 
 
 def main():
@@ -151,7 +153,7 @@ def main():
         result['holdout'] = [heldout(seed) for seed in HOLDOUT_SEEDS]
     if args.suite in ('power', 'all'):
         result['power'] = [power(seed, version) for seed in REFERENCE_SEEDS for version in (1, 2)]
-        result['power_null'] = [power(seed, 2, null=True) for seed in REFERENCE_SEEDS]
+        result['power_equalized_targets'] = [power(seed, 2, equalized=True) for seed in REFERENCE_SEEDS]
     print(json.dumps(result, sort_keys=True, ensure_ascii=False, indent=2))
 
 

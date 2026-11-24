@@ -27,6 +27,8 @@ A avaliação mantém os rótulos `experimental`, `insufficient` e `rejected`. A
 
 ## Benchmark v1 e v2
 
+Os resultados nesta secção descrevem o HEAD original da PR #84. Consultar a [auditoria científica](SCIENTIFIC-AUDIT.md) para a revisão do minerador, a comparação entre regras selecionadas e regras-oráculo e a calibração adversarial do protocolo congelado.
+
 A unidade para recuperação é o conjunto de jogos. Um padrão conta como recuperado se alguma proposta tiver Jaccard ≥ 0,60 com os jogos plantados. A precisão de candidatos é a fração de propostas que atingem esse limiar para um padrão verdadeiro. Propostas sem correspondência são apresentadas como não atribuídas, pois o banco não permite concluir que toda relação inédita é falsa. Os limiares, as etiquetas e as regras-oráculo são usados exclusivamente pelo benchmark. A avaliação prospetiva usa uma janela nova e o desfecho monetário sintético como ensaio de potência distinto.
 
 | Banco | Semente | Jogos | Recuperação v1 → v2 | Precisão por candidato v1 → v2 |
@@ -63,7 +65,7 @@ As sete definições-oráculo foram publicadas num diário temporário com teste
 | 84 | 0/6 | 1/6 | 0 / 0 |
 | 85 | 0/6 | 1/6 | 0 / 0 |
 
-A v2 formou mais blocos úteis. Por exemplo, a reversão multiorigem do oráculo passou de 4–12 dias emparelhados na v1 para 58–75 dias com suporte na v2. O ensaio continua a mostrar baixa potência após os cortes de cobertura e Holm. A população LIVE plantada não teve um braço negativo comparável, pois o contexto quase identifica a exposição. Num cenário nulo para as sete regras, 0 de 21 testes de três sementes produziram retenção. São ensaios finitos com parâmetros sintéticos. O banco também pode dar o resultado plantado a uma seleção de âncora diferente da aposta implícita no oráculo, o que dilui efeitos e impede interpretar estes números como estimativa de potência universal.
+A v2 formou mais blocos úteis. Por exemplo, a reversão multiorigem do oráculo passou de 4–12 dias emparelhados na v1 para 58–75 dias com suporte na v2. O ensaio continua a mostrar baixa potência após os cortes de cobertura e Holm. A população LIVE plantada não teve um braço negativo comparável, pois o contexto quase identifica a exposição. Com as probabilidades dos alvos do gerador igualizadas, 0 de 21 testes de três sementes produziram retenção. O alvo do gerador pode diferir da seleção e da odd da decisão, pelo que este resultado não calibra a taxa de falsos positivos do teste. São ensaios finitos com parâmetros sintéticos. O banco também pode dar o resultado plantado a uma seleção de âncora diferente da aposta implícita no oráculo, o que dilui efeitos e impede interpretar estes números como estimativa de potência universal.
 
 No snapshot real da PR A, a v2 avaliou 54 propostas no corte de 24 de novembro às 08:22 UTC. Vinte e oito tinham ambos os braços e alguma sobreposição histórica, 26 ficaram insuficientes e houve zero jogos confirmatórios. O estudo preserva a descoberta histórica como um exercício separado da validação futura.
 

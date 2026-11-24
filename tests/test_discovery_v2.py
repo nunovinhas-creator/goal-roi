@@ -95,6 +95,16 @@ class LanguageV2(unittest.TestCase):
         self.assertEqual(len(rejections), 2)
         self.assertEqual(researcher.proposals(raw)[0], [])
 
+    def test_price_path_requires_exact_selection_source_and_period(self):
+        bank = BANK.World(1)
+        first = quote(bank, 'one', AT, 0)
+        second = quote(bank, 'one', AT, 1, price='2.10')
+        self.assertGreater(dsl_v2.relation('odds_delta_bp', first, second), 0)
+        for change in ({'source': 'Stake'}, {'period': 'first_half'}, {'fixture_id': 'other'},
+                       {'market': 'Team Total'}, {'direction': 'under', 'selection': 'Under 2.5'},
+                       {'line': '3.5', 'selection': 'Over 3.5'}):
+            self.assertIsNone(dsl_v2.relation('odds_delta_bp', first, dict(second, **change)), change)
+
 
 class CausalReservation(unittest.TestCase):
     def test_first_completion_waits_and_control_keeps_original_clock(self):
@@ -175,6 +185,27 @@ class ProspectiveBlocks(unittest.TestCase):
         self.assertAlmostEqual(blocks_v2.sign_tail(10, 10), 2**-10)
         self.assertEqual(engine.study.holm([.01, .03, None]), [.03, .06, 1.])
 
+    def test_frozen_sign_targets_non_tied_days(self):
+        world = BANK.World(3)
+        for day in range(80):
+            when = AT + timedelta(days=day)
+            for group in ('case', 'control'):
+                key = next(f'{day}-{i}' for i in range(100) if replay_v2.arm(f'{day}-{i}') == group)
+                if group == 'case':
+                    quote(world, key, when, 1, 'under')
+                quote(world, key, when, 2, price='2.00')
+                world.settle(key, when + timedelta(hours=5), 'over', '2.5', day < 20 and group == 'case')
+        end = AT + timedelta(days=81)
+        replay = audit(world, end + blocks_v2.SETTLEMENT)
+        cohort = replay_v2.Timeline(replay).run(REVERSAL, Budget(2_000))
+        overlap = blocks_v2.overlap(cohort.decisions, Budget(1_000))
+        report = blocks_v2.profile(replay, cohort, overlap, end=end)
+        self.assertEqual(report['days'], 80)
+        self.assertEqual(report['informative_days'], 20)
+        self.assertEqual(report['nominal_sign_p'], 2**-20)
+        self.assertEqual(report['median_day_95pct_interval'], [0., 0.])
+        self.assertGreater(blocks_v2.sign_tail(80, 20), .99)
+
 
 class RegistryCompatibility(unittest.TestCase):
     def test_independent_publication_version_and_immutable_result_archive(self):
@@ -215,6 +246,22 @@ class RegistryCompatibility(unittest.TestCase):
 
 
 class DiscoveryAcceptance(unittest.TestCase):
+    def test_joint_line_projection_is_generic_and_venue_agnostic(self):
+        world = BANK.World(12)
+        a = dict(quote(world, 'game', AT, 1), source='Betfair')
+        b = dict(quote(world, 'game', AT, 2, 'under'), source='Stake')
+        c = dict(quote(world, 'game', AT, 3, 'under'), source='Betfair')
+        fields = lambda e, name: dsl_v2.FIELDS[name].read(e)
+        from collections import Counter
+        rows = dict(miner_v2.projections((a, b, c), fields, Counter()))
+        self.assertIn(('mixed', 'source', 'direction'), rows)
+        definition = dsl_v2.canonical(miner_v2.rule(rows[('scoped', 'source', 'direction')]))
+        self.assertEqual([r['field'] for r in definition['relations']], ['same_line', 'same_line'])
+        other_period = dict(c, period='first_half')
+        rows = dict(miner_v2.projections((a, b, other_period), fields, Counter()))
+        self.assertIn(('mixed', 'source', 'direction'), rows)
+        self.assertNotIn(('scoped', 'source', 'direction'), rows)
+
     def test_reference_recovers_at_least_four_on_all_three_reference_seeds(self):
         for seed in BENCH.REFERENCE_SEEDS:
             replay, labels = BANK.build(seed)
