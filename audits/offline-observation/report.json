@@ -1,0 +1,437 @@
+{
+  "adversarial_audit": {
+    "check_count": 10,
+    "checks": [
+      {
+        "antecedent": "absent",
+        "coverage_slots": 10,
+        "edges": "fcdf3af81201a0626b40d118895e93a89c4759499549d4802b97d2a9fee2d993",
+        "pairs": 1,
+        "receipt_reasons": {
+          "empty": 7,
+          "received": 3
+        },
+        "scenario": "proved_empty",
+        "signature": "d5fa1c3967621349e4dd3118dd4daa0bf376c04e6c4bd12f1590b2eccd877711"
+      },
+      {
+        "antecedent": "indeterminate",
+        "coverage_slots": 9,
+        "edges": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pairs": 0,
+        "receipt_reasons": {
+          "empty": 6,
+          "offline": 1,
+          "received": 3
+        },
+        "scenario": "outage_alert",
+        "signature": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "antecedent": "indeterminate",
+        "coverage_slots": 9,
+        "edges": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pairs": 0,
+        "receipt_reasons": {
+          "empty": 6,
+          "lost_receipt": 1,
+          "received": 3
+        },
+        "scenario": "missing_revision_receipt",
+        "signature": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "antecedent": "indeterminate",
+        "coverage_slots": 9,
+        "edges": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pairs": 0,
+        "receipt_reasons": {
+          "empty": 6,
+          "lost_receipt": 1,
+          "received": 3
+        },
+        "scenario": "late_goal_seal",
+        "signature": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "antecedent": "indeterminate",
+        "coverage_slots": 9,
+        "edges": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pairs": 0,
+        "receipt_reasons": {
+          "empty": 6,
+          "independent_inventory_mismatch": 1,
+          "received": 3
+        },
+        "scenario": "suppressed_known_alert",
+        "signature": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "antecedent": "present",
+        "coverage_slots": 10,
+        "edges": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pairs": 0,
+        "receipt_reasons": {
+          "empty": 6,
+          "received": 4
+        },
+        "scenario": "antecedent_after_comparator_quote",
+        "signature": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "frozen": "picked_one_report",
+        "pilot": "unknown_volume_and_absence_indeterminate",
+        "scenario": "equal_price_conflicting_volume"
+      },
+      {
+        "durable_prefix": 3,
+        "identical_chain_head": true,
+        "scenario": "restart_after_disk_failure"
+      },
+      {
+        "rejected": true,
+        "scenario": "truncation_with_external_checkpoint"
+      },
+      {
+        "rejected": true,
+        "scenario": "forged_capture"
+      }
+    ],
+    "permutation_seeds": [
+      1789,
+      2207,
+      3739,
+      9923
+    ],
+    "schema": "goal_roi_executable_offline_audit_v1",
+    "state_counts": {
+      "absent": 1,
+      "indeterminate": 4,
+      "present": 1
+    }
+  },
+  "confirmatory": false,
+  "decision": {
+    "confirmation": "NO-GO",
+    "execution": "not_demonstrated",
+    "offline": "GO",
+    "request_real_pilot": "NO-GO"
+  },
+  "discovery": {
+    "confirmatory": false,
+    "deterministic": {
+      "candidates": 47,
+      "distinct_lengths": [
+        2,
+        3,
+        4
+      ],
+      "holdout_passes": 0,
+      "selected_on_development": {
+        "development": {
+          "cases": 18,
+          "exact_terminal": 6,
+          "exact_witness": 0,
+          "exact_witness_share": 0.0,
+          "false_motifs": {
+            "price_rises": 6,
+            "wrong_period": 6
+          },
+          "gate_passed": false,
+          "precision_at_t": 0.3333333333333333,
+          "recall_at_t": 1.0,
+          "search_complete": true,
+          "target_games": 6,
+          "wrong_time": 0
+        },
+        "holdout": [
+          {
+            "cases": 18,
+            "exact_terminal": 6,
+            "exact_witness": 0,
+            "exact_witness_share": 0.0,
+            "false_motifs": {
+              "price_rises": 6,
+              "wrong_period": 6
+            },
+            "gate_passed": false,
+            "precision_at_t": 0.3333333333333333,
+            "recall_at_t": 1.0,
+            "search_complete": true,
+            "seed": 59219,
+            "target_games": 6,
+            "wrong_time": 0
+          },
+          {
+            "cases": 18,
+            "exact_terminal": 6,
+            "exact_witness": 0,
+            "exact_witness_share": 0.0,
+            "false_motifs": {
+              "price_rises": 6,
+              "wrong_period": 6
+            },
+            "gate_passed": false,
+            "precision_at_t": 0.3333333333333333,
+            "recall_at_t": 1.0,
+            "search_complete": true,
+            "seed": 80657,
+            "target_games": 6,
+            "wrong_time": 0
+          }
+        ],
+        "id": "tr32:77141ceaad61e6b1a1b0aaa146419bb682ec7df7cf7cd175803f09e978776d27",
+        "origin": "legacy_projection",
+        "steps": 4
+      }
+    },
+    "frozen_entrypoint": {
+      "candidates": null,
+      "status": "invalid_literal_on_mixed_trajectory"
+    },
+    "gates": {
+      "exact_witness_share": 0.75,
+      "precision": 0.9,
+      "recall": 0.8
+    },
+    "holdout_seeds": [
+      59219,
+      80657
+    ],
+    "llm": {
+      "metrics": null,
+      "model_basename": null,
+      "status": "local_model_or_runtime_unavailable"
+    },
+    "oracle": {
+      "development": {
+        "cases": 6,
+        "exact_terminal": 6,
+        "exact_witness": 6,
+        "exact_witness_share": 1.0,
+        "false_motifs": {},
+        "gate_passed": true,
+        "precision_at_t": 1.0,
+        "recall_at_t": 1.0,
+        "search_complete": true,
+        "target_games": 6,
+        "wrong_time": 0
+      },
+      "holdout": [
+        {
+          "cases": 6,
+          "exact_terminal": 6,
+          "exact_witness": 6,
+          "exact_witness_share": 1.0,
+          "false_motifs": {},
+          "gate_passed": true,
+          "precision_at_t": 1.0,
+          "recall_at_t": 1.0,
+          "search_complete": true,
+          "seed": 59219,
+          "target_games": 6,
+          "wrong_time": 0
+        },
+        {
+          "cases": 6,
+          "exact_terminal": 6,
+          "exact_witness": 6,
+          "exact_witness_share": 1.0,
+          "false_motifs": {},
+          "gate_passed": true,
+          "precision_at_t": 1.0,
+          "recall_at_t": 1.0,
+          "search_complete": true,
+          "seed": 80657,
+          "target_games": 6,
+          "wrong_time": 0
+        }
+      ],
+      "id": "tr32:afa40b6deeae87517e4b5f0dca9f886bf336811c99f477b40dfac4f2dd6566e8"
+    },
+    "outcomes_visible_to_miner": false,
+    "schema": "offline_unseen_trajectory_transfer_v1",
+    "training_seed": 23801,
+    "transfer_gate": false,
+    "version": 32
+  },
+  "gates": {
+    "discovery_transfer_gate": false,
+    "independent_real_stream_attestation": false,
+    "offline_protocol_integrity": true,
+    "proof_fail_closed_in_synthetic_replay": true,
+    "real_terms_and_geography_reviewed": false,
+    "slot_accounting_fraction": 0.9986111111111111,
+    "slot_accounting_threshold": 0.95,
+    "verified_real_catalogue_and_book_envelopes": false
+  },
+  "immutable_protocols": {
+    "checked_files": 31,
+    "commit": "6df43dfb4e6be285600fa54ec601f6cd0976be81"
+  },
+  "offline_pilot": {
+    "book_continuous_coverage_spans": 0,
+    "by_protocol": {
+      "CTF": {
+        "distinct_tokens": 18,
+        "max_latency_seconds": 3.0,
+        "median_latency_seconds": 0.0,
+        "observed": 418,
+        "planned": 432,
+        "reopened": 1,
+        "zero_two_sided_liquidity": 1
+      },
+      "V2": {
+        "distinct_tokens": 12,
+        "max_latency_seconds": 3.0,
+        "median_latency_seconds": 0.0,
+        "observed": 288,
+        "planned": 288,
+        "reopened": 0,
+        "zero_two_sided_liquidity": 0
+      }
+    },
+    "catalog_sha256": "c1a0e2193c49db3fdc5f07b8ea4a61b3742e838d062f004a1f99817adaf3bfb4",
+    "chain_head_sha256": "3ccce0a393f60efa6661ad322b143076fa1b3f45b5898098d532cd47c754d636",
+    "comparator_age_seconds": {
+      "max": 3.0,
+      "median": 0.0,
+      "min": 0.0
+    },
+    "comparator_reasons": {
+      "comparator_started": 18,
+      "exact_sampled_book_comparator": 324,
+      "kickoff_outside_45_minutes": 275,
+      "lost_receipt": 42,
+      "no_comparator_slot_due": 22,
+      "protocol_or_contract_scope_mismatch": 694
+    },
+    "comparators": {
+      "excluded": 987,
+      "indeterminate": 64,
+      "valid": 324
+    },
+    "confirmatory_pairs": 0,
+    "coverage_by_stream": {
+      "alert": 4,
+      "goal": 5,
+      "quote": 5,
+      "revision": 5,
+      "score": 5
+    },
+    "evidence_domain": "goal-roi/pilot-offline-fixture-v1",
+    "independent_stream_probe": {
+      "CTF": {
+        "admissible_pairs": 1,
+        "probe_utc": "2029-09-12T18:30:00+00:00",
+        "rows": [
+          {
+            "antecedent": "absent",
+            "game": "edge-ctf",
+            "streams": [
+              "alert",
+              "goal",
+              "quote",
+              "revision",
+              "score"
+            ]
+          },
+          {
+            "antecedent": "indeterminate",
+            "game": "gap-ctf",
+            "streams": [
+              "goal",
+              "quote",
+              "revision",
+              "score"
+            ]
+          },
+          {
+            "antecedent": "present",
+            "game": "ref-ctf",
+            "streams": [
+              "alert",
+              "goal",
+              "quote",
+              "revision",
+              "score"
+            ]
+          }
+        ]
+      },
+      "V2": {
+        "admissible_pairs": 0,
+        "probe_utc": "2029-09-12T18:30:00+00:00",
+        "rows": [
+          {
+            "antecedent": "indeterminate",
+            "game": "pair-v2",
+            "streams": [
+              "alert",
+              "quote",
+              "revision",
+              "score"
+            ]
+          },
+          {
+            "antecedent": "present",
+            "game": "ref-v2",
+            "streams": [
+              "alert",
+              "goal",
+              "quote",
+              "revision",
+              "score"
+            ]
+          }
+        ]
+      }
+    },
+    "manifest_sha256": "b4276d868cba39ef5f9229ece6a1cc48777d5445107c8187ce20ac4f1fb66304",
+    "network_calls": 0,
+    "notifications_sent": 0,
+    "orders_sent": 0,
+    "power": null,
+    "price_basis": "native_token_price",
+    "recorded_book_responses": 2,
+    "schema": "goal_roi_offline_observation_v1",
+    "slots": {
+      "attempted": 717,
+      "lost": 14,
+      "observed": 706,
+      "planned": 720,
+      "reasons": {
+        "book_identity_changed_or_conflicted": 2,
+        "conflicting_receipts": 1,
+        "crossed_or_locked_book": 1,
+        "disk_error": 1,
+        "incomplete_book_or_wrong_protocol": 1,
+        "lost_receipt": 1,
+        "market_suspended": 1,
+        "no_two_sided_liquidity": 1,
+        "observed": 706,
+        "offline": 1,
+        "rate_limited": 1,
+        "timeout": 1,
+        "unproven_latency_or_source_clock": 2
+      }
+    },
+    "window": {
+      "hours_before_kickoff": 6,
+      "included_games": [
+        "edge-ctf",
+        "gap-ctf",
+        "pair-v2",
+        "ref-ctf",
+        "ref-v2"
+      ],
+      "kickoff_caliper_minutes": 45,
+      "max_cadence_minutes": 15
+    }
+  },
+  "reviews": [
+    "https://github.com/nunovinhas-creator/goal-roi/pull/87#pullrequestreview-6041697734"
+  ],
+  "schema": "goal_roi_pr_g_executable_report_v1",
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}
