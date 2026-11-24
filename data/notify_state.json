@@ -1647,12 +1647,17 @@
    "state": "delivered"
   },
   "game|id:boca-juniors-de-cali-vs-quindio-20261124|231480cc2678": {
+   "attempt_id": "ad676ab4ecdd48caa324832ea7ce797a",
+   "attempt_utc": "2026-11-24T01:41:11+00:00",
+   "chars": 209,
    "created_utc": "2026-11-24T01:41:10+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "5152691dc620f2a5258da4f6228fc086fa779f48232c83dc4fce22aea36cce86",
+   "state": "in_flight"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|c53de40e793c": {
    "attempt_id": "3625b1296d204f7fa31b65db66c1ac50",
@@ -2856,13 +2861,15 @@
    "attempt_utc": "2026-11-24T01:41:10+00:00",
    "chars": 182,
    "created_utc": "2026-11-24T01:41:10+00:00",
+   "done_utc": "2026-11-24T01:41:10+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "3de293da6e5affee940208fee117cbe91f7349fa3e1bd1341dd194320e8930bc",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:feyenoord-vs-sbv-excelsior-20261121|2e8d788f3c2e": {
    "attempt_utc": "2026-11-21T19:26:44+00:00",
@@ -6479,7 +6486,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 415,
+  "delivered": 416,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T01:35:24+00:00",
@@ -6543,6 +6550,7 @@
   "2026-11-23T23:34:02+00:00|Santos — Gremio|Santos": true,
   "2026-11-23T23:54:30+00:00|Internacional — Vitoria BA|Over 5": true,
   "2026-11-24T00:10:27+00:00|Santos — Gremio|AH1(-0.5)": true,
+  "2026-11-24T01:37:54+00:00|Boca Juniors de Cali — Quindio|Over 3": true,
   "2026-11-24T01:38:00+00:00|Feyenoord — Porto|AH2(-0.5)": true
  },
  "migrations": {
@@ -6732,7 +6740,7 @@
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 42,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": 36,
-  "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 21,
+  "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 22,
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": 26,
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": 84,
@@ -6748,7 +6756,7 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 45,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Ritmo indicado pelo bot = menos de 90": 33,
-  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 78,
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 79,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
   "Polymarket | Competição = liga & Momento = durante o jogo": 51,
   "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 42,
@@ -7088,6 +7096,9 @@
   },
   "item|id:belize-vs-sint-maarten-20261117|Asian Total|Over 3": {
    "at_utc": "2026-11-17T20:19:35+00:00"
+  },
+  "item|id:boca-juniors-de-cali-vs-quindio-20261124|Asian Total|Over 3": {
+   "at_utc": "2026-11-24T01:41:10+00:00"
   },
   "item|id:bodo-glimt-vs-lask-linz-20261124|1x2|LASK": {
    "at_utc": "2026-11-23T19:09:06+00:00"
@@ -8132,7 +8143,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 727,
+ "sent_total": 728,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -8961,6 +8972,7 @@
   "2026-11-23T23:34:02+00:00|Santos — Gremio|Santos",
   "2026-11-23T23:54:30+00:00|Internacional — Vitoria BA|Over 5",
   "2026-11-24T00:10:27+00:00|Santos — Gremio|AH1(-0.5)",
+  "2026-11-24T01:37:54+00:00|Boca Juniors de Cali — Quindio|Over 3",
   "2026-11-24T01:38:00+00:00|Feyenoord — Porto|AH2(-0.5)"
  ]
 }
