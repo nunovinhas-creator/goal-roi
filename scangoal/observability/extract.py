@@ -7,7 +7,7 @@ from typing import Literal
 
 from scangoal import match_identity, parser
 
-from .models import ScoreEvent
+from .models import PriceKind, ScoreEvent
 
 DIGITS = r'[0-9]{1,4}'
 GOAL = re.compile(rf"⚽\s*({DIGITS})(?:\+({DIGITS}))?['′]\s+({DIGITS})\s*[-–]\s*({DIGITS})")
@@ -138,7 +138,8 @@ def exchange_quote(text: str, source: str) -> re.Match | None:
     return EXCHANGE_PRICE.fullmatch(line)
 
 
-def price_bounds(text: str, source: str, odds: list[str] | None) -> tuple[Decimal | None, Decimal | None]:
+def price_bounds(text: str, source: str,
+                 odds: list[str] | None) -> tuple[PriceKind, Decimal | None, Decimal | None]:
     """Verify the entire advertised token, including both ends of a range."""
     if source in ('Polymarket', 'Betfair'):
         match = exchange_quote(text, source)
@@ -148,9 +149,9 @@ def price_bounds(text: str, source: str, odds: list[str] | None) -> tuple[Decima
         match = STAKE_PRICE.fullmatch(quotes[0]) if len(quotes) == 1 else None
         tokens = match.groups() if match else None
     else:
-        tokens = odds
+        tokens = (odds[0], odds[1] if odds[1] != odds[0] else None) if odds is not None else None
     if tokens is not None:
         low, high = Decimal(tokens[0]), Decimal(tokens[1] or tokens[0])
         if 1 < low <= high:
-            return low, high
-    return None, None
+            return ('interval' if tokens[1] is not None else 'point'), low, high
+    return 'indeterminate', None, None

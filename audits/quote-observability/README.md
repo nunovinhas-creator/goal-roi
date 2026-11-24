@@ -35,7 +35,7 @@ Corte de 24 de novembro de 2026 às 08:22 UTC. SHA-256 da reprodução v3.1 `1f2
 | Identidades de par distintas nesses 13 emparelhamentos | 5 |
 | Pares na janela de recibos completos | 0 |
 
-Os 348 preços recuperados vêm de 271 alertas Betfair e 77 Polymarket. São 326 pontos e 22 intervalos adicionais no inventário de texto. Uma linha de cotação pode ser legível com mercado ou identidade do jogo ainda por provar. Os intervalos continuam a ter ambos os limites. Quando o texto e o parser não sustentam um preço fica `indeterminate`. Os 13 pares históricos e a cascata foram reproduzidos com o protocolo original.
+Os 348 preços recuperados vêm de 271 alertas Betfair e 77 Polymarket. São 326 pontos e 22 intervalos adicionais no inventário de texto. Uma linha de cotação pode ser legível com mercado ou identidade do jogo ainda por provar. Os intervalos continuam a ter ambos os limites, incluindo 11 faixas Polymarket que foram publicadas com extremos iguais. Quando o texto e o parser não sustentam um preço fica `indeterminate`. Os 13 pares históricos e a cascata foram reproduzidos com o protocolo original.
 
 Nas 3.654 observações, 2.242 alertas já tinham maior bilhete e contagem na versão inicial, e 1.196 já tinham volume acumulado. Das 403 versões com recibo completo e ligação ao jogo, 90 tinham cronologia de golos, 313 tinham contagem e maior bilhete e 128 tinham acumulado. As contagens distinguem apostas de negócios. Os totais são agregados publicados por desfecho e jogo e podem reaparecer em revisões. Uma cronologia esparsa ou revista descreve o que o bot reportou com o respetivo recibo.
 

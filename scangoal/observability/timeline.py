@@ -176,8 +176,7 @@ def read_timeline(data_dir: Path, as_of: datetime) -> Timeline:
         if quote_fixture is None and exclusion is None:
             exclusion = 'unproven_fixture_at_receipt'
             exclusions[exclusion] += 1
-        low, high = price_bounds(version.text, event['source'], event['odds'])
-        kind = 'indeterminate' if low is None else 'point' if low == high else 'interval'
+        kind, low, high = price_bounds(version.text, event['source'], event['odds'])
         volume = usd_amount(exchange[4]) if exchange else None
         if volume is None and event['volume_usd'] is not None:
             volume = Decimal(str(event['volume_usd']))

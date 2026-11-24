@@ -203,11 +203,12 @@ class Journal(unittest.TestCase):
         self.save(message(1, alert(odds='2.0 - 2.2'), utc(10)),
                   message(2, alert(odds='2.2–1.9'), utc(10)),
                   message(3, alert(odds='2.2–'), utc(10)),
-                  message(4, alert('Under 2.5') + "\n⚽ 33' 0 - 1", utc(10)))
+                  message(4, alert('Under 2.5') + "\n⚽ 33' 0 - 1", utc(10)),
+                  message(5, alert(odds='2.0–2.00'), utc(10)))
         timeline = read_timeline(self.directory, utc(11))
         prices = {q.message_id: (q.price_kind, q.price_point) for q in timeline.quotes}
         self.assertEqual(prices, {1: ('interval', None), 2: ('indeterminate', None),
-                                 3: ('indeterminate', None), 4: ('point', Decimal('1.90'))})
+                                 3: ('indeterminate', None), 4: ('point', Decimal('1.90')), 5: ('interval', None)})
         row = next(v for v in timeline.versions if v.message_id == 4)
         self.assertEqual(row.scores, ())
         self.assertIn('score_timeline_before_kickoff', row.issues)
