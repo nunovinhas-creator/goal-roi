@@ -1060,6 +1060,19 @@
    "sha256": "5478342b7fcda9903671103bf55f57287fbc5b8e36ecd5ef0f548a3573ea4673",
    "state": "delivered"
   },
+  "game|id:arsenal-vs-dortmund-20261124|0bb8e9477ffa": {
+   "attempt_id": "707adde716fa454595ea54dbdd797e1f",
+   "attempt_utc": "2026-11-24T20:14:20+00:00",
+   "chars": 202,
+   "created_utc": "2026-11-24T20:14:20+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "d651435bc1666127b1e81887cb9a7fe0fb6c55de232326396da136d863a97950",
+   "state": "in_flight"
+  },
   "game|id:arsenal-vs-dortmund-20261124|ad3ce31bd3cf": {
    "attempt_id": "24267d7cdd8b4f1992c3340740753b4f",
    "attempt_utc": "2026-11-24T14:12:10+00:00",
@@ -4261,6 +4274,14 @@
    "sha256": "17f728684618726d4742070905d647a3cc7738b1bf63e8beaa3a4a3929244fa5",
    "state": "delivered"
   },
+  "game|id:leipzig-vs-lens-20261124|9499a11b5470": {
+   "created_utc": "2026-11-24T20:14:20+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
+  },
   "game|id:lens-vs-toulouse-20261121|6f410c8cccce": {
    "attempt_utc": "2026-11-21T19:33:17+00:00",
    "chars": 179,
@@ -7350,13 +7371,13 @@
  "health": {
   "reference": {
    "bsd_results": 48,
-   "eligible": 2180,
+   "eligible": 2182,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 114,
-   "hypotheses": 15011,
-   "settled_bets": 1606,
+   "hypotheses": 15040,
+   "settled_bets": 1608,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 332,
+   "statuses": 334,
    "validation_state": "not_activated"
   }
  },
@@ -7467,7 +7488,8 @@
   "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)": true,
   "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5": true,
   "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)": true,
-  "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)": true
+  "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)": true,
+  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -7675,7 +7697,7 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 81,
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
   "Polymarket | Competição = liga & Momento = durante o jogo": 56,
-  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 44,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 45,
   "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 74,
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 38,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
@@ -7871,6 +7893,9 @@
   },
   "item|id:arsenal-vs-dortmund-20261124|Asian Total|Over 2.5": {
    "at_utc": "2026-11-24T14:12:10+00:00"
+  },
+  "item|id:arsenal-vs-dortmund-20261124|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-24T20:14:20+00:00"
   },
   "item|id:arsenal-vs-dortmund-20261124|Polymarket|X": {
    "at_utc": "2026-11-24T15:39:54+00:00"
@@ -9224,7 +9249,7 @@
   "BETFAIR/live": "poucos dados",
   "BETFAIR/pre": "poucos dados",
   "OPEN_GAME": "estável",
-  "POLYMARKET": "piorou",
+  "POLYMARKET": "estável",
   "STAKE_LOAD": "estável",
   "TOTALS_FORM": "estável",
   "WEAKENED_LINEUP": "poucos dados"
@@ -9307,6 +9332,7 @@
   "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": "abandonada",
   "Polymarket | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Dia = dia de semana & Mercado = golos (mais/menos)": "abandonada",
   "Polymarket | Dia = dia de semana & Mercado = golos (mais/menos) & Momento = antes do jogo": "abandonada",
   "Polymarket | Dia = dia de semana & Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Mercado = golos (mais/menos) & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -9319,6 +9345,7 @@
   "Polymarket | Dia = dia de semana & Número de apostas = uma": "abandonada",
   "Polymarket | Dia = dia de semana & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Polymarket | Dia = dia de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Polymarket | Dia = dia de semana & Número de apostas = uma & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -10182,6 +10209,7 @@
   "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)",
   "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5",
   "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)",
-  "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)"
+  "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)",
+  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5"
  ]
 }
