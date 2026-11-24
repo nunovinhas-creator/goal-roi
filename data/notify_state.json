@@ -1961,12 +1961,17 @@
    "state": "delivered"
   },
   "game|id:bristol-city-vs-wrexham-20261124|5409ea8c33e2": {
+   "attempt_id": "e5bad2bad1c1452b8b60b921c8d2b8a7",
+   "attempt_utc": "2026-11-24T10:29:27+00:00",
+   "chars": 192,
    "created_utc": "2026-11-24T10:29:25+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "2ad668028415812813204fb92549ea02d66925066e575e998298813092ba652f",
+   "state": "in_flight"
   },
   "game|id:brondby-vs-midtjylland-20261123|bfecb0b6e049": {
    "attempt_id": "13d3bfee74064a48a3730213ac88fc11",
@@ -3826,13 +3831,15 @@
    "attempt_utc": "2026-11-24T10:29:25+00:00",
    "chars": 215,
    "created_utc": "2026-11-24T10:29:25+00:00",
+   "done_utc": "2026-11-24T10:29:25+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "89088921336c44477e7a75ff37b9b79bd1d414ca7f5dcf2d1a20fe88b5a43d32",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:kyrgyzstan-vs-vietnam-20261117|12fa94e8316a": {
    "attempt_utc": "2026-11-17T12:58:31+00:00",
@@ -6629,7 +6636,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 425,
+  "delivered": 426,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T10:22:39+00:00",
@@ -6703,6 +6710,7 @@
   "2026-11-24T09:20:21+00:00|Bodo-Glimt — LASK Linz|AH2(+1.5)": true,
   "2026-11-24T10:15:48+00:00|Garudayaksa — PSS Sleman|Over 3": true,
   "2026-11-24T10:17:46+00:00|Kyoto — Pohang Steelers|Kyoto Sanga FC": true,
+  "2026-11-24T10:22:53+00:00|Bristol City — Wrexham|AH2(+0.5)": true,
   "2026-11-24T10:26:17+00:00|Kyoto — Pohang Steelers|Over 0.5": true
  },
  "migrations": {
@@ -7319,6 +7327,9 @@
   },
   "item|id:brisbane-roar-women-vs-melbourne-city-women-20261121|Asian Total|Over 1.5": {
    "at_utc": "2026-11-21T06:35:28+00:00"
+  },
+  "item|id:bristol-city-vs-wrexham-20261124|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-24T10:29:25+00:00"
   },
   "item|id:brondby-vs-midtjylland-20261123|Polymarket|AH1(+0.5)": {
    "at_utc": "2026-11-23T17:50:55+00:00"
@@ -8324,7 +8335,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 737,
+ "sent_total": 738,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9177,6 +9188,7 @@
   "2026-11-24T09:20:21+00:00|Bodo-Glimt — LASK Linz|AH2(+1.5)",
   "2026-11-24T10:15:48+00:00|Garudayaksa — PSS Sleman|Over 3",
   "2026-11-24T10:17:46+00:00|Kyoto — Pohang Steelers|Kyoto Sanga FC",
+  "2026-11-24T10:22:53+00:00|Bristol City — Wrexham|AH2(+0.5)",
   "2026-11-24T10:26:17+00:00|Kyoto — Pohang Steelers|Over 0.5"
  ]
 }
