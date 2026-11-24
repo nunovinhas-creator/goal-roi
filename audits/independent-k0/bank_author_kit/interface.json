@@ -1,0 +1,36 @@
+{
+  "schema": "goal_roi_k0_bank_interface_v1",
+  "function": "build(slot: str, role: 'mining'|'validation', index: int, seed: int) -> dict",
+  "returns": {
+    "observations": "list of event dicts (fields below)",
+    "cutoff_utc": "ISO-8601 UTC string after every observation",
+    "coverage": "list of {fixture_key, from_utc, to_utc, certified_at_utc}: intervals where every receipt is known",
+    "truth": "list of {terminal_message_id, path_message_ids}: labelled target trajectories, terminal last",
+    "counterexamples": "list of {terminal_message_id, mechanism}: near misses, at least 6 mechanisms x 3 fixtures",
+    "background": "list of terminal_message_id of unrelated fixtures"
+  },
+  "event_fields": {
+    "match_id": "text, unique per fixture",
+    "teams": "[home text, away text]",
+    "league": "text",
+    "kickoff_utc": "ISO-8601 UTC",
+    "phase": "pre | live",
+    "minute": "int (live) or null (pre)",
+    "event_kind": "quote | alert | revision | goal | score",
+    "source": "text, e.g. Stake | Betfair | Polymarket | ScanGoal",
+    "signal_type": "text", "signal_kind": "text",
+    "market": "text", "market_key": "text",
+    "period": "regulation | first_half | second_half | first_<n>_minutes",
+    "direction": "over | under", "line": "decimal text", "selection": "text",
+    "price_kind": "point | range (quotes only)",
+    "odds": "[low text, high text] (quotes only)", "price_low": "number", "price_high": "number",
+    "score": "[home int, away int] (required on live quotes)",
+    "volume_usd": "number", "volume_cumulative_usd": "number", "biggest_ticket_usd": "number",
+    "n_bets": "int", "count_unit": "text", "share_pct": "number",
+    "emitted_utc": "ISO-8601 UTC, issue time",
+    "available_utc": "ISO-8601 UTC, receipt time (>= emitted_utc)",
+    "message_id": "unique int",
+    "receipt": "completed_page"
+  },
+  "labels_never_in_observations": ["truth", "counterexamples", "background", "mechanism names"]
+}

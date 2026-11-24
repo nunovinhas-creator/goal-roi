@@ -1,0 +1,154 @@
+{
+  "amendments": "any change after this lock is a new versioned file with its reason; it can never move thresholds, matrix or scoring rules after any commitment by B or C exists",
+  "bank_content": {
+    "fixtures_per_mechanism": 3,
+    "forbidden": "reusing any PR G/H/I/J family or mechanism; family-specific seeds chosen by hand; any input other than the derived seeds",
+    "grammar": "steps drawn from {quote, alert, revision, goal, score}; 4 to 8 steps; at least one relation between non-adjacent steps; at least one of price, volume, count or score transitions; nuisance (distractors, near-omnipresent decoys, unrelated background fixtures, scale shifts, delays) drawn from the seeds",
+    "labels": "kept by B and D only; the engines receive the observation tape only",
+    "minimum_near_miss_mechanisms": 6,
+    "targets_per_bank": 10
+  },
+  "base": {
+    "j_lock_commit": "4d14cc8",
+    "j_verdict": "NO-GO (unchanged)",
+    "pr91_head": "908e361"
+  },
+  "beacon": {
+    "availability": "a round is unavailable only if, within 7 days after its time, fewer than relay_quorum relays return identical randomness and signature with randomness == sha256(signature); then the next round of the sequence applies",
+    "chain_hash": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+    "derivation": "seed = first 8 bytes of HMAC-SHA256(key=randomness, msg=\"goal-roi-k0/v1/<protocol sha256>/<slot>/<role>/<i>\") mod 2^63",
+    "fallback_step_rounds": 864000,
+    "forbidden": "choosing another round, relay subset or derivation for any other reason",
+    "genesis_time": 1692803367,
+    "max_fallbacks": 6,
+    "minimum_margin_seconds": 604800,
+    "network": "drand quicknet (League of Entropy), unchained BLS on G1",
+    "parameters_verified": false,
+    "period_seconds": 3,
+    "primary_round": 36226612,
+    "primary_round_utc": "2027-02-01T12:00:00Z",
+    "relay_quorum": 2,
+    "relays": [
+      "https://api.drand.sh",
+      "https://api2.drand.sh",
+      "https://api3.drand.sh",
+      "https://drand.cloudflare.com"
+    ],
+    "selection": "the first round of primary + k*fallback_step whose scheduled time is at least minimum_margin after the latest of: B commitment publication, K lock publication (GitHub server timestamps)",
+    "verification": "before the K lock, D fetches /info for this chain hash from at least two relays and checks chain hash, genesis and period; any mismatch requires a protocol amendment with a new primary round at least 30 days after the amendment"
+  },
+  "commitments": {
+    "B": "generator tree commitment, file count, and nothing else",
+    "C": "K lock: commit SHA of the algorithm and its parameters, published in the repository",
+    "format": "sha256(\"goal-roi-k0/commitment/v1\\n<role>\\n<protocol sha256>\\n<tree digest>\\n<salt hex>\\n\") with salt >= 32 random bytes",
+    "publication": "as a comment on the K0 tracking pull request; the GitHub server timestamp is the publication time; the repository commit carrying the same value is secondary"
+  },
+  "confirmatory": false,
+  "decision": [
+    "all eight families eligible",
+    "K does not abstain in any family x mining seed",
+    "all 72 K cells pass all three thresholds",
+    "K choices invariant to the transport transformation",
+    "complete search on every mining bank",
+    "evaluation reproduces byte-identically in a second clean run",
+    "otherwise NO-GO; the banks become development data and K is not retuned on them"
+  ],
+  "eligibility": {
+    "correction": "at most one correction per family, by B only, before any scoring; the failed check, the diff and the new commitment are published; seeds are not redrawn",
+    "failure": "a family still ineligible stays in every table and makes the verdict NO-GO",
+    "per_bank": ">= 8 targets with an eligible receipt decision and >= 5 near-miss mechanisms with an eligible terminal decision",
+    "timing": "computed by D after reveal and before any engine choice is scored; published as its own commit"
+  },
+  "independence": {
+    "condition": "independence may be declared only when every attestation in isolation.md is satisfied and verifiable; a separate session with access to the same repository does not count",
+    "current_blocker": "no bank author outside the repository has been designated; this session is algorithm-side and cannot act as B",
+    "declared": false
+  },
+  "matrix": {
+    "engines": {
+      "H": "frozen PR H miner, first proposal",
+      "I": "frozen PR I miner, first phase-filtered proposal",
+      "J": "frozen PR J selector (PR #91), unchanged",
+      "K": "successor, locked before reveal"
+    },
+    "evaluations_per_engine": 72,
+    "families": [
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "pre",
+        "slot": "F1"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "pre",
+        "slot": "F2"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "pre",
+        "slot": "F3"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "pre",
+        "slot": "F4"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "live",
+        "slot": "F5"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "live",
+        "slot": "F6"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "live",
+        "slot": "F7"
+      },
+      {
+        "mechanism": "hidden: chosen by the bank author within the grammar",
+        "phase": "live",
+        "slot": "F8"
+      }
+    ],
+    "mining_seeds": 3,
+    "validation_seeds": 3
+  },
+  "order": [
+    "lock this protocol (K0 PR)",
+    "designate B and complete the isolation attestations",
+    "B publishes generator commitment",
+    "C develops K on development data and publishes the K lock",
+    "beacon round time passes; D fetches and verifies randomness and derives seeds",
+    "B reveals generator and salt; D verifies the commitment",
+    "D publishes eligibility before scoring",
+    "D runs H/I/J/K choices on mining banks and seals them by hash before building validation banks",
+    "D scores once, then reproduces in a second clean run"
+  ],
+  "roles": {
+    "A_protocol": "writes and locks this file; may not write banks or algorithm K after the lock",
+    "B_bank_author": "a person or process with no access to this repository, its history or any H/I/J/K code or report; works only from the exported bank_author_kit",
+    "C_algorithm_author": "develops K on development data only; must never see B generator, mechanisms or final seeds before the K lock",
+    "D_evaluator": "runs the frozen pipeline once in a clean environment and publishes logs; must not communicate bank content to C before scoring"
+  },
+  "schema": "goal_roi_k0_protocol_v1",
+  "scoring_rules": [
+    "an abstention scores zero detections and fails the cell",
+    "zero detections leaves precision undefined and fails the cell",
+    "targets always stay in the denominator; no family, seed or bank is excluded",
+    "an ineligible bank fails its cells",
+    "retrospective best candidates are reported as diagnostics and never enter the decision",
+    "a missing cell is a failed cell"
+  ],
+  "status": "methodology_only",
+  "thresholds": {
+    "exact_path_recall": 0.75,
+    "precision": 0.9,
+    "terminal_recall": 0.8,
+    "unit": "every family x mining seed x validation seed cell, for engine K"
+  },
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}
