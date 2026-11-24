@@ -1,6 +1,7 @@
 """Verify independently sealed plans and receipts in the offline trust domain."""
 
 from collections import Counter, defaultdict
+from copy import deepcopy
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 import fcntl
@@ -10,6 +11,7 @@ import os
 from pathlib import Path
 import re
 from tempfile import NamedTemporaryFile
+from types import MappingProxyType
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
@@ -331,10 +333,15 @@ class VerifiedReplay:
     def __init__(self, plan, authority, journal, capture, *, witness):
         if authority.public_bytes(Encoding.Raw, PublicFormat.Raw) == capture.public_bytes(Encoding.Raw, PublicFormat.Raw):
             raise Invalid('plan_and_capture_authorities_must_be_distinct')
-        self.plan_sha, self.slots = load_plan(plan, authority)
-        self.entries = Journal(journal, self.plan_sha, capture, witness=witness).read()
+        self.plan_sha, slots = load_plan(plan, authority)
+        self.slots = MappingProxyType(slots)
+        self._entries = tuple(Journal(journal, self.plan_sha, capture, witness=witness).read())
         self.catalog_sha256 = plan['content']['catalog_sha256']
-        self.head = self.entries[-1][0] if self.entries else self.plan_sha
+        self.head = self._entries[-1][0] if self._entries else self.plan_sha
+
+    @property
+    def entries(self):
+        return deepcopy(self._entries)
 
     def at(self, cutoff):
         if cutoff.utcoffset() is None:

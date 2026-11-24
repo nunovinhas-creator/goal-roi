@@ -84,6 +84,20 @@ class SignedCoverage(unittest.TestCase):
             replay, slot = self._one(folder, expected=[event], received=[])
             self.assertEqual(replay.at(T).slots[slot.id]['status'], 'independent_inventory_mismatch')
 
+    def test_reading_rows_cannot_mutate_the_verified_prefix(self):
+        game = assurance.lab_games()[0]
+        row = fixtures.typed_event(game, T - assurance.SECOND, 'alert', volume_usd=17_000)
+        with TemporaryDirectory() as folder:
+            replay, slot = self._one(folder, expected=[row])
+            expected = replay.tape_at(T).snapshot_sha256
+            replay.entries[0][1]['payload'][0]['volume_usd'] = 90_000
+            evidence = replay.at(T)
+            evidence.rows[0]['teams'][0] = 'changed'
+            evidence.slots[slot.id]['receipt']['available_utc'] = 'invalid'
+            with self.assertRaises(TypeError):
+                replay.slots[slot.id] = replace(slot, stream='quote')
+            self.assertEqual(replay.tape_at(T).snapshot_sha256, expected)
+
     def test_plan_and_capture_cannot_use_one_authority_or_rebind_seals(self):
         authority, capture = fixtures.authorities()
         slot = assurance.slot_for(assurance.lab_games()[0], 'score', [])
