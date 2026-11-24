@@ -1711,13 +1711,15 @@
    "attempt_utc": "2026-11-24T18:15:37+00:00",
    "chars": 209,
    "created_utc": "2026-11-24T18:15:37+00:00",
+   "done_utc": "2026-11-24T18:15:37+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d176214f0aec9c505560e40dbcd256169d234aa9a8be8a33fc9261934e115d4a",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|c53de40e793c": {
    "attempt_id": "3625b1296d204f7fa31b65db66c1ac50",
@@ -6477,12 +6479,17 @@
    "state": "delivered"
   },
   "game|id:virtus-entella-vs-verona-20261124|74fb93356eb1": {
+   "attempt_id": "e084b9403502405ea7384968420578fb",
+   "attempt_utc": "2026-11-24T18:15:39+00:00",
+   "chars": 276,
    "created_utc": "2026-11-24T18:15:37+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "b0499bd906e8d0164667975a30f2d3a245e300ac486adc670291222c4ecffcb4",
+   "state": "in_flight"
   },
   "game|id:vitoria-ba-vs-bragantino-20261120|5bfed7b7fea9": {
    "attempt_utc": "2026-11-19T23:49:01+00:00",
@@ -6907,7 +6914,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 443,
+  "delivered": 444,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:09:54+00:00",
@@ -6999,6 +7006,7 @@
   "2026-11-24T17:32:16+00:00|Galatasaray — Aston Villa|AH1(+0.5)": true,
   "2026-11-24T17:43:46+00:00|Orlando Pirates (RSA) — Golden Arrows|AH1(-0.5)": true,
   "2026-11-24T18:03:12+00:00|Real Madrid — PSV Eindhoven|AH1(-2.5)": true,
+  "2026-11-24T18:10:54+00:00|Virtus Entella — Verona|Over 2.5": true,
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5": true
  },
  "migrations": {
@@ -7237,7 +7245,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 23,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 24,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 83,
-  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos) & Número de apostas = várias": 37,
+  "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos) & Número de apostas = várias": 41,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
   "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": 46,
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 62,
@@ -8630,6 +8638,9 @@
   "item|id:villarreal-b-vs-gimnastic-20261120|Asian Total|Over 4": {
    "at_utc": "2026-11-20T21:16:28+00:00"
   },
+  "item|id:virtus-entella-vs-verona-20261124|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-24T18:15:37+00:00"
+  },
   "item|id:vitoria-ba-vs-bragantino-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-19T23:59:01+00:00"
   },
@@ -8674,7 +8685,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 755,
+ "sent_total": 756,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9571,6 +9582,7 @@
   "2026-11-24T17:32:16+00:00|Galatasaray — Aston Villa|AH1(+0.5)",
   "2026-11-24T17:43:46+00:00|Orlando Pirates (RSA) — Golden Arrows|AH1(-0.5)",
   "2026-11-24T18:03:12+00:00|Real Madrid — PSV Eindhoven|AH1(-2.5)",
+  "2026-11-24T18:10:54+00:00|Virtus Entella — Verona|Over 2.5",
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5"
  ]
 }
