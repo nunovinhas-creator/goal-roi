@@ -48,7 +48,7 @@ class BankKitBoundary(unittest.TestCase):
                     for alias in node.names}
         imported |= {node.module.split('.')[0] for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)}
         self.assertLessEqual(imported, {'datetime', 'random'})
-        text = ''.join(p.read_text() for p in (K0 / 'bank_author_kit').iterdir())
+        text = ''.join(p.read_text() for p in sorted((K0 / 'bank_author_kit').iterdir()) if p.is_file())
         for word in ('experimental_', 'selector', 'consensus', 'refine', 'miner'):
             self.assertNotIn(word, text)
 
