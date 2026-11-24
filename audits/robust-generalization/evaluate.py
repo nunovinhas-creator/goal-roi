@@ -11,10 +11,11 @@ from time import perf_counter
 
 import bank_i
 import history
+from scangoal import chronology, event_audit
 from scangoal.discovery import dsl
 from scangoal.discovery.experimental_h import miner as previous, observed, rules
 from scangoal.discovery.experimental_i import miner
-from scangoal.discovery.v32 import engine
+from scangoal.discovery.v32 import engine, riskset
 from scangoal.discovery.v32.tape import Tape
 
 DIRECTORY = Path(__file__).resolve().parent
@@ -52,6 +53,25 @@ class Evaluator:
         if clock.exhausted:
             raise RuntimeError('decision_index_budget')
         self.cache = {}
+
+    def availability(self):
+        bank = self.mining_bank
+        tape = self.source.tape
+        eligible = {bank_i.key(d.fixture, d.quote) for d in self.decisions}
+        targets, counterexamples = set(bank.truth), set(bank.counterexamples)
+        reasons = Counter()
+        for key in sorted(targets - eligible):
+            fixture, clock, _ = key
+            at = chronology.parse_utc(clock)
+            view, _ = observed.view_at(tape, fixture, at)
+            anchor = next((candidate for candidate in view.quotes.values()
+                           if bank_i.key(fixture, candidate) == key), None)
+            cause = (event_audit.timely(anchor, at, tape.parts[fixture][0])
+                     or riskset.quote_gate(tape, anchor, view, at)) if anchor is not None else 'quote_not_reconstructed'
+            reasons[cause or 'no_eligible_receipt_decision'] += 1
+        return dict(targets=len(targets), eligible_targets=len(targets & eligible),
+                    counterexamples=len(counterexamples), eligible_counterexamples=len(counterexamples & eligible),
+                    unavailable_target_reasons=dict(reasons))
 
     def measure(self, proposed):
         identity = proposed['id']
@@ -156,6 +176,7 @@ def _prepare(lock, timings):
             h_candidates = baseline['candidates']  # This scenario supplies only one terminal phase.
             plans[scenario, seed] = dict(
                 work=current['work'], stable_rank=current == verified,
+                development_availability=fit.availability(),
                 h_work_complete=not (baseline['work']['exhausted'] or baseline['work']['anchor_scan_capped']),
                 i=_development_result(i_candidates, fit, lock),
                 h=_development_result(h_candidates, fit, lock),
@@ -230,16 +251,21 @@ def run(*, details=False, profile=False):
             bank = bank_i.build(index, seed, fresh=True)
             variant = bank_i.transformed(bank, seed + expected['transformation_seed_offset'])
             batches.append((seed, Evaluator(bank, lock), Evaluator(variant, lock)))
+        availability = [dict(seed=seed, **test.availability()) for seed, test, _ in batches]
+        observable = all(row['eligible_targets'] >= lock['thresholds']['minimum_targets'] for row in availability)
         rows = []
         for seed in expected['development_seeds']:
             plan = plans[scenario, seed]
             rows.append(dict(seed=seed, i=_stages(plan['i'], batches, details=details),
                              h=_stages(plan['h'], batches, details=details),
-                             work=plan['work'], stable_rank=plan['stable_rank'], h_work_complete=plan['h_work_complete']))
-        phase_ok = all(r['work']['search_complete'] and r['stable_rank'] and all(
+                             work=plan['work'], stable_rank=plan['stable_rank'], h_work_complete=plan['h_work_complete'],
+                             development_availability=plan['development_availability']))
+        phase_ok = observable and all(r['work']['search_complete'] and r['stable_rank'] and all(
             trial['chosen_witness_invariant'] and trial['selected'] is not None and trial['selected']['gate']
             for trial in r['i']['transfer']) for r in rows)
         scenarios[scenario] = dict(phase=phase, development=rows, eligibility=phase_ok, counterexample_mechanisms=counterexamples,
+                                   availability=availability,
+                                   scoring_status='assessable' if observable else 'ineligible_labelled_targets',
                                    stability={name: _stability(rows, name) for name in ('i', 'h')})
     timings['validation_seconds'] = perf_counter() - started
     preserved = all(x['max_loss_vs_h_selected'] <= known['max_allowed_loss'] for name, x in known.items()
