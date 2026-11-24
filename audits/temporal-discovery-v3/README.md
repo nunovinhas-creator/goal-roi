@@ -1,4 +1,6 @@
-# PR D · Inferência científica v3 (`temporal-risk-set-v3`)
+# PR D · Inferência científica v3 (`temporal-risk-set-v3.1`)
+
+> **Revisão v3.1.** A v3.0 (`1726e67e…`) contava as meias liquidações asiáticas (`+0,5`/`−0,5`) como vitórias ou derrotas completas na camada de previsão. A v3.1 corrige só essa definição e a v3.0 fica congelada e em quarentena. Ver [HALF-SETTLEMENT.md](HALF-SETTLEMENT.md), a [auditoria de cobertura](COVERAGE-AUDIT.md) e a [especificação da PR E](PR-E-SPEC.md).
 
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**
 
@@ -12,7 +14,7 @@ A v2 comparava casos e controlos em blocos dia × contrato, com relógios difere
 
 | Camada | Pergunta | Estatística por par |
 | --- | --- | --- |
-| Previsão | O antecedente acrescenta informação além da odd anunciada? | (ganhou − 1/odd)caso − (ganhou − 1/odd)comparador, só em desfechos decisivos |
+| Previsão | O antecedente acrescenta informação além da odd anunciada? | (stake ganho − stake decisivo/odd)caso − (idem)comparador, só com stake decisivo > 0; uma meia liquidação conta meio stake |
 | Odd anunciada | O retorno à odd anunciada é melhor do que o do comparador **e** positivo em absoluto? | retorno líquido (2% sobre ganhos, 0,02 por unidade) do caso − do comparador; IC do retorno absoluto do caso > 0 |
 | Execução | Seria rentável executar? | Não mensurável offline. Só um teste de esforço com degradação de odd 0/2/5/10% e o ponto de equilíbrio. Estado fixo: `not_demonstrated`. |
 
@@ -51,8 +53,9 @@ O registo v3 (`scangoal/discovery/v3/registry.py`) é separado do ledger v1/v2. 
 
 | Objeto | SHA-256 |
 | --- | --- |
-| Protocolo v3 | `1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939` |
-| Intérprete v3 (bytes dos módulos interpretativos) | `987a4d68468ab93ee7969258b0d36eab709fcd47c64a9a19d2a01a65e87ca161` |
+| Protocolo v3.1 (em vigor) | `b26e9e14479bd3ef80f4ce8c072768108c62ba9ddb136d3503a13a5bd2bc3e71` |
+| Intérprete v3.1 (bytes dos módulos interpretativos) | `96a4faae34280cad46263dd593bf950131605201b7b9fa9353e6a2c06cd9c417` |
+| Protocolo v3.0 (congelado, em quarentena, nenhum plano registado) | `1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939` |
 | Protocolo v2 (inalterado) | `659d7de3788657abfed2b6a07170f16381e3b7acca202084f67a6af18ed98f3a` |
 | Intérprete v2 (inalterado) | `a22d681b4d66767ee5b3cf06bbe05e446beeddfd5ddc39406ac870d0f178b6c9` |
 | Protocolo v1 (inalterado) | `1c49b4d9a4d5bba54a1d7b05c2a4eec821dbb05bd834fcc1f6e2c87fde081041` |
@@ -79,6 +82,8 @@ PYTHONPATH=. python audits/temporal-discovery-v3/power_v3.py --repetitions 400 >
 PYTHONPATH=. python audits/temporal-discovery-v3/calibration_e2e.py --repetitions 40 > audits/temporal-discovery-v3/results/calibration_e2e.json
 PYTHONPATH=. python audits/temporal-discovery-v3/reevaluate.py > audits/temporal-discovery-v3/results/reevaluate.json
 PYTHONPATH=. python audits/temporal-discovery-v3/real_snapshot.py --as-of 2026-11-24T08:22:00Z > audits/temporal-discovery-v3/results/real_snapshot.json
+PYTHONPATH=. python audits/temporal-discovery-v3/half_settlement.py --as-of 2026-11-24T08:22:00Z > audits/temporal-discovery-v3/results/half_settlement.json
+PYTHONPATH=. python audits/temporal-discovery-v3/coverage_audit.py --as-of 2026-11-24T08:22:00Z > audits/temporal-discovery-v3/results/coverage.json
 python -m unittest discover -s tests -v
 node --test ops/continuity/watchdog.test.mjs
 git diff --name-status 01cef30e27d507b3c9ca52696ed273e6747ccda2..HEAD

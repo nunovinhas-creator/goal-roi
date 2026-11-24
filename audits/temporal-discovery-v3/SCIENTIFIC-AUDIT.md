@@ -1,5 +1,7 @@
 # Auditoria científica adversarial da v3
 
+> **Revisão v3.1.** Desde então foi confirmado e corrigido um defeito: a camada de previsão da v3.0 tratava `+0,5`/`−0,5` como resultados completos ([HALF-SETTLEMENT.md](HALF-SETTLEMENT.md)). Nenhuma decisão avaliada nesta auditoria tinha meia liquidação, por isso todos os números abaixo são idênticos na v3.1. Os ficheiros em `results/` foram regenerados com os hashes da v3.1. A falta de pares no snapshot real é diagnosticada em [COVERAGE-AUDIT.md](COVERAGE-AUDIT.md).
+
 **GO técnico para integração experimental do protocolo v3 em draft. NO-GO para qualquer alegação confirmatória, económica ou de execução. Nenhuma hipótese real tem hoje suporte para registo v3.**
 
 A auditoria parte de `01cef30e27d507b3c9ca52696ed273e6747ccda2` (`audits/temporal-discovery-v2/SCIENTIFIC-AUDIT.md`). Todos os números abaixo foram produzidos pelos scripts deste diretório e estão em `results/`. Os ensaios sintéticos são novos: usam geradores, sementes e datas (março de 2028) disjuntos dos bancos v1/v2. A única exceção é a reavaliação das regras-oráculo, que usa de propósito o banco v1/v2 sem alterar os sorteios.
