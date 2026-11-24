@@ -4,7 +4,7 @@ from collections import Counter, defaultdict
 from datetime import timedelta
 from math import comb, fsum
 
-from .. import chronology, event_intelligence as events
+from .. import event_intelligence as events
 from . import dsl
 from .replay import SETTLEMENT
 

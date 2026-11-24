@@ -17,7 +17,23 @@ MAX_PROPOSALS = 5
 MAX_TOKENS = 1536
 CONTEXT = 6144
 TIMEOUT_SECONDS = 45
-CLAIM = re.compile(r'garantid|certificad|rentável|validated|guaranteed|risk.free|lucro comprovado', re.I)
+# Explanations describe a mechanism. Return, certainty, validation and betting
+# instructions are outside the researcher's role in either language.
+CLAIM = re.compile(r'garant|guarant|certific|rentáv|rentab|lucr|profit|\broi\b|\byield|\bedge\b|value.?bet|'
+                   r'validat|validad|comprovad|proven|risk.?free|sem risco|sure.?(win|bet|thing)|certain.?win|'
+                   r'aposte|apostar|bet now|place (a )?bet|stake now|\bwin(s|ning)? every', re.I)
+SENTINEL = b'[end of text]'
+# Output grammar for llama.cpp. It fixes the envelope only; the DSL validator
+# remains the only authority on rule content.
+REPLY_SCHEMA = {
+    'type': 'object', 'additionalProperties': False, 'required': ['proposals'],
+    'properties': {'proposals': {'type': 'array', 'maxItems': MAX_PROPOSALS, 'items': {
+        'type': 'object', 'additionalProperties': False,
+        'required': ['rule', 'alternative', 'mechanism', 'refutation'],
+        'properties': {'rule': {'type': 'object'}, 'alternative': {'anyOf': [{'type': 'object'}, {'type': 'null'}]},
+                       'mechanism': {'type': 'string', 'maxLength': 280},
+                       'refutation': {'type': 'string', 'maxLength': 280}}}}},
+}
 SHORT_TEXT = re.compile(r'^[^\x00-\x1f\x7f<>]{8,280}$')
 
 
@@ -82,7 +98,8 @@ def run_local(model, request):
         try:
             subprocess.run([engine, '-m', str(model), '-f', prompt_file.name,
                             '-n', str(MAX_TOKENS), '-c', str(CONTEXT), '-t', '2',
-                            '--temp', '0', '--seed', '82', '--no-display-prompt', '--log-disable'],
+                            '--temp', '0', '--seed', '82', '--no-display-prompt', '--log-disable',
+                            '--json-schema', dsl.encoded(REPLY_SCHEMA).decode()],
                            check=True, timeout=TIMEOUT_SECONDS, stdin=subprocess.DEVNULL,
                            stdout=output, stderr=subprocess.DEVNULL,
                            env={k: os.environ[k] for k in ('PATH', 'HOME', 'LD_LIBRARY_PATH') if k in os.environ})
@@ -105,20 +122,28 @@ def proposals(raw):
     if not isinstance(raw, bytes) or len(raw) > MAX_REPLY_BYTES:
         # For a truncated response only the retained bytes identify the failure.
         return [], [rejection(raw[:MAX_REPLY_BYTES + 1] if isinstance(raw, bytes) else b'', 'model_response_budget')]
+    body = raw.rstrip()
+    # llama.cpp may terminate stdout with its end-of-generation marker. Markdown
+    # fences and any other surrounding text remain invalid. Failures keep the
+    # fingerprint of the original bytes.
+    body = body[:-len(SENTINEL)] if body.endswith(SENTINEL) else raw
     try:
-        obj = dsl.strict_json(raw)
+        obj = dsl.strict_json(body)
         if not isinstance(obj, dict) or set(obj) != {'proposals'} or not isinstance(obj['proposals'], list):
             raise dsl.Invalid('model_response_schema')
         if len(obj['proposals']) > MAX_PROPOSALS:
             raise dsl.Invalid('model_proposal_budget')
     except dsl.Invalid as exc:
         return [], [rejection(raw, str(exc))]
-    accepted, refusals = [], []
+    accepted, refusals, seen = [], [], set()
     for entry in obj['proposals']:
         try:
             if not isinstance(entry, dict) or set(entry) != {'rule', 'alternative', 'mechanism', 'refutation'}:
                 raise dsl.Invalid('model_proposal_schema')
             rule = dsl.canonical(entry['rule'])
+            if dsl.identifier(rule) in seen:
+                raise dsl.Invalid('duplicate_model_proposal')
+            seen.add(dsl.identifier(rule))
             alt = dsl.canonical(entry['alternative']) if entry['alternative'] is not None else None
             if alt is not None and (alt['steps'][-1] != rule['steps'][-1]
                                     or alt['within_seconds'] != rule['within_seconds'] or alt == rule):

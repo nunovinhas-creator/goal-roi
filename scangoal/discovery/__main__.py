@@ -43,7 +43,8 @@ def _path(directory, inputs, *, write=False):
     protected = [inputs.resolve(), *(REPOSITORY / name for name in
                   ('.git', '.github', 'data', 'docs', 'ops', 'scangoal', 'scripts', 'tests'))]
     overlaps = any(resolved.is_relative_to(path) or path.is_relative_to(resolved) for path in protected)
-    if write and (REPOSITORY.is_relative_to(resolved) or overlaps):
+    # Any location inside the working tree could be committed with production files.
+    if write and (REPOSITORY.is_relative_to(resolved) or resolved.is_relative_to(REPOSITORY) or overlaps):
         raise ValueError('use a separate experimental registry directory')
     return resolved
 
@@ -103,7 +104,8 @@ def main(argv=None):
                 if args.commit:
                     report['publication'] = ledger.append(location, discovery_as_of=as_of,
                         manifest=report['input_sha256'], snapshot_sha256=report['snapshot_sha256'], records=records,
-                        investigation=dict(protocol_sha256=report['protocol_sha256'], work=report['work'], model=report['model']))
+                        investigation=dict(protocol_sha256=report['protocol_sha256'], interpreter_sha256=report['interpreter_sha256'],
+                                           work=report['work'], model=report['model']))
         if args.format == 'summary' and args.command != 'registry':
             print(_summary(report))
         else:

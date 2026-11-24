@@ -1,6 +1,6 @@
 """Bounded projected subsequence mining and falsification proposals."""
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from itertools import combinations, islice, zip_longest
 
