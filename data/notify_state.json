@@ -1797,12 +1797,17 @@
    "state": "delivered"
   },
   "game|id:bodo-glimt-vs-lask-linz-20261124|dbbe61fd32b4": {
+   "attempt_id": "b53f80098de1422c883d1f028eae1587",
+   "attempt_utc": "2026-11-24T18:53:02+00:00",
+   "chars": 196,
    "created_utc": "2026-11-24T18:53:01+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "487fd00503603760bb30de92334709cfd5d6edcd3635a3a101f0b5ef55d7ead0",
+   "state": "in_flight"
   },
   "game|id:bologna-vs-udinese-20261122|0b50d0d7c724": {
    "attempt_utc": "2026-11-22T13:21:54+00:00",
@@ -3237,13 +3242,15 @@
    "attempt_utc": "2026-11-24T18:53:01+00:00",
    "chars": 223,
    "created_utc": "2026-11-24T18:53:01+00:00",
+   "done_utc": "2026-11-24T18:53:01+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "613bf88e59abe8279f4c441d64977922c3a2392a6acba48106cf7cec1f0897f9",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:galatasaray-vs-aston-villa-20261124|81d08cc9be54": {
    "attempt_id": "e2d0debfdbbe4aaa99d4662df2e7265a",
@@ -7064,7 +7071,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 454,
+  "delivered": 455,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:46:05+00:00",
@@ -7168,6 +7175,7 @@
   "2026-11-24T18:40:27+00:00|EC Flamengo Women — Fluminense Women|Over 3": true,
   "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2": true,
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5": true,
+  "2026-11-24T18:47:16+00:00|Bodo-Glimt — LASK Linz|Bodo Glimt": true,
   "2026-11-24T18:47:20+00:00|Galatasaray — Aston Villa|Over 1.5": true
  },
  "migrations": {
@@ -7733,6 +7741,9 @@
   },
   "item|id:boca-juniors-de-cali-vs-quindio-20261124|Asian Total|Over 3": {
    "at_utc": "2026-11-24T01:41:10+00:00"
+  },
+  "item|id:bodo-glimt-vs-lask-linz-20261124|1x2|Bodo Glimt": {
+   "at_utc": "2026-11-24T18:53:01+00:00"
   },
   "item|id:bodo-glimt-vs-lask-linz-20261124|1x2|LASK": {
    "at_utc": "2026-11-23T19:09:06+00:00"
@@ -8879,7 +8890,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 766,
+ "sent_total": 767,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9788,6 +9799,7 @@
   "2026-11-24T18:40:27+00:00|EC Flamengo Women — Fluminense Women|Over 3",
   "2026-11-24T18:40:41+00:00|Bodo-Glimt — LASK Linz|Under 2",
   "2026-11-24T18:40:47+00:00|Blackpool — Leicester|Over 3.5",
+  "2026-11-24T18:47:16+00:00|Bodo-Glimt — LASK Linz|Bodo Glimt",
   "2026-11-24T18:47:20+00:00|Galatasaray — Aston Villa|Over 1.5"
  ]
 }
