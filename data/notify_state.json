@@ -3133,13 +3133,15 @@
    "attempt_utc": "2026-11-24T19:06:29+00:00",
    "chars": 199,
    "created_utc": "2026-11-24T19:06:27+00:00",
+   "done_utc": "2026-11-24T19:06:27+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "bba39dad52a0764ad5d2ba5d8afedb1610226b7bf2e9ad321d904818bc604253",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:feyenoord-vs-sbv-excelsior-20261121|2e8d788f3c2e": {
    "attempt_utc": "2026-11-21T19:26:44+00:00",
@@ -4498,12 +4500,17 @@
    "state": "delivered"
   },
   "game|id:manchester-city-vs-napoli-20261124|281ae6ee0c6b": {
+   "attempt_id": "dc3bccdb6e53429ab29bcc82657921e1",
+   "attempt_utc": "2026-11-24T19:06:31+00:00",
+   "chars": 214,
    "created_utc": "2026-11-24T19:06:27+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "b4d6cb09f0816dd7f2f719c68829aae4bff15523f105a7bd602ace522f012a58",
+   "state": "in_flight"
   },
   "game|id:manchester-city-vs-napoli-20261124|6bfe39aaecdd": {
    "attempt_id": "4212d2cdb56b4fccb756b9ca3c97b302",
@@ -7154,7 +7161,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 460,
+  "delivered": 461,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:59:38+00:00",
@@ -7264,6 +7271,7 @@
   "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)": true,
   "2026-11-24T18:53:35+00:00|Al Nasr Riyadh — Al Sadd Doha|Under 2.5": true,
   "2026-11-24T18:57:45+00:00|Feyenoord — Porto|AH1(+0.5)": true,
+  "2026-11-24T18:57:45+00:00|Manchester City — Napoli|Under 3.5": true,
   "2026-11-24T19:00:17+00:00|Leipzig — Lens|AH2(+0.5)": true
  },
  "migrations": {
@@ -8445,6 +8453,9 @@
   "item|id:manchester-city-vs-napoli-20261124|1st Half - Manchester City Exact Corners|4+": {
    "at_utc": "2026-11-24T16:26:11+00:00"
   },
+  "item|id:manchester-city-vs-napoli-20261124|Asian Total|Under 3.5": {
+   "at_utc": "2026-11-24T19:06:27+00:00"
+  },
   "item|id:manta-vs-delfin-20261122|Asian Total|Over 2.5": {
    "at_utc": "2026-11-22T16:00:32+00:00"
   },
@@ -8993,7 +9004,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 772,
+ "sent_total": 773,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9908,6 +9919,7 @@
   "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)",
   "2026-11-24T18:53:35+00:00|Al Nasr Riyadh — Al Sadd Doha|Under 2.5",
   "2026-11-24T18:57:45+00:00|Feyenoord — Porto|AH1(+0.5)",
+  "2026-11-24T18:57:45+00:00|Manchester City — Napoli|Under 3.5",
   "2026-11-24T19:00:17+00:00|Leipzig — Lens|AH2(+0.5)"
  ]
 }
