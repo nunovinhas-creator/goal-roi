@@ -3129,12 +3129,17 @@
    "state": "delivered"
   },
   "game|id:feyenoord-vs-porto-20261124|d81b20a3c35c": {
+   "attempt_id": "cf24a0c3366a43119bd824b521c61556",
+   "attempt_utc": "2026-11-24T19:06:29+00:00",
+   "chars": 199,
    "created_utc": "2026-11-24T19:06:27+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "bba39dad52a0764ad5d2ba5d8afedb1610226b7bf2e9ad321d904818bc604253",
+   "state": "in_flight"
   },
   "game|id:feyenoord-vs-sbv-excelsior-20261121|2e8d788f3c2e": {
    "attempt_utc": "2026-11-21T19:26:44+00:00",
@@ -4169,13 +4174,15 @@
    "attempt_utc": "2026-11-24T19:06:27+00:00",
    "chars": 176,
    "created_utc": "2026-11-24T19:06:27+00:00",
+   "done_utc": "2026-11-24T19:06:27+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "17f728684618726d4742070905d647a3cc7738b1bf63e8beaa3a4a3929244fa5",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:lens-vs-toulouse-20261121|6f410c8cccce": {
    "attempt_utc": "2026-11-21T19:33:17+00:00",
@@ -7147,7 +7154,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 459,
+  "delivered": 460,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:59:38+00:00",
@@ -7256,6 +7263,7 @@
   "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)": true,
   "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)": true,
   "2026-11-24T18:53:35+00:00|Al Nasr Riyadh — Al Sadd Doha|Under 2.5": true,
+  "2026-11-24T18:57:45+00:00|Feyenoord — Porto|AH1(+0.5)": true,
   "2026-11-24T19:00:17+00:00|Leipzig — Lens|AH2(+0.5)": true
  },
  "migrations": {
@@ -8125,6 +8133,9 @@
   "item|id:feyenoord-u19-vs-fc-porto-u19-20261124|Asian Total|Over 1.5": {
    "at_utc": "2026-11-24T16:45:07+00:00"
   },
+  "item|id:feyenoord-vs-porto-20261124|Polymarket|AH1(+0.5)": {
+   "at_utc": "2026-11-24T19:06:27+00:00"
+  },
   "item|id:feyenoord-vs-porto-20261124|Polymarket|AH2(-0.5)": {
    "at_utc": "2026-11-24T01:41:10+00:00"
   },
@@ -8982,7 +8993,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 771,
+ "sent_total": 772,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9896,6 +9907,7 @@
   "2026-11-24T18:51:32+00:00|Bristol City — Wrexham|AH1(-0.5)",
   "2026-11-24T18:51:32+00:00|Real Madrid — PSV Eindhoven|AH2(+2.5)",
   "2026-11-24T18:53:35+00:00|Al Nasr Riyadh — Al Sadd Doha|Under 2.5",
+  "2026-11-24T18:57:45+00:00|Feyenoord — Porto|AH1(+0.5)",
   "2026-11-24T19:00:17+00:00|Leipzig — Lens|AH2(+0.5)"
  ]
 }
