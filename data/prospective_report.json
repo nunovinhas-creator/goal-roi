@@ -4,53 +4,58 @@
   "status": "diagnostic_only"
  },
  "H1": {
-  "expected": 3.133,
+  "expected": 7.533,
   "games_in_population": 24,
-  "games_with_result": 5,
+  "games_with_result": 11,
   "minute_bands": {
    "0-29": {
-    "expected": 0,
-    "games": 0,
-    "observed": 0
-   },
-   "30-59": {
-    "expected": 2.069,
-    "games": 3,
-    "observed": 3
-   },
-   "60-89": {
-    "expected": 1.064,
+    "expected": 1.739,
     "games": 2,
     "observed": 2
+   },
+   "30-59": {
+    "expected": 4.25,
+    "games": 6,
+    "observed": 5
+   },
+   "60-89": {
+    "expected": 1.544,
+    "games": 3,
+    "observed": 3
    }
   },
   "note": "predictive information relative to a generic rate; not profitability",
-  "observed": 5,
+  "observed": 10,
   "score_strata": {
    "margin_level|goals_0": {
-    "expected": 0.434,
-    "games": 1,
-    "observed": 1
+    "expected": 3.015,
+    "games": 4,
+    "observed": 4
    },
    "margin_level|goals_2+": {
-    "expected": 0.759,
+    "expected": 1.239,
+    "games": 2,
+    "observed": 2
+   },
+   "margin_one|goals_2+": {
+    "expected": 0.651,
     "games": 1,
-    "observed": 1
+    "observed": 0
    },
    "margin_two_plus|goals_2+": {
-    "expected": 1.941,
-    "games": 3,
-    "observed": 3
+    "expected": 2.629,
+    "games": 4,
+    "observed": 4
    }
   },
   "status": "insufficient_games",
-  "z": 1.77
+  "z": 1.677
  },
  "H2": {
   "games_in_population": 9,
-  "games_settled": 3,
-  "losses": 0,
-  "mean_implied": 0.5794,
+  "games_settled": 5,
+  "losses": 1,
+  "mean_implied": 0.585,
   "note": "earlier edge did not replicate; no ROI validation without executable prices and known costs",
   "status": "insufficient_games",
   "wins": 2
@@ -58,13 +63,13 @@
  "activated_utc": "2026-11-24T19:12:40.715876+00:00",
  "games_registered": 30,
  "games_with_conflicting_results": 0,
- "games_with_independent_result": 5,
+ "games_with_independent_result": 13,
  "games_without_result_after_72h": 0,
- "independent_result_share": 0.1667,
- "ledger_entries": 87,
+ "independent_result_share": 0.4333,
+ "ledger_entries": 96,
  "schema": "goal_roi_prospective_report_v1",
- "signals_registered": 76,
- "signals_registered_before_result": 75,
+ "signals_registered": 77,
+ "signals_registered_before_result": 76,
  "signals_result_known_at_registration": 1,
  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
 }
