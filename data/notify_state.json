@@ -1065,13 +1065,15 @@
    "attempt_utc": "2026-11-24T20:14:20+00:00",
    "chars": 202,
    "created_utc": "2026-11-24T20:14:20+00:00",
+   "done_utc": "2026-11-24T20:14:20+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d651435bc1666127b1e81887cb9a7fe0fb6c55de232326396da136d863a97950",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:arsenal-vs-dortmund-20261124|ad3ce31bd3cf": {
    "attempt_id": "24267d7cdd8b4f1992c3340740753b4f",
@@ -4275,12 +4277,17 @@
    "state": "delivered"
   },
   "game|id:leipzig-vs-lens-20261124|9499a11b5470": {
+   "attempt_id": "a3414da8c7644e53ab5273d23514fcf0",
+   "attempt_utc": "2026-11-24T20:14:23+00:00",
+   "chars": 191,
    "created_utc": "2026-11-24T20:14:20+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "de3475305d934f39698682e5db69a4850975e6814fd863f0f96ea33a52e34872",
+   "state": "in_flight"
   },
   "game|id:lens-vs-toulouse-20261121|6f410c8cccce": {
    "attempt_utc": "2026-11-21T19:33:17+00:00",
@@ -7364,7 +7371,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 474,
+  "delivered": 475,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T20:09:00+00:00",
@@ -7489,7 +7496,8 @@
   "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5": true,
   "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)": true,
   "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)": true,
-  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5": true
+  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5": true,
+  "2026-11-24T20:09:37+00:00|Leipzig — Lens|AH1(-1.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -8620,6 +8628,9 @@
   "item|id:lech-ii-pozna-vs-victoria-wrzesnia-20261121|Asian Total|Over 5": {
    "at_utc": "2026-11-21T12:21:42+00:00"
   },
+  "item|id:leipzig-vs-lens-20261124|Polymarket|AH1(-1.5)": {
+   "at_utc": "2026-11-24T20:14:20+00:00"
+  },
   "item|id:leipzig-vs-lens-20261124|Polymarket|AH2(+0.5)": {
    "at_utc": "2026-11-24T19:06:27+00:00"
   },
@@ -9264,7 +9275,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 786,
+ "sent_total": 787,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -10210,6 +10221,7 @@
   "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5",
   "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)",
   "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)",
-  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5"
+  "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5",
+  "2026-11-24T20:09:37+00:00|Leipzig — Lens|AH1(-1.5)"
  ]
 }
