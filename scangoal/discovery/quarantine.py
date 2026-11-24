@@ -11,6 +11,10 @@ null; day blocks assume independence; comparators are not defined at the
 same instant; prediction, announced price and execution are conflated.
 v1 uses the same tie-discarding day sign test (study.sign_p) with 15-minute
 pairing, so it inherits the inferential defect.
+
+temporal-risk-set-v3 (v3.0) is superseded by v3.1: its prediction layer
+counted Asian half settlements as full wins or losses. Its economic layer and
+every other definition are unchanged in v3.1.
 """
 
 AUDIT = 'audits/temporal-discovery-v2/SCIENTIFIC-AUDIT.md'
@@ -21,10 +25,15 @@ DEFECTS = (
     'comparator_not_defined_at_case_instant',
     'prediction_announced_and_executable_layers_conflated',
 )
+V3_0_AUDIT = 'audits/temporal-discovery-v3/HALF-SETTLEMENT.md'
+V3_0_DEFECTS = ('prediction_layer_counts_asian_half_settlements_as_full_outcomes',)
 BLOCKED = {
     '659d7de3788657abfed2b6a07170f16381e3b7acca202084f67a6af18ed98f3a': 'temporal-day-contract-v2',
     '1c49b4d9a4d5bba54a1d7b05c2a4eec821dbb05bd834fcc1f6e2c87fde081041': 'temporal-v1',
+    # Superseded by temporal-risk-set-v3.1; no plan was ever registered under it.
+    '1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939': 'temporal-risk-set-v3',
 }
+_DETAILS = {'temporal-risk-set-v3': (V3_0_AUDIT, None, V3_0_DEFECTS, 'temporal-risk-set-v3.1')}
 
 
 class ConfirmatoryClaimBlocked(RuntimeError):
@@ -35,15 +44,22 @@ def blocked(protocol_sha256):
     return protocol_sha256 in BLOCKED
 
 
+def _details(protocol_sha256):
+    name = BLOCKED[protocol_sha256]
+    return (name, *_DETAILS.get(name, (AUDIT, AUDIT_COMMIT, DEFECTS, 'temporal-risk-set-v3.1')))
+
+
 def require_confirmatory(protocol_sha256):
     if blocked(protocol_sha256):
-        raise ConfirmatoryClaimBlocked(f'{BLOCKED[protocol_sha256]}: confirmatory claims blocked ({AUDIT})')
+        name, audit, *_ = _details(protocol_sha256)
+        raise ConfirmatoryClaimBlocked(f'{name}: confirmatory claims blocked ({audit})')
 
 
 def notice(protocol_sha256):
-    return dict(protocol=BLOCKED[protocol_sha256], protocol_sha256=protocol_sha256, confirmatory_claims='blocked',
-                audit=AUDIT, audit_commit=AUDIT_COMMIT, defects=list(DEFECTS),
-                history='preserved_unchanged', successor='temporal-risk-set-v3')
+    name, audit, commit, defects, successor = _details(protocol_sha256)
+    return dict(protocol=name, protocol_sha256=protocol_sha256, confirmatory_claims='blocked',
+                audit=audit, audit_commit=commit, defects=list(defects),
+                history='preserved_unchanged', successor=successor)
 
 
 def annotate(report):

@@ -92,12 +92,18 @@ def assess(source, rule, *, start=None, end=None, discovery_cutoff=None, budget=
                                [e['record_sha256'] for e in c.witness]) for c in cohort.cases])
     pairing = dsl.digest([(c.anchor['message_id'], k.anchor['message_id'], events.iso(c.at))
                           for c, k, _ in cohort.pairs])
+    controls = [b for *_, b, _ in rows]
+
+    def stake_rate(group, field):
+        decisive = fsum(r['decisive_stake'] for r in group if r['decisive'])
+        return fsum(r[field] for r in group if r['decisive']) / decisive if decisive else None
+
     prediction = dict(
-        case_hit_rate=_mean(a['prediction'][0] + 1 / a['odds'] for a in case_values
-                            if a['prediction'] and a['prediction'][0] is not None),
+        case_hit_rate=stake_rate(case_values, 'won_stake'),
         case_mean_implied=_mean(1 / a['odds'] for a in case_values if a['decisive']),
-        control_hit_rate=_mean(b['prediction'][0] + 1 / b['odds'] for *_, b, _ in rows
-                               if b['prediction'] and b['prediction'][0] is not None))
+        control_hit_rate=stake_rate(controls, 'won_stake'),
+        half_settlements=dict(case=sum(bool(a['half']) for a in case_values),
+                              control=sum(bool(b['half']) for b in controls)))
     return dict(counts=dict(cohort.counts), excluded=dict(excluded), balance=balance,
                 reservation_sha256=reservation, pairing_sha256=pairing, work=budget.used,
                 truncated=budget.exhausted or bool(cohort.counts.get('search_incomplete')),
@@ -203,6 +209,7 @@ def evaluate(source, plans, receipts=None, *, verify=None):
     output = []
     budget = Budget(MAX_WORK * 4)
     for plan in registry.visible(plans, source.as_of):
+        superseded = plan['protocol_sha256'] in protocol.SUPERSEDED
         ok_protocol = plan['protocol_sha256'] == protocol.PROTOCOL_SHA256
         ok_code = plan['interpreter_sha256'] == INTERPRETER_SHA256
         proof = (registry.attest(plan, receipts, source.as_of, **({'verify': verify} if verify else {}))
@@ -220,7 +227,9 @@ def evaluate(source, plans, receipts=None, *, verify=None):
             row = dict(id=h['id'], rule=h['rule'], origin=h['origin'], plan_sha256=registry.digest(plan),
                        wave=plan['number'], status='insufficient')
             evidence = None
-            if not ok_protocol:
+            if superseded:
+                row['reason'] = 'superseded_protocol_' + protocol.SUPERSEDED[plan['protocol_sha256']]
+            elif not ok_protocol:
                 row['reason'] = 'unsupported_protocol'
             elif not ok_code:
                 row['reason'] = 'interpreter_changed_since_registration'

@@ -16,7 +16,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest import mock
 
-from scangoal import chronology, event_intelligence as events, scientific_receipts
+from scangoal import chronology, event_audit, event_intelligence as events, scientific_receipts
 from scangoal.discovery import __main__ as cli, dsl, dsl_v2, engine as engine_v1, engine_v2, quarantine
 from scangoal.discovery.replay import Budget, Replay
 from scangoal.discovery.v3 import engine, inference, layers, protocol, registry, riskset
@@ -63,8 +63,16 @@ class Immutability(unittest.TestCase):
 
     def test_v3_protocol_digest_is_pinned(self):
         # Changing any frozen parameter requires a new protocol name and identifier.
-        self.assertEqual(protocol.PROTOCOL['name'], 'temporal-risk-set-v3')
+        self.assertEqual(protocol.PROTOCOL['name'], 'temporal-risk-set-v3.1')
         self.assertEqual(protocol.PROTOCOL_SHA256, PINNED_V3)
+        # v3.0 stays byte-for-byte as published and differs only in the prediction layer.
+        self.assertEqual(protocol.V3_0_SHA256, PINNED_V3_0)
+        self.assertEqual(protocol.PROTOCOL_V3_0['name'], 'temporal-risk-set-v3')
+        changed = {k for k in protocol.PROTOCOL if protocol.PROTOCOL.get(k) != protocol.PROTOCOL_V3_0.get(k)}
+        self.assertEqual(changed, {'name', 'revision', 'supersedes', 'layers'})
+        layers_changed = {k for k in protocol.PROTOCOL['layers']
+                          if protocol.PROTOCOL['layers'][k] != protocol.PROTOCOL_V3_0['layers'].get(k)}
+        self.assertEqual(layers_changed, {'prediction', 'asian_half_settlements'})
 
     def test_v3_identifiers_are_distinct_from_v2(self):
         rule = dsl_v2.canonical(WORLD.RULE)
@@ -181,6 +189,59 @@ class Layers(unittest.TestCase):
         self.assertEqual(layers.executable([])['break_even_price_degradation'], None)
 
 
+class AsianHalfSettlement(unittest.TestCase):
+    """Mission: +0.5 / -0.5 must not be scored as full wins or losses in prediction."""
+
+    @staticmethod
+    def event(line, direction='over'):
+        return dict(period='regulation', market_key='match_goals', selection=f'{direction.capitalize()} {line}',
+                    direction=direction, line=line, source='Stake', phase='pre', teams=['H', 'A'])
+
+    def test_parser_settles_wins_losses_pushes_and_halves(self):
+        cases = {('2.5', (2, 1)): 1., ('2.5', (1, 0)): -1., ('2.0', (1, 1)): 0.,
+                 ('2.25', (1, 1)): -.5, ('2.75', (2, 1)): .5, ('2.25', (2, 1)): 1., ('2.75', (1, 1)): -1.}
+        for (line, score), expected in cases.items():
+            self.assertEqual(event_audit.payoff(self.event(line), score), expected, (line, score))
+        self.assertEqual(event_audit.payoff(self.event('2.25', 'under'), (1, 1)), .5)
+
+    def test_prediction_counts_only_the_decisive_half_and_return_is_unchanged(self):
+        odds = 1.9
+        rows = {payoff: layers.values(dict(status='settled', payoff=payoff), odds)
+                for payoff in (1., .5, 0., -.5, -1.)}
+        self.assertAlmostEqual(rows[1.]['prediction'][0], 1 - 1 / odds)
+        self.assertAlmostEqual(rows[-1.]['prediction'][0], -1 / odds)
+        self.assertAlmostEqual(rows[.5]['prediction'][0], .5 - .5 / odds)
+        self.assertAlmostEqual(rows[-.5]['prediction'][0], -.5 / odds)
+        self.assertIsNone(rows[0.]['prediction'])
+        self.assertTrue(rows[.5]['half'] and rows[-.5]['half'] and not rows[1.]['half'])
+        for payoff, row in rows.items():
+            profit = payoff * (odds - 1) if payoff > 0 else payoff
+            self.assertAlmostEqual(row['announced'][0], profit - .02 * max(0., profit) - .02)
+            if row['decisive']:
+                self.assertAlmostEqual(row['prediction'][0], profit / odds)
+        self.assertIsNone(layers.pair_difference(rows[.5], rows[0.], 'prediction'))
+        self.assertAlmostEqual(layers.pair_difference(rows[.5], rows[-.5], 'prediction')['observed'], .5)
+
+    def test_residual_is_unbiased_at_fair_prices_where_binary_scoring_is_not(self):
+        from math import exp, factorial
+        goals = [exp(-2.6) * 2.6 ** g / factorial(g) for g in range(15)]
+        for line, direction in (('2.25', 'over'), ('2.75', 'over'), ('2.25', 'under'), ('3.75', 'under'), ('2.5', 'over')):
+            event = self.event(line, direction)
+            law = [(p, event_audit.payoff(event, (g, 0))) for g, p in enumerate(goals)]
+            # Fair odds: expected profit zero.
+            win = sum(p * max(0., w) for p, w in law)
+            lose = sum(p * max(0., -w) for p, w in law)
+            odds = 1 + lose / win
+            v31 = sum(p * layers.values(dict(status='settled', payoff=w), odds)['prediction'][0]
+                      for p, w in law if w != 0)
+            binary = sum(p * ((w > 0) - 1 / odds) for p, w in law if w != 0)
+            self.assertAlmostEqual(v31, 0., places=12, msg=line)
+            if line == '2.5':
+                self.assertAlmostEqual(binary, 0., places=12)
+            else:
+                self.assertGreater(abs(binary), .01, msg=(line, direction, binary))
+
+
 class RiskSetDesign(unittest.TestCase):
     def test_comparators_share_instant_contract_and_are_reserved_once(self):
         replay, _ = world('null', days=21)
@@ -251,6 +312,22 @@ class RiskSetDesign(unittest.TestCase):
         self.assertEqual([(c.anchor['message_id'], k.anchor['message_id']) for c, k, _ in a.pairs], before)
 
 
+class CoverageAudit(unittest.TestCase):
+    def test_waterfall_reproduces_the_protocol_pairs_without_relaxing_it(self):
+        spec = importlib.util.spec_from_file_location('v3_coverage', ROOT / 'audits' / 'temporal-discovery-v3' / 'coverage_audit.py')
+        coverage = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(coverage)
+        replay, _ = world('null', days=21)
+        _, cohort = engine.assess(replay, WORLD.RULE)
+        result = coverage.waterfall(replay, [dict(rule=WORLD.RULE)])
+        self.assertEqual(result['strict_pairs'], len(cohort.pairs))
+        self.assertEqual(result['first_failing_stage']['matched'], len(cohort.pairs))
+        self.assertEqual(result['case_decisions_summed_over_hypotheses'], len(cohort.cases))
+        self.assertEqual(sum(result['first_failing_stage'].values()), len(cohort.cases))
+        self.assertEqual(riskset.MAX_QUOTE_AGE, timedelta(minutes=30))
+        self.assertEqual(riskset.LOG_ODDS_CALIPER, .15)
+
+
 class EndToEnd(unittest.TestCase):
     def test_strong_effect_is_detected_and_null_is_not(self):
         positive, _ = world('positive_20pp')
@@ -296,6 +373,26 @@ class Registration(unittest.TestCase):
                 with self.assertRaisesRegex(registry.RegistryError, error):
                     registry.validate(dict(plan, **change), 1, None, None)
 
+    def test_superseded_v3_0_plans_stay_history_and_are_never_evaluated(self):
+        rule = dsl_v2.canonical(WORLD.RULE)
+        old = [dict(id=registry._identifier(rule, protocol.V3_0_SHA256), rule=rule, origin='oracle',
+                    mechanism=None, source_id=None)]
+        with TemporaryDirectory() as folder:
+            with self.assertRaisesRegex(registry.RegistryError, 'only_the_current'):
+                registry.append(folder, discovery_as_of=WORLD.START, snapshot_sha256='0' * 64,
+                                protocol_sha256=protocol.V3_0_SHA256, interpreter_sha256='0' * 64,
+                                hypotheses=old, now=WORLD.START)
+        plan = dict(schema=3, number=1, previous=None, published_utc=events.iso(WORLD.START),
+                    discovery_as_of_utc=events.iso(WORLD.START), snapshot_sha256='0' * 64,
+                    protocol_sha256=protocol.V3_0_SHA256, interpreter_sha256='0' * 64, hypotheses=old,
+                    confirmatory_results=0)
+        registry.validate(plan, 1, None, None)
+        self.assertNotEqual(old[0]['id'], engine.hypothesis_id(rule))
+        replay, _ = world('null', days=21)
+        row = engine.evaluate(replay, [plan])['investigations'][0]
+        self.assertEqual((row['status'], row['reason']), ('insufficient', 'superseded_protocol_v3_0_half_settlement_defect'))
+        self.assertNotIn('evidence', row)
+
     def test_confirmatory_window_requires_witness_and_closure(self):
         replay, _ = world('positive_20pp')
         published = WORLD.START - timedelta(days=1)
@@ -331,6 +428,11 @@ class Quarantine(unittest.TestCase):
             with self.assertRaises(quarantine.ConfirmatoryClaimBlocked):
                 quarantine.require_confirmatory(digest)
         quarantine.require_confirmatory(protocol.PROTOCOL_SHA256)
+        notice = quarantine.notice(protocol.V3_0_SHA256)
+        self.assertEqual((notice['protocol'], notice['successor']), ('temporal-risk-set-v3', 'temporal-risk-set-v3.1'))
+        self.assertIn('prediction_layer_counts_asian_half_settlements_as_full_outcomes', notice['defects'])
+        with self.assertRaises(quarantine.ConfirmatoryClaimBlocked):
+            quarantine.require_confirmatory(protocol.V3_0_SHA256)
         self.assertIs(quarantine.annotate(dict(protocol_sha256=protocol.PROTOCOL_SHA256)).get('quarantine'), None)
 
     def test_cli_marks_v2_evaluation_as_blocked(self):
@@ -361,7 +463,8 @@ class Quarantine(unittest.TestCase):
                 self.assertNotIn(word, text, (path.name, word))
 
 
-PINNED_V3 = '1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939'
+PINNED_V3_0 = '1726e67ee8ff345175468471b76cccae4124a087c8f45ca0dcbf5b5b877f8939'
+PINNED_V3 = 'b26e9e14479bd3ef80f4ce8c072768108c62ba9ddb136d3503a13a5bd2bc3e71'
 
 if __name__ == '__main__':
     unittest.main()

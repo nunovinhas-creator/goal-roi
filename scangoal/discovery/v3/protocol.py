@@ -1,8 +1,10 @@
-"""Frozen, versioned definition of temporal-risk-set-v3.
+"""Frozen, versioned definitions of temporal-risk-set-v3.x.
 
-Changing any value below changes PROTOCOL_SHA256. tests/test_discovery_v3.py
-pins that digest, so a change requires a new protocol name and identifier.
-The v1 and v2 protocols are never edited; their digests are pinned too.
+PROTOCOL_V3_0 is kept byte-for-byte as published (digest 1726e67e...). It is
+superseded by v3.1 because its prediction layer counted Asian half
+settlements (+0.5 / -0.5) as full wins or losses. v3.1 changes only that
+definition; every other parameter is identical. tests/test_discovery_v3.py
+pins every digest. The v1 and v2 protocols are never edited.
 """
 
 from .. import dsl
@@ -17,7 +19,7 @@ WINDOW_DAYS = 90
 MAX_FAMILY = 12
 MIN_DISCOVERY_PAIRS = 20
 
-PROTOCOL = {
+PROTOCOL_V3_0 = {
     'name': 'temporal-risk-set-v3', 'format': 3, 'dsl_version': 2,
     'supersedes': {'temporal-day-contract-v2': V2_PROTOCOL_SHA256, 'temporal-v1': V1_PROTOCOL_SHA256,
                    'audit_commit': AUDIT_COMMIT},
@@ -69,7 +71,18 @@ PROTOCOL = {
                      'witness': 'rfc3161_receipt_before_window', 'confirmatory_results_at_registration': 0},
     'claims': {'max_status': 'experimental', 'executable_profitability': 'not_demonstrated'},
 }
+V3_0_SHA256 = dsl.digest(PROTOCOL_V3_0)
+
+PROTOCOL = dict(
+    PROTOCOL_V3_0, name='temporal-risk-set-v3.1', revision=1,
+    supersedes=dict(PROTOCOL_V3_0['supersedes'], **{'temporal-risk-set-v3': V3_0_SHA256}),
+    layers=dict(PROTOCOL_V3_0['layers'],
+                prediction='paired_mean_of_won_stake_minus_decisive_stake_over_odds_on_decisive_stake',
+                asian_half_settlements='half_stake_decisive_half_stake_pushed'),
+)
 PROTOCOL_SHA256 = dsl.digest(PROTOCOL)
+# Superseded v3 protocols: plans stay readable as history, never evaluated.
+SUPERSEDED = {V3_0_SHA256: 'v3_0_half_settlement_defect'}
 
 
 def alpha(wave):

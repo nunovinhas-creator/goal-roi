@@ -1,7 +1,13 @@
 """Three separate questions about the same matched pairs.
 
 1. Prediction: does the antecedent add information beyond the announced
-   price? Per decision, residual = won - 1/odds on decisive outcomes.
+   price? Per decision, residual = won stake - decisive stake / odds, on
+   decisions with a decisive stake (protocol v3.1). Asian quarter lines
+   settle in halves: a half win has won stake 0.5 and decisive stake 0.5, a
+   half loss won stake 0 and decisive stake 0.5. The residual has mean zero
+   at a fair announced price for every Asian line, and equals profit / odds.
+   v3.0 counted half settlements as full wins or losses, which biases the
+   residual at fair prices; see audits/temporal-discovery-v3/HALF-SETTLEMENT.md.
 2. Announced-price performance: net return at the announced price after the
    frozen haircut and fee, paired against the comparator, plus the case
    arm's absolute return.
@@ -32,14 +38,16 @@ def values(label, odds):
     implied = 1 / odds
     win_profit, loss_profit = odds - 1, -1.
     if settled:
+        # The economic return is unchanged from v3.0.
         profit = payoff * (odds - 1) if payoff > 0 else payoff
-        decisive = payoff != 0
-        won = 1. if payoff > 0 else 0.
-        return dict(settled=True, decisive=decisive, push=payoff == 0,
-                    prediction=(won - implied,) * 3 if decisive else None,
+        won, stake = max(0., payoff), abs(payoff)
+        decisive = stake > 0
+        return dict(settled=True, decisive=decisive, push=payoff == 0, half=stake == .5,
+                    won_stake=won, decisive_stake=stake,
+                    prediction=(won - stake * implied,) * 3 if decisive else None,
                     announced=(net(profit),) * 3, profit=profit, odds=odds, payoff=payoff)
-    # Unknown FT: observed is missing, bounds are loss and full win.
-    return dict(settled=False, decisive=None, push=None,
+    # Unknown FT: observed is missing, bounds are full loss and full win.
+    return dict(settled=False, decisive=None, push=None, half=None, won_stake=None, decisive_stake=None,
                 prediction=(None, -implied, 1 - implied),
                 announced=(None, net(loss_profit), net(win_profit)), profit=None, odds=odds, payoff=None)
 

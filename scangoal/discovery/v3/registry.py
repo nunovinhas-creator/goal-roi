@@ -34,9 +34,9 @@ def digest(plan):
     return scientific_receipts.digest(DOMAIN, plan)
 
 
-def _identifier(rule):
+def _identifier(rule, protocol_sha256=None):
     from .protocol import PROTOCOL_SHA256
-    return 'tr3:' + dsl.digest(dict(protocol=PROTOCOL_SHA256, rule=dsl_v2.canonical(rule)))
+    return 'tr3:' + dsl.digest(dict(protocol=protocol_sha256 or PROTOCOL_SHA256, rule=dsl_v2.canonical(rule)))
 
 
 def validate(plan, number, parent, prior):
@@ -50,10 +50,11 @@ def validate(plan, number, parent, prior):
     if any(not isinstance(plan[k], str) or not HEX.fullmatch(plan[k])
            for k in ('snapshot_sha256', 'protocol_sha256', 'interpreter_sha256')):
         raise RegistryError('invalid_plan_digest')
-    from .protocol import PROTOCOL_SHA256, V1_PROTOCOL_SHA256, V2_PROTOCOL_SHA256
+    from .protocol import PROTOCOL_SHA256, SUPERSEDED, V1_PROTOCOL_SHA256, V2_PROTOCOL_SHA256
     if plan['protocol_sha256'] in (V1_PROTOCOL_SHA256, V2_PROTOCOL_SHA256):
         raise RegistryError('defective_protocol_cannot_be_registered_in_v3')
-    if plan['protocol_sha256'] != PROTOCOL_SHA256:
+    # Superseded v3 plans remain readable history; evaluate refuses them.
+    if plan['protocol_sha256'] != PROTOCOL_SHA256 and plan['protocol_sha256'] not in SUPERSEDED:
         raise RegistryError('unsupported_protocol')
     if plan['confirmatory_results'] != 0:
         raise RegistryError('plan_must_start_with_zero_confirmatory_results')
@@ -68,7 +69,7 @@ def validate(plan, number, parent, prior):
             canonical = dsl_v2.canonical(h['rule'])
         except dsl.Invalid as exc:
             raise RegistryError('invalid_rule') from exc
-        if canonical != h['rule'] or h['id'] != _identifier(canonical):
+        if canonical != h['rule'] or h['id'] != _identifier(canonical, plan['protocol_sha256']):
             raise RegistryError('invalid_hypothesis_fingerprint')
         seen.add(h['id'])
     return published
@@ -112,6 +113,9 @@ def append(directory, *, discovery_as_of, snapshot_sha256, protocol_sha256, inte
         fcntl.flock(fd, fcntl.LOCK_EX)
         existing = read(directory)
         registered = {h['id'] for p in existing for h in p['hypotheses']}
+        from .protocol import PROTOCOL_SHA256
+        if protocol_sha256 != PROTOCOL_SHA256:
+            raise RegistryError('only_the_current_v3_protocol_can_be_registered')
         fresh = [h for h in hypotheses if h['id'] not in registered]
         if not fresh:
             return None
