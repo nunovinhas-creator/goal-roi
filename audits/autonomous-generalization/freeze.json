@@ -1,0 +1,45 @@
+{
+  "after_holdout": "No miner retuning on these banks. Reserve a later independent bank for a revised miner.",
+  "algorithm_sha256": {
+    "scangoal/discovery/experimental_h/__init__.py": "790a5d7a7bba8352a11af1085e3335ce1048a99be9033c456e0e5dedad3e95a5",
+    "scangoal/discovery/experimental_h/miner.py": "4bcf9cc5c44a2bee30bba56601bf389ec79f36bee7d8eb9b444eeacb54083247",
+    "scangoal/discovery/experimental_h/observed.py": "c6b30bbb5c3d1928952d91efb4e4bf85732c287ac75eb8aa7fc8b2bae84e490c",
+    "scangoal/discovery/experimental_h/research.py": "c68ef69e8bd3cdfed73c0f02b8daa4d9457732ec48108142d9cfba8d64444a91",
+    "scangoal/discovery/experimental_h/rules.py": "f8c57a0b5cb29ca6a299f454ec03aba571e6a69e620fdb61fb8347fbf392f13d"
+  },
+  "bank_worlds": 3,
+  "base": "3b0534148c5482dacbe3a903d6efee53599e2f40",
+  "development_seeds": [
+    31051,
+    82519
+  ],
+  "go_requires": [
+    "all_selected_rules_pass_every_world_seed_and_development_seed",
+    "all_selected_rules_invariant_under_transport_noise",
+    "complete_budgeted_search_and_preserved_baselines"
+  ],
+  "holdout_seeds": [
+    202927,
+    577531,
+    819149
+  ],
+  "invariance_seed_offset": 77113,
+  "minimum": {
+    "exact_path_recall": 0.75,
+    "holdout_negative_mechanisms": 5,
+    "holdout_target_fixtures": 6,
+    "terminal_precision": 0.9,
+    "terminal_recall": 0.8
+  },
+  "schema": "goal-roi-offline-generalization-lock-v1",
+  "selection": [
+    "development_exact_paths_desc",
+    "development_precision_desc",
+    "development_exact_terminals_desc",
+    "rule_id_asc"
+  ],
+  "work": {
+    "matcher_per_candidate_per_bank": 300000,
+    "miner": 1800000
+  }
+}
