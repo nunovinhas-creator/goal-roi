@@ -267,8 +267,12 @@ def outcome_for(inputs, row, final, known_before, as_of):
                 ft_known_by_decision=known_before.first_available_at is not None)
 
 
-def build(directory, as_of, *, volume_min=10_000):
-    """Build all observations, chronological episodes, and separate outcome labels."""
+def build(directory, as_of, *, volume_min=10_000, quote_only=False):
+    """Build the audit, or project only quotes with their original decision clocks.
+
+    The projection shares provenance and settlement checks but avoids the
+    all-pairs inventory and price diagnostics that a sequence engine supplies.
+    """
     if not isinstance(as_of, datetime) or as_of.utcoffset() is None:
         raise ValueError('as_of must be a timezone-aware datetime')
     if type(volume_min) is not int or volume_min <= 0:
@@ -289,8 +293,7 @@ def build(directory, as_of, *, volume_min=10_000):
         if event.get('exclusion'):
             continue
         history[event['fixture_id']].append(event)
-        key = events.selection_key(event)
-        if key is not None and event['odds'] is not None:
+        if not quote_only and event['odds'] is not None and (key := events.selection_key(event)) is not None:
             price_history[key].append(event)
 
     episodes, outcomes, fixture_results = [], {}, {}
@@ -341,7 +344,7 @@ def build(directory, as_of, *, volume_min=10_000):
 
         fixture_bindings = [binding for binding in bindings.values() if binding.canonical == fixture]
         for anchor in sorted(fixture_events, key=lambda e: (events.emitted(e), events.seen(e), e['message_id'])):
-            if anchor['direction'] is not None:
+            if not quote_only and anchor['direction'] is not None:
                 if anchor['line'] is None or anchor['market_key'] is None or anchor['period'] is None:
                     incompleteness['total_without_exact_scope'] += 1
                 else:
@@ -358,6 +361,9 @@ def build(directory, as_of, *, volume_min=10_000):
             high_volume = (anchor['source'] in events.VOLUME_SOURCES and anchor['volume_usd'] is not None
                            and anchor['volume_usd'] >= volume_min)
             if anchor['odds'] is None and not high_volume:
+                continue
+            if quote_only:
+                add('quote', 'unproven', (anchor,), dict(high_volume=high_volume))
                 continue
             key = events.selection_key(anchor)
             if key is None or anchor['odds'] is None:
