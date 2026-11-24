@@ -1696,13 +1696,15 @@
    "attempt_utc": "2026-11-24T18:26:30+00:00",
    "chars": 184,
    "created_utc": "2026-11-24T18:26:30+00:00",
+   "done_utc": "2026-11-24T18:26:30+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "a2f32794cf0e9a930f25fa7df98232dd46eebe849660aeca617d747d907b3b67",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:boca-juniors-de-cali-vs-quindio-20261124|231480cc2678": {
    "attempt_id": "ad676ab4ecdd48caa324832ea7ce797a",
@@ -2162,12 +2164,17 @@
    "state": "delivered"
   },
   "game|id:cesena-vs-ascoli-20261124|38b39c5a0913": {
+   "attempt_id": "1c0b6cbe3a414325a52963e540a0e536",
+   "attempt_utc": "2026-11-24T18:26:32+00:00",
+   "chars": 180,
    "created_utc": "2026-11-24T18:26:30+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "45008ff5cb2123cb0ac00966cf2393bbeabb8577a4ee80e065725c29704e082f",
+   "state": "in_flight"
   },
   "game|id:cfr-cluj-vs-otelul-galati-20261121|e81b52a7c765": {
    "attempt_utc": "2026-11-21T16:53:33+00:00",
@@ -6944,7 +6951,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 446,
+  "delivered": 447,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:21:44+00:00",
@@ -7039,7 +7046,8 @@
   "2026-11-24T18:08:53+00:00|Como — AEK Athens|AH1(-1.5)": true,
   "2026-11-24T18:10:54+00:00|Virtus Entella — Verona|Over 2.5": true,
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5": true,
-  "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)": true
+  "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)": true,
+  "2026-11-24T18:21:13+00:00|Cesena — Ascoli|AH2(+0.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -7697,6 +7705,9 @@
   },
   "item|id:cerro-porteno-vs-sol-de-america-20261116|1X2|1": {
    "at_utc": "2026-11-17T13:01:06+00:00"
+  },
+  "item|id:cesena-vs-ascoli-20261124|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-24T18:26:30+00:00"
   },
   "item|id:cfr-cluj-vs-otelul-galati-20261121|Asian Total|Over 5": {
    "at_utc": "2026-11-21T16:53:33+00:00"
@@ -8723,7 +8734,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 758,
+ "sent_total": 759,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9623,6 +9634,7 @@
   "2026-11-24T18:08:53+00:00|Como — AEK Athens|AH1(-1.5)",
   "2026-11-24T18:10:54+00:00|Virtus Entella — Verona|Over 2.5",
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5",
-  "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)"
+  "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)",
+  "2026-11-24T18:21:13+00:00|Cesena — Ascoli|AH2(+0.5)"
  ]
 }
