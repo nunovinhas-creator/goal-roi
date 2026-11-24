@@ -37,10 +37,10 @@ REPLY_SCHEMA = {
 SHORT_TEXT = re.compile(r'^[^\x00-\x1f\x7f<>]{8,280}$')
 
 
-def prompt(replay, memory):
+def prompt(replay, memory, *, language=dsl):
     """Offer diverse observed inputs without raw Telegram text or free-form identity."""
-    fields = {name: p.kind for name, p in dsl.FIELDS.items()}
-    relations = {name: p.kind for name, p in dsl.RELATIONS.items()}
+    fields = {name: p.kind for name, p in language.FIELDS.items()}
+    relations = {name: p.kind for name, p in language.RELATIONS.items()}
     sample_fields = ('source', 'phase', 'direction', 'market_key', 'period', 'line',
                      'point_odds', 'volume_usd', 'minute', 'goals')
     examples = []
@@ -64,7 +64,7 @@ def prompt(replay, memory):
     instructions = (
         'Investigate temporal associations. Return exactly one JSON object {"proposals":[...]}. '
         'Each item has rule, alternative (rule or null), mechanism, refutation. '
-        'A rule is {"version":1,"within_seconds":21600,"steps":[[predicate],...],"relations":[link,...]}. '
+        'A rule is {"version":VERSION,"within_seconds":21600,"steps":[[predicate],...],"relations":[link,...]}. '
         'Each predicate is {"field":name,"op":"eq","value":literal}. A link adds integer '
         '"from" and "to" step indexes with from < to. Ops eq/ne, and gt/ge/lt/le for numbers. '
         'Steps are strictly emitted in order, last is the exposure opportunity. Use 2–8 steps. '
@@ -74,6 +74,10 @@ def prompt(replay, memory):
         'Use only fields and numeric/typed relations listed below. odds_delta_bp is change in basis '
         'points on the same point-price contract. odds_velocity_bp_hour divides that change by elapsed hours.'
     )
+    instructions = instructions.replace('VERSION', str(language.VERSION))
+    if language.VERSION == 2:
+        instructions += (' Persistence fields check endpoints and intervening observed events '
+                         'of the prefix. A later eligible anchor may complete the proposed pattern.')
     root = dict(fields=fields, relations=relations, observed_sequences=examples,
                 prior_rejection_counts=dict(Counter(r['reason'] for r in memory if r['status'] != 'experimental').most_common(6)))
     while len(instructions.encode()) + len(dsl.encoded(root)) + 1 > MAX_PROMPT_BYTES and root['observed_sequences']:
@@ -117,7 +121,7 @@ def rejection(value, reason):
                 origin='llm', reason=reason)
 
 
-def proposals(raw):
+def proposals(raw, *, language=dsl, candidate=miner.Candidate):
     """Validate before use, preserving failures as fingerprints, never free-form actions."""
     if not isinstance(raw, bytes) or len(raw) > MAX_REPLY_BYTES:
         # For a truncated response only the retained bytes identify the failure.
@@ -140,11 +144,11 @@ def proposals(raw):
         try:
             if not isinstance(entry, dict) or set(entry) != {'rule', 'alternative', 'mechanism', 'refutation'}:
                 raise dsl.Invalid('model_proposal_schema')
-            rule = dsl.canonical(entry['rule'])
-            if dsl.identifier(rule) in seen:
+            rule = language.canonical(entry['rule'])
+            if language.identifier(rule) in seen:
                 raise dsl.Invalid('duplicate_model_proposal')
-            seen.add(dsl.identifier(rule))
-            alt = dsl.canonical(entry['alternative']) if entry['alternative'] is not None else None
+            seen.add(language.identifier(rule))
+            alt = language.canonical(entry['alternative']) if entry['alternative'] is not None else None
             if alt is not None and (alt['steps'][-1] != rule['steps'][-1]
                                     or alt['within_seconds'] != rule['within_seconds'] or alt == rule):
                 raise dsl.Invalid('invalid_falsifying_alternative')
@@ -152,7 +156,7 @@ def proposals(raw):
                 val = entry[key]
                 if not isinstance(val, str) or not SHORT_TEXT.fullmatch(val) or CLAIM.search(val):
                     raise dsl.Invalid('invalid_research_explanation')
-            accepted.append(miner.Candidate(rule, 'llm', entry['mechanism'], entry['refutation'], alt))
+            accepted.append(candidate(rule, 'llm', entry['mechanism'], entry['refutation'], alt))
         except dsl.Invalid as exc:
             # A valid JSON object can contain finite-but-out-of-range floats.
             # If canonical JSON itself is invalid, refer to the full raw reply.

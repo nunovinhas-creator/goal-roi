@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from tempfile import NamedTemporaryFile
 
 from .. import chronology, event_intelligence as events, scientific_receipts
-from . import dsl
+from . import dsl, dsl_v2
 
 DOMAIN = 'temporal-discovery-publication-v1'
 MAX_BYTES = 1_000_000
@@ -55,8 +55,10 @@ def _validate(batch, number, parent, prior):
             raise LedgerError('invalid_or_duplicate_record')
         identifiers.add(record['id'])
         if 'rule' in record:
-            rule = dsl.canonical(record['rule'])
-            if (record['rule'] != rule or record['id'] != dsl.identifier(rule)
+            definition = record['rule']
+            language = dsl_v2 if isinstance(definition, dict) and definition.get('version') == 2 else dsl
+            rule = language.canonical(definition)
+            if (definition != rule or record['id'] != language.identifier(rule)
                     or type(record.get('track_prospectively')) is not bool
                     or record['status'] == 'rejected' and record['track_prospectively']):
                 raise LedgerError('invalid_definition_fingerprint')
