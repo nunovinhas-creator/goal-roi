@@ -111,5 +111,61 @@ class Transport(unittest.TestCase):
         self.assertEqual(a['audit']['checks'], b['audit']['checks'])
 
 
+EVALUATOR = ROOT / 'audits/selective-abstention/evaluate.py'
+ESPEC = importlib.util.spec_from_file_location('goal_roi_j_evaluator', EVALUATOR)
+J_EVAL = importlib.util.module_from_spec(ESPEC)
+with patch.object(sys, 'path', [str(EVALUATOR.parent), *sys.path]), patch.dict(sys.modules):
+    ESPEC.loader.exec_module(J_EVAL)
+
+
+class IndependentEvaluation(unittest.TestCase):
+    def test_lock_eligibility_and_report_reproduce_offline_in_the_sealed_order(self):
+        import json
+        import socket
+        calls = []
+        choices, build, eligible = J_EVAL._choices, J_EVAL.bank_j.build, J_EVAL.eligibility
+
+        def counted(*args):
+            result = eligible(*args)
+            calls.append('eligibility_done')
+            return result
+
+        def sealed(*args):
+            result = choices(*args)
+            calls.append('choices_sealed')
+            return result
+
+        def guarded(index, seed, *, fresh):
+            # Validation banks exist only for the label-count pre-check and after choices are sealed.
+            if fresh and 'eligibility_done' in calls:
+                self.assertIn('choices_sealed', calls)
+            return build(index, seed, fresh=fresh)
+
+        with patch.object(socket, 'socket', side_effect=AssertionError('network unavailable')), \
+                patch.object(socket, 'getaddrinfo', side_effect=AssertionError('DNS unavailable')), \
+                patch.object(J_EVAL, '_choices', side_effect=sealed), \
+                patch.object(J_EVAL, 'eligibility', side_effect=counted), \
+                patch.object(J_EVAL.bank_j, 'build', side_effect=guarded):
+            report = J_EVAL.run()
+        self.assertEqual(calls, ['eligibility_done', 'choices_sealed'])
+        encoded = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + '\n'
+        self.assertEqual(encoded.encode(), EVALUATOR.with_name('report.json').read_bytes())
+        self.assertEqual(report['decision']['independent_selection'], 'NO-GO')
+        self.assertFalse(report['confirmatory'])
+        for family in report['families'].values():
+            self.assertTrue(family['assessable'])
+            for fold in family['folds']:
+                self.assertTrue(fold['search_complete'])
+                self.assertTrue(fold['j_transport_same_choice'])
+                self.assertTrue(all(trial['j_invariant'] for trial in fold['trials']))
+
+    def test_an_abstention_counts_in_every_denominator(self):
+        import json
+        report = json.loads(EVALUATOR.with_name('report.json').read_bytes())
+        totals = report['totals']
+        self.assertEqual({e: totals[e]['evaluations'] for e in 'hij'}, dict(h=24, i=24, j=24))
+        self.assertEqual({e: totals[e]['targets'] for e in 'hij'}, dict(h=240, i=240, j=240))
+
+
 if __name__ == '__main__':
     unittest.main()

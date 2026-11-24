@@ -1,0 +1,207 @@
+{
+  "changes_verdict": false,
+  "families": {
+    "live_away_goal_drift": [
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "goal",
+            "score",
+            "quote",
+            "quote"
+          ]
+        ],
+        "mining_seed": 61403,
+        "missed_mechanisms": [],
+        "published_abstain_reason": null
+      },
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "goal",
+            "score",
+            "quote",
+            "quote"
+          ]
+        ],
+        "mining_seed": 18839,
+        "missed_mechanisms": [],
+        "published_abstain_reason": null
+      }
+    ],
+    "live_open_total": [
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "goal",
+            "score",
+            "alert",
+            "quote"
+          ]
+        ],
+        "mining_seed": 61403,
+        "missed_mechanisms": [],
+        "published_abstain_reason": null
+      },
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "goal",
+            "score",
+            "alert",
+            "quote"
+          ]
+        ],
+        "mining_seed": 18839,
+        "missed_mechanisms": [],
+        "published_abstain_reason": null
+      }
+    ],
+    "pre_count_surge": [
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "quote",
+            "revision",
+            "alert",
+            "quote"
+          ]
+        ],
+        "mining_seed": 61403,
+        "missed_mechanisms": [
+          "surge_counts_fall"
+        ],
+        "published_abstain_reason": null
+      },
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "quote",
+            "alert",
+            "quote",
+            "revision",
+            "alert",
+            "quote"
+          ]
+        ],
+        "mining_seed": 18839,
+        "published_abstain_reason": "replicated",
+        "without_replication": {
+          "abstain_reason": null,
+          "shape": [
+            "quote",
+            "alert",
+            "quote",
+            "revision",
+            "alert",
+            "quote"
+          ],
+          "validation": [
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            },
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            },
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            }
+          ]
+        }
+      }
+    ],
+    "pre_source_relay": [
+      {
+        "labelled_shape_in_generator_pool": false,
+        "labelled_shapes": [
+          [
+            "alert",
+            "quote",
+            "alert",
+            "revision",
+            "quote",
+            "quote"
+          ]
+        ],
+        "mining_seed": 61403,
+        "missed_mechanisms": [
+          "relay_volume_stalls"
+        ],
+        "published_abstain_reason": null
+      },
+      {
+        "labelled_shape_in_generator_pool": true,
+        "labelled_shapes": [
+          [
+            "alert",
+            "quote",
+            "alert",
+            "revision",
+            "quote",
+            "quote"
+          ]
+        ],
+        "mining_seed": 18839,
+        "published_abstain_reason": "replicated",
+        "without_replication": {
+          "abstain_reason": null,
+          "shape": [
+            "alert",
+            "quote",
+            "alert",
+            "revision",
+            "quote",
+            "quote"
+          ],
+          "validation": [
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            },
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            },
+            {
+              "detections": 13,
+              "exact_paths": 10,
+              "exact_terminals": 10,
+              "gate": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "schema": "goal_roi_pr_j_posthoc_v1",
+  "written_after_report_sha256": "38dcaf6f4b1aca2c3358893163cf4cd1704606373d385169ef85d0544f8db072"
+}
