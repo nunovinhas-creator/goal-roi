@@ -76,7 +76,7 @@ O volume disponível é o valor anunciado no ScanGoal. Para comparar com a 1xBet
 
 ## Casos auditáveis
 
-Os números a seguir aos IDs, entre parênteses, são linhas do diário fixado no commit da reprodução. Pesquise o ID do episódio no JSON `audit` para obter os hashes completos, a primeira leitura, o limite de disponibilidade, os dados do jogo e as observações de FT.
+Os números a seguir aos IDs, entre parênteses, são linhas do diário fixado no commit da reprodução. Pesquise o ID do episódio no JSON `audit` para obter os hashes completos, a primeira leitura, o limite de disponibilidade e os dados do jogo. As observações de FT estão em `fixture_results`, indexadas pelo `fixture_id` do episódio.
 
 | Episódio | Sinais originais | Decisão UTC | Resultado e prova |
 | --- | --- | --- | --- |
@@ -97,3 +97,14 @@ A busca pelos três relatos localizou **180 decisões em 29 jogos** com inversã
 O recorte mais direto para uma futura hipótese é a inversão no mesmo mercado, período e linha, estratificada pelo sentido, minuto, marcador, intervalo entre alertas e combinação de fontes. O segundo recorte é a relação entre volume e movimento de preços comparáveis antes da decisão, com controlo pelo preço inicial e pela fase. Os dados exibem seleção pela disponibilidade de cotações, repetição de partidas e mistura de mercados. Os ROIs da tabela são descritivos, com odds anunciadas, sem custos de execução. Uma avaliação futura precisaria de um protocolo registado antes de uma janela nova, com uma regra de dependência por partida e cobertura de cotações construída para esse fim.
 
 A PR B pode consumir `goal_roi_experimental_temporal_context_v1` através de `llm_context` ou do JSON da CLI. Cada exemplo tem um ID estável, um instante de decisão, no máximo duas observações com hashes e um conjunto fixo de campos. O exportador emite até 100 episódios e limita campos textuais. A sua entrada é um replay com `as_of` explícito. A auditoria mantém FT, edições e movimentos conhecidos mais tarde em estruturas próprias. Hipóteses sequenciais podem ser expressas como predicados externos sobre estes campos e testadas por replay, mantendo o cérebro atual como consumidor independente das suas próprias regras. A PR A é invocada explicitamente pela CLI e funciona em leitura local.
+
+## Verificação
+
+Os 16 testes adversariais cobrem os relógios, a ordem de leitura, as edições, a identidade da partida, a granularidade dos mercados, os movimentos de preço e a execução em leitura local. As mesmas características e decisões foram reproduzidas em quatro cortes históricos do diário real, de 15 a 23 de novembro, ao comparar cada replay com os episódios já observados no corte final.
+
+```sh
+python -m unittest discover -s tests -v
+node --test ops/continuity/watchdog.test.mjs
+```
+
+Na referência de 1.049 testes Python, a regressão do dashboard falhou porque o Chromium do Playwright ainda estava ausente. Depois da instalação, o sandbox de comandos bloqueou o arranque do Chromium. A regressão passou com o binário instalado e a execução fora desse sandbox.

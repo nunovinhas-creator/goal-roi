@@ -101,7 +101,7 @@ class TemporalReplay(unittest.TestCase):
         self.assertEqual(early['outcomes']['sequence:1:2']['status'], 'pending')
         label = final['outcomes']['sequence:1:2']
         self.assertEqual((label['status'], label['ft'], label['last_payoff']), ('confirmed', (2, 1), 1.0))
-        self.assertEqual(label['evidence'][0]['journal']['text_sha256'], revised['sha256'])
+        self.assertEqual(final['fixture_results']['alpha-beta'][0]['journal']['text_sha256'], revised['sha256'])
         self.assertEqual(label['theoretical_profit_units'], 0.9)
 
     def test_conflicting_same_receipt_versions_and_hashes_are_excluded(self):

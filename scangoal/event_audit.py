@@ -213,16 +213,15 @@ def emitted_after(later, earlier):
     return events.emitted(later) > events.emitted(earlier)
 
 
-def outcome_for(inputs, row, final, known_before, evidence):
+def outcome_for(inputs, row, final, known_before, as_of):
     anchor = inputs[-1]
     first_payoff = payoff(inputs[0], final.score) if len(inputs) > 1 else None
     unit_outcome = payoff(anchor, final.score)
     if final.conflict:
         status, reason = 'indeterminate', 'conflicting_ft'
     elif final.score is None:
-        clock = chronology.parse_utc(row['as_of_utc'])
         limit = chronology.parse_utc(row['observed_utc']) + timedelta(days=opportunity_results.SETTLEMENT_WINDOW_DAYS)
-        status = 'pending' if clock < limit else 'indeterminate'
+        status = 'pending' if as_of < limit else 'indeterminate'
         reason = 'ft_not_proven'
     elif unit_outcome is None:
         status, reason = 'indeterminate', 'market_not_settled_by_ft'
@@ -238,7 +237,7 @@ def outcome_for(inputs, row, final, known_before, evidence):
     return dict(status=status, reason=reason, ft=final.score, last_payoff=unit_outcome,
                 first_payoff=first_payoff, theoretical_profit_units=profit,
                 ft_available_utc=events.iso(final.available_at),
-                ft_known_by_decision=known_before.first_available_at is not None, evidence=evidence)
+                ft_known_by_decision=known_before.first_available_at is not None)
 
 
 def build(directory, as_of, *, volume_min=10_000):
@@ -267,13 +266,13 @@ def build(directory, as_of, *, volume_min=10_000):
         if key is not None and event['odds'] is not None:
             price_history[key].append(event)
 
-    episodes, outcomes = [], {}
+    episodes, outcomes, fixture_results = [], {}, {}
     incompleteness = Counter()
 
     for fixture, fixture_events in sorted(history.items()):
         evidence = results.get(fixture, [])
         final, final_kickoff = resolution(fixture_events, evidence, as_of)
-        final_evidence = result_proofs(evidence, proofs, final_kickoff, as_of)
+        fixture_results[fixture] = result_proofs(evidence, proofs, final_kickoff, as_of)
         decision_evidence = {}
         totals = []
 
@@ -307,7 +306,7 @@ def build(directory, as_of, *, volume_min=10_000):
                        message_ids=ids, observed_utc=events.iso(available),
                        decision_utc=events.iso(available) if not reasons else None, exclusion_reasons=reasons,
                        features=features)
-            label = outcome_for(inputs, dict(row, as_of_utc=events.iso(as_of)), final, prior, final_evidence)
+            label = outcome_for(inputs, row, final, prior, as_of)
             if later_quotes is not None:
                 label.update(later_quotes)
             episodes.append(row)
@@ -364,7 +363,7 @@ def build(directory, as_of, *, volume_min=10_000):
                 volume_min_usd=volume_min, input_sha256=manifest, versions_visible=len(versions),
                 events=signals, excluded_first_versions=excluded, edits=edits,
                 input_exclusions=dict(input_counts), episode_incompleteness=dict(incompleteness),
-                episodes=episodes, outcomes=outcomes, verdict=VERDICT)
+                episodes=episodes, outcomes=outcomes, fixture_results=fixture_results, verdict=VERDICT)
 
 
 def stats(rows, outcomes, *, economic=True):
