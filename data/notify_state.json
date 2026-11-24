@@ -1030,6 +1030,19 @@
    "sha256": "5478342b7fcda9903671103bf55f57287fbc5b8e36ecd5ef0f548a3573ea4673",
    "state": "delivered"
   },
+  "game|id:arsenal-vs-dortmund-20261124|ad3ce31bd3cf": {
+   "attempt_id": "24267d7cdd8b4f1992c3340740753b4f",
+   "attempt_utc": "2026-11-24T14:12:10+00:00",
+   "chars": 266,
+   "created_utc": "2026-11-24T14:12:10+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "f98862874618e59f9099b686e8de383cfe7e5ac36eb752eacf57f05751b98af3",
+   "state": "in_flight"
+  },
   "game|id:arsenal-women-vs-lyon-women-20261119|354e318b7703": {
    "attempt_utc": "2026-11-19T20:22:33+00:00",
    "chars": 670,
@@ -6765,13 +6778,13 @@
  "health": {
   "reference": {
    "bsd_results": 48,
-   "eligible": 2080,
+   "eligible": 2081,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 113,
    "hypotheses": 14681,
-   "settled_bets": 1567,
+   "settled_bets": 1573,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 294,
+   "statuses": 300,
    "validation_state": "not_activated"
   }
  },
@@ -6841,7 +6854,8 @@
   "2026-11-24T13:22:24+00:00|Luanda Villa SC — Equity FC|Over 3": true,
   "2026-11-24T13:27:48+00:00|Real Madrid — PSV Eindhoven|BTTS: Yes": true,
   "2026-11-24T13:33:40+00:00|Shanghai Port — Buriram United|Over 4": true,
-  "2026-11-24T13:37:53+00:00|Cong An Ha Noi — Kobe|Over 5": true
+  "2026-11-24T13:37:53+00:00|Cong An Ha Noi — Kobe|Over 5": true,
+  "2026-11-24T14:05:47+00:00|Arsenal — Dortmund|Over 2.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -7050,7 +7064,7 @@
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
   "Polymarket | Competição = liga & Momento = durante o jogo": 52,
   "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 43,
-  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 73,
+  "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 74,
   "Polymarket | Dia = fim de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos)": 38,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00": 117,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 28,
@@ -7081,10 +7095,10 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": 83,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Mercado = golos (mais/menos) & Número de apostas = várias": 37,
   "Polymarket | Faixa de odd = odd 2,00 a 3,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 26,
-  "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": 43,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 61,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 35,
-  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 56,
+  "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": 46,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 62,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 36,
+  "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 57,
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 60,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 48,
@@ -7235,6 +7249,9 @@
   },
   "item|id:arminia-bielefeld-vs-magdeburg-20261120|Asian Total|Under 2.5": {
    "at_utc": "2026-11-20T13:55:49+00:00"
+  },
+  "item|id:arsenal-vs-dortmund-20261124|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-24T14:12:10+00:00"
   },
   "item|id:arsenal-women-vs-lyon-women-20261119|1st Half - Asian Total|Over 0.5": {
    "at_utc": "2026-11-19T20:22:33+00:00"
@@ -8534,9 +8551,12 @@
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Minuto = 61 em diante & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": "abandonada",
   "Jogo aberto | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
+  "Polymarket | Competição = liga & Dia = dia de semana & Mercado = golos (mais/menos)": "abandonada",
   "Polymarket | Competição = liga & Dia = dia de semana & Momento = antes do jogo": "abandonada",
   "Polymarket | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": "abandonada",
+  "Polymarket | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
   "Polymarket | Competição = liga & Mercado = golos (mais/menos) & Número de apostas = uma": "abandonada",
+  "Polymarket | Competição = liga & Momento = antes do jogo & Número de apostas = uma": "abandonada",
   "Polymarket | Competição = liga & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Competição = liga & Momento = antes do jogo & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Competição = liga & Momento = durante o jogo": "promissora",
@@ -8546,6 +8566,7 @@
   "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
   "Polymarket | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": "abandonada",
+  "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Dia = dia de semana & Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Dia = dia de semana & Momento = antes do jogo": "abandonada",
@@ -8554,6 +8575,7 @@
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = dia de semana & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Dia = dia de semana & Número de apostas = uma": "abandonada",
+  "Polymarket | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Polymarket | Dia = dia de semana & Quota de mercado = 80 % ou mais & Valor da aposta = menos de 10 mil $": "abandonada",
   "Polymarket | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -8604,6 +8626,7 @@
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Valor da aposta = 10 mil $ ou mais": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = uma": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = uma & Quota de mercado = 80 % ou mais": "abandonada",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": "promissora",
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": "promissora",
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -9353,6 +9376,7 @@
   "2026-11-24T13:22:24+00:00|Luanda Villa SC — Equity FC|Over 3",
   "2026-11-24T13:27:48+00:00|Real Madrid — PSV Eindhoven|BTTS: Yes",
   "2026-11-24T13:33:40+00:00|Shanghai Port — Buriram United|Over 4",
-  "2026-11-24T13:37:53+00:00|Cong An Ha Noi — Kobe|Over 5"
+  "2026-11-24T13:37:53+00:00|Cong An Ha Noi — Kobe|Over 5",
+  "2026-11-24T14:05:47+00:00|Arsenal — Dortmund|Over 2.5"
  ]
 }
