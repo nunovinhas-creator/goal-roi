@@ -4939,12 +4939,17 @@
    "state": "delivered"
   },
   "game|id:norwich-vs-qpr-20261124|e82a5102b7c4": {
+   "attempt_id": "7c071ccc62b840648a38cd50dc46e9a1",
+   "attempt_utc": "2026-11-24T18:38:31+00:00",
+   "chars": 249,
    "created_utc": "2026-11-24T18:38:30+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "813d41713446abe1df00029e9312684b8c999978e602a95ce718c8f56a795217",
+   "state": "in_flight"
   },
   "game|id:nurnberg-vs-eintracht-braunschweig-20261121|cb03e0614fac": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
@@ -5960,13 +5965,15 @@
    "attempt_utc": "2026-11-24T18:38:30+00:00",
    "chars": 201,
    "created_utc": "2026-11-24T18:38:30+00:00",
+   "done_utc": "2026-11-24T18:38:30+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "1b6c256f52ab275dcc09c59f13c8a326366bbbda54c201db4b5463ee102901e6",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:shirak-vs-gandzasar-kapan-20261120|1f1c6ada62ea": {
    "attempt_utc": "2026-11-20T16:09:34+00:00",
@@ -6982,7 +6989,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 448,
+  "delivered": 449,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T18:33:22+00:00",
@@ -7079,6 +7086,8 @@
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5": true,
   "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)": true,
   "2026-11-24T18:21:13+00:00|Cesena — Ascoli|AH2(+0.5)": true,
+  "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)": true,
+  "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)": true,
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5": true
  },
  "migrations": {
@@ -8359,6 +8368,12 @@
   "item|id:norwich-vs-cardiff-city-20261121|Half Time Total Goals|Over 0.5": {
    "at_utc": "2026-11-21T13:06:49+00:00"
   },
+  "item|id:norwich-vs-qpr-20261124|Polymarket|AH1(-0.5)": {
+   "at_utc": "2026-11-24T18:38:30+00:00"
+  },
+  "item|id:norwich-vs-qpr-20261124|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-24T18:38:30+00:00"
+  },
   "item|id:nurnberg-vs-eintracht-braunschweig-20261121|Asian Total|Under 2.75": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
@@ -8769,7 +8784,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 760,
+ "sent_total": 761,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -9671,6 +9686,8 @@
   "2026-11-24T18:12:52+00:00|Bodo-Glimt — LASK Linz|Over 2.5",
   "2026-11-24T18:21:13+00:00|Benevento — Empoli|AH2(+1.5)",
   "2026-11-24T18:21:13+00:00|Cesena — Ascoli|AH2(+0.5)",
+  "2026-11-24T18:34:26+00:00|Norwich — QPR|AH1(-0.5)",
+  "2026-11-24T18:34:26+00:00|Norwich — QPR|AH2(+0.5)",
   "2026-11-24T18:36:30+00:00|Sheff United — Southampton|Under 2.5"
  ]
 }
