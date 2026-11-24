@@ -1,0 +1,4386 @@
+{
+  "age_seconds": {
+    "case_quote": {
+      "n": 1851,
+      "percentiles": {
+        "p10": 301.0,
+        "p25": 324.0,
+        "p50": 363.0,
+        "p75": 406.0,
+        "p90": 439.0
+      }
+    },
+    "matched_comparator": {
+      "n": 13,
+      "percentiles": {
+        "p10": 797.0,
+        "p25": 801.0,
+        "p50": 969.0,
+        "p75": 1452.0,
+        "p90": 1452.0
+      }
+    },
+    "nearest_other_fixture_same_contract_available": {
+      "n": 1616,
+      "percentiles": {
+        "p10": 708.0,
+        "p25": 1935.0,
+        "p50": 6495.0,
+        "p75": 52194.0,
+        "p90": 111698.356
+      }
+    }
+  },
+  "as_of_utc": "2026-11-24T08:22:00+00:00",
+  "autonomous_hypotheses": 54,
+  "case_decisions": 1851,
+  "completed_receipt_pairs_summed": 0,
+  "confirmatory": false,
+  "cross_source_families": [
+    {
+      "family": "regulation_1x2",
+      "native_market": "1x2",
+      "scope": "winner",
+      "source": "Betfair"
+    },
+    {
+      "family": "regulation_1x2",
+      "native_market": "1x2",
+      "scope": "winner",
+      "source": "Polymarket"
+    },
+    {
+      "family": "asian_goal_total",
+      "native_market": "asian total",
+      "scope": "match_goals",
+      "source": "Polymarket"
+    },
+    {
+      "family": "asian_handicap",
+      "native_market": "polymarket",
+      "scope": "asian_handicap",
+      "source": "Polymarket"
+    },
+    {
+      "family": "asian_goal_total",
+      "native_market": "asian total",
+      "scope": "match_goals",
+      "source": "ScanGoal"
+    },
+    {
+      "family": "regulation_1x2",
+      "native_market": "1x2",
+      "scope": "winner",
+      "source": "Stake"
+    },
+    {
+      "family": "asian_handicap",
+      "native_market": "asian handicap",
+      "scope": "asian_handicap",
+      "source": "Stake"
+    },
+    {
+      "family": "asian_goal_total",
+      "native_market": "asian total",
+      "scope": "match_goals",
+      "source": "Stake"
+    }
+  ],
+  "density": {
+    "contract_hours": 1316,
+    "contract_hours_with_multiple_fixtures": 207,
+    "reference_observations": 1807,
+    "references_with_other_fixture_last_hour": 502,
+    "references_with_other_fixture_last_hour_and_kickoff_within_45m": 224,
+    "references_with_point_in_both_and_kickoff_within_45m": 82
+  },
+  "distinct_historical_pair_identities": 5,
+  "input_sha256": {
+    "details_hl.json": "4353d3c1310151f7e85b2fa82fff308421b6adac1141d1a45d08fce48c09f969",
+    "messages.jsonl": "fef5a0c0f4be56d769d26f4975a6445b01068680a07bb1afd06367356c46a565",
+    "results_bsd.json": "e48e9568a3cc661c1556a5ddce12792f1f75743075ec6be25b3c725c6118af02",
+    "results_hl.json": "9629e508b659d68e0d8263c871f4a8d19066a9ee9ae43cb5d5a2d75dc4b317d5"
+  },
+  "power": {
+    "alpha_two_layers_single_hypothesis": 0.0125,
+    "assumptions": "Observed receipt-day schedules repeated with zero days intact. Earliest complete receipt through cutoff inclusive; partial UTC days count in full. Synthetic independent outcomes at fair price plus case shift on decisive stake. Observed prices, competitions, missing-result and push/half-stake patterns. v3.1 pair-difference kernel and pair, cluster, coverage, leave-one-out, lower-bound and two-layer alpha gates. Fitted correction and absolute announced-return gate. Sampled effects describe planning only.",
+    "by_hypothesis": [
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:4718fb938ecbd3da6cdda331bb757c5e320aec16a570ed8ec72f3af8ebbd63ed"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:0443e2a7ab78c11d26c65c61dbac8dc58c8bf877634d565207d49ff8457aa8d7"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:02f1f9773910e39e3adfe995162a0435a8303b6defe870ba040c543d8030b07d"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:a2bc16e1bf04ff34c55672e877b43b8393b670f2e34fe240ebc376427ab440a1"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:a936e26bcb16397bcc315cbe250b63c80792e63ee4c5a06c1e18d96987c49703"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:467cb1956aac2958e18938e7b596c53b0c5bc5792dda402de8dd355b87631f22"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:40350ab956ac539ccae16d32281fbc6acb2e7435f370eabcad9728036497bee7"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:21cf37de68f13d47608564694433fd9de3916b06b155c64777fc02774a0528bd"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:40110bf9e7715455e8b7ec420ae01844fc25cfd950f06e403de8b7c3b62ea246"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:a2b19d79eed75f7178a74932519e75462d9c88dd8e21294868b8664eecbf7965"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:6b2f8e35df632c68c60d3f906b7677aca76a4f79c0205c62a73862e2442f8fe7"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:d56d3e6b5bced80d8deabde0b7e47e97dd39847b29277cefe6632a4b4221281b"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:7d392b9ab35c34c5ee51e58b46b49bed30953194e3d9c96e284e57dd7ecb7e53"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:d3ab87b238588cae639045d2db17850d7591e0b79c0e91d9349fbce3cb63b59d"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:6ab094fb276e4e6a622340d7af89189e7c63747d71fa8b984cfe97e439be2edf"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:a2622fac037ddd27ba078aec0463f84ce6694b2e59cd433d807b799a04b58a3a"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:9db560e9e96727445725ee918b5fa26e3ed0f9abe67c7cbb0ad505a00fd6a2c2"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_handicap"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:168c1eddac2c4c7a21ba00c2215890b823369537dcf1c7ba0da78a495a90c3da"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:d524364fa7166d1938035b77653d01c3363f5145415c40ed3730b23ff28e82e5"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:07c57ee89d0e3e416cb7335eb049011a983278773dc4eaccd8fc5aa717f37f5a"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:a8dae1134dca71e1d04d46bc1c1cc71d13a2f5f78716052a93ba0ee954032624"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:35a210fdf402a58dfee88a3dcb672919b976e9b2106a76626293302fd87191ec"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:5cc7368a4bfeb2fc6c9a66e241062c768f02cb54e59977a6e9d23341eaa6d9b3"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:304557fe0cf4fa3b2c0ebddf7bdf9e4f38af9982df3abc82d89eb209917c4bcd"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_handicap"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:43a6776a12ebac8e4a3ae0197da52ad9c8307aba0e18cb81097a2ba4b055f7c7"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:7d85b1cba8aa356dd078cd4dd4596d4ed88d788e03ff6eba21f74b820974cff4"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:8666a836fc128e1d9650cd368d41a8b20ea2a9028d9b82ff5d9abcad75d45886"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:2da8a4ded2799df1b6aa55c95576527d7c3061af1dfd0be0c4bd02056f8db628"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:6e65305eb66ab5f7f5b81b0bc5bc073e1554265174807f9e38006f785741da08"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:e6498ca2784f6c4f98960d75bbbc15a22e8b515915ca53f8fe79703e4c81d182"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:3ec217a25600d71acfa8169b243d1731780805458be2ec5496c9a2a894fa9f07"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_handicap"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:17623d4be378aaf17838c4424c759a4a9dc7b6347e83f5c301462d8b562bf7e7"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:11922188ae720ce52c04c9cbdeb27ddcf477fb2d1a01c2c6284a56b5494b47d4"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:49eda391c54accfafe7342e1cd50dba0268033daae81f735ef802e873cbd230d"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:66ddd181577a0491b5a45f4e07c9c8dc54198f6c5e260563c2a3566ab090276f"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:1c50c768400b4de9c5c9bc80ed512fecb0f380876f9349f1636199670df1a841"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:2e62b213f0bcd204bb55a19070f5dad2249b14e4c1f38d17a953147d5e42d1ea"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:10cf43c5bc328b4be60655e3a5c1baf7c9906c0adecf7442e33fb66cbb21da79"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:0647b4530c698995d5a3fa524c8e6db80b4cbe798582d9d13f435ea944d4fc40"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_goal_total"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:d76157a88171ab73035c7f4435cb66e50c285196ee498a8a55e5557b76608267"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:45066816eca222e01a2befafd82344a7225d500883dd8d40a6e3d8b7fed0f142"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:8ed340458afceec455813ea087d59f6e1ca33994042c689294474c0f4913eb24"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:8115871630dbf38e6365c203eb65059b34da05772c6d3dfd51d82856fcb512ad"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_handicap"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:1c98ad138fa460c032b0483c81915367744b165fbbd53f7325951804a73358c2"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:3a68b9359f885dd8de9be0cacfe3f152630c7ab49e2eb8c86ecebb130e80de8f"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [
+          {
+            "completed_receipt_power": {
+              "effects": [
+                {
+                  "effect_pp": 4,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 8,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                },
+                {
+                  "effect_pp": 12,
+                  "first_tested_days_at_80pct": {
+                    "announced": null,
+                    "prediction": null
+                  },
+                  "horizons": [
+                    {
+                      "days": 90,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 180,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    },
+                    {
+                      "days": 365,
+                      "layers": {
+                        "announced": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        },
+                        "prediction": {
+                          "rate": 0.0,
+                          "wilson_95": null
+                        }
+                      },
+                      "minimum_sample_and_weeks": false,
+                      "projected_pairs": 0,
+                      "projected_weeks": 0
+                    }
+                  ]
+                }
+              ],
+              "exposure_days": 2,
+              "first_tested_days_passing_sample_and_weeks": null,
+              "observed_pairs": 0,
+              "pairs_per_day": 0.0,
+              "rate_equivalent_days_for_minimum_pairs": null
+            },
+            "family": [
+              "Polymarket",
+              "pre",
+              "regulation",
+              "asian_handicap"
+            ],
+            "historical_pairs": 1,
+            "historical_pairs_per_day": 0.07692307692307693
+          }
+        ],
+        "historical_pairs": 1,
+        "hypothesis_sha256": "tr3:7fa8027da0ec17c48e5a59afd412c6b3b112e7ded91939b153cdd5346751c225"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:007db4ff05ad2cdbf3cb33acd3233999b72bd5cbaa42d1b05a2513271a464c59"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:575a6b1962842852d09e1074a0a7a8b6c416e0a8be716eeb2a9320ea98c160c6"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:b7292952141c104f4bc02107f0e0892b1f8b021069202de1c4804421e696b415"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:ff606b8b6937d83f8c69f1fe88441a48ee6b7f340c51420cff3a2aeb0e32a034"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:35241f20b48d52c413181097b8cb9c735b787ae3f331f78dec6da785961036fd"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:b27893f07d0553e03d0868d65b7f13387b3e56e8159aadaa53a168e1b8176837"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:16ca0e50181b9f7aed6d869b0dde3cc00d86f3e811f7c49d609e3801e95eeac9"
+      },
+      {
+        "completed_receipt_pairs": 0,
+        "families": [],
+        "historical_pairs": 0,
+        "hypothesis_sha256": "tr3:f45735576c0f6365313286804044eee73e6f75ad104fe9e4b7e6238b41c5189d"
+      }
+    ],
+    "completed_receipt_exposure_utc_days": 2,
+    "deduplicated_family_pair_count_for_coverage_only": [
+      {
+        "completed_receipt": 0,
+        "family": [
+          "Polymarket",
+          "pre",
+          "regulation",
+          "asian_goal_total"
+        ],
+        "historical": 3
+      },
+      {
+        "completed_receipt": 0,
+        "family": [
+          "Polymarket",
+          "pre",
+          "regulation",
+          "asian_handicap"
+        ],
+        "historical": 2
+      }
+    ],
+    "default_zero_pair_power": {
+      "effects": [
+        {
+          "effect_pp": 4,
+          "first_tested_days_at_80pct": {
+            "announced": null,
+            "prediction": null
+          },
+          "horizons": [
+            {
+              "days": 90,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 180,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 365,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            }
+          ]
+        },
+        {
+          "effect_pp": 8,
+          "first_tested_days_at_80pct": {
+            "announced": null,
+            "prediction": null
+          },
+          "horizons": [
+            {
+              "days": 90,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 180,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 365,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            }
+          ]
+        },
+        {
+          "effect_pp": 12,
+          "first_tested_days_at_80pct": {
+            "announced": null,
+            "prediction": null
+          },
+          "horizons": [
+            {
+              "days": 90,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 180,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            },
+            {
+              "days": 365,
+              "layers": {
+                "announced": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                },
+                "prediction": {
+                  "rate": 0.0,
+                  "wilson_95": null
+                }
+              },
+              "minimum_sample_and_weeks": false,
+              "projected_pairs": 0,
+              "projected_weeks": 0
+            }
+          ]
+        }
+      ],
+      "exposure_days": 2,
+      "first_tested_days_passing_sample_and_weeks": null,
+      "observed_pairs": 0,
+      "pairs_per_day": 0.0,
+      "rate_equivalent_days_for_minimum_pairs": null
+    },
+    "historical_exposure_utc_days": 13,
+    "lookahead_days": [
+      90,
+      180,
+      365
+    ],
+    "repetitions": 100
+  },
+  "price_inventory": {
+    "by_source": {
+      "Betfair": {
+        "indeterminate": 0,
+        "interval": 0,
+        "point": 594,
+        "point_fraction": 1.0,
+        "quotes": 594
+      },
+      "Polymarket": {
+        "indeterminate": 0,
+        "interval": 593,
+        "point": 691,
+        "point_fraction": 0.5381619937694704,
+        "quotes": 1284
+      },
+      "ScanGoal": {
+        "indeterminate": 129,
+        "interval": 0,
+        "point": 689,
+        "point_fraction": 0.8422982885085575,
+        "quotes": 818
+      },
+      "Stake": {
+        "indeterminate": 0,
+        "interval": 137,
+        "point": 821,
+        "point_fraction": 0.8569937369519833,
+        "quotes": 958
+      }
+    },
+    "distinct_exact_contracts": 448,
+    "explicit_price_recovered_from_text": {
+      "Betfair": 271,
+      "Polymarket": 77
+    },
+    "top_contracts": [
+      {
+        "contract_sha256": "3bcb79cf2335e9274404b302979b2fc78d6de776212ad676b2df5b43982f997f",
+        "fixtures": 119,
+        "indeterminate": 0,
+        "interval": 0,
+        "line": "3",
+        "market": "asian total",
+        "period": "regulation",
+        "phase": "live",
+        "point": 122,
+        "point_fraction": 1.0,
+        "quotes": 122,
+        "scope": "match_goals",
+        "selection": "over",
+        "source": "ScanGoal"
+      },
+      {
+        "contract_sha256": "44c354b9722c1cf2322a2a2deae45ff9206eafe3fc770715b32be74ab1125515",
+        "fixtures": 95,
+        "indeterminate": 0,
+        "interval": 0,
+        "line": null,
+        "market": "1x2",
+        "period": "regulation",
+        "phase": "live",
+        "point": 130,
+        "point_fraction": 1.0,
+        "quotes": 130,
+        "scope": "winner",
+        "selection": "1",
+        "source": "Betfair"
+      },
+      {
+        "contract_sha256": "7de0726cb63b8cfc54fdaf20b4e7b0667f1a3c149d1869c8a6d4dccbeb4466d5",
+        "fixtures": 87,
+        "indeterminate": 0,
+        "interval": 0,
+        "line": "4",
+        "market": "asian total",
+        "period": "regulation",
+        "phase": "live",
+        "point": 89,
+        "point_fraction": 1.0,
+        "quotes": 89,
+        "scope": "match_goals",
+        "selection": "over",
+        "source": "ScanGoal"
+      },
+      {
+        "contract_sha256": "26d2a37d615c078780b1ed22932ea3c77a5d27f5676dfc3b35286a80a5e331ca",
+        "fixtures": 79,
+        "indeterminate": 0,
+        "interval": 0,
+        "line": "0.75",
+        "market": "asian total",
+        "period": "regulation",
+        "phase": "live",
+        "point": 79,
+        "point_fraction": 1.0,
+        "quotes": 79,
+        "scope": "match_goals",
+        "selection": "over",
+        "source": "ScanGoal"
+      },
+      {
+        "contract_sha256": "09871a00530e529c275db3da89ee49dd16d4f696f593ee67b6ae256614d2f227",
+        "fixtures": 63,
+        "indeterminate": 0,
+        "interval": 53,
+        "line": "2.5",
+        "market": "asian total",
+        "period": "regulation",
+        "phase": "pre",
+        "point": 52,
+        "point_fraction": 0.49523809523809526,
+        "quotes": 105,
+        "scope": "match_goals",
+        "selection": "over",
+        "source": "Polymarket"
+      },
+      {
+        "contract_sha256": "f020d02ecc5b84e77492d715430e082bfe6f60ee8b33bbe225348881b05324fb",
+        "fixtures": 62,
+        "indeterminate": 0,
+        "interval": 89,
+        "line": "-0.5",
+        "market": "polymarket",
+        "period": "regulation",
+        "phase": "pre",
+        "point": 57,
+        "point_fraction": 0.3904109589041096,
+        "quotes": 146,
+        "scope": "asian_handicap",
+        "selection": "ah1(-0.5)",
+        "source": "Polymarket"
+      },
+      {
+        "contract_sha256": "5c5fa2169c62ce5abdba02efc87bc6cf34a0745deea7a5adb52a39553e83c736",
+        "fixtures": 56,
+        "indeterminate": 0,
+        "interval": 0,
+        "line": null,
+        "market": "1x2",
+        "period": "regulation",
+        "phase": "live",
+        "point": 76,
+        "point_fraction": 1.0,
+        "quotes": 76,
+        "scope": "winner",
+        "selection": "2",
+        "source": "Betfair"
+      },
+      {
+        "contract_sha256": "bb012704667324f20e24b802a9bd48464a3b489881231c24dc77bcc1d3fe2581",
+        "fixtures": 53,
+        "indeterminate": 0,
+        "interval": 63,
+        "line": "+0.5",
+        "market": "polymarket",
+        "period": "regulation",
+        "phase": "pre",
+        "point": 77,
+        "point_fraction": 0.55,
+        "quotes": 140,
+        "scope": "asian_handicap",
+        "selection": "ah2(+0.5)",
+        "source": "Polymarket"
+      }
+    ],
+    "total_quotes": 3654,
+    "without_exact_contract": 638
+  },
+  "protocol_sha256": "b26e9e14479bd3ef80f4ce8c072768108c62ba9ddb136d3503a13a5bd2bc3e71",
+  "schema": "goal_roi_quote_observability_v1",
+  "snapshot_sha256": "1f2bf65d751dc735d2a0688c700e7ff24ad9b41474e87f7768efc38c9e102944",
+  "strict_pairs": 13,
+  "strict_pairs_with_both_settled": 13,
+  "text_enrichment": {
+    "alert_versions_with_bet_count": 2242,
+    "alert_versions_with_biggest_ticket": 2242,
+    "alert_versions_with_cumulative_volume": 1196,
+    "all_verified_versions": {
+      "alert_score_versions": 2916,
+      "bet_count_versions": 4315,
+      "biggest_ticket_versions": 4315,
+      "by_count_unit": {
+        "bets": 1856,
+        "trades": 2459
+      },
+      "cumulative_volume_versions": 2341,
+      "distinct_fixture_goal_events": 1464,
+      "final_score_versions": 2773,
+      "fixtures": 1212,
+      "goal_lines": 3832,
+      "issues": {
+        "invalid_final_score": 18,
+        "partial_goal_timeline": 484
+      },
+      "messages": 3694,
+      "versions": 6452,
+      "versions_with_goal_timeline": 1363
+    },
+    "fixture_linked": {
+      "alert_score_versions": 2847,
+      "bet_count_versions": 4091,
+      "biggest_ticket_versions": 4091,
+      "by_count_unit": {
+        "bets": 1831,
+        "trades": 2260
+      },
+      "cumulative_volume_versions": 2167,
+      "distinct_fixture_goal_events": 1464,
+      "final_score_versions": 2627,
+      "fixtures": 1212,
+      "goal_lines": 3722,
+      "issues": {
+        "invalid_final_score": 16,
+        "partial_goal_timeline": 462
+      },
+      "messages": 3517,
+      "versions": 6155,
+      "versions_with_goal_timeline": 1326
+    },
+    "input_exclusions": {
+      "betfair_burst": 12,
+      "edited_at_first_read": 1,
+      "first_read_with_ft": 39,
+      "incomplete_fixture_identity": 77,
+      "missing_match_id": 1,
+      "reused_match_id": 9,
+      "unproven_fixture_at_receipt": 30,
+      "unproven_independence": 24
+    },
+    "linked_completed_page": {
+      "alert_score_versions": 136,
+      "bet_count_versions": 313,
+      "biggest_ticket_versions": 313,
+      "by_count_unit": {
+        "bets": 143,
+        "trades": 170
+      },
+      "cumulative_volume_versions": 128,
+      "distinct_fixture_goal_events": 71,
+      "final_score_versions": 177,
+      "fixtures": 62,
+      "goal_lines": 281,
+      "issues": {
+        "invalid_final_score": 1,
+        "partial_goal_timeline": 19
+      },
+      "messages": 239,
+      "versions": 403,
+      "versions_with_goal_timeline": 90
+    },
+    "linked_edited": {
+      "alert_score_versions": 1370,
+      "bet_count_versions": 1954,
+      "biggest_ticket_versions": 1954,
+      "by_count_unit": {
+        "bets": 880,
+        "trades": 1074
+      },
+      "cumulative_volume_versions": 1054,
+      "distinct_fixture_goal_events": 1464,
+      "final_score_versions": 2627,
+      "fixtures": 893,
+      "goal_lines": 3722,
+      "issues": {
+        "invalid_final_score": 16,
+        "partial_goal_timeline": 462
+      },
+      "messages": 2648,
+      "versions": 2649,
+      "versions_with_goal_timeline": 1326
+    }
+  },
+  "unsupported_settlements": [
+    {
+      "contract_sha256": "9c7021b38d826f13b989653c3c2a5d993e21f8a2908900d437bb314123467699",
+      "count": 1,
+      "market": "1st half - asian total",
+      "market_selection_sha256": "17ba83843fd7808ae237d81afc4ec85392047465d55154004b170626e6917057",
+      "period": "first_half",
+      "phase": "live",
+      "selection": "over 0.5",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "a5c9bd0c6eb8bd66c63b4bf39719599c62504156fe775805d6c706f77e465b62",
+      "count": 16,
+      "market": "polymarket",
+      "market_selection_sha256": "bb3fe1646103e3d372f7d477650d98726953fe478c69453c5473bd89a886f3bd",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah1(+0.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "b91781ead083818d96e2a5c07c68348d954ed55ed23109d1e1d33a58cb3438af",
+      "count": 43,
+      "market": "polymarket",
+      "market_selection_sha256": "6b53287291f0352b6faca838079a2e8c0b3589decb89b52789b64578a563807d",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah1(-0.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "97a831ea11d8b3b29288d8dc03b82d126ce16c03070bc2c208e7bb41903d7d60",
+      "count": 2,
+      "market": "polymarket",
+      "market_selection_sha256": "b5030b51aead49ea50c2e3821bb741a78f827ddda2e237533505f1d20968ec2a",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah1(-1.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "30698eacddd47c217b38fad83bf1586353b028d2221867ed170e53d8e4d04f99",
+      "count": 1,
+      "market": "polymarket",
+      "market_selection_sha256": "19117423f0d9387f4f3d5a89cbfe7784fdcd7a4cdc51bdd4d2bf45656f38737a",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah1(-2.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "5546719dda00e0ce5180bbbe0937b5206cd3f6e0f7211bbfe7c679f0778cd11e",
+      "count": 1,
+      "market": "polymarket",
+      "market_selection_sha256": "2c4cd1f242824e153ae3a5fcf37fedcde4af2d9d4f273fdc06e33b3b2fffaa51",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah1(-3.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "d6f49a667c2727649fe894012eeb351c40b21e91caee959aaee91c4402cd415e",
+      "count": 36,
+      "market": "polymarket",
+      "market_selection_sha256": "3b091d73b2603cfe20a6107935f4fd2e35940384948e52d9ec0bf472ff77c826",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah2(+0.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "5b412ce538a30f765c3cc4f24f75322835909b9ea2d2b8ec6e9aebbf24aae0c8",
+      "count": 1,
+      "market": "polymarket",
+      "market_selection_sha256": "ed4a2a67f68b0b9592e8ad00f9585d80d4228ae7e476cf74be2bd2a1b3ab6bf6",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah2(+1.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "f5b2fd44d7a82c445f9081215412f4f48613d5e7efd9a50e4abe897a586d2676",
+      "count": 34,
+      "market": "polymarket",
+      "market_selection_sha256": "fb5582a14f9af530c0fba79b7b492158587d5d336f4e87b83e3a0e4da3454434",
+      "period": "regulation",
+      "phase": "live",
+      "selection": "ah2(-0.5)",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "ad026036344fcec28024e2a0d90fbc674b7a93ee9b321c8bd576b5220d1dfb72",
+      "count": 2,
+      "market": "1st half - asian total",
+      "market_selection_sha256": "d1216b74b45cd20154c2a3178acf29e0dd93538c7a64c628ca73ec43c53cd5c5",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "over 1.5",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "3df0f8aa4a2190eaaaa62a43d5d3d3f01f5010cab39e6e7ab949778064f1dd43",
+      "count": 1,
+      "market": "polymarket",
+      "market_selection_sha256": "1fccd69b4fa94112db7049a6b549e5bd2154c72e758b4d2883161dec5ddbbe5a",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "05ab8d2c751517784687550b165e69238bb174c36be2b14f66a6354d0b4f948a",
+      "count": 3,
+      "market": "polymarket",
+      "market_selection_sha256": "4142a74a355e15604e86fa515d3d49f64c052aefed4b767ed22af2fc909c8c7b",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "d85c3407435953b629b2a6b515833cb5de51f0a3f5c9ab3b4f7a8464f79345f6",
+      "count": 2,
+      "market": "polymarket",
+      "market_selection_sha256": "4ab020c7d8f5ede35220abeb4b029119cb74dd82dc20c10ea7b5b3cec5b5b8a9",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "61713ea184d4cba0e6187c64213dc911d2213c35b4d8870ff43cd8e9cee3a904",
+      "count": 1,
+      "market": "total corners",
+      "market_selection_sha256": "5ca2587fcebc515d266bf4a9fa38c1d409829e536046233fca746db649e903c9",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "over 8.5",
+      "source": "Polymarket"
+    },
+    {
+      "contract_sha256": "a1a106f143235a64d5c21b3f70396c4a519b63a00778fa2301e5f013f42cd46d",
+      "count": 3,
+      "market": "1st half - asian total",
+      "market_selection_sha256": "17ba83843fd7808ae237d81afc4ec85392047465d55154004b170626e6917057",
+      "period": "first_half",
+      "phase": "live",
+      "selection": "over 0.5",
+      "source": "ScanGoal"
+    },
+    {
+      "contract_sha256": "1ad69e37c8816b35f8a4492a7eaf3d0fe92d80e913e061179d8dca543b2adeb2",
+      "count": 2,
+      "market": "1st half - asian total",
+      "market_selection_sha256": "3cae0a42b11a930a4dabf529639b0bd34c647583391ee817195a0758ea42833f",
+      "period": "first_half",
+      "phase": "live",
+      "selection": "over 0.75",
+      "source": "ScanGoal"
+    },
+    {
+      "contract_sha256": "bf1b28a692cac58fe1548f27d543c06d2d43d8f7a77f504d350215ed853d4994",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "013aa0f5b5de673a72292172774c0fffe254ee19f57415fa2ca8e1899fd8a7c8",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "bf1b28a692cac58fe1548f27d543c06d2d43d8f7a77f504d350215ed853d4994",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "781e1305170d19d483cf4acb72f5c3ccd1b2278ef8c9b76530ce4ff50b7f192b",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "bf1b28a692cac58fe1548f27d543c06d2d43d8f7a77f504d350215ed853d4994",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "78ea0a2b1bcd0926fef79911d70894e813557edb2f8c68b1c830d4ebc021845b",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "013a93507012749ca2cddc1b34ddec52720b492f0ca80f56a3ed9bda7699823d",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "8d99bb3e1cf2ed81d5f6d5e522d3a44fdf138edd698c8a116c19e6bf9f5f72fc",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "bf1b28a692cac58fe1548f27d543c06d2d43d8f7a77f504d350215ed853d4994",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "d105baf8a3273fa874da11907b8abc4c7a9d7e7d63759e4eeb9b4bf523c28b5a",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "013a93507012749ca2cddc1b34ddec52720b492f0ca80f56a3ed9bda7699823d",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "e22a843211adc1d292ed3ca23d13c4830095825773be13f02cd0cb5b82cbb987",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "013a93507012749ca2cddc1b34ddec52720b492f0ca80f56a3ed9bda7699823d",
+      "count": 1,
+      "market": "1st half - 1x2",
+      "market_selection_sha256": "e3e81df59ce5e2f99362ef270220f0c1426665f416cccc0597f2ef459a5ab2bc",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "7a1dccbdba6317e01095e0aa1a65ba3e6ebe78be4420c695acb089f89be9c288",
+      "count": 5,
+      "market": "1st half - asian total",
+      "market_selection_sha256": "6f8da864b7403c03dad1ed3e5857ba76ce1d06f7ff88f8bd7108296ed1275223",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "over 1",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": null,
+      "count": 1,
+      "market": "1x2",
+      "market_selection_sha256": "0a2694899284e698fb77c179f21f973c2e983f39fe5767847857ff7716d62116",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": null,
+      "count": 1,
+      "market": "1x2",
+      "market_selection_sha256": "1f1f0a8fdc1c7b669cd4e16dd0f0379be51420c391a9e8d422b908d90ebe85de",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": null,
+      "count": 1,
+      "market": "1x2",
+      "market_selection_sha256": "38842b811d94817535c7e3a870af8605b2357a77d0c86118781795271971659a",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": null,
+      "count": 1,
+      "market": "1x2",
+      "market_selection_sha256": "48442b8ec7aa09635c597c612e9a2d911d60af7017914a98e9ea80b55233259a",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": null,
+      "count": 3,
+      "market": "1x2",
+      "market_selection_sha256": "dd5cd5d94e601aee56c83de93cbdbaa66ec03af5c2f438d0d408c40218be3408",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "8d9977ff3571677f0e23fe886b29f9247538c8ce66e16b0b4381222de8e8e504",
+      "count": 2,
+      "market": "2nd half - asian total",
+      "market_selection_sha256": "bbb799904369c596b2fc8678d9279ffaf4b7946ae60184c98740591b72ac5673",
+      "period": "second_half",
+      "phase": "pre",
+      "selection": "over 1.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "4c0f3e88e8bbf5693ea83c5fa6adb3ca0b030faf16a495461a5d6395e361bd6b",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "0e740ac25cd6f64d57679cdebce8bf88739a443b6d397c9515bb2f12188a45a0",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "03781c28411b7477c888981855e56dd3b7a7acd1a9a0d655fb5a3198d1535738",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "1075ae97ac6f54f35e960b4b6a17cd83b29fc43a07db3fce632a09ed42e9c00e",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "295c577ec6c8cafe4b4ec24ba457d1d92a9261f173109e040c6dff0c616a886f",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "2c4fccfc9b64af2c1739a04b6431739762d8bf35feea868892fd5e2b42fe18ff",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "13c452dda480351713b4dea79ea01627d8495c59b661763149b45adeaf9632b2",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "352e865cb74bb4f6d7a3c9a4c121c49af51e41376c318dce273c002f229c4707",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "ec1a523efed55d703bd178e4a6fe2d7cb8c788d5e40bf65d8fa4efc50bc9f5fc",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "5a2c91dbf6710b4f1faedbb4bb51f05dd2b34e28d3f7affa4d91ecd1da1a1b75",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "dd871ba10a7996bbaaa1855251732956b2903fdcf85b1cbf368a6f893c321267",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "8158fe3cf452f09a061211c3345a944932233e02bc6c2ed323561bd1d1470cc6",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "ddc64baa5cafb5972fd4a6df3dec2e119480f8cae91d1ffa2b8758e06d669201",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "b61b66a2bc5e3c0be9f192543479476ac7028c5ccb251843d735185e7d99205b",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "b0b1b50460575783fe890c23c62d6e6ea03150b150d3153ba56dbdfc4b4e1907",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "cb1c3a058e12f1b0b54d5a915f0ad63184ae6654aa1afbbfb6bc64c72d5d6a44",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "44c1157e637720d8d666de9bddc8946b8d2bb2362986f89dd06b0d8671bc6af7",
+      "count": 1,
+      "market": "asian handicap",
+      "market_selection_sha256": "ef5a95a2d62941d59e5a1d7260d4fd8d6d909743a7ff2d9e021cc40b812f2bef",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "826419be587e8b32fb5caf98d0d65ad4e4c3c8aa58eb474f6dcf1a7647a35c49",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "0117c8d07f6a207138e32c4b92c9e4adabe0c681c7f5af2933d69208cf21dfe5",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "c451d92cec0e7ff2ce2f539b39044c28f2639c0f6065b0b6a3df16b324c5ec99",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "1557c289943bb682032daa39c8138e4f337544b62f9d6c089f8af2822435c5c3",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "3a1607accbe2542277be23075dd7ba2bfc6c2168f68e278c5138975e38e45039",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "22f247f2785fabd77168a1e16052af96ff0710097f9382d1acc5d167c8f1c5ad",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "9ae6f8766dfccfdeaf04303b4ba7bd8c0a168b3e7b187d5a043f4932aff48418",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "2e69ca80e7439fe628373624712cc9c854ef5503a2935b760f69a8c8b3400dc4",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "5033d6da7c24f67ce5d03abdee82b15fd8e5e73ec502dff08a5256151e233a8e",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "3b0657350950a20fbb234f6dd99072a59357ef1bb89ef4efa67954c60aabcac7",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "186130613d90aba6216040bf9733246585a53db50488894d0c5c5585fac54e4d",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "5660b84c1cba4b5960607431c919f80de839ea7ca1e4faec2fbc11c7209037eb",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "8a3f15277fa02ad0a951dc52f69f5c29b9f97b7847936801e975ca78c7e8110d",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "6bd556f19ce2cc6ecc85edf7ae4543cd2efcb63402681534005f371a6e5b0edd",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "9234a35610e7bfb936fda7811c89c81a730ec9288ee39b2e70abbeee779d8b51",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "6f6d8db53ec7773e87d5656fe8674c7ab957e8f78e9ab04a9eeb6b4a45391212",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "ccf8771302a87fd279b32b84c9a002fa9ba323b38d15fd558434fd7c65434478",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "df48f3064db8d77475e26bd20f6634689d09ab310a1cd883fdce522e4afc2149",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "85ac92ee5f1871e1b281323a4e3166f2bd0a8dcd4c7a38a6fb91e041169af229",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "e1bc129ac5d66dfb075008c9147de254e1531c402774140c494cd37040097ca5",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "9f82cbc2b952b1663ab27e780a6d7bd11360a00c26da07f8ebb6c4a9f86d7c1e",
+      "count": 1,
+      "market": "draw no bet",
+      "market_selection_sha256": "e1c116e86ff30fe921c4440de2b1deb4f7a6939e8d0bd1c5e9ae71a3f2d176a7",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "fc88f72a3a6453c2e839c1c6112e47f2b7a205a90e0a4cf924caae09baf603b4",
+      "count": 2,
+      "market": "draw no bet",
+      "market_selection_sha256": "fac768333d44bd657abe13b90cc76b8dbeae7c87bd7b33d73fdeab02db372a54",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "7ec4bb9da6645e5e7721af0571a7978659a32db0b7e64b02f4becd6dc3558065",
+      "count": 2,
+      "market": "other",
+      "market_selection_sha256": "20dc040d5377ac67b3ca4d37af5b42a10a71032c57a49de0e964c050993606e7",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "b12ccb77fb57c9c3600169226494578d85fdefc77d4e0a4beeac4ea79b676c62",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "9e6c33a21acffb05d42ea6cf9bbc211b4a4c226dbc9fb0cf8b16d78c69c9aa93",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "de5fddc71d7cc8784ef3020fc9f63f63a9c09d0ac0237935a911e69405e7cb95",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "f50bb5ef4825fda8059eeaaacc169d2c2dbb014eedf27d605d5bb74536f89a31",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "09ac55470181a40d32512d07a8d3e2842a992cad0227cc82c05848b89816f790",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "9cb39b1c74456268a1c3bf6a40430ea4eaa5ec9c11e2ea8bb42a26dbd9dab5a5",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "over 0.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "71680d5f0a63cc30ed92d8e8cb7bbafe5aacbe40ebb7ac7c5599b5678ffd65f2",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "a075d7b5c80ff920b01a0d7c208236679064fa1717d869171023e4e7fc757cbb",
+      "period": "first_half",
+      "phase": "pre",
+      "selection": "over 1.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "b5b39df34478df643473ee32deb72e9c0f75bd1413a51d3d376b7532d22eee96",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "d22312d66b0bb4ac000e27ee3c3359d560b7dff18dabdc90a606f6e5e63bab24",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "other",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "dda06e0654cbd3a63ef6b74e03f1e97a827cbe7e3d9b84dda79596188c305a3e",
+      "count": 2,
+      "market": "other",
+      "market_selection_sha256": "9c41c4cb8ef1986397585541d19fa53954f9cadb935a8c6c6dfadc4aa68da31f",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "over 1.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "bd16920e881b9408f94f8672ce106954266c0abe02b8f86fd9c99b1a6b126299",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "c515363cd93e56eb36d52a072a2c71abb0d609afe08395c5f648eca2f4b4d345",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "over 2.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "3bbcba4570a14498c4a019c178409f9b03b91b828a655f6fcad01c174bec7c2b",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "606db1d22bc876c6e2adee7c0a22ea67d1529ec25708e756ce890aeff7115810",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "under 3.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "9e9a0054651ec79143db78893e9528a495d2e2ef83bdb1eff6d2f4b4ee4ad5c9",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "eb8d83cb3a8c7b254fe71f402ea8d554522a758f7c49bc0d24ba84f71bc2a128",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "under 4.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "fe4dd4e0258fd01d73f0aabfa8530f481e6e8d5f924586bcfff515975e5d6d8c",
+      "count": 1,
+      "market": "other",
+      "market_selection_sha256": "1757ccb0421204c188a5ad0b96c8350abc7cfdaf3db4f885754155cfc4f25034",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "under 5.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "4304dc392e97964ddf532448b9b45398b0bb4424c0aa9ef853eaa7a9c0166225",
+      "count": 1,
+      "market": "total bookings",
+      "market_selection_sha256": "2cb6207e9076d513599f6312217e486ef4e8ccd58f7ace949fab38bb46516b2b",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "over 2.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "3ad4e4bfc56f0cd18116b933fe753f66a0f6cf354b47389aaafe93136a3a130f",
+      "count": 1,
+      "market": "total corners",
+      "market_selection_sha256": "5ca2587fcebc515d266bf4a9fa38c1d409829e536046233fca746db649e903c9",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "over 8.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "209d6b50a884ec0515d406d26cdfe09f39eaae3af1bef58d5a6f797435ae1992",
+      "count": 1,
+      "market": "total corners",
+      "market_selection_sha256": "f80aa167a82101f2a17af5620af483110292695d8d6d88ddfc01921a57f42ab1",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "under 11.5",
+      "source": "Stake"
+    },
+    {
+      "contract_sha256": "936861e6c2003328dadaeb5483d86d1ae882191bab76e28e3a48d3775427da72",
+      "count": 1,
+      "market": "total corners",
+      "market_selection_sha256": "6b30ebbe5e58acba317966a8f56a4adbe2f70e97c2869f0d97b041f70c0a8ec8",
+      "period": "regulation",
+      "phase": "pre",
+      "selection": "under 9.5",
+      "source": "Stake"
+    }
+  ],
+  "v3_anchor_price_inventory": {
+    "by_source": {
+      "Betfair": {
+        "indeterminate": 271,
+        "input_exclusion": 14,
+        "point": 323,
+        "point_below_min_odds": 2,
+        "receipt_completed_page": 34,
+        "receipt_legacy_upper_bound": 560
+      },
+      "Polymarket": {
+        "indeterminate": 77,
+        "input_exclusion": 77,
+        "interval": 571,
+        "point": 636,
+        "receipt_completed_page": 94,
+        "receipt_legacy_upper_bound": 1190
+      },
+      "ScanGoal": {
+        "indeterminate": 129,
+        "input_exclusion": 32,
+        "point": 689,
+        "receipt_completed_page": 30,
+        "receipt_legacy_upper_bound": 788
+      },
+      "Stake": {
+        "interval": 137,
+        "point": 821,
+        "receipt_completed_page": 71,
+        "receipt_legacy_upper_bound": 887
+      }
+    },
+    "decision_anchors": {
+      "by_source_and_price_form": {
+        "Betfair/point": 65,
+        "Polymarket/interval": 417,
+        "Polymarket/point": 492,
+        "ScanGoal/point": 604,
+        "Stake/interval": 40,
+        "Stake/point": 198
+      },
+      "same_second_conflicting_prices_made_indeterminate": {
+        "Polymarket": 30
+      },
+      "total": 1816
+    },
+    "emission_to_availability_minutes": {
+      "Betfair": {
+        "p10": 5.1,
+        "p25": 5.5,
+        "p50": 6.167,
+        "p75": 7.15,
+        "p90": 68.433
+      },
+      "Polymarket": {
+        "p10": 5.083,
+        "p25": 5.433,
+        "p50": 6.033,
+        "p75": 6.8,
+        "p90": 7.433
+      },
+      "ScanGoal": {
+        "p10": 5.117,
+        "p25": 5.433,
+        "p50": 6.033,
+        "p75": 6.633,
+        "p90": 7.517
+      },
+      "Stake": {
+        "p10": 5.05,
+        "p25": 5.433,
+        "p50": 6.1,
+        "p75": 6.683,
+        "p90": 7.583
+      }
+    },
+    "events": 3654,
+    "interval_width_percent": {
+      "Polymarket": {
+        "at_most_1pct": 74,
+        "at_most_2pct": 274,
+        "n": 571,
+        "p10": 0.82,
+        "p25": 1.382,
+        "p50": 2.0,
+        "p75": 2.874,
+        "p90": 4.0
+      },
+      "Stake": {
+        "at_most_1pct": 17,
+        "at_most_2pct": 58,
+        "n": 137,
+        "p10": 0.69,
+        "p25": 1.333,
+        "p50": 2.439,
+        "p75": 3.333,
+        "p90": 4.42
+      }
+    }
+  },
+  "v3_decision_clock_funnel": {
+    "anchors_after_receipt_check": 1816,
+    "anchors_by_receipt": {
+      "completed_page": 130,
+      "legacy_upper_bound": 1686
+    },
+    "episode_exclusion_reasons": {
+      "fixture_identifier_collision": 29,
+      "ft_already_known": 14,
+      "last_first_half_window_elapsed": 4,
+      "last_live_market_window_elapsed": 118,
+      "last_phase_conflicts_with_kickoff": 218,
+      "last_signal_outside_decision_window": 298,
+      "last_unproven_first_half_window": 64,
+      "last_unproven_live_market_window": 557,
+      "last_unproven_market_period": 50,
+      "last_unproven_second_half_window": 1
+    },
+    "episode_exclusions_by_class": {
+      "clock": 1260,
+      "identity": 29,
+      "market": 50,
+      "results": 14
+    },
+    "events_by_emission_day_and_receipt": {
+      "2026-11-11": {
+        "legacy_upper_bound": 51
+      },
+      "2026-11-12": {
+        "legacy_upper_bound": 65
+      },
+      "2026-11-13": {
+        "legacy_upper_bound": 76
+      },
+      "2026-11-14": {
+        "legacy_upper_bound": 387
+      },
+      "2026-11-15": {
+        "legacy_upper_bound": 350
+      },
+      "2026-11-16": {
+        "legacy_upper_bound": 174
+      },
+      "2026-11-17": {
+        "legacy_upper_bound": 300
+      },
+      "2026-11-18": {
+        "legacy_upper_bound": 106
+      },
+      "2026-11-19": {
+        "legacy_upper_bound": 94
+      },
+      "2026-11-20": {
+        "legacy_upper_bound": 278
+      },
+      "2026-11-21": {
+        "legacy_upper_bound": 851
+      },
+      "2026-11-22": {
+        "legacy_upper_bound": 663
+      },
+      "2026-11-23": {
+        "completed_page": 194,
+        "legacy_upper_bound": 30
+      },
+      "2026-11-24": {
+        "completed_page": 35
+      }
+    },
+    "input_exclusions": {
+      "betfair_burst": 12,
+      "edited_at_first_read": 1,
+      "first_read_with_ft": 39,
+      "incomplete_fixture_identity": 77,
+      "missing_match_id": 1,
+      "reused_match_id": 9,
+      "unproven_independence": 24
+    },
+    "input_exclusions_by_class": {
+      "availability": 40,
+      "identity": 87,
+      "source": 36
+    },
+    "quote_episodes": 3143,
+    "with_decision_clock": 1816
+  },
+  "v3_results": {
+    "anchor_label_status": {
+      "missing_ft": 42,
+      "pending_ft": 38,
+      "settled": 1527,
+      "unsupported_settlement": 209
+    },
+    "by_source": {
+      "Betfair": {
+        "missing_ft": 12,
+        "pending_ft": 7,
+        "settled": 46
+      },
+      "Polymarket": {
+        "missing_ft": 22,
+        "pending_ft": 20,
+        "settled": 723,
+        "unsupported_settlement": 144
+      },
+      "ScanGoal": {
+        "missing_ft": 8,
+        "settled": 591,
+        "unsupported_settlement": 5
+      },
+      "Stake": {
+        "pending_ft": 11,
+        "settled": 167,
+        "unsupported_settlement": 60
+      }
+    },
+    "half_settlements": {
+      "by_source_and_line": {
+        "ScanGoal/0.75": 26,
+        "ScanGoal/1.75": 4,
+        "ScanGoal/2.25": 1,
+        "ScanGoal/2.75": 4,
+        "ScanGoal/3.25": 1,
+        "ScanGoal/3.75": 3,
+        "ScanGoal/4.25": 2,
+        "ScanGoal/5.25": 4,
+        "ScanGoal/6.25": 1,
+        "Stake/2.25": 1
+      },
+      "total": 47
+    }
+  },
+  "v3_spacing": {
+    "nearest_other_fixture_same_contract_and_clock_minutes": {
+      "n": 171,
+      "p10": 0.0,
+      "p25": 13.033,
+      "p50": 50.7,
+      "p75": 215.317,
+      "p90": 606.833,
+      "within_protocol_age": 58
+    },
+    "nearest_other_fixture_same_contract_minutes": {
+      "n": 1148,
+      "p10": 8.7,
+      "p25": 41.9,
+      "p50": 174.133,
+      "p75": 1054.4,
+      "p90": 2449.55,
+      "within_protocol_age": 240
+    },
+    "same_fixture_requote_minutes": {
+      "n": 162,
+      "p10": 1.983,
+      "p25": 6.45,
+      "p50": 39.917,
+      "p75": 158.517,
+      "p90": 524.55
+    }
+  },
+  "v3_waterfall": {
+    "case_decisions_summed_over_hypotheses": 1851,
+    "counterfactual_fresh_same_contract_observation": {
+      "by_blocking_stage": {
+        "availability_not_yet_observed_at_instant": 20,
+        "correspondence_terminal_or_antecedent": 1,
+        "price_comparator_not_point": 6,
+        "price_outside_caliper": 2,
+        "staleness_last_quote_older_than_limit": 87
+      },
+      "cases": 116,
+      "note": "Upper bound for planning only: cases whose blocking stage was clock-compatible availability, staleness or price, and which have at least one clock-compatible same-contract fixture with a point price within the caliper at its nearest known quote, not reserved, with FT. Correspondence (antecedent absent at the instant) is not checked."
+    },
+    "counterfactual_interval_cases": {
+      "note": "Cases blocked only because their own quote is an interval; counts by interval width. v3.1 keeps requiring a point price; using bounds needs a new pre-registered protocol.",
+      "unique_width_at_most_1pct": 28,
+      "unique_width_at_most_2pct": 110,
+      "width_at_most_1pct": 101,
+      "width_at_most_2pct": 356
+    },
+    "first_failing_stage": {
+      "availability_not_yet_observed_at_instant": 130,
+      "clock_no_same_contract_fixture_at_same_clock": 407,
+      "correspondence_terminal_or_antecedent": 2,
+      "market_contract_unique_to_fixture": 57,
+      "matched": 13,
+      "price_case_indeterminate": 21,
+      "price_case_interval": 806,
+      "price_comparator_not_point": 49,
+      "price_outside_caliper": 9,
+      "reservation_all_comparators_reserved": 11,
+      "staleness_last_quote_older_than_limit": 346
+    },
+    "first_failing_stage_unique_cases": {
+      "availability_not_yet_observed_at_instant": 30,
+      "clock_no_same_contract_fixture_at_same_clock": 115,
+      "market_contract_unique_to_fixture": 15,
+      "matched": 4,
+      "price_case_indeterminate": 9,
+      "price_case_interval": 226,
+      "price_comparator_not_point": 15,
+      "price_outside_caliper": 6,
+      "reservation_all_comparators_reserved": 3,
+      "staleness_last_quote_older_than_limit": 82
+    },
+    "half_settlements": {
+      "cases_half_settlement": 0,
+      "pair_decisions_half_settlement": 0
+    },
+    "strict_pairs": 13,
+    "strict_pairs_with_ft_both_arms": 13,
+    "unique_case_decisions": 505
+  },
+  "v3_waterfall_by_class": {
+    "availability": 476,
+    "clock": 407,
+    "correspondence": 2,
+    "market_selection": 57,
+    "matched": 13,
+    "price": 885,
+    "reservation": 11,
+    "results_after_matching": 0
+  },
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA."
+}
