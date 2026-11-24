@@ -1,0 +1,94 @@
+{
+  "base": {
+    "j_lock": "4d14cc8",
+    "k0_head": "59d5622",
+    "k0_protocol_sha256": "99611ec64891c7e11b9f0252fb7297d074f70765964f3a77dde68cd2562901f3"
+  },
+  "blind_banks": "not used, generated or consulted; none exist",
+  "cell": "family x mining seed x validation seed; gate = precision >= 0.9, terminal recall >= 0.8, exact path recall >= 0.75; abstention and zero detections fail; ineligible families reported, never dropped",
+  "confirmatory": false,
+  "development_sources": {
+    "H": {
+      "families": "3 PR H worlds",
+      "mining": [
+        31051,
+        82519
+      ],
+      "status": "known",
+      "validation": [
+        202927,
+        577531,
+        819149
+      ]
+    },
+    "I": {
+      "families": "4 PR I scenarios",
+      "mining": [
+        46027,
+        90787
+      ],
+      "status": "known",
+      "validation": [
+        207983,
+        556421,
+        791699
+      ]
+    },
+    "J": {
+      "families": "4 PR J families",
+      "mining": [
+        61403,
+        18839
+      ],
+      "status": "known; source of the K hypotheses",
+      "validation": [
+        330217,
+        472883,
+        905161
+      ]
+    },
+    "KDEV": {
+      "families": "4 families in dev_bank.py",
+      "mining": [
+        7314027,
+        7421903
+      ],
+      "status": "new, written by C knowing the hypotheses; favours K by construction",
+      "validation": [
+        8102511,
+        8276389,
+        8390047
+      ]
+    }
+  },
+  "frozen_inputs_sha256": {
+    "audits/autonomous-generalization/banks.py": "a7f5545ff44080e1be8b95ade3dad9151453a122deea03e6476eada00d743456",
+    "audits/k-development/dev_bank.py": "73e49814d12c3ece558eca69c3f083540474e1fcb223bb52ccfaaef538392c40",
+    "audits/robust-generalization/bank_i.py": "49d6011e2fe1cb49125705af70a430113fa6d2bb1dfb36a252fb4af50617dc03",
+    "audits/selective-abstention/bank_j.py": "4f446961a34a9fc54e6ca45d80ccb33ec936bd653457ece14e22d8a76d7880ea",
+    "audits/selective-abstention/freeze.json": "a23566f7db6c4efdd5c6511a2ec0928c42ef8e504ef623034fa951e82d41d300"
+  },
+  "lock_recommendation": {
+    "L1": "no regression: every cell J passes on I, H, J and KDEV sources is also passed",
+    "L2": "all cells pass on the J pre-match families and on all four KDEV families",
+    "L3": "J live families keep all 12 cells",
+    "L4": "L1-L3 also hold at at least one grid point adjacent to the default (4/5, 3/4)",
+    "L5": "no family, mechanism or scenario name in experimental_k (AST/text check); H, I and J code hashes unchanged",
+    "candidate": "among variants with no regression (L1), the one with most passing cells; ties go to fewer components (parsimony)",
+    "result": "GO for the definitive K lock only if L1-L5 hold; otherwise NO-GO and the negative results are published. The final decision is human."
+  },
+  "negatives": "every variant, source, cell and abstention is published, including variants that regress",
+  "role": "C (algorithm author)",
+  "schema": "goal_roi_k_development_plan_v1",
+  "sensitivity": "every variant on the 3 x 3 grid consensus {3/4, 4/5, 5/6} x regular {2/3, 3/4, 4/5} for the J and KDEV sources",
+  "shared_parameters": "every variant keeps all J constants (consensus 4/5, regular 3/4, min fixtures 5, min days 2, terminals 11/10, half share 1/4, ambiguity 1/2, 2 rounds, mining work 1 800 000, matcher 300 000); K2 adds min_known = 1/2 of the fired fixtures; K1 adds max_enumerated_shapes = 48 per phase, ordered by sampled fixture support",
+  "variants": {
+    "J": "frozen PR J selector (experimental_j), unchanged",
+    "J_K1": "J + shapes enumerated from the sampled trajectories, in addition to the generator shortlist",
+    "J_K2": "J + consensus measured only over fixtures where the predicate value is observable; unknown values stay indeterminate in matching",
+    "J_K3": "J + replication re-selects each calendar half without the nested half-stability check, requiring the same shape",
+    "K": "K1 + K2 + K3"
+  },
+  "verdict": "RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.",
+  "written_before": "scangoal/discovery/experimental_k does not exist when this plan is committed"
+}
