@@ -5727,13 +5727,15 @@
    "attempt_utc": "2026-11-24T19:43:18+00:00",
    "chars": 220,
    "created_utc": "2026-11-24T19:43:18+00:00",
+   "done_utc": "2026-11-24T19:43:18+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "0a771fe236a419d81c7272efdf1094f693bca0c3206d5043f49bfde7b4a7af20",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:real-madrid-vs-psv-eindhoven-20261124|3720b92a746a": {
    "attempt_id": "d6765b839270457db873bdef5bfb228c",
@@ -6339,12 +6341,17 @@
    "state": "delivered"
   },
   "game|id:slovan-bratislava-vs-real-betis-20261124|5521c2322d03": {
+   "attempt_id": "63f8df75dda4402382c4892c2b483b89",
+   "attempt_utc": "2026-11-24T19:43:20+00:00",
+   "chars": 208,
    "created_utc": "2026-11-24T19:43:18+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "7f0453c0d088f6e172570c885ea783fa8ae1365f67649b3726788239485c9365",
+   "state": "in_flight"
   },
   "game|id:st-pauli-vs-bochum-20261121|0ff8a8602406": {
    "attempt_utc": "2026-11-21T20:53:44+00:00",
@@ -7304,7 +7311,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 470,
+  "delivered": 471,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T19:37:40+00:00",
@@ -7426,7 +7433,8 @@
   "2026-11-24T19:19:53+00:00|Manchester City — Napoli|Over 3.5": true,
   "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)": true,
   "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)": true,
-  "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5": true
+  "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5": true,
+  "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -9028,6 +9036,9 @@
   "item|id:sl-benfica-women-vs-as-roma-women-20261119|Asian Total|Over 4": {
    "at_utc": "2026-11-19T21:21:49+00:00"
   },
+  "item|id:slovan-bratislava-vs-real-betis-20261124|Polymarket|AH1(+0.5)": {
+   "at_utc": "2026-11-24T19:43:18+00:00"
+  },
   "item|id:st-pauli-vs-bochum-20261121|Asian Total|Over 3": {
    "at_utc": "2026-11-21T20:53:44+00:00"
   },
@@ -9192,7 +9203,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 782,
+ "sent_total": 783,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -10119,6 +10130,7 @@
   "2026-11-24T19:19:53+00:00|Manchester City — Napoli|Over 3.5",
   "2026-11-24T19:29:39+00:00|Como — AEK Athens|AH2(-0.5)",
   "2026-11-24T19:29:39+00:00|Middlesbrough — Swansea|AH1(-1.5)",
-  "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5"
+  "2026-11-24T19:40:55+00:00|Real Madrid — PSV Eindhoven|Under 4.5",
+  "2026-11-24T19:40:55+00:00|Slovan Bratislava — Real Betis|AH1(+0.5)"
  ]
 }
