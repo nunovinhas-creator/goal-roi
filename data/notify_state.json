@@ -1722,12 +1722,17 @@
    "state": "delivered"
   },
   "game|id:benevento-vs-empoli-20261124|75f7ef525767": {
+   "attempt_id": "833bf64debac4bf3863052f14b8e7503",
+   "attempt_utc": "2026-11-24T20:24:10+00:00",
+   "chars": 210,
    "created_utc": "2026-11-24T20:24:07+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "7784a55fe275ceda317270c6ed153ac1969955d5e2350133c38c1a076c6d97a5",
+   "state": "in_flight"
   },
   "game|id:benevento-vs-empoli-20261124|c1a52061f5a8": {
    "attempt_id": "2d4ac926ebe54de68ea357196f729440",
@@ -6383,13 +6388,15 @@
    "attempt_utc": "2026-11-24T20:24:07+00:00",
    "chars": 225,
    "created_utc": "2026-11-24T20:24:07+00:00",
+   "done_utc": "2026-11-24T20:24:07+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "f736d2f469bff3440682d51f2b4fead738069fed1af6ef8f0d7474876413ed99",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:slovan-bratislava-vs-real-betis-20261124|5521c2322d03": {
    "attempt_id": "63f8df75dda4402382c4892c2b483b89",
@@ -7394,7 +7401,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 476,
+  "delivered": 477,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-24T20:21:31+00:00",
@@ -7521,6 +7528,7 @@
   "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)": true,
   "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5": true,
   "2026-11-24T20:09:37+00:00|Leipzig — Lens|AH1(-1.5)": true,
+  "2026-11-24T20:19:40+00:00|Benevento — Empoli|Over 4": true,
   "2026-11-24T20:20:23+00:00|Slovan Bratislava — Real Betis|AH2(-0.5)": true
  },
  "migrations": {
@@ -7705,9 +7713,9 @@
   "Betfair | Hora (UTC) = tarde & Reforço = sem reforço": 32,
   "Betfair | Reforço = sem reforço": 51,
   "Jogo aberto | Competição = liga & Dia = fim de semana & Parte do jogo = 2.ª parte": 103,
-  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": 42,
-  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 43,
-  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 44,
+  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": 43,
+  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 44,
+  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 45,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": 36,
   "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 25,
@@ -7715,8 +7723,8 @@
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": 84,
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": 31,
-  "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 43,
-  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 44,
+  "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 44,
+  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 45,
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite": 45,
   "Jogo aberto | Hora (UTC) = noite": 53,
   "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte": 41,
@@ -8084,6 +8092,9 @@
   },
   "item|id:belize-vs-sint-maarten-20261117|Asian Total|Over 3": {
    "at_utc": "2026-11-17T20:19:35+00:00"
+  },
+  "item|id:benevento-vs-empoli-20261124|Asian Total|Over 4": {
+   "at_utc": "2026-11-24T20:24:07+00:00"
   },
   "item|id:benevento-vs-empoli-20261124|Polymarket|AH2(+1.5)": {
    "at_utc": "2026-11-24T18:26:30+00:00"
@@ -9302,7 +9313,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 788,
+ "sent_total": 789,
  "statuses": {
   "Jogo aberto | Competição = liga & Confiança indicada pelo bot = menos de 95 % & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Competição = liga & Dia = fim de semana & Marcador no momento = empatado": "abandonada",
@@ -10250,6 +10261,7 @@
   "2026-11-24T19:50:33+00:00|Virtus Entella — Verona|AH1(+0.5)",
   "2026-11-24T20:09:37+00:00|Arsenal — Dortmund|Under 2.5",
   "2026-11-24T20:09:37+00:00|Leipzig — Lens|AH1(-1.5)",
+  "2026-11-24T20:19:40+00:00|Benevento — Empoli|Over 4",
   "2026-11-24T20:20:23+00:00|Slovan Bratislava — Real Betis|AH2(-0.5)"
  ]
 }
