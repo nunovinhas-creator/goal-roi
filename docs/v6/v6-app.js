@@ -107,18 +107,37 @@
   }
   const byteLength = text => new TextEncoder().encode(text).length;
 
-  // Modo 1: snapshots derivados com manifesto (carregamento progressivo e atualização seletiva).
-  async function refreshSnapshots(ticket) {
+  // ---------- carregamento ----------
+  // Cada ciclo lê o manifesto dos snapshots e a revisão disponível do relatório (pedido parcial dos primeiros bytes:
+  // "generated_at_utc" é o primeiro campo do ficheiro). Usa os snapshots só se forem da revisão disponível ou mais
+  // recentes; caso contrário recorre ao relatório completo e volta aos snapshots quando estes alcançarem o relatório,
+  // sem recarregar a página. Cada revisão é aplicada de uma só vez: nunca se misturam ficheiros de revisões diferentes.
+  const REV = /"generated_at_utc"\s*:\s*"([^"]+)"/;
+  async function probeReport() {
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctl && setTimeout(() => ctl.abort(), CFG.timeoutMs);
+    S.stats.requests++;
+    try {
+      const res = await fetch(CFG.report, {cache: 'no-cache', headers: {Range: 'bytes=0-511'}, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl ? ctl.signal : undefined});
+      if (res.status === 206) { const t = await res.text(); S.stats.bytes += t.length; const m = t.match(REV); return {rev: m ? m[1] : null, full: null}; }
+      if (res.ok) { const t = await res.text(); S.stats.bytes += t.length; const m = t.slice(0, 512).match(REV); return {rev: m ? m[1] : null, full: t}; } // Range ignorado
+      return {rev: null, full: null, error: 'HTTP ' + res.status};
+    } catch (e) { return {rev: null, full: null, error: e.message || String(e)}; }
+    finally { if (timer) clearTimeout(timer); }
+  }
+  async function loadManifest() {
     let text;
-    try { text = await get(CFG.manifest); }
-    catch (e) { if (S.mode === 'snapshots') throw e; return false; }
+    try { text = await get(CFG.manifest); } catch (e) { return {error: e.status === 404 ? 'sem snapshots publicados' : e.message}; }
     let manifest;
-    try { manifest = JSON.parse(text); } catch (e) { if (S.mode === 'snapshots') throw new Error('manifesto ilegível'); return false; }
+    try { manifest = JSON.parse(text); } catch (e) { return {error: 'manifesto ilegível'}; }
     const mv = C.validateManifest(manifest);
-    if (!mv.ok) { if (S.mode === 'snapshots') throw new Error(mv.problems.join('; ')); return false; }
-    if (S.mode === 'snapshots' && S.manifest && Date.parse(manifest.report_generated_at_utc) < Date.parse(S.manifest.report_generated_at_utc)) return true;
-    const changed = C.SNAPSHOTS.filter(k => !S.manifest || S.mode !== 'snapshots' || S.manifest.files[k].sha256 !== manifest.files[k].sha256);
-    if (!changed.length) { S.seq.accept(ticket, manifest.report_generated_at_utc); S.manifest = manifest; return true; }
+    return mv.ok ? {manifest} : {error: mv.problems.join('; ')};
+  }
+
+  async function applySnapshots(ticket, manifest) {
+    const switching = S.mode !== 'snapshots';
+    if (!switching && S.manifest && Date.parse(manifest.report_generated_at_utc) < Date.parse(S.manifest.report_generated_at_utc)) return; // manifesto mais antigo
+    const changed = C.SNAPSHOTS.filter(k => switching || !S.manifest || S.manifest.files[k].sha256 !== manifest.files[k].sha256);
     const load = async name => {
       const body = await get(CFG.manifest.replace(/[^/]*$/, '') + manifest.files[name].path);
       S.stats.snapshotFetches++;
@@ -129,37 +148,40 @@
       if (!chk.ok) throw new Error(chk.problems.join('; '));
       return [name, snap];
     };
-    const first = S.mode !== 'snapshots' && changed.includes('summary');
     const fresh = {};
-    if (first) {
-      // Primeira pintura com o resumo (alguns KB) antes dos restantes ficheiros.
+    if (!S.files.summary && changed.includes('summary')) {
+      // Primeira pintura com o resumo (alguns KB) antes dos restantes ficheiros; marcada como parcial.
       const [, summary] = await load('summary');
-      if (!S.files.summary) { S.files = {summary}; S.mode = 'snapshots-parcial'; paintChrome(); renderView(true); }
+      S.files = {summary}; S.mode = 'snapshots-parcial'; paintChrome(); renderView(true);
       fresh.summary = summary;
     }
-    const rest = await Promise.all(changed.filter(k => !(first && k === 'summary')).map(load));
+    const rest = await Promise.all(changed.filter(k => !fresh[k]).map(load));
     for (const [k, v] of rest) fresh[k] = v;
-    // Revisão fora de ordem ou mais antiga do que a aplicada: ignorada. Fora do modo snapshots, recorre-se ao relatório.
-    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return S.mode === 'snapshots';
-    // Atómico: só agora os ficheiros novos substituem os anteriores, todos da mesma revisão do manifesto.
-    S.files = Object.assign({}, S.mode === 'snapshots' ? S.files : {}, fresh);
-    S.manifest = manifest; S.mode = 'snapshots'; S.revision++;
-    S.prospectiveState = 'incluído nos snapshots (revisão ' + when(manifest.report_generated_at_utc) + ')';
-    return true;
+    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return; // fora de ordem: mantém-se a revisão aplicada
+    S.files = Object.assign({}, switching ? {} : S.files, fresh);
+    S.manifest = manifest; S.mode = 'snapshots'; S.revision++; S.appliedRevision = manifest.report_generated_at_utc;
+    S.reportText = null;
+    S.prospectiveState = 'incluído nos snapshots';
   }
 
-  // Modo 2 (recurso): relatório completo, derivado no navegador com o mesmo núcleo.
-  async function refreshReport(ticket) {
-    const [text, pros] = await Promise.all([get(CFG.report), loadProspective()]);
-    if (text === S.reportText && !pros.changed) { S.seq.accept(ticket, S.files.summary && S.files.summary.data.generated_at_utc); S.stats.notModified++; return; }
-    let report;
-    try { report = JSON.parse(text); } catch (e) { throw new Error('relatório ilegível'); }
-    const v = C.validateReport(report);
-    if (!v.ok) throw new Error('relatório recusado: ' + v.problems.slice(0, 3).join('; '));
+  async function applyReport(ticket, probe) {
+    // Revisão disponível igual à aplicada e prospetivo inalterado: nada a descarregar.
+    const pros = await loadProspective();
+    if (S.mode === 'relatório' && probe.rev && probe.rev === S.appliedRevision && !pros.changed && !probe.full) {
+      S.seq.accept(ticket, probe.rev); S.stats.notModified++; return;
+    }
+    const text = probe.full || await get(CFG.report);
+    let report = null;
+    if (text !== S.reportText || pros.changed || S.mode !== 'relatório') {
+      try { report = JSON.parse(text); } catch (e) { throw new Error('relatório ilegível'); }
+      const v = C.validateReport(report);
+      if (!v.ok) throw new Error('relatório recusado: ' + v.problems.slice(0, 3).join('; '));
+    }
+    if (!report) { S.seq.accept(ticket, S.appliedRevision); S.stats.notModified++; return; }
     if (!S.seq.accept(ticket, report.generated_at_utc)) return; // mais antigo do que o já aplicado
     S.files = C.buildAll(report, S.prospective, S.protocol, Date.now());
     S.stats.derivations++;
-    S.reportText = text; S.mode = 'relatório'; S.revision++;
+    S.reportText = text; S.mode = 'relatório'; S.revision++; S.appliedRevision = report.generated_at_utc; S.manifest = null;
   }
   async function loadProspective() {
     const out = {changed: false};
@@ -184,19 +206,25 @@
     S.busy = true;
     const ticket = S.seq.begin();
     try {
-      let used = false;
-      try { used = await refreshSnapshots(ticket); }
-      catch (e) {
-        // Snapshots incompatíveis ou incompletos: se ainda não havia uma revisão de snapshots válida, usa-se o relatório
-        // completo; se havia, mantém-se essa revisão e mostra-se o erro.
-        if (S.mode === 'snapshots') throw e;
-        S.mode = null; S.snapshotError = e.message; // o resumo já pintado fica até o relatório o substituir
+      const [man, probe] = await Promise.all([loadManifest(), probeReport()]);
+      if (probe.rev) S.availableRevision = probe.rev;
+      const mrev = man.manifest ? man.manifest.report_generated_at_utc : null;
+      // Atraso dos snapshots face ao relatório disponível (distinto do atraso da recolha).
+      S.snapshotLagMin = mrev && probe.rev ? Math.round((Date.parse(probe.rev) - Date.parse(mrev)) / 60000) : null;
+      let done = false;
+      if (man.manifest && !(S.snapshotLagMin > 0)) {
+        try { await applySnapshots(ticket, man.manifest); done = true; S.snapshotState = 'atuais'; }
+        catch (e) { S.snapshotState = 'recusados (' + e.message + ')'; }
+      } else S.snapshotState = man.manifest ? 'desatualizados (' + ago(S.snapshotLagMin) + ' atrás do relatório)' : man.error;
+      if (!done) {
+        if (probe.error && !probe.full && S.mode === 'snapshots' && !man.manifest) throw new Error('snapshots e relatório indisponíveis: ' + probe.error);
+        await applyReport(ticket, probe);
       }
-      if (!used) await refreshReport(ticket);
       S.lastOk = Date.now(); S.lastError = null;
     } catch (e) {
       S.stats.failures++;
       S.lastError = e.message || String(e);
+      if (S.mode === 'snapshots-parcial') S.mode = 'snapshots-parcial (incompleto)';
     } finally {
       S.busy = false;
       $('main').setAttribute('aria-busy', 'false');
@@ -207,6 +235,7 @@
   }
 
   // ---------- moldura ----------
+  const modeLabel = () => S.mode === 'snapshots' ? 'snapshots' : /^snapshots-parcial/.test(S.mode || '') ? 'snapshots (a completar)' : S.mode === 'relatório' ? 'relatório completo' : '—';
   function paintChrome() {
     const sum = S.files.summary && S.files.summary.data;
     const err = $('banner-error');
@@ -214,8 +243,13 @@
       err.hidden = false;
       err.textContent = (sum ? 'Falha na atualização; mantém-se a última revisão válida. ' : 'Não foi possível carregar os dados. ') + S.lastError;
     } else err.hidden = true;
-    $('loader-mode').textContent = 'Fonte: ' + (S.mode === 'snapshots' ? 'snapshots derivados' : S.mode === 'snapshots-parcial' ? 'snapshots (a completar)' : S.mode === 'relatório' ? 'report.json completo' : '—');
+    $('loader-mode').textContent = 'Dados: ' + modeLabel();
     if (!sum) return;
+    // Atraso dos dados aplicados face à revisão disponível (snapshots ou relatório) — distinto do atraso da recolha.
+    const behind = S.availableRevision && S.appliedRevision ? Math.round((Date.parse(S.availableRevision) - Date.parse(S.appliedRevision)) / 60000) : null;
+    const sb = $('banner-snap');
+    sb.hidden = !(behind > 0);
+    sb.textContent = behind > 0 ? 'Revisão aplicada ' + ago(behind) + ' atrás da revisão disponível do relatório. A atualização seguinte tenta recuperar.' : '';
     const fr = C.freshness(sum.collected_at_utc, Date.now());
     const fb = $('banner-fresh');
     fb.hidden = fr.state === 'normal';
@@ -227,6 +261,7 @@
     $('ticker').innerHTML = [
       ['Recolha', ago(fr.minutes) + ' · ' + fr.state],
       ['Revisão', when(sum.generated_at_utc)],
+      ['Dados', modeLabel()],
       ['Acompanhadas', int(sum.tracked)],
       ['Liquidadas', int(sum.settled)],
       ['ROI Q7', roi ? spct(roi.roi) : '—'],
@@ -680,7 +715,10 @@
     html += panel('Jogos por liquidar', table(['Jogo', 'Liga', 'Sinal', 'Motivo'], o.unsettled.slice(0, 40).map(u => '<tr>' + td(esc(u.match)) + td(esc(u.league || '')) + td(when(u.date_utc)) + td(esc(u.why)) + '</tr>'), 'Jogos por liquidar'),
       {span: 'span-7', flush: true, meta: int(o.unsettled.length) + ' jogos'});
     const st = S.stats;
-    html += panel('Carregamento desta página', '<dl class="facts"><dt>Fonte de dados</dt><dd>' + esc(S.mode || '—') + '</dd><dt>Pedidos</dt><dd>' + int(st.requests) + '</dd><dt>Sem alterações</dt><dd>' + int(st.notModified) + '</dd>' +
+    html += panel('Carregamento desta página', '<dl class="facts"><dt>Fonte de dados</dt><dd>' + esc(modeLabel()) + '</dd>' +
+      '<dt>Revisão aplicada</dt><dd>' + when(S.appliedRevision) + '</dd><dt>Revisão disponível</dt><dd>' + when(S.availableRevision) + '</dd>' +
+      '<dt>Snapshots</dt><dd>' + esc(S.snapshotState || '—') + '</dd>' +
+      '<dt>Atraso da recolha</dt><dd>' + ago(C.freshness(o.collector.at_utc, Date.now()).minutes) + '</dd><dt>Pedidos</dt><dd>' + int(st.requests) + '</dd><dt>Sem alterações</dt><dd>' + int(st.notModified) + '</dd>' +
       '<dt>Falhas</dt><dd>' + int(st.failures) + '</dd><dt>Snapshots descarregados</dt><dd>' + int(st.snapshotFetches) + '</dd><dt>Derivações no navegador</dt><dd>' + int(st.derivations) + '</dd>' +
       '<dt>Última atualização válida</dt><dd>' + (S.lastOk ? when(new Date(S.lastOk).toISOString()) : '—') + '</dd><dt>Relatório prospetivo</dt><dd>' + esc(S.prospectiveState) + '</dd></dl>', {span: 'span-5'});
     return html + '</div>';

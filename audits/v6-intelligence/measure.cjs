@@ -60,7 +60,7 @@ async function measure(browser, srv, kind) {
   const files = {'/v6/snapshots/dashboard-manifest.json': path.join(dir, 'dashboard-manifest.json')};
   for (const f of Object.values(manifest.files)) files['/v6/snapshots/' + f.path] = path.join(dir, f.path);
   const plain = await start(), withSnap = await start({files});
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.V6_CHROMIUM ? {executablePath: process.env.V6_CHROMIUM} : {});
   const result = {conditions: {cpu: '4× mais lenta', network: '1,6 Mbit/s, 150 ms', viewport: '412×915 (Android)', runs: RUNS, refreshCycles: CYCLES},
     report_bytes: manifest.report_bytes, snapshot_bytes: Object.fromEntries(Object.entries(manifest.files).map(([k, f]) => [k, f.bytes])), results: {}};
   for (const [kind, srv] of [['clássico', plain], ['v6-relatório', plain], ['v6-snapshots', withSnap]]) {

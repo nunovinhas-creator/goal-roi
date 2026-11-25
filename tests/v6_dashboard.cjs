@@ -103,7 +103,8 @@ async function functional(browser, srv) {
   srv.reset();
   await page.evaluate(() => window.__V6.refresh());
   const rep = srv.state.log.filter(l => l.path === '/report.json');
-  assert.equal(rep.length, 1); assert.equal(rep[0].status, 304, 'relatório inalterado deve devolver 304');
+  assert.deepEqual(rep.map(l => l.status), [206], 'relatório inalterado: só o pedido parcial da revisão');
+  assert.ok(rep[0].bytes <= 512);
   await ctx.close();
 
   // Falhas HTTP: no arranque mostra erro; depois de recuperar, uma nova falha mantém a última revisão válida.
@@ -230,7 +231,7 @@ async function snapshots(browser, srvFactory) {
   try {
     let {ctx, page, errors} = await open(browser, srv);
     assert.equal(await mode(page), 'snapshots');
-    assert.equal(srv.state.log.filter(l => l.path === '/report.json').length, 0, 'modo snapshots não deve descarregar report.json');
+    assert.deepEqual(srv.state.log.filter(l => l.path === '/report.json').map(l => l.status), [206], 'modo snapshots: só o pedido parcial da revisão');
     const first = srv.state.log.find(l => l.path.startsWith('/v6/snapshots/dashboard-') && !l.path.endsWith('manifest.json'));
     assert.equal(first.path, '/v6/snapshots/dashboard-summary.json', 'o resumo deve ser o primeiro snapshot');
     for (const v of VIEWS) { await page.evaluate(h => { location.hash = h; }, v); await page.waitForSelector('#view-' + v + ' h2'); }
@@ -255,7 +256,7 @@ async function snapshots(browser, srvFactory) {
     m3.files.learning.sha256 = 'a'.repeat(64);
     srv.set('/v6/snapshots/dashboard-manifest.json', {body: JSON.stringify(m3)});
     await page.evaluate(() => window.__V6.refresh());
-    assert.match(await page.locator('#banner-error').innerText(), /hash diferente/i);
+    assert.match(await page.evaluate(() => window.__V6.state.snapshotState), /hash diferente/i);
     assert.equal(await page.evaluate(() => window.__V6.state.manifest.report_generated_at_utc), m2.report_generated_at_utc);
     assert.deepEqual(errors, []);
     await ctx.close();
@@ -276,11 +277,53 @@ async function snapshots(browser, srvFactory) {
     ({ctx, page, errors} = await open(browser, srv));
     assert.equal(await mode(page), 'relatório');
     await ctx.close();
+
+    // P1-3: snapshots obsoletos face ao relatório -> recurso automático; recuperação sem recarregar quando alcançam.
+    srv.clear(); srv.reset();
+    const newerRev = new Date(Date.parse(manifest.report_generated_at_utc) + 20 * 60000).toISOString();
+    const newerReport = variant(5, r => { r.generated_at_utc = newerRev; });
+    srv.set('/report.json', {body: newerReport});
+    ({ctx, page, errors} = await open(browser, srv));
+    assert.equal(await mode(page), 'relatório', 'snapshots 20 min atrás do relatório devem ser ignorados');
+    assert.equal(await page.evaluate(() => window.__V6.state.appliedRevision), newerRev);
+    assert.match(await page.evaluate(() => window.__V6.state.snapshotState), /desatualizados/);
+    // os snapshots alcançam o relatório: volta aos snapshots no ciclo seguinte, sem recarregar
+    const caughtOut = fs.mkdtempSync(path.join(os.tmpdir(), 'v6caught-'));
+    const caught = build(Object.assign({}, opts, {report: writeTmp(newerReport), out: caughtOut}));
+    srv.set('/v6/snapshots/dashboard-manifest.json', {body: JSON.stringify(caught)});
+    for (const k of core.SNAPSHOTS) srv.set('/v6/snapshots/' + core.FILE(k), {body: fs.readFileSync(path.join(caughtOut, core.FILE(k)))});
+    const marker = await page.evaluate(() => { window.__marker = 1; return 1; });
+    await page.evaluate(() => window.__V6.refresh());
+    assert.equal(await mode(page), 'snapshots');
+    assert.equal(await page.evaluate(() => window.__marker), marker, 'sem recarregar a página');
+    assert.equal(await page.evaluate(() => window.__V6.state.appliedRevision), newerRev);
+    // desaparecimento dos snapshots -> relatório; corrupção -> relatório; sem mistura de revisões
+    srv.set('/v6/snapshots/dashboard-manifest.json', {status: 404});
+    await page.evaluate(() => window.__V6.refresh());
+    assert.equal(await mode(page), 'relatório');
+    srv.set('/v6/snapshots/dashboard-manifest.json', {body: JSON.stringify(caught)});
+    await page.evaluate(() => window.__V6.refresh());
+    assert.equal(await mode(page), 'snapshots');
+    srv.set('/v6/snapshots/dashboard-learning.json', {body: '{"corrompido":'});
+    const m4 = structuredClone(caught); m4.report_generated_at_utc = new Date(Date.parse(newerRev) + 60000).toISOString();
+    m4.files.summary.sha256 = 'b'.repeat(64);
+    srv.set('/v6/snapshots/dashboard-manifest.json', {body: JSON.stringify(m4)});
+    srv.set('/report.json', {body: variant(5, r => { r.generated_at_utc = m4.report_generated_at_utc; })});
+    await page.evaluate(() => window.__V6.refresh());
+    assert.equal(await mode(page), 'relatório', 'snapshots corrompidos devem levar ao relatório');
+    assert.equal(await page.evaluate(() => window.__V6.state.appliedRevision), m4.report_generated_at_utc);
+    const revs = await page.evaluate(() => { const f = window.__V6.state.files; return [f.summary.data.generated_at_utc]; });
+    assert.deepEqual(revs, [m4.report_generated_at_utc]);
+    assert.deepEqual(errors, []);
+    await ctx.close();
   } finally { await srv.close(); }
 }
 
+function writeTmp(text) { const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'v6rep-')), 'report.json'); fs.writeFileSync(f, text); return f; }
+
+
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.V6_CHROMIUM ? {executablePath: process.env.V6_CHROMIUM} : {});
   const failures = [];
   const run = async (name, fn) => { try { await fn(); console.log('ok -', name); } catch (e) { failures.push(e); console.log('not ok -', name, '\n', e && e.stack); } };
   const srv = await start();

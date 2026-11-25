@@ -96,6 +96,15 @@ class V6Science(unittest.TestCase):
         r = subprocess.run(['node', '--test', 'tests/v6_core.test.cjs'], cwd=ROOT, capture_output=True, text=True, timeout=300)
         self.assertEqual(r.returncode, 0, r.stdout[-4000:] + r.stderr[-2000:])
 
+    def test_market_matrix(self):
+        r = subprocess.run(['node', '--test', 'tests/v6_markets.test.cjs'], cwd=ROOT, capture_output=True, text=True, timeout=300)
+        self.assertEqual(r.returncode, 0, r.stdout[-4000:] + r.stderr[-2000:])
+
+    @unittest.skipUnless(_playwright(), 'playwright indisponível')
+    def test_long_open_tab(self):
+        r = subprocess.run(['node', 'tests/v6_longrun.cjs'], cwd=ROOT, capture_output=True, text=True, timeout=1200)
+        self.assertEqual(r.returncode, 0, r.stdout[-4000:] + r.stderr[-2000:])
+
     @unittest.skipUnless(_playwright(), 'playwright indisponível')
     def test_browser_regressions(self):
         r = subprocess.run(['node', 'tests/v6_dashboard.cjs'], cwd=ROOT, capture_output=True, text=True, timeout=900)

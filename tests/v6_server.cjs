@@ -37,6 +37,14 @@ function start(options = {}) {
       return res.end(status === 404 ? 'not found' : 'error');
     }
     const etag = '"' + crypto.createHash('sha1').update(body).digest('hex') + '"';
+    const range = /^bytes=(\d+)-(\d+)$/.exec(req.headers.range || '');
+    if (range && !(o && o.noRange) && !options.noRange) {
+      const part = body.subarray(Number(range[1]), Number(range[2]) + 1);
+      state.bytes += part.length;
+      state.log.push({path: p, status: 206, bytes: part.length});
+      res.writeHead(206, {'content-type': type, etag, 'content-range': 'bytes ' + range[1] + '-' + (Number(range[1]) + part.length - 1) + '/' + body.length, 'content-length': part.length});
+      return res.end(part);
+    }
     if (req.headers['if-none-match'] === etag) {
       state.log.push({path: p, status: 304, bytes: 0});
       res.writeHead(304, {etag, 'cache-control': 'max-age=0, must-revalidate'});
