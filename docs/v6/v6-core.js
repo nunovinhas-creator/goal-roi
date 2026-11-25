@@ -1,6 +1,6 @@
 /* Goal-ROI Intelligence V6 — núcleo de derivação (sem DOM, sem dependências).
  *
- * Usado pelo navegador (window.V6Core) e por scripts/build_dashboard_snapshots.mjs (CommonJS),
+ * Usado pelo navegador (window.V6Core) e por scripts/build_dashboard_snapshots.cjs (CommonJS),
  * para que os snapshots derivados e o modo de recurso (report.json completo) produzam exatamente
  * os mesmos números. Nada aqui calcula estatísticas novas de inferência: copia valores publicados
  * pelo relatório e faz apenas contagens, somas e máximos descritivos, sempre com a origem indicada.

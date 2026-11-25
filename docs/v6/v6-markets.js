@@ -26,6 +26,7 @@
     compativeis: 'Mercados compatíveis',
     nao_comparaveis: 'Mercados não comparáveis',
     divergencia_temporal: 'Divergência temporal',
+    concordancia_nao_contemporanea: 'Concordância não contemporânea',
     insuficiente: 'Evidência insuficiente'
   };
 
@@ -51,7 +52,7 @@
   function side1x2(selection, teams) { // selection_1x2: 1/X/2, "Draw" ou nome exato e único
     const token = String(selection || '').trim();
     if (['1', 'X', '2'].includes(token.toUpperCase())) return token.toUpperCase();
-    if (token.toLowerCase() === 'draw' || token.toLowerCase() === 'empate') return 'X';
+    if (token.toLowerCase() === 'draw') return 'X';
     if (!Array.isArray(teams) || teams.length !== 2 || teams.some(t => typeof t !== 'string' || !t.trim())) return null;
     const hits = ['1', '2'].filter((k, i) => teams[i].trim().toLowerCase() === token.toLowerCase());
     return hits.length === 1 ? hits[0] : null;
@@ -68,7 +69,7 @@
     const no = reason => Object.assign(base, {kind: 'nao_comparavel', reason});
     const weak = reason => Object.assign(base, {kind: 'insuficiente', reason});
     if (!market || !sel || sel === 'None') return weak('mercado ou seleção em falta');
-    if (/^1st half|^2nd half|half -|corners|bookings|cards|both halves|to score|exact|\(2up\)|team total/i.test(market) ||
+    if (/^1st half|^2nd half|half -|corners|bookings|cards|both halves|team to score|exact|\(2up\)|team total/i.test(market) ||
         (/ total$/i.test(market) && mk !== 'asian total')) return no('mercado fora do resultado final em golos (' + market + ')');
     let rule = null, key = null;
     if (mk === 'asian total' || (mk === 'polymarket' && /^(over|under)\s/i.test(sel))) {
@@ -83,8 +84,13 @@
       if (!s) return weak('equipa da seleção sem correspondência exata');
       rule = (h, a) => (s === (h > a ? '1' : a > h ? '2' : 'X') ? 1 : -1);
       key = '1x2|' + s;
+    } else if (mk === 'both teams to score') {
+      const v = sel.toLowerCase();
+      if (v !== 'yes' && v !== 'no') return weak('seleção de ambas marcam ilegível');
+      rule = (h, a) => ((v === 'yes') === (h > 0 && a > 0) ? 1 : -1);
+      key = 'btts|' + v;
     } else if (mk === 'double chance') {
-      const parts = sel.split(/\s+or\s+/i).map(t => side(t, teams));
+      const parts = sel.split(' or ').map(t => side(t, teams));
       if (parts.length !== 2 || parts.includes(null) || parts[0] === parts[1]) return weak('dupla hipótese ilegível');
       rule = (h, a) => (parts.includes(h > a ? '1' : a > h ? '2' : 'X') ? 1 : -1);
       key = 'dc|' + parts.slice().sort().join('');
@@ -168,7 +174,7 @@
     const phaseA = sa.phase === 'live' ? 'live' : sa.phase === 'pre' ? 'pre' : null, phaseB = sb.phase === 'live' ? 'live' : sb.phase === 'pre' ? 'pre' : null;
     if (!phaseA || !phaseB) return Object.assign(out, {category: 'insuficiente', reason: 'fase do sinal desconhecida'});
     if (phaseA !== phaseB || minutes(sa.d, sb.d) > WINDOW_MIN[phaseA]) {
-      return Object.assign(out, {category: 'divergencia_temporal', reason: rel.reason + '; sinais afastados (' + Math.round(minutes(sa.d, sb.d)) + ' min' + (phaseA !== phaseB ? ', antes e durante o jogo' : '') + ')'});
+      return Object.assign(out, {category: rel.relation === 'equivalentes' ? 'concordancia_nao_contemporanea' : 'divergencia_temporal', reason: rel.reason + '; sinais afastados (' + Math.round(minutes(sa.d, sb.d)) + ' min' + (phaseA !== phaseB ? ', antes e durante o jogo' : '') + ')'});
     }
     return Object.assign(out, {category: rel.relation === 'equivalentes' ? 'convergencia' : 'exclusivas_entre_fontes'});
   }
@@ -187,7 +193,7 @@
       if (latest.has(id)) { repeated++; if (Date.parse(e.d) > Date.parse(latest.get(id).d)) latest.set(id, e); }
       else latest.set(id, e);
     }
-    counts.repeticao += repeated;
+    counts.observacoes_repetidas = repeated; // não são pares: a mesma seleção vista de novo na mesma fonte
     const list = [...latest.values()], pairs = [];
     for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
       const c = classify(list[i], list[j], teams);
@@ -210,7 +216,7 @@
 
   // Resumo de um jogo para a interface: estado dominante, por ordem de gravidade.
   function headline(counts) {
-    for (const k of ['exclusivas_entre_fontes', 'convergencia', 'divergencia_temporal', 'exclusivas_mesma_fonte', 'compativeis', 'repeticao', 'insuficiente', 'nao_comparaveis'])
+    for (const k of ['exclusivas_entre_fontes', 'convergencia', 'divergencia_temporal', 'concordancia_nao_contemporanea', 'exclusivas_mesma_fonte', 'compativeis', 'repeticao', 'insuficiente', 'nao_comparaveis'])
       if (counts[k] > 0) return k;
     return null; // um só sinal: nada a comparar
   }

@@ -1,4 +1,4 @@
-/* Goal-ROI Intelligence V6 — interface. Depende apenas de v6-core.js. */
+/* Goal-ROI Intelligence V6 — interface. Depende de v6-markets.js e v6-core.js. */
 (function () {
   'use strict';
   const C = window.V6Core;
@@ -52,26 +52,40 @@
   const statusLabel = (map, status, valid) => (!valid && status !== 'insufficient_games') ? ['certificação inválida', 'bad'] : (map[status] || [String(status || '—'), '']);
   // Relações do motor de mercados (v6-markets.js): rótulo e gravidade visual.
   const REL = {exclusivas_entre_fontes: ['seleções exclusivas entre fontes', 'bad'], convergencia: ['convergência entre fontes', 'info'],
-    divergencia_temporal: ['divergência temporal', 'warn'], exclusivas_mesma_fonte: ['opostas na mesma fonte', ''], compativeis: ['compatíveis', ''],
+    divergencia_temporal: ['divergência temporal', 'warn'], concordancia_nao_contemporanea: ['concordância não contemporânea', ''], exclusivas_mesma_fonte: ['opostas na mesma fonte', ''], compativeis: ['compatíveis', ''],
     repeticao: ['repetição na mesma fonte', ''], insuficiente: ['evidência insuficiente', 'warn'], nao_comparaveis: ['não comparáveis', '']};
   const relTag = k => k ? tag(REL[k][0], REL[k][1]) : tag('um só sinal', '');
   const REL_ORDER = Object.keys(REL);
   function relationsBlock(r, limit) {
     if (!r) return '';
-    const counts = REL_ORDER.filter(k => r.counts[k] > 0).map(k => '<tr>' + td(relTag(k)) + td(int(r.counts[k]), 'n') + '</tr>');
+    const counts = REL_ORDER.filter(k => r.counts[k] > 0).map(k => '<tr>' + td(relTag(k)) + td(int(r.counts[k]), 'n') + '</tr>')
+      .concat(r.counts.observacoes_repetidas ? ['<tr>' + td('observações repetidas da mesma seleção') + td(int(r.counts.observacoes_repetidas), 'n') + '</tr>'] : []);
     const pairs = (r.pairs || []).slice().sort((a, b) => REL_ORDER.indexOf(a.category) - REL_ORDER.indexOf(b.category)).slice(0, limit || 12);
     const total = r.pairs_total || (r.pairs || []).length;
-    return table(['Relação', {t: 'Pares', n: 1}], counts, 'Relações entre sinais') +
+    return table(['Relação', {t: 'Ocorrências', n: 1}], counts, 'Relações entre sinais') +
       (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + x.a.market + ' ' + x.a.selection) + ' × ' +
         esc(x.b.source + ' · ' + x.b.market + ' ' + x.b.selection) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
         (total > pairs.length ? '<p class="note" style="padding:0 12px">A mostrar ' + int(pairs.length) + ' de ' + int(total) + ' pares, os mais graves primeiro.</p>' : '') : '') +
       '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação de produção (linhas asiáticas, devoluções e meias). Plataformas distintas, mesmo canal de recolha.</p>';
   }
-  const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': 'bad', 'evitar': 'bad', 'sem evidência': ''};
+  const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': '', 'evitar': 'bad', 'sem evidência': ''};
+  // O relatório chama "contraditório" a qualquer jogo com seleções diferentes no mesmo mercado (brain.py), mesmo que
+  // sejam compatíveis. Mostra-se com o que significa; a relação matemática vem do motor de mercados.
+  const VLABEL = v => v === 'contraditório' ? 'seleções diferentes no mesmo mercado' : v;
+  const vtag = (v, extra) => tag(VLABEL(v) + (extra || ''), VERD[v]);
+  const TR = {not_activated: 'não ativada', active: 'ativa', none: 'nenhuma', em_observacao: 'em observação', evidencia_insuficiente: 'evidência insuficiente',
+    rejeitada: 'rejeitada', validada: 'validada', no_valid_odds: 'sem odd válida', no_market: 'sem mercado', no_selection: 'sem seleção', burst: 'lote (5 ou mais no mesmo segundo)',
+    provenance_not_verified: 'proveniência não verificada', had_ft_at_first_sight: 'já com resultado quando foi visto', edited_at_first_sight: 'já editado quando foi visto',
+    reused_match_id: 'identificador de jogo reutilizado'};
+  const tr = k => TR[k] || String(k).replace(/_/g, ' ');
   const ECON = {positive_exploratory: ['positiva (exploratória)', 'info'], nonpositive_exploratory: ['não positiva (exploratória)', ''], insufficient: ['insuficiente', 'warn']};
   const econ = s => s ? tag((ECON[s] || [s])[0], (ECON[s] || [0, ''])[1]) : '—';
   const STATUS = {'promissora': 'info', 'em observação': '', 'abandonada': 'bad', 'forte': 'good', 'confirmada': 'good'};
-  const panel = (title, body, opts = {}) => '<section class="panel ' + (opts.span || 'span-12') + '"' + (opts.id ? ' id="' + opts.id + '"' : '') + '><header><h3>' + esc(title) + '</h3>' +
+  // Secções secundárias: expansíveis, fechadas em ecrãs estreitos e abertas nos largos.
+  const wide = () => !window.matchMedia || window.matchMedia('(min-width: 641px)').matches;
+  const fold = (title, body, opts = {}) => '<details class="panel fold ' + (opts.span || 'span-12') + '"' + (wide() ? ' open' : '') + '><summary><h3>' + esc(title) + '</h3>' +
+    (opts.meta ? '<span class="meta">' + opts.meta + '</span>' : '') + '</summary><div class="body' + (opts.flush ? ' flush' : '') + '">' + body + '</div></details>';
+  const panel = (title, body, opts = {}) => opts.fold ? fold(title, body, opts) : '<section class="panel ' + (opts.span || 'span-12') + '"' + (opts.id ? ' id="' + opts.id + '"' : '') + '><header><h3>' + esc(title) + '</h3>' +
     (opts.meta ? '<span class="meta">' + opts.meta + '</span>' : '') + '</header><div class="body' + (opts.flush ? ' flush' : '') + '">' + body + '</div></section>';
   const table = (head, rows, caption) => '<div class="table-wrap" role="region" tabindex="0" aria-label="' + esc(caption || 'Tabela') + '"><table>' +
     (caption ? '<caption class="sr">' + esc(caption) + '</caption>' : '') + '<thead><tr>' +
@@ -136,8 +150,10 @@
 
   async function applySnapshots(ticket, manifest) {
     const switching = S.mode !== 'snapshots';
-    if (!switching && S.manifest && Date.parse(manifest.report_generated_at_utc) < Date.parse(S.manifest.report_generated_at_utc)) return; // manifesto mais antigo
+    // Manifesto mais antigo do que a revisão aplicada: não serve (nunca se recua).
+    if (S.appliedRevision && Date.parse(manifest.report_generated_at_utc) < Date.parse(S.appliedRevision)) return 'antigo';
     const changed = C.SNAPSHOTS.filter(k => switching || !S.manifest || S.manifest.files[k].sha256 !== manifest.files[k].sha256);
+    if (!changed.length) { S.seq.accept(ticket, manifest.report_generated_at_utc); S.manifest = manifest; S.stats.notModified++; return 'inalterado'; }
     const load = async name => {
       const body = await get(CFG.manifest.replace(/[^/]*$/, '') + manifest.files[name].path);
       S.stats.snapshotFetches++;
@@ -157,11 +173,12 @@
     }
     const rest = await Promise.all(changed.filter(k => !fresh[k]).map(load));
     for (const [k, v] of rest) fresh[k] = v;
-    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return; // fora de ordem: mantém-se a revisão aplicada
+    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return 'fora de ordem'; // mantém-se a revisão aplicada
     S.files = Object.assign({}, switching ? {} : S.files, fresh);
     S.manifest = manifest; S.mode = 'snapshots'; S.revision++; S.appliedRevision = manifest.report_generated_at_utc;
     S.reportText = null;
     S.prospectiveState = 'incluído nos snapshots';
+    return 'aplicado';
   }
 
   async function applyReport(ticket, probe) {
@@ -213,8 +230,12 @@
       S.snapshotLagMin = mrev && probe.rev ? Math.round((Date.parse(probe.rev) - Date.parse(mrev)) / 60000) : null;
       let done = false;
       if (man.manifest && !(S.snapshotLagMin > 0)) {
-        try { await applySnapshots(ticket, man.manifest); done = true; S.snapshotState = 'atuais'; }
-        catch (e) { S.snapshotState = 'recusados (' + e.message + ')'; }
+        try {
+          const r = await applySnapshots(ticket, man.manifest);
+          done = r !== 'antigo';
+          // Sem a revisão do relatório (pedido parcial falhou) a frescura dos snapshots não é verificável.
+          S.snapshotState = r === 'antigo' ? 'mais antigos do que a revisão aplicada' : probe.rev ? 'atuais' : 'em uso, frescura não verificada (revisão do relatório indisponível)';
+        } catch (e) { S.snapshotState = 'recusados (' + e.message + ')'; }
       } else S.snapshotState = man.manifest ? 'desatualizados (' + ago(S.snapshotLagMin) + ' atrás do relatório)' : man.error;
       if (!done) {
         if (probe.error && !probe.full && S.mode === 'snapshots' && !man.manifest) throw new Error('snapshots e relatório indisponíveis: ' + probe.error);
@@ -235,6 +256,8 @@
   }
 
   // ---------- moldura ----------
+  let lastAnnounce = '';
+  function announce(text) { if (text !== lastAnnounce) { lastAnnounce = text; $('announce').textContent = text; } }
   const modeLabel = () => S.mode === 'snapshots' ? 'snapshots' : /^snapshots-parcial/.test(S.mode || '') ? 'snapshots (a completar)' : S.mode === 'relatório' ? 'relatório completo' : '—';
   function paintChrome() {
     const sum = S.files.summary && S.files.summary.data;
@@ -256,6 +279,7 @@
     fb.className = 'banner ' + (fr.state === 'parada' ? 'bad' : 'warn');
     fb.textContent = fr.state === 'parada' ? 'Recolha parada há ' + ago(fr.minutes) + '. Os sinais e as odds podem já não existir.'
       : fr.state === 'atrasada' ? 'Recolha atrasada: última há ' + ago(fr.minutes) + '. Confirme as odds antes de qualquer leitura.' : '';
+    announce('Recolha ' + fr.state + '. Dados: ' + modeLabel() + (S.lastError ? '. Falha na atualização.' : '.'));
     const ref = sum.reference || {}, roi = ref.roi && ref.roi['odd-0%'];
     const p = sum.prospective;
     $('ticker').innerHTML = [
@@ -356,12 +380,13 @@
     if (!names.length) return '<div class="empty">Sem dados publicados.</div>';
     const max = Math.max(1, ...names.flatMap(k => rows[k]));
     const lvl = v => v === 0 ? 0 : Math.min(5, 1 + Math.floor(v / max * 4.999));
-    let html = '<div class="heat" role="table" aria-label="Sinais por hora de Lisboa e fonte"><span></span>' +
+    let html = '<div class="heat" role="img" aria-label="Mapa de calor: apostas por hora de Lisboa e fonte. ' + esc(names.map(k => (k === 'Outros' ? 'Canal' : k) + ': pico às ' + rows[k].indexOf(Math.max(...rows[k])) + ' h').join('; ')) + '."><span></span>' +
       Array.from({length: 24}, (_, h) => '<span class="hh">' + (h % 3 === 0 ? h : '') + '</span>').join('');
     for (const k of names) {
       html += '<span class="hl" title="' + esc(k === 'Outros' ? 'Sinais analíticos do canal' : k) + '">' + src(k === 'Outros' ? 'Canal' : k) + '</span>' + rows[k].map((v, h) => '<span class="cell l' + lvl(v) + '" title="' + esc(k + ', ' + h + 'h: ' + v + ' apostas') + '" aria-label="' + esc(k + ' às ' + h + ' h: ' + v) + '"></span>').join('');
     }
-    return html + '</div><div class="legend"><span class="note">Mais claro = menos apostas; mais escuro = mais (máximo ' + int(max) + ' por hora e fonte).</span></div>';
+    return html + '</div><div class="legend heat-legend" aria-hidden="true"><span class="note">0</span>' + [0, 1, 2, 3, 4, 5].map(l => '<i class="cell l' + l + '"></i>').join('') +
+      '<span class="note">' + int(max) + ' apostas por hora e fonte</span></div>';
   }
 
   // ---------- vistas ----------
@@ -380,7 +405,7 @@
       ['Conflitos prospetivos', ops.prospective ? ops.prospective.conflicts : null],
       ['Sem resultado após 72 h', ops.prospective ? ops.prospective.missing_72h : null],
       ['Minutos de golos inconsistentes', ops.counters.goal_minutes_inconsistent],
-      ['Mensagens por ler', ops.exclusions.unparsed]] : [];
+      ['Mensagens não interpretadas', ops.exclusions.unparsed]] : [];
     let html = head('Command Center', 'Estado operacional, qualidade dos dados e veredito científico desta revisão do relatório.', verdictBox());
     html += kpis([
       ['Recolha', ago(fr.minutes), tag(fr.state, frKind)],
@@ -415,8 +440,8 @@
       '<li><div>' + esc(d.id) + '</div><small>' + when(d.at_utc) + ' · ' + int(d.n) + ' resultados · acerto ' + pct(d.hit_rate) + ' vs necessário ' + pct(d.break_even) + ' · ' + esc(d.status || '') + '</small></li>').join('') + '</ul>'
       : '<div class="empty">Sem descobertas registadas.</div>', {span: 'span-8', flush: true, meta: 'texto gerado; não são descobertas validadas'});
     html += panel('Leitura automática do relatório', s.narrative.length ? '<ul class="list">' + s.narrative.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>' : '<div class="empty">Sem leitura publicada.</div>',
-      {flush: true, meta: 'texto gerado por regras no código de produção'});
-    html += panel('Agenda de sinais', '<div class="stack">' + Object.entries(s.agenda_counts).map(([k, v]) => '<div class="row"><span>' + tag(k, VERD[k]) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
+      {fold: 1, flush: true, meta: 'texto gerado por regras no código de produção'});
+    html += panel('Agenda de sinais', '<div class="stack">' + Object.entries(s.agenda_counts).map(([k, v]) => '<div class="row"><span>' + vtag(k) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
       '<p class="note">' + int(s.agenda_items) + ' sinais na agenda. <a href="#radar">Abrir o radar</a>.</p></div>', {span: 'span-6'});
     html += panel('Hipóteses do Brain', '<div class="stack">' + Object.entries(s.hypotheses_counts).map(([k, v]) => '<div class="row"><span>' + tag(k, STATUS[k]) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
       '<p class="note">Estados exploratórios, sem correção de multiplicidade. <a href="#brain">Brain Intelligence</a>.</p></div>', {span: 'span-6'});
@@ -432,11 +457,10 @@
     html += '<div class="banner info" style="margin:0">Cobertura efetiva: cronologia de mercado publicada para ' + int(cov.games_with_market_history) + ' jogos de ' + int(cov.games_in_history) + ' no histórico (' + pct(cov.share) + '). As restantes vistas desta área usam o histórico completo.</div>';
     html += '<div class="grid">';
     html += panel('Mapa de calor · apostas por hora de Lisboa e fonte', '<div class="heat-wrap">' + heatmap(sg.heatmap) + '</div>', {flush: true, meta: 'histórico completo (' + int(Object.values(sg.heatmap).flat().reduce((a, b) => a + b, 0)) + ' apostas)'});
-    const rows = sg.markets.map(m => '<tr class="click" tabindex="0" data-market="' + esc(m.match_id) + '"' + (sel && m.match_id === sel.match_id ? ' aria-selected="true"' : '') + '>' +
-      td(esc(m.teams ? m.teams.join(' — ') : m.match_id)) + td(Object.keys(m.sources).map(src).join(' ')) + td(int(m.events), 'n') +
-      td(day(m.first_utc) + ' → ' + when(m.last_utc)) +
-      td(m.identity && !m.identity.ok ? tag('identidade insuficiente', 'warn') : relTag(m.relations.headline)) + '</tr>');
-    html += panel('Jogos com cronologia de mercado', table(['Jogo', 'Fontes', {t: 'Obs.', n: 1}, 'Período (Lisboa)', 'Relação dominante'], rows, 'Jogos com cronologia de mercado'), {span: 'span-6', flush: true, meta: int(sg.markets.length) + ' jogos'});
+    const rows = sg.markets.map(m => '<li><button type="button" class="pick" data-market="' + esc(m.match_id) + '" aria-pressed="' + String(!!(sel && m.match_id === sel.match_id)) + '">' +
+      '<span class="title">' + esc(m.teams ? m.teams.join(' — ') : m.match_id) + '</span><span class="sub">' + Object.keys(m.sources).map(src).join(' ') + ' · ' + int(m.events) + ' obs. · ' + day(m.first_utc) + ' → ' + when(m.last_utc) + '</span>' +
+      '<span class="right">' + (m.identity && !m.identity.ok ? tag('identidade insuficiente', 'warn') : relTag(m.relations.headline)) + '</span></button></li>');
+    html += panel('Jogos com cronologia de mercado', '<ul class="list picks">' + rows.join('') + '</ul>', {span: 'span-6', flush: true, meta: int(sg.markets.length) + ' jogos · escolha um para ver odds e relações'});
     if (sel) {
       const series = {};
       for (const e of sel.series) if (isNum(e.odds)) {
@@ -449,7 +473,8 @@
         td('<span class="' + sign(-(x.move_pct || 0)) + '">' + (isNum(x.move_pct) ? (x.move_pct > 0 ? '+' : '') + n(x.move_pct, 1) + ' %' : '—') + '</span>', 'n') +
         td(int(x.observations), 'n') + td(int(x.volume_last), 'n') + td(x.max_mult > 1 ? '×' + x.max_mult : '—', 'n') + '</tr>');
       html += panel('Odds observadas · ' + (sel.teams ? sel.teams.join(' — ') : sel.match_id), chart +
-        table(['Fonte', 'Mercado', 'Seleção', {t: 'Odd inicial', n: 1}, {t: 'Odd final', n: 1}, {t: 'Variação', n: 1}, {t: 'Obs.', n: 1}, {t: 'Volume (último)', n: 1}, {t: 'Reforço', n: 1}], selRows, 'Seleções observadas') +
+        '<details class="inner"' + (wide() ? ' open' : '') + '><summary>Seleções observadas (' + int(sel.selections.length) + ')</summary>' +
+        table(['Fonte', 'Mercado', 'Seleção', {t: 'Odd inicial', n: 1}, {t: 'Odd final', n: 1}, {t: 'Variação', n: 1}, {t: 'Obs.', n: 1}, {t: 'Volume (último)', n: 1}, {t: 'Reforço', n: 1}], selRows, 'Seleções observadas') + '</details>' +
         '<p class="note">O volume é o total do mercado na última observação; não se soma entre observações.</p>',
         {span: 'span-6', meta: 'odds anunciadas, não executáveis'});
       html += panel('Relações entre seleções · ' + (sel.teams ? sel.teams.join(' — ') : sel.match_id),
@@ -457,26 +482,37 @@
     }
     const tot = {};
     for (const m of sg.markets) for (const [k, v] of Object.entries(m.relations.counts)) tot[k] = (tot[k] || 0) + v;
-    html += panel('Relações em todos os jogos com cronologia', table(['Relação', {t: 'Pares', n: 1}], REL_ORDER.map(k => '<tr>' + td(relTag(k)) + td(int(tot[k] || 0), 'n') + '</tr>'), 'Relações agregadas') +
+    html += panel('Relações em todos os jogos com cronologia', table(['Relação', {t: 'Pares', n: 1}], REL_ORDER.map(k => '<tr>' + td(relTag(k)) + td(int(tot[k] || 0), 'n') + '</tr>')
+      .concat(['<tr>' + td('observações repetidas (não são pares)') + td(int(tot.observacoes_repetidas || 0), 'n') + '</tr>']), 'Relações agregadas') +
       '<p class="note" style="padding:0 12px 12px">"Exclusivas" significa que não existe resultado final em que ambas ganhem. Pares compatíveis (por exemplo Over 1,5 e Under 3,5) não são contradições. Opostas na mesma fonte não contam como contradição entre fontes. Sinais afastados no tempo ou em fases diferentes são divergência temporal. Mercados de cantos, cartões, partes do jogo ou totais por equipa não são comparáveis. Na dúvida, evidência insuficiente.</p>',
-      {span: 'span-6', flush: true, meta: 'pares de seleções distintas'});
+      {fold: 1, span: 'span-6', flush: true, meta: 'pares de seleções distintas'});
     const pm = sg.price_move;
     if (pm) {
       const pmRows = Object.entries(pm).filter(([, v]) => v && isNum(v.n)).map(([k, v]) => '<tr>' + td(k === 'pre' ? 'Antes do jogo' : k === 'live' ? 'Durante o jogo' : esc(k)) + td(int(v.n), 'n') +
         td(int(v.shortened), 'n') + td(int(v.drifted), 'n') + td(int(v.unchanged), 'n') + td(isNum(v.median_move_pct) ? n(v.median_move_pct, 1) + ' %' : '—', 'n') +
         td(v.when_shortened ? pct(v.when_shortened.hit_rate) + ' (n=' + int(v.when_shortened.n) + ')' : '—', 'n') + td(v.when_drifted ? pct(v.when_drifted.hit_rate) + ' (n=' + int(v.when_drifted.n) + ')' : '—', 'n') + '</tr>');
       html += panel('Movimento da odd após reforço Betfair', table(['Fase', {t: 'n', n: 1}, {t: 'Desceu', n: 1}, {t: 'Subiu', n: 1}, {t: 'Igual', n: 1}, {t: 'Mediana', n: 1}, {t: 'Acerto se desceu', n: 1}, {t: 'Acerto se subiu', n: 1}], pmRows, 'Movimento da odd'),
-        {span: 'span-6', flush: true, meta: 'insights.price_move · exploratório'});
+        {fold: 1, span: 'span-6', flush: true, meta: 'insights.price_move · exploratório'});
     }
     const over = sg.polymarket_over25.map(x => '<tr>' + td(when(x.date_utc)) + td(esc(x.match)) + td(esc(x.selection)) + td(n(x.odds, 2), 'n') + td(isNum(x.share) ? n(x.share) + ' %' : '—', 'n') + td(int(x.total), 'n') + '</tr>');
-    html += panel('Polymarket · Over 2,5', table(['Visto', 'Jogo', 'Seleção', {t: 'Odd', n: 1}, {t: 'Quota', n: 1}, {t: 'Volume', n: 1}], over, 'Polymarket Over 2,5'), {span: 'span-6', flush: true});
+    html += panel('Polymarket · Over 2,5', table(['Visto', 'Jogo', 'Seleção', {t: 'Odd', n: 1}, {t: 'Quota', n: 1}, {t: 'Volume', n: 1}], over, 'Polymarket Over 2,5'), {fold: 1, span: 'span-6', flush: true});
     return html + '</div>';
   }
 
+  // Relações de um jogo: do histórico de mercado quando publicado (mais completo), senão dos sinais da agenda.
+  // O radar, o filtro e a ficha usam sempre esta mesma fonte.
+  function gameRelations(id) {
+    const sg = S.files.signals && S.files.signals.data;
+    if (!sg) return null;
+    const m = sg.markets.find(x => x.match_id === id);
+    if (m && m.identity && m.identity.ok) return m.relations;
+    const g = sg.games.find(x => x.match_id === id);
+    return g ? g.relations : null;
+  }
   // Jogo com seleções mutuamente exclusivas entre fontes, segundo o motor (não segundo o rótulo do relatório).
   function exclusiveGame(id) {
-    const sg = S.files.signals && S.files.signals.data, g = sg && sg.games.find(x => x.match_id === id);
-    return !!(g && g.relations && g.relations.counts.exclusivas_entre_fontes > 0);
+    const r = gameRelations(id);
+    return !!(r && r.counts.exclusivas_entre_fontes > 0);
   }
   function radarFilter(items) {
     const f = S.ui.radar, q = f.q.trim().toLowerCase();
@@ -497,7 +533,7 @@
       '<label>Pesquisa<input type="search" name="q" value="' + esc(f.q) + '" placeholder="Equipa, liga, seleção"></label>' +
       '<label>Fonte<select name="source">' + opts(sources, f.source) + '</select></label>' +
       '<label>Fase<select name="phase">' + opts(phases, f.phase) + '</select></label>' +
-      '<label>Leitura<select name="verdict">' + opts(verdicts, f.verdict) + '</select></label>' +
+      '<label>Leitura do relatório<select name="verdict">' + '<option value="">Todas</option>' + verdicts.map(v => '<option value="' + esc(v) + '"' + (v === f.verdict ? ' selected' : '') + '>' + esc(VLABEL(v)) + '</option>').join('') + '</select></label>' +
       '<label>Odd mín.<input type="number" step="0.01" min="1" name="min" value="' + esc(f.min) + '" inputmode="decimal"></label>' +
       '<label>Odd máx.<input type="number" step="0.01" min="1" name="max" value="' + esc(f.max) + '" inputmode="decimal"></label>' +
       '<label class="check"><input type="checkbox" name="conflict"' + (f.conflict ? ' checked' : '') + '> Só seleções exclusivas entre fontes</label></form>';
@@ -506,13 +542,12 @@
   }
   function radarResults(sg) {
     const items = radarFilter(sg.items);
-    const rel = new Map(sg.games.map(g => [g.match_id, g.relations]));
-    const games = C.groupByGame(items).map(g => Object.assign(g, {relations: rel.get(g.match_id) || null}));
+    const games = C.groupByGame(items).map(g => Object.assign(g, {relations: gameRelations(g.match_id)}));
     const dupTotal = games.reduce((s, g) => s + g.duplicates, 0);
     const body = games.length ? '<div class="games">' + games.map(g => '<div class="game"><button type="button" data-game="' + esc(g.match_id) + '">' +
       '<span><span class="title">' + esc(g.match) + '</span><span class="sub"><span>' + esc(g.league || '') + '</span><span>' + int(g.signals.length) + ' sinal(is)</span><span>último ' + when(g.last_utc) + '</span>' +
       (g.duplicates ? '<span>' + int(g.duplicates) + ' duplicado(s) agrupado(s)</span>' : '') + '</span></span>' +
-      '<span class="right">' + g.sources.map(src).join(' ') + Object.entries(g.verdicts).map(([k, v]) => tag(k + (v > 1 ? ' ×' + v : ''), VERD[k])).join('') + (g.relations && g.relations.headline && g.relations.headline !== 'compativeis' && g.relations.headline !== 'nao_comparaveis' ? relTag(g.relations.headline) : '') + '</span></button></div>').join('') + '</div>'
+      '<span class="right">' + g.sources.map(src).join(' ') + Object.entries(g.verdicts).map(([k, v]) => vtag(k, v > 1 ? ' ×' + v : '')).join('') + (g.relations && g.relations.headline && g.relations.headline !== 'compativeis' && g.relations.headline !== 'nao_comparaveis' ? relTag(g.relations.headline) : '') + '</span></button></div>').join('') + '</div>'
       : '<div class="empty">Nenhum sinal corresponde aos filtros.</div>';
     return panel('Jogos', body, {flush: true, meta: int(games.length) + ' jogos · ' + int(items.length) + ' sinais' + (dupTotal ? ' · ' + int(dupTotal) + ' duplicados' : '') + ' · agenda ' + when(sg.agenda_generated_utc)});
   }
@@ -522,8 +557,7 @@
     const g = C.groupByGame(sg.items.filter(i => i.match_id === id))[0];
     if (!g) return;
     const market = sg.markets.find(m => m.match_id === id);
-    const pre = sg.games.find(x => x.match_id === id);
-    const relations = market ? market.relations : pre && pre.relations;
+    const relations = gameRelations(id);
     const chrono = (market ? market.series.map(e => ({d: e.d, source: e.source, text: e.market + ' · ' + e.selection + (isNum(e.odds) ? ' @ ' + n(e.odds, 2) : '') + (isNum(e.total) ? ' · volume do mercado ' + int(e.total) : '') + (e.phase ? ' · ' + (e.phase === 'live' ? 'ao vivo' : 'antes do jogo') : '')}))
       : g.signals.map(s => ({d: s.date_utc, source: s.source, text: s.market + ' · ' + s.selection + ' @ ' + n(s.odds, 2) + (s.phase ? ' · ' + s.phase : '')})));
     const ev = list => list.length ? '<ul>' + list.slice(0, 8).map(h => '<li><div>' + esc(h.id) + '</div><small class="note">' + int(h.games) + ' jogos · ' + int(h.hits) + ' acertos em ' + int(h.n) +
@@ -532,7 +566,7 @@
       '<dl class="facts"><dt>Fonte</dt><dd>' + src(s.source) + ' · ' + esc(s.family || s.type) + '</dd><dt>Fase</dt><dd>' + esc(s.when || s.phase || '—') + (isNum(s.minute) ? ' · ' + s.minute + '′' : '') + '</dd>' +
       '<dt>Odd</dt><dd>' + n(s.odds, 2) + (isNum(s.odds_last) && s.odds_last !== s.odds ? ' → ' + n(s.odds_last, 2) : '') + ' · ' + esc(s.odds_band || '') + '</dd>' +
       '<dt>Reforço</dt><dd>' + (s.max_mult > 1 ? '×' + s.max_mult : 'nenhum') + '</dd><dt>Quota</dt><dd>' + (isNum(s.share) ? n(s.share) + ' %' : '—') + '</dd>' +
-      '<dt>Leitura</dt><dd>' + tag(s.verdict || '—', VERD[s.verdict]) + ' · não validado' + (s.conflict ? '<br><small class="note">O relatório marca "contraditório" quando há seleções diferentes no mesmo mercado do jogo; a relação matemática está na secção Relações.</small>' : '') + '</dd>' +
+      '<dt>Leitura do relatório</dt><dd>' + vtag(s.verdict || '—') + ' · não validado' + (s.conflict ? '<br><small class="note">O relatório marca "contraditório" quando há seleções diferentes no mesmo mercado do jogo; a relação matemática está na secção Relações.</small>' : '') + '</dd>' +
       (s.duplicates ? '<dt>Duplicados</dt><dd>' + int(s.duplicates) + ' agrupados</dd>' : '') + '</dl>' +
       '<div class="evidence"><div class="for"><h4>A favor (' + int(s.good_total) + ')</h4>' + ev(s.good) + '</div><div class="against"><h4>Contra (' + int(s.bad_total) + ')</h4>' + ev(s.bad) + '</div></div></div></section>').join('');
     openDrawer(g.match, (g.league || '') + ' · ' + g.sources.join(', '),
@@ -596,9 +630,11 @@
     LISTS.promissoras = idx.filter(x => x.status === 'promissora').map(x => rowFor(x.id, x.status));
     LISTS.rejeitadas = idx.filter(x => x.status === 'abandonada').map(x => rowFor(x.id, x.status));
     LISTS.replicacao = l.replicated_exploratory.map(h => {
-      const e = h.prospective || {}, nn = (e.wins || 0) + (e.losses || 0), w = wilson(e.wins, nn);
-      return {text: h.id, status: h.status, html: '<div class="clamp">' + esc(h.id) + '</div><small>Prospetivo: ' + int(e.wins) + ' ganhas e ' + int(e.losses) + ' perdidas em ' + int(nn) + ' decididas' +
-        (e.voids ? ', ' + int(e.voids) + ' devolvidas' : '') + (e.imputed_losses ? ' (' + int(e.imputed_losses) + ' perdas imputadas)' : '') + ', ' + int(e.pending) + ' pendentes · acerto ' + (nn ? pct(e.wins / nn) : '—') +
+      // Perdas imputadas (jogo sem resultado em 3 dias) contam como perdas, tal como no ROI publicado.
+      const e = h.prospective || {}, nn = (e.wins || 0) + (e.losses || 0) + (e.imputed_losses || 0), w = wilson(e.wins, nn);
+      return {text: h.id, status: h.status, html: '<div class="clamp">' + esc(h.id) + '</div><small>Prospetivo: ' + int(e.wins) + ' ganhas, ' + int(e.losses) + ' perdidas' +
+        (e.imputed_losses ? ' e ' + int(e.imputed_losses) + ' perdas imputadas (sem resultado em 3 dias)' : '') + ' em ' + int(nn) + ' decididas' +
+        (e.voids ? ', ' + int(e.voids) + ' devolvidas' : '') + ', ' + int(e.pending) + ' pendentes · acerto ' + (nn ? pct(e.wins / nn) : '—') +
         ' (IC95 ' + (w ? pct(w[0], 0) + '–' + pct(w[1], 0) : '—') + ') · ROI anunciado ' + spct(e.roi_advertised) + ', −2 % ' + spct(e.roi_odds_minus_2pct) + (e.decision_days ? ' · ' + int(e.decision_days) + ' dias' : '') +
         (nn < 30 ? ' · <b>amostra pequena</b>' : '') + '</small>'};
     });
@@ -608,7 +644,7 @@
     html += kpis([['Hipóteses registadas', int(T.hypotheses), 'testadas agora: ' + int(l.tested)], ['Em observação', int(T.observing), 'estado do gerador'],
       ['Promissoras', int(T.promising), 'sem correção de multiplicidade'], ['Abandonadas', int(T.abandoned), 'estado do gerador'],
       ['Propostas LLM', int(T.llm), int(T.llm_published) + ' publicadas com métricas'], ['Promissoras esperadas só por acaso', isNum(l.expected_by_chance) ? n(l.expected_by_chance, 1) : '—', 'observadas: ' + int(T.promising) + ' · expectativa, a dependência alarga a dispersão']]);
-    html += '<div class="tabs" role="tablist" aria-label="Secções do Brain">' + TABS.map(([k, t, c]) => '<button type="button" role="tab" data-tab="' + k + '" aria-selected="' + (k === tab) + '"' + (k === tab ? '' : ' tabindex="-1"') + '>' + esc(t) + (isNum(c) ? ' <span class="num">' + int(c) + '</span>' : '') + '</button>').join('') + '</div>';
+    html += '<div class="tabs" role="tablist" aria-label="Secções do Brain">' + TABS.map(([k, t, c]) => '<button type="button" role="tab" id="tab-' + k + '" aria-controls="brain-panel" data-tab="' + k + '" aria-selected="' + (k === tab) + '"' + (k === tab ? '' : ' tabindex="-1"') + '>' + esc(t) + (isNum(c) ? ' <span class="num">' + int(c) + '</span>' : '') + '</button>').join('') + '</div>';
     let body;
     if (tab === 'diario') body = panel('Diário de aprendizagem', pagedList('diario', LISTS.diario, {total: T.journal}), {flush: true, meta: 'notas do modelo de linguagem'});
     else if (tab === 'llm') body = panel('Hipóteses propostas pelo modelo de linguagem', '<p class="note pad">Avaliação: ' + esc(l.llm.evaluation ? l.llm.evaluation.verdict : '—') + ' — ' + (l.llm.evaluation ? note(l.llm.evaluation.reason) : '') +
@@ -619,7 +655,7 @@
       '). Hipóteses partilham jogos e não há correção de multiplicidade; IC95 de Wilson calculado no navegador sobre as contagens publicadas. Não é validação.</p>' + pagedList('replicacao', LISTS.replicacao, {}), {flush: true});
     else if (tab === 'rejeitadas') body = panel('Rejeitadas (abandonadas pelo gerador)', pagedList('rejeitadas', LISTS.rejeitadas, {total: T.abandoned}) +
       '<p class="note pad">"Abandonada" é o estado do gerador (≥ 30 jogos e ≤ 10 % de probabilidade de estar acima do necessário). O quadro de estratégias usa outra classificação: ' +
-      (l.strategy_board_counts ? Object.entries(l.strategy_board_counts).map(([k, v]) => esc(k.replace(/_/g, ' ')) + ' ' + int(v)).join(', ') : '—') + '.</p>', {flush: true});
+      (l.strategy_board_counts ? Object.entries(l.strategy_board_counts).map(([k, v]) => esc(tr(k)) + ' ' + int(v)).join(', ') : '—') + '.</p>', {flush: true});
     else if (tab === 'seguimento') {
       const m = l.multiplicity || {};
       body = panel('Seguimento por origem', l.track && l.track.by_source ? table(['Origem', {t: 'Hipóteses', n: 1}, {t: 'Com evidência prospetiva', n: 1}, {t: 'Jogos prospetivos', n: 1}],
@@ -628,7 +664,7 @@
         panel('Multiplicidade', '<dl class="facts"><dt>Testadas agora</dt><dd>' + int(m.tested_now) + '</dd><dt>Conjuntos de jogos distintos</dt><dd>' + int(m.distinct_game_sets_tested) + '</dd>' +
         '<dt>Promissoras ou melhor</dt><dd>' + int(m.promising_or_better) + '</dd><dt>Jogos (união)</dt><dd>' + int(m.promising_union_games) + ' de ' + int(m.promising_sum_games) + ' somados</dd></dl>');
     } else body = panel('Limitações científicas', '<ul class="list">' + l.limitations.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>', {flush: true});
-    return html + '<div class="grid" role="tabpanel">' + body + '</div>';
+    return html + '<div class="grid" role="tabpanel" id="brain-panel" aria-labelledby="tab-' + tab + '">' + body + '</div>';
   }
 
   function viewLab() {
@@ -680,12 +716,12 @@
     const c = sc.certification, sb = sc.strategy_board || {};
     html += panel('Certificação das estratégias (relatório principal)', '<dl class="facts"><dt>Método</dt><dd>' + esc(sc.validation_method ? sc.validation_method.method : '—') + '</dd><dt>Estado</dt><dd>' + esc(c.state) + '</dd>' +
       '<dt>Registo válido</dt><dd>' + (sc.validation_method && sc.validation_method.ledger_valid ? 'sim' : 'não') + '</dd><dt>Validadas</dt><dd>' + int(c.validated) + '</dd>' +
-      '<dt>Afirmação estatística</dt><dd>' + esc(sb.statistical_claim || '—') + '</dd><dt>Critérios (SHA-256)</dt><dd style="word-break:break-all">' + esc(sb.criteria_sha256 || '—') + '</dd></dl>' +
-      (sb.counts ? '<div class="stack" style="margin-top:10px">' + Object.entries(sb.counts).map(([k, v]) => '<div class="row"><span>' + esc(k.replace(/_/g, ' ')) + '</span><b class="num">' + int(v) + '</b></div>').join('') + '</div>' : '') +
+      '<dt>Afirmação estatística</dt><dd>' + esc(sb.statistical_claim ? tr(sb.statistical_claim) : '—') + '</dd><dt>Critérios (SHA-256)</dt><dd style="word-break:break-all">' + esc(sb.criteria_sha256 || '—') + '</dd></dl>' +
+      (sb.counts ? '<div class="stack" style="margin-top:10px">' + Object.entries(sb.counts).map(([k, v]) => '<div class="row"><span>' + esc(tr(k)) + '</span><b class="num">' + int(v) + '</b></div>').join('') + '</div>' : '') +
       (c.invalid.length ? '<p class="note neg">' + esc(c.invalid.join('; ')) + '</p>' : ''), {span: 'span-6'});
     const e = sc.eligibility || {};
     html += panel('Elegibilidade dos sinais', '<dl class="facts"><dt>Total</dt><dd>' + int(e.total) + '</dd><dt>Elegíveis</dt><dd>' + int(e.eligible) + '</dd><dt>Excluídos</dt><dd>' + int(e.excluded) + '</dd></dl>' +
-      (e.reasons ? table(['Motivo', {t: 'Sinais', n: 1}], Object.entries(e.reasons).map(([k, v]) => '<tr>' + td(esc(k.replace(/_/g, ' '))) + td(int(v), 'n') + '</tr>'), 'Motivos de exclusão') : ''), {span: 'span-6'});
+      (e.reasons ? table(['Motivo', {t: 'Sinais', n: 1}], Object.entries(e.reasons).map(([k, v]) => '<tr>' + td(esc(tr(k))) + td(int(v), 'n') + '</tr>'), 'Motivos de exclusão') : ''), {span: 'span-6'});
     return html + '</div>';
   }
 
@@ -715,12 +751,12 @@
     html += panel('Por semana (unidades)', barsChart(weeks.map(([k, r]) => ({label: day(k + 'T12:00:00Z'), v: r.units, text: units(r.units, 1)})), {label: 'Unidades por semana'}) +
       table(['Semana', {t: 'Liquidadas', n: 1}, {t: 'Unidades', n: 1}, {t: 'ROI', n: 1}], weeks.map(([k, r]) => '<tr>' + td(day(k + 'T12:00:00Z')) + td(int(r.settled), 'n') + td(units(r.units), 'n') + td(spct(r.roi), 'n') + '</tr>'), 'Desempenho por semana'), {span: 'span-6'});
     const groups = Object.entries(pf.groups).map(([k, g]) => '<tr>' + td(esc(k)) + td(int(g.bets), 'n') + td(int(g.settled), 'n') + td('<span class="' + sign(g.units) + '">' + units(g.units) + '</span>', 'n') +
-      ['odd-0%', 'odd-2%', 'odd-5%'].map(o => td(spct(g.roi && g.roi[o] && g.roi[o].roi), 'n')).join('') + td(ci(g.roi && g.roi['odd-0%'] && g.roi['odd-0%'].ci95), 'n') + td(tag(g.conclusive ? 'ok' : 'sem conclusão', g.conclusive ? '' : 'warn')) + '</tr>');
-    html += panel('Por grupo e mercado', table(['Grupo', {t: 'Apostas', n: 1}, {t: 'Liq.', n: 1}, {t: 'Unid.', n: 1}, {t: 'ROI', n: 1}, {t: '−2 %', n: 1}, {t: '−5 %', n: 1}, {t: 'IC95', n: 1}, 'Conclusão'], groups, 'Desempenho por grupo'), {flush: true});
+      ['odd-0%', 'odd-2%', 'odd-5%'].map(o => td(spct(g.roi && g.roi[o] && g.roi[o].roi), 'n')).join('') + td(ci(g.roi && g.roi['odd-0%'] && g.roi['odd-0%'].ci95), 'n') + td(tag(g.conclusive ? '≥ 300 liquidadas (descritivo)' : 'sem conclusão (< 300)', g.conclusive ? '' : 'warn')) + '</tr>');
+    html += panel('Por grupo e mercado', table(['Grupo', {t: 'Apostas', n: 1}, {t: 'Liq.', n: 1}, {t: 'Unid.', n: 1}, {t: 'ROI', n: 1}, {t: '−2 %', n: 1}, {t: '−5 %', n: 1}, {t: 'IC95', n: 1}, 'Conclusão'], groups, 'Desempenho por grupo'), {fold: 1, flush: true});
     const acc = Object.entries(pf.accuracy).map(([k, a]) => '<tr>' + td(esc(k)) + td(int(a.with_result), 'n') + td(pct(a.hit_rate), 'n') + td(ci(a.ci95).replace(/\+/g, ''), 'n') + td(pct(a.break_even), 'n') + td(n(a.avg_odds, 2), 'n') + td(spct(a.roi_announced_odds), 'n') + '</tr>');
-    html += panel('Taxa de acerto por tipo', table(['Tipo', {t: 'Com resultado', n: 1}, {t: 'Acerto', n: 1}, {t: 'IC95', n: 1}, {t: 'Necessário', n: 1}, {t: 'Odd média', n: 1}, {t: 'ROI', n: 1}], acc, 'Acerto por tipo'), {span: 'span-6', flush: true});
+    html += panel('Taxa de acerto por tipo', table(['Tipo', {t: 'Com resultado', n: 1}, {t: 'Acerto', n: 1}, {t: 'IC95', n: 1}, {t: 'Necessário', n: 1}, {t: 'Odd média', n: 1}, {t: 'ROI', n: 1}], acc, 'Acerto por tipo'), {fold: 1, span: 'span-6', flush: true});
     const cal = pf.calibration.map(b => '<tr>' + td(esc(b.band)) + td(int(b.n), 'n') + td(pct(b.hit_rate), 'n') + td(pct(b.break_even), 'n') + td(spct(b.roi), 'n') + '</tr>');
-    html += panel('Calibração por faixa de odd', table(['Faixa', {t: 'n', n: 1}, {t: 'Acerto', n: 1}, {t: 'Necessário', n: 1}, {t: 'ROI', n: 1}], cal, 'Calibração'), {span: 'span-6', flush: true});
+    html += panel('Calibração por faixa de odd', table(['Faixa', {t: 'n', n: 1}, {t: 'Acerto', n: 1}, {t: 'Necessário', n: 1}, {t: 'ROI', n: 1}], cal, 'Calibração'), {fold: 1, span: 'span-6', flush: true});
     const wf = pf.walk_forward;
     if (wf) {
       const wfr = ['followed', 'skipped', 'not_reconstructible'].filter(k => wf[k]).map(k => '<tr>' + td({followed: 'Seguidas', skipped: 'Ignoradas', not_reconstructible: 'Não reconstituíveis'}[k]) + td(int(wf[k].settled), 'n') + td(units(wf[k].units), 'n') + td(spct(wf[k].roi), 'n') + td(spct(wf[k].roi_cut), 'n') + '</tr>');
@@ -730,7 +766,7 @@
         '<p class="note">Reconstituição com regras conhecidas em cada momento (brain.walk_forward). Descritiva e exploratória; não é o registo prospetivo congelado.</p>', {span: 'span-6'});
     }
     const reg = pf.regime.map(r => '<tr>' + td(esc(r.type)) + td(int(r.n), 'n') + td(esc(r.state)) + td(r.before ? pct(r.before.hit_rate) : '—', 'n') + td(r.recent ? pct(r.recent.hit_rate) : '—', 'n') + td(isNum(r.z) ? n(r.z, 2) : '—', 'n') + '</tr>');
-    html += panel('Mudança de regime (recente vs anterior)', table(['Tipo', {t: 'n', n: 1}, 'Estado', {t: 'Antes', n: 1}, {t: 'Recente', n: 1}, {t: 'z', n: 1}], reg, 'Regime'), {span: 'span-6', flush: true});
+    html += panel('Mudança de regime (recente vs anterior)', table(['Tipo', {t: 'n', n: 1}, 'Estado', {t: 'Antes', n: 1}, {t: 'Recente', n: 1}, {t: 'z', n: 1}], reg, 'Regime'), {fold: 1, span: 'span-6', flush: true});
     return html + '</div>';
   }
 
@@ -752,10 +788,10 @@
       ['Nomes por rever (Highlightly)', cnt.hl_near_misses, null], ['Nomes por rever (BSD)', cnt.bsd_near_misses, null], ['Revisões de nomes pendentes', o.name_review, null],
       ['Duplicados na agenda (agrupados)', o.agenda_duplicates, 1]]
       .map(([k, v, w]) => '<tr>' + td(esc(k)) + td(int(v), 'n') + td(w ? tag(v > 0 ? 'rever' : 'ok', warnIf(v)) : tag('informativo', '')) + '</tr>');
-    html += panel('Integridade e conflitos', table(['Indicador', {t: 'Valor', n: 1}, 'Estado'], cRows, 'Integridade'), {span: 'span-5', flush: true});
+    html += panel('Integridade e conflitos', table(['Indicador', {t: 'Valor', n: 1}, 'Estado'], cRows, 'Integridade'), {fold: 1, span: 'span-5', flush: true});
     const ex = o.exclusions;
     html += panel('Exclusões', table(['Motivo', {t: 'Apostas', n: 1}], [['Vistas já com resultado', ex.first_seen_with_result], ['Editadas antes de vistas', ex.edited_before_seen], ['Lote (≥ 5 no mesmo segundo)', ex.burst],
-      ['Odd < 1,10', ex.low_odds], ['Mensagens por ler', ex.unparsed], ['Mercados sem liquidação', ex.unsettled_market]].map(([k, v]) => '<tr>' + td(esc(k)) + td(int(v), 'n') + '</tr>'), 'Exclusões'), {span: 'span-4', flush: true});
+      ['Odd < 1,10', ex.low_odds], ['Mensagens não interpretadas', ex.unparsed], ['Mercados sem liquidação', ex.unsettled_market]].map(([k, v]) => '<tr>' + td(esc(k)) + td(int(v), 'n') + '</tr>'), 'Exclusões'), {fold: 1, span: 'span-4', flush: true});
     const ct = o.continuity;
     html += panel('Continuidade', '<dl class="facts"><dt>Dias com apostas</dt><dd>' + int(ct.days) + '</dd><dt>Primeiro dia</dt><dd>' + esc(ct.first_day || '—') + '</dd><dt>Último dia</dt><dd>' + esc(ct.last_day || '—') + '</dd>' +
       '<dt>Interrupções</dt><dd>' + (ct.gaps.length ? ct.gaps.map(g => esc(g.after + ' → ' + g.before + ' (' + g.missing_days + ' d)')).join('<br>') : 'nenhuma') + '</dd></dl>' +
@@ -769,16 +805,16 @@
       ['Mapa de calor e períodos', int(cv.simulation_entries) + ' apostas (histórico completo)'],
       ['Apostas recentes', int(cv.recent_bets) + ' de ' + int(cv.tracked)]].map(([k, v]) => '<tr>' + td(esc(k)) + td(v) + '</tr>'), 'Cobertura'), {span: 'span-4', flush: true});
     const types = Object.entries(o.types).sort((a, b) => b[1] - a[1]).map(([k, v]) => '<tr>' + td(esc(k === 'None' ? 'sem tipo reconhecido' : k)) + td(int(v), 'n') + '</tr>');
-    html += panel('Mensagens por tipo', table(['Tipo', {t: 'Mensagens', n: 1}], types, 'Mensagens por tipo'), {span: 'span-5', flush: true});
+    html += panel('Mensagens por tipo', table(['Tipo', {t: 'Mensagens', n: 1}], types, 'Mensagens por tipo'), {fold: 1, span: 'span-5', flush: true});
     html += panel('Jogos por liquidar', table(['Jogo', 'Liga', 'Sinal', 'Motivo'], o.unsettled.slice(0, 40).map(u => '<tr>' + td(esc(u.match)) + td(esc(u.league || '')) + td(when(u.date_utc)) + td(esc(u.why)) + '</tr>'), 'Jogos por liquidar'),
-      {span: 'span-7', flush: true, meta: int(o.unsettled.length) + ' jogos'});
+      {fold: 1, span: 'span-7', flush: true, meta: int(o.unsettled.length) + ' jogos'});
     const st = S.stats;
     html += panel('Carregamento desta página', '<dl class="facts"><dt>Fonte de dados</dt><dd>' + esc(modeLabel()) + '</dd>' +
       '<dt>Revisão aplicada</dt><dd>' + when(S.appliedRevision) + '</dd><dt>Revisão disponível</dt><dd>' + when(S.availableRevision) + '</dd>' +
       '<dt>Snapshots</dt><dd>' + esc(S.snapshotState || '—') + '</dd>' +
       '<dt>Atraso da recolha</dt><dd>' + ago(C.freshness(o.collector.at_utc, Date.now()).minutes) + '</dd><dt>Pedidos</dt><dd>' + int(st.requests) + '</dd><dt>Sem alterações</dt><dd>' + int(st.notModified) + '</dd>' +
       '<dt>Falhas</dt><dd>' + int(st.failures) + '</dd><dt>Snapshots descarregados</dt><dd>' + int(st.snapshotFetches) + '</dd><dt>Derivações no navegador</dt><dd>' + int(st.derivations) + '</dd>' +
-      '<dt>Última atualização válida</dt><dd>' + (S.lastOk ? when(new Date(S.lastOk).toISOString()) : '—') + '</dd><dt>Relatório prospetivo</dt><dd>' + esc(S.prospectiveState) + '</dd></dl>', {span: 'span-5'});
+      '<dt>Última atualização válida</dt><dd>' + (S.lastOk ? when(new Date(S.lastOk).toISOString()) : '—') + '</dd><dt>Relatório prospetivo</dt><dd>' + esc(S.prospectiveState) + '</dd></dl>', {fold: 1, span: 'span-5'});
     return html + '</div>';
   }
 
@@ -788,7 +824,7 @@
       '<p>O Goal-ROI Brain é um cofre privado. Esta página é pública e não existe ainda um canal seguro que publique apenas indicadores agregados, por isso nenhum conteúdo do Brain é carregado ou mostrado aqui.</p>' +
       '<p>Condições para ativar (decisão humana):</p><ul><li>um ficheiro agregado gerado pelo próprio Brain, com uma lista fechada de campos numéricos (por exemplo, número de PRs indexadas, relações curadas, temas);</li>' +
       '<li>sem texto livre, títulos de notas, caminhos, autores ou ligações;</li><li>verificação automática de privacidade antes da publicação, igual à aplicada aos snapshots desta página;</li>' +
-      '<li>publicação sem credenciais novas e sem custo.</li></ul><p class="note">Os indicadores científicos públicos (H1, H2, D1, certificação) já estão no <a href="#lab">Scientific Lab</a>, lidos diretamente da produção.</p></div>') + '</div>';
+      '<li>publicação sem credenciais novas e sem custo.</li></ul><p class="note">Os indicadores científicos públicos (H1, H2, D1, certificação) já estão no <a href="#lab">Scientific Lab</a>, lidos do relatório publicado.</p></div>') + '</div>';
   }
 
   const RENDER = {command: viewCommand, market: viewMarket, radar: viewRadar, brain: viewBrain, lab: viewLab, performance: viewPerformance, operations: viewOperations, knowledge: viewKnowledge};
@@ -837,7 +873,10 @@
   }
   function closeDrawer() {
     $('drawer').hidden = true; $('scrim').hidden = true;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    // Se a lista foi refeita entretanto, devolve o foco ao botão equivalente do mesmo jogo.
+    const id = lastFocus && lastFocus.dataset && lastFocus.dataset.game;
+    const target = lastFocus && lastFocus.isConnected ? lastFocus : id ? document.querySelector('[data-game="' + CSS.escape(id) + '"]') : null;
+    if (target && target.focus) target.focus();
   }
 
   // ---------- tema ----------
@@ -853,18 +892,24 @@
     if (pg) { const [k, d] = pg.dataset.pager.split(':'); S.ui.pages[k].page += Number(d); $('list-' + k).innerHTML = pagedBody(k, LISTS[k], listOpts(k)); labelTables($('list-' + k)); const c = $('list-' + k).querySelector('.count'); if (c) { c.setAttribute('tabindex', '-1'); c.focus(); } return; }
     const g = e.target.closest('[data-game]');
     if (g) { openGame(g.dataset.game); return; }
-    const m = e.target.closest('tr[data-market]');
-    if (m) { S.ui.market = m.dataset.market; S.rendered.market = null; renderView(false); const row = document.querySelector('tr[data-market="' + CSS.escape(S.ui.market) + '"]'); if (row) row.focus(); }
+    const m = e.target.closest('[data-market]');
+    if (m) { S.ui.market = m.dataset.market; S.rendered.market = null; renderView(false); const row = document.querySelector('[data-market="' + CSS.escape(S.ui.market) + '"]'); if (row) row.focus(); }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !$('drawer').hidden) closeDrawer();
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-market]')) { e.preventDefault(); e.target.click(); }
+    if (e.key === 'Tab' && !$('drawer').hidden) { // foco preso na gaveta enquanto está aberta
+      const f = [...$('drawer').querySelectorAll('button, [href], input, select, [tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && x.offsetParent !== null);
+      if (f.length) { const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } }
+    }
   });
   function listOpts(k) { const T = (S.files.learning && S.files.learning.data.totals) || {}; return {total: {diario: T.journal, llm: T.llm, promissoras: T.promising, rejeitadas: T.abandoned}[k]}; }
   document.addEventListener('keydown', e => {
     const t = e.target.closest && e.target.closest('[role="tab"]');
-    if (!t || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
-    const all = [...document.querySelectorAll('[role="tab"]')], i = all.indexOf(t), next = all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
+    if (!t || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    const all = [...document.querySelectorAll('[role="tab"]')], i = all.indexOf(t);
+    const next = e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length - 1] : all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
     e.preventDefault(); next.click();
   });
   document.addEventListener('input', e => {
