@@ -156,6 +156,10 @@ def bsd_record_matches(target, row):
             or row.get('identity_method') != BSD_COMPETITION_IDENTITY
             or not bsd_league_matches(target.get('league'), league_id) or chronology.kickoff_time(target) is None):
         return False
+    return record_teams_match(target, row)
+
+
+def record_teams_match(target, row):
     observed = [norm_team(row.get(side)) for side in ('home', 'away')]
     expected = [norm_team(name) for name in target['teams']]
     if observed == expected:
@@ -196,21 +200,19 @@ def competition_ok(target, event, *, provider_id=None):
     return bound
 
 
-def match_events(targets, events, aliases, unfinished=None):
-    """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
+def match_events(targets, events, aliases, unfinished=None, *, conflicting=None):
+    """Match one fixture, retaining score disagreements separately when its identity is proven."""
     names = lambda name: ({norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}) - {''}
     found, near = {}, {}
-    index, v2_events, conflicting_ids = {}, {}, set()
+    index, by_id = {}, {}
     for ev in events:
         if isinstance(ev, dict):
             event_id = ev.get('id')
-            if 'league_id' in ev and type(event_id) is int:
-                previous = v2_events.get(event_id)
-                if previous is not None:
-                    if previous == ev:
-                        continue
-                    conflicting_ids.add(event_id)
-                v2_events[event_id] = ev
+            if type(event_id) is int and ('league_id' in ev or conflicting is not None):
+                group = by_id.setdefault(event_id, [])
+                if ev in group:
+                    continue
+                group.append(ev)
             index.setdefault((norm_team(name_of(ev, 'home_team')), norm_team(name_of(ev, 'away_team'))), []).append(ev)
     bindings = {}
     for mid, t in targets.items():
@@ -223,15 +225,21 @@ def match_events(targets, events, aliases, unfinished=None):
                                                and chronology.kickoff_time(t) is not None))]
         if any('league_id' in ev for ev in cands):
             # Unresolved competition on another plausible event prevents a new binding.
-            if (any(type(ev.get('id')) is int and ev['id'] in conflicting_ids for ev in cands)
-                    or provider_id is None and any(not bsd_competition_proof(ev) for ev in candidates)):
+            if provider_id is None and any(not bsd_competition_proof(ev) for ev in candidates):
                 cands = []
-        scored = [(ev, score_of(ev)) for ev in cands]
-        if len(cands) == 1 and scored[0][1]:
-            ev = cands[0]
-            found[mid] = dict(event_binding(mid, t, ev), ft=scored[0][1])
-            if found[mid]['identity_method'] == BSD_COMPETITION_IDENTITY:
-                bindings.setdefault(ev['id'], []).append(mid)
+        event_ids = {ev['id'] for ev in cands if type(ev.get('id')) is int}
+        if len(event_ids) == 1:
+            event_id, = event_ids
+            if len(by_id.get(event_id, ())) > len(cands):
+                cands = []  # Same ID on an incompatible event row makes its identity ambiguous.
+        candidate_rows = [(event_binding(mid, t, ev), score_of(ev)) for ev in cands]
+        scored = [dict(row, ft=score) for row, score in candidate_rows if score is not None]
+        if len(cands) == 1 and scored:
+            found[mid] = scored[0]
+        elif (conflicting is not None and len(event_ids) == 1 and len(scored) > 1
+              and len({tuple(row['ft']) for row in scored}) > 1
+              and all(row == candidate_rows[0][0] for row, _ in candidate_rows[1:])):
+            conflicting[mid] = scored
         elif len(cands) == 1 and unfinished is not None:
             unfinished[mid] = dict(event_binding(mid, t, cands[0]), status=str(cands[0].get('status')), id=cands[0].get('id'))
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
@@ -242,10 +250,17 @@ def match_events(targets, events, aliases, unfinished=None):
                     {'provider_id': ev.get('id'), 'league': name_of(ev, 'league') or name_of(ev, 'competition') or None,
                      **({'bsd_league_id': ev['league_id']} if type(ev.get('league_id')) is int else {}),
                      'event_date': kickoff_of(ev).isoformat()} for ev in candidates[:3]]}
+        binding = found.get(mid)
+        if conflicting is not None and mid in conflicting:
+            binding = conflicting[mid][0]
+        if binding and (binding['identity_method'] == BSD_COMPETITION_IDENTITY or conflicting is not None):
+            bindings.setdefault(binding['bsd_id'], []).append(mid)
     for mids in bindings.values():
         if len(mids) > 1:
             for mid in mids:
-                del found[mid]
+                found.pop(mid, None)
+                if conflicting is not None:
+                    conflicting.pop(mid, None)
     return found, near
 
 
@@ -265,21 +280,22 @@ def event_binding(mid, target, event):
     return row
 
 
-def capture_result_versions(state, found, events, observed_at):
+def capture_result_versions(state, found, events, observed_at, *, conflicting=None):
     """Capture every FT version returned by the ordinary quota-limited queries."""
     previous_bindings = {stored['bsd_id']: mid for mid, stored in state['results'].items()
                          if type(stored.get('bsd_id')) is int}
-    found = {mid: row for mid, row in found.items()
-             if ft_time_valid(chronology.parse_utc(row.get('event_date')), observed_at, observed_at, None, observed_at)
-             and (row.get('identity_method') != BSD_COMPETITION_IDENTITY or previous_bindings.get(row['bsd_id'], mid) == mid)}
-    remember_provider_results(state, found, observed_at)
+    batch = {mid: [row] for mid, row in found.items()}
+    batch.update(conflicting or {})
+    batch = {mid: rows for mid, rows in batch.items()
+             if ft_time_valid(chronology.parse_utc(rows[0].get('event_date')), observed_at, observed_at, None, observed_at)
+             and previous_bindings.get(rows[0]['bsd_id'], mid) == mid}
     by_provider_id = {}
     for event in events:
         if isinstance(event, dict) and type(event.get('id')) is int:
             by_provider_id.setdefault(event['id'], []).append(event)
-    for match_id, stored in state['results'].items():
+    for match_id, stored in {**state['results'], **{mid: rows[0] for mid, rows in batch.items()}}.items():
         bound = stored.get('identity_method') in ('provider_id', BSD_COMPETITION_IDENTITY)
-        bound_id = stored.get('bsd_id') if match_id in found or bound else None
+        bound_id = stored.get('bsd_id') if match_id in batch or bound else None
         by_league = stored.get('identity_method') == BSD_COMPETITION_IDENTITY
         for event in by_provider_id.get(stored.get('bsd_id'), ()):
             score, kickoff = score_of(event), kickoff_of(event)
@@ -293,7 +309,14 @@ def capture_result_versions(state, found, events, observed_at):
                 update = dict(stored, ft=score, home=name_of(event, 'home_team'), away=name_of(event, 'away_team'))
                 if 'url' in event and not by_league:
                     update['link'] = event['url']
-                remember_provider_results(state, {match_id: update}, observed_at)
+                if update not in batch.setdefault(match_id, []):
+                    batch[match_id].append(update)
+    for match_id, rows in batch.items():
+        has_conflict = len({tuple(row['ft']) for row in rows}) > 1
+        if has_conflict:
+            rows = sorted(rows, key=lambda row: (row['ft'], json.dumps(row, sort_keys=True)), reverse=True)
+        for row in rows:
+            remember_provider_results(state, {match_id: row}, observed_at, update_snapshot=not has_conflict)
 
 
 def load_result_state(path):
@@ -397,11 +420,12 @@ def run(fetch=request_json, now=None, token=None, *, after_bsd=None):
                 seen_ids.add(ev.get('id'))
                 unique.append(ev)
         # Preserve contradictory v2 observations for identity checks before establishing a first binding.
-        v2 = [ev for ev in events if isinstance(ev, dict) and 'league_id' in ev]
-        found, near = match_events(targets, v2 + [ev for ev in unique if 'league_id' not in ev], aliases)
+        conflicting = {}
+        found, near = match_events(targets, events, aliases, conflicting=conflicting)
         if capped:
             found = {mid: row for mid, row in found.items() if row['identity_method'] != BSD_COMPETITION_IDENTITY}
-        capture_result_versions(state, found, events, observed_clock())
+            conflicting = {}
+        capture_result_versions(state, found, events, observed_clock(), conflicting=conflicting)
         events = unique
         state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     events_seen = len(events)

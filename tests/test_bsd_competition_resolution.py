@@ -190,6 +190,8 @@ class BSDCompetitionResolution(unittest.TestCase):
                         type='OPEN_GAME', market='Asian Total', selection='Over 2.5', odds=1.9,
                         minute=30, score_at_signal=[1, 0], message_id=1)
         first, changed = [self.match([event(home_score=score)], fixture=signal)[FIXTURE] for score in (2, 3)]
+        first['observed_at'] = OBSERVED.isoformat()
+        changed['observed_at'] = (OBSERVED + timedelta(hours=1)).isoformat()
         with TemporaryDirectory() as folder, patch.dict(os.environ, {'SCANGOAL_DATA_DIR': folder}), \
                 patch('scangoal.eligibility.eligible', return_value=True):
             prospective.record(KICKOFF, signals=[], providers={})

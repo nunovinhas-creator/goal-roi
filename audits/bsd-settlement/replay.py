@@ -79,7 +79,9 @@ def report_rejection(target, event, aliases):
     return 'ambiguous_or_unverified_binding'
 
 
-def replay(snapshot, older, evidence):
+def replay(snapshot, older, evidence, replay_archive=None):
+    if replay_archive is None:
+        replay_archive = {'results': {}}
     raw = (snapshot / 'data/results_bsd.json').read_bytes()
     pinned = {
         snapshot / 'data/results_bsd.json': evidence['diagnostic_snapshot_sha256'],
@@ -115,7 +117,6 @@ def replay(snapshot, older, evidence):
     with patch.dict(os.environ, {'SCANGOAL_DATA_DIR': str(snapshot / 'data')}):
         aliases = results_bsd.load_aliases()
         found, _ = results_bsd.match_events(targets, list(events.values()), aliases)
-        replay_archive = {'results': {}}
         cut = max(chronology.parse_utc(row['observed_at_utc']) for row in public.values())
         results_bsd.capture_result_versions(replay_archive, found, list(events.values()), cut)
         rows = opportunity_results.provider_snapshot(replay_archive, 'bsd', cut)

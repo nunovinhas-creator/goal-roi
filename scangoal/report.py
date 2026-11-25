@@ -197,14 +197,15 @@ def note_ft(b, notes):
     return list(hit.score) if hit else None
 
 
-def external_matches(bet, row):
+def external_matches(bet, row, *, independent=False):
     """Verify the source-specific fixture association stored with the observation."""
-    from .results_bsd import BSD_COMPETITION_IDENTITY, bsd_record_matches, norm_team, time_ok
+    from .results_bsd import (BSD_COMPETITION_IDENTITY, bsd_record_matches, leagues_compatible, norm_team,
+                              record_teams_match, time_ok)
 
     if not row or row.get('fixture_id', bet['match_id']) != bet['match_id']:
         return False
     if row.get('provider') == 'manual':
-        return row.get('fixture_id') == bet['match_id'] and bool(row.get('source'))
+        return not independent and row.get('fixture_id') == bet['match_id'] and bool(row.get('source'))
     names = row.get('target_teams') or (row.get('home'), row.get('away'))
     expected = [norm_team(name) for name in bet.get('teams') or ()]
     if len(expected) != 2 or not all(expected) or list(map(norm_team, names)) != expected:
@@ -214,6 +215,10 @@ def external_matches(bet, row):
         return (bsd_record_matches(bet, row)
                 and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
     league = norm_team(row.get('target_league') or row.get('league'))
+    if independent:
+        observed = norm_team(row.get('league'))
+        if not observed or not leagues_compatible(league, observed) or not record_teams_match(bet, row):
+            return False
     return (bool(league) and league == norm_team(bet.get('league'))
             and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
 

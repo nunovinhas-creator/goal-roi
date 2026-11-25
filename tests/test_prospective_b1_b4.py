@@ -93,7 +93,7 @@ def _signal(i, seen, **extra):
 def _provider(sig, ft, league='La Liga'):
     return dict(fixture_id=sig['match_id'], bsd_id=100, home=sig['teams'][0], away=sig['teams'][1],
                 event_date=sig['kickoff_utc'], ft=ft, league=league, target_league=sig['league'],
-                target_teams=sig['teams'], period='regulation', observed_at=T0.isoformat(),
+                target_teams=sig['teams'], period='regulation', observed_at=(T0 + timedelta(hours=2)).isoformat(),
                 identity_method='competition_participants_kickoff')
 
 

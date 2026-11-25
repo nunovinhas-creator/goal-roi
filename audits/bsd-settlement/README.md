@@ -1,6 +1,6 @@
 # Recuperação da associação BSD — 25/11/2026
 
-**NO-GO para integração imediata.** A amostra autenticada confirma 12 vínculos BSD no coletor. Seis passaram a verificação do primeiro sinal prospetivo e todos concordaram com o Highlightly já registado. O tratamento prospetivo de versões simultâneas contraditórias permanece em aberto. [Evidência autenticada](authenticated-evidence.json)
+**GO para integração manual, com a transição auditada abaixo.** O tratamento de conflitos foi verificado na BSD e na Highlightly. A amostra autenticada confirma 12 vínculos BSD no coletor. O replay final inscreveu as seis confirmações que corroboram resultados Highlightly, com a mesma população científica. [Evidência autenticada](authenticated-evidence.json) · [Replay final](replay-final-results.json)
 
 ## Cronologia e causa-raiz
 
@@ -51,11 +51,11 @@ O replay verifica os hashes das fontes históricas, reexecuta o filtro anterior,
 
 O GitHub Actions disponibilizou `BSD_API_KEY` apenas no passo de leitura de um workflow próprio, numa branch temporária. O job exigia a criação do ref e a primeira tentativa, com permissões GitHub de leitura. O cliente recusou redirecionamentos e encerrou após quatro páginas e um detalhe. As cinco respostas foram HTTP 200 entre 10:07:10 e 10:07:15. O log conservou hashes e resultados derivados. O valor do segredo, os cabeçalhos completos e os corpos das respostas permaneceram fora do log e da PR. A sondagem usa um workflow separado, que fica fora do diff desta PR. [Workflow isolado](https://github.com/nunovinhas-creator/goal-roi/blob/9bf689d25070c5f859f4cf280be5221648ee1ac0/.github/workflows/bsd-audit-probe.yml) · [Job](https://github.com/nunovinhas-creator/goal-roi/actions/runs/45591800573/job/139127617269)
 
-A CI do candidato passou **1.107 testes Python 3.11 com Chromium**, incluindo 16 adversariais novos, e **12 testes Node**. A baseline passou 1.091 testes Python e 12 Node. [Suite integral](https://github.com/nunovinhas-creator/goal-roi/actions/runs/45591346532)
+A primeira versão da PR passou 1.107 testes Python 3.11 com Chromium e 12 Node. A revisão final acrescenta 10 testes sobre conflitos e versionamento. Os casos de recolha e arquivo exercitam ambos os fornecedores com respostas locais. Incluem simultaneidade, sucessão 2–1 → 3–1 → 2–1, resposta inválida junto de duas válidas, divergência entre fornecedores, inscrição com resultado já conhecido, proveniência danificada, corte temporal, permutação da ordem e repetição. Esta revisão realizou zero pedidos adicionais à BSD. [Suite final da PR](https://github.com/nunovinhas-creator/goal-roi/pull/96/checks)
 
 ## Continuidade do registo prospetivo
 
-Na ativação, `code_sha256` registou os cinco ficheiros de implementação, incluindo `results_bsd.py`. A barreira de gravação compara o SHA-256 do ficheiro de protocolo com o valor da ativação. Mudanças no manifesto de código são registadas num `code_version` antes de qualquer nova inscrição. O candidato alterou apenas `results_bsd.py` no manifesto. O SHA-256 do protocolo `4ab189247d0e4b83f17ffd7931bf772c73bad37b2b7f270f2855a157f1731101` coincidiu com o da ativação. [Gravador e manifesto](https://github.com/nunovinhas-creator/goal-roi/blob/11ca75fc7ed6f9ff30b77f4883e2253722823aed/scangoal/prospective.py)
+Na ativação, `code_sha256` registou cinco ficheiros de implementação, incluindo `results_bsd.py`. A barreira de gravação compara o SHA-256 do protocolo com o valor da ativação. Na primeira versão desta PR, apenas `results_bsd.py` mudou no manifesto. O SHA-256 do protocolo `4ab189247d0e4b83f17ffd7931bf772c73bad37b2b7f270f2855a157f1731101` coincide com o da ativação. [Gravador original](https://github.com/nunovinhas-creator/goal-roi/blob/11ca75fc7ed6f9ff30b77f4883e2253722823aed/scangoal/prospective.py)
 
 - O ensaio de aplicação e reversão reproduziu uma única entrada `code_version` por mudança de versão. A repetição de cada corte acrescentou zero entradas, todas as cadeias foram verificadas e as 149 entradas originais ficaram preservadas byte a byte. Um controlo que alterou o protocolo numa cópia temporária foi bloqueado antes de gravar. [Manifesto e hashes das etapas](ledger/evidence.json)
 - O ensaio de continuidade usou o corte real a seguir, executando `prospective.record()` e o pipeline de sinais sobre cópias, com rede bloqueada. A baseline reproduziu o diário publicado byte a byte. O candidato preservou as 149 entradas e acrescentou `code_version` seguido dos mesmos dois sinais de Gamba Osaka–Port FC. Os campos dos sinais coincidiram, salvo os de encadeamento. A repetição acrescentou zero entradas e não houve novos resultados ou conflitos. [Corte com os dois sinais](https://github.com/nunovinhas-creator/goal-roi/commit/1429777178a0b8a6d7be3fa50e9ed0aca06f5a30) · [Prova da inscrição](ledger/registration-evidence.json)
@@ -65,20 +65,44 @@ A transição usa a versão já prevista no diário. Aplicar o commit cria uma v
 ```sh
 git worktree add --detach /tmp/goal-roi-bsd-base 11ca75fc7ed6f9ff30b77f4883e2253722823aed
 git worktree add --detach /tmp/goal-roi-bsd-candidate f597717bcb253dc80f80f5276ecc52ed06929e00
-python3 audits/bsd-settlement/ledger/replay.py . 11ca75fc7ed6f9ff30b77f4883e2253722823aed f597717bcb253dc80f80f5276ecc52ed06929e00
+python3 audits/bsd-settlement/ledger/replay.py /tmp/goal-roi-bsd-base 11ca75fc7ed6f9ff30b77f4883e2253722823aed f597717bcb253dc80f80f5276ecc52ed06929e00
 python3 audits/bsd-settlement/ledger/registration.py . /tmp/goal-roi-bsd-base /tmp/goal-roi-bsd-candidate 1429777178a0b8a6d7be3fa50e9ed0aca06f5a30
+```
+
+## Resolução final dos bloqueios
+
+### P0 — versões e conflitos
+
+Os dois coletores guardam todos os marcadores regulamentares divergentes de uma identidade independente e única, mesmo se chegam juntos antes da primeira confirmação. Um lote conflituoso conserva a observação anterior, quando existe, e omite uma nova escolha de placar. `provider_observations()` valida cada versão com os metadados que a acompanham. `provider_snapshot()` continua a fornecer a vista corrente para o relatório. O gravador prospetivo recebe o histórico válido até ao corte, incluindo versões intermédias e lotes cujo snapshot omite o empate.
+
+- Se já existe um `outcome`, ele permanece em cadeia. Cada novo marcador distinto documentado produz `outcome_conflict`, com a fonte, as datas de observação e disponibilidade e o hash do registo do fornecedor.
+- Se a divergência já é conhecida no momento da primeira confirmação, as versões são registadas como `outcome_conflict` e nenhuma é escolhida. Uma divergência conhecida à inscrição conta como resultado conhecido para essa inscrição. Jogos em conflito ficam fora das estimativas H1 e H2, mesmo se um marcador posterior coincide com o inicial.
+- A chave de idempotência do conflito é jogo, fornecedor e marcador. Um empate de tempos usa uma ordenação estável pelo hash do registo. Permutar as versões visíveis num mesmo corte produz o mesmo apêndice. Se uma versão só se torna disponível depois, conserva-se a decisão anterior como observação histórica e aplica-se a exclusão ao conhecer a divergência.
+- Cada versão precisa de satisfazer o vínculo do jogo, o período regulamentar e o intervalo cronológico. A associação BSD conserva a prova de competição pelo catálogo e a verificação N03. Para linhas textuais legadas, a análise prospetiva exige competição observada e equipas verificáveis. Duas identidades de evento plausíveis ou um identificador de evento com metadados incompatíveis deixam o caso pendente.
+
+### P1 — manifesto científico v2
+
+O manifesto histórico v1 continua legível. Uma entrada append-only `code_version` assinala `code_manifest_schema=2` e os hashes dos cinco ficheiros anteriores mais `report.py`, `results_hl.py`, `details_hl.py`, `match_identity.py`, `chronology.py`, `parser.py` e `store.py`. São as dependências diretas de seleção, identidade, leitura e validação das observações, tempo, liquidação e análises utilizadas. `reference_sha256` inclui o ficheiro de aliases revistos `team_aliases.json`, cuja ausência é explícita. O conteúdo das observações dinâmicas fica referenciado nas provas do replay e nos próprios registos de confirmação.
+
+O replay final usou o corte de produção `33b6ea9a` às 10:23:57 UTC. Executou o gravador normal com rede bloqueada em cópias descartáveis. A produção tinha **156 entradas, 129 sinais, 56 jogos inscritos e 19 jogos com confirmação independente**. A transição produziu uma entrada v2 e a reversão uma entrada v1. As repetições produziram zero entradas. No ramo de recuperação, os 12 vínculos saíram da evidência pública congelada e foram confrontados com a amostra autenticada existente. O gravador acrescentou seis confirmações BSD, todas concordantes com o Highlightly. Cada etapa verificou a cadeia, conservou as 156 entradas anteriores byte a byte e preservou a população original. [Corte de produção](https://github.com/nunovinhas-creator/goal-roi/commit/33b6ea9a2158b711f925f369dac084f626363edf) · [Hashes e transições](replay-final-results.json)
+
+```sh
+git worktree add --detach /tmp/goal-roi-bsd-real 33b6ea9a2158b711f925f369dac084f626363edf
+python3 audits/bsd-settlement/replay-final.py /tmp/goal-roi-bsd-real /tmp/goal-roi-bsd-nov25 /tmp/goal-roi-bsd-lecco
 ```
 
 ## Ativação, reversão e riscos residuais
 
-1. Usar o replay fixado, o registo dos cinco pedidos e a suite executada para rever o catálogo, a unicidade e a rejeição de períodos fora dos 90 minutos. Resolver a propagação prospetiva de versões simultâneas contraditórias antes da aprovação manual.
-2. A recolha normal tem uma janela de três dias. O patch usa as mesmas páginas, limite de pedidos e intervalo mínimo, com zero pedidos adicionais de catálogo ou detalhe. O diário regista a versão de código pela regra já em vigor e só pode anexar novas observações à hora em que sejam verificadas.
-3. Nos primeiros ciclos normais, conferir contagens, provas e conflitos. Se houver sinais de associação incorreta, suspender a recolha BSD por intervenção operacional revista e reverter o commit da aplicação. Preservar as observações e entradas já anexadas. Rever esses casos pelo mecanismo de conflito do protocolo, mantendo a cadeia verificável.
+1. Aprovar manualmente a integração com o replay fixado, o registo dos cinco pedidos e a CI. Fixar o hash do diário imediatamente antes da ativação. Após o primeiro ciclo normal, verificar o apêndice `code_version` v2, a cadeia e a proveniência das novas confirmações e conflitos.
+2. A recolha normal conserva a janela de três dias, as mesmas páginas, o limite de pedidos e o intervalo mínimo. A evidência dos 12 jogos pertence ao corte auditado. A integração apenas aproveita aquilo que continuar elegível no ciclo normal.
+3. Se houver necessidade de reversão depois de recolher novos resultados, pausar a recolha BSD e o gravador prospetivo antes de repor o código v1. Preservar os arquivos e o diário. O replay verificou a reversão do manifesto com o arquivo real anterior à recolha v2. Rever as novas versões e as provas com as garantias v2 antes de retomar a inscrição ou a liquidação prospetiva.
 
-IDs desconhecidos e jogos sem início explícito ficam pendentes. A cobertura depende da estabilidade do catálogo BSD e da revisão das grafias. O identificador da liga pode aparecer nulo. Um `league_id` incorreto na fonte pode exigir verificação do detalhe. Num controlo sintético com um resultado já registado, dois marcadores distintos observados no mesmo instante ficaram no arquivo de versões e foram omitidos do snapshot. O diário conservou o resultado inicial sem acrescentar `outcome_conflict`, e o jogo continuou na contagem de H1. Cada um dos 17 candidatos autenticados apareceu uma só vez. Resolver a passagem dessas observações para o mecanismo de conflito congelado é condição de ativação.
+IDs desconhecidos e jogos sem início explícito continuam pendentes no caminho BSD por catálogo. A cobertura depende da estabilidade desse catálogo e da revisão das grafias. Um conflito só pode ser demonstrado a partir de versões que a fonte devolveu e cujo registo foi preservado. A leitura do corpo da sondagem original das 09:12 permanece indisponível. A concordância dos seis resultados mede cobertura da mesma coorte.
 
 ## Nota candidata para o Goal-ROI Brain
 
 Atualizar, após revisão humana, a observação do Brain sobre a ausência de liga. O nome está ausente no contrato da lista e do detalhe v2. A identidade de liga está disponível pelo `league_id` quando atribuído. A coorte de 17 diagnósticos mede cobertura operacional da amostra. Os seis vínculos prospetivos aceites são concordância adicional sobre jogos já confirmados e deixam a contagem de jogos com resultado independente inalterada. [Relações científicas do Brain](https://github.com/nunovinhas-creator/goal-roi-brain/blob/main/Conhecimento/Rela%C3%A7%C3%B5es%20cient%C3%ADficas.md)
+
+Registar como aprendizagem candidata que a versão mais recente serve para apresentação, enquanto a avaliação científica precisa de todas as observações válidas até ao corte. Uma divergência intermédia continua a fazer parte da evidência. O manifesto que acompanha a decisão deve incluir os ficheiros de associação e os aliases revistos, com mudança de versão no diário.
 
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**

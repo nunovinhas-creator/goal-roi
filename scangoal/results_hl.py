@@ -95,19 +95,21 @@ def run(fetch=request_json, now=None, token=None):
             seen.add(ev['id'])
             unique.append(ev)
     unfinished = {}
-    found, near = match_events(targets, unique, load_aliases(), unfinished)
+    conflicting = {}
+    found, near = match_events(targets, events, load_aliases(), unfinished, conflicting=conflicting)
     # Jogos decididos depois dos 90 minutos: ficam em aberto (o resultado aos 90 não vem na resposta) e são contados.
     late = {m: s for m, s in unfinished.items() if re.search(r'extra time|penalt', s['status'], re.I)}
     state['not_regular_time'] = {m: s for m, s in {**state.get('not_regular_time', {}), **late}.items() if m not in state['results']}
     complete = {d for d, p in per_day.items() if p['count_reported'] is not None and p['events_read'] >= p['count_reported']}
     for mid, t in targets.items():
         ref = datetime.fromisoformat(t['kickoff_utc'] or t['date_utc'])
-        if mid in found or mid in near or mid in unfinished or now - ref < timedelta(hours=GIVE_UP_AFTER_H) or not set(t['days']) <= complete:
+        if mid in found or mid in near or mid in unfinished or mid in conflicting or now - ref < timedelta(hours=GIVE_UP_AFTER_H) or not set(t['days']) <= complete:
             continue   # só conta como ausência quando os dias do jogo foram lidos por inteiro e não há nome parecido por rever
         misses[mid] = misses.get(mid, 0) + 1
         if misses[mid] >= GIVE_UP_CHECKS:
             not_covered[mid] = now.isoformat(timespec='seconds')
-    capture_result_versions(state, found, events, observed_clock())
+    capture_result_versions(state, found, events, observed_clock(),
+                            conflicting={mid: rows for mid, rows in conflicting.items() if set(targets[mid]['days']) <= complete})
     state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     state['last_run_utc'] = now.isoformat(timespec='seconds')
     state['stats'] = {'not_covered': len(not_covered), 'targets': len(targets), 'matched_this_run': len([m for m in targets if m in state['results']]), 'requests': requests,

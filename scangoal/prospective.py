@@ -21,6 +21,8 @@ from .store import data_dir
 HERE = Path(__file__).resolve().parent
 PROTOCOL = HERE / 'prospective_protocol.json'
 CODE = ('prospective.py', 'prospective_protocol.json', 'eligibility.py', 'results_bsd.py', 'opportunity_results.py')
+CODE_V2 = CODE + ('report.py', 'results_hl.py', 'details_hl.py', 'match_identity.py', 'chronology.py', 'parser.py', 'store.py')
+CODE_MANIFEST_SCHEMA = 2
 LEDGER_NAME, REPORT_NAME = 'prospective_ledger.jsonl', 'prospective_report.json'
 GOALS_PER_MIN = 2.7 / 95
 MISSING_AFTER = timedelta(hours=72)
@@ -52,7 +54,17 @@ def _utc(value):
 
 
 def code_hashes():
-    return {name: _sha((HERE / name).read_bytes()) for name in CODE}
+    return {name: _sha((HERE / name).read_bytes()) for name in CODE_V2}
+
+
+def code_manifest():
+    aliases = data_dir() / 'team_aliases.json'
+    try:
+        reference_sha = _sha(aliases.read_bytes())
+    except FileNotFoundError:
+        reference_sha = None
+    return dict(code_manifest_schema=CODE_MANIFEST_SCHEMA, code_sha256=code_hashes(),
+                reference_sha256={'team_aliases.json': reference_sha})
 
 
 def ledger_path():
@@ -138,7 +150,7 @@ def _signals(now):
 
 
 def _providers(now):
-    from .opportunity_results import provider_snapshot
+    from .opportunity_results import provider_records
     from .results_bsd import load_result_state
     out = {}
     for name, label in (('hl', 'Highlightly'), ('bsd', 'BSD')):
@@ -146,8 +158,35 @@ def _providers(now):
             state = load_result_state(data_dir() / f'results_{name}.json')
         except (OSError, ValueError):
             continue
-        out[label] = provider_snapshot(state, name, now)
+        out[label] = provider_records(state, name, now)
     return out
+
+
+def _bound_versions(target, providers, now):
+    """Return every independently bound regulation version, ordered by availability."""
+    from .opportunity_results import ft_time_valid, score_pair
+    from .report import external_matches
+
+    for provider, fixtures in sorted(providers.items()):
+        if provider not in ('BSD', 'Highlightly'):
+            continue
+        rows = fixtures.get(target['match_id'], ())
+        if isinstance(rows, dict):
+            rows = (rows,)
+        valid = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            score = score_pair(row.get('ft'))
+            observed = _utc(row.get('observed_at', row.get('matched_at_utc')))
+            available = _utc(row.get('available_at', observed))
+            if (score is not None and row.get('period', 'regulation') == 'regulation'
+                    and type(row.get('bsd_id')) is int and row['bsd_id'] > 0
+                    and ft_time_valid(_utc(row.get('event_date')), observed, available, None, now)
+                    and external_matches(target, row, independent=True)):
+                valid.append((available, observed, _sha(_canonical(row).encode()), score, row))
+        if valid:
+            yield provider, sorted(valid, key=lambda version: version[:3])
 
 
 def record(now=None, *, signals=None, providers=None):
@@ -157,20 +196,24 @@ def record(now=None, *, signals=None, providers=None):
     verify(entries)
     writer = Writer(path, entries)
     protocol_sha = _sha(PROTOCOL.read_bytes())
+    if entries and entries[0]['protocol_sha256'] != protocol_sha:
+        raise LedgerError('protocol_changed_since_activation')
+    if entries:
+        last_at = _utc(entries[-1].get('at_utc'))
+        if last_at is None or now < last_at:
+            raise LedgerError('invalid_cutoff_for_ledger_head')
+    manifest = code_manifest()
     if not entries:
-        writer.append('activation', at_utc=now.isoformat(), protocol_sha256=protocol_sha, code_sha256=code_hashes(),
+        writer.append('activation', at_utc=now.isoformat(), protocol_sha256=protocol_sha, **manifest,
                       note='prospective registration starts here; earlier data never enters this ledger')
     activation = entries[0]
-    if activation['protocol_sha256'] != protocol_sha:
-        raise LedgerError('protocol_changed_since_activation')
-    current = code_hashes()
-    last_code = next((e['code_sha256'] for e in reversed(entries) if 'code_sha256' in e), None)
-    if current != last_code:
-        writer.append('code_version', at_utc=now.isoformat(), code_sha256=current)
+    last_code = next((e for e in reversed(entries) if 'code_sha256' in e), {})
+    if any(last_code.get(key) != value for key, value in manifest.items()):
+        writer.append('code_version', at_utc=now.isoformat(), **manifest)
     start = _utc(activation['at_utc'])
     signals = _signals(now) if signals is None else signals
     providers = _providers(now) if providers is None else providers
-    provider_known = {mid for rows in providers.values() for mid in rows}
+    provider_known = {e['match_id'] for e in entries if e['kind'] in ('outcome', 'outcome_conflict')}
     from .eligibility import eligible
     registered = {e['key'] for e in entries if e['kind'] == 'signal'}
     totals = collections.defaultdict(list)
@@ -180,12 +223,13 @@ def record(now=None, *, signals=None, providers=None):
     added = 0
     for b in sorted(signals, key=lambda x: (x.get('signal_seen_utc') or '', x.get('message_id') or 0)):
         seen = _utc(b.get('signal_seen_utc'))
-        if seen is None or seen < start or not eligible(b):
+        if seen is None or not start <= seen <= now or not eligible(b):
             continue
         key = signal_key(b)
         if key in registered:
             continue
-        known = bool(b.get('ft')) or bool(b.get('match_result_first_seen_utc')) or b['match_id'] in provider_known
+        known = (bool(b.get('ft')) or bool(b.get('match_result_first_seen_utc')) or b['match_id'] in provider_known
+                 or any(_bound_versions(b, providers, now)))
         entry = writer.append(
             'signal', at_utc=now.isoformat(), key=key, match_id=b['match_id'],
             canonical_match_id=b.get('canonical_match_id'), message_id=b.get('message_id'), type=b['type'],
@@ -208,39 +252,52 @@ def record(now=None, *, signals=None, providers=None):
 
 
 def outcomes(writer, now, providers=None):
-    from .report import external_matches
     providers = _providers(now) if providers is None else providers
     entries = writer.entries
     games = {}
     for e in entries:
         if e['kind'] == 'signal':
             games.setdefault(e['match_id'], e)
-    first = {(e['match_id'], e['provider']): e for e in entries if e['kind'] == 'outcome'}
-    conflicts = {(e['match_id'], e['provider'], tuple(e['ft'])) for e in entries if e['kind'] == 'outcome_conflict'}
+    first, conflicts = collections.defaultdict(dict), collections.defaultdict(set)
+    prior_outcomes = collections.defaultdict(list)
+    for entry in entries:
+        if entry['kind'] == 'outcome':
+            first[entry['match_id']][entry['provider']] = tuple(entry['ft'])
+            prior_outcomes[entry['match_id']].append(entry)
+        elif entry['kind'] == 'outcome_conflict':
+            conflicts[entry['match_id']].add((entry['provider'], tuple(entry['ft'])))
     missing = {e['match_id'] for e in entries if e['kind'] == 'outcome_missing'}
     for mid, sig in sorted(games.items()):
-        bet_like = dict(match_id=mid, teams=sig['teams'], league=sig['league'], kickoff_utc=sig['kickoff_utc'],
-                        date_utc=sig['date_utc'], phase=sig['phase'], minute=sig['minute'])
-        bound = False
-        for provider, rows in sorted(providers.items()):
-            row = rows.get(mid)
-            if not row or not external_matches(bet_like, row):
-                continue
-            bound = True
-            ft = list(row['ft'])
-            previous = first.get((mid, provider))
-            if previous is None:
-                first[(mid, provider)] = writer.append(
-                    'outcome', at_utc=now.isoformat(), match_id=mid, provider=provider, ft=ft,
-                    provider_id=row.get('bsd_id'), period=row.get('period', 'regulation'),
-                    provider_observed_utc=row.get('observed_at'), identity_method=row.get('identity_method'),
-                    provider_record_sha256=_sha(_canonical(row).encode()))
-            elif previous['ft'] != ft and (mid, provider, tuple(ft)) not in conflicts:
-                conflicts.add((mid, provider, tuple(ft)))
-                writer.append('outcome_conflict', at_utc=now.isoformat(), match_id=mid, provider=provider, ft=ft,
-                              first_ft=previous['ft'], provider_observed_utc=row.get('observed_at'))
+        versions = list(_bound_versions(sig, providers, now))
+        scores = set(first[mid].values())
+        # Legacy runs could record two provider outcomes without an explicit conflict entry.
+        if len(scores) > 1:
+            for previous_outcome in prior_outcomes[mid]:
+                key = (previous_outcome['provider'], tuple(previous_outcome['ft']))
+                if key not in conflicts[mid]:
+                    writer.append('outcome_conflict', at_utc=now.isoformat(), match_id=mid,
+                                  provider=key[0], ft=list(key[1]), first_ft=None,
+                                  prior_outcome_sha256=previous_outcome['sha256'])
+                    conflicts[mid].add(key)
+        scores.update(score for _, history in versions for _, _, _, score, _ in history)
+        conflicted = bool(conflicts[mid]) or len(scores) > 1
+        for provider, history in versions:
+            previous = first[mid].get(provider)
+            for available, observed, digest, score, row in history:
+                if score == previous or (provider, score) in conflicts[mid]:
+                    continue
+                proof = dict(at_utc=now.isoformat(), match_id=mid, provider=provider, ft=list(score),
+                             provider_id=row.get('bsd_id'), period='regulation',
+                             provider_observed_utc=observed.isoformat(), provider_available_utc=available.isoformat(),
+                             identity_method=row.get('identity_method'), provider_record_sha256=digest)
+                if conflicted:
+                    writer.append('outcome_conflict', first_ft=list(previous) if previous is not None else None, **proof)
+                    conflicts[mid].add((provider, score))
+                else:
+                    writer.append('outcome', **proof)
+                    previous = first[mid][provider] = score
         reference = _utc(sig['kickoff_utc']) or _utc(sig['date_utc'])
-        if (not bound and mid not in missing and not any(k[0] == mid for k in first)
+        if (not versions and mid not in missing and not first[mid] and not conflicts[mid]
                 and reference is not None and now - reference > MISSING_AFTER):
             writer.append('outcome_missing', at_utc=now.isoformat(), match_id=mid, after_hours=72)
             missing.add(mid)
@@ -318,7 +375,7 @@ def summary(entries):
         signals_registered_before_result=len(clean),
         signals_result_known_at_registration=len(signals) - len(clean),
         games_with_independent_result=len(confirmed), games_with_conflicting_results=len(conflicted),
-        games_without_result_after_72h=len(missing - set(confirmed)),
+        games_without_result_after_72h=len(missing - set(confirmed) - conflicted),
         independent_result_share=round(len(confirmed) / len(games), 4) if games else None,
         H1=dict(games_in_population=len(h1), games_with_result=len(rows), observed=o, expected=round(ex, 3),
                 z=round(z, 3) if z is not None else None, minute_bands=bands, score_strata=dict(strata),
