@@ -4787,13 +4787,15 @@
    "attempt_utc": "2026-11-25T17:03:04+00:00",
    "chars": 207,
    "created_utc": "2026-11-25T17:03:04+00:00",
+   "done_utc": "2026-11-25T17:03:04+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "1981c672af7f13c3daa16c287386b53dc4cfa7ed348ab2f14a9d436e29920b39",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:lille-vs-lyon-20261121|113ce5ac69e0": {
    "attempt_utc": "2026-11-21T14:35:18+00:00",
@@ -7133,12 +7135,17 @@
    "state": "delivered"
   },
   "game|id:slavia-praha-vs-villarreal-20261125|738cfb90b4b4": {
+   "attempt_id": "fb90db3930f647c19e4c5217edeed198",
+   "attempt_utc": "2026-11-25T17:03:05+00:00",
+   "chars": 213,
    "created_utc": "2026-11-25T17:03:04+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "bd15b3750d512f8445459c3bde2c446dbdeef996d3453a462b2c49671d409205",
+   "state": "in_flight"
   },
   "game|id:slavia-praha-vs-villarreal-20261125|89ce3b790614": {
    "attempt_id": "5d28e092aa8744ef8c6d141544f69d04",
@@ -8278,7 +8285,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 529,
+  "delivered": 530,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-25T16:56:44+00:00",
@@ -8457,6 +8464,7 @@
   "2026-11-25T16:13:44+00:00|Pro Patria — Sanremese|Over 4": true,
   "2026-11-25T16:34:53+00:00|Sabah Baku — Barcelona|Under 4.5": true,
   "2026-11-25T16:43:57+00:00|Slavia Praha — Villarreal|AH1(+0.5)": true,
+  "2026-11-25T16:57:05+00:00|Slavia Praha — Villarreal|Over 2.5": true,
   "2026-11-25T16:58:53+00:00|Lille — Bayern Munchen|Over 3.5": true
  },
  "migrations": {
@@ -10218,6 +10226,9 @@
   "item|id:sl-benfica-women-vs-as-roma-women-20261119|Asian Total|Over 4": {
    "at_utc": "2026-11-19T21:21:49+00:00"
   },
+  "item|id:slavia-praha-vs-villarreal-20261125|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-25T17:03:04+00:00"
+  },
   "item|id:slavia-praha-vs-villarreal-20261125|Polymarket|AH1(+0.5)": {
    "at_utc": "2026-11-25T16:49:53+00:00"
   },
@@ -10412,7 +10423,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 841,
+ "sent_total": 842,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -11503,6 +11514,7 @@
   "2026-11-25T16:13:44+00:00|Pro Patria — Sanremese|Over 4",
   "2026-11-25T16:34:53+00:00|Sabah Baku — Barcelona|Under 4.5",
   "2026-11-25T16:43:57+00:00|Slavia Praha — Villarreal|AH1(+0.5)",
+  "2026-11-25T16:57:05+00:00|Slavia Praha — Villarreal|Over 2.5",
   "2026-11-25T16:58:53+00:00|Lille — Bayern Munchen|Over 3.5"
  ]
 }
