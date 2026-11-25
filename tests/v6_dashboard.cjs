@@ -101,6 +101,12 @@ async function narrow(browser, srv) {
     assert.ok(await fits(page, width), 'tooltip cria scroll horizontal a ' + width + ' px');
     await page.evaluate(() => { location.hash = 'radar'; });
     await page.waitForSelector('#radar-filters');
+    // nenhum texto dos cartões espremido nem sobreposto: o título ocupa a largura útil do cartão
+    const squeezed = await page.evaluate(() => [...document.querySelectorAll('.game > button, .pick')].filter(b => {
+      const t = b.querySelector('.title'), col = t && (t.closest('.pick') ? t : t.parentElement);
+      return col && col.getBoundingClientRect().width < b.getBoundingClientRect().width * 0.6;
+    }).length);
+    assert.equal(squeezed, 0, 'cartões do radar com o título espremido a ' + width + ' px');
     if (await page.locator('[data-game]').count()) {
       await page.locator('[data-game]').first().click();
       await page.waitForSelector('#drawer:not([hidden])');

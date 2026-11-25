@@ -343,3 +343,9 @@ details.inner > summary { cursor: pointer; font-weight: 600; font-size: 13px; pa
 .icon-btn { width: 40px; height: 40px; }
 .classic { min-height: 40px; display: inline-flex; align-items: center; }
 .filters input, .filters select { min-height: 40px; }
+@media (max-width: 640px) {
+  .game > button { grid-template-columns: minmax(0, 1fr); }
+  .game .right { justify-content: flex-start; }
+}
+.game > button > span:first-child { display: block; min-width: 0; }
+.game .title { display: block; }
