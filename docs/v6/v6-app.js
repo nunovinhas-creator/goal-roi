@@ -342,7 +342,7 @@
     ]);
     html += '<div class="grid">';
     html += panel('Veredito científico', '<div class="stack"><p style="margin:0"><b>' + esc(C.VERDICT) + '</b></p>' +
-      '<dl class="facts"><dt>Certificação</dt><dd>' + esc(cert.state) + (cert.active ? '' : ' (não ativa)') + '</dd>' +
+      '<dl class="facts"><dt>Certificação</dt><dd>' + esc(({not_activated: 'não ativada', active: 'ativa'})[cert.state] || cert.state) + '</dd>' +
       '<dt>Preços executáveis</dt><dd>' + (cert.executable_price_evidence ? 'com evidência' : 'sem evidência') + '</dd>' +
       '<dt>Custos</dt><dd>' + (cert.costs_known ? 'conhecidos' : 'desconhecidos') + '</dd>' +
       '<dt>Relatório prospetivo</dt><dd>' + (p ? (p.valid ? 'válido' : 'com problemas') : esc(S.prospectiveState)) + '</dd></dl>' +
