@@ -2,7 +2,7 @@
 
 Regras (nunca liquidar por semelhança):
 - identidade = nome da casa E nome de fora iguais depois de normalizar (ou via data/team_aliases.json, revisto à mão);
-- hora compatível: pré-jogo, início a ±90 min do anunciado; ao vivo, o sinal cai entre o início e 150 min depois;
+- para um novo vínculo por liga BSD v2, início explícito a ±15 min e competição resolvida pelo catálogo BSD;
 - exatamente um candidato; caso contrário fica em aberto e é contado.
 BSD documenta home_score/away_score como resultado do tempo regulamentar.
 Segredo: BSD_API_KEY (enviado só em Authorization: Token; nunca impresso). Sem chave, não faz nada.
@@ -18,6 +18,7 @@ from .opportunity_results import ft_time_valid, remember_provider_results
 from .store import data_dir
 
 ROOT = 'https://sports.bzzoiro.com/api/v2/events/'
+PUBLIC_ROOT = 'https://sports.bzzoiro.com/'
 MAX_REQUESTS = int(os.environ.get('BSD_MAX_REQUESTS', '12'))   # por execução
 MIN_INTERVAL_MIN = int(os.environ.get('BSD_MIN_INTERVAL_MIN', '50'))
 MAX_AGE_DAYS = 3
@@ -30,7 +31,7 @@ class BSDError(RuntimeError):
 
 
 def norm_team(value):
-    value = unicodedata.normalize('NFKD', value or '')
+    value = unicodedata.normalize('NFKD', value if isinstance(value, str) else '')
     value = ''.join(c for c in value if not unicodedata.combining(c)).casefold().replace('&', 'and')
     words = re.findall(r'[a-z0-9]+', value)
     designators = {'fc', 'fk', 'sv', 'afc', 'cf', 'sc'}   # só nas pontas; nunca remover u19, women, ii, etc.
@@ -90,13 +91,82 @@ def time_ok(target, ko):
 
 
 def score_of(event):
-    if event.get('status') != 'finished' or any(event.get(f) is True for f in ('postponed', 'cancelled', 'abandoned')):
+    if (event.get('status') != 'finished'
+            or any(event.get(f) is True for f in ('postponed', 'cancelled', 'abandoned', 'awarded'))
+            or any(event.get(f) is not None for f in ('extra_time_score', 'penalty_shootout'))):
         return None
     h, a = event.get('home_score'), event.get('away_score')
     return [h, a] if all(type(n) is int and n >= 0 for n in (h, a)) and type(event.get('id')) is int else None
 
 
 LEAGUE_NOISE = frozenset({'league', 'liga', 'division', 'primera', 'premier', 'the'})
+BSD_COMPETITION_IDENTITY = 'bsd_league_id_participants_kickoff'
+# Provider names and explicitly reviewed target names. See audits/bsd-settlement/README.md.
+# Keep domestic aliases country-scoped when the unqualified name is ambiguous.
+BSD_LEAGUES = {
+    7: ('Champions League', ('UEFA Champions League',)),
+    9: ('Brasileirão Serie A', ('Brazilian BRAZIL SERIE A', 'Brazil Serie A')),
+    13: ('Scottish Premiership', ('Scottish Premiership',)),
+    18: ('MLS', ('US Major League Soccer', 'USA Major League Soccer')),
+    80: ('Categoría Primera A', ('Colombian Primera Division', 'Colombia Primera A')),
+    86: ('League One', ('England League 1', 'England League One')),
+    91: ('National League', ('England National League',)),
+    100: ('Serie B', ('Italian Serie B', 'Italy Serie B')),
+    101: ('Serie C, Girone A', ('Italian Serie C - Group A', 'Italy Serie C Group A')),
+}
+
+
+def bsd_competition_proof(event, league_id=None):
+    # The optional id is only for checking later observations of an already verified event.
+    incoming_id = event.get('league_id')
+    if incoming_id is not None:
+        if league_id is not None and incoming_id != league_id:
+            return None
+        league_id = incoming_id
+    if type(league_id) is not int or league_id not in BSD_LEAGUES:
+        return None
+    name, target_names = BSD_LEAGUES[league_id]
+    names = {norm_team(label) for label in (name, *target_names)}
+    for field in ('league', 'competition'):
+        other = event.get(field)
+        if isinstance(other, dict):
+            other = other.get('id')
+        elif isinstance(other, str):
+            continue
+        if other is not None and (type(other) is not int or other != league_id):
+            return None
+    if any(norm_team(label) not in names for label in (
+            name_of(event, 'league'), name_of(event, 'competition'), event.get('league_name'),
+            event.get('competition_name')) if label):
+        return None
+    return {'field': 'league_id', 'league_url': f'{PUBLIC_ROOT}leagues/{league_id}/', 'name': name}
+
+
+def bsd_league_matches(expected, league_id):
+    return (type(league_id) is int and league_id in BSD_LEAGUES
+            and norm_team(expected) in {norm_team(label) for label in BSD_LEAGUES[league_id][1]})
+
+
+def bsd_record_matches(target, row):
+    league_id = row.get('bsd_league_id')
+    proof = bsd_competition_proof({'league_id': league_id})
+    if (not proof or row.get('competition_provenance') != proof or row.get('league') != proof['name']
+            or row.get('fixture_id') != target['match_id'] or type(row.get('bsd_id')) is not int or row['bsd_id'] <= 0
+            or row.get('link') != f"{PUBLIC_ROOT}matches/{row['bsd_id']}/"
+            or row.get('identity_method') != BSD_COMPETITION_IDENTITY
+            or not bsd_league_matches(target.get('league'), league_id) or chronology.kickoff_time(target) is None):
+        return False
+    return record_teams_match(target, row)
+
+
+def record_teams_match(target, row):
+    observed = [norm_team(row.get(side)) for side in ('home', 'away')]
+    expected = [norm_team(name) for name in target['teams']]
+    if observed == expected:
+        return True
+    aliases = load_aliases()
+    return all(actual and (actual == wanted or actual in map(norm_team, aliases.get(wanted, ())))
+               for wanted, actual in zip(expected, observed))
 
 
 def leagues_compatible(expected, observed):
@@ -117,31 +187,59 @@ def competition_ok(target, event, *, provider_id=None):
     Without a provider league only an independently bound provider id is accepted (audit N03): teams and
     kickoff alone never identify a fixture.
     """
+    bound = type(provider_id) is int and type(event.get('id')) is int and provider_id == event['id']
+    if 'league_id' in event:
+        if bsd_competition_proof(event):
+            return bsd_league_matches(target.get('league'), event['league_id'])
+        return (bound and event['league_id'] is None
+                and not any(event.get(field) for field in ('league', 'league_name', 'competition', 'competition_name')))
     expected = norm_team(target.get('league'))
     observed = norm_team(name_of(event, 'league') or name_of(event, 'competition'))
     if expected and observed:
         return leagues_compatible(expected, observed)
-    return type(provider_id) is int and provider_id == event.get('id')
+    return bound
 
 
-def match_events(targets, events, aliases, unfinished=None):
-    """targets: {match_id: {teams, date_utc, kickoff_utc}} -> ({match_id: resultado}, {match_id: quase-correspondências})."""
+def match_events(targets, events, aliases, unfinished=None, *, conflicting=None):
+    """Match one fixture, retaining score disagreements separately when its identity is proven."""
     names = lambda name: ({norm_team(name)} | {norm_team(x) for x in aliases.get(norm_team(name), [])}) - {''}
     found, near = {}, {}
-    index = {}
+    index, by_id = {}, {}
     for ev in events:
         if isinstance(ev, dict):
+            event_id = ev.get('id')
+            if type(event_id) is int and ('league_id' in ev or conflicting is not None):
+                group = by_id.setdefault(event_id, [])
+                if ev in group:
+                    continue
+                group.append(ev)
             index.setdefault((norm_team(name_of(ev, 'home_team')), norm_team(name_of(ev, 'away_team'))), []).append(ev)
+    bindings = {}
     for mid, t in targets.items():
         homes, aways = names(t['teams'][0]), names(t['teams'][1])
         provider_id = t.get('provider_id')
         candidates = [ev for h in homes for a in aways for ev in index.get((h, a), []) if time_ok(t, kickoff_of(ev))]
         cands = [ev for ev in candidates if (provider_id is None or provider_id == ev.get('id'))
-                 and competition_ok(t, ev, provider_id=provider_id)]
-        scored = [(ev, score_of(ev)) for ev in cands]
-        if len(cands) == 1 and scored[0][1]:
-            ev = cands[0]
-            found[mid] = dict(event_binding(mid, t, ev), ft=scored[0][1])
+                 and competition_ok(t, ev, provider_id=provider_id)
+                 and ('league_id' not in ev or (type(ev.get('id')) is int and ev['id'] > 0
+                                               and chronology.kickoff_time(t) is not None))]
+        if any('league_id' in ev for ev in cands):
+            # Unresolved competition on another plausible event prevents a new binding.
+            if provider_id is None and any(not bsd_competition_proof(ev) for ev in candidates):
+                cands = []
+        event_ids = {ev['id'] for ev in cands if type(ev.get('id')) is int}
+        if len(event_ids) == 1:
+            event_id, = event_ids
+            if len(by_id.get(event_id, ())) > len(cands):
+                cands = []  # Same ID on an incompatible event row makes its identity ambiguous.
+        candidate_rows = [(event_binding(mid, t, ev), score_of(ev)) for ev in cands]
+        scored = [dict(row, ft=score) for row, score in candidate_rows if score is not None]
+        if len(cands) == 1 and scored:
+            found[mid] = scored[0]
+        elif (conflicting is not None and len(event_ids) == 1 and len(scored) > 1
+              and len({tuple(row['ft']) for row in scored}) > 1
+              and all(row == candidate_rows[0][0] for row, _ in candidate_rows[1:])):
+            conflicting[mid] = scored
         elif len(cands) == 1 and unfinished is not None:
             unfinished[mid] = dict(event_binding(mid, t, cands[0]), status=str(cands[0].get('status')), id=cands[0].get('id'))
         elif not cands:  # diagnóstico para revisão manual de alias: uma das equipas coincide e a hora é compatível
@@ -150,42 +248,75 @@ def match_events(targets, events, aliases, unfinished=None):
             if n or candidates:
                 near[mid] = {'bot': t['teams'], 'bsd_candidates': n[:3], 'competition_review': [
                     {'provider_id': ev.get('id'), 'league': name_of(ev, 'league') or name_of(ev, 'competition') or None,
+                     **({'bsd_league_id': ev['league_id']} if type(ev.get('league_id')) is int else {}),
                      'event_date': kickoff_of(ev).isoformat()} for ev in candidates[:3]]}
+        binding = found.get(mid)
+        if conflicting is not None and mid in conflicting:
+            binding = conflicting[mid][0]
+        if binding and (binding['identity_method'] == BSD_COMPETITION_IDENTITY or conflicting is not None):
+            bindings.setdefault(binding['bsd_id'], []).append(mid)
+    for mids in bindings.values():
+        if len(mids) > 1:
+            for mid in mids:
+                found.pop(mid, None)
+                if conflicting is not None:
+                    conflicting.pop(mid, None)
     return found, near
 
 
 def event_binding(mid, target, event):
-    return {'fixture_id': mid, 'bsd_id': event.get('id'), 'home': name_of(event, 'home_team'),
+    row = {'fixture_id': mid, 'bsd_id': event.get('id'), 'home': name_of(event, 'home_team'),
             'away': name_of(event, 'away_team'), 'event_date': kickoff_of(event).isoformat(),
             'league': name_of(event, 'league') or name_of(event, 'competition') or None,
             'target_league': target.get('league'), 'target_teams': target.get('teams'),
             'target_kickoff_utc': target.get('kickoff_utc'), 'target_phase': target.get('phase'),
             'identity_method': 'provider_id' if type(target.get('provider_id')) is int else 'competition_participants_kickoff',
             'link': event.get('url')}
+    proof = bsd_competition_proof(event)
+    if proof:
+        row.update(league=proof['name'], bsd_league_id=event['league_id'], competition_provenance=proof,
+                   identity_method=BSD_COMPETITION_IDENTITY,
+                   link=f"{PUBLIC_ROOT}matches/{event['id']}/")
+    return row
 
 
-def capture_result_versions(state, found, events, observed_at):
+def capture_result_versions(state, found, events, observed_at, *, conflicting=None):
     """Capture every FT version returned by the ordinary quota-limited queries."""
-    found = {mid: row for mid, row in found.items()
-             if ft_time_valid(chronology.parse_utc(row.get('event_date')), observed_at, observed_at, None, observed_at)}
-    remember_provider_results(state, found, observed_at)
+    previous_bindings = {stored['bsd_id']: mid for mid, stored in state['results'].items()
+                         if type(stored.get('bsd_id')) is int}
+    batch = {mid: [row] for mid, row in found.items()}
+    batch.update(conflicting or {})
+    batch = {mid: rows for mid, rows in batch.items()
+             if ft_time_valid(chronology.parse_utc(rows[0].get('event_date')), observed_at, observed_at, None, observed_at)
+             and previous_bindings.get(rows[0]['bsd_id'], mid) == mid}
     by_provider_id = {}
     for event in events:
         if isinstance(event, dict) and type(event.get('id')) is int:
             by_provider_id.setdefault(event['id'], []).append(event)
-    for match_id, stored in state['results'].items():
-        bound_id = stored.get('bsd_id') if match_id in found or stored.get('identity_method') == 'provider_id' else None
+    for match_id, stored in {**state['results'], **{mid: rows[0] for mid, rows in batch.items()}}.items():
+        bound = stored.get('identity_method') in ('provider_id', BSD_COMPETITION_IDENTITY)
+        bound_id = stored.get('bsd_id') if match_id in batch or bound else None
+        by_league = stored.get('identity_method') == BSD_COMPETITION_IDENTITY
         for event in by_provider_id.get(stored.get('bsd_id'), ()):
             score, kickoff = score_of(event), kickoff_of(event)
+            same_competition = (bool(bsd_competition_proof(event, stored['bsd_league_id'])) if by_league
+                                else competition_ok(stored, event, provider_id=bound_id))
             if (score is not None and ft_time_valid(kickoff, observed_at, observed_at, None, observed_at)
                     and kickoff == chronology.parse_utc(stored.get('event_date'))
-                    and competition_ok(stored, event, provider_id=bound_id)
+                    and same_competition
                     and all(norm_team(name_of(event, side + '_team')) == norm_team(stored.get(side, ''))
                             for side in ('home', 'away'))):
                 update = dict(stored, ft=score, home=name_of(event, 'home_team'), away=name_of(event, 'away_team'))
-                if 'url' in event:
+                if 'url' in event and not by_league:
                     update['link'] = event['url']
-                remember_provider_results(state, {match_id: update}, observed_at)
+                if update not in batch.setdefault(match_id, []):
+                    batch[match_id].append(update)
+    for match_id, rows in batch.items():
+        has_conflict = len({tuple(row['ft']) for row in rows}) > 1
+        if has_conflict:
+            rows = sorted(rows, key=lambda row: (row['ft'], json.dumps(row, sort_keys=True)), reverse=True)
+        for row in rows:
+            remember_provider_results(state, {match_id: row}, observed_at, update_snapshot=not has_conflict)
 
 
 def load_result_state(path):
@@ -285,11 +416,16 @@ def run(fetch=request_json, now=None, token=None, *, after_bsd=None):
                 break
         seen_ids, unique = set(), []
         for ev in events:                               # a mesma página pode repetir eventos
-            if isinstance(ev, dict) and ev.get('id') not in seen_ids:
+            if isinstance(ev, dict) and type(ev.get('id')) is int and ev['id'] not in seen_ids:
                 seen_ids.add(ev.get('id'))
                 unique.append(ev)
-        found, near = match_events(targets, unique, aliases)
-        capture_result_versions(state, found, events, observed_clock())
+        # Preserve contradictory v2 observations for identity checks before establishing a first binding.
+        conflicting = {}
+        found, near = match_events(targets, events, aliases, conflicting=conflicting)
+        if capped:
+            found = {mid: row for mid, row in found.items() if row['identity_method'] != BSD_COMPETITION_IDENTITY}
+            conflicting = {}
+        capture_result_versions(state, found, events, observed_clock(), conflicting=conflicting)
         events = unique
         state['near_misses'] = {m: n for m, n in {**state.get('near_misses', {}), **near}.items() if m not in state['results']}
     events_seen = len(events)

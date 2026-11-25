@@ -173,7 +173,7 @@ def settle_research_bet(bet, as_of):
     return row
 
 
-def remember_provider_results(state, matched, stamp):
+def remember_provider_results(state, matched, stamp, *, update_snapshot=True):
     """Archive the score and its full provider record in the same observation."""
     for match_id, info in matched.items():
         score = score_pair(info.get("ft"))
@@ -185,25 +185,52 @@ def remember_provider_results(state, matched, stamp):
                "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date"),
                "fixture_id": match_id, "snapshot": snapshot}
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
-        if history and all(history[-1].get(key) == value for key, value in row.items()):
-            continue
-        history.append(dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat()))
         previous = state["results"].get(match_id)
+        version = dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat())
+        if version in history:
+            continue
+        if (update_snapshot and previous and history and previous.get("matched_at_utc") == history[-1].get("available_at")
+                and all(history[-1].get(key) == value for key, value in row.items())):
+            continue
+        history.append(version)
         if previous is not None:
             state.setdefault("first_results", {}).setdefault(match_id, previous)
-        state["results"][match_id] = dict(deepcopy(snapshot), matched_at_utc=stamp.isoformat())
+        if update_snapshot:
+            state["results"][match_id] = dict(deepcopy(snapshot), matched_at_utc=stamp.isoformat())
 
 
-def provider_observations(state, source):
-    """Load archived versions. A current-only snapshot does not prove past content."""
-    versions = state.get("ft_versions") if isinstance(state, dict) else None
-    if not isinstance(versions, dict):
+def provider_observations(state, source, *, as_of=None, include_legacy=False):
+    """Validate each version using its own score, identity fields and availability."""
+    if not isinstance(state, dict):
         return {}
-    return {
-        mid: [observation for row in rows if isinstance(row, dict)
-              and (observation := _provider_observation(mid, row, source)) is not None]
-        for mid, rows in versions.items() if isinstance(rows, list)
-    }
+    histories = state.get("ft_versions") or {}
+    if not isinstance(histories, dict):
+        return {}
+    snapshots = (state.get("results") or {}) if include_legacy else {}
+    first = (state.get("first_results") or {}) if include_legacy else {}
+    visible = {}
+    for mid in histories.keys() | snapshots.keys() | first.keys():
+        versions = histories.get(mid, ())
+        versions = [row for row in versions if isinstance(row, dict)] if isinstance(versions, list) else []
+        observations = [_provider_observation(mid, row, source, as_of) for row in versions]
+        observations = [row for row in observations if row is not None]
+        # An unversioned current result only attests its own state at its own timestamp.
+        legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
+        if isinstance(legacy, dict):
+            stamp = legacy.get("matched_at_utc")
+            original = _provider_observation(mid, {
+                "ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
+                "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
+                "observed_at": stamp, "available_at": stamp, "snapshot": legacy,
+            }, source, as_of)
+            legacy_fields = {key: value for key, value in legacy.items() if key != "matched_at_utc"}
+            if original and not any(row.observed_at == original.observed_at
+                                    and row.available_at == original.available_at
+                                    and row.provider_record == legacy_fields for row in observations):
+                observations.append(original)
+        if observations:
+            visible[mid] = observations
+    return visible
 
 
 def _provider_observation(mid, version, source, as_of=None):
@@ -218,44 +245,32 @@ def _provider_observation(mid, version, source, as_of=None):
         # Old journals only attest these fields. The current snapshot may be a later version.
         snapshot = {"bsd_id": version.get("provider_id"), "event_date": version["kickoff_utc"], "ft": list(score)}
     if (not isinstance(snapshot, dict) or snapshot.get("fixture_id", mid) != mid or score_pair(snapshot.get("ft")) != score
+            or snapshot.get("period", "regulation") != "regulation"
             or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
         return None
     return Observation(source, mid, "regulation", score, observed, available, kickoff=kickoff, fixture_id=mid,
                        link=snapshot.get("link"), provider_record=snapshot)
 
 
-def _provider_record(mid, version, source, as_of):
-    row = _provider_observation(mid, version, source, as_of)
-    if row is None:
-        return None
+def _provider_record(row):
     snapshot = row.provider_record
-    return dict(deepcopy(snapshot), fixture_id=mid, period="regulation",
-                provider=snapshot.get("provider", source), observed_at=row.observed_at.isoformat(),
+    return dict(deepcopy(snapshot), fixture_id=row.fixture_id, period=row.period,
+                provider=snapshot.get("provider", row.source), observed_at=row.observed_at.isoformat(),
                 available_at=row.available_at.isoformat(), matched_at_utc=row.available_at.isoformat())
+
+
+def provider_records(state, source, as_of):
+    """Provide every visible version with its own binding to prospective consumers."""
+    return {mid: [_provider_record(row) for row in observations]
+            for mid, observations in provider_observations(state, source, as_of=as_of, include_legacy=True).items()}
 
 
 def provider_snapshot(state, source, as_of):
     """Return one complete, temporally valid provider record per fixture at the cutoff."""
-    snapshots, first = state.get("results") or {}, state.get("first_results") or {}
-    histories, visible = state.get("ft_versions") or {}, {}
-    for mid in snapshots.keys() | histories.keys() | first.keys():
-        versions = histories.get(mid, [])
-        versions = [row for row in versions if isinstance(row, dict)] if isinstance(versions, list) else []
-        records = [_provider_record(mid, row, source, as_of) for row in versions if isinstance(row, dict)]
-        # The original snapshot is immutable once updates start. Only restore its own fields.
-        legacy = first.get(mid) if mid in first else snapshots.get(mid) if not versions else None
-        if isinstance(legacy, dict):
-            stamp = legacy.get("matched_at_utc")
-            observed = utc(stamp)
-            if observed is not None and not any(utc(row.get("observed_at")) == observed for row in versions):
-                records.append(_provider_record(mid, {"ft": legacy.get("ft"), "period": legacy.get("period", "regulation"),
-                                                       "provider_id": legacy.get("bsd_id"), "kickoff_utc": legacy.get("event_date"),
-                                                       "observed_at": stamp, "available_at": stamp, "snapshot": legacy}, source, as_of))
-        candidates = [row for row in records if row is not None]
-        if not candidates:
-            continue
-        def order(row):
-            return utc(row["observed_at"]), utc(row["available_at"])
+    visible = {}
+    def order(row):
+        return utc(row["observed_at"]), utc(row["available_at"])
+    for mid, candidates in provider_records(state, source, as_of).items():
         latest = max(candidates, key=order)
         # Two different versions at the same observation leave the result in conflict.
         tied = [row for row in candidates if order(row) == order(latest)]
