@@ -302,15 +302,10 @@
   }
 
   // ---------- construtores de snapshots ----------
-  function base(report, prospective) {
-    return {
-      schema: SCHEMA,
-      source: {
-        report_generated_at_utc: report.generated_at_utc,
-        prospective_activated_utc: (prospective && prospective.activated_utc) || null,
-        prospective_ledger_entries: prospective && int(prospective.ledger_entries) ? prospective.ledger_entries : null
-      }
-    };
+  // O cabeçalho não inclui a hora de geração: um snapshot cujo conteúdo não mudou mantém o mesmo hash entre
+  // revisões e não é descarregado de novo. A coerência entre ficheiros é garantida pelo manifesto (hash por ficheiro).
+  function base() {
+    return {schema: SCHEMA};
   }
 
   function buildSummary(report, prospective, now) {
@@ -318,7 +313,7 @@
     const cert = certificationState(report.brain);
     const pv = prospective ? validateProspective(prospective) : {ok: false, problems: ['ausente'], certification: []};
     const agenda = (report.brain.agenda || {});
-    return Object.assign(base(report, prospective), {kind: 'summary', data: {
+    return Object.assign(base(), {kind: 'summary', data: {
       generated_at_utc: report.generated_at_utc,
       collected_at_utc: report.audit.collector_last_run_utc || report.audit.last_collected_at_utc || null,
       freshness: freshness(report.audit.collector_last_run_utc || report.audit.last_collected_at_utc, now),
@@ -351,7 +346,7 @@
       bad: (Array.isArray(it.bad) ? it.bad : []).map(evidence), bad_total: it.bad_total}));
     const markets = marketTimeline(report.matches);
     const committed = report.simulation && int(report.simulation.committed_games) ? report.simulation.committed_games : null;
-    return Object.assign(base(report), {kind: 'signals', data: {
+    return Object.assign(base(), {kind: 'signals', data: {
       agenda_generated_utc: agenda.generated_utc || null, rules: agenda.rules || null, counts: agenda.counts || {},
       items, games: groupByGame(items).map(g => Object.assign({}, g, {signals: g.signals.map(s => signalKey(s))})),
       markets,
@@ -375,11 +370,11 @@
     const series = (report.timeline || []).map(p => p.u);
     const sim = report.simulation || {};
     const ins = report.insights || {};
-    return Object.assign(base(report), {kind: 'performance', data: {
+    return Object.assign(base(), {kind: 'performance', data: {
       reference: report.questions[REFERENCE] || null,
       groups: report.groups, questions: report.questions,
       accuracy: report.accuracy || {},
-      timeline: (report.timeline || []).map(p => ({d: p.d, u: p.u, w: p.w, t: p.t, o: p.o})),
+      timeline: (report.timeline || []).map(p => ({d: p.d, u: p.u, w: p.w, t: p.t, o: p.o, m: p.m, s: p.s})),
       timeline_window: {points: series.length, settled: report.settled_bets, note: 'últimas ' + series.length + ' liquidações publicadas'},
       drawdown_window: drawdown(series),
       luck: ins.luck || null,
@@ -406,7 +401,7 @@
       status: protocol.hypotheses[k].status, population: protocol.hypotheses[k].population, decision: protocol.hypotheses[k].decision,
       statistic: protocol.hypotheses[k].statistic, definition: protocol.hypotheses[k].definition, limits: protocol.hypotheses[k].limits} : null;
     const b = report.brain;
-    return Object.assign(base(report, prospective), {kind: 'science', data: {
+    return Object.assign(base(), {kind: 'science', data: {
       prospective: pick(prospective), validation: pv,
       frozen: FROZEN, protocol: protocol ? {schema: protocol.schema, frozen: protocol.frozen, scope: protocol.scope,
         H1: decision('H1'), H2: decision('H2'), D1: decision('D1'), missing: protocol.independent_result && protocol.independent_result.missing,
@@ -435,7 +430,7 @@
       if (diff > 1) gaps.push({after: days[i - 1], before: days[i], missing_days: diff - 1});
     }
     const lag = (iso) => { const f = freshness(iso, now); return {at_utc: iso || null, minutes: f.minutes, state: f.state}; };
-    return Object.assign(base(report, prospective), {kind: 'operations', data: {
+    return Object.assign(base(), {kind: 'operations', data: {
       collector: lag(a.collector_last_run_utc), highlightly: lag(a.hl_last_run_utc), bsd: lag(a.bsd_last_run_utc),
       counters: {versions: a.versions, edits_changing_signal: a.edits_changing_signal, bot_mark_disagreements: a.bot_mark_disagreements,
         impossible_ft_observations: a.impossible_ft_observations, hl_results: a.hl_results, hl_vs_bot_disagreements: a.hl_vs_bot_disagreements,
@@ -473,7 +468,7 @@
         status: h.prospective.economics ? h.prospective.economics.status : null,
         scope: h.prospective.economics ? h.prospective.economics.scope : null} : null});
     const replicated = (b.top || []).filter(h => h.prospective && h.prospective.economics && h.prospective.economics.status === 'positive_exploratory');
-    return Object.assign(base(report), {kind: 'learning', data: {
+    return Object.assign(base(), {kind: 'learning', data: {
       counts: b.counts || {}, hypotheses_total: num(b.hypotheses) ? b.hypotheses : null, tested: b.tested,
       status_rules: b.status_rules || null, rules: b.rules || null,
       journal: (b.notes || []).map(n => ({id: n.id, note: n.note, at_utc: n.at_utc, model: n.model, n: n.n, hits: n.hits,
@@ -519,14 +514,21 @@
     }
     return {ok: problems.length === 0, problems};
   }
-  function checkSnapshot(name, snap, manifest) {
-    const problems = [];
+  // integrity: {sha256} calculado no cliente quando o navegador o permite; senão {bytes}. Um ficheiro de outra revisão
+  // tem outro hash (ou tamanho) e é recusado: nunca se misturam snapshots de revisões diferentes.
+  function checkSnapshot(name, snap, manifest, integrity) {
+    const problems = [], entry = manifest && manifest.files && manifest.files[name];
+    if (!entry) problems.push(name + ': ausente do manifesto');
     if (!isObj(snap) || snap.schema !== SCHEMA) problems.push(name + ': esquema incompatível');
     else {
       if (snap.kind !== name) problems.push(name + ': tipo errado (' + snap.kind + ')');
-      if (!snap.source || snap.source.report_generated_at_utc !== manifest.report_generated_at_utc) problems.push(name + ': revisão diferente do manifesto');
       if (!isObj(snap.data)) problems.push(name + ': sem dados');
     }
+    if (entry && integrity) {
+      if (integrity.sha256 && integrity.sha256 !== entry.sha256) problems.push(name + ': hash diferente do manifesto');
+      if (!integrity.sha256 && integrity.bytes !== entry.bytes) problems.push(name + ': tamanho diferente do manifesto');
+    }
+    if (entry && !integrity) problems.push(name + ': integridade não verificada');
     return {ok: problems.length === 0, problems};
   }
 
