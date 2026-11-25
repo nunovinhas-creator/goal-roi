@@ -4907,13 +4907,15 @@
    "attempt_utc": "2026-11-25T19:49:17+00:00",
    "chars": 215,
    "created_utc": "2026-11-25T19:49:12+00:00",
+   "done_utc": "2026-11-25T19:49:12+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "2f24a0bf069e376225c61f1c7ea40a8319ad8a065b57639e0226a575b08dc75b",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:lille-vs-bayern-munchen-20261125|bda919787479": {
    "attempt_id": "7e84255e1672412c94a9639d92575d10",
@@ -7340,12 +7342,17 @@
    "state": "delivered"
   },
   "game|id:shakhtar-donetsk-vs-fenerbahce-20261125|cc0f1055b18b": {
+   "attempt_id": "4527d3d022d24a4b9316ba32bc9c5c1e",
+   "attempt_utc": "2026-11-25T19:49:19+00:00",
+   "chars": 288,
    "created_utc": "2026-11-25T19:49:12+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "3e46b1357e21dcbb61837169722d4dd3e03b0d4b716c4f901a190880c9a1687f",
+   "state": "in_flight"
   },
   "game|id:shakhtar-donetsk-vs-fenerbahce-20261125|f03fbbef3396": {
    "attempt_id": "e069a2717be04f02940d1e74c6eff240",
@@ -8646,7 +8653,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 553,
+  "delivered": 554,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-25T19:43:52+00:00",
@@ -8800,6 +8807,7 @@
   "2026-11-25T05:49:58+00:00|Paris Saint Germain — Roma|Paris Saint Germain (-1.5)": true,
   "2026-11-25T07:44:18+00:00|Kashima — Jeonbuk Hyundai Motors|Kashima Antlers": true,
   "2026-11-25T08:16:42+00:00|Sporting Lisbon — Manchester United|Manchester United (0)": true,
+  "2026-11-25T08:28:50+00:00|Shakhtar Donetsk — Fenerbahce|FC Shakhtar Donetsk": true,
   "2026-11-25T08:34:32+00:00|Tochigi City — Blaublitz Akita|AH1(+0.5)": true,
   "2026-11-25T09:09:33+00:00|Sporting Lisbon — Manchester United|AH1(+0.5)": true,
   "2026-11-25T09:44:19+00:00|Gamba Osaka — Port FC|Over 3.5": true,
@@ -8827,6 +8835,7 @@
   "2026-11-25T16:43:57+00:00|Slavia Praha — Villarreal|AH1(+0.5)": true,
   "2026-11-25T16:57:05+00:00|Slavia Praha — Villarreal|Over 2.5": true,
   "2026-11-25T16:58:53+00:00|Lille — Bayern Munchen|Over 3.5": true,
+  "2026-11-25T17:02:25+00:00|Shakhtar Donetsk — Fenerbahce|Fenerbahce": true,
   "2026-11-25T17:20:27+00:00|Al Muharraq — FC Arkadag|Over 5": true,
   "2026-11-25T17:22:50+00:00|HJK Helsinki U19 — Stabaek U19|Over 5": true,
   "2026-11-25T17:29:57+00:00|Sabah Baku — Barcelona|AH2(-2.5)": true,
@@ -10658,6 +10667,12 @@
   "item|id:shakhtar-donetsk-vs-fc-livyi-bereh-20261120|1x2|FC Shakhtar Donetsk": {
    "at_utc": "2026-11-20T16:41:36+00:00"
   },
+  "item|id:shakhtar-donetsk-vs-fenerbahce-20261125|1x2|FC Shakhtar Donetsk": {
+   "at_utc": "2026-11-25T19:49:12+00:00"
+  },
+  "item|id:shakhtar-donetsk-vs-fenerbahce-20261125|1x2|Fenerbahce": {
+   "at_utc": "2026-11-25T19:49:12+00:00"
+  },
   "item|id:shakhtar-donetsk-vs-fenerbahce-20261125|Polymarket|AH1(+0.5)": {
    "at_utc": "2026-11-25T01:52:53+00:00"
   },
@@ -10894,7 +10909,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 865,
+ "sent_total": 866,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -11958,6 +11973,7 @@
   "2026-11-25T05:49:58+00:00|Paris Saint Germain — Roma|Paris Saint Germain (-1.5)",
   "2026-11-25T07:44:18+00:00|Kashima — Jeonbuk Hyundai Motors|Kashima Antlers",
   "2026-11-25T08:16:42+00:00|Sporting Lisbon — Manchester United|Manchester United (0)",
+  "2026-11-25T08:28:50+00:00|Shakhtar Donetsk — Fenerbahce|FC Shakhtar Donetsk",
   "2026-11-25T08:34:32+00:00|Tochigi City — Blaublitz Akita|AH1(+0.5)",
   "2026-11-25T09:09:33+00:00|Sporting Lisbon — Manchester United|AH1(+0.5)",
   "2026-11-25T09:44:19+00:00|Gamba Osaka — Port FC|Over 3.5",
@@ -11985,6 +12001,7 @@
   "2026-11-25T16:43:57+00:00|Slavia Praha — Villarreal|AH1(+0.5)",
   "2026-11-25T16:57:05+00:00|Slavia Praha — Villarreal|Over 2.5",
   "2026-11-25T16:58:53+00:00|Lille — Bayern Munchen|Over 3.5",
+  "2026-11-25T17:02:25+00:00|Shakhtar Donetsk — Fenerbahce|Fenerbahce",
   "2026-11-25T17:20:27+00:00|Al Muharraq — FC Arkadag|Over 5",
   "2026-11-25T17:22:50+00:00|HJK Helsinki U19 — Stabaek U19|Over 5",
   "2026-11-25T17:29:57+00:00|Sabah Baku — Barcelona|AH2(-2.5)",
