@@ -102,6 +102,9 @@ def refresh(publisher=None):
         temporary = target.with_suffix('.tmp')
         shutil.copyfile(out, temporary)
         temporary.replace(target)
+        # V6 snapshots of the same revision (inactive unless GOAL_ROI_V6_SNAPSHOTS=on; never raises).
+        from . import dashboard_snapshots
+        dashboard_snapshots.publish_quietly()
     if publisher is not None:
         publisher.publish()
     try:

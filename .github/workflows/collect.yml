@@ -103,6 +103,17 @@ jobs:
         continue-on-error: true
         timeout-minutes: 3
         run: python -u -m scangoal.prospective record
+      # V6 dashboard snapshots (INACTIVE unless the repository variable GOAL_ROI_V6_SNAPSHOTS is 'on'). Reads the published
+      # report and the prospective summary; writes only docs/v6/snapshots/, published in the same commit as the report.
+      # Never blocks: on failure the previous manifest stays and the dashboard falls back to the full report.
+      # Activation: set the variable to 'on'. Reversal: unset it (the last snapshots are then detected as stale).
+      - name: V6 dashboard snapshots (inactive by default)
+        if: ${{ !cancelled() && vars.GOAL_ROI_V6_SNAPSHOTS == 'on' }}
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}
+        run: python -u -m scangoal.dashboard_snapshots
       # Notices only on top of a published state: an intent is claimed by a fast-forward push from this exact tip.
       - name: Publish the report before sending notices
         id: published
@@ -134,6 +145,7 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NOTIFY_DURABLE: git
+          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}
         run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch
       - name: Stop the Polymarket shadow observer and add its observations (inactive by default)
         if: ${{ !cancelled() && steps.fast.outcome != 'skipped' && vars.GOAL_ROI_POLYMARKET_SHADOW == 'on' }}

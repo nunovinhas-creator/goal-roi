@@ -21,7 +21,9 @@ import uuid
 from pathlib import Path
 
 
-PATHS = ('data', 'docs/report.json', 'docs/bets.csv')
+PATHS = ('data', 'docs/report.json', 'docs/bets.csv', 'docs/v6/snapshots')
+# Derived V6 dashboard snapshots (scangoal.dashboard_snapshots, inactive by default) travel in the same commit as the report.
+SNAPSHOT_PREFIX = 'docs/v6/snapshots/'
 BRANCH = 'refs/heads/main'
 TRACKING = 'refs/remotes/origin/main'
 MAX_ATTEMPTS = 4  # initial attempt, retry, and at most two more after a restart
@@ -96,7 +98,7 @@ class Publisher:
 
     def check_paths(self, *args):
         changed = self.require(*args).split('\0')
-        if any(name and name not in PATHS and not name.startswith('data/') for name in changed):
+        if any(name and name not in PATHS and not name.startswith('data/') and not name.startswith(SNAPSHOT_PREFIX) for name in changed):
             raise PublicationError('publication contains paths outside the data and report')
 
     def queue(self, pending):
