@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T00:14:13.864514+00:00",
+ "generated_at_utc": "2026-11-25T00:27:04.394127+00:00",
  "messages": 4865,
  "types": {
   "SERVICE": 11,
@@ -46,11 +46,11 @@
   "bsd_vs_bot_disagreements": 0,
   "bsd_near_misses": 57,
   "bsd_last_run_utc": "2026-11-25T00:14:10+00:00",
-  "goal_minutes_matches": 118,
+  "goal_minutes_matches": 122,
   "goal_minutes_inconsistent": 7,
   "manual_results": 0,
   "manual_vs_other_disagreements": 0,
-  "collector_last_run_utc": "2026-11-25T00:14:08.046109+00:00",
+  "collector_last_run_utc": "2026-11-25T00:27:01.750618+00:00",
   "name_review": [
    {
     "bot": [
@@ -461,7 +461,7 @@
   "stake_no_score_after_kickoff": 114,
   "stake_sent_45_after_kickoff": 238,
   "goal_lists": 1235,
-  "goal_lists_consistent": 487
+  "goal_lists_consistent": 493
  },
  "unique_bets": 2236,
  "settled_bets": 1702,
@@ -2550,34 +2550,40 @@
   },
   "GOAL_BREWING": {
    "signals": 100,
-   "with_result": 0,
-   "hits": 0,
-   "misses": 0,
+   "with_result": 2,
+   "hits": 1,
+   "misses": 1,
    "pushes": 0,
-   "eff_hits": 0,
-   "eff_misses": 0,
-   "vote_hits": 0.0,
-   "vote_misses": 0.0,
+   "eff_hits": 1.0,
+   "eff_misses": 1.0,
+   "vote_hits": 1.0,
+   "vote_misses": 1.0,
    "vote_break_even": null,
-   "games": 0,
+   "games": 2,
    "no_source": 78,
-   "unsettleable": 13,
-   "hit_rate": null,
-   "ci95": null,
+   "unsettleable": 11,
+   "hit_rate": 0.5,
+   "ci95": [
+    0.0945,
+    0.9055
+   ],
    "avg_odds": null,
-   "break_even": null,
-   "baseline": false,
+   "break_even": 0.415,
+   "baseline": true,
    "roi_announced_odds": null,
    "seen_late": 0,
    "by_bot_mark": 0,
-   "per_day": 0.0,
-   "days_to_hint": null,
-   "days_to_conclusion": null,
-   "prudent_rate": null,
-   "prob_above": null,
-   "edge": null,
-   "edge_ci": null,
-   "prob_above_cut": null
+   "per_day": 0.1,
+   "days_to_hint": 189,
+   "days_to_conclusion": 2012,
+   "prudent_rate": 0.4292,
+   "prob_above": 0.5277,
+   "edge": 0.0142,
+   "edge_ci": [
+    -0.2051,
+    0.2474
+   ],
+   "prob_above_cut": 0.5045
   },
   "OPEN_GAME": {
    "signals": 402,
@@ -2604,7 +2610,7 @@
    "roi_announced_odds": 0.0343,
    "seen_late": 5,
    "by_bot_mark": 0,
-   "per_day": 20.4,
+   "per_day": 20.3,
    "days_to_hint": 0,
    "days_to_conclusion": 2,
    "prudent_rate": 0.5937,
@@ -9418,7 +9424,7 @@
     "contraditório": 4,
     "evitar": 4
    },
-   "generated_utc": "2026-11-25T00:14:13+00:00",
+   "generated_utc": "2026-11-25T00:27:04+00:00",
    "rules": {
     "min_results": 8,
     "good": 0.8,
@@ -105581,7 +105587,7 @@
     "by_bot_mark": 0,
     "per_day": 3.0,
     "days_to_hint": 0,
-    "days_to_conclusion": 85
+    "days_to_conclusion": 86
    },
    "BETFAIR/pre": {
     "signals": 57,
@@ -107249,15 +107255,6 @@
    "signals": 4
   },
   {
-   "match_id": "rb-leipzig-u19-vs-lens-u19-20261124",
-   "match": "RB Leipzig U19 — Lens U19",
-   "league": "UEFA Youth League",
-   "date_utc": "2026-11-24T16:33:07+00:00",
-   "kickoff_utc": null,
-   "why": "à espera dos minutos dos golos",
-   "signals": 1
-  },
-  {
    "match_id": "real-madrid-u19-vs-psv-youth-20261124",
    "match": "Real Madrid U19 — PSV Youth",
    "league": "UEFA Youth League",
@@ -107336,7 +107333,7 @@
    "date_utc": "2026-11-24T08:10:25+00:00",
    "kickoff_utc": "2026-11-24T20:00+00:00",
    "why": "mercado que o resultado final não decide",
-   "signals": 7
+   "signals": 6
   },
   {
    "match_id": "bradford-city-vs-barnsley-20261124",
@@ -107706,6 +107703,15 @@
    "kickoff_utc": "2026-11-22T14:00+00:00",
    "why": "mercado que o resultado final não decide",
    "signals": 5
+  },
+  {
+   "match_id": "levski-sofia-vs-lokomotiv-sofia-20261122",
+   "match": "Levski Sofia — Lokomotiv Sofia",
+   "league": "Bulgarian 1st Professional League",
+   "date_utc": "2026-11-22T13:37:39+00:00",
+   "kickoff_utc": "2026-11-22T13:30+00:00",
+   "why": "mercado que o resultado final não decide",
+   "signals": 1
   }
  ],
  "matches": {
@@ -108016,11 +108022,11 @@
      "0-1"
     ],
     [
-     49,
+     50,
      "1-1"
     ],
     [
-     59,
+     60,
      "2-1"
     ],
     [
@@ -108036,7 +108042,7 @@
      "5-1"
     ]
    ],
-   "goals_source": "bot",
+   "goals_source": "Highlightly",
    "ft": [
     5,
     1
@@ -109683,11 +109689,19 @@
    ],
    "goals": [
     [
+     5,
+     "1-0"
+    ],
+    [
+     32,
+     "2-0"
+    ],
+    [
      90,
      "3-0"
     ]
    ],
-   "goals_source": "bot",
+   "goals_source": "Highlightly",
    "ft": [
     3,
     0
@@ -109753,7 +109767,7 @@
      "0-1"
     ]
    ],
-   "goals_source": "bot",
+   "goals_source": "Highlightly",
    "ft": [
     0,
     1
