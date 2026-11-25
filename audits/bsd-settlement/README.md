@@ -1,6 +1,6 @@
 # Recuperação da associação BSD — 25/11/2026
 
-**NO-GO para integração.** O replay dos 17 candidatos produziu 12 vínculos BSD no coletor. Seis passaram a verificação do primeiro sinal prospetivo e todos concordaram com o Highlightly já registado. A resposta JSON autenticada da lista de produção ainda precisa de validação. Foram autorizados até cinco pedidos isolados e executados zero, porque o ambiente não tem uma referência de cofre associada a `BSD_API_KEY`.
+**NO-GO para integração imediata.** A amostra autenticada confirma 12 vínculos BSD no coletor. Seis passaram a verificação do primeiro sinal prospetivo e todos concordaram com o Highlightly já registado. O tratamento prospetivo de versões simultâneas contraditórias permanece em aberto. [Evidência autenticada](authenticated-evidence.json)
 
 ## Cronologia e causa-raiz
 
@@ -19,23 +19,23 @@ A PR #73 introduziu `competition_ok()` no caminho de recolha BSD. O filtro inter
 ## Contrato do fornecedor e correção
 
 - A listagem `/api/v2/events/` e o detalhe `/api/v2/events/{id}/` usam `EventDetailV2Schema`. O campo de competição é `league_id`, inteiro ou nulo quando o evento está sem associação. O contrato desses endpoints omite `league`, `competition` e `league_name`. A lista live v2 usa `league_id` e `league_name`. A v1 representa `league` num objeto aninhado com `id`, `name` e país. O catálogo v2 `/api/v2/leagues/` e `/api/v2/leagues/{id}/` fornece o nome, o país e a categoria, incluindo `is_women`. [OpenAPI](https://sports.bzzoiro.com/api/schema/) · [Eventos](https://sports.bzzoiro.com/docs/football/events/) · [Catálogo](https://sports.bzzoiro.com/docs/football/leagues/)
-- As 17 páginas públicas do mesmo fornecedor ligam os IDs dos eventos a competições identificadas. As nove competições foram verificadas nas páginas individuais do catálogo. O arquivo original guarda o ID do evento, a hora e `league: null` depois da interpretação do coletor. O `league_id`, o marcador e o corpo da resposta original estão ausentes desse arquivo. Isso comprova a falha de interpretação do contrato e mantém em aberto a presença concreta do campo em cada resposta original. [Amostra pública e hashes](public-evidence.json)
+- As 17 páginas públicas do mesmo fornecedor ligam os IDs dos eventos a competições identificadas. As nove competições foram verificadas nas páginas individuais do catálogo. A sondagem autenticada posterior encontrou `league_id` em 232/232 eventos e como inteiro em 17/17 candidatos. Nenhum dos 232 tinha `league`, `competition` ou `league_name`. O detalhe 655441 concordou com a lista. O arquivo original guarda o ID do evento, a hora e `league: null` depois da interpretação do coletor. O corpo da resposta original está ausente, pelo que os cinco pedidos replicam o corte com a resposta atual. [Amostra pública](public-evidence.json) · [Sondagem autenticada](authenticated-evidence.json)
 - Para novos vínculos v2, o coletor compara um `league_id` observado com o catálogo local de nove IDs. As grafias aceites do alvo são revistas, incluindo país nas designações domésticas ambíguas. O resultado guarda o ID BSD do jogo, o ID e o nome da liga BSD, o campo de origem, os links oficiais e o método de associação. O relatório verifica novamente essa prova contra o alvo. A competição declarada no sinal serve para comparação.
 - O novo vínculo exige casa e fora exatas após normalização ou alias revisto, início explícito dentro de ±15 minutos e candidato único. Ficam pendentes IDs de liga desconhecidos, identidades sobrepostas, respostas contraditórias no primeiro vínculo e lotes truncados pelo limite de páginas. Placar final aos 90 minutos é obrigatório. Os controlos públicos distinguem fim normal, prolongamento e penáltis. [Prolongamento](https://sports.bzzoiro.com/matches/604464/) · [Penáltis](https://sports.bzzoiro.com/matches/602350/)
 - `near_misses` e os 48 resultados legados ficam como evidência histórica. Os IDs desses registos carecem de prova independente para efeito de N03. A proteção contra colisões usa um ID histórico apenas para impedir uma nova ocupação por outro jogo. Um vínculo novo verificável pode confirmar uma observação posterior do mesmo ID na ausência de metadados de liga, com equipas e hora iguais e sem liga contraditória.
 
 ## Antes e depois
 
-| Medida | Antes | Replay com evidência pública BSD |
-|---|---:|---:|
-| Vínculos BSD entre os 17 diagnósticos | 0/17 | 12/17 |
-| Vínculos BSD entre os candidatos ainda na fila do corte de 25/11 | 0/16 | 12/16 |
-| Vínculos aceites contra o primeiro sinal prospetivo congelado | 0/13 | 6/13 |
-| Primeira confirmação independente adicional na coorte | 0 | 0 |
-| Divergências BSD–Highlightly nos vínculos prospetivos aceites | 0 | 0 |
-| Novas liquidações ou entradas de produção nesta auditoria | 0 | 0 |
+| Medida | Antes | Replay público BSD | Lista autenticada BSD |
+|---|---:|---:|---:|
+| Vínculos BSD entre os 17 diagnósticos | 0/17 | 12/17 | 12/17 |
+| Vínculos BSD entre os candidatos ainda na fila do corte de 25/11 | 0/16 | 12/16 | 12/16 |
+| Vínculos aceites contra o primeiro sinal prospetivo congelado | 0/13 | 6/13 | 6/13 |
+| Primeira confirmação independente adicional na coorte | 0 | 0 | 0 |
+| Divergências BSD–Highlightly nos vínculos prospetivos aceites | 0 | 0 | 0 |
+| Novas liquidações ou entradas de produção nesta auditoria | 0 | 0 | 0 |
 
-O replay usa exclusivamente os 17 diagnósticos retidos e metadados observados depois em páginas públicas BSD. A unicidade verificada está limitada a essa população. O universo original de 232 eventos e a entrega real de `league_id` continuam por verificar na lista autenticada. Os 12 vínculos são recuperáveis no replay sob essas condições. A execução real continua por confirmar. O `near_misses` acumula observações. Lecco–Lumezzane aparece no corte original de 23/11 e está fora da fila pendente do corte de 25/11.
+O replay público usa os 17 diagnósticos retidos e metadados observados depois em páginas BSD. A verificação autenticada repetiu as quatro páginas, sem paginação adicional, e avaliou a unicidade entre os 232 eventos devolvidos. Os 17 IDs apareceram uma vez cada e coincidiram em competição, hora e placar com as páginas públicas. Os 12 vínculos são recuperáveis no corte histórico isolado. A janela normal de três dias continua a determinar o que está elegível numa execução corrente. O `near_misses` acumula observações. Lecco–Lumezzane aparece no corte original de 23/11 e está fora da fila pendente do corte de 25/11.
 
 Quatro dos 17 carecem de hora de início explícita no alvo do coletor. Lecco–Lumezzane tem diferença de 15 minutos e competição genérica `Italian Serie C`, insuficiente para provar `Serie C, Girone A`. Sete dos 13 primeiros sinais prospetivos carecem de hora explícita. Doze jogos prospetivos já tinham resultado Highlightly. América de Cali–Deportivo Cali é o único sem esse resultado e fica pendente pela ausência de hora explícita no sinal. [Comparação por jogo](replay-results.json) · [Protocolo congelado](https://github.com/nunovinhas-creator/goal-roi/blob/9f9f61c77538fb06ae4d2505b4ae9ff133e410b8/scangoal/prospective_protocol.json)
 
@@ -47,13 +47,35 @@ python3 audits/bsd-settlement/replay.py /tmp/goal-roi-bsd-nov25 /tmp/goal-roi-bs
 
 O replay verifica os hashes das fontes históricas, reexecuta o filtro anterior, usa a evidência pública no novo caminho e verifica o arquivo temporário em memória e o primeiro sinal congelado. A recolha de evidência pública guardou campos mínimos, URLs, datas e hashes dos corpos dos documentos. O arquivo de produção, o diário append-only e o protocolo foram consultados em leitura.
 
+## Sondagem autorizada e testes
+
+O GitHub Actions disponibilizou `BSD_API_KEY` apenas no passo de leitura de um workflow próprio, numa branch temporária. O job exigia a criação do ref e a primeira tentativa, com permissões GitHub de leitura. O cliente recusou redirecionamentos e encerrou após quatro páginas e um detalhe. As cinco respostas foram HTTP 200 entre 10:07:10 e 10:07:15. O log conservou hashes e resultados derivados. O valor do segredo, os cabeçalhos completos e os corpos das respostas permaneceram fora do log e da PR. A sondagem usa um workflow separado, que fica fora do diff desta PR. [Workflow isolado](https://github.com/nunovinhas-creator/goal-roi/blob/9bf689d25070c5f859f4cf280be5221648ee1ac0/.github/workflows/bsd-audit-probe.yml) · [Job](https://github.com/nunovinhas-creator/goal-roi/actions/runs/45591800573/job/139127617269)
+
+A CI do candidato passou **1.107 testes Python 3.11 com Chromium**, incluindo 16 adversariais novos, e **12 testes Node**. A baseline passou 1.091 testes Python e 12 Node. [Suite integral](https://github.com/nunovinhas-creator/goal-roi/actions/runs/45591346532)
+
+## Continuidade do registo prospetivo
+
+Na ativação, `code_sha256` registou os cinco ficheiros de implementação, incluindo `results_bsd.py`. A barreira de gravação compara o SHA-256 do ficheiro de protocolo com o valor da ativação. Mudanças no manifesto de código são registadas num `code_version` antes de qualquer nova inscrição. O candidato alterou apenas `results_bsd.py` no manifesto. O SHA-256 do protocolo `4ab189247d0e4b83f17ffd7931bf772c73bad37b2b7f270f2855a157f1731101` coincidiu com o da ativação. [Gravador e manifesto](https://github.com/nunovinhas-creator/goal-roi/blob/11ca75fc7ed6f9ff30b77f4883e2253722823aed/scangoal/prospective.py)
+
+- O ensaio de aplicação e reversão reproduziu uma única entrada `code_version` por mudança de versão. A repetição de cada corte acrescentou zero entradas, todas as cadeias foram verificadas e as 149 entradas originais ficaram preservadas byte a byte. Um controlo que alterou o protocolo numa cópia temporária foi bloqueado antes de gravar. [Manifesto e hashes das etapas](ledger/evidence.json)
+- O ensaio de continuidade usou o corte real a seguir, executando `prospective.record()` e o pipeline de sinais sobre cópias, com rede bloqueada. A baseline reproduziu o diário publicado byte a byte. O candidato preservou as 149 entradas e acrescentou `code_version` seguido dos mesmos dois sinais de Gamba Osaka–Port FC. Os campos dos sinais coincidiram, salvo os de encadeamento. A repetição acrescentou zero entradas e não houve novos resultados ou conflitos. [Corte com os dois sinais](https://github.com/nunovinhas-creator/goal-roi/commit/1429777178a0b8a6d7be3fa50e9ed0aca06f5a30) · [Prova da inscrição](ledger/registration-evidence.json)
+
+A transição usa a versão já prevista no diário. Aplicar o commit cria uma versão e revertê-lo regista o manifesto original como nova entrada. Este fluxo preserva a cadeia, a população inscrita e a evidência acumulada. O ensaio mediu continuidade do registo. A certeza científica de cada nova liquidação continua a depender da sua própria prova.
+
+```sh
+git worktree add --detach /tmp/goal-roi-bsd-base 11ca75fc7ed6f9ff30b77f4883e2253722823aed
+git worktree add --detach /tmp/goal-roi-bsd-candidate f597717bcb253dc80f80f5276ecc52ed06929e00
+python3 audits/bsd-settlement/ledger/replay.py . 11ca75fc7ed6f9ff30b77f4883e2253722823aed f597717bcb253dc80f80f5276ecc52ed06929e00
+python3 audits/bsd-settlement/ledger/registration.py . /tmp/goal-roi-bsd-base /tmp/goal-roi-bsd-candidate 1429777178a0b8a6d7be3fa50e9ed0aca06f5a30
+```
+
 ## Ativação, reversão e riscos residuais
 
-1. Antes de integrar, ligar `BSD_API_KEY` por referência ao cofre no ambiente isolado. Usar até quatro páginas diárias e um detalhe, sem repetição. Parar em erros de quota ou autorização. Conferir a primeira página de cada dia e a cobertura total antes de interpretar unicidade. Usar os campos reais para confrontar `league_id`, estado, hora, equipas e marcadores por período com o replay público. Guardar hashes e a contagem de pedidos fora dos arquivos de produção.
-2. Exigir revisão do catálogo e verificação de toda a suite. Integrar manualmente só após aprovar a comparação em ambiente isolado. A recolha normal tem uma janela de três dias. O patch usa as mesmas páginas, limite de pedidos e intervalo mínimo, com zero pedidos adicionais de catálogo ou detalhe. O diário regista a versão de código pela regra já em vigor e só pode anexar novas observações à hora em que sejam verificadas.
+1. Usar o replay fixado, o registo dos cinco pedidos e a suite executada para rever o catálogo, a unicidade e a rejeição de períodos fora dos 90 minutos. Resolver a propagação prospetiva de versões simultâneas contraditórias antes da aprovação manual.
+2. A recolha normal tem uma janela de três dias. O patch usa as mesmas páginas, limite de pedidos e intervalo mínimo, com zero pedidos adicionais de catálogo ou detalhe. O diário regista a versão de código pela regra já em vigor e só pode anexar novas observações à hora em que sejam verificadas.
 3. Nos primeiros ciclos normais, conferir contagens, provas e conflitos. Se houver sinais de associação incorreta, suspender a recolha BSD por intervenção operacional revista e reverter o commit da aplicação. Preservar as observações e entradas já anexadas. Rever esses casos pelo mecanismo de conflito do protocolo, mantendo a cadeia verificável.
 
-IDs desconhecidos e jogos sem início explícito ficam pendentes. A cobertura depende da estabilidade do catálogo BSD e da revisão das grafias. O identificador da liga pode aparecer nulo. Um `league_id` incorreto na fonte pode exigir verificação do detalhe. Duas versões distintas de um jogo já ligado com o mesmo instante de observação ficam no arquivo de versões e o snapshot omite o empate. A propagação desse caso simultâneo para o diário prospetivo requer validação isolada antes de ativar.
+IDs desconhecidos e jogos sem início explícito ficam pendentes. A cobertura depende da estabilidade do catálogo BSD e da revisão das grafias. O identificador da liga pode aparecer nulo. Um `league_id` incorreto na fonte pode exigir verificação do detalhe. Num controlo sintético com um resultado já registado, dois marcadores distintos observados no mesmo instante ficaram no arquivo de versões e foram omitidos do snapshot. O diário conservou o resultado inicial sem acrescentar `outcome_conflict`, e o jogo continuou na contagem de H1. Cada um dos 17 candidatos autenticados apareceu uma só vez. Resolver a passagem dessas observações para o mecanismo de conflito congelado é condição de ativação.
 
 ## Nota candidata para o Goal-ROI Brain
 
