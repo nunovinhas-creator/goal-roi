@@ -2,7 +2,7 @@
 // Gera os snapshots derivados do Goal-ROI Intelligence V6 a partir do relatório original.
 //
 //   node scripts/build_dashboard_snapshots.cjs [--report data/report.json] [--prospective data/prospective_report.json]
-//        [--protocol scangoal/prospective_protocol.json] [--out build/dashboard-snapshots]
+//        [--protocol scangoal/prospective_protocol.json] [--out build/dashboard-snapshots] [--hashed]
 //
 // Só lê. Nunca altera report.json, o registo prospetivo nem o protocolo. A derivação é a mesma do navegador
 // (docs/v6/v6-core.js). A saída é determinística: a frescura é medida à hora de geração do relatório.
@@ -15,9 +15,10 @@ const core = require('../docs/v6/v6-core.js');
 
 function args(argv) {
   const out = {report: 'data/report.json', prospective: 'data/prospective_report.json',
-    protocol: 'scangoal/prospective_protocol.json', out: 'build/dashboard-snapshots'};
+    protocol: 'scangoal/prospective_protocol.json', out: 'build/dashboard-snapshots', hashed: false};
   for (let i = 0; i < argv.length; i += 2) {
     const k = argv[i].replace(/^--/, '');
+    if (k === 'hashed') { out.hashed = true; i--; continue; }
     if (!(k in out) || argv[i + 1] === undefined) throw new Error('argumento desconhecido: ' + argv[i]);
     out[k] = argv[i + 1];
   }
@@ -47,9 +48,11 @@ function build(opts) {
     report_sha256: sha(reportBytes), report_bytes: reportBytes.length,
     prospective_sha256: prospective ? sha(fs.readFileSync(opts.prospective)) : null, redacted_fields: redacted, files: {}};
   for (const name of core.SNAPSHOTS) {
-    const body = Buffer.from(JSON.stringify(files[name]) + '\n', 'utf8');
-    fs.writeFileSync(path.join(opts.out, core.FILE(name)), body);
-    manifest.files[name] = {path: core.FILE(name), sha256: sha(body), bytes: body.length};
+    const body = Buffer.from(JSON.stringify(files[name]) + '\n', 'utf8'), digest = sha(body);
+    // --hashed: nome endereçado por conteúdo, para que caches e publicações concorrentes nunca misturem revisões.
+    const file = opts.hashed ? 'dashboard-' + name + '.' + digest.slice(0, 16) + '.json' : core.FILE(name);
+    fs.writeFileSync(path.join(opts.out, file), body);
+    manifest.files[name] = {path: file, sha256: digest, bytes: body.length};
   }
   fs.writeFileSync(path.join(opts.out, 'dashboard-manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
   return manifest;

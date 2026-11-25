@@ -229,13 +229,18 @@
         first_utc: events.length ? events[0].d : null, last_utc: events.length ? events[events.length - 1].d : null,
         sources, selections: [...bySel.values()].map(s => Object.assign(s, {
           move_pct: num(s.first_odds) && num(s.last_odds) && s.first_odds > 0 ? round((s.last_odds / s.first_odds - 1) * 100, 1) : null})),
-        relations: {counts: analysis.counts, headline: M.headline(analysis.counts), pairs: analysis.pairs.slice(0, 60), pairs_total: analysis.pairs.length},
+        relations: {counts: analysis.counts, headline: M.headline(analysis.counts), pairs: worst(analysis.pairs, 24), pairs_total: analysis.pairs.length},
         series: events.map(e => ({d: e.d, source: SOURCES[e.k] || sourceOf(e.k), market: e.market, selection: e.selection,
           odds: num(e.odds) ? e.odds : null, total: num(e.total) ? e.total : null, share: num(e.share) ? e.share : null, phase: e.phase || null,
           score: Array.isArray(e.score_at_signal) ? e.score_at_signal : null}))});
     }
     return out.sort((a, b) => time(b.last_utc) - time(a.last_utc));
   }
+
+  // Guarda só os pares mais relevantes (exclusivos entre fontes primeiro); as contagens por categoria ficam completas.
+  const SEVERITY = ['exclusivas_entre_fontes', 'convergencia', 'divergencia_temporal', 'exclusivas_mesma_fonte', 'insuficiente', 'compativeis', 'repeticao', 'nao_comparaveis'];
+  const worst = (pairs, n) => pairs.slice().sort((a, b) => SEVERITY.indexOf(a.category) - SEVERITY.indexOf(b.category)).slice(0, n)
+    .map(p => ({category: p.category, relation: p.relation, reason: p.reason, a: p.a, b: p.b}));
 
   // Equipas de um jogo da agenda: do histórico publicado, senão do nome "Casa — Fora" com exatamente duas partes.
   function teamsOf(report, g) {
@@ -251,7 +256,7 @@
       selection: it.market === '1X2' && Array.isArray(teams) ? ({[teams[0]]: '1', [teams[1]]: '2', Empate: 'X'}[it.selection] || it.selection) : it.selection,
       score_at_signal: it.score_at_signal}));
     const a = M.analyseGame(events, teams, teams ? {ok: true} : {ok: false, reason: 'equipas desconhecidas'});
-    return {counts: a.counts, headline: M.headline(a.counts), pairs: a.pairs};
+    return {counts: a.counts, headline: M.headline(a.counts), pairs: worst(a.pairs, 12), pairs_total: a.pairs.length};
   }
 
   // Mapa de calor hora de Lisboa × fonte, a partir das apostas publicadas no simulador.
@@ -537,7 +542,9 @@
     if (!isObj(m.files)) problems.push('manifesto sem ficheiros');
     else for (const k of SNAPSHOTS) {
       const f = m.files[k];
-      if (!isObj(f) || f.path !== FILE(k) || typeof f.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(f.sha256) || !int(f.bytes)) problems.push('entrada inválida: ' + k);
+      // Nome fixo ou endereçado por conteúdo (dashboard-<nome>.<início do sha256>.json), nunca outro caminho.
+      const hashed = isObj(f) && typeof f.sha256 === 'string' && f.path === 'dashboard-' + k + '.' + f.sha256.slice(0, 16) + '.json';
+      if (!isObj(f) || !(f.path === FILE(k) || hashed) || typeof f.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(f.sha256) || !int(f.bytes)) problems.push('entrada inválida: ' + k);
     }
     return {ok: problems.length === 0, problems};
   }

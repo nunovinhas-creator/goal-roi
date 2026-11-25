@@ -255,3 +255,17 @@ test('P2: contagens do Brain distinguem totais, publicados e listas completas', 
   assert.equal(l.totals.llm_published, report.brain.llm.length);
   assert.equal(l.top_pool, report.brain.top.length);
 });
+
+test('P1-2: manifesto com nomes endereçados por conteúdo é aceite; outros caminhos não', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v6h-'));
+  const m = build({report: REPORT_PATH, prospective: path.join(ROOT, 'data/prospective_report.json'), protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out: dir, hashed: true});
+  assert.equal(core.validateManifest(m).ok, true);
+  for (const k of core.SNAPSHOTS) {
+    assert.equal(m.files[k].path, 'dashboard-' + k + '.' + m.files[k].sha256.slice(0, 16) + '.json');
+    assert.ok(fs.existsSync(path.join(dir, m.files[k].path)));
+  }
+  const bad = clone(m); bad.files.summary.path = 'dashboard-summary.' + 'f'.repeat(16) + '.json';
+  assert.equal(core.validateManifest(bad).ok, false, 'hash do nome diferente do sha256');
+  const bad2 = clone(m); bad2.files.summary.path = 'dashboard-signals.' + m.files.summary.sha256.slice(0, 16) + '.json';
+  assert.equal(core.validateManifest(bad2).ok, false, 'nome de outro snapshot');
+});
