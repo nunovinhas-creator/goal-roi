@@ -464,7 +464,7 @@
       '<div class="evidence"><div class="for"><h4>A favor (' + int(s.good_total) + ')</h4>' + ev(s.good) + '</div><div class="against"><h4>Contra (' + int(s.bad_total) + ')</h4>' + ev(s.bad) + '</div></div></div></section>').join('');
     openDrawer(g.match, (g.league || '') + ' · ' + g.sources.join(', '),
       '<section class="panel"><header><h3>Cronologia</h3><span class="meta">' + (market ? 'histórico de mercado publicado' : 'só sinais da agenda (jogo sem histórico de mercado publicado)') + '</span></header><div class="body"><ol class="chrono">' +
-      chrono.map(c => '<li class="' + esc(c.source) + '"><time>' + when(c.d) + '</time>' + esc(c.source) + ' · ' + esc(c.text) + '</li>').join('') + '</ol></div></section>' + content +
+      chrono.map(c => '<li class="' + esc(c.source) + '"><time>' + when(c.d) + '</time> ' + esc(c.source) + ' · ' + esc(c.text) + '</li>').join('') + '</ol></div></section>' + content +
       '<p class="note">Evidência exploratória por hipótese do gerador. Hipóteses partilham jogos e não têm correção de multiplicidade.</p>');
   }
 

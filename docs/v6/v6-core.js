@@ -278,6 +278,8 @@
     });
     return {max: round(max, 2), at};
   }
+  // Mesma regra de scangoal/report.py:pl — w é o desfecho (1, 0,5, 0, −0,5, −1), não unidades.
+  const pl = (w, odds) => (w > 0 ? w * (odds - 1) : w);
   function periodTable(entries) {
     const byWeek = {}, bySource = {};
     for (const e of entries || []) {
@@ -291,7 +293,7 @@
         row.bets++;
         if (num(e.w)) {
           row.settled++;
-          row.units += e.w;
+          row.units += pl(e.w, e.o);
           if (e.w > 0) row.wins++;
         }
       }
