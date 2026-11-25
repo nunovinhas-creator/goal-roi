@@ -199,7 +199,7 @@ def note_ft(b, notes):
 
 def external_matches(bet, row):
     """Verify the source-specific fixture association stored with the observation."""
-    from .results_bsd import norm_team, time_ok
+    from .results_bsd import BSD_COMPETITION_IDENTITY, bsd_record_matches, norm_team, time_ok
 
     if not row or row.get('fixture_id', bet['match_id']) != bet['match_id']:
         return False
@@ -209,6 +209,10 @@ def external_matches(bet, row):
     expected = [norm_team(name) for name in bet.get('teams') or ()]
     if len(expected) != 2 or not all(expected) or list(map(norm_team, names)) != expected:
         return False
+    if ('bsd_league_id' in row or 'competition_provenance' in row
+            or row.get('identity_method') == BSD_COMPETITION_IDENTITY):
+        return (bsd_record_matches(bet, row)
+                and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
     league = norm_team(row.get('target_league') or row.get('league'))
     return (bool(league) and league == norm_team(bet.get('league'))
             and time_ok(bet, chronology.parse_utc(row.get('event_date'))))
