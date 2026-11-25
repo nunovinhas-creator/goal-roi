@@ -2744,12 +2744,17 @@
    "state": "delivered"
   },
   "game|id:club-brugge-vs-liverpool-20261125|be4e8fadfe02": {
+   "attempt_id": "d7e7d92d98754dfab537497ac7407ad7",
+   "attempt_utc": "2026-11-25T14:04:43+00:00",
+   "chars": 194,
    "created_utc": "2026-11-25T14:04:41+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "6d74c912f0dd290d54d1aa4e9d4a15fe9b9de9c30ba298a920bb932716b327c4",
+   "state": "in_flight"
   },
   "game|id:cobresal-vs-audax-italiano-20261121|4f32e271270b": {
    "attempt_utc": "2026-11-20T20:24:58+00:00",
@@ -3153,13 +3158,15 @@
    "attempt_utc": "2026-11-25T14:04:41+00:00",
    "chars": 197,
    "created_utc": "2026-11-25T14:04:41+00:00",
+   "done_utc": "2026-11-25T14:04:41+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "fdeb9d32201c14722b194af3a2468a4953acbdb2bd6e2154b2c45ba7547c1900",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:eintracht-frankfurt-vs-hoffenheim-20261121|6549a4338226": {
    "attempt_utc": "2026-11-19T12:53:18+00:00",
@@ -8128,7 +8135,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 519,
+  "delivered": 520,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-25T13:58:47+00:00",
@@ -8297,6 +8304,7 @@
   "2026-11-25T13:45:58+00:00|Alexandria Petroleum — Delphi SC|Over 3": true,
   "2026-11-25T13:46:09+00:00|Sabah Baku — Barcelona|Over 4.5": true,
   "2026-11-25T13:48:11+00:00|Roan United — Mufulira Wanderers|Over 3": true,
+  "2026-11-25T13:59:20+00:00|Club Brugge — Liverpool|AH2(-0.5)": true,
   "2026-11-25T14:01:25+00:00|Egypt Stars — Sila|Over 5.5": true
  },
  "migrations": {
@@ -8519,7 +8527,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 79,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Quota de mercado = menos de 80 %": 55,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 24,
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": 42,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": 43,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": 48,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": 42,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Número de apostas = várias": 87,
@@ -9078,6 +9086,9 @@
   },
   "item|id:club-atletico-pulpileno-vs-deportivo-maritimo-20261118|Asian Total|Over 2.5": {
    "at_utc": "2026-11-18T20:13:25+00:00"
+  },
+  "item|id:club-brugge-vs-liverpool-20261125|Polymarket|AH2(-0.5)": {
+   "at_utc": "2026-11-25T14:04:41+00:00"
   },
   "item|id:cobresal-vs-audax-italiano-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-20T20:24:58+00:00"
@@ -10221,7 +10232,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 831,
+ "sent_total": 832,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -11290,6 +11301,7 @@
   "2026-11-25T13:45:58+00:00|Alexandria Petroleum — Delphi SC|Over 3",
   "2026-11-25T13:46:09+00:00|Sabah Baku — Barcelona|Over 4.5",
   "2026-11-25T13:48:11+00:00|Roan United — Mufulira Wanderers|Over 3",
+  "2026-11-25T13:59:20+00:00|Club Brugge — Liverpool|AH2(-0.5)",
   "2026-11-25T14:01:25+00:00|Egypt Stars — Sila|Over 5.5"
  ]
 }
