@@ -6,7 +6,7 @@
     manifest: 'snapshots/dashboard-manifest.json',
     report: '../report.json',
     prospective: 'https://raw.githubusercontent.com/nunovinhas-creator/goal-roi/main/data/prospective_report.json',
-    protocol: 'https://raw.githubusercontent.com/nunovinhas-creator/goal-roi/main/scangoal/prospective_protocol.json',
+    protocol: null, // o texto do protocolo só é mostrado a partir dos snapshots; aqui usam-se os critérios congelados
     refreshMs: 3 * 60000, tickMs: 15000, timeoutMs: 45000,
     knowledge: false // Integração com o Goal-ROI Brain desativada: não existe canal público seguro (ver Knowledge Center).
   }, window.V6_CONFIG || {});
@@ -50,6 +50,23 @@
   const H2S = {insufficient_games: ['amostra insuficiente', 'warn'], descriptive_only: ['apenas descritiva', 'info']};
   // Um estado decisório só é mostrado se o relatório prospetivo cumprir o protocolo; caso contrário, "certificação inválida".
   const statusLabel = (map, status, valid) => (!valid && status !== 'insufficient_games') ? ['certificação inválida', 'bad'] : (map[status] || [String(status || '—'), '']);
+  // Relações do motor de mercados (v6-markets.js): rótulo e gravidade visual.
+  const REL = {exclusivas_entre_fontes: ['seleções exclusivas entre fontes', 'bad'], convergencia: ['convergência entre fontes', 'info'],
+    divergencia_temporal: ['divergência temporal', 'warn'], exclusivas_mesma_fonte: ['opostas na mesma fonte', ''], compativeis: ['compatíveis', ''],
+    repeticao: ['repetição na mesma fonte', ''], insuficiente: ['evidência insuficiente', 'warn'], nao_comparaveis: ['não comparáveis', '']};
+  const relTag = k => k ? tag(REL[k][0], REL[k][1]) : tag('um só sinal', '');
+  const REL_ORDER = Object.keys(REL);
+  function relationsBlock(r, limit) {
+    if (!r) return '';
+    const counts = REL_ORDER.filter(k => r.counts[k] > 0).map(k => '<tr>' + td(relTag(k)) + td(int(r.counts[k]), 'n') + '</tr>');
+    const pairs = (r.pairs || []).slice().sort((a, b) => REL_ORDER.indexOf(a.category) - REL_ORDER.indexOf(b.category)).slice(0, limit || 12);
+    const total = r.pairs_total || (r.pairs || []).length;
+    return table(['Relação', {t: 'Pares', n: 1}], counts, 'Relações entre sinais') +
+      (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + x.a.market + ' ' + x.a.selection) + ' × ' +
+        esc(x.b.source + ' · ' + x.b.market + ' ' + x.b.selection) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
+        (total > pairs.length ? '<p class="note" style="padding:0 12px">A mostrar ' + int(pairs.length) + ' de ' + int(total) + ' pares, os mais graves primeiro.</p>' : '') : '') +
+      '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação de produção (linhas asiáticas, devoluções e meias). Plataformas distintas, mesmo canal de recolha.</p>';
+  }
   const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': 'bad', 'evitar': 'bad', 'sem evidência': ''};
   const ECON = {positive_exploratory: ['positiva (exploratória)', 'info'], nonpositive_exploratory: ['não positiva (exploratória)', ''], insufficient: ['insuficiente', 'warn']};
   const econ = s => s ? tag((ECON[s] || [s])[0], (ECON[s] || [0, ''])[1]) : '—';
@@ -147,7 +164,7 @@
   async function loadProspective() {
     const out = {changed: false};
     try {
-      const [text, proto] = await Promise.all([get(CFG.prospective), S.protocol ? Promise.resolve(null) : get(CFG.protocol).catch(() => null)]);
+      const [text, proto] = await Promise.all([get(CFG.prospective), (S.protocol || !CFG.protocol) ? Promise.resolve(null) : get(CFG.protocol).catch(() => null)]);
       if (proto) { try { const p = JSON.parse(proto); if (p && p.schema === 'goal_roi_prospective_protocol_v1') S.protocol = p; } catch (e) {} }
       if (text !== S.prospectiveText) {
         const p = JSON.parse(text);
@@ -363,7 +380,7 @@
       '<li><div>' + esc(d.id) + '</div><small>' + when(d.at_utc) + ' · ' + int(d.n) + ' resultados · acerto ' + pct(d.hit_rate) + ' vs necessário ' + pct(d.break_even) + ' · ' + esc(d.status || '') + '</small></li>').join('') + '</ul>'
       : '<div class="empty">Sem descobertas registadas.</div>', {span: 'span-8', flush: true, meta: 'nunca constituem validação'});
     html += panel('Leitura automática do relatório', s.narrative.length ? '<ul class="list">' + s.narrative.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>' : '<div class="empty">Sem leitura publicada.</div>',
-      {flush: true, meta: 'texto gerado por regras em scangoal/insights.py'});
+      {flush: true, meta: 'texto gerado por regras no código de produção'});
     html += panel('Agenda de sinais', '<div class="stack">' + Object.entries(s.agenda_counts).map(([k, v]) => '<div class="row"><span>' + tag(k, VERD[k]) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
       '<p class="note">' + int(s.agenda_items) + ' sinais na agenda. <a href="#radar">Abrir o radar</a>.</p></div>', {span: 'span-6'});
     html += panel('Hipóteses do Brain', '<div class="stack">' + Object.entries(s.hypotheses_counts).map(([k, v]) => '<div class="row"><span>' + tag(k, STATUS[k]) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
@@ -376,15 +393,15 @@
     if (!sg) return head('Market Intelligence') + missing('os mercados');
     const cov = sg.coverage;
     const sel = S.ui.market && sg.markets.find(m => m.match_id === S.ui.market) || sg.markets[0];
-    let html = head('Market Intelligence', 'Betfair, Polymarket e Stake: cronologia, volumes, odds observadas, reforços, convergências e contradições. Não se inferem identidades de apostadores.');
+    let html = head('Market Intelligence', 'Betfair, Polymarket e Stake: cronologia, volumes observados, odds, reforços e relações matemáticas entre seleções. Não se inferem identidades de apostadores.');
     html += '<div class="banner info" style="margin:0">Cobertura efetiva: cronologia de mercado publicada para ' + int(cov.games_with_market_history) + ' jogos de ' + int(cov.games_in_history) + ' no histórico (' + pct(cov.share) + '). As restantes vistas desta área usam o histórico completo.</div>';
     html += '<div class="grid">';
     html += panel('Mapa de calor · apostas por hora de Lisboa e fonte', '<div class="heat-wrap">' + heatmap(sg.heatmap) + '</div>', {flush: true, meta: 'histórico completo (' + int(Object.values(sg.heatmap).flat().reduce((a, b) => a + b, 0)) + ' apostas)'});
     const rows = sg.markets.map(m => '<tr class="click" tabindex="0" data-market="' + esc(m.match_id) + '"' + (sel && m.match_id === sel.match_id ? ' aria-selected="true"' : '') + '>' +
       td(esc(m.teams ? m.teams.join(' — ') : m.match_id)) + td(Object.keys(m.sources).map(src).join(' ')) + td(int(m.events), 'n') +
       td(day(m.first_utc) + ' → ' + when(m.last_utc)) +
-      td((m.convergences.length ? tag('convergência', 'info') + ' ' : '') + (m.contradictions.length ? tag('contradição', 'bad') : '') || '—') + '</tr>');
-    html += panel('Jogos com cronologia de mercado', table(['Jogo', 'Fontes', {t: 'Obs.', n: 1}, 'Período (Lisboa)', 'Sinais cruzados'], rows, 'Jogos com cronologia de mercado'), {span: 'span-6', flush: true, meta: int(sg.markets.length) + ' jogos'});
+      td(m.identity && !m.identity.ok ? tag('identidade insuficiente', 'warn') : relTag(m.relations.headline)) + '</tr>');
+    html += panel('Jogos com cronologia de mercado', table(['Jogo', 'Fontes', {t: 'Obs.', n: 1}, 'Período (Lisboa)', 'Relação dominante'], rows, 'Jogos com cronologia de mercado'), {span: 'span-6', flush: true, meta: int(sg.markets.length) + ' jogos'});
     if (sel) {
       const series = {};
       for (const e of sel.series) if (isNum(e.odds)) {
@@ -394,13 +411,19 @@
       const chart = lineChart(Object.entries(series).map(([k, pts]) => ({name: k, cls: 's-' + k, points: pts})), {fy: v => n(v, 2), fx: v => day(new Date(v).toISOString()), label: 'Odds observadas por fonte'});
       const selRows = sel.selections.map(x => '<tr>' + td(src(x.source)) + td(esc(x.market)) + td(esc(x.selection)) + td(n(x.first_odds, 2), 'n') + td(n(x.last_odds, 2), 'n') +
         td('<span class="' + sign(-(x.move_pct || 0)) + '">' + (isNum(x.move_pct) ? (x.move_pct > 0 ? '+' : '') + n(x.move_pct, 1) + ' %' : '—') + '</span>', 'n') +
-        td(int(x.observations), 'n') + td(int(x.volume), 'n') + td(x.max_mult > 1 ? '×' + x.max_mult : '—', 'n') + '</tr>');
+        td(int(x.observations), 'n') + td(int(x.volume_last), 'n') + td(x.max_mult > 1 ? '×' + x.max_mult : '—', 'n') + '</tr>');
       html += panel('Odds observadas · ' + (sel.teams ? sel.teams.join(' — ') : sel.match_id), chart +
-        (sel.contradictions.length ? '<p class="note neg">Contradição: ' + sel.contradictions.map(c => c.a + ' (' + c.sources_a.join(', ') + ') vs ' + c.b + ' (' + c.sources_b.join(', ') + ')').join('; ') + '</p>' : '') +
-        (sel.convergences.length ? '<p class="note">Convergência: ' + sel.convergences.map(c => c.side + ' em ' + c.sources.join(' + ')).join('; ') + '</p>' : '') +
-        table(['Fonte', 'Mercado', 'Seleção', {t: 'Odd inicial', n: 1}, {t: 'Odd final', n: 1}, {t: 'Variação', n: 1}, {t: 'Obs.', n: 1}, {t: 'Volume', n: 1}, {t: 'Reforço', n: 1}], selRows, 'Seleções observadas'),
+        table(['Fonte', 'Mercado', 'Seleção', {t: 'Odd inicial', n: 1}, {t: 'Odd final', n: 1}, {t: 'Variação', n: 1}, {t: 'Obs.', n: 1}, {t: 'Volume (último)', n: 1}, {t: 'Reforço', n: 1}], selRows, 'Seleções observadas') +
+        '<p class="note">O volume é o total do mercado na última observação; não se soma entre observações.</p>',
         {span: 'span-6', meta: 'odds anunciadas, não executáveis'});
+      html += panel('Relações entre seleções · ' + (sel.teams ? sel.teams.join(' — ') : sel.match_id),
+        sel.identity && !sel.identity.ok ? '<div class="empty">Identidade do jogo insuficiente: ' + esc(sel.identity.reason) + '.</div>' : relationsBlock(sel.relations, 12), {flush: true});
     }
+    const tot = {};
+    for (const m of sg.markets) for (const [k, v] of Object.entries(m.relations.counts)) tot[k] = (tot[k] || 0) + v;
+    html += panel('Relações em todos os jogos com cronologia', table(['Relação', {t: 'Pares', n: 1}], REL_ORDER.map(k => '<tr>' + td(relTag(k)) + td(int(tot[k] || 0), 'n') + '</tr>'), 'Relações agregadas') +
+      '<p class="note" style="padding:0 12px 12px">"Exclusivas" significa que não existe resultado final em que ambas ganhem. Pares compatíveis (por exemplo Over 1,5 e Under 3,5) não são contradições. Opostas na mesma fonte não contam como contradição entre fontes. Sinais afastados no tempo ou em fases diferentes são divergência temporal. Mercados de cantos, cartões, partes do jogo ou totais por equipa não são comparáveis. Na dúvida, evidência insuficiente.</p>',
+      {span: 'span-6', flush: true, meta: 'pares de seleções distintas'});
     const pm = sg.price_move;
     if (pm) {
       const pmRows = Object.entries(pm).filter(([, v]) => v && isNum(v.n)).map(([k, v]) => '<tr>' + td(k === 'pre' ? 'Antes do jogo' : k === 'live' ? 'Durante o jogo' : esc(k)) + td(int(v.n), 'n') +
@@ -414,12 +437,17 @@
     return html + '</div>';
   }
 
+  // Jogo com seleções mutuamente exclusivas entre fontes, segundo o motor (não segundo o rótulo do relatório).
+  function exclusiveGame(id) {
+    const sg = S.files.signals && S.files.signals.data, g = sg && sg.games.find(x => x.match_id === id);
+    return !!(g && g.relations && g.relations.counts.exclusivas_entre_fontes > 0);
+  }
   function radarFilter(items) {
     const f = S.ui.radar, q = f.q.trim().toLowerCase();
     const min = parseFloat(String(f.min).replace(',', '.')), max = parseFloat(String(f.max).replace(',', '.'));
     return items.filter(it => (!q || (it.match + ' ' + it.league + ' ' + it.selection + ' ' + it.market).toLowerCase().includes(q)) &&
       (!f.source || it.source === f.source) && (!f.phase || it.phase === f.phase) && (!f.verdict || it.verdict === f.verdict) &&
-      (!f.conflict || it.conflict) && (!Number.isFinite(min) || it.odds >= min) && (!Number.isFinite(max) || it.odds <= max));
+      (!f.conflict || exclusiveGame(it.match_id)) && (!Number.isFinite(min) || it.odds >= min) && (!Number.isFinite(max) || it.odds <= max));
   }
   function viewRadar() {
     const sg = S.files.signals && S.files.signals.data;
@@ -436,18 +464,19 @@
       '<label>Leitura<select name="verdict">' + opts(verdicts, f.verdict) + '</select></label>' +
       '<label>Odd mín.<input type="number" step="0.01" min="1" name="min" value="' + esc(f.min) + '" inputmode="decimal"></label>' +
       '<label>Odd máx.<input type="number" step="0.01" min="1" name="max" value="' + esc(f.max) + '" inputmode="decimal"></label>' +
-      '<label class="check"><input type="checkbox" name="conflict"' + (f.conflict ? ' checked' : '') + '> Só contradições</label></form>';
+      '<label class="check"><input type="checkbox" name="conflict"' + (f.conflict ? ' checked' : '') + '> Só seleções exclusivas entre fontes</label></form>';
     html += '<div id="radar-results">' + radarResults(sg) + '</div>';
     return html;
   }
   function radarResults(sg) {
     const items = radarFilter(sg.items);
-    const games = C.groupByGame(items);
+    const rel = new Map(sg.games.map(g => [g.match_id, g.relations]));
+    const games = C.groupByGame(items).map(g => Object.assign(g, {relations: rel.get(g.match_id) || null}));
     const dupTotal = games.reduce((s, g) => s + g.duplicates, 0);
     const body = games.length ? '<div class="games">' + games.map(g => '<div class="game"><button type="button" data-game="' + esc(g.match_id) + '">' +
       '<span><span class="title">' + esc(g.match) + '</span><span class="sub"><span>' + esc(g.league || '') + '</span><span>' + int(g.signals.length) + ' sinal(is)</span><span>último ' + when(g.last_utc) + '</span>' +
       (g.duplicates ? '<span>' + int(g.duplicates) + ' duplicado(s) agrupado(s)</span>' : '') + '</span></span>' +
-      '<span class="right">' + g.sources.map(src).join(' ') + Object.entries(g.verdicts).map(([k, v]) => tag(k + (v > 1 ? ' ×' + v : ''), VERD[k])).join('') + (g.conflict ? tag('contradição', 'bad') : '') + '</span></button></div>').join('') + '</div>'
+      '<span class="right">' + g.sources.map(src).join(' ') + Object.entries(g.verdicts).map(([k, v]) => tag(k + (v > 1 ? ' ×' + v : ''), VERD[k])).join('') + (g.relations && g.relations.headline && g.relations.headline !== 'compativeis' && g.relations.headline !== 'nao_comparaveis' ? relTag(g.relations.headline) : '') + '</span></button></div>').join('') + '</div>'
       : '<div class="empty">Nenhum sinal corresponde aos filtros.</div>';
     return panel('Jogos', body, {flush: true, meta: int(games.length) + ' jogos · ' + int(items.length) + ' sinais' + (dupTotal ? ' · ' + int(dupTotal) + ' duplicados' : '') + ' · agenda ' + when(sg.agenda_generated_utc)});
   }
@@ -457,7 +486,9 @@
     const g = C.groupByGame(sg.items.filter(i => i.match_id === id))[0];
     if (!g) return;
     const market = sg.markets.find(m => m.match_id === id);
-    const chrono = (market ? market.series.map(e => ({d: e.d, source: e.source, text: e.market + ' · ' + e.selection + (isNum(e.odds) ? ' @ ' + n(e.odds, 2) : '') + (isNum(e.total) ? ' · vol. ' + int(e.total) : '') + (e.phase ? ' · ' + e.phase : '')}))
+    const pre = sg.games.find(x => x.match_id === id);
+    const relations = market ? market.relations : pre && pre.relations;
+    const chrono = (market ? market.series.map(e => ({d: e.d, source: e.source, text: e.market + ' · ' + e.selection + (isNum(e.odds) ? ' @ ' + n(e.odds, 2) : '') + (isNum(e.total) ? ' · volume do mercado ' + int(e.total) : '') + (e.phase ? ' · ' + (e.phase === 'live' ? 'ao vivo' : 'antes do jogo') : '')}))
       : g.signals.map(s => ({d: s.date_utc, source: s.source, text: s.market + ' · ' + s.selection + ' @ ' + n(s.odds, 2) + (s.phase ? ' · ' + s.phase : '')})));
     const ev = list => list.length ? '<ul>' + list.slice(0, 8).map(h => '<li><div>' + esc(h.id) + '</div><small class="note">' + int(h.games) + ' jogos · ' + int(h.hits) + ' acertos em ' + int(h.n) +
       ' · necessário ' + pct(h.break_even) + ' · P(acima) ' + pct(h.prob_above, 0) + ' · ' + esc(h.status || '') + '<br>Prospetivo: ' + econ(h.prospective && h.prospective.status) + '</small></li>').join('') + '</ul>' : '<p class="note">Nenhuma.</p>';
@@ -465,12 +496,13 @@
       '<dl class="facts"><dt>Fonte</dt><dd>' + src(s.source) + ' · ' + esc(s.family || s.type) + '</dd><dt>Fase</dt><dd>' + esc(s.when || s.phase || '—') + (isNum(s.minute) ? ' · ' + s.minute + '′' : '') + '</dd>' +
       '<dt>Odd</dt><dd>' + n(s.odds, 2) + (isNum(s.odds_last) && s.odds_last !== s.odds ? ' → ' + n(s.odds_last, 2) : '') + ' · ' + esc(s.odds_band || '') + '</dd>' +
       '<dt>Reforço</dt><dd>' + (s.max_mult > 1 ? '×' + s.max_mult : 'nenhum') + '</dd><dt>Quota</dt><dd>' + (isNum(s.share) ? n(s.share) + ' %' : '—') + '</dd>' +
-      '<dt>Leitura</dt><dd>' + tag(s.verdict || '—', VERD[s.verdict]) + (s.conflict ? ' ' + tag('contradição', 'bad') : '') + ' · não validado</dd>' +
+      '<dt>Leitura</dt><dd>' + tag(s.verdict || '—', VERD[s.verdict]) + ' · não validado' + (s.conflict ? '<br><small class="note">O relatório marca "contraditório" quando há seleções diferentes no mesmo mercado do jogo; a relação matemática está na secção Relações.</small>' : '') + '</dd>' +
       (s.duplicates ? '<dt>Duplicados</dt><dd>' + int(s.duplicates) + ' agrupados</dd>' : '') + '</dl>' +
       '<div class="evidence"><div class="for"><h4>A favor (' + int(s.good_total) + ')</h4>' + ev(s.good) + '</div><div class="against"><h4>Contra (' + int(s.bad_total) + ')</h4>' + ev(s.bad) + '</div></div></div></section>').join('');
     openDrawer(g.match, (g.league || '') + ' · ' + g.sources.join(', '),
       '<section class="panel"><header><h3>Cronologia</h3><span class="meta">' + (market ? 'histórico de mercado publicado' : 'só sinais da agenda (jogo sem histórico de mercado publicado)') + '</span></header><div class="body"><ol class="chrono">' +
-      chrono.map(c => '<li class="' + esc(c.source) + '"><time>' + when(c.d) + '</time> ' + esc(c.source) + ' · ' + esc(c.text) + '</li>').join('') + '</ol></div></section>' + content +
+      chrono.map(c => '<li class="' + esc(c.source) + '"><time>' + when(c.d) + '</time> ' + esc(c.source) + ' · ' + esc(c.text) + '</li>').join('') + '</ol></div></section>' +
+      '<section class="panel"><header><h3>Relações entre seleções</h3><span class="meta">' + (market ? 'histórico de mercado' : 'sinais da agenda') + '</span></header><div class="body flush">' + relationsBlock(relations, 8) + '</div></section>' + content +
       '<p class="note">Evidência exploratória por hipótese do gerador. Hipóteses partilham jogos e não têm correção de multiplicidade.</p>');
   }
 
@@ -549,8 +581,10 @@
       (proto ? '<p class="note">Conflitos: ' + esc(proto.conflict || '') + '</p><p class="note">Ausência: ' + esc(proto.missing || '') + '</p>' : ''), {span: 'span-7'});
     html += panel('Critérios congelados', proto ? '<div class="stack">' + ['H1', 'H2'].map(k => proto[k] ? '<div><b>' + k + '</b> — <span class="note">' + esc(proto[k].status) + '</span><p class="note">População: ' + esc(proto[k].population) + '</p><p class="note">Decisão: ' + esc(proto[k].decision) + '</p></div>' : '').join('') +
       '<p class="note">' + esc(proto.frozen) + '</p><p class="note">Âmbito: ' + esc(proto.scope) + '</p></div>'
-      : '<dl class="facts"><dt>Jogos mínimos</dt><dd>' + F.min_games + '</dd><dt>z crítico</dt><dd>' + F.z_crit + '</dd><dt>Faixa mínima</dt><dd>' + F.min_band + ' jogos</dd></dl><p class="note">Texto do protocolo indisponível; valores de scangoal/prospective.py.</p>',
-      {meta: 'scangoal/prospective_protocol.json'});
+      : '<dl class="facts"><dt>Jogos mínimos</dt><dd>' + F.min_games + '</dd><dt>z crítico</dt><dd>' + F.z_crit + '</dd><dt>Faixa mínima</dt><dd>' + F.min_band + ' jogos</dd><dt>Sem resultado</dt><dd>' + F.missing_after_hours + ' h</dd></dl>' +
+        '<p class="note">H1: nenhuma conclusão antes de ' + F.min_games + ' jogos com resultado independente; depois, "suportada" só com z ≥ ' + n(F.z_crit, 3) + ' e observado acima do esperado em todas as faixas de minutos com pelo menos ' + F.min_band + ' jogos. Apenas informação preditiva, não rentabilidade.</p>' +
+        '<p class="note">H2: nenhuma conclusão antes de ' + F.min_games + ' jogos; sem validação de ROI, porque as odds anunciadas não são preços executáveis e os custos são desconhecidos.</p><p class="note">Texto integral do protocolo disponível com os snapshots; valores congelados do código de produção.</p>',
+      {meta: 'protocolo prospetivo congelado'});
     const c = sc.certification, sb = sc.strategy_board || {};
     html += panel('Certificação das estratégias (relatório principal)', '<dl class="facts"><dt>Método</dt><dd>' + esc(sc.validation_method ? sc.validation_method.method : '—') + '</dd><dt>Estado</dt><dd>' + esc(c.state) + '</dd>' +
       '<dt>Registo válido</dt><dd>' + (sc.validation_method && sc.validation_method.ledger_valid ? 'sim' : 'não') + '</dd><dt>Validadas</dt><dd>' + int(c.validated) + '</dd>' +

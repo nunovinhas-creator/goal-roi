@@ -97,18 +97,22 @@ test('duplicações na agenda são agrupadas e contadas', () => {
   assert.equal(games.reduce((s, g) => s + g.signals.length, 0), out.length);
 });
 
-test('contradições e convergências entre fontes', () => {
+test('cronologia de mercado: relações do motor, volume sem dupla contagem, eventos inválidos ignorados', () => {
   const matches = {x: {teams: ['A', 'B'], events: [
-    {d: '2026-11-20T10:00:00+00:00', k: 'POLYMARKET', selection: 'Over 2.5', market: 'Asian Total', odds: 1.9, total: 1000},
-    {d: '2026-11-20T11:00:00+00:00', k: 'STAKE_LOAD', selection: 'Under 2.5', market: 'Total', odds: 2.0, total: 500},
-    {d: '2026-11-20T12:00:00+00:00', k: 'BETFAIR', selection: 'Over 2.5', market: 'Total', odds: 1.8, total: 800, mult: 4},
+    {d: '2026-11-20T10:00:00+00:00', k: 'POLYMARKET', phase: 'pre', selection: 'Over 2.5', market: 'Asian Total', odds: 1.9, total: 1000},
+    {d: '2026-11-20T10:30:00+00:00', k: 'POLYMARKET', phase: 'pre', selection: 'Over 2.5', market: 'Asian Total', odds: 1.85, total: 1500},
+    {d: '2026-11-20T11:00:00+00:00', k: 'STAKE_LOAD', phase: 'pre', selection: 'Under 2.5', market: 'Asian Total', odds: 2.0, total: 500},
+    {d: '2026-11-20T12:00:00+00:00', k: 'STAKE_LOAD', phase: 'pre', selection: 'Under 3.5', market: 'Asian Total', odds: 1.5, total: 800, mult: 4},
     {d: 'inválida', k: 'BETFAIR', selection: 'Over 2.5', market: 'Total', odds: 9}]}};
   const [m] = core.marketTimeline(matches);
-  assert.equal(m.events, 3);
-  assert.deepEqual(m.contradictions.map(c => [c.a, c.b]), [['over', 'under']]);
-  assert.deepEqual(m.convergences.map(c => c.side), ['over']);
-  const bf = m.selections.find(s => s.source === 'Betfair');
-  assert.equal(bf.max_mult, 4);
+  assert.equal(m.events, 4);
+  const pm = m.selections.find(s => s.source === 'Polymarket');
+  assert.equal(pm.observations, 2); assert.equal(pm.volume_last, 1500); assert.equal(pm.volume_max, 1500);
+  assert.equal(m.relations.counts.exclusivas_entre_fontes, 1);   // Over 2,5 vs Under 2,5
+  assert.equal(m.relations.counts.compativeis, 2);               // Over 2,5 × Under 3,5 e Under 2,5 × Under 3,5
+  assert.equal(m.relations.counts.exclusivas_mesma_fonte, 0);    // Under 2,5 e Under 3,5 da Stake são compatíveis
+  assert.equal(m.relations.counts.repeticao, 1);
+  assert.equal(m.selections.find(s => s.selection === 'Under 3.5').max_mult, 4);
 });
 
 test('respostas fora de ordem e revisões mais antigas são ignoradas', () => {

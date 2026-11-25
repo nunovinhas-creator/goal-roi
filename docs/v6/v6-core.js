@@ -18,7 +18,7 @@
   const SNAPSHOTS = ['summary', 'signals', 'performance', 'science', 'operations', 'learning'];
   const FILE = name => 'dashboard-' + name + '.json';
   const VERDICT = 'RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.';
-  // Critérios congelados no protocolo prospetivo (scangoal/prospective.py e prospective_protocol.json).
+  // Critérios congelados no protocolo prospetivo (prospective.py e prospective_protocol.json).
   // Servem apenas para detetar certificações inválidas no relatório recebido; não são recalculados aqui.
   const FROZEN = Object.freeze({min_games: 200, z_crit: 2.576, min_band: 30, missing_after_hours: 72});
   const H1_STATUSES = ['insufficient_games', 'supported_predictive_only', 'not_supported'];
@@ -56,7 +56,7 @@
     /(?:^|[^\w@])@[A-Za-z][A-Za-z0-9_]{4,31}\b/g,     // identificador Telegram em qualquer posição
     /\bt(?:elegram)?\.me\/[A-Za-z0-9_+/-]+/gi        // ligações t.me
   ];
-  const ALLOWED_HANDLES = new Set(['@scangoal_bot']);
+  const ALLOWED_HANDLES = new Set();
   function privateString(s) {
     if (typeof s !== 'string') return false;
     for (const re of PRIVATE_VALUE) {
@@ -200,56 +200,58 @@
     return [...games.values()].sort((a, b) => time(b.last_utc) - time(a.last_utc));
   }
 
-  // Lado de uma seleção, para detetar convergência/contradição entre fontes no mesmo jogo.
-  function side(selection, teams) {
-    const s = String(selection || '').toLowerCase();
-    if (/^over\b|\bover\b/.test(s)) return 'over';
-    if (/^under\b|\bunder\b/.test(s)) return 'under';
-    if (/^ah1|^1\b|^w1/.test(s)) return 'home';
-    if (/^ah2|^2\b|^w2/.test(s)) return 'away';
-    if (Array.isArray(teams)) {
-      const norm = x => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-      const sel = norm(s.replace(/\(.*\)/, ''));
-      if (sel && norm(teams[0]).startsWith(sel.slice(0, 5))) return 'home';
-      if (sel && norm(teams[1]).startsWith(sel.slice(0, 5))) return 'away';
-    }
-    return null;
-  }
-  const OPPOSITE = {over: 'under', under: 'over', home: 'away', away: 'home'};
+  // Motor de compatibilidade (v6-markets.js): no navegador é carregado antes deste ficheiro; no Node é requerido.
+  const M = (typeof module === 'object' && module.exports) ? require('./v6-markets.js') : (typeof self !== 'undefined' ? self.V6Markets : null);
 
   function marketTimeline(matches) {
     const out = [];
     for (const [id, m] of Object.entries(matches || {})) {
       const events = (m.events || []).filter(e => Number.isFinite(time(e.d))).slice().sort((a, b) => time(a.d) - time(b.d));
-      const bySel = new Map(), sources = {}, sides = {};
+      const bySel = new Map(), sources = {};
       for (const e of events) {
         const src = SOURCES[e.k] || sourceOf(e.k);
         sources[src] = (sources[src] || 0) + 1;
-        const key = src + '|' + e.market + '|' + e.selection;
+        const key = src + '|' + e.market + '|' + e.selection + '|' + (e.phase || '');
         if (!bySel.has(key)) bySel.set(key, {source: src, market: e.market, selection: e.selection, phase: e.phase,
           first_utc: e.d, first_odds: num(e.odds) ? e.odds : null, last_utc: e.d, last_odds: num(e.odds) ? e.odds : null,
-          observations: 0, volume: 0, max_mult: 1});
+          observations: 0, volume_last: null, volume_max: null, max_mult: 1});
         const s = bySel.get(key);
         s.observations++;
         s.last_utc = e.d;
         if (num(e.odds)) s.last_odds = e.odds;
-        if (num(e.total)) s.volume += e.total;
+        // "total" é o volume do mercado no momento da observação: não se soma entre observações.
+        if (num(e.total)) { s.volume_last = e.total; s.volume_max = Math.max(s.volume_max || 0, e.total); }
         if (num(e.mult) && e.mult > s.max_mult) s.max_mult = e.mult;
-        const sd = side(e.selection, m.teams);
-        if (sd) (sides[sd] = sides[sd] || new Set()).add(src);
       }
-      const contradictions = Object.keys(sides).filter(sd => sides[OPPOSITE[sd]] && sd < OPPOSITE[sd])
-        .map(sd => ({a: sd, b: OPPOSITE[sd], sources_a: [...sides[sd]], sources_b: [...sides[OPPOSITE[sd]]]}));
-      const convergences = Object.entries(sides).filter(([, set]) => set.size > 1).map(([sd, set]) => ({side: sd, sources: [...set]}));
-      out.push({match_id: id, teams: m.teams || null, events: events.length,
+      const identity = M.gameIdentity(id, m);
+      const analysis = M.analyseGame(events, m.teams, identity);
+      out.push({match_id: id, teams: m.teams || null, identity, events: events.length,
         first_utc: events.length ? events[0].d : null, last_utc: events.length ? events[events.length - 1].d : null,
-        sources, selections: [...bySel.values()].map(s => Object.assign(s, {volume: round(s.volume, 0),
+        sources, selections: [...bySel.values()].map(s => Object.assign(s, {
           move_pct: num(s.first_odds) && num(s.last_odds) && s.first_odds > 0 ? round((s.last_odds / s.first_odds - 1) * 100, 1) : null})),
-        convergences, contradictions,
+        relations: {counts: analysis.counts, headline: M.headline(analysis.counts), pairs: analysis.pairs.slice(0, 60), pairs_total: analysis.pairs.length},
         series: events.map(e => ({d: e.d, source: SOURCES[e.k] || sourceOf(e.k), market: e.market, selection: e.selection,
-          odds: num(e.odds) ? e.odds : null, total: num(e.total) ? e.total : null, share: num(e.share) ? e.share : null, phase: e.phase || null}))});
+          odds: num(e.odds) ? e.odds : null, total: num(e.total) ? e.total : null, share: num(e.share) ? e.share : null, phase: e.phase || null,
+          score: Array.isArray(e.score_at_signal) ? e.score_at_signal : null}))});
     }
     return out.sort((a, b) => time(b.last_utc) - time(a.last_utc));
+  }
+
+  // Equipas de um jogo da agenda: do histórico publicado, senão do nome "Casa — Fora" com exatamente duas partes.
+  function teamsOf(report, g) {
+    const m = report.matches && report.matches[g.match_id];
+    if (m && Array.isArray(m.teams) && m.teams.length === 2) return m.teams;
+    const parts = String(g.match || '').split(' — ');
+    return parts.length === 2 && parts.every(x => x.trim()) ? parts.map(x => x.trim()) : null;
+  }
+
+  // Relações entre os sinais da agenda de um jogo (para o radar), com o mesmo motor.
+  function agendaRelations(items, teams) {
+    const events = items.map(it => ({k: it.type, d: it.date_utc, phase: it.phase, market: it.market,
+      selection: it.market === '1X2' && Array.isArray(teams) ? ({[teams[0]]: '1', [teams[1]]: '2', Empate: 'X'}[it.selection] || it.selection) : it.selection,
+      score_at_signal: it.score_at_signal}));
+    const a = M.analyseGame(events, teams, teams ? {ok: true} : {ok: false, reason: 'equipas desconhecidas'});
+    return {counts: a.counts, headline: M.headline(a.counts), pairs: a.pairs};
   }
 
   // Mapa de calor hora de Lisboa × fonte, a partir das apostas publicadas no simulador.
@@ -286,7 +288,7 @@
     });
     return {max: round(max, 2), at};
   }
-  // Mesma regra de scangoal/report.py:pl — w é o desfecho (1, 0,5, 0, −0,5, −1), não unidades.
+  // Mesma regra de report.py:pl — w é o desfecho (1, 0,5, 0, −0,5, −1), não unidades.
   const pl = (w, odds) => (w > 0 ? w * (odds - 1) : w);
   function periodTable(entries) {
     const byWeek = {}, bySource = {};
@@ -358,7 +360,10 @@
     const committed = report.simulation && int(report.simulation.committed_games) ? report.simulation.committed_games : null;
     return Object.assign(base(), {kind: 'signals', data: {
       agenda_generated_utc: agenda.generated_utc || null, rules: agenda.rules || null, counts: agenda.counts || {},
-      items, games: groupByGame(items).map(g => Object.assign({}, g, {signals: g.signals.map(s => signalKey(s))})),
+      items, games: groupByGame(items).map(g => {
+        const teams = teamsOf(report, g);
+        return Object.assign({}, g, {teams, signals: g.signals.map(s => signalKey(s)), relations: agendaRelations(g.signals, teams)});
+      }),
       markets,
       polymarket_over25: (report.polymarket_over25 || []).map(p => ({match_id: p.match_id, match: p.match, date_utc: p.date_utc,
         kickoff_utc: p.kickoff_utc, phase: p.phase, market: p.market, selection: p.selection, odds: p.odds, share: p.share, total: p.total})),
@@ -560,7 +565,7 @@
 
   return {SCHEMA, MANIFEST_SCHEMA, PROSPECTIVE_SCHEMA, SNAPSHOTS, FILE, FROZEN, VERDICT, REFERENCE,
     sanitize, privacyFindings, validateReport, validateProspective, certificationState, freshness,
-    dedupe, groupByGame, signalKey, marketTimeline, heatmap, drawdown, periodTable, sourceOf, side,
+    dedupe, groupByGame, signalKey, marketTimeline, agendaRelations, heatmap, drawdown, periodTable, sourceOf,
     buildSummary, buildSignals, buildPerformance, buildScience, buildOperations, buildLearning, buildAll,
     validateManifest, checkSnapshot, createSequencer};
 });
