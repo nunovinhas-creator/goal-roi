@@ -64,6 +64,43 @@ async function visual(browser, srv) {
   }
 }
 
+// Android estreito: nenhuma vista, gaveta ou separador pode criar scroll horizontal entre 320 e 430 px.
+async function narrow(browser, srv) {
+  for (const width of [320, 340, 360, 375, 390, 412, 430]) for (const scheme of ['light', 'dark']) {
+    const {ctx, page, errors} = await open(browser, srv, {device: {viewport: {width, height: 800}, isMobile: true, hasTouch: true}, scheme});
+    for (const v of VIEWS) {
+      await page.evaluate(h => { location.hash = h; }, v);
+      await page.waitForSelector('#view-' + v + ' h2');
+      if (v === 'brain') for (const t of ['diario', 'llm', 'promissoras', 'replicacao', 'rejeitadas', 'seguimento', 'limites']) {
+        await page.click('[data-tab="' + t + '"]');
+        assert.ok(await noOverflow(page), 'overflow em brain/' + t + ' a ' + width + ' px ' + scheme);
+      }
+      assert.ok(await noOverflow(page), 'overflow em ' + v + ' a ' + width + ' px ' + scheme);
+      // nenhum elemento visível ultrapassa a largura do ecrã fora de uma região com scroll próprio
+      const wide = await page.evaluate(() => [...document.querySelectorAll('#main *')].filter(el => {
+        if (el.closest('thead, caption, .sr')) return false; // só para leitores de ecrã (recortados a 1 px)
+        const r = el.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + 1 || r.left < -1);
+      }).slice(0, 3).map(el => el.tagName + '.' + el.className));
+      assert.deepEqual(wide, [], 'elementos fora do ecrã em ' + v + ' a ' + width + ' px');
+      // nenhuma região com scroll horizontal (tabelas empilham-se, ticker e separadores quebram linha)
+      const scrollers = await page.evaluate(() => [...document.querySelectorAll('body *')].filter(el => {
+        const cs = getComputedStyle(el); if (el.closest('[hidden]') || cs.display === 'none') return false;
+        return (cs.overflowX === 'auto' || cs.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 1;
+      }).slice(0, 3).map(el => el.tagName + '.' + el.className));
+      assert.deepEqual(scrollers, [], 'scroll horizontal interno em ' + v + ' a ' + width + ' px');
+    }
+    await page.evaluate(() => { location.hash = 'radar'; });
+    await page.waitForSelector('#radar-filters');
+    if (await page.locator('[data-game]').count()) {
+      await page.locator('[data-game]').first().click();
+      await page.waitForSelector('#drawer:not([hidden])');
+      assert.ok(await page.evaluate(() => document.getElementById('drawer').scrollWidth <= document.getElementById('drawer').clientWidth + 1), 'gaveta com scroll horizontal a ' + width + ' px');
+    }
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+}
+
 async function functional(browser, srv) {
   // Recurso: sem manifesto, relatório completo derivado no navegador.
   let {ctx, page, errors} = await open(browser, srv);
@@ -331,6 +368,7 @@ function writeTmp(text) { const f = path.join(fs.mkdtempSync(path.join(os.tmpdir
     await run('funcional e adversarial (modo relatório)', () => functional(browser, srv));
     srv.clear();
     await run('visual: telemóvel, tablet e desktop em claro e escuro', () => visual(browser, srv));
+    await run('Android 320–430 px sem overflow (claro e escuro)', () => narrow(browser, srv));
     await run('snapshots: progressivo, seletivo, incompatível', () => snapshots(browser, start));
   } finally { await srv.close(); await browser.close(); }
   if (failures.length) { console.error(failures.length + ' falha(s)'); process.exit(1); }

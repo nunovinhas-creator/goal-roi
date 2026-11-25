@@ -258,3 +258,51 @@ ul.list small { color: var(--mut); }
   .filters input[type="number"] { width: 100%; }
 }
 @media (forced-colors: active) { .tag::before, .src i { forced-color-adjust: none; } }
+
+/* separadores, listas compactas e paginação (Brain) */
+.tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 0 0 auto; border: 0; background: none; padding: 10px 12px; min-height: 44px; font-weight: 600; font-size: 13px; color: var(--mut); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button .num { font-size: 11px; color: var(--faint); margin-left: 2px; }
+.list-filters { padding: 10px 12px 0; }
+.list.compact li { padding: 8px 12px; }
+.list.compact small { display: block; margin-top: 2px; line-height: 1.4; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.count { padding: 8px 12px 0; margin: 0; }
+.count:focus { outline: none; }
+.pager { display: flex; gap: 8px; justify-content: space-between; padding: 8px 12px 12px; }
+.more { min-height: 40px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); font-weight: 600; cursor: pointer; }
+.more[disabled] { opacity: .45; cursor: default; }
+.pad { padding: 10px 12px 0; margin: 0; }
+
+/* Android: nenhuma região com scroll horizontal */
+@media (max-width: 640px) {
+  .table-wrap { overflow: visible; }
+  .table-wrap table, .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; width: 100%; }
+  .table-wrap thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .table-wrap tr { padding: 6px 0; border-bottom: 1px solid var(--grid); }
+  .table-wrap td { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border: 0; padding: 2px 12px; text-align: right; overflow-wrap: anywhere; }
+  .table-wrap td::before { content: attr(data-label); flex: 0 0 auto; max-width: 45%; text-align: left; color: var(--mut); font: 600 10.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+  .table-wrap td:not([data-label])::before { content: none; }
+  .table-wrap td:not([data-label]) { justify-content: flex-start; text-align: left; }
+  .table-wrap td.empty { justify-content: flex-start; }
+  .ticker { flex-wrap: wrap; overflow: visible; gap: 2px 14px; }
+  .tick.secondary { display: none; }
+  .tabs { flex-wrap: wrap; overflow: visible; }
+  .tabs button { padding: 8px 10px; min-height: 40px; }
+  .heat-wrap { overflow: visible; padding: 10px 8px; }
+  .heat-wrap .heat { min-width: 0; grid-template-columns: 58px repeat(24, minmax(0, 1fr)); gap: 1px; }
+  .heat .src { font-size: 10px; overflow: hidden; text-overflow: ellipsis; }
+  .heat .cell { min-height: 8px; }
+  .rail .nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+  .rail .nav a { min-width: 0; min-height: 40px; padding: 4px 2px; }
+  .rail .nav a span { display: none; }
+  .rail .nav a::after { content: attr(data-short); font-size: 11px; font-weight: 600; }
+  .main { padding-bottom: 104px; }
+  .status .tools .classic { padding: 7px 8px; }
+  .chrono { overflow-wrap: anywhere; }
+}
+
+.heat .hl { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.src.Canal i { background: var(--s0); }

@@ -479,9 +479,12 @@
       hit_rate: h.hit_rate, break_even: h.break_even, prob_above: h.prob_above, roi: h.roi, status: h.status,
       source: h.source || null, born_utc: h.born_utc || null, reason: h.reason || null, expect: h.expect || null, mode: h.mode || null,
       evidence_level: h.evidence_level || null,
-      prospective: h.prospective ? {games: h.prospective.games, roi: h.prospective.roi,
-        status: h.prospective.economics ? h.prospective.economics.status : null,
-        scope: h.prospective.economics ? h.prospective.economics.scope : null} : null});
+      prospective: h.prospective ? (e => ({games: h.prospective.games, roi: h.prospective.roi,
+        status: e.status || null, scope: e.scope || null, results_confirmed: int(e.results_confirmed) ? e.results_confirmed : null,
+        wins: int(e.wins) ? e.wins : null, losses: int(e.losses) ? e.losses : null, voids: int(e.voids) ? e.voids : null,
+        pending: int(e.pending) ? e.pending : null, imputed_losses: int(e.imputed_losses) ? e.imputed_losses : null,
+        roi_advertised: num(e.roi_advertised) ? e.roi_advertised : null, roi_odds_minus_2pct: num(e.roi_odds_minus_2pct) ? e.roi_odds_minus_2pct : null,
+        decision_days: int(e.decision_days) ? e.decision_days : null}))(h.prospective.economics || {}) : null});
     const replicated = (b.top || []).filter(h => h.prospective && h.prospective.economics && h.prospective.economics.status === 'positive_exploratory');
     return Object.assign(base(), {kind: 'learning', data: {
       counts: b.counts || {}, hypotheses_total: num(b.hypotheses) ? b.hypotheses : null, tested: b.tested,
@@ -492,9 +495,16 @@
         today: b.llm_today || null, evaluation: b.llm_evaluation || null, hypotheses: (b.llm || []).map(lite)},
       promising: (b.top || []).filter(h => h.status === 'promissora').map(lite),
       top: (b.top || []).slice(0, 40).map(lite),
-      rejected: (b.abandoned || []).slice(0, 60).map(lite), rejected_total: (b.abandoned || []).length,
-      replicated_exploratory: replicated.slice(0, 40).map(lite), replicated_exploratory_total: replicated.length,
+      rejected: (b.abandoned || []).map(lite), rejected_total: (b.counts || {})['abandonada'] || (b.abandoned || []).length,
+      replicated_exploratory: replicated.map(lite), replicated_exploratory_total: replicated.length,
       top_pool: (b.top || []).length,
+      // Totais exatos e listas completas de estados (ids), distintos das listas com métricas, que são parciais.
+      totals: {hypotheses: num(b.hypotheses) ? b.hypotheses : null, promising: (b.counts || {})['promissora'] || 0,
+        abandoned: (b.counts || {})['abandonada'] || 0, observing: (b.counts || {})['em observação'] || 0,
+        llm: num(b.llm_total) ? b.llm_total : null, llm_published: (b.llm || []).length, top_published: (b.top || []).length,
+        abandoned_published: (b.abandoned || []).length, journal: (b.notes || []).length},
+      status_index: Object.entries(isObj(b.status_list) ? b.status_list : {}).filter(([, v]) => typeof v === 'string').map(([id, status]) => ({id, status})),
+      strategy_board_counts: b.strategy_board ? b.strategy_board.counts || null : null,
       track: b.track ? {by_source: b.track.by_source, meaning: b.track.meaning, unit: b.track.unit, min_results: b.track.min_results} : null,
       watch: (b.watch || []).slice(0, 30).map(w => ({date_utc: w.date_utc, match: w.match, match_id: w.match_id, type: w.type,
         market: w.market, selection: w.selection, odds: w.odds, phase: w.phase, reasons: (w.reasons || []).length})),

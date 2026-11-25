@@ -213,7 +213,8 @@ test('atualização seletiva: conteúdos inalterados mantêm o hash entre revis�
 test('auditoria: filtro de privacidade sem desvios e sem falsos positivos', () => {
   for (const s of ['@scangoal_bot hi @realuser', '(@johndoe', 'x:@johndoe', 't.me/johndoe', 'bot123456789:' + 'A'.repeat(34), 'sk-proj-' + 'a'.repeat(26), 'a@b.com'])
     assert.equal(core.sanitize(s), '[ocultado]', s);
-  for (const s of ['Over 2.5@1.85', 'Lille — Bayern Munchen', '@scangoal_bot', 'AH2(-0.5)', 'Asian Handicap: Viborg (-1)'])
+  assert.equal(core.sanitize('@scangoal_bot'), '[ocultado]'); // o nome do canal não é publicado
+  for (const s of ['Over 2.5@1.85', 'Lille — Bayern Munchen', 'AH2(-0.5)', 'Asian Handicap: Viborg (-1)'])
     assert.equal(core.sanitize(s), s, s);
   assert.deepEqual(Object.keys(core.sanitize({SESSION_X: 1, tokens_used: 2, api_key: 3, bot_token: 4})), ['SESSION_X', 'tokens_used']);
 });
@@ -232,4 +233,25 @@ test('auditoria: valores não numéricos do relatório prospetivo não chegam ao
   assert.equal(s.valid, false);
   assert.equal(s.games_registered, null);
   assert.equal(s.h1.games, null);
+});
+
+test('P2: nenhuma referência pública ao nome do canal nas páginas e snapshots servidos', () => {
+  const re = new RegExp('scan' + 'goal', 'i');
+  for (const f of fs.readdirSync(path.join(ROOT, 'docs/v6'))) {
+    if (/\.(js|css|html)$/.test(f)) assert.doesNotMatch(fs.readFileSync(path.join(ROOT, 'docs/v6', f), 'utf8'), re, f);
+  }
+  assert.doesNotMatch(JSON.stringify(core.buildAll(report, prospective, protocol, AT)), re);
+});
+
+test('P2: contagens do Brain distinguem totais, publicados e listas completas', () => {
+  const l = core.buildLearning(report).data;
+  assert.equal(l.totals.hypotheses, report.brain.hypotheses);
+  assert.equal(l.totals.promising, report.brain.counts['promissora']);
+  assert.equal(l.totals.abandoned, report.brain.counts['abandonada']);
+  assert.equal(l.status_index.filter(x => x.status === 'promissora').length, l.totals.promising);
+  assert.equal(l.status_index.filter(x => x.status === 'abandonada').length, l.totals.abandoned);
+  assert.equal(l.rejected_total, report.brain.counts['abandonada']);
+  assert.equal(l.totals.llm, report.brain.llm_total);
+  assert.equal(l.totals.llm_published, report.brain.llm.length);
+  assert.equal(l.top_pool, report.brain.top.length);
 });

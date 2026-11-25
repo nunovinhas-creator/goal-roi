@@ -20,7 +20,7 @@
     mode: null, files: {}, revision: 0, manifest: null, reportText: null, prospectiveText: null, prospective: null,
     prospectiveState: 'por carregar', protocol: null, lastOk: null, lastError: null, busy: false,
     seq: C.createSequencer(), stats: {requests: 0, notModified: 0, failures: 0, bytes: 0, derivations: 0, snapshotFetches: 0},
-    view: 'command', rendered: {}, charts: {}, ui: {radar: {q: '', source: '', phase: '', verdict: '', conflict: false, min: '', max: ''}, market: null}
+    view: 'command', rendered: {}, charts: {}, ui: {radar: {q: '', source: '', phase: '', verdict: '', conflict: false, min: '', max: ''}, market: null, pages: {}, brainTab: null}
   };
 
   // ---------- formatação (pt-PT) ----------
@@ -39,7 +39,7 @@
   const when = iso => { const t = Date.parse(iso); return Number.isFinite(t) ? LIS.format(new Date(t)) : '—'; };
   const day = iso => { const t = Date.parse(iso); return Number.isFinite(t) ? LISD.format(new Date(t)) : '—'; };
   const ago = m => !isNum(m) ? '—' : m < 60 ? m + ' min' : m < 1440 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : Math.floor(m / 1440) + ' d';
-  const src = s => '<span class="src ' + esc(s) + '"><i aria-hidden="true"></i>' + esc(s === 'Outros' ? 'Outros sinais do bot' : s) + '</span>';
+  const src = s => '<span class="src ' + esc(s) + '"><i aria-hidden="true"></i>' + esc(s === 'Outros' ? 'Sinais analíticos do canal' : s) + '</span>';
   // Notas do relatório publicadas em inglês, traduzidas sem alterar o sentido; texto desconhecido fica como está.
   const NOTES = {'predictive information relative to a generic rate; not profitability': 'Informação preditiva face a uma taxa genérica; não é rentabilidade.',
     'earlier edge did not replicate; no ROI validation without executable prices and known costs': 'A vantagem anterior não se replicou; sem validação de ROI sem preços executáveis e custos conhecidos.',
@@ -269,7 +269,7 @@
       ['H1', p && p.h1 ? int(p.h1.games) + '/' + p.h1.target : '—'],
       ['H2', p && p.h2 ? int(p.h2.games) + '/' + p.h2.target : '—'],
       ['Validadas', int(sum.certification.validated)]
-    ].map(([k, v]) => '<span class="tick">' + esc(k) + ' <b>' + esc(v) + '</b></span>').join('');
+    ].map(([k, v]) => '<span class="tick' + (['Recolha', 'Dados', 'ROI Q7', 'H1'].includes(k) ? '' : ' secondary') + '">' + esc(k) + ' <b>' + esc(v) + '</b></span>').join('');
   }
 
   // ---------- gráficos ----------
@@ -359,7 +359,7 @@
     let html = '<div class="heat" role="table" aria-label="Sinais por hora de Lisboa e fonte"><span></span>' +
       Array.from({length: 24}, (_, h) => '<span class="hh">' + (h % 3 === 0 ? h : '') + '</span>').join('');
     for (const k of names) {
-      html += '<span>' + src(k) + '</span>' + rows[k].map((v, h) => '<span class="cell l' + lvl(v) + '" title="' + esc(k + ', ' + h + 'h: ' + v + ' apostas') + '" aria-label="' + esc(k + ' às ' + h + ' h: ' + v) + '"></span>').join('');
+      html += '<span class="hl" title="' + esc(k === 'Outros' ? 'Sinais analíticos do canal' : k) + '">' + src(k === 'Outros' ? 'Canal' : k) + '</span>' + rows[k].map((v, h) => '<span class="cell l' + lvl(v) + '" title="' + esc(k + ', ' + h + 'h: ' + v + ' apostas') + '" aria-label="' + esc(k + ' às ' + h + ' h: ' + v) + '"></span>').join('');
     }
     return html + '</div><div class="legend"><span class="note">Mais claro = menos apostas; mais escuro = mais (máximo ' + int(max) + ' por hora e fonte).</span></div>';
   }
@@ -411,9 +411,9 @@
       : '<div class="empty">Relatório prospetivo ' + esc(S.prospectiveState) + '.</div>', {span: 'span-7'});
     html += panel('Qualidade dos dados', ops ? '<div class="stack">' + issues.map(([k, v]) => '<div class="row"><span>' + esc(k) + '</span>' +
       (isNum(v) ? tag(int(v), v > 0 ? 'warn' : 'good') : '—') + '</div>').join('') + '<p class="note"><a href="#operations">Monitorização completa</a></p></div>' : missing('a qualidade dos dados'), {span: 'span-4'});
-    html += panel('Descobertas recentes (exploratórias)', s.recent_discoveries.length ? '<ul class="list">' + s.recent_discoveries.map(d =>
+    html += panel('Notas recentes do modelo de linguagem (exploratórias)', s.recent_discoveries.length ? '<ul class="list">' + s.recent_discoveries.map(d =>
       '<li><div>' + esc(d.id) + '</div><small>' + when(d.at_utc) + ' · ' + int(d.n) + ' resultados · acerto ' + pct(d.hit_rate) + ' vs necessário ' + pct(d.break_even) + ' · ' + esc(d.status || '') + '</small></li>').join('') + '</ul>'
-      : '<div class="empty">Sem descobertas registadas.</div>', {span: 'span-8', flush: true, meta: 'nunca constituem validação'});
+      : '<div class="empty">Sem descobertas registadas.</div>', {span: 'span-8', flush: true, meta: 'texto gerado; não são descobertas validadas'});
     html += panel('Leitura automática do relatório', s.narrative.length ? '<ul class="list">' + s.narrative.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>' : '<div class="empty">Sem leitura publicada.</div>',
       {flush: true, meta: 'texto gerado por regras no código de produção'});
     html += panel('Agenda de sinais', '<div class="stack">' + Object.entries(s.agenda_counts).map(([k, v]) => '<div class="row"><span>' + tag(k, VERD[k]) + '</span><b class="num">' + int(v) + '</b></div>').join('') +
@@ -443,7 +443,8 @@
         const key = e.source;
         (series[key] = series[key] || []).push({x: Date.parse(e.d), y: e.odds, label: when(e.d) + ' · ' + e.source + ' · ' + e.selection + ' @ ' + n(e.odds, 2) + (isNum(e.total) ? ' · vol. ' + int(e.total) : '')});
       }
-      const chart = lineChart(Object.entries(series).map(([k, pts]) => ({name: k, cls: 's-' + k, points: pts})), {fy: v => n(v, 2), fx: v => day(new Date(v).toISOString()), label: 'Odds observadas por fonte'});
+      const xs = sel.series.map(e => Date.parse(e.d)).filter(Number.isFinite), short = xs.length && Math.max(...xs) - Math.min(...xs) < 36 * 3600000;
+      const chart = lineChart(Object.entries(series).map(([k, pts]) => ({name: k, cls: 's-' + k, points: pts})), {fy: v => n(v, 2), fx: v => (short ? when : day)(new Date(v).toISOString()), label: 'Odds observadas por fonte'});
       const selRows = sel.selections.map(x => '<tr>' + td(src(x.source)) + td(esc(x.market)) + td(esc(x.selection)) + td(n(x.first_odds, 2), 'n') + td(n(x.last_odds, 2), 'n') +
         td('<span class="' + sign(-(x.move_pct || 0)) + '">' + (isNum(x.move_pct) ? (x.move_pct > 0 ? '+' : '') + n(x.move_pct, 1) + ' %' : '—') + '</span>', 'n') +
         td(int(x.observations), 'n') + td(int(x.volume_last), 'n') + td(x.max_mult > 1 ? '×' + x.max_mult : '—', 'n') + '</tr>');
@@ -547,31 +548,87 @@
         td('<span class="' + sign(h.roi) + '">' + spct(h.roi) + '</span>', 'n') + td(tag(h.status || '—', STATUS[h.status])) +
         td(h.prospective ? econ(h.prospective.status) + ' <small class="note">' + int(h.prospective.games) + ' jogos</small>' : '—') + (opts.born ? td(day(h.born_utc)) : '') + '</tr>'), caption);
   }
+
+  // Intervalo de Wilson a 95 % para uma proporção (calculado no navegador sobre contagens publicadas; não é um teste).
+  function wilson(k, nTot) {
+    if (!isNum(k) || !isNum(nTot) || nTot <= 0) return null;
+    const z = 1.96, p = k / nTot, d = 1 + z * z / nTot, c = p + z * z / (2 * nTot), h = z * Math.sqrt(p * (1 - p) / nTot + z * z / (4 * nTot * nTot));
+    return [(c - h) / d, (c + h) / d];
+  }
+
+  // Lista com filtro e paginação. rows: [{text, status, html}]. Indica sempre filtrados, publicados e total.
+  const PAGE = 8;
+  function pagedList(key, rows, opts = {}) {
+    const st = S.ui.pages[key] = S.ui.pages[key] || {page: 0, q: '', status: ''};
+    const statuses = [...new Set(rows.map(r => r.status).filter(Boolean))];
+    const filters = '<div class="filters list-filters"><label>Pesquisa<input type="search" data-filter="' + key + ':q" value="' + esc(st.q) + '" placeholder="Filtrar"></label>' +
+      (statuses.length > 1 ? '<label>Estado<select data-filter="' + key + ':status"><option value="">Todos</option>' + statuses.map(x => '<option' + (x === st.status ? ' selected' : '') + '>' + esc(x) + '</option>').join('') + '</select></label>' : '') + '</div>';
+    return filters + '<div id="list-' + key + '">' + pagedBody(key, rows, opts) + '</div>';
+  }
+  function pagedBody(key, rows, opts) {
+    const st = S.ui.pages[key], q = st.q.trim().toLowerCase();
+    const hit = rows.filter(r => (!q || r.text.toLowerCase().includes(q)) && (!st.status || r.status === st.status));
+    const pages = Math.max(1, Math.ceil(hit.length / PAGE));
+    st.page = Math.min(st.page, pages - 1);
+    const slice = hit.slice(st.page * PAGE, st.page * PAGE + PAGE);
+    const totalTxt = isNum(opts.total) && opts.total !== rows.length ? ' · total no relatório: ' + int(opts.total) : '';
+    return '<p class="count note" role="status">' + int(hit.length) + (hit.length !== rows.length ? ' filtrados de ' + int(rows.length) : '') + ' publicados' + totalTxt +
+      (hit.length > PAGE ? ' · página ' + (st.page + 1) + ' de ' + pages : '') + '</p>' +
+      (slice.length ? '<ul class="list compact">' + slice.map(r => '<li>' + r.html + '</li>').join('') + '</ul>' : '<div class="empty">Nada corresponde ao filtro.</div>') +
+      (pages > 1 ? '<div class="pager"><button type="button" class="more" data-pager="' + key + ':-1"' + (st.page === 0 ? ' disabled' : '') + '>Anterior</button>' +
+        '<button type="button" class="more" data-pager="' + key + ':1"' + (st.page >= pages - 1 ? ' disabled' : '') + '>Seguinte</button></div>' : '');
+  }
+  const LISTS = {};
+  const hypLine = h => '<div class="clamp">' + esc(h.id) + '</div><small>' + int(h.games) + ' jogos · acerto ' + pct(h.hit_rate) + ' vs necessário ' + pct(h.break_even) +
+    ' · ROI anunciado ' + spct(h.roi) + ' · ' + esc(h.status || '—') + (h.prospective ? ' · prospetivo ' + (ECON[h.prospective.status] || [h.prospective.status || '—'])[0] + ' (' + int(h.prospective.games) + ' jogos)' : '') + '</small>';
+
   function viewBrain() {
     const l = S.files.learning && S.files.learning.data;
     if (!l) return head('Brain Intelligence') + missing('a aprendizagem');
-    let html = head('Brain Intelligence', 'Diário da aprendizagem autónoma: hipóteses geradas, propostas pelo modelo de linguagem, rejeitadas e com replicação prospetiva exploratória.');
-    html += kpis(Object.entries(l.counts).map(([k, v]) => [k, int(v), 'hipóteses']).concat([
-      ['Execuções LLM', int(l.llm.runs), 'última ' + when(l.llm.last_run_utc) + ' · ' + esc(l.llm.last_outcome || '—')],
-      ['Avaliação LLM', esc(l.llm.evaluation ? l.llm.evaluation.verdict : '—'), l.llm.evaluation ? esc(l.llm.evaluation.protocol) : ''],
-      ['Esperadas por acaso', isNum(l.expected_by_chance) ? n(l.expected_by_chance, 1) : '—', 'entre as promissoras']]));
-    html += '<div class="grid">';
-    html += panel('Diário de aprendizagem', l.journal.length ? '<ul class="list">' + l.journal.map(j => '<li><div><b>' + esc(j.id) + '</b></div><div>' + esc(j.note) + '</div><small>' + when(j.at_utc) + ' · ' + esc(j.model || '') +
-      ' · ' + int(j.n) + ' resultados · acerto ' + pct(j.hit_rate) + ' vs ' + pct(j.break_even) + ' · ' + esc(j.status || '') + '</small></li>').join('') + '</ul>' : '<div class="empty">Sem entradas.</div>',
-      {span: 'span-6', flush: true, meta: 'texto gerado; não é evidência'});
-    const track = l.track && l.track.by_source ? table(['Origem', {t: 'Hipóteses', n: 1}, {t: 'Com evidência prospetiva', n: 1}, {t: 'Jogos prospetivos', n: 1}],
-      Object.entries(l.track.by_source).map(([k, v]) => '<tr>' + td(esc(k)) + td(int(v.hypotheses), 'n') + td(int(v.with_prospective_evidence), 'n') + td(int(v.prospective_games), 'n') + '</tr>'), 'Seguimento por origem') +
-      '<p class="note" style="padding:0 12px 12px">' + esc(l.track.meaning || '') + '</p>' : '<div class="empty">Sem seguimento.</div>';
-    html += panel('Alterações de comportamento · seguimento por origem', track, {span: 'span-6', flush: true});
-    html += panel('Hipóteses propostas pelo modelo de linguagem', hypTable(l.llm.hypotheses, 'Hipóteses LLM', {born: true}), {flush: true, meta: int(l.llm.hypotheses.length) + ' · ' + (l.llm.evaluation ? note(l.llm.evaluation.reason) : '')});
-    html += panel('Promissoras (exploratórias)', hypTable(l.promising, 'Hipóteses promissoras'), {span: 'span-6', flush: true, meta: int(l.promising.length)});
-    html += panel('Replicação prospetiva exploratória positiva', hypTable(l.replicated_exploratory, 'Replicação exploratória'), {span: 'span-6', flush: true, meta: int(l.replicated_exploratory_total) + ' entre as ' + int(l.top_pool) + ' hipóteses do topo publicado · não é validação'});
-    html += panel('Rejeitadas (abandonadas)', hypTable(l.rejected, 'Hipóteses abandonadas'), {flush: true, meta: 'primeiras ' + int(l.rejected.length) + ' de ' + int(l.rejected_total)});
-    const m = l.multiplicity || {};
-    html += panel('Multiplicidade', '<dl class="facts"><dt>Testadas agora</dt><dd>' + int(m.tested_now) + '</dd><dt>Conjuntos de jogos distintos</dt><dd>' + int(m.distinct_game_sets_tested) + '</dd>' +
-      '<dt>Promissoras ou melhor</dt><dd>' + int(m.promising_or_better) + '</dd><dt>Jogos (união)</dt><dd>' + int(m.promising_union_games) + ' de ' + int(m.promising_sum_games) + ' somados</dd></dl><p class="note">' + esc(m.note || '') + '</p>', {span: 'span-6'});
-    html += panel('Limitações científicas', '<ul class="list">' + l.limitations.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>', {span: 'span-6', flush: true});
-    return html + '</div>';
+    const T = l.totals || {};
+    const tab = S.ui.brainTab = S.ui.brainTab || 'diario';
+    const byId = new Map((l.top || []).concat(l.promising || [], l.rejected || [], l.llm.hypotheses || []).map(h => [h.id, h]));
+    const idx = l.status_index || [];
+    const rowFor = (id, status) => { const h = byId.get(id); return {text: id, status, html: h ? hypLine(h) : '<div class="clamp">' + esc(id) + '</div><small>' + esc(status) + ' · métricas não publicadas no relatório</small>'}; };
+    LISTS.diario = l.journal.map(j => ({text: j.id + ' ' + j.note, status: j.status, html: '<div class="clamp"><b>' + esc(j.id) + '</b></div><div>' + esc(j.note) + '</div><small>' + when(j.at_utc) +
+      ' · ' + int(j.n) + ' resultados · acerto ' + pct(j.hit_rate) + ' vs ' + pct(j.break_even) + ' · ' + esc(j.status || '') + ' · texto gerado, não é evidência</small>'}));
+    LISTS.llm = l.llm.hypotheses.map(h => ({text: h.id + ' ' + (h.reason || ''), status: h.status, html: hypLine(h) + (h.reason ? '<br><small>Motivo proposto: ' + esc(h.reason) + '</small>' : '') + '<br><small>Criada ' + day(h.born_utc) + '</small>'}));
+    LISTS.promissoras = idx.filter(x => x.status === 'promissora').map(x => rowFor(x.id, x.status));
+    LISTS.rejeitadas = idx.filter(x => x.status === 'abandonada').map(x => rowFor(x.id, x.status));
+    LISTS.replicacao = l.replicated_exploratory.map(h => {
+      const e = h.prospective || {}, nn = (e.wins || 0) + (e.losses || 0), w = wilson(e.wins, nn);
+      return {text: h.id, status: h.status, html: '<div class="clamp">' + esc(h.id) + '</div><small>Prospetivo: ' + int(e.wins) + ' ganhas e ' + int(e.losses) + ' perdidas em ' + int(nn) + ' decididas' +
+        (e.voids ? ', ' + int(e.voids) + ' devolvidas' : '') + (e.imputed_losses ? ' (' + int(e.imputed_losses) + ' perdas imputadas)' : '') + ', ' + int(e.pending) + ' pendentes · acerto ' + (nn ? pct(e.wins / nn) : '—') +
+        ' (IC95 ' + (w ? pct(w[0], 0) + '–' + pct(w[1], 0) : '—') + ') · ROI anunciado ' + spct(e.roi_advertised) + ', −2 % ' + spct(e.roi_odds_minus_2pct) + (e.decision_days ? ' · ' + int(e.decision_days) + ' dias' : '') +
+        (nn < 30 ? ' · <b>amostra pequena</b>' : '') + '</small>'};
+    });
+    const TABS = [['diario', 'Diário', T.journal], ['llm', 'Propostas LLM', T.llm], ['promissoras', 'Promissoras', T.promising], ['replicacao', 'Replicação', l.replicated_exploratory_total],
+      ['rejeitadas', 'Rejeitadas', T.abandoned], ['seguimento', 'Seguimento', null], ['limites', 'Limitações', null]];
+    let html = head('Brain Intelligence', 'Aprendizagem autónoma: hipóteses geradas, propostas pelo modelo de linguagem, promissoras, com replicação prospetiva exploratória e rejeitadas. Tudo exploratório.');
+    html += kpis([['Hipóteses registadas', int(T.hypotheses), 'testadas agora: ' + int(l.tested)], ['Em observação', int(T.observing), 'estado do gerador'],
+      ['Promissoras', int(T.promising), 'sem correção de multiplicidade'], ['Abandonadas', int(T.abandoned), 'estado do gerador'],
+      ['Propostas LLM', int(T.llm), int(T.llm_published) + ' publicadas com métricas'], ['Promissoras esperadas só por acaso', isNum(l.expected_by_chance) ? n(l.expected_by_chance, 1) : '—', 'observadas: ' + int(T.promising) + ' · expectativa, a dependência alarga a dispersão']]);
+    html += '<div class="tabs" role="tablist" aria-label="Secções do Brain">' + TABS.map(([k, t, c]) => '<button type="button" role="tab" data-tab="' + k + '" aria-selected="' + (k === tab) + '"' + (k === tab ? '' : ' tabindex="-1"') + '>' + esc(t) + (isNum(c) ? ' <span class="num">' + int(c) + '</span>' : '') + '</button>').join('') + '</div>';
+    let body;
+    if (tab === 'diario') body = panel('Diário de aprendizagem', pagedList('diario', LISTS.diario, {total: T.journal}), {flush: true, meta: 'notas do modelo de linguagem'});
+    else if (tab === 'llm') body = panel('Hipóteses propostas pelo modelo de linguagem', '<p class="note pad">Avaliação: ' + esc(l.llm.evaluation ? l.llm.evaluation.verdict : '—') + ' — ' + (l.llm.evaluation ? note(l.llm.evaluation.reason) : '') +
+      '. Execuções: ' + int(l.llm.runs) + ', última ' + when(l.llm.last_run_utc) + '.</p>' + pagedList('llm', LISTS.llm, {total: T.llm}), {flush: true});
+    else if (tab === 'promissoras') body = panel('Promissoras', pagedList('promissoras', LISTS.promissoras, {total: T.promising}) +
+      '<p class="note pad">Lista completa do estado do gerador. Métricas só para as ' + int(T.top_published) + ' hipóteses do topo publicado.</p>', {flush: true});
+    else if (tab === 'replicacao') body = panel('Replicação prospetiva exploratória positiva', '<p class="note pad">' + int(l.replicated_exploratory_total) + ' entre as ' + int(l.top_pool) + ' hipóteses do topo publicado (escolhidas pelo desempenho histórico, entre ' + int(T.hypotheses) +
+      '). Hipóteses partilham jogos e não há correção de multiplicidade; IC95 de Wilson calculado no navegador sobre as contagens publicadas. Não é validação.</p>' + pagedList('replicacao', LISTS.replicacao, {}), {flush: true});
+    else if (tab === 'rejeitadas') body = panel('Rejeitadas (abandonadas pelo gerador)', pagedList('rejeitadas', LISTS.rejeitadas, {total: T.abandoned}) +
+      '<p class="note pad">"Abandonada" é o estado do gerador (≥ 30 jogos e ≤ 10 % de probabilidade de estar acima do necessário). O quadro de estratégias usa outra classificação: ' +
+      (l.strategy_board_counts ? Object.entries(l.strategy_board_counts).map(([k, v]) => esc(k.replace(/_/g, ' ')) + ' ' + int(v)).join(', ') : '—') + '.</p>', {flush: true});
+    else if (tab === 'seguimento') {
+      const m = l.multiplicity || {};
+      body = panel('Seguimento por origem', l.track && l.track.by_source ? table(['Origem', {t: 'Hipóteses', n: 1}, {t: 'Com evidência prospetiva', n: 1}, {t: 'Jogos prospetivos', n: 1}],
+        Object.entries(l.track.by_source).map(([k, v]) => '<tr>' + td(esc(k)) + td(int(v.hypotheses), 'n') + td(int(v.with_prospective_evidence), 'n') + td(int(v.prospective_games), 'n') + '</tr>'), 'Seguimento por origem') +
+        '<p class="note pad">Os jogos prospetivos somam-se por hipótese: o mesmo jogo conta em várias hipóteses.</p>' : '<div class="empty">Sem seguimento.</div>', {flush: true}) +
+        panel('Multiplicidade', '<dl class="facts"><dt>Testadas agora</dt><dd>' + int(m.tested_now) + '</dd><dt>Conjuntos de jogos distintos</dt><dd>' + int(m.distinct_game_sets_tested) + '</dd>' +
+        '<dt>Promissoras ou melhor</dt><dd>' + int(m.promising_or_better) + '</dd><dt>Jogos (união)</dt><dd>' + int(m.promising_union_games) + ' de ' + int(m.promising_sum_games) + ' somados</dd></dl>');
+    } else body = panel('Limitações científicas', '<ul class="list">' + l.limitations.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>', {flush: true});
+    return html + '<div class="grid" role="tabpanel">' + body + '</div>';
   }
 
   function viewLab() {
@@ -643,7 +700,7 @@
       ['ROI · odd −5 %', spct(roi['odd-5%'] && roi['odd-5%'].roi), 'IC95 ' + ci(roi['odd-5%'] && roi['odd-5%'].ci95), sign(roi['odd-5%'] && roi['odd-5%'].roi)],
       ['Saldo', units(ref.units) + ' u', int(ref.settled) + ' liquidadas', sign(ref.units)],
       ['Maior queda (histórico)', pf.luck ? n(pf.luck.max_drawdown, 2) + ' u' : '—', 'pior sequência ' + (pf.luck ? int(pf.luck.longest_losing_run) : '—')],
-      ['Oscilação esperada (±2σ)', pf.luck ? '±' + n(pf.luck.luck_sd * 2, 1) + ' u' : '—', 'σ publicado ' + (pf.luck ? n(pf.luck.luck_sd, 1) : '—') + ' u · z ' + (pf.luck ? n(pf.luck.z, 2) : '—')]
+      ['Oscilação esperada (±2 desvios-padrão)', pf.luck ? '±' + n(pf.luck.luck_sd * 2, 1) + ' u' : '—', 'desvio-padrão publicado ' + (pf.luck ? n(pf.luck.luck_sd, 1) : '—') + ' u · z ' + (pf.luck ? n(pf.luck.z, 2) : '—')]
     ]);
     html += '<div class="grid">';
     const pts = pf.timeline.map((p, i) => ({x: i, y: p.u, label: when(p.d) + ' · ' + (p.m || p.t) + ' · ' + units(p.g) + ' u → saldo ' + units(p.u)}));
@@ -686,7 +743,8 @@
     let html = head('Data Quality & Operations', 'Recolha, continuidade, atrasos, falhas, duplicados, resultados contraditórios, integridade e cobertura efetiva de cada vista.');
     html += '<div class="grid">';
     html += panel('Recolha e fornecedores', table(['Processo', 'Última execução', {t: 'Há', n: 1}, 'Estado', {t: 'Esperado até', n: 1}],
-      [lagRow('Recolha Telegram', o.collector, 45), lagRow('Highlightly (resultados)', o.highlightly, 6 * 60), lagRow('BSD (resultados)', o.bsd, 3 * 60)], 'Estado da recolha'), {span: 'span-7', flush: true});
+      [lagRow('Recolha de sinais', o.collector, 45), lagRow('Highlightly (resultados)', o.highlightly, 4 * 60 + 20), lagRow('BSD (resultados)', o.bsd, 60 + 20)], 'Estado da recolha') +
+      '<p class="note pad" style="padding-bottom:12px">Referências: recolha de 10 em 10 minutos; Highlightly no máximo de 4 em 4 horas e BSD no máximo de hora a hora, só quando há jogos por liquidar. Um atraso nos fornecedores pode significar apenas que não havia nada a pedir.</p>', {span: 'span-7', flush: true});
     const cnt = o.counters, warnIf = v => isNum(v) && v > 0 ? 'warn' : 'good';
     const cRows = [['Versões de mensagens lidas', cnt.versions, null], ['Edições que mudaram o sinal', cnt.edits_changing_signal, 1], ['Marca ✅/❌ do bot vs liquidação', cnt.bot_mark_disagreements, 1],
       ['Highlightly vs bot', cnt.hl_vs_bot_disagreements, 1], ['BSD vs bot', cnt.bsd_vs_bot_disagreements, 1], ['Manual vs outras fontes', cnt.manual_vs_other_disagreements, 1],
@@ -735,6 +793,13 @@
 
   const RENDER = {command: viewCommand, market: viewMarket, radar: viewRadar, brain: viewBrain, lab: viewLab, performance: viewPerformance, operations: viewOperations, knowledge: viewKnowledge};
 
+  // Em ecrãs estreitos as tabelas empilham-se: cada célula leva o nome da coluna (sem scroll horizontal).
+  function labelTables(root) {
+    for (const t of root.querySelectorAll('table')) {
+      const names = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
+      for (const tr of t.querySelectorAll('tbody tr')) [...tr.children].forEach((cell, i) => { if (names[i] && !cell.hasAttribute('colspan')) cell.dataset.label = names[i]; });
+    }
+  }
   // ---------- navegação ----------
   function renderView(focus) {
     const el = $('view-' + S.view);
@@ -743,6 +808,7 @@
       S.charts = {};
       el.innerHTML = RENDER[S.view]();
       bindCharts(el);
+      labelTables(el);
       S.rendered[S.view] = key;
     }
     if (focus) { const h = el.querySelector('h2'); if (h) h.focus({preventScroll: true}); }
@@ -765,6 +831,7 @@
     lastFocus = document.activeElement;
     $('drawer-title').textContent = title; $('drawer-sub').textContent = sub;
     $('drawer-content').innerHTML = html;
+    labelTables($('drawer-content'));
     $('drawer').hidden = false; $('scrim').hidden = false;
     $('drawer-close').focus();
   }
@@ -780,6 +847,10 @@
 
   // ---------- eventos ----------
   document.addEventListener('click', e => {
+    const t = e.target.closest('[data-tab]');
+    if (t) { S.ui.brainTab = t.dataset.tab; S.rendered.brain = null; renderView(false); const b = document.querySelector('[data-tab="' + t.dataset.tab + '"]'); if (b) b.focus(); return; }
+    const pg = e.target.closest('[data-pager]');
+    if (pg) { const [k, d] = pg.dataset.pager.split(':'); S.ui.pages[k].page += Number(d); $('list-' + k).innerHTML = pagedBody(k, LISTS[k], listOpts(k)); labelTables($('list-' + k)); const c = $('list-' + k).querySelector('.count'); if (c) { c.setAttribute('tabindex', '-1'); c.focus(); } return; }
     const g = e.target.closest('[data-game]');
     if (g) { openGame(g.dataset.game); return; }
     const m = e.target.closest('tr[data-market]');
@@ -789,13 +860,22 @@
     if (e.key === 'Escape' && !$('drawer').hidden) closeDrawer();
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-market]')) { e.preventDefault(); e.target.click(); }
   });
+  function listOpts(k) { const T = (S.files.learning && S.files.learning.data.totals) || {}; return {total: {diario: T.journal, llm: T.llm, promissoras: T.promising, rejeitadas: T.abandoned}[k]}; }
+  document.addEventListener('keydown', e => {
+    const t = e.target.closest && e.target.closest('[role="tab"]');
+    if (!t || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+    const all = [...document.querySelectorAll('[role="tab"]')], i = all.indexOf(t), next = all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
+    e.preventDefault(); next.click();
+  });
   document.addEventListener('input', e => {
+    const lf = e.target.closest('[data-filter]');
+    if (lf) { const [k, field] = lf.dataset.filter.split(':'); S.ui.pages[k][field] = e.target.value; S.ui.pages[k].page = 0; $('list-' + k).innerHTML = pagedBody(k, LISTS[k], listOpts(k)); return; }
     const form = e.target.closest('#radar-filters');
     if (!form) return;
     const f = S.ui.radar, el = e.target;
     f[el.name] = el.type === 'checkbox' ? el.checked : el.value;
     const sg = S.files.signals && S.files.signals.data;
-    if (sg) $('radar-results').innerHTML = radarResults(sg); // só a lista; os filtros mantêm foco e valores
+    if (sg) { $('radar-results').innerHTML = radarResults(sg); labelTables($('radar-results')); } // só a lista; os filtros mantêm foco e valores
   });
   $('drawer-close').onclick = closeDrawer;
   $('scrim').onclick = closeDrawer;
