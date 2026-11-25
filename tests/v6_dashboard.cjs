@@ -46,6 +46,8 @@ async function open(browser, srv, opts = {}) {
 }
 const mode = page => page.evaluate(() => window.__V6.state.mode);
 const noOverflow = page => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+// Em emulação móvel o viewport de layout alarga-se ao conteúdo: compara-se com a largura real do dispositivo.
+const fits = (page, width) => page.evaluate(w => document.documentElement.scrollWidth <= w + 1 && window.innerWidth <= w + 1, width);
 
 async function visual(browser, srv) {
   for (const [name, device] of Object.entries(SIZES)) for (const scheme of ['light', 'dark']) {
@@ -53,7 +55,7 @@ async function visual(browser, srv) {
     for (const v of VIEWS) {
       await page.evaluate(h => { location.hash = h; }, v);
       await page.waitForFunction(h => !document.getElementById('view-' + h).hidden && document.querySelector('#view-' + h + ' h2'), v);
-      assert.ok(await noOverflow(page), 'scroll horizontal em ' + v + ' ' + name);
+      assert.ok(await fits(page, device.width), 'scroll horizontal em ' + v + ' ' + name);
       const text = await page.locator('#view-' + v).innerText();
       assert.ok(!/undefined|NaN|\[object Object\]/.test(text), 'texto inválido em ' + v + ' ' + name + ': ' + (text.match(/.{0,40}(undefined|NaN|\[object Object\]).{0,20}/) || [''])[0]);
       if (SHOTS) await page.screenshot({path: path.join(SHOTS, `${v}-${name}-${scheme === 'light' ? 'claro' : 'escuro'}.png`), fullPage: false});
@@ -67,20 +69,21 @@ async function visual(browser, srv) {
 // Android estreito: nenhuma vista, gaveta ou separador pode criar scroll horizontal entre 320 e 430 px.
 async function narrow(browser, srv) {
   for (const width of [320, 340, 360, 375, 390, 412, 430]) for (const scheme of ['light', 'dark']) {
-    const {ctx, page, errors} = await open(browser, srv, {device: {viewport: {width, height: 800}, isMobile: true, hasTouch: true}, scheme});
+    const {ctx, page, errors} = await open(browser, srv, {device: {viewport: {width, height: 800}, isMobile: true, hasTouch: true}, scheme,
+      config: {protocol: '/__raw/prospective_protocol.json'}});
     for (const v of VIEWS) {
       await page.evaluate(h => { location.hash = h; }, v);
       await page.waitForSelector('#view-' + v + ' h2');
       if (v === 'brain') for (const t of ['diario', 'llm', 'promissoras', 'replicacao', 'rejeitadas', 'seguimento', 'limites']) {
         await page.click('[data-tab="' + t + '"]');
-        assert.ok(await noOverflow(page), 'overflow em brain/' + t + ' a ' + width + ' px ' + scheme);
+        assert.ok(await fits(page, width), 'overflow em brain/' + t + ' a ' + width + ' px ' + scheme);
       }
-      assert.ok(await noOverflow(page), 'overflow em ' + v + ' a ' + width + ' px ' + scheme);
+      assert.ok(await fits(page, width), 'overflow em ' + v + ' a ' + width + ' px ' + scheme + ': ' + await page.evaluate(() => document.documentElement.scrollWidth) + ' px');
       // nenhum elemento visível ultrapassa a largura do ecrã fora de uma região com scroll próprio
-      const wide = await page.evaluate(() => [...document.querySelectorAll('#main *')].filter(el => {
-        if (el.closest('thead, caption, .sr')) return false; // só para leitores de ecrã (recortados a 1 px)
-        const r = el.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + 1 || r.left < -1);
-      }).slice(0, 3).map(el => el.tagName + '.' + el.className));
+      const wide = await page.evaluate(w => [...document.querySelectorAll('body *')].filter(el => {
+        if (el.closest('thead, caption, .sr, .skip, [hidden]')) return false; // só para leitores de ecrã (recortados a 1 px)
+        const r = el.getBoundingClientRect(); return r.width > 0 && (r.right > w + 1 || r.left < -1);
+      }).slice(0, 3).map(el => el.tagName + '.' + el.className + ' «' + (el.textContent || '').trim().slice(0, 30) + '»'), width);
       assert.deepEqual(wide, [], 'elementos fora do ecrã em ' + v + ' a ' + width + ' px');
       // nenhuma região com scroll horizontal (tabelas empilham-se, ticker e separadores quebram linha)
       const scrollers = await page.evaluate(() => [...document.querySelectorAll('body *')].filter(el => {
@@ -123,8 +126,8 @@ async function functional(browser, srv) {
   assert.equal(await page.locator('#drawer').isHidden(), true);
   // Market: seleção de jogo pelo teclado e gráfico com tooltip pelo teclado.
   await page.evaluate(() => { location.hash = 'market'; });
-  await page.waitForSelector('tr[data-market]');
-  const second = page.locator('tr[data-market]').nth(1);
+  await page.waitForSelector('[data-market]');
+  const second = page.locator('[data-market]').nth(1);
   const id = await second.getAttribute('data-market');
   await second.focus(); await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(() => window.__V6.state.ui.market), id);
