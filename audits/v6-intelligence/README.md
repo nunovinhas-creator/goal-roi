@@ -1,5 +1,7 @@
 # Goal-ROI Intelligence V6
 
+> V6.1: ver `v6.1-resolucao.md` (matriz de resolução da auditoria independente), `snapshots-integration.md` (PR #98) e `mobile-heights-before-after.json` (alturas e scroll horizontal em telemóvel de 375 px, antes e depois).
+
 Terminal de análise em `docs/v6/`, publicado ao lado do dashboard clássico (`docs/index.html`). O clássico, o simulador e as análises anteriores não foram alterados e continuam disponíveis. Há uma ligação "Clássico" em todas as vistas da V6.
 
 ## Recuperação do trabalho do Codex
@@ -48,13 +50,13 @@ Regras seguidas:
 
 `node audits/v6-intelligence/measure.cjs` usa Chromium em 412×915, com CPU 4× mais lenta, rede de 1,6 Mbit/s e 150 ms, e servidor com ETag. Os valores são a mediana de 3 execuções e estão em `performance.json`.
 
-| | Clássico (antes) | V6 · relatório completo | V6 · snapshots |
+| | Clássico (antes) | V6.1 · relatório completo | V6.1 · snapshots |
 | --- | ---: | ---: | ---: |
-| Primeiro conteúdo | 15,9 s | 16,4 s | **1,6 s** |
-| Página completa | 15,9 s | 16,5 s | **3,4 s** |
-| Transferência inicial | 3,19 MB | 3,19 MB | **0,49 MB** |
-| Tarefas longas | 373 ms | 483 ms | 190 ms |
-| 10 atualizações sem dados novos | **30,5 MB** | **6 KB** (respostas 304) | **2 KB** (respostas 304) |
+| Primeiro conteúdo | 15,9 s | 17,0 s | **1,8 s** |
+| Página completa | 15,9 s | 17,1 s | **4,7 s** |
+| Transferência inicial | 3,19 MB | 3,24 MB | **0,75 MB** |
+| Tarefas longas | 398 ms | 502 ms | 51 ms |
+| 10 atualizações sem dados novos | **30,5 MB** | **12 KB** (pedido parcial da revisão + 304) | **10 KB** |
 
 Snapshots derivados (`scripts/build_dashboard_snapshots.cjs`), 354 KB no total contra 3,05 MB do relatório:
 
