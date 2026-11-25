@@ -92,6 +92,13 @@ async function narrow(browser, srv) {
       }).slice(0, 3).map(el => el.tagName + '.' + el.className));
       assert.deepEqual(scrollers, [], 'scroll horizontal interno em ' + v + ' a ' + width + ' px');
     }
+    await page.evaluate(() => { location.hash = 'performance'; });
+    await page.waitForSelector('#view-performance .chart[data-chart]');
+    const chart = page.locator('#view-performance .chart[data-chart]').first();
+    await chart.focus();
+    for (const key of ['End', 'ArrowLeft', 'ArrowRight']) await page.keyboard.press(key === 'End' ? 'ArrowRight' : key);
+    assert.ok(await chart.locator('.tooltip').isVisible());
+    assert.ok(await fits(page, width), 'tooltip cria scroll horizontal a ' + width + ' px');
     await page.evaluate(() => { location.hash = 'radar'; });
     await page.waitForSelector('#radar-filters');
     if (await page.locator('[data-game]').count()) {
@@ -119,6 +126,7 @@ async function functional(browser, srv) {
   assert.equal(await page.locator('[data-game]').count(), 0);
   assert.equal(await page.evaluate(() => document.activeElement.name), 'q', 'o filtro deve manter o foco');
   await page.fill('#radar-filters input[name="q"]', '');
+  assert.doesNotMatch(await page.locator('#view-radar').innerText(), /contraditório/i, 'rótulo do relatório sem explicação');
   await page.locator('[data-game]').first().click();
   await page.waitForSelector('#drawer:not([hidden])');
   assert.match(await page.locator('#drawer').innerText(), /A favor[\s\S]*Contra/i);
@@ -275,6 +283,20 @@ async function snapshots(browser, srvFactory) {
     const first = srv.state.log.find(l => l.path.startsWith('/v6/snapshots/dashboard-') && !l.path.endsWith('manifest.json'));
     assert.equal(first.path, '/v6/snapshots/dashboard-summary.json', 'o resumo deve ser o primeiro snapshot');
     for (const v of VIEWS) { await page.evaluate(h => { location.hash = h; }, v); await page.waitForSelector('#view-' + v + ' h2'); }
+    // Manifesto inalterado: nenhuma re-renderização (o foco e o texto escrito num filtro mantêm-se).
+    await page.evaluate(() => { location.hash = 'radar'; });
+    await page.waitForSelector('#radar-filters');
+    await page.fill('#radar-filters input[name="q"]', 'a');
+    const rev0 = await page.evaluate(() => window.__V6.state.revision);
+    await page.evaluate(() => window.__V6.refresh());
+    assert.equal(await page.evaluate(() => window.__V6.state.revision), rev0, 'revisão incrementada sem alterações');
+    assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.name), 'q', 'foco perdido numa atualização sem alterações');
+    await page.fill('#radar-filters input[name="q"]', '');
+    // Revisão do relatório indisponível: os snapshots são usados, mas marcados como não verificados.
+    srv.set('/report.json', {status: 500});
+    await page.evaluate(() => window.__V6.refresh());
+    assert.match(await page.evaluate(() => window.__V6.state.snapshotState), /não verificada/);
+    srv.clear('/report.json');
     // Atualização seletiva: nova revisão em que só o resumo muda.
     const sumPath = path.join(dir, core.FILE('summary'));
     const sum = JSON.parse(fs.readFileSync(sumPath, 'utf8'));

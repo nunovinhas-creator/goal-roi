@@ -52,6 +52,13 @@ const MATRIX = [
   [['2nd Team to Score', 'Sporting'], ['1x2', 'Sporting'], 'nao_comparaveis'],
   [['Sporting to Win Both Halves', 'Yes'], ['1x2', 'Benfica'], 'nao_comparaveis'],
   [['Both Teams Score', 'Yes'], ['1x2', 'Benfica'], 'nao_comparaveis'],
+  // ambas marcam (como parser.settle)
+  [['Both Teams To Score', 'Yes'], ['Asian Total', 'Under 1.5'], 'exclusivas'],
+  [['Both Teams To Score', 'No'], ['1x2', 'Draw'], 'compativeis'],
+  [['Both Teams To Score', 'Yes'], ['Both Teams To Score', 'No'], 'exclusivas'],
+  // paridade com parser.py: "Empate" não é aceite; dupla hipótese só com " or "
+  [['1x2', 'Empate'], ['1x2', 'Sporting'], 'insuficiente'],
+  [['Double Chance', 'Draw OR Benfica'], ['1x2', 'Sporting'], 'insuficiente'],
   // na dúvida, insuficiente
   [['1x2', 'Sporting CP'], ['1x2', 'Benfica'], 'insuficiente'],
   [['Asian Handicap', 'Spor (-1)'], ['1x2', 'Sporting'], 'compativeis'],
@@ -80,8 +87,12 @@ test('seleções opostas da mesma fonte não são contradição entre fontes', (
 
 test('convergência só entre fontes independentes e contemporâneas', () => {
   assert.equal(cat(sig(B, '1X2', '1'), sig(P, 'Polymarket', 'AH1(-0.5)', {d: at(60)})), 'convergencia');
-  assert.equal(cat(sig(B, '1X2', '1'), sig(P, 'Polymarket', 'AH1(-0.5)', {d: at(8 * 60)})), 'divergencia_temporal');
-  assert.equal(cat(sig(B, '1X2', '1'), sig(P, '1x2', 'Sporting', {phase: 'live', score_at_signal: [0, 0]})), 'divergencia_temporal');
+  // equivalentes mas afastadas no tempo ou em fases diferentes: concordância não contemporânea (nunca "divergência")
+  assert.equal(cat(sig(B, '1X2', '1'), sig(P, 'Polymarket', 'AH1(-0.5)', {d: at(8 * 60)})), 'concordancia_nao_contemporanea');
+  assert.equal(cat(sig(B, '1X2', '1'), sig(P, '1x2', 'Sporting', {phase: 'live', score_at_signal: [0, 0]})), 'concordancia_nao_contemporanea');
+  assert.equal(cat(sig(S, 'Asian Total', 'Over 2.5'), sig(P, 'Asian Total', 'Over 2.5', {d: at(10 * 60)})), 'concordancia_nao_contemporanea');
+  // exclusivas afastadas no tempo: divergência temporal
+  assert.equal(cat(sig(S, 'Asian Total', 'Over 2.5'), sig(P, 'Asian Total', 'Under 2.5', {d: at(10 * 60)})), 'divergencia_temporal');
   assert.equal(cat(sig(S, 'Asian Total', 'Over 2.5', {phase: 'live', score_at_signal: [1, 0]}), sig(P, 'Asian Total', 'Under 2.5', {phase: 'live', score_at_signal: [1, 0], d: at(25)})), 'divergencia_temporal');
   // sinais analíticos do canal não são fonte de mercado independente
   assert.equal(cat(sig('OPEN_GAME', 'Asian Total', 'Over 3.5'), sig(S, 'Asian Total', 'Under 3.5')), 'insuficiente');

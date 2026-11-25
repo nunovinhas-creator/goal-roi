@@ -25,8 +25,8 @@
       <a href="#radar" data-view="radar" data-short="Radar"><kbd>03</kbd><span>Radar de sinais</span></a>
       <a href="#brain" data-view="brain" data-short="Brain"><kbd>04</kbd><span>Brain Intelligence</span></a>
       <a href="#lab" data-view="lab" data-short="Lab"><kbd>05</kbd><span>Scientific Lab</span></a>
-      <a href="#performance" data-view="performance" data-short="Desempenho"><kbd>06</kbd><span>Performance</span></a>
-      <a href="#operations" data-view="operations" data-short="Dados"><kbd>07</kbd><span>Dados e operações</span></a>
+      <a href="#performance" data-view="performance" data-short="Desempenho"><kbd>06</kbd><span>Performance Analytics</span></a>
+      <a href="#operations" data-view="operations" data-short="Dados"><kbd>07</kbd><span>Data Quality &amp; Operations</span></a>
       <a href="#knowledge" data-view="knowledge" data-short="Saber"><kbd>08</kbd><span>Knowledge Center</span></a>
     </nav>
     <div class="rail-foot">
@@ -37,7 +37,7 @@
   <div class="main">
     <header class="status">
       <h1 id="view-title">Command Center</h1>
-      <div class="ticker" id="ticker" role="status" aria-live="polite"><span class="tick">A carregar…</span></div>
+      <div class="ticker" id="ticker"><span class="tick">A carregar…</span></div>
       <div class="tools">
         <a class="classic" href="../index.html" title="Dashboard clássico, simulador e análises anteriores">Clássico</a>
         <button type="button" class="icon-btn" id="refresh" aria-label="Atualizar agora"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg></button>
@@ -47,8 +47,9 @@
     <div class="banner warn" id="banner-fresh" role="status" hidden></div>
     <div class="banner info" id="banner-snap" role="status" hidden></div>
     <div class="banner bad" id="banner-error" role="alert" hidden></div>
+    <div class="sr" id="announce" role="status" aria-live="polite"></div>
     <main id="main" tabindex="-1" aria-busy="true">
-      <section class="view" id="view-command" data-title="Command Center" aria-labelledby="h-command"></section>
+      <section class="view" id="view-command" data-title="Command Center"></section>
       <section class="view" id="view-market" data-title="Market Intelligence" hidden></section>
       <section class="view" id="view-radar" data-title="Radar de sinais" hidden></section>
       <section class="view" id="view-brain" data-title="Brain Intelligence" hidden></section>

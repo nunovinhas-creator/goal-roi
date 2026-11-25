@@ -334,3 +334,12 @@ details.inner > summary { cursor: pointer; font-weight: 600; font-size: 13px; pa
 .pick:hover, .pick[aria-pressed="true"] { background: var(--panel-2); }
 .pick[aria-pressed="true"] { box-shadow: inset 3px 0 0 var(--accent); }
 @media (max-width: 420px) { .pick { grid-template-columns: minmax(0, 1fr); } .pick .right { grid-column: 1; grid-row: auto; } }
+.heat-legend { align-items: center; gap: 4px; padding: 0 12px 12px; }
+.heat-legend .cell { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+.heat-legend .l0 { background: var(--seq-0); } .heat-legend .l1 { background: var(--seq-1); } .heat-legend .l2 { background: var(--seq-2); } .heat-legend .l3 { background: var(--seq-3); } .heat-legend .l4 { background: var(--seq-4); } .heat-legend .l5 { background: var(--seq-5); }
+
+/* auditoria V6.1: tooltips com quebra de linha; áreas de toque ≥ 40 px */
+.tooltip { white-space: normal; max-width: min(320px, calc(100vw - 32px)); }
+.icon-btn { width: 40px; height: 40px; }
+.classic { min-height: 40px; display: inline-flex; align-items: center; }
+.filters input, .filters select { min-height: 40px; }

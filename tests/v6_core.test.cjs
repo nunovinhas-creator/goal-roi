@@ -111,7 +111,8 @@ test('cronologia de mercado: relações do motor, volume sem dupla contagem, eve
   assert.equal(m.relations.counts.exclusivas_entre_fontes, 1);   // Over 2,5 vs Under 2,5
   assert.equal(m.relations.counts.compativeis, 2);               // Over 2,5 × Under 3,5 e Under 2,5 × Under 3,5
   assert.equal(m.relations.counts.exclusivas_mesma_fonte, 0);    // Under 2,5 e Under 3,5 da Stake são compatíveis
-  assert.equal(m.relations.counts.repeticao, 1);
+  assert.equal(m.relations.counts.repeticao, 0);                // repetição é um par de seleções distintas equivalentes
+  assert.equal(m.relations.counts.observacoes_repetidas, 1);     // a mesma seleção vista duas vezes não é um par
   assert.equal(m.selections.find(s => s.selection === 'Under 3.5').max_mult, 4);
 });
 
