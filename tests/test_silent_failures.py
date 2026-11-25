@@ -429,7 +429,9 @@ class Steps(unittest.TestCase):
                                      # P2 Polymarket (ativação): observador sombra, só leitura, nunca bloqueia a recolha.
                                      'Start the Polymarket shadow observer (inactive by default)',
                                      'Stop the Polymarket shadow observer and add its observations (inactive by default)',
-                                     "Telegram notices through the user's bot (skipped without keys)"])
+                                     "Telegram notices through the user's bot (skipped without keys)",
+                                     # V6 snapshots (PR #98, inativo por omissão): só escreve docs/v6/snapshots, nunca bloqueia a recolha.
+                                     'V6 dashboard snapshots (inactive by default)'])
 
 
 if __name__ == '__main__':

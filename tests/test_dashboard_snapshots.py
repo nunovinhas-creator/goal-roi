@@ -3,6 +3,7 @@
 import hashlib
 import json
 import multiprocessing
+import re
 import os
 import shutil
 import subprocess
@@ -16,6 +17,8 @@ from scangoal import prospective as P
 from scangoal.publication import Publisher, PublicationError, PATHS
 
 ROOT = Path(__file__).resolve().parents[1]
+# sha256 of .github/workflows/collect.yml on main at the base of PR #98 (2026-11-25)
+MAIN_COLLECT_SHA256 = 'a725e5d28f3cdaf08137c1506b25aeb48f077f8e53895fded1996773533dea82'
 NODE = shutil.which('node')
 
 
@@ -242,3 +245,33 @@ class GitPublication(unittest.TestCase):
         self.assertEqual(tip_report['messages'], json.loads((self.first / 'docs/report.json').read_text())['messages'])
         self.assertEqual(self.git(self.remote, 'show', 'main:data/notify_log.jsonl'), '{"intent":"x"}', 'concurrent data kept')
         self.assertTrue(manifest['files'])
+
+
+class ProductionIsolationV6(unittest.TestCase):
+    """Without the gated step, collect.yml is byte-identical to main; every other step behaves identically."""
+
+    STEP = 'V6 dashboard snapshots (inactive by default)'
+
+    def setUp(self):
+        from test_polymarket_observer import strip_v6
+        from test_git_persistence import simulate_job
+        self.simulate = simulate_job
+        self.current = (ROOT / '.github/workflows/collect.yml').read_text(encoding='utf-8')
+        self.original = strip_v6(self.current)
+
+    def test_only_the_gated_step_and_its_variable_were_added(self):
+        self.assertNotEqual(self.current, self.original)
+        self.assertNotIn('GOAL_ROI_V6_SNAPSHOTS', self.original)
+        # main's collect.yml at the base of this PR (2026-11-25), unchanged except for the gated additions
+        self.assertEqual(hashlib.sha256(self.original.encode()).hexdigest(), MAIN_COLLECT_SHA256)
+
+    def test_simulated_runs_identical_with_step_on_off_or_failing(self):
+        names = re.findall(r'^      - name: (.+)$', self.original, re.M)
+        strip = lambda xs: [n for n in xs if n != self.STEP]
+        for failing in [None, *names, self.STEP]:
+            with self.subTest(failing=failing):
+                reference = self.simulate(self.original, failing if failing in names else None)
+                for v6 in (True, False):
+                    state, ran, skipped = self.simulate(self.current, failing, v6=v6)
+                    self.assertEqual((state, strip(ran), strip(skipped)), reference)
+                    self.assertIn(self.STEP, ran if v6 else skipped)

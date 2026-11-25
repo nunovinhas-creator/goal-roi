@@ -869,6 +869,12 @@ class IncrementalJournal(Harness):
         self.assertEqual(follower.tick(), 1)
 
 
+def strip_v6(text):
+    """collect.yml without the gated V6 dashboard snapshot step and its variable on the fast reads."""
+    text = re.sub(r'^      # V6 dashboard snapshots.*?(?=^      # Notices only on top of a published state)', '', text, flags=re.M | re.S)
+    return text.replace('          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n', '')
+
+
 class ProductionIsolation(unittest.TestCase):
     """Compara os passos existentes com o workflow anterior à ativação."""
 
@@ -882,7 +888,9 @@ class ProductionIsolation(unittest.TestCase):
         for name in self.FILES:
             (self.tmp / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, self.tmp / name)
-        self.patched = (ROOT / self.FILES[0]).read_text()
+        # The gated V6 snapshot step (PR #98) is isolated by its own tests (tests/test_dashboard_snapshots.py); it is removed
+        # here so this comparison keeps covering exactly the Polymarket activation against the same pinned workflow.
+        self.patched = strip_v6((ROOT / self.FILES[0]).read_text())
         self.original = re.sub(r'^      # P2 Polymarket shadow.*?(?=^      - name: Read bot conversation)',
                                '', self.patched, flags=re.M | re.S)
         self.original = re.sub('^      - name: ' + re.escape(self.STOP) + r'.*?(?=^      - name: Commit data)',

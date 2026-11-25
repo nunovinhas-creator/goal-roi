@@ -483,7 +483,7 @@ class FastReadsRetryTests(GitPersistenceTests):
         self.assertEqual(self.sb.shim_log('pushes'), ['2'])
 
 
-def simulate_job(text, failing, shadow=True):
+def simulate_job(text, failing, shadow=True, v6=True):
     """Avaliação das condições dos passos como no GitHub Actions (só as expressões usadas neste workflow): o passo `failing`
     falha; devolve (conclusão do job, passos executados, passos saltados)."""
     names, steps = re.findall(r'^      - name: (.+)$', text, re.M), {}
@@ -505,6 +505,8 @@ def simulate_job(text, failing, shadow=True):
             "steps.publication.outputs.pending != 'true'": not pending,
             # P2 Polymarket (ativação): simula o observador ligado; os seus passos toleram falhas.
             "vars.GOAL_ROI_POLYMARKET_SHADOW == 'on'": shadow,
+            # V6 snapshots (PR #98, inactive unless the repository variable is 'on'): simulated on; the step tolerates failures.
+            "vars.GOAL_ROI_V6_SNAPSHOTS == 'on'": v6,
         }
         go = all(facts[part] for part in cond.split(' && '))
         if not go:
