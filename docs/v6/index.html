@@ -6,12 +6,10 @@
 <meta name="theme-color" content="#07090d">
 <meta name="description" content="Goal-ROI Intelligence V6: terminal de análise de sinais, mercados e investigação prospetiva.">
 <meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com; base-uri 'none'; form-action 'none'">
 <title>Goal-ROI Intelligence</title>
 <link rel="stylesheet" href="v6.css">
-<script>
-  // Tema antes da primeira pintura, para evitar o clarão no modo escuro.
-  try { const t = localStorage.getItem('goal-roi-v6-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
+<script src="v6-theme.js"></script>
 <script defer src="v6-core.js"></script>
 <script defer src="v6-app.js"></script>
 </head>

@@ -48,6 +48,8 @@
   const tag = (text, kind) => '<span class="tag ' + (kind || '') + '">' + esc(text) + '</span>';
   const H1S = {insufficient_games: ['amostra insuficiente', 'warn'], supported_predictive_only: ['suportada (só preditiva)', 'good'], not_supported: ['não suportada', 'bad']};
   const H2S = {insufficient_games: ['amostra insuficiente', 'warn'], descriptive_only: ['apenas descritiva', 'info']};
+  // Um estado decisório só é mostrado se o relatório prospetivo cumprir o protocolo; caso contrário, "certificação inválida".
+  const statusLabel = (map, status, valid) => (!valid && status !== 'insufficient_games') ? ['certificação inválida', 'bad'] : (map[status] || [String(status || '—'), '']);
   const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': 'bad', 'evitar': 'bad', 'sem evidência': ''};
   const ECON = {positive_exploratory: ['positiva (exploratória)', 'info'], nonpositive_exploratory: ['não positiva (exploratória)', ''], insufficient: ['insuficiente', 'warn']};
   const econ = s => s ? tag((ECON[s] || [s])[0], (ECON[s] || [0, ''])[1]) : '—';
@@ -59,8 +61,8 @@
     head.map(h => '<th scope="col"' + (h.n ? ' class="n"' : '') + '>' + esc(h.t || h) + '</th>').join('') + '</tr></thead><tbody>' +
     (rows.length ? rows.join('') : '<tr><td colspan="' + head.length + '" class="empty">Sem dados publicados.</td></tr>') + '</tbody></table></div>';
   const td = (v, cls) => '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</td>';
-  const progress = (value, target) => { const p = isNum(value) && target ? Math.min(1, value / target) : 0;
-    return '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + target + '" aria-valuenow="' + (value || 0) + '"><i style="width:' + (p * 100).toFixed(1) + '%"></i></div>'; };
+  const progress = (value, target) => { const v = isNum(value) ? value : 0, t = isNum(target) ? target : 0, p = t ? Math.min(1, v / t) : 0;
+    return '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + t + '" aria-valuenow="' + v + '"><i style="width:' + (p * 100).toFixed(1) + '%"></i></div>'; };
   const head = (title, lede, extra) => '<div class="view-head"><div><h2 tabindex="-1">' + esc(title) + '</h2>' + (lede ? '<p>' + lede + '</p>' : '') + '</div>' + (extra || '') + '</div>';
   const kpis = items => '<dl class="kpis" style="--n:' + items.length + '">' + items.map(k => '<div class="kpi"><dt>' + esc(k[0]) + '</dt><dd><b class="' + (k[3] || '') + '">' + k[1] + '</b>' + (k[2] ? '<small>' + k[2] + '</small>' : '') + '</dd></div>').join('') + '</dl>';
   const verdictBox = () => '<span class="verdict">' + esc(C.VERDICT) + '</span>';
@@ -120,10 +122,12 @@
     }
     const rest = await Promise.all(changed.filter(k => !(first && k === 'summary')).map(load));
     for (const [k, v] of rest) fresh[k] = v;
-    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return true; // resposta fora de ordem: ignorada
+    // Revisão fora de ordem ou mais antiga do que a aplicada: ignorada. Fora do modo snapshots, recorre-se ao relatório.
+    if (!S.seq.accept(ticket, manifest.report_generated_at_utc)) return S.mode === 'snapshots';
     // Atómico: só agora os ficheiros novos substituem os anteriores, todos da mesma revisão do manifesto.
     S.files = Object.assign({}, S.mode === 'snapshots' ? S.files : {}, fresh);
     S.manifest = manifest; S.mode = 'snapshots'; S.revision++;
+    S.prospectiveState = 'incluído nos snapshots (revisão ' + when(manifest.report_generated_at_utc) + ')';
     return true;
   }
 
@@ -157,8 +161,9 @@
     return out;
   }
 
+  let again = false;
   async function refresh() {
-    if (S.busy) return;
+    if (S.busy) { again = true; return; } // pedido durante outra atualização: repete-se no fim
     S.busy = true;
     const ticket = S.seq.begin();
     try {
@@ -168,7 +173,7 @@
         // Snapshots incompatíveis ou incompletos: se ainda não havia uma revisão de snapshots válida, usa-se o relatório
         // completo; se havia, mantém-se essa revisão e mostra-se o erro.
         if (S.mode === 'snapshots') throw e;
-        S.files = {}; S.mode = null; S.snapshotError = e.message;
+        S.mode = null; S.snapshotError = e.message; // o resumo já pintado fica até o relatório o substituir
       }
       if (!used) await refreshReport(ticket);
       S.lastOk = Date.now(); S.lastError = null;
@@ -180,6 +185,7 @@
       $('main').setAttribute('aria-busy', 'false');
       paintChrome();
       renderView(false);
+      if (again) { again = false; setTimeout(refresh, 0); }
     }
   }
 
@@ -330,8 +336,8 @@
       ['Apostas liquidadas', int(s.settled), int(s.reference.matches) + ' jogos'],
       ['ROI histórico Q7', r0 ? spct(r0.roi) : '—', 'IC95 ' + (r0 ? ci(r0.ci95) : '—'), r0 ? sign(r0.roi) : ''],
       ['Saldo histórico', units(s.reference.units) + ' u', 'à odd anunciada', sign(s.reference.units)],
-      ['H1 prospetiva', p && p.h1 ? int(p.h1.games) + ' / ' + p.h1.target : '—', p && p.h1 ? (H1S[p.h1.status] || [p.h1.status])[0] : 'relatório indisponível'],
-      ['H2 prospetiva', p && p.h2 ? int(p.h2.games) + ' / ' + p.h2.target : '—', p && p.h2 ? (H2S[p.h2.status] || [p.h2.status])[0] : 'relatório indisponível'],
+      ['H1 prospetiva', p && p.h1 ? int(p.h1.games) + ' / ' + p.h1.target : '—', p && p.h1 ? esc(statusLabel(H1S, p.h1.status, p.valid)[0]) : 'relatório indisponível'],
+      ['H2 prospetiva', p && p.h2 ? int(p.h2.games) + ' / ' + p.h2.target : '—', p && p.h2 ? esc(statusLabel(H2S, p.h2.status, p.valid)[0]) : 'relatório indisponível'],
       ['Estratégias validadas', int(cert.validated), cert.active ? 'certificação ativa' : 'certificação não ativa']
     ]);
     html += '<div class="grid">';
@@ -492,7 +498,7 @@
     html += panel('Alterações de comportamento · seguimento por origem', track, {span: 'span-6', flush: true});
     html += panel('Hipóteses propostas pelo modelo de linguagem', hypTable(l.llm.hypotheses, 'Hipóteses LLM', {born: true}), {flush: true, meta: int(l.llm.hypotheses.length) + ' · ' + (l.llm.evaluation ? note(l.llm.evaluation.reason) : '')});
     html += panel('Promissoras (exploratórias)', hypTable(l.promising, 'Hipóteses promissoras'), {span: 'span-6', flush: true, meta: int(l.promising.length)});
-    html += panel('Replicação prospetiva exploratória positiva', hypTable(l.replicated_exploratory, 'Replicação exploratória'), {span: 'span-6', flush: true, meta: int(l.replicated_exploratory_total) + ' no total · não é validação'});
+    html += panel('Replicação prospetiva exploratória positiva', hypTable(l.replicated_exploratory, 'Replicação exploratória'), {span: 'span-6', flush: true, meta: int(l.replicated_exploratory_total) + ' entre as ' + int(l.top_pool) + ' hipóteses do topo publicado · não é validação'});
     html += panel('Rejeitadas (abandonadas)', hypTable(l.rejected, 'Hipóteses abandonadas'), {flush: true, meta: 'primeiras ' + int(l.rejected.length) + ' de ' + int(l.rejected_total)});
     const m = l.multiplicity || {};
     html += panel('Multiplicidade', '<dl class="facts"><dt>Testadas agora</dt><dd>' + int(m.tested_now) + '</dd><dt>Conjuntos de jogos distintos</dt><dd>' + int(m.distinct_game_sets_tested) + '</dd>' +
@@ -510,8 +516,7 @@
     if (v && !v.ok) html += '<div class="banner bad" style="margin:0">Relatório prospetivo com problemas — ' + esc(v.problems.concat(v.certification).join('; ')) + '. Estados não conformes com o protocolo não são apresentados como decisão.</div>';
     const certBad = v && v.certification.length > 0;
     const h1 = p.H1 || {}, h2 = p.H2 || {};
-    const h1s = certBad && h1.status !== 'insufficient_games' ? ['certificação inválida', 'bad'] : (H1S[h1.status] || [h1.status || '—', '']);
-    const h2s = certBad && !H2S[h2.status] ? ['certificação inválida', 'bad'] : (H2S[h2.status] || [h2.status || '—', '']);
+    const h1s = statusLabel(H1S, h1.status, !certBad), h2s = statusLabel(H2S, h2.status, !certBad);
     html += kpis([
       ['Ativação', day(p.activated_utc), when(p.activated_utc)],
       ['Entradas no registo', int(p.ledger_entries), 'append-only, cadeia SHA-256'],
@@ -569,10 +574,10 @@
       ['ROI · odd −5 %', spct(roi['odd-5%'] && roi['odd-5%'].roi), 'IC95 ' + ci(roi['odd-5%'] && roi['odd-5%'].ci95), sign(roi['odd-5%'] && roi['odd-5%'].roi)],
       ['Saldo', units(ref.units) + ' u', int(ref.settled) + ' liquidadas', sign(ref.units)],
       ['Maior queda (histórico)', pf.luck ? n(pf.luck.max_drawdown, 2) + ' u' : '—', 'pior sequência ' + (pf.luck ? int(pf.luck.longest_losing_run) : '—')],
-      ['Oscilação esperada', pf.luck ? '±' + n(pf.luck.luck_sd * 2, 1) + ' u' : '—', 'z ' + (pf.luck ? n(pf.luck.z, 2) : '—') + ' (sorte)']
+      ['Oscilação esperada (±2σ)', pf.luck ? '±' + n(pf.luck.luck_sd * 2, 1) + ' u' : '—', 'σ publicado ' + (pf.luck ? n(pf.luck.luck_sd, 1) : '—') + ' u · z ' + (pf.luck ? n(pf.luck.z, 2) : '—')]
     ]);
     html += '<div class="grid">';
-    const pts = pf.timeline.map((p, i) => ({x: i, y: p.u, label: when(p.d) + ' · ' + (p.m || p.t) + ' · ' + units(p.w) + ' → saldo ' + units(p.u)}));
+    const pts = pf.timeline.map((p, i) => ({x: i, y: p.u, label: when(p.d) + ' · ' + (p.m || p.t) + ' · ' + units(p.g) + ' u → saldo ' + units(p.u)}));
     html += panel('Saldo acumulado', lineChart([{name: 'Saldo', points: pts}], {zero: true, fy: v => units(v, 0), fx: v => pf.timeline[Math.round(v)] ? day(pf.timeline[Math.round(v)].d) : '', label: 'Saldo acumulado nas últimas liquidações'}) +
       '<p class="note">Janela publicada: ' + esc(pf.timeline_window.note) + ' de ' + int(pf.timeline_window.settled) + '. Maior queda dentro da janela: ' + n(pf.drawdown_window.max, 2) + ' u (calculada no navegador sobre a série publicada).</p>', {span: 'span-8', meta: 'unidades à odd anunciada'});
     const sens = ['odd-0%', 'odd-2%', 'odd-5%'].map(k => '<tr>' + td(k === 'odd-0%' ? 'Odd anunciada' : 'Odd −' + k.slice(4)) + td('<span class="' + sign(roi[k] && roi[k].roi) + '">' + spct(roi[k] && roi[k].roi) + '</span>', 'n') + td(ci(roi[k] && roi[k].ci95), 'n') + '</tr>');

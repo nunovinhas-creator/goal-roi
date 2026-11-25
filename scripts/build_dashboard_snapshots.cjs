@@ -36,13 +36,16 @@ function build(opts) {
   if (!check.ok) throw new Error('relatório inválido: ' + check.problems.join('; '));
   const prospective = readJson(opts.prospective, true);
   const protocol = readJson(opts.protocol, true);
-  const files = core.buildAll(report, prospective, protocol, Date.parse(report.generated_at_utc));
+  const at = Date.parse(report.generated_at_utc);
+  // Conta o que o filtro de privacidade retira (para auditoria) e confirma que nada passa depois dele.
+  const redacted = core.privacyFindings(core.buildAll(report, prospective, protocol, at, {raw: true})).length;
+  const files = core.buildAll(report, prospective, protocol, at);
   const leaks = core.privacyFindings(files);
   if (leaks.length) throw new Error('dados privados detetados: ' + leaks.slice(0, 5).join(', '));
   fs.mkdirSync(opts.out, {recursive: true});
   const manifest = {schema: core.MANIFEST_SCHEMA, report_generated_at_utc: report.generated_at_utc,
     report_sha256: sha(reportBytes), report_bytes: reportBytes.length,
-    prospective_sha256: prospective ? sha(fs.readFileSync(opts.prospective)) : null, files: {}};
+    prospective_sha256: prospective ? sha(fs.readFileSync(opts.prospective)) : null, redacted_fields: redacted, files: {}};
   for (const name of core.SNAPSHOTS) {
     const body = Buffer.from(JSON.stringify(files[name]) + '\n', 'utf8');
     fs.writeFileSync(path.join(opts.out, core.FILE(name)), body);

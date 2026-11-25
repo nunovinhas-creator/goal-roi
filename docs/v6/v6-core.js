@@ -44,21 +44,27 @@
   // ---------- privacidade ----------
   // Nunca entram nos snapshots nem na interface: amostras de mensagens em bruto, chaves com aparência
   // de credencial e cadeias com aparência de token, e-mail, telefone ou identificador Telegram.
-  const PRIVATE_KEY = /(token|secret|password|passwd|api[_-]?key|session|cookie|chat[_-]?id|user[_-]?id|phone|email|unparsed_samples|telegram_raw|^raw$|^text$)/i;
+  // Chaves: lista fechada (nomes exatos) mais termos inequívocos de credencial. Chaves de dados como tipos de sinal
+  // ("SESSION_X") não são confundidas com credenciais.
+  const PRIVATE_KEY = /^(token|access_token|session|session_id|cookie|chat_?id|user_?id|phone|email|unparsed_samples|telegram_raw|raw|text)$|secret|password|passwd|api[_-]?key|auth[_-]?token|bot[_-]?token/i;
   const PRIVATE_VALUE = [
-    /\b[\w.+-]+@[\w-]+\.[\w.-]+\b/,                 // e-mail
-    /\b\d{6,}:[A-Za-z0-9_-]{30,}\b/,                 // token de bot Telegram
-    /\b(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/, // token GitHub
-    /\b(sk|pk)[-_][A-Za-z0-9]{20,}\b/,               // chaves de API genéricas
-    /(^|[^\w])\+\d{9,15}\b/,                         // telefone internacional
-    /(^|\s)@[A-Za-z][A-Za-z0-9_]{4,31}\b/            // identificador Telegram
+    /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}(?![\w.])/g, // e-mail (não apanha "Over 2.5@1.85")
+    /\d{6,}:[A-Za-z0-9_-]{30,}/g,                     // token de bot Telegram (também "bot123456:…")
+    /(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})/g, // token GitHub
+    /\b(?:sk|pk|rk)-[A-Za-z0-9_-]{20,}/g,            // chaves de API (inclui sk-proj-…)
+    /(?:^|[^\w])\+\d{9,15}\b/g,                      // telefone internacional
+    /(?:^|[^\w@])@[A-Za-z][A-Za-z0-9_]{4,31}\b/g,     // identificador Telegram em qualquer posição
+    /\bt(?:elegram)?\.me\/[A-Za-z0-9_+/-]+/gi        // ligações t.me
   ];
-  const ALLOWED_HANDLES = new Set(['@scangoal_bot', '@cf']);
+  const ALLOWED_HANDLES = new Set(['@scangoal_bot']);
   function privateString(s) {
     if (typeof s !== 'string') return false;
     for (const re of PRIVATE_VALUE) {
-      const m = s.match(re);
-      if (m && !ALLOWED_HANDLES.has(m[0].trim().split('/')[0])) return true;
+      re.lastIndex = 0;
+      for (const m of s.matchAll(re)) {
+        const hit = m[0].replace(/^[^\w@+]/, '').trim();
+        if (!ALLOWED_HANDLES.has(hit)) return true;
+      }
     }
     return false;
   }
@@ -270,7 +276,9 @@
 
   // ---------- desempenho ----------
   function drawdown(series) {
-    let peak = 0, max = 0, at = null;
+    // O pico parte do primeiro ponto da janela: um pico anterior à janela não é observado nesta série.
+    const first = (series || []).find(num);
+    let peak = first === undefined ? 0 : first, max = 0, at = null;
     (series || []).forEach((v, i) => {
       if (!num(v)) return;
       if (v > peak) peak = v;
@@ -327,10 +335,10 @@
       hypotheses_counts: report.brain.counts || {},
       certification: cert,
       prospective: prospective ? {valid: pv.ok, problems: pv.problems.concat(pv.certification),
-        verdict: prospective.verdict, games_registered: prospective.games_registered,
-        games_with_independent_result: prospective.games_with_independent_result,
-        h1: prospective.H1 && {status: prospective.H1.status, games: prospective.H1.games_with_result, target: FROZEN.min_games},
-        h2: prospective.H2 && {status: prospective.H2.status, games: prospective.H2.games_settled, target: FROZEN.min_games}} : null,
+        verdict: String(prospective.verdict), games_registered: num(prospective.games_registered) ? prospective.games_registered : null,
+        games_with_independent_result: num(prospective.games_with_independent_result) ? prospective.games_with_independent_result : null,
+        h1: prospective.H1 && {status: String(prospective.H1.status), games: num(prospective.H1.games_with_result) ? prospective.H1.games_with_result : null, target: FROZEN.min_games},
+        h2: prospective.H2 && {status: String(prospective.H2.status), games: num(prospective.H2.games_settled) ? prospective.H2.games_settled : null, target: FROZEN.min_games}} : null,
       narrative: Array.isArray(report.insights.narrative) ? report.insights.narrative.slice(0, 8) : [],
       recent_discoveries: (report.brain.notes || []).slice(0, 5).map(n => ({id: n.id, at_utc: n.at_utc, status: n.status, n: n.n, hit_rate: n.hit_rate, break_even: n.break_even})),
       verdict: VERDICT
@@ -376,7 +384,7 @@
       reference: report.questions[REFERENCE] || null,
       groups: report.groups, questions: report.questions,
       accuracy: report.accuracy || {},
-      timeline: (report.timeline || []).map(p => ({d: p.d, u: p.u, w: p.w, t: p.t, o: p.o, m: p.m, s: p.s})),
+      timeline: (report.timeline || []).map(p => ({d: p.d, u: p.u, g: p.g, w: p.w, t: p.t, o: p.o, m: p.m, s: p.s})),
       timeline_window: {points: series.length, settled: report.settled_bets, note: 'últimas ' + series.length + ' liquidações publicadas'},
       drawdown_window: drawdown(series),
       luck: ins.luck || null,
@@ -481,6 +489,7 @@
       top: (b.top || []).slice(0, 40).map(lite),
       rejected: (b.abandoned || []).slice(0, 60).map(lite), rejected_total: (b.abandoned || []).length,
       replicated_exploratory: replicated.slice(0, 40).map(lite), replicated_exploratory_total: replicated.length,
+      top_pool: (b.top || []).length,
       track: b.track ? {by_source: b.track.by_source, meaning: b.track.meaning, unit: b.track.unit, min_results: b.track.min_results} : null,
       watch: (b.watch || []).slice(0, 30).map(w => ({date_utc: w.date_utc, match: w.match, match_id: w.match_id, type: w.type,
         market: w.market, selection: w.selection, odds: w.odds, phase: w.phase, reasons: (w.reasons || []).length})),
@@ -494,12 +503,13 @@
     }});
   }
 
-  function buildAll(report, prospective, protocol, now) {
+  function buildAll(report, prospective, protocol, now, options) {
     const at = now === undefined ? Date.now() : now;
     const files = {
       summary: buildSummary(report, prospective, at), signals: buildSignals(report), performance: buildPerformance(report),
       science: buildScience(report, prospective, protocol), operations: buildOperations(report, prospective, at), learning: buildLearning(report)
     };
+    if (options && options.raw) return files;
     for (const k of Object.keys(files)) files[k] = sanitize(files[k]);
     return files;
   }

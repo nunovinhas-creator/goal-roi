@@ -205,3 +205,27 @@ test('atualização seletiva: conteúdos inalterados mantêm o hash entre revis�
   assert.equal(JSON.stringify(a.science), JSON.stringify(b.science));
   assert.notEqual(JSON.stringify(a.summary), JSON.stringify(b.summary));
 });
+
+test('auditoria: filtro de privacidade sem desvios e sem falsos positivos', () => {
+  for (const s of ['@scangoal_bot hi @realuser', '(@johndoe', 'x:@johndoe', 't.me/johndoe', 'bot123456789:' + 'A'.repeat(34), 'sk-proj-' + 'a'.repeat(26), 'a@b.com'])
+    assert.equal(core.sanitize(s), '[ocultado]', s);
+  for (const s of ['Over 2.5@1.85', 'Lille — Bayern Munchen', '@scangoal_bot', 'AH2(-0.5)', 'Asian Handicap: Viborg (-1)'])
+    assert.equal(core.sanitize(s), s, s);
+  assert.deepEqual(Object.keys(core.sanitize({SESSION_X: 1, tokens_used: 2, api_key: 3, bot_token: 4})), ['SESSION_X', 'tokens_used']);
+});
+
+test('auditoria: queda máxima medida a partir do início da janela', () => {
+  assert.deepEqual(core.drawdown([-10, -5, -12, -3]), {max: 7, at: 2});
+  assert.equal(core.drawdown([-10, -11]).max, 1);
+  assert.equal(core.drawdown([]).max, 0);
+});
+
+test('auditoria: valores não numéricos do relatório prospetivo não chegam ao resumo', () => {
+  const p = clone(prospective);
+  p.games_registered = '1" onmouseover=alert(1) x="';
+  p.H1.games_with_result = '<img src=x onerror=alert(1)>';
+  const s = core.buildSummary(report, p, AT).data.prospective;
+  assert.equal(s.valid, false);
+  assert.equal(s.games_registered, null);
+  assert.equal(s.h1.games, null);
+});

@@ -177,6 +177,8 @@ async function functional(browser, srv) {
   await page.waitForSelector('#view-command h2');
   const cmd = await page.locator('#view-command').innerText();
   assert.match(cmd, /Estratégias validadas\s*\n?\s*0/i);
+  assert.match(cmd, /H1 prospetiva[\s\S]{0,40}certificação inválida/i);
+  assert.doesNotMatch(cmd, /suportada \(só preditiva\)/i);
   assert.match(cmd, /Certificações inválidas ignoradas/i);
   const html = await page.content();
   for (const secret of ['nuno@example.com', '@pessoa_privada', 'AAAAAAAAAAAAAAAA', 'mensagem privada em bruto']) assert.ok(!html.includes(secret), 'dado privado visível: ' + secret);
@@ -187,6 +189,26 @@ async function functional(browser, srv) {
   }
   assert.deepEqual(errors, []);
   await ctx.close();
+  srv.clear();
+
+  // Injeção de HTML pelo relatório prospetivo e pelo relatório principal: nada executa.
+  const evil = structuredClone(prospective);
+  evil.games_registered = '1" onmouseover="window.__pwned=1" x="';
+  evil.H1.status = '<img src=x onerror="window.__pwned=1">';
+  evil.H1.note = '<img src=x onerror="window.__pwned=1">';
+  srv.set('/__raw/prospective_report.json', {body: JSON.stringify(evil)});
+  srv.set('/report.json', {body: variant(5, r => {
+    r.insights.narrative = ['<img src=x onerror="window.__pwned=1">'];
+    if (r.brain.agenda.items.length) r.brain.agenda.items[0].match = '<script>window.__pwned=1</script>';
+  })});
+  for (const v of ['command', 'lab', 'radar']) {
+    ({ctx, page, errors} = await open(browser, srv, {hash: v}));
+    if (v === 'radar' && await page.locator('[data-game]').count()) await page.locator('[data-game]').first().click();
+    await page.mouse.move(200, 300); await page.waitForTimeout(100);
+    assert.equal(await page.evaluate(() => window.__pwned), undefined, 'HTML injetado executou em ' + v);
+    assert.equal(await page.locator('#main img').count(), 0);
+    await ctx.close();
+  }
   srv.clear();
 
   // Relatório prospetivo indisponível: o Lab explica e o resto funciona.
