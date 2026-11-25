@@ -1,0 +1,32 @@
+name: BSD isolated evidence probe
+
+on:
+  push:
+    branches: [codex/bsd-audit-probe-20261125]
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    if: >-
+      github.repository == 'nunovinhas-creator/goal-roi' &&
+      github.ref == 'refs/heads/codex/bsd-audit-probe-20261125' &&
+      github.event_name == 'push' && github.event.created &&
+      !github.event.deleted && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prepare pinned read-only inputs
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/bsd-current" 9f9f61c77538fb06ae4d2505b4ae9ff133e410b8
+          git worktree add --detach "$RUNNER_TEMP/bsd-lecco" 58cd373ecb07df58f04afb0417cde6ac2c9ed6f2
+      - name: Make the five bounded BSD reads and emit derived evidence
+        env:
+          BSD_API_KEY: ${{ secrets.BSD_API_KEY }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -I audits/bsd-settlement/authenticated-probe.py "$RUNNER_TEMP/bsd-current" "$RUNNER_TEMP/bsd-lecco"
