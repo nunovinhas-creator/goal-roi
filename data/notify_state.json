@@ -2778,13 +2778,15 @@
    "attempt_utc": "2026-11-25T18:48:47+00:00",
    "chars": 212,
    "created_utc": "2026-11-25T18:48:47+00:00",
+   "done_utc": "2026-11-25T18:48:47+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "26b99f737e360ef317ca967e6c6bbd65bd663ff87af612c04bb0cf66e8bc7b9b",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:club-brugge-vs-liverpool-20261125|be4e8fadfe02": {
    "attempt_id": "d7e7d92d98754dfab537497ac7407ad7",
@@ -6864,12 +6866,17 @@
    "state": "delivered"
   },
   "game|id:sabah-baku-vs-barcelona-20261125|eee3e97338a4": {
+   "attempt_id": "eadb2ddf1cc54394b926914120867bae",
+   "attempt_utc": "2026-11-25T18:48:49+00:00",
+   "chars": 202,
    "created_utc": "2026-11-25T18:48:47+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "b454a6b78ccc21535a91a8c4bd576d615aab96f809ffd51f65d319584c4ec925",
+   "state": "in_flight"
   },
   "game|id:sabah-baku-vs-barcelona-20261125|f8177fc29fbc": {
    "attempt_id": "3c9135d222864772bbe983a0999fd03f",
@@ -8443,7 +8450,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 540,
+  "delivered": 541,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-25T18:42:25+00:00",
@@ -8634,6 +8641,7 @@
   "2026-11-25T18:34:50+00:00|Sabah Baku — Barcelona|Over 2.5": true,
   "2026-11-25T18:39:06+00:00|Sabah Baku — Barcelona|Sabah FC (2.25)": true,
   "2026-11-25T18:39:06+00:00|Sabah Baku — Barcelona|Sabah FC (3)": true,
+  "2026-11-25T18:45:04+00:00|Sabah Baku — Barcelona|Over 3.5": true,
   "2026-11-25T18:45:17+00:00|Club Brugge — Liverpool|Under 3.5": true
  },
  "migrations": {
@@ -10326,6 +10334,9 @@
   "item|id:sabah-baku-vs-barcelona-20261125|Asian Handicap|Sabah FC (3)": {
    "at_utc": "2026-11-25T18:42:25+00:00"
   },
+  "item|id:sabah-baku-vs-barcelona-20261125|Asian Total|Over 3.5": {
+   "at_utc": "2026-11-25T18:48:47+00:00"
+  },
   "item|id:sabah-baku-vs-barcelona-20261125|Asian Total|Over 4.5": {
    "at_utc": "2026-11-25T13:51:09+00:00"
   },
@@ -10625,7 +10636,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 852,
+ "sent_total": 853,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -11729,6 +11740,7 @@
   "2026-11-25T18:34:50+00:00|Sabah Baku — Barcelona|Over 2.5",
   "2026-11-25T18:39:06+00:00|Sabah Baku — Barcelona|Sabah FC (2.25)",
   "2026-11-25T18:39:06+00:00|Sabah Baku — Barcelona|Sabah FC (3)",
+  "2026-11-25T18:45:04+00:00|Sabah Baku — Barcelona|Over 3.5",
   "2026-11-25T18:45:17+00:00|Club Brugge — Liverpool|Under 3.5"
  ]
 }
