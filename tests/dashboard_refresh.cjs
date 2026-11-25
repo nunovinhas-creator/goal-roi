@@ -10,6 +10,25 @@ const base = JSON.parse(fs.readFileSync(process.argv[3] || 'docs/report.json','u
 const docs = path.dirname(indexPath);
 const root = 'http://goal-roi.test/';
 const date = new Date(base.generated_at_utc);
+
+// The refresh regression filters the agenda on Stake + "misto" + "por começar". Whether the live report holds such a
+// signal depends on the hour of collection, so the fixture always carries one, built from the report's own schema and
+// dated relative to the test clock. The assertions on the filtered cards are unchanged.
+(function ensureAgendaFixture(report) {
+  const agenda = report.brain?.agenda;
+  if (!agenda || !Array.isArray(agenda.items)) return;
+  const now = Date.parse(report.generated_at_utc);
+  if (agenda.items.some(a => a.family === 'Stake' && a.verdict === 'misto' && a.when === 'por começar' &&
+      Date.parse(a.kickoff_utc) > now + 3600000)) return;
+  const donor = agenda.items.find(a => (a.good || []).length && (a.bad || []).length);
+  agenda.items.push({match_id:'fixture-stake-por-comecar', match:'Equipa Fixa — Equipa Teste', league:'Liga de teste',
+    family:'Stake', type:'STAKE_LOAD', phase:'pre', when:'por começar', kickoff_utc:new Date(now + 6*3600000).toISOString(),
+    date_utc:new Date(now - 10*60000).toISOString(), minute:null, score_at_signal:null, market:'Asian Total',
+    selection:'Over 2.5', odds:1.9, odds_last:1.9, max_mult:1, share:null, share_last:null, verdict:'misto', conflict:false,
+    validated:false, odds_band:'odd 1,50 a 2,00', odds_band_n:0, good:donor ? donor.good.slice(0, 1) : [], good_total:donor ? 1 : 0,
+    bad:donor ? donor.bad.slice(0, 1) : [], bad_total:donor ? 1 : 0});
+  if (agenda.counts) agenda.counts.misto = (agenda.counts.misto || 0) + 1;
+})(base);
 const percent = (value, places=1) => (value * 100).toFixed(places).replace('.',',') + ' %';
 const units = n => (n > 0 ? '+' : '') + String(n).replace('.',',');
 const count = n => new Intl.NumberFormat('pt-PT').format(n);
