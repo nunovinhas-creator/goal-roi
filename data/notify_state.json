@@ -2808,13 +2808,15 @@
    "attempt_utc": "2026-11-25T18:56:20+00:00",
    "chars": 211,
    "created_utc": "2026-11-25T18:56:20+00:00",
+   "done_utc": "2026-11-25T18:56:20+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "c4b2f863c6a92361c2430252b5fa8958881abde834bc5d2ee205dee31587458f",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:club-brugge-vs-liverpool-20261125|be4e8fadfe02": {
    "attempt_id": "d7e7d92d98754dfab537497ac7407ad7",
@@ -4291,12 +4293,17 @@
    "state": "delivered"
   },
   "game|id:inter-milan-vs-stuttgart-20261125|0477c0cdeb7e": {
+   "attempt_id": "db93b991143a48f8a28fff6a14a00dba",
+   "attempt_utc": "2026-11-25T18:56:23+00:00",
+   "chars": 295,
    "created_utc": "2026-11-25T18:56:20+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "96f865286f3ae025a4c2f4b6b04b11e1eab5f282745e8590fc7a588da8294404",
+   "state": "in_flight"
   },
   "game|id:internacional-vs-vitoria-ba-20261124|29ae45ed4927": {
    "attempt_id": "3e270cb69a3843f388aa02726765a96c",
@@ -8488,7 +8495,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 543,
+  "delivered": 544,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-25T18:51:02+00:00",
@@ -8682,7 +8689,9 @@
   "2026-11-25T18:45:04+00:00|Sabah Baku — Barcelona|Over 3.5": true,
   "2026-11-25T18:45:17+00:00|Club Brugge — Liverpool|Under 3.5": true,
   "2026-11-25T18:47:11+00:00|Atletico de Madrid — Viking|Over 3.5": true,
-  "2026-11-25T18:53:05+00:00|Club Brugge — Liverpool|Over 3.5": true
+  "2026-11-25T18:52:54+00:00|Inter Milan — Stuttgart|Inter (-1.75)": true,
+  "2026-11-25T18:53:05+00:00|Club Brugge — Liverpool|Over 3.5": true,
+  "2026-11-25T18:53:05+00:00|Inter Milan — Stuttgart|AH2(+1.5)": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -9813,6 +9822,12 @@
   "item|id:inter-milan-u19-vs-stuttgart-u19-20261125|Asian Total|Over 4": {
    "at_utc": "2026-11-25T15:27:08+00:00"
   },
+  "item|id:inter-milan-vs-stuttgart-20261125|Asian Handicap|Inter (-1.75)": {
+   "at_utc": "2026-11-25T18:56:20+00:00"
+  },
+  "item|id:inter-milan-vs-stuttgart-20261125|Polymarket|AH2(+1.5)": {
+   "at_utc": "2026-11-25T18:56:20+00:00"
+  },
   "item|id:internacional-vs-vitoria-ba-20261124|Asian Total|Over 2.5": {
    "at_utc": "2026-11-23T18:08:45+00:00"
   },
@@ -10682,7 +10697,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 855,
+ "sent_total": 856,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -11789,6 +11804,8 @@
   "2026-11-25T18:45:04+00:00|Sabah Baku — Barcelona|Over 3.5",
   "2026-11-25T18:45:17+00:00|Club Brugge — Liverpool|Under 3.5",
   "2026-11-25T18:47:11+00:00|Atletico de Madrid — Viking|Over 3.5",
-  "2026-11-25T18:53:05+00:00|Club Brugge — Liverpool|Over 3.5"
+  "2026-11-25T18:52:54+00:00|Inter Milan — Stuttgart|Inter (-1.75)",
+  "2026-11-25T18:53:05+00:00|Club Brugge — Liverpool|Over 3.5",
+  "2026-11-25T18:53:05+00:00|Inter Milan — Stuttgart|AH2(+1.5)"
  ]
 }
