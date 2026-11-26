@@ -76,15 +76,11 @@ O manifesto traz o SHA-256 e o tamanho de cada ficheiro.
 - **Consistência:** todos os ficheiros têm de corresponder ao manifesto da mesma revisão; um hash diferente é recusado e mantém-se a revisão anterior.
 - **Ordem:** um sequenciador ignora respostas fora de ordem e revisões mais antigas.
 
-**Ativação pendente (decisão humana):** os workflows de produção não foram alterados, como pedido. Sem um passo em `collect.yml` que corra o gerador para `docs/v6/snapshots/`, a V6 em produção usa o modo "relatório completo". Nesse modo, a revalidação condicional (`cache: 'no-cache'` em vez de `no-store`) já reduz as atualizações sem dados novos de 3 MB para uma resposta 304. O passo seria:
-
-```
-node scripts/build_dashboard_snapshots.cjs --report data/report.json --out docs/v6/snapshots
-```
+**Ativação (decisão humana):** os workflows de produção não são alterados nesta PR. A integração operacional (publicação atómica com o relatório na recolha e nas leituras rápidas, `publication.py`, guardas de workflow) está na PR separada #98, inativa até a variável `GOAL_ROI_V6_SNAPSHOTS` ser `on`. Ver `snapshots-integration.md`. Sem snapshots publicados, a V6 usa o relatório completo, com revalidação condicional e um pedido parcial de 512 bytes por ciclo para saber a revisão disponível.
 
 ## Knowledge Center (desativado)
 
-O Goal-ROI Brain é um cofre privado, e a página da V6 é pública. Não existe um canal que publique apenas indicadores agregados, por isso nada do Brain é carregado. As condições para ativar estão descritas na própria vista.
+As fontes de conhecimento do projeto são privadas, e a página da V6 é pública. Não existe um canal que publique apenas indicadores agregados, por isso nada do Brain é carregado. As condições para ativar estão descritas na própria vista.
 
 ## Segurança e privacidade
 

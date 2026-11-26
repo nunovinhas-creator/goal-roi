@@ -34,6 +34,8 @@ async function open(browser, srv, opts = {}) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
+  // Violações de CSP e outros erros de consola contam como falhas (os 404 de rede esperados não).
+  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('consola: ' + m.text()); });
   await page.addInitScript(([cfg, now]) => {
     window.V6_CONFIG = cfg;
     const RealDate = Date, offset = now - RealDate.now();
@@ -161,6 +163,24 @@ async function functional(browser, srv) {
   assert.ok(rep[0].bytes <= 512);
   await ctx.close();
 
+  // Sem snapshots publicados: o manifesto não é pedido em cada ciclo.
+  ({ctx, page, errors} = await open(browser, srv));
+  srv.reset();
+  await page.evaluate(() => window.__V6.refresh()); await page.evaluate(() => window.__V6.refresh());
+  assert.equal(srv.state.log.filter(l => l.path === '/v6/snapshots/dashboard-manifest.json').length, 0, 'manifesto pedido apesar do 404 recente');
+  await page.evaluate(() => { location.hash = 'knowledge'; });
+  await page.waitForSelector('#view-knowledge h2');
+  assert.doesNotMatch(await page.locator('#view-knowledge').innerText(), /obsidian|cofre|brain/i, 'o Knowledge Center não revela fontes privadas');
+  // Foco mantido numa nova revisão dos dados (radar).
+  await page.evaluate(() => { location.hash = 'radar'; });
+  await page.waitForSelector('#radar-filters');
+  await page.focus('#radar-filters input[name="q"]');
+  srv.set('/report.json', {body: variant(5, r => { r.generated_at_utc = new Date(NOW - 30000).toISOString(); })});
+  await page.evaluate(() => window.__V6.refresh());
+  assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.name), 'q', 'foco perdido numa nova revisão');
+  srv.clear('/report.json');
+  await ctx.close();
+  ({ctx, page, errors} = await open(browser, srv));
   // Falhas HTTP: no arranque mostra erro; depois de recuperar, uma nova falha mantém a última revisão válida.
   srv.set('/report.json', {status: 500});
   ({ctx, page, errors} = await open(browser, srv, {wait: false}));
@@ -228,6 +248,7 @@ async function functional(browser, srv) {
   assert.match(lab, /certificação inválida/i);
   assert.doesNotMatch(lab, /suportada \(só preditiva\)/i);
   assert.match(lab, /Conflitos\s*\n?\s*3/i);
+  assert.doesNotMatch(lab.replace(/Texto original do protocolo[\s\S]*$/i, ''), /predictive information|no claim before|earlier edge/i, 'texto do protocolo em inglês fora da secção original');
   await page.evaluate(() => { location.hash = 'command'; });
   await page.waitForSelector('#view-command h2');
   const cmd = await page.locator('#view-command').innerText();
@@ -264,6 +285,20 @@ async function functional(browser, srv) {
     assert.equal(await page.locator('#main img').count(), 0);
     await ctx.close();
   }
+  srv.clear();
+
+  // T8: certificação ativa e válida com estratégias validadas -> veredito publicado, nunca "nenhuma validada" ao lado.
+  srv.set('/report.json', {body: variant(5, r => {
+    Object.assign(r.brain.validation, {state: 'active', ledger_valid: true});
+    Object.assign(r.brain.strategy_board, {certification_active: true, verdict: 'VEREDITO PUBLICADO DE TESTE', statistical_claim: 'none'});
+    r.brain.strategy_board.counts.validada = 3;
+  })});
+  ({ctx, page, errors} = await open(browser, srv, {hash: 'command'}));
+  const t8 = await page.locator('#view-command').innerText();
+  assert.match(t8, /VEREDITO PUBLICADO DE TESTE/i);
+  assert.doesNotMatch(t8, /NENHUMA ESTRATÉGIA VALIDADA/i);
+  assert.match(t8, /Estratégias validadas\s*\n?\s*3/i);
+  await ctx.close();
   srv.clear();
 
   // Relatório prospetivo indisponível: o Lab explica e o resto funciona.

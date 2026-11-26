@@ -270,6 +270,11 @@
     const parts = Object.fromEntries(LISBON.formatToParts(d).map(p => [p.type, p.value]));
     return {hour: Number(parts.hour) % 24, weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday)};
   }
+  const LISBON_DAY = (() => {
+    try { return new Intl.DateTimeFormat('en-CA', {timeZone: 'Europe/Lisbon', year: 'numeric', month: '2-digit', day: '2-digit'}); }
+    catch (e) { return null; }
+  })();
+  const lisbonDate = iso => LISBON_DAY ? LISBON_DAY.format(new Date(iso)) : new Date(iso).toISOString().slice(0, 10);
   function heatmap(entries) {
     const rows = {};
     for (const e of entries || []) {
@@ -301,7 +306,8 @@
       const t = time(e.d);
       if (!Number.isFinite(t)) continue;
       const src = sourceOf(e.t);
-      const d = new Date(t), day = (d.getUTCDay() + 6) % 7;
+      // Semana de segunda a domingo na hora de Lisboa (a mesma referência do mapa de calor).
+      const local = lisbonDate(e.d), d = new Date(local + 'T12:00:00Z'), day = (d.getUTCDay() + 6) % 7;
       const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - day)).toISOString().slice(0, 10);
       for (const [bucket, key] of [[byWeek, monday], [bySource, src]]) {
         const row = bucket[key] = bucket[key] || {bets: 0, settled: 0, units: 0, wins: 0};
@@ -336,7 +342,7 @@
       freshness: freshness(report.audit.collector_last_run_utc || report.audit.last_collected_at_utc, now),
       tracked: report.unique_bets, settled: report.settled_bets, messages: report.messages,
       reference: {roi: ref.roi || null, units: num(ref.units) ? ref.units : null, matches: ref.matches || null,
-        wins: ref.wins || null, pushes: ref.pushes || null, avg_odds: ref.avg_odds || null, conclusive: ref.conclusive === true, note: ref.note || null},
+        wins: num(ref.wins) ? ref.wins : null, pushes: num(ref.pushes) ? ref.pushes : null, avg_odds: num(ref.avg_odds) ? ref.avg_odds : null, conclusive: ref.conclusive === true, note: ref.note || null},
       first_signal_utc: report.first_signal_utc || null,
       agenda_counts: agenda.counts || {}, agenda_items: (agenda.items || []).length,
       hypotheses_counts: report.brain.counts || {},
@@ -483,7 +489,7 @@
     const lite = h => ({id: h.id, family: h.family, conditions: h.conditions, n: h.n, games: h.games, hits: h.hits,
       hit_rate: h.hit_rate, break_even: h.break_even, prob_above: h.prob_above, roi: h.roi, status: h.status,
       source: h.source || null, born_utc: h.born_utc || null, reason: h.reason || null, expect: h.expect || null, mode: h.mode || null,
-      evidence_level: h.evidence_level || null,
+      evidence_level: h.evidence_level || null, game_set: typeof h.game_set === 'string' ? h.game_set : null,
       prospective: h.prospective ? (e => ({games: h.prospective.games, roi: h.prospective.roi,
         status: e.status || null, scope: e.scope || null, results_confirmed: int(e.results_confirmed) ? e.results_confirmed : null,
         wins: int(e.wins) ? e.wins : null, losses: int(e.losses) ? e.losses : null, voids: int(e.voids) ? e.voids : null,
@@ -502,6 +508,13 @@
       top: (b.top || []).slice(0, 40).map(lite),
       rejected: (b.abandoned || []).map(lite), rejected_total: (b.counts || {})['abandonada'] || (b.abandoned || []).length,
       replicated_exploratory: replicated.map(lite), replicated_exploratory_total: replicated.length,
+      replicated_context: (() => {
+        const decided = replicated.map(h => { const e = h.prospective.economics; return (e.wins || 0) + (e.losses || 0) + (e.imputed_losses || 0); }).sort((a, b) => a - b);
+        const sets = new Set(replicated.map(h => h.game_set).filter(Boolean));
+        return {min_decided: decided.length ? decided[0] : null, median_decided: decided.length ? decided[Math.floor((decided.length - 1) / 2)] : null,
+          max_decided: decided.length ? decided[decided.length - 1] : null, distinct_game_sets: sets.size,
+          days_max: Math.max(0, ...replicated.map(h => h.prospective.economics.decision_days || 0))};
+      })(),
       top_pool: (b.top || []).length,
       // Totais exatos e listas completas de estados (ids), distintos das listas com métricas, que são parciais.
       totals: {hypotheses: num(b.hypotheses) ? b.hypotheses : null, promising: (b.counts || {})['promissora'] || 0,

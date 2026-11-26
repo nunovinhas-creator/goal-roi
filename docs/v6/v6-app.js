@@ -8,7 +8,7 @@
     prospective: 'https://raw.githubusercontent.com/nunovinhas-creator/goal-roi/main/data/prospective_report.json',
     protocol: null, // o texto do protocolo só é mostrado a partir dos snapshots; aqui usam-se os critérios congelados
     refreshMs: 3 * 60000, tickMs: 15000, timeoutMs: 45000,
-    knowledge: false // Integração com o Goal-ROI Brain desativada: não existe canal público seguro (ver Knowledge Center).
+    knowledge: false // integração de conhecimento privado desativada: não existe canal público seguro (ver Knowledge Center)
   }, window.V6_CONFIG || {});
 
   const $ = id => document.getElementById(id);
@@ -96,7 +96,13 @@
     return '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + t + '" aria-valuenow="' + v + '"><i style="width:' + (p * 100).toFixed(1) + '%"></i></div>'; };
   const head = (title, lede, extra) => '<div class="view-head"><div><h2 tabindex="-1">' + esc(title) + '</h2>' + (lede ? '<p>' + lede + '</p>' : '') + '</div>' + (extra || '') + '</div>';
   const kpis = items => '<dl class="kpis" style="--n:' + items.length + '">' + items.map(k => '<div class="kpi"><dt>' + esc(k[0]) + '</dt><dd><b class="' + (k[3] || '') + '">' + k[1] + '</b>' + (k[2] ? '<small>' + k[2] + '</small>' : '') + '</dd></div>').join('') + '</dl>';
-  const verdictBox = () => '<span class="verdict">' + esc(C.VERDICT) + '</span>';
+  // Veredito: o fixo "não demonstrada" só enquanto não houver certificação ativa e válida com estratégias validadas;
+  // nesse caso mostra-se o veredito publicado pelo quadro de estratégias (nunca as duas mensagens em contradição).
+  function verdictText() {
+    const c = S.files.summary && S.files.summary.data.certification;
+    return c && c.active && c.validated > 0 && !c.invalid.length ? (c.verdict || 'Há estratégias certificadas: ver o Scientific Lab.') : C.VERDICT;
+  }
+  const verdictBox = () => '<span class="verdict">' + esc(verdictText()) + '</span>';
 
   // ---------- rede ----------
   async function get(url) {
@@ -139,9 +145,18 @@
     } catch (e) { return {rev: null, full: null, error: e.message || String(e)}; }
     finally { if (timer) clearTimeout(timer); }
   }
+  // Sem snapshots publicados (404), o manifesto só volta a ser pedido 30 minutos depois: evita um 404 por ciclo.
+  let manifestMissingUntil = 0, manifestSeen = false;
   async function loadManifest() {
+    if (Date.now() < manifestMissingUntil) return {error: 'sem snapshots publicados (nova verificação às ' + when(new Date(manifestMissingUntil).toISOString()) + ')'};
     let text;
-    try { text = await get(CFG.manifest); } catch (e) { return {error: e.status === 404 ? 'sem snapshots publicados' : e.message}; }
+    try { text = await get(CFG.manifest); manifestMissingUntil = 0; manifestSeen = true; }
+    catch (e) {
+      // Só se espaça a verificação se este separador nunca viu snapshots; depois de os ver, um desaparecimento é
+      // verificado em cada ciclo para recuperar logo que voltem.
+      if (e.status === 404 && !manifestSeen) manifestMissingUntil = Date.now() + 30 * 60000;
+      return {error: e.status === 404 ? 'sem snapshots publicados' : e.message};
+    }
     let manifest;
     try { manifest = JSON.parse(text); } catch (e) { return {error: 'manifesto ilegível'}; }
     const mv = C.validateManifest(manifest);
@@ -210,7 +225,9 @@
         if (!p || p.schema !== C.PROSPECTIVE_SCHEMA) throw new Error('esquema prospetivo desconhecido');
         S.prospective = p; S.prospectiveText = text; out.changed = true;
       }
-      S.prospectiveState = 'atual';
+      // O prospetivo vem do ramo principal do repositório; o relatório principal vem da página publicada: podem
+      // ser de revisões diferentes por alguns minutos.
+      S.prospectiveState = 'lido do ramo principal (' + int(S.prospective && S.prospective.ledger_entries) + ' entradas no registo; pode não coincidir com a revisão do relatório)';
     } catch (e) {
       S.prospectiveState = S.prospective ? 'última versão válida (falha: ' + e.message + ')' : 'indisponível (' + e.message + ')';
     }
@@ -418,7 +435,7 @@
       ['Estratégias validadas', int(cert.validated), cert.active ? 'certificação ativa' : 'certificação não ativa']
     ]);
     html += '<div class="grid">';
-    html += panel('Veredito científico', '<div class="stack"><p style="margin:0"><b>' + esc(C.VERDICT) + '</b></p>' +
+    html += panel('Veredito científico', '<div class="stack"><p style="margin:0"><b>' + esc(verdictText()) + '</b></p>' +
       '<dl class="facts"><dt>Certificação</dt><dd>' + esc(({not_activated: 'não ativada', active: 'ativa'})[cert.state] || cert.state) + '</dd>' +
       '<dt>Preços executáveis</dt><dd>' + (cert.executable_price_evidence ? 'com evidência' : 'sem evidência') + '</dd>' +
       '<dt>Custos</dt><dd>' + (cert.costs_known ? 'conhecidos' : 'desconhecidos') + '</dd>' +
@@ -529,7 +546,7 @@
     const sources = [...new Set(sg.items.map(i => i.source))].sort(), phases = [...new Set(sg.items.map(i => i.phase).filter(Boolean))].sort(),
       verdicts = [...new Set(sg.items.map(i => i.verdict).filter(Boolean))].sort();
     let html = head('Radar de sinais', 'Sinais da agenda agrupados por jogo. Duplicações visuais eliminadas; cada ficha mostra a cronologia e a evidência favorável e contrária.');
-    html += '<form class="filters panel" style="padding:10px 12px" id="radar-filters" role="search" onsubmit="return false">' +
+    html += '<form class="filters panel" style="padding:10px 12px" id="radar-filters" role="search">' +
       '<label>Pesquisa<input type="search" name="q" value="' + esc(f.q) + '" placeholder="Equipa, liga, seleção"></label>' +
       '<label>Fonte<select name="source">' + opts(sources, f.source) + '</select></label>' +
       '<label>Fase<select name="phase">' + opts(phases, f.phase) + '</select></label>' +
@@ -638,7 +655,7 @@
         ' (IC95 ' + (w ? pct(w[0], 0) + '–' + pct(w[1], 0) : '—') + ') · ROI anunciado ' + spct(e.roi_advertised) + ', −2 % ' + spct(e.roi_odds_minus_2pct) + (e.decision_days ? ' · ' + int(e.decision_days) + ' dias' : '') +
         (nn < 30 ? ' · <b>amostra pequena</b>' : '') + '</small>'};
     });
-    const TABS = [['diario', 'Diário', T.journal], ['llm', 'Propostas LLM', T.llm], ['promissoras', 'Promissoras', T.promising], ['replicacao', 'Replicação', l.replicated_exploratory_total],
+    const TABS = [['diario', 'Diário', T.journal], ['llm', 'Propostas LLM', T.llm], ['promissoras', 'Promissoras', T.promising], ['replicacao', 'Replicação', null],
       ['rejeitadas', 'Rejeitadas', T.abandoned], ['seguimento', 'Seguimento', null], ['limites', 'Limitações', null]];
     let html = head('Brain Intelligence', 'Aprendizagem autónoma: hipóteses geradas, propostas pelo modelo de linguagem, promissoras, com replicação prospetiva exploratória e rejeitadas. Tudo exploratório.');
     html += kpis([['Hipóteses registadas', int(T.hypotheses), 'testadas agora: ' + int(l.tested)], ['Em observação', int(T.observing), 'estado do gerador'],
@@ -651,8 +668,11 @@
       '. Execuções: ' + int(l.llm.runs) + ', última ' + when(l.llm.last_run_utc) + '.</p>' + pagedList('llm', LISTS.llm, {total: T.llm}), {flush: true});
     else if (tab === 'promissoras') body = panel('Promissoras', pagedList('promissoras', LISTS.promissoras, {total: T.promising}) +
       '<p class="note pad">Lista completa do estado do gerador. Métricas só para as ' + int(T.top_published) + ' hipóteses do topo publicado.</p>', {flush: true});
-    else if (tab === 'replicacao') body = panel('Replicação prospetiva exploratória positiva', '<p class="note pad">' + int(l.replicated_exploratory_total) + ' entre as ' + int(l.top_pool) + ' hipóteses do topo publicado (escolhidas pelo desempenho histórico, entre ' + int(T.hypotheses) +
-      '). Hipóteses partilham jogos e não há correção de multiplicidade; IC95 de Wilson calculado no navegador sobre as contagens publicadas. Não é validação.</p>' + pagedList('replicacao', LISTS.replicacao, {}), {flush: true});
+    else if (tab === 'replicacao') { const rc = l.replicated_context || {};
+      body = panel('Replicação prospetiva exploratória', '<p class="note pad">Hipóteses do topo publicado (' + int(l.top_pool) + ', escolhidas pelo desempenho histórico entre ' + int(T.hypotheses) +
+      ') cujo resultado prospetivo exploratório é positivo: ' + int(l.replicated_exploratory_total) + '. Jogos decididos por hipótese: mínimo ' + int(rc.min_decided) + ', mediana ' + int(rc.median_decided) +
+      ', máximo ' + int(rc.max_decided) + '; no máximo ' + int(rc.days_max) + ' dias de decisão. Conjuntos de jogos históricos distintos: ' + int(rc.distinct_game_sets) + ' — as hipóteses partilham jogos e não são replicações independentes.' +
+      ' Sem correção de multiplicidade; IC95 de Wilson calculado no navegador. Não é validação.</p>' + pagedList('replicacao', LISTS.replicacao, {}), {flush: true}); }
     else if (tab === 'rejeitadas') body = panel('Rejeitadas (abandonadas pelo gerador)', pagedList('rejeitadas', LISTS.rejeitadas, {total: T.abandoned}) +
       '<p class="note pad">"Abandonada" é o estado do gerador (≥ 30 jogos e ≤ 10 % de probabilidade de estar acima do necessário). O quadro de estratégias usa outra classificação: ' +
       (l.strategy_board_counts ? Object.entries(l.strategy_board_counts).map(([k, v]) => esc(tr(k)) + ' ' + int(v)).join(', ') : '—') + '.</p>', {flush: true});
@@ -702,16 +722,19 @@
       '<dl class="facts"><dt>População</dt><dd>' + int(h2.games_in_population) + ' jogos</dd><dt>Ganhos / perdas</dt><dd>' + int(h2.wins) + ' / ' + int(h2.losses) + '</dd>' +
       '<dt>Probabilidade implícita média</dt><dd>' + pct(h2.mean_implied) + '</dd></dl><p class="note">' + note(h2.note) + '</p></div>', {span: 'span-5'});
     html += panel('D1 · totais em sentido oposto', '<div class="stack"><div class="row"><span>Jogos</span><b class="num">' + int(p.D1 && p.D1.opposite_totals_games) + '</b></div>' +
-      '<div class="row"><span>Estado</span>' + tag('apenas diagnóstico', '') + '</div><p class="note">' + esc(proto && proto.D1 ? proto.D1.definition : 'Sem teste de hipótese.') + '</p></div>', {span: 'span-5'});
+      '<div class="row"><span>Estado</span>' + tag('apenas diagnóstico', '') + '</div><p class="note">' + 'Um sinal de totais registado com direção (Over/Under) oposta a um sinal de totais anterior de outro tipo no mesmo jogo. Sem teste de hipótese.' + '</p></div>', {span: 'span-5'});
     html += panel('Exclusões e integridade da amostra', '<dl class="facts"><dt>Sinais registados</dt><dd>' + int(p.signals_registered) + '</dd><dt>Antes do resultado</dt><dd>' + int(p.signals_registered_before_result) + '</dd>' +
       '<dt>Resultado já conhecido (excluídos)</dt><dd>' + int(p.signals_result_known_at_registration) + '</dd><dt>Jogos em conflito (excluídos)</dt><dd>' + int(p.games_with_conflicting_results) + '</dd>' +
       '<dt>Sem resultado após 72 h</dt><dd>' + int(p.games_without_result_after_72h) + '</dd><dt>Esquema</dt><dd>' + esc(p.schema) + '</dd></dl>' +
-      (proto ? '<p class="note">Conflitos: ' + esc(proto.conflict || '') + '</p><p class="note">Ausência: ' + esc(proto.missing || '') + '</p>' : ''), {span: 'span-7'});
-    html += panel('Critérios congelados', proto ? '<div class="stack">' + ['H1', 'H2'].map(k => proto[k] ? '<div><b>' + k + '</b> — <span class="note">' + esc(proto[k].status) + '</span><p class="note">População: ' + esc(proto[k].population) + '</p><p class="note">Decisão: ' + esc(proto[k].decision) + '</p></div>' : '').join('') +
-      '<p class="note">' + esc(proto.frozen) + '</p><p class="note">Âmbito: ' + esc(proto.scope) + '</p></div>'
-      : '<dl class="facts"><dt>Jogos mínimos</dt><dd>' + F.min_games + '</dd><dt>z crítico</dt><dd>' + F.z_crit + '</dd><dt>Faixa mínima</dt><dd>' + F.min_band + ' jogos</dd><dt>Sem resultado</dt><dd>' + F.missing_after_hours + ' h</dd></dl>' +
+      '<p class="note">Conflitos: um resultado diferente do mesmo fornecedor, ou fornecedores em desacordo, exclui o jogo da análise primária. Ausência: sem resultado independente ' + F.missing_after_hours + ' h depois do início, o jogo é excluído das estimativas e contado em todas as tabelas.</p>', {span: 'span-7'});
+    // Resumo em português, derivado dos critérios congelados; o texto original do protocolo (em inglês) fica disponível à parte.
+    const original = proto ? '<details class="inner"><summary>Texto original do protocolo (inglês)</summary>' + ['H1', 'H2', 'D1'].map(k => proto[k] ? '<p class="note"><b>' + k + '</b> — ' + esc(proto[k].status || '') +
+      (proto[k].population ? '<br>' + esc(proto[k].population) : '') + (proto[k].decision ? '<br>' + esc(proto[k].decision) : '') + (proto[k].definition ? '<br>' + esc(proto[k].definition) : '') + '</p>' : '').join('') +
+      '<p class="note">' + esc(proto.frozen || '') + '</p><p class="note">' + esc(proto.scope || '') + '</p></details>' : '';
+    html += panel('Critérios congelados', '<dl class="facts"><dt>Jogos mínimos</dt><dd>' + F.min_games + '</dd><dt>z crítico</dt><dd>' + F.z_crit + '</dd><dt>Faixa mínima</dt><dd>' + F.min_band + ' jogos</dd><dt>Sem resultado</dt><dd>' + F.missing_after_hours + ' h</dd></dl>' +
         '<p class="note">H1: nenhuma conclusão antes de ' + F.min_games + ' jogos com resultado independente; depois, "suportada" só com z ≥ ' + n(F.z_crit, 3) + ' e observado acima do esperado em todas as faixas de minutos com pelo menos ' + F.min_band + ' jogos. Apenas informação preditiva, não rentabilidade.</p>' +
-        '<p class="note">H2: nenhuma conclusão antes de ' + F.min_games + ' jogos; sem validação de ROI, porque as odds anunciadas não são preços executáveis e os custos são desconhecidos.</p><p class="note">Texto integral do protocolo disponível com os snapshots; valores congelados do código de produção.</p>',
+        '<p class="note">H2: nenhuma conclusão antes de ' + F.min_games + ' jogos; sem validação de ROI, porque as odds anunciadas não são preços executáveis e os custos são desconhecidos.</p>' +
+        '<p class="note">D1: apenas diagnóstico, sem teste de hipótese.</p><p class="note">Protocolo congelado antes da ativação; só sinais futuros elegíveis entram no registo.</p>' + original,
       {meta: 'protocolo prospetivo congelado'});
     const c = sc.certification, sb = sc.strategy_board || {};
     html += panel('Certificação das estratégias (relatório principal)', '<dl class="facts"><dt>Método</dt><dd>' + esc(sc.validation_method ? sc.validation_method.method : '—') + '</dd><dt>Estado</dt><dd>' + esc(c.state) + '</dd>' +
@@ -819,10 +842,10 @@
   }
 
   function viewKnowledge() {
-    return head('Knowledge Center', 'Integração com o Goal-ROI Brain e o cofre Obsidian.') +
+    return head('Knowledge Center', 'Integração de conhecimento agregado.') +
       '<div class="grid">' + panel('Integração desativada', '<div class="knowledge-off"><p style="margin:0">' + tag('desativada', 'warn') + '</p>' +
-      '<p>O Goal-ROI Brain é um cofre privado. Esta página é pública e não existe ainda um canal seguro que publique apenas indicadores agregados, por isso nenhum conteúdo do Brain é carregado ou mostrado aqui.</p>' +
-      '<p>Condições para ativar (decisão humana):</p><ul><li>um ficheiro agregado gerado pelo próprio Brain, com uma lista fechada de campos numéricos (por exemplo, número de PRs indexadas, relações curadas, temas);</li>' +
+      '<p>As fontes de conhecimento do projeto são privadas. Esta página é pública e não existe ainda um canal seguro que publique apenas indicadores agregados, por isso nenhum conteúdo privado é carregado ou mostrado aqui.</p>' +
+      '<p>Condições para ativar (decisão humana):</p><ul><li>um ficheiro agregado gerado pela própria fonte privada, com uma lista fechada de campos numéricos (por exemplo, número de PRs indexadas, relações curadas, temas);</li>' +
       '<li>sem texto livre, títulos de notas, caminhos, autores ou ligações;</li><li>verificação automática de privacidade antes da publicação, igual à aplicada aos snapshots desta página;</li>' +
       '<li>publicação sem credenciais novas e sem custo.</li></ul><p class="note">Os indicadores científicos públicos (H1, H2, D1, certificação) já estão no <a href="#lab">Scientific Lab</a>, lidos do relatório publicado.</p></div>') + '</div>';
   }
@@ -841,8 +864,12 @@
     const el = $('view-' + S.view);
     const key = S.revision + ':' + NEEDS[S.view].map(k => S.files[k] ? 1 : 0).join('');
     if (S.rendered[S.view] !== key) {
+      // Repõe o foco no elemento equivalente depois de refazer a vista (filtros, jogos, separadores, listas).
+      const a = document.activeElement, keep = a && el.contains(a) ? ['data-game', 'data-market', 'data-tab', 'data-filter', 'data-pager', 'name', 'id']
+        .map(k => a.getAttribute(k) !== null ? '[' + k + '="' + CSS.escape(a.getAttribute(k)) + '"]' : null).find(Boolean) : null;
       S.charts = {};
       el.innerHTML = RENDER[S.view]();
+      if (keep) { const b = el.querySelector(keep); if (b) b.focus({preventScroll: true}); }
       bindCharts(el);
       labelTables(el);
       S.rendered[S.view] = key;
@@ -912,6 +939,7 @@
     const next = e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length - 1] : all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
     e.preventDefault(); next.click();
   });
+  document.addEventListener('submit', e => { if (e.target.id === 'radar-filters') e.preventDefault(); });
   document.addEventListener('input', e => {
     const lf = e.target.closest('[data-filter]');
     if (lf) { const [k, field] = lf.dataset.filter.split(':'); S.ui.pages[k][field] = e.target.value; S.ui.pages[k].page = 0; $('list-' + k).innerHTML = pagedBody(k, LISTS[k], listOpts(k)); return; }
