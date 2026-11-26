@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+// Gera os snapshots derivados do Goal-ROI Intelligence V6 a partir do relatório original.
+//
+//   node scripts/build_dashboard_snapshots.cjs [--report data/report.json] [--prospective data/prospective_report.json]
+//        [--protocol scangoal/prospective_protocol.json] [--out build/dashboard-snapshots] [--hashed]
+//
+// Só lê. Nunca altera report.json, o registo prospetivo nem o protocolo. A derivação é a mesma do navegador
+// (docs/v6/v6-core.js). A saída é determinística: a frescura é medida à hora de geração do relatório.
+// Não está ligado a nenhum workflow: a ativação em produção exige um passo novo em collect.yml (fora do âmbito).
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const core = require('../docs/v6/v6-core.js');
+
+// Caminhos por omissão relativos à raiz do repositório (não à diretoria de trabalho).
+const ROOT = path.join(__dirname, '..');
+function args(argv) {
+  const out = {report: path.join(ROOT, 'data/report.json'), prospective: path.join(ROOT, 'data/prospective_report.json'),
+    protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out: path.join(ROOT, 'build/dashboard-snapshots'), hashed: false};
+  for (let i = 0; i < argv.length; i += 2) {
+    const k = argv[i].replace(/^--/, '');
+    if (k === 'hashed') { out.hashed = true; i--; continue; }
+    if (!(k in out) || argv[i + 1] === undefined) throw new Error('argumento desconhecido: ' + argv[i]);
+    out[k] = argv[i + 1];
+  }
+  return out;
+}
+const readJson = (file, optional) => {
+  if (optional && !fs.existsSync(file)) return null;
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
+};
+const sha = buf => crypto.createHash('sha256').update(buf).digest('hex');
+
+function build(opts) {
+  const reportBytes = fs.readFileSync(opts.report);
+  const report = JSON.parse(reportBytes.toString('utf8'));
+  const check = core.validateReport(report);
+  if (!check.ok) throw new Error('relatório inválido: ' + check.problems.join('; '));
+  const prospective = readJson(opts.prospective, true);
+  const protocol = readJson(opts.protocol, true);
+  const at = Date.parse(report.generated_at_utc);
+  // Conta o que o filtro de privacidade retira (para auditoria) e confirma que nada passa depois dele.
+  const redacted = core.privacyFindings(core.buildAll(report, prospective, protocol, at, {raw: true})).length;
+  const files = core.buildAll(report, prospective, protocol, at);
+  const leaks = core.privacyFindings(files);
+  if (leaks.length) throw new Error('dados privados detetados: ' + leaks.slice(0, 5).join(', '));
+  fs.mkdirSync(opts.out, {recursive: true});
+  // Escrita atómica: cada ficheiro vai para um temporário e é renomeado; o manifesto é o último.
+  const atomic = (file, body) => { const tmp = file + '.tmp-' + process.pid; fs.writeFileSync(tmp, body); fs.renameSync(tmp, file); };
+  const manifest = {schema: core.MANIFEST_SCHEMA, report_generated_at_utc: report.generated_at_utc,
+    report_sha256: sha(reportBytes), report_bytes: reportBytes.length,
+    prospective_sha256: prospective ? sha(fs.readFileSync(opts.prospective)) : null, redacted_fields: redacted, files: {}};
+  for (const name of core.SNAPSHOTS) {
+    const body = Buffer.from(JSON.stringify(files[name]) + '\n', 'utf8'), digest = sha(body);
+    // --hashed: nome endereçado por conteúdo, para que caches e publicações concorrentes nunca misturem revisões.
+    const file = opts.hashed ? 'dashboard-' + name + '.' + digest.slice(0, 16) + '.json' : core.FILE(name);
+    atomic(path.join(opts.out, file), body);
+    manifest.files[name] = {path: file, sha256: digest, bytes: body.length};
+  }
+  const previous = (() => { try { return JSON.parse(fs.readFileSync(path.join(opts.out, 'dashboard-manifest.json'), 'utf8')); } catch (e) { return null; } })();
+  atomic(path.join(opts.out, 'dashboard-manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+  // Limpeza: só ficheiros de snapshot que nem este manifesto nem o anterior referem (e temporários órfãos).
+  const keep = new Set(Object.values(manifest.files).map(f => f.path).concat(previous && previous.files ? Object.values(previous.files).map(f => f && f.path) : []));
+  for (const name of fs.readdirSync(opts.out)) {
+    if ((/^dashboard-[a-z]+(\.[0-9a-f]{16})?\.json$/.test(name) && name !== 'dashboard-manifest.json' && !keep.has(name)) || /\.tmp-\d+$/.test(name)) fs.unlinkSync(path.join(opts.out, name));
+  }
+  return manifest;
+}
+
+if (require.main === module) {
+  try {
+    const m = build(args(process.argv.slice(2)));
+    const total = Object.values(m.files).reduce((s, f) => s + f.bytes, 0);
+    console.log(JSON.stringify({report_bytes: m.report_bytes, snapshots_bytes: total,
+      files: Object.fromEntries(Object.entries(m.files).map(([k, f]) => [k, f.bytes]))}));
+  } catch (e) {
+    console.error(e.message);
+    process.exit(2);
+  }
+}
+module.exports = {build, args};

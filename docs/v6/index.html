@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07090d">
+<meta name="description" content="Goal-ROI Intelligence V6: terminal de análise de sinais, mercados e investigação prospetiva.">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com; base-uri 'none'; form-action 'none'">
+<title>Goal-ROI Intelligence</title>
+<link rel="stylesheet" href="v6.css">
+<script src="v6-theme.js"></script>
+<script defer src="v6-markets.js"></script>
+<script defer src="v6-core.js"></script>
+<script defer src="v6-app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Saltar para o conteúdo</a>
+<div class="app">
+  <aside class="rail">
+    <a class="brand" href="#command"><span>GOAL<em>-ROI</em></span><small>V6</small></a>
+    <nav class="nav" aria-label="Áreas">
+      <a href="#command" data-view="command" data-short="Comando"><kbd>01</kbd><span>Command Center</span></a>
+      <a href="#market" data-view="market" data-short="Mercados"><kbd>02</kbd><span>Market Intelligence</span></a>
+      <a href="#radar" data-view="radar" data-short="Radar"><kbd>03</kbd><span>Radar de sinais</span></a>
+      <a href="#brain" data-view="brain" data-short="Brain"><kbd>04</kbd><span>Brain Intelligence</span></a>
+      <a href="#lab" data-view="lab" data-short="Lab"><kbd>05</kbd><span>Scientific Lab</span></a>
+      <a href="#performance" data-view="performance" data-short="Desempenho"><kbd>06</kbd><span>Performance Analytics</span></a>
+      <a href="#operations" data-view="operations" data-short="Dados"><kbd>07</kbd><span>Data Quality &amp; Operations</span></a>
+      <a href="#knowledge" data-view="knowledge" data-short="Saber"><kbd>08</kbd><span>Knowledge Center</span></a>
+    </nav>
+    <div class="rail-foot">
+      <a href="../index.html">Dashboard clássico e simulador</a>
+      <span id="loader-mode">A iniciar…</span>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="status">
+      <h1 id="view-title">Command Center</h1>
+      <div class="ticker" id="ticker"><span class="tick">A carregar…</span></div>
+      <div class="tools">
+        <a class="classic" href="../index.html" title="Dashboard clássico, simulador e análises anteriores">Clássico</a>
+        <button type="button" class="icon-btn" id="refresh" aria-label="Atualizar agora"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg></button>
+        <button type="button" class="icon-btn" id="theme" aria-label="Alternar modo escuro" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 14.3A9 9 0 0 1 9.7 3.2a9 9 0 1 0 11.1 11.1z"/></svg></button>
+      </div>
+    </header>
+    <div class="banner warn" id="banner-fresh" role="status" hidden></div>
+    <div class="banner info" id="banner-snap" role="status" hidden></div>
+    <div class="banner bad" id="banner-error" role="alert" hidden></div>
+    <div class="sr" id="announce" role="status" aria-live="polite"></div>
+    <main id="main" tabindex="-1" aria-busy="true">
+      <section class="view" id="view-command" data-title="Command Center"></section>
+      <section class="view" id="view-market" data-title="Market Intelligence" hidden></section>
+      <section class="view" id="view-radar" data-title="Radar de sinais" hidden></section>
+      <section class="view" id="view-brain" data-title="Brain Intelligence" hidden></section>
+      <section class="view" id="view-lab" data-title="Scientific Lab" hidden></section>
+      <section class="view" id="view-performance" data-title="Performance Analytics" hidden></section>
+      <section class="view" id="view-operations" data-title="Data Quality &amp; Operations" hidden></section>
+      <section class="view" id="view-knowledge" data-title="Knowledge Center" hidden></section>
+    </main>
+  </div>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+  <header><div><h3 id="drawer-title"></h3><div class="note" id="drawer-sub"></div></div>
+    <button type="button" class="icon-btn" id="drawer-close" aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+  <div class="content" id="drawer-content"></div>
+</aside>
+</body>
+</html>

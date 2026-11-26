@@ -1,0 +1,300 @@
+// Testes do núcleo V6 (node --test tests/v6_core.test.cjs). Sem rede, sem dependências.
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const core = require('../docs/v6/v6-core.js');
+const {build} = require('../scripts/build_dashboard_snapshots.cjs');
+
+const ROOT = path.join(__dirname, '..');
+const REPORT_PATH = process.env.V6_REPORT || path.join(ROOT, 'data/report.json');
+const report = JSON.parse(fs.readFileSync(REPORT_PATH, 'utf8'));
+const prospective = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/prospective_report.json'), 'utf8'));
+const protocol = JSON.parse(fs.readFileSync(path.join(ROOT, 'scangoal/prospective_protocol.json'), 'utf8'));
+const clone = o => structuredClone(o);
+const AT = Date.parse(report.generated_at_utc);
+
+test('o relatório publicado passa a validação', () => {
+  assert.deepEqual(core.validateReport(report).problems, []);
+  assert.deepEqual(core.validateProspective(prospective), {ok: true, problems: [], certification: []});
+});
+
+test('dados incompletos: campos obrigatórios em falta são recusados', () => {
+  for (const key of ['groups', 'questions', 'audit', 'brain', 'timeline', 'generated_at_utc', 'unique_bets']) {
+    const r = clone(report); delete r[key];
+    assert.equal(core.validateReport(r).ok, false, key);
+  }
+  assert.equal(core.validateReport(null).ok, false);
+  assert.equal(core.validateReport([]).ok, false);
+});
+
+test('dados incompletos: secções opcionais em falta não impedem a derivação', () => {
+  const r = clone(report);
+  delete r.matches; delete r.simulation; delete r.polymarket_over25; delete r.unsettled; delete r.recent_bets;
+  delete r.brain.agenda; delete r.brain.notes; delete r.brain.llm; delete r.brain.top; delete r.brain.walk_forward;
+  r.insights = {};
+  const files = core.buildAll(r, null, null, AT);
+  assert.equal(files.signals.data.items.length, 0);
+  assert.equal(files.signals.data.coverage.games_in_history, null);
+  assert.equal(files.summary.data.prospective, null);
+  assert.equal(files.science.data.prospective, null);
+  assert.deepEqual(files.performance.data.walk_forward_curve, []);
+});
+
+test('incoerências internas do relatório são detetadas', () => {
+  const r = clone(report);
+  Object.values(r.groups)[0].bets += 1;
+  assert.match(core.validateReport(r).problems.join(), /soma dos grupos/);
+  const r2 = clone(report);
+  r2.timeline[0].d = '2099-01-01T00:00:00+00:00';
+  assert.match(core.validateReport(r2).problems.join(), /posterior/);
+  const r3 = clone(report);
+  r3.settled_bets = r3.unique_bets + 1;
+  assert.equal(core.validateReport(r3).ok, false);
+});
+
+test('certificações inválidas no relatório prospetivo nunca passam como decisão', () => {
+  const p = clone(prospective);
+  p.H1.status = 'supported_predictive_only';             // com 19 jogos
+  let v = core.validateProspective(p);
+  assert.equal(v.ok, false);
+  assert.match(v.certification.join(), /menos de 200/);
+  p.H1.games_with_result = 250; p.H1.games_in_population = 300; p.H1.z = 1.2;
+  v = core.validateProspective(p);
+  assert.match(v.certification.join(), /z abaixo/);
+  const p2 = clone(prospective); p2.H2.status = 'validated';
+  assert.match(core.validateProspective(p2).certification.join(), /fora do protocolo/);
+  const p3 = clone(prospective); p3.verdict = 'RENTABILIDADE DEMONSTRADA';
+  assert.match(core.validateProspective(p3).certification.join(), /veredito/);
+  const p4 = clone(prospective); p4.schema = 'outro';
+  assert.equal(core.validateProspective(p4).ok, false);
+  const p5 = clone(prospective); p5.signals_registered += 3;
+  assert.match(core.validateProspective(p5).problems.join(), /incoerente/);
+});
+
+test('estratégias "validadas" sem certificação ativa são anuladas', () => {
+  const b = clone(report.brain);
+  b.strategy_board.counts.validada = 3;
+  b.strategy_board.statistical_claim = 'significant';
+  const c = core.certificationState(b);
+  assert.equal(c.active, false);
+  assert.equal(c.validated, 0);
+  assert.equal(c.invalid.length, 2);
+  b.validation.state = 'active'; b.validation.ledger_valid = false;
+  assert.match(core.certificationState(b).invalid.join(), /registo inválido/);
+});
+
+test('duplicações na agenda são agrupadas e contadas', () => {
+  const items = report.brain.agenda.items.slice(0, 3);
+  const doubled = items.concat(clone(items), clone(items.slice(0, 1)));
+  const out = core.dedupe(doubled);
+  assert.equal(out.length, new Set(items.map(core.signalKey)).size);
+  assert.equal(out.reduce((s, x) => s + x.duplicates, 0), doubled.length - out.length);
+  const games = core.groupByGame(doubled);
+  assert.equal(games.reduce((s, g) => s + g.signals.length, 0), out.length);
+});
+
+test('cronologia de mercado: relações do motor, volume sem dupla contagem, eventos inválidos ignorados', () => {
+  const matches = {x: {teams: ['A', 'B'], events: [
+    {d: '2026-11-20T10:00:00+00:00', k: 'POLYMARKET', phase: 'pre', selection: 'Over 2.5', market: 'Asian Total', odds: 1.9, total: 1000},
+    {d: '2026-11-20T10:30:00+00:00', k: 'POLYMARKET', phase: 'pre', selection: 'Over 2.5', market: 'Asian Total', odds: 1.85, total: 1500},
+    {d: '2026-11-20T11:00:00+00:00', k: 'STAKE_LOAD', phase: 'pre', selection: 'Under 2.5', market: 'Asian Total', odds: 2.0, total: 500},
+    {d: '2026-11-20T12:00:00+00:00', k: 'STAKE_LOAD', phase: 'pre', selection: 'Under 3.5', market: 'Asian Total', odds: 1.5, total: 800, mult: 4},
+    {d: 'inválida', k: 'BETFAIR', selection: 'Over 2.5', market: 'Total', odds: 9}]}};
+  const [m] = core.marketTimeline(matches);
+  assert.equal(m.events, 4);
+  const pm = m.selections.find(s => s.source === 'Polymarket');
+  assert.equal(pm.observations, 2); assert.equal(pm.volume_last, 1500); assert.equal(pm.volume_max, 1500);
+  assert.equal(m.relations.counts.exclusivas_entre_fontes, 1);   // Over 2,5 vs Under 2,5
+  assert.equal(m.relations.counts.compativeis, 2);               // Over 2,5 × Under 3,5 e Under 2,5 × Under 3,5
+  assert.equal(m.relations.counts.exclusivas_mesma_fonte, 0);    // Under 2,5 e Under 3,5 da Stake são compatíveis
+  assert.equal(m.relations.counts.repeticao, 0);                // repetição é um par de seleções distintas equivalentes
+  assert.equal(m.relations.counts.observacoes_repetidas, 1);     // a mesma seleção vista duas vezes não é um par
+  assert.equal(m.selections.find(s => s.selection === 'Under 3.5').max_mult, 4);
+});
+
+test('respostas fora de ordem e revisões mais antigas são ignoradas', () => {
+  const seq = core.createSequencer();
+  const a = seq.begin(), b = seq.begin();
+  assert.equal(seq.accept(b, '2026-11-25T10:00:00Z'), true);
+  assert.equal(seq.accept(a, '2026-11-25T11:00:00Z'), false, 'pedido anterior chegou depois');
+  const c = seq.begin();
+  assert.equal(seq.accept(c, '2026-11-25T09:00:00Z'), false, 'revisão mais antiga');
+  const d = seq.begin();
+  assert.equal(seq.accept(d, 'lixo'), false);
+  assert.equal(seq.accept(seq.begin(), '2026-11-25T10:00:00Z'), true, 'mesma revisão é aceite');
+});
+
+test('dados desatualizados: estados de frescura', () => {
+  const now = Date.parse('2026-11-25T12:00:00Z');
+  assert.equal(core.freshness('2026-11-25T11:50:00Z', now).state, 'normal');
+  assert.equal(core.freshness('2026-11-25T11:00:00Z', now).state, 'atrasada');
+  assert.equal(core.freshness('2026-11-25T08:00:00Z', now).state, 'parada');
+  assert.equal(core.freshness(null, now).state, 'desconhecido');
+  assert.equal(core.freshness('2026-11-25T13:00:00Z', now).minutes, 0);
+});
+
+test('privacidade: chaves e valores privados nunca saem nos snapshots', () => {
+  const r = clone(report);
+  r.unparsed_samples = ['contacto nuno@example.com'];
+  r.insights.narrative = ['token 123456789:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'chamar @pessoa_privada', 'ok'];
+  r.brain.notes = [{id: 'x', note: 'ghp_' + 'a'.repeat(36), at_utc: r.generated_at_utc, api_key: 'segredo', chat_id: 99}];
+  r.brain.agenda.items[0].session = 'abc';
+  const files = core.buildAll(r, prospective, protocol, AT);
+  assert.deepEqual(core.privacyFindings(files), []);
+  const text = JSON.stringify(files);
+  for (const bad of ['nuno@example.com', 'AAAAAAAAAAAAAAAA', '@pessoa_privada', 'ghp_aaaa', 'segredo', '"chat_id"', '"session"', 'unparsed_samples', 'contacto']) assert.ok(!text.includes(bad), bad);
+  assert.equal(files.summary.data.narrative[2], 'ok');
+  assert.ok(core.privacyFindings({email: 'x'}).length === 1);
+});
+
+test('números publicados são copiados sem alteração (sem estatísticas inventadas)', () => {
+  const files = core.buildAll(report, prospective, protocol, AT);
+  const sc = files.science.data.prospective;
+  for (const k of ['H1', 'H2', 'D1', 'games_registered', 'ledger_entries', 'games_with_independent_result', 'verdict']) assert.deepEqual(sc[k], prospective[k], k);
+  const ref = report.questions[core.REFERENCE];
+  assert.deepEqual(files.summary.data.reference.roi, ref.roi);
+  assert.equal(files.summary.data.reference.units, ref.units);
+  assert.deepEqual(files.performance.data.groups, report.groups);
+  assert.deepEqual(files.performance.data.luck, report.insights.luck);
+  const byWeek = Object.values(files.performance.data.periods.by_week).reduce((s, r) => s + r.bets, 0);
+  assert.equal(byWeek, report.simulation.entries.length);
+  const units = Object.values(files.performance.data.periods.by_source).reduce((s, r) => s + r.units, 0);
+  assert.ok(Math.abs(units - ref.units) < 0.05, 'soma por fonte ' + units + ' vs Q7 ' + ref.units);
+  assert.equal(files.science.data.verdict, core.VERDICT);
+  assert.equal(files.signals.data.items.every(i => i.validated === false), true);
+});
+
+test('gerador: manifesto coerente, determinístico e sem tocar no relatório original', () => {
+  const before = crypto.createHash('sha256').update(fs.readFileSync(REPORT_PATH)).digest('hex');
+  const dirA = fs.mkdtempSync(path.join(os.tmpdir(), 'v6a-')), dirB = fs.mkdtempSync(path.join(os.tmpdir(), 'v6b-'));
+  const opts = out => ({report: REPORT_PATH, prospective: path.join(ROOT, 'data/prospective_report.json'), protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out});
+  const m = build(opts(dirA)), m2 = build(opts(dirB));
+  assert.deepEqual(m, m2);
+  assert.equal(core.validateManifest(m).ok, true);
+  assert.equal(m.report_sha256, before);
+  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(REPORT_PATH)).digest('hex'), before);
+  let total = 0;
+  for (const name of core.SNAPSHOTS) {
+    const body = fs.readFileSync(path.join(dirA, core.FILE(name)));
+    total += body.length;
+    const sha = crypto.createHash('sha256').update(body).digest('hex');
+    assert.deepEqual(core.checkSnapshot(name, JSON.parse(body), m, {sha256: sha}).problems, []);
+  }
+  assert.ok(total < m.report_bytes / 3, 'snapshots devem ser bem menores que o relatório');
+  assert.ok(m.files.summary.bytes < 20000);
+});
+
+test('snapshots incompatíveis ou de outra revisão são recusados', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v6c-'));
+  const m = build({report: REPORT_PATH, prospective: path.join(ROOT, 'data/prospective_report.json'), protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out: dir});
+  const snap = JSON.parse(fs.readFileSync(path.join(dir, core.FILE('learning')), 'utf8'));
+  assert.match(core.checkSnapshot('learning', Object.assign({}, snap, {schema: 'goal_roi_dashboard_v5'}), m, {sha256: m.files.learning.sha256}).problems.join(), /esquema/);
+  assert.match(core.checkSnapshot('science', snap, m, {sha256: m.files.science.sha256}).problems.join(), /tipo errado/);
+  assert.match(core.checkSnapshot('learning', snap, m, {sha256: 'f'.repeat(64)}).problems.join(), /hash/);
+  assert.match(core.checkSnapshot('learning', snap, m, {bytes: 1}).problems.join(), /tamanho/);
+  assert.match(core.checkSnapshot('learning', snap, m).problems.join(), /integridade/);
+  const bad = clone(m); bad.files.signals.path = '../../etc/passwd';
+  assert.equal(core.validateManifest(bad).ok, false);
+  assert.equal(core.validateManifest(Object.assign({}, m, {schema: 'x'})).ok, false);
+});
+
+test('atualização seletiva: conteúdos inalterados mantêm o hash entre revisões', () => {
+  const r2 = clone(report);
+  r2.generated_at_utc = new Date(AT + 600000).toISOString();
+  const a = core.buildAll(report, prospective, protocol, AT), b = core.buildAll(r2, prospective, protocol, AT + 600000);
+  assert.equal(JSON.stringify(a.learning), JSON.stringify(b.learning));
+  assert.equal(JSON.stringify(a.science), JSON.stringify(b.science));
+  assert.notEqual(JSON.stringify(a.summary), JSON.stringify(b.summary));
+});
+
+test('auditoria: filtro de privacidade sem desvios e sem falsos positivos', () => {
+  for (const s of ['@scangoal_bot hi @realuser', '(@johndoe', 'x:@johndoe', 't.me/johndoe', 'bot123456789:' + 'A'.repeat(34), 'sk-proj-' + 'a'.repeat(26), 'a@b.com'])
+    assert.equal(core.sanitize(s), '[ocultado]', s);
+  assert.equal(core.sanitize('@scangoal_bot'), '[ocultado]'); // o nome do canal não é publicado
+  for (const s of ['Over 2.5@1.85', 'Lille — Bayern Munchen', 'AH2(-0.5)', 'Asian Handicap: Viborg (-1)'])
+    assert.equal(core.sanitize(s), s, s);
+  assert.deepEqual(Object.keys(core.sanitize({SESSION_X: 1, tokens_used: 2, api_key: 3, bot_token: 4})), ['SESSION_X', 'tokens_used']);
+});
+
+test('auditoria: queda máxima medida a partir do início da janela', () => {
+  assert.deepEqual(core.drawdown([-10, -5, -12, -3]), {max: 7, at: 2});
+  assert.equal(core.drawdown([-10, -11]).max, 1);
+  assert.equal(core.drawdown([]).max, 0);
+});
+
+test('auditoria: valores não numéricos do relatório prospetivo não chegam ao resumo', () => {
+  const p = clone(prospective);
+  p.games_registered = '1" onmouseover=alert(1) x="';
+  p.H1.games_with_result = '<img src=x onerror=alert(1)>';
+  const s = core.buildSummary(report, p, AT).data.prospective;
+  assert.equal(s.valid, false);
+  assert.equal(s.games_registered, null);
+  assert.equal(s.h1.games, null);
+});
+
+test('P2: nenhuma referência pública ao nome do canal nas páginas e snapshots servidos', () => {
+  const re = new RegExp('scan' + 'goal', 'i');
+  for (const f of fs.readdirSync(path.join(ROOT, 'docs/v6'))) {
+    if (/\.(js|css|html)$/.test(f)) assert.doesNotMatch(fs.readFileSync(path.join(ROOT, 'docs/v6', f), 'utf8'), re, f);
+  }
+  assert.doesNotMatch(JSON.stringify(core.buildAll(report, prospective, protocol, AT)), re);
+});
+
+test('P2: contagens do Brain distinguem totais, publicados e listas completas', () => {
+  const l = core.buildLearning(report).data;
+  assert.equal(l.totals.hypotheses, report.brain.hypotheses);
+  assert.equal(l.totals.promising, report.brain.counts['promissora']);
+  assert.equal(l.totals.abandoned, report.brain.counts['abandonada']);
+  assert.equal(l.status_index.filter(x => x.status === 'promissora').length, l.totals.promising);
+  assert.equal(l.status_index.filter(x => x.status === 'abandonada').length, l.totals.abandoned);
+  assert.equal(l.rejected_total, report.brain.counts['abandonada']);
+  assert.equal(l.totals.llm, report.brain.llm_total);
+  assert.equal(l.totals.llm_published, report.brain.llm.length);
+  assert.equal(l.top_pool, report.brain.top.length);
+});
+
+test('P1-2: manifesto com nomes endereçados por conteúdo é aceite; outros caminhos não', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v6h-'));
+  const m = build({report: REPORT_PATH, prospective: path.join(ROOT, 'data/prospective_report.json'), protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out: dir, hashed: true});
+  assert.equal(core.validateManifest(m).ok, true);
+  for (const k of core.SNAPSHOTS) {
+    assert.equal(m.files[k].path, 'dashboard-' + k + '.' + m.files[k].sha256.slice(0, 16) + '.json');
+    assert.ok(fs.existsSync(path.join(dir, m.files[k].path)));
+  }
+  const bad = clone(m); bad.files.summary.path = 'dashboard-summary.' + 'f'.repeat(16) + '.json';
+  assert.equal(core.validateManifest(bad).ok, false, 'hash do nome diferente do sha256');
+  const bad2 = clone(m); bad2.files.summary.path = 'dashboard-signals.' + m.files.summary.sha256.slice(0, 16) + '.json';
+  assert.equal(core.validateManifest(bad2).ok, false, 'nome de outro snapshot');
+});
+
+test('P3 auditoria: zeros publicados não viram "—"; semanas na hora de Lisboa; contexto das replicações', () => {
+  const r = clone(report);
+  r.questions[core.REFERENCE].wins = 0; r.questions[core.REFERENCE].pushes = 0;
+  const s = core.buildSummary(r, prospective, AT).data.reference;
+  assert.equal(s.wins, 0); assert.equal(s.pushes, 0);
+  // domingo 23:30 UTC no verão = segunda 00:30 em Lisboa: pertence à semana que começa nessa segunda
+  const weeks = core.periodTable([{d: '2026-06-14T23:30:00+00:00', w: 1, o: 2, t: 'STAKE_LOAD'}]).by_week;
+  assert.deepEqual(Object.keys(weeks), ['2026-06-15']);
+  const ctx = core.buildLearning(report).data.replicated_context;
+  assert.ok(ctx.min_decided <= ctx.median_decided && ctx.median_decided <= ctx.max_decided);
+  assert.ok(ctx.distinct_game_sets <= core.buildLearning(report).data.replicated_exploratory_total);
+});
+
+test('P3 auditoria: gerador usa caminhos da raiz, escreve de forma atómica e limpa ficheiros antigos', () => {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'v6gen-'));
+  fs.writeFileSync(path.join(out, 'dashboard-signals.0123456789abcdef.json'), '{}');   // geração antiga sem referência
+  fs.writeFileSync(path.join(out, 'dashboard-summary.json.tmp-999'), 'x');              // temporário órfão
+  fs.writeFileSync(path.join(out, 'outro.txt'), 'não é um snapshot');
+  const r = require('node:child_process').spawnSync(process.execPath, [path.join(ROOT, 'scripts/build_dashboard_snapshots.cjs'), '--out', out, '--hashed'], {cwd: os.tmpdir(), encoding: 'utf8'});
+  assert.equal(r.status, 0, r.stderr);
+  const names = fs.readdirSync(out);
+  assert.ok(!names.includes('dashboard-signals.0123456789abcdef.json'));
+  assert.ok(!names.some(n => n.includes('.tmp-')));
+  assert.ok(names.includes('outro.txt'), 'nunca apaga ficheiros que não são snapshots');
+  const m = JSON.parse(fs.readFileSync(path.join(out, 'dashboard-manifest.json'), 'utf8'));
+  for (const f of Object.values(m.files)) assert.ok(names.includes(f.path));
+});
