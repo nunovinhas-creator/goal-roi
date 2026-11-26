@@ -6567,13 +6567,15 @@
    "attempt_utc": "2026-11-26T19:22:05+00:00",
    "chars": 198,
    "created_utc": "2026-11-26T19:22:02+00:00",
+   "done_utc": "2026-11-26T19:22:02+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "37eff8edd01b918b59f11d427f0482edf6207e434ae4fa2de3f70b2069786c28",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:new-england-vs-philadelphia-20261121|af22ceea8646": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
@@ -6816,12 +6818,17 @@
    "state": "delivered"
   },
   "game|id:ofi-crete-vs-rsc-anderlecht-20261126|78e6500fcba2": {
+   "attempt_id": "2e414795672e495d82984eaf9d5c6aec",
+   "attempt_utc": "2026-11-26T19:22:07+00:00",
+   "chars": 189,
    "created_utc": "2026-11-26T19:22:02+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "0ffc22de16f0aa4cac8fde823a90f650b15cfb918269e14a82ef1b4bedd048b6",
+   "state": "in_flight"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|05aa7cc92153": {
    "attempt_id": "1baa2532d39e47b2b65e5ea38aefe74f",
@@ -10077,7 +10084,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 642,
+  "delivered": 643,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T19:17:10+00:00",
@@ -10379,6 +10386,7 @@
   "2026-11-26T19:13:57+00:00|Sunderland — Jagiellonia|Under 3": true,
   "2026-11-26T19:13:58+00:00|NEC Nijmegen — Rennes|NEC Nijmegen": true,
   "2026-11-26T19:13:59+00:00|Olympiacos — AC Milan|Under 4.75": true,
+  "2026-11-26T19:16:26+00:00|OFI Crete — RSC Anderlecht|Anderlecht": true,
   "2026-11-26T19:18:31+00:00|NEC Nijmegen — Rennes|Rennes": true,
   "2026-11-26T19:18:36+00:00|Torreense — Celtic|AH2(-0.5)": true
  },
@@ -12074,6 +12082,9 @@
   "item|id:nurnberg-vs-eintracht-braunschweig-20261121|Asian Total|Under 3.5": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
+  "item|id:ofi-crete-vs-rsc-anderlecht-20261126|1x2|Anderlecht": {
+   "at_utc": "2026-11-26T19:22:02+00:00"
+  },
   "item|id:olympiacos-vs-ac-milan-20261126|1x2 (2up)|AC Milan": {
    "at_utc": "2026-11-26T17:39:06+00:00"
   },
@@ -12733,7 +12744,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 954,
+ "sent_total": 955,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -13965,6 +13976,7 @@
   "2026-11-26T19:13:57+00:00|Sunderland — Jagiellonia|Under 3",
   "2026-11-26T19:13:58+00:00|NEC Nijmegen — Rennes|NEC Nijmegen",
   "2026-11-26T19:13:59+00:00|Olympiacos — AC Milan|Under 4.75",
+  "2026-11-26T19:16:26+00:00|OFI Crete — RSC Anderlecht|Anderlecht",
   "2026-11-26T19:18:31+00:00|NEC Nijmegen — Rennes|Rennes",
   "2026-11-26T19:18:36+00:00|Torreense — Celtic|AH2(-0.5)"
  ]
