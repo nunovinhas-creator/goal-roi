@@ -1,0 +1,223 @@
+name: Ensaio V7 - leitor monotonico (45 min)
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: staging-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: true
+      max-parallel: 3
+      matrix:
+        revision: [17, 18, 19, 20]
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: nunovinhas-creator/goal-roi
+          ref: f5cfd961fc897290ffea9dc20ac91d8e20a45da9
+          path: source
+          persist-credentials: false
+          sparse-checkout: |
+            audits/v7/snapshots
+            ops/staging
+            scripts/build_dashboard_snapshots.cjs
+            docs/v6/v6-core.js
+            docs/v6/v6-markets.js
+            scangoal/prospective_protocol.json
+          sparse-checkout-cone-mode: false
+
+      - name: Gerar e verificar pacote sintetico
+        env:
+          REVISION: ${{ matrix.revision }}
+        run: |
+          python3 source/ops/staging/remote/prepare_site.py --out "$RUNNER_TEMP/site" --revisions "$REVISION"
+          PYTHONPATH=source python3 - <<'PYTHON'
+          import hashlib, json, os, re
+          from pathlib import Path
+          from audits.v7.snapshots import publisher_v2 as P
+          root = Path(os.environ['RUNNER_TEMP']) / 'site'
+          manifest = json.loads((root / 'SITE-MANIFEST.json').read_text())
+          assert manifest['synthetic'] is True
+          files = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
+          assert files == set(manifest['files']) | {'SITE-MANIFEST.json'}
+          allowed = {'index.html', 'probe.mjs', '.nojekyll', 'SITE-MANIFEST.json', 'client/client_integrity.mjs', 'client/client_integrity_v2.mjs'}
+          for rel in files:
+              p = root / rel
+              assert not p.is_symlink()
+              assert rel in allowed or (rel.startswith('snapshots/') and P.PUBLISHABLE.fullmatch(rel[10:]))
+              if rel in manifest['files']:
+                  assert hashlib.sha256(p.read_bytes()).hexdigest() == manifest['files'][rel]
+              if rel.startswith('snapshots/'):
+                  assert not any(x in p.read_text().lower() for x in ('scangoal.com', 't.me/', 'telegram.org'))
+          pointer = P.read_pointer(root / 'snapshots')
+          P.validate_pointer(pointer)
+          for rev in pointer['history']:
+              P.verify_revision(rev, root / 'snapshots')
+          print('Pacote verificado:', len(files), 'ficheiros')
+          PYTHON
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: staging-${{ matrix.revision }}
+          path: ${{ runner.temp }}/site
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+
+    steps:
+      - name: Publicar revisao 17
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: staging-17
+
+      - name: Registar revisao 17
+        run: echo "Revisao 17 publicada $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Intervalo de 600 segundos
+        run: sleep 600
+
+      - name: Publicar revisao 18
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: staging-18
+
+      - name: Registar revisao 18
+        run: echo "Revisao 18 publicada $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Intervalo de 600 segundos
+        run: sleep 600
+
+      - name: Publicar revisao 19
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: staging-19
+
+      - name: Registar revisao 19
+        run: echo "Revisao 19 publicada $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Intervalo de 600 segundos
+        run: sleep 600
+
+      - name: Publicar revisao 20
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: staging-20
+
+      - name: Registar revisao 20
+        run: echo "Revisao 20 publicada $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"
+
+
+  measure:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: nunovinhas-creator/goal-roi
+          ref: f5cfd961fc897290ffea9dc20ac91d8e20a45da9
+          path: source
+          persist-credentials: false
+          sparse-checkout: |
+            audits/v7/snapshots/client_integrity.mjs
+            audits/v7/snapshots/client_integrity_v2.mjs
+            ops/staging/remote/measure_remote.mjs
+          sparse-checkout-cone-mode: false
+
+      - name: Medir CDN e leitor durante 45 minutos
+        run: |
+          node --input-type=module <<'JS'
+          import {sample, sampleVisible} from './source/ops/staging/remote/measure_remote.mjs';
+          import {createMonotonicReader} from './source/audits/v7/snapshots/client_integrity_v2.mjs';
+          import fs from 'node:fs';
+          const base = 'https://nunovinhas-creator.github.io/goal-roi-staging';
+          const reader = createMonotonicReader(), rows = [], start = Date.now();
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const label = t => {
+            const n = typeof t === 'number' ? t / 600 : NaN;
+            return Number.isInteger(n) && n >= 0 ? n : null;
+          };
+          const rawLabel = r => {
+            const n = (Date.parse(r.generated_at) - Date.parse('2030-01-01T00:00:00Z')) / 1200000;
+            return Number.isInteger(n) && n >= 0 ? n : null;
+          };
+          const safe = async fn => {
+            try { return await fn(); } catch (e) { return {which:'unavailable',errors:[String(e)],ms:null}; }
+          };
+          for (let slot = 0; slot < 45; slot++) {
+            const remaining = start + slot * 60000 - Date.now();
+            if (remaining > 0) await sleep(remaining);
+            const [raw, visible] = await Promise.all([safe(() => sample(base)), safe(() => sampleVisible(base,reader))]);
+            const row = {slot,raw,visible,raw_revision:rawLabel(raw),
+              observed_revision:label(visible.observed_published_at),visible_revision:label(visible.visible_published_at)};
+            rows.push(row);
+            fs.appendFileSync('stability.jsonl',JSON.stringify(row)+'\n');
+            console.log(JSON.stringify(row));
+          }
+          const revisions = [17,18,19,20];
+          const stats = (key, source) => {
+            const seen = new Set(); let max = 0, regressions = 0, missing_samples = 0, invalid = 0;
+            for (const r of rows) {
+              const n = r[key];
+              if (n === null) { missing_samples++; continue; }
+              if (n < 16 || n > 20) invalid++;
+              if (n < max) regressions++;
+              max = Math.max(max,n); seen.add(n);
+            }
+            const latency = rows.map(r=>r[source].ms).filter(Number.isFinite).sort((a,b)=>a-b);
+            return {seen:[...seen].sort((a,b)=>a-b),missing:revisions.filter(n=>!seen.has(n)),missing_samples,
+              invalid,regressions,p95_ms:latency.length ? latency[Math.ceil(latency.length*.95)-1] : null};
+          };
+          const raw = stats('raw_revision','raw'), observed = stats('observed_revision','visible'),
+            visible = stats('visible_revision','visible');
+          const retained = rows.filter(r=>r.visible.which==='retained').length;
+          const unavailable = rows.filter(r=>r.visible.which==='unavailable'||r.visible_revision===null).length;
+          const rawUnavailable = rows.filter(r=>!['current','older'].includes(r.raw.which)).length;
+          const staleLabelErrors = rows.filter(r=>r.visible.which==='retained' && r.visible.stale!==true).length;
+          const finalStable = rows.slice(-5).every(r=>r.visible_revision===20 && r.visible.which==='current' && r.visible.stale===false);
+          const common = s => s.missing.length===0 && s.missing_samples===0 && s.invalid===0 && s.p95_ms!==null && s.p95_ms<=2000;
+          const result = {samples:rows.length,raw,observed,visible,retained,unavailable,rawUnavailable,staleLabelErrors,finalStable,
+            raw_cdn_pass:rows.length===45 && common(raw) && raw.regressions===0 && rawUnavailable===0,
+            reader_pass:rows.length===45 && common(visible) && visible.regressions===0 && unavailable===0 &&
+              staleLabelErrors===0 && finalStable,
+            note:'Short staging screening only. Raw and visible are separate requests; reader pass does not certify raw CDN or production.'};
+          fs.writeFileSync('stability-summary.json',JSON.stringify(result,null,2)+'\n');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify(result,null,2)+'\n```\n');
+          if (!result.reader_pass || !result.raw_cdn_pass) process.exitCode=1;
+          JS
+
+      - name: Guardar medicoes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stability-evidence
+          path: |
+            stability.jsonl
+            stability-summary.json
+          retention-days: 1
