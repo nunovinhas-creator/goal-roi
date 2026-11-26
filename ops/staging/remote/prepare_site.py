@@ -25,13 +25,33 @@ INDEX = """<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name
 <body><h1>Staging sintético dos snapshots V7.2</h1><p>Dados 100 % sintéticos. Não é um produto nem uma previsão.</p>
 <pre id="out">a medir…</pre><script type="module" src="probe.mjs"></script></body></html>
 """
-PROBE = """import {loadVerified} from './client/client_integrity_v2.mjs';
-const t0 = performance.now();
-const get = async p => { const r = await fetch(p, {cache: 'no-cache'}); if (!r.ok) throw new Error(r.status + ' ' + p); return r.text(); };
-const pointer = JSON.parse(await get('snapshots/dashboard-manifest.json'));
-const got = await loadVerified(pointer, p => get('snapshots/' + p), undefined, async () => JSON.parse(await get('snapshots/dashboard-manifest.json')));
-document.getElementById('out').textContent = JSON.stringify({which: got ? got.which : 'full_report', refetched: got && got.refetched,
-  generated: got && got.revision.report_generated_at_utc, ms: Math.round(performance.now() - t0)}, null, 1);
+PROBE = """import {createMonotonicReader} from './client/client_integrity_v2.mjs';
+const out = document.getElementById('out');
+let storage = null;
+try { storage = window.sessionStorage; } catch {}
+const reader = createMonotonicReader({storage});
+const get = async (p, refresh = false) => {
+  const r = await fetch(p, {cache: refresh ? 'reload' : 'no-cache', redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(10000)});
+  if (!r.ok) throw new Error(r.status + ' ' + p);
+  return r.text();
+};
+const pointer = async (refresh = false) => JSON.parse(await get('snapshots/dashboard-manifest.json', refresh));
+async function refresh() {
+  const t0 = performance.now();
+  let initial = null;
+  try { initial = await pointer(); } catch {}
+  const got = await reader.read(initial, p => get('snapshots/' + p), undefined, () => pointer(true));
+  out.textContent = JSON.stringify({which: got.which, stale: got.stale, reason: got.reason,
+    refetched: got.refetched, storage_available: !!storage, storage_error: got.storage_error,
+    observed_published_at: got.observed_published_at,
+    visible_published_at: got.revision?.published_at ?? null,
+    generated: got.revision?.report_generated_at_utc ?? null, ms: Math.round(performance.now() - t0)}, null, 1);
+}
+async function loop() {
+  try { await refresh(); } catch (e) { out.textContent = 'Medição indisponível: ' + e.message; }
+  setTimeout(loop, 60000);
+}
+await loop();
 """
 
 
