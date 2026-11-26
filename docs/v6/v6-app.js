@@ -66,7 +66,7 @@
       (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + x.a.market + ' ' + x.a.selection) + ' × ' +
         esc(x.b.source + ' · ' + x.b.market + ' ' + x.b.selection) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
         (total > pairs.length ? '<p class="note" style="padding:0 12px">A mostrar ' + int(pairs.length) + ' de ' + int(total) + ' pares, os mais graves primeiro.</p>' : '') : '') +
-      '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação de produção (linhas asiáticas, devoluções e meias). Plataformas distintas chegam pelo mesmo canal de recolha: a independência estatística entre elas não está demonstrada, e uma convergência não é uma confirmação independente.</p>';
+      '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação do parser de produção (linhas asiáticas, devoluções e meias). Duas extensões são da V6 e não são aplicadas pelo relatório: Draw No Bet como handicap 0 e handicap asiático ao vivo da Stake contado a partir do marcador no momento do sinal. Sinais contemporâneos: até 6 h de diferença antes do jogo e até 10 min durante o jogo. Plataformas distintas chegam pelo mesmo canal de recolha: a independência estatística entre elas não está demonstrada, e uma convergência não é uma confirmação independente.</p>';
   }
   const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': '', 'evitar': 'bad', 'sem evidência': ''};
   // O relatório chama "contraditório" a qualquer jogo com seleções diferentes no mesmo mercado (brain.py), mesmo que
@@ -244,9 +244,11 @@
       if (probe.rev) S.availableRevision = probe.rev;
       const mrev = man.manifest ? man.manifest.report_generated_at_utc : null;
       // Atraso dos snapshots face ao relatório disponível (distinto do atraso da recolha).
-      S.snapshotLagMin = mrev && probe.rev ? Math.round((Date.parse(probe.rev) - Date.parse(mrev)) / 60000) : null;
+      // Comparação em milissegundos: qualquer atraso, mesmo de segundos, torna os snapshots obsoletos.
+      S.snapshotLagMs = mrev && probe.rev ? Date.parse(probe.rev) - Date.parse(mrev) : null;
+      S.snapshotLagMin = S.snapshotLagMs === null ? null : Math.ceil(S.snapshotLagMs / 60000);
       let done = false;
-      if (man.manifest && !(S.snapshotLagMin > 0)) {
+      if (man.manifest && !(S.snapshotLagMs > 0)) {
         try {
           const r = await applySnapshots(ticket, man.manifest);
           done = r !== 'antigo';

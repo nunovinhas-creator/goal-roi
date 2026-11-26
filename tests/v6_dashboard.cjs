@@ -387,6 +387,13 @@ async function snapshots(browser, srvFactory) {
     assert.equal(await mode(page), 'relatório');
     await ctx.close();
 
+    // Atraso de poucos segundos também conta: manifesto em T, relatório em T + 20 s -> relatório completo.
+    srv.clear(); srv.reset();
+    srv.set('/report.json', {body: variant(5, r => { r.generated_at_utc = new Date(Date.parse(manifest.report_generated_at_utc) + 20000).toISOString(); })});
+    ({ctx, page, errors} = await open(browser, srv));
+    assert.equal(await mode(page), 'relatório', 'snapshots 20 s atrás do relatório não podem ser usados');
+    await ctx.close();
+
     // P1-3: snapshots obsoletos face ao relatório -> recurso automático; recuperação sem recarregar quando alcançam.
     srv.clear(); srv.reset();
     const newerRev = new Date(Date.parse(manifest.report_generated_at_utc) + 20 * 60000).toISOString();
