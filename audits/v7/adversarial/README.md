@@ -1,62 +1,88 @@
-# Auditoria adversarial independente da PR #103 — snapshots
+# Auditoria adversarial dos snapshots — constatações e correção (V7.2)
 
-Âmbito: `audits/v7/snapshots/publisher.py` e `client_integrity.mjs` no HEAD `1b06e7d6` da PR #103. Foco: concorrência entre leitores e publicadores, reutilização das duas ranhuras, cache CDN e recuperação da revisão anterior. O protótipo não foi alterado. Ensaios offline; sem rede, fornecedores nem produção.
+Âmbito: protótipo de snapshots da PR #103 (`audits/v7/snapshots/`). A primeira ronda (HEAD `660fa123`) documentou os defeitos com `expectedFailure`/`todo`. Esta ronda acrescenta um publicador e um cliente corrigidos, **sem alterar o protótipo da #103**:
 
-## Resultado
+- `audits/v7/snapshots/publisher_v2.py`
+- `audits/v7/snapshots/client_integrity_v2.mjs`
 
-Os quatro defeitos da PR #98 continuam corrigidos (11 testes existentes passam). A garantia anunciada "há sempre uma versão anterior íntegra" **não se verifica**. Com a cadência real de publicação, duas ranhuras são insuficientes atrás de uma CDN com `max-age=600`.
+Também compara três desenhos. Todas as constatações passam a testes aprovados, com as mesmas asserções. Tudo offline: snapshots inativos, sem produção, sem publicação.
 
-| # | Constatação | Gravidade | Prova |
+## Constatações e estado
+
+| # | Constatação (ronda 1) | Correção | Prova (passa) |
 |---|---|---|---|
-| A1 | A nova revisão é escrita na ranhura que o ponteiro ainda anuncia como `previous`. Durante a publicação, e para sempre se esta for interrompida, `previous` aponta para corpos já reescritos. | Alta | `test_a1_…` (xfail: `corpo não coincide com o manifesto: summary`) |
-| A2 | A ranhura de destino é escolhida pelo ponteiro, não pela integridade. Se `current` estiver corrompida, a publicação reescreve a única revisão íntegra. Uma interrupção deixa zero revisões legíveis. | Alta | `test_a2_…` (xfail: `read_verified` devolve `None`) |
-| A3 | Leitor com o ponteiro obtido antes de duas publicações (A-B-A) não lê nem `current` nem `previous`. `previous` morre sempre primeiro (à 1.ª publicação), por isso nunca serve de recuo para leituras atrasadas. | Média | `test_a3_…` (xfail), `test_a3b_…` (limite exato) |
-| A4 | Proteção implícita: o ponteiro é uma linha única, por isso o `rebase --onto` de `scangoal/publication.py` entra em conflito e aborta quando dois escritores publicam da mesma base. Se o ponteiro passar a JSON indentado, a fusão pode misturar ranhuras sem conflito. | Latente | `test_a4_…` (passa; fixa a invariante) |
-| A5 | O layout `a/`, `b/` e `.lock` não cabe na lista de caminhos publicáveis da PR #98 (`SNAPSHOT_FILE`). O `.lock` ficaria na pasta servida pelo Pages. O porte exige alterar `publication.py`. | Média (porte) | `test_a5_…` (xfail) |
-| A6 | O recuo para `previous` devolve dados de outras entradas. O chamador tem de comparar `inputs`/`report_generated_at_utc` e assinalar o atraso. | Baixa | `test_a6_…` (passa; documenta o contrato) |
-| C1 | O cliente pede `entry.path` tal como vem do manifesto: aceita URL absoluta ou `../`. | Baixa (endurecimento) | `test_v7_adversarial_client.mjs` C1 (todo) |
-| C2 | `loadVerified` não volta a pedir o ponteiro quando ambas as revisões falham. Com um ponteiro atrasado, recorre ao relatório completo (~4 MB). | Média | C2 (todo) |
-| C3 | Corpo de outra revisão no mesmo caminho é sempre recusado (tudo-ou-nada). | — | C3 (passa) |
-| D1 | `flock` só serializa processos no mesmo anfitrião. Entre runners a serialização vem do grupo `scangoal-write` e do conflito de rebase (A4); o coletor externo (commits a cada 1–4 min) não partilha o lock. | Informativa | análise de `collect.yml`, `continuity.yml`, `publication.py` |
-| D2 | Com `?v=<sha16>`, um ponteiro atrasado pede uma chave nova; a CDN obtém da origem os bytes da revisão mais recente e guarda-os sob a chave antiga durante o TTL. A integridade mantém-se (SHA-256), mas a chave fica envenenada até expirar. | Média (desempenho) | modelo abaixo; requer confirmação em staging |
+| A1 | A publicação reescrevia a ranhura anunciada como `previous` | CAS: objetos imutáveis; nada anunciado é reescrito | `test_a1_…` em cada um dos 7 pontos de interrupção |
+| A2 | Com `current` corrompida, a única revisão íntegra era reescrita | Idem; o histórico só mantém revisões verificadas | `test_a2_…` (7 pontos) |
+| A3 | Leitor atrasado 2 publicações não lia nada | Retenção contada **desde a substituição** (≥ TTL da CDN) | `test_a3_…` (20 publicações), `test_a3c_…` (período calmo seguido de rajada) |
+| A3b | — | Fora da retenção, o leitor deteta e volta a pedir o ponteiro | `test_a3b_…`, cliente C2 |
+| A4 | Ponteiro numa linha (proteção do rebase) | Mantido (`separators` compactos) | `test_a4_…`, conflito real entre clones Git |
+| A5 | Layout fora da lista publicável; `.lock` na pasta servida | Lista `PUBLISHABLE` exata; lock fora da pasta; temporários interrompidos apagados no início | `test_a5_…`, `test_github_pages_compatible_names` |
+| A6 | O recuo tinha de ser distinguível | `inputs` e `published_at` diferentes; o cliente devolve `which` | `test_a6_…`, C3 |
+| C1 | O cliente pedia qualquer caminho | Caminho = `objects/<sha256>/dashboard-<nome>.json`, com o SHA igual ao declarado, validado **antes** de qualquer pedido | C1 (URL absoluta, `../`, SHA trocado, query) |
+| C2 | O cliente não voltava a pedir o ponteiro | Percorre o histórico e depois volta a pedir o ponteiro uma vez | C2 |
+| D2 | `?v=` com caminhos mutáveis envenenava a chave CDN | CAS: o caminho é a versão; não há query | staging (PR #106), cenário "CDN sem query" |
 
-## Cache CDN × ranhuras (`cdn_slot_sim.py`)
+Defeitos que só apareceram nesta ronda, também corrigidos:
 
-**Limite superior.** O staging HTTPS (PR #106, `ops/staging/`) mostrou que, com ponteiro e corpos na mesma cache, um ponteiro atrasado continua coerente: os corpos com `?v=` ficam em cache com ele. Os valores abaixo só se aplicam quando ponteiro e corpos estão em níveis ou nós de cache diferentes (cache do navegador, outro nó, despejo LRU). A frequência real só se mede numa CDN real.
+- A retenção contada desde a publicação perdia a revisão atual depois de um período calmo (`test_a3c_…`).
+- Um relógio atrasado noutro anfitrião fazia adiar a publicação mesmo sem limite configurado (`test_clock_behind_the_last_publication_never_defers`, encontrado pelo teste concorrente).
 
-Publicações: os 1 628 instantes em que `docs/report.json` mudou em `main` entre 19/11 e 26/11/2026 (`publicacoes-report-7d.txt`). Intervalo p10/p50/p90: 112/381/577 s. Em 26,6 % dos casos há duas publicações em menos de 600 s. Modelo: idade do ponteiro em cache uniforme em [0, 600] s (pior caso), corpos com chave nova. É um limite superior, porque o Pages cancela implantações sobrepostas.
+Outras provas que passam:
 
-| Limite entre publicações de snapshots | 2 ranhuras | 3 ranhuras | 4 ranhuras |
-|---|---:|---:|---:|
-| Sem limite (1 628 publicações) | 19,0 % relatório completo | 0,8 % | 0 % |
-| ≥ 300 s (1 097) | 2,9 % | 0 % | 0 % |
-| ≥ 600 s (790) | 0 % | 0 % | 0 % |
+- SIGKILL em cada rename (7 pontos).
+- 8 publicadores concorrentes no mesmo anfitrião, com entradas diferentes: nenhuma revisão misturada.
+- Dois clones Git que publicam a partir da mesma base: conflito no ponteiro, abort e repetição limpa.
+- Reparação da revisão atual com as mesmas entradas.
+- Objeto partilhado corrompido reescrito.
+- Limitação de frequência, que nunca adia uma revisão corrompida.
+- Armazenamento limitado ao fim de 100 publicações.
+- Cliente: `node --test` corre na CI através de `NodeClient` (`# todo 0`, `# fail 0`).
 
-## Correções propostas (não aplicadas; exigem autorização e ramo próprio)
+## Comparação dos três desenhos
 
-1. **Três ranhuras** com nomes estáveis: escrever sempre na ranhura que não é `current` nem `previous`. Corrige A1 e A2. Mantém os deltas Git (cada caminho muda de três em três revisões).
-2. Escolher a ranhura de destino pela integridade verificada, nunca só pelo ponteiro (A2).
-3. **Limitar a publicação de snapshots a ≥ TTL (600 s)**, por exemplo só na execução por cron. Com isso, 2 ranhuras chegam para leitores atrasados; com 3, há margem.
-4. Cliente: validar `path` contra `^[ab]/dashboard-<nome>\.json$` (C1); se `current` e `previous` falharem, voltar a pedir o ponteiro uma vez com `cache: 'no-cache'` antes de recorrer ao relatório (C2).
-5. Porte: acrescentar o layout à lista de `publication.py` e mover o `.lock` para fora de `docs/` (A5). Manter o ponteiro numa linha e acrescentar o teste A4 ao porte.
-6. Staging HTTPS: confirmar se a CDN inclui a query string na chave e medir D2 (ver `ops/staging/`, PR de staging).
+| Propriedade | 3 ranhuras (escolha por integridade) | CAS (objetos imutáveis) | Limitação de frequência ≥ 600 s |
+|---|---|---|---|
+| A1/A2 (interrupção, corrupção) | Corrige | Corrige | Não corrige sozinha |
+| Leitor atrasado k publicações | Falha com k ≥ 3 (`test_three_slots_are_not_enough_for_delayed_readers`) | Lê enquanto a retenção cobrir o atraso | Reduz k, não elimina o risco |
+| CDN que ignora query strings | Serve corpos antigos pelo caminho → recuo para dados atrasados | Sem efeito: o caminho é a versão | — |
+| Cache em níveis diferentes | Ponteiro de um nível com corpos de outro → relatório completo | Sem efeito enquanto retido | — |
+| 2 ranhuras com escolha segura | Sem revisão anterior anunciada (`test_two_slots_cannot_announce_a_previous_revision`) | — | — |
+| Push Git por publicação (40 relatórios reais, b29f0be4–68f451d9) | **8,6 KB** | 57,0 KB | 67,9 KB (19 de 40 publicadas) |
+| Pack após `git gc`, 40 revisões | 177 KB | 206 KB | 136 KB |
+
+O nome `objects/<sha256>/dashboard-<nome>.json` (hash no diretório, nome estável no fim) foi escolhido depois de medir. Com `objects/<nome>/<sha256>.json`, o pack após `gc` era 829 KB. O push do CAS não usa deltas porque o Git só usa como base objetos com o mesmo caminho. É custo de rede, não de armazenamento: ~36 MB/dia de envio a ~640 publicações/dia, ou ~10 MB/dia com o limite de 600 s.
+
+Simulação CDN (`cdn_slot_sim.py`, 1 628 publicações reais em 7 dias, TTL 600 s, pior caso com corpos fora de cache):
+
+| Desenho | Recurso ao relatório completo |
+|---|---:|
+| 2 ranhuras | 19,0 % |
+| 3 ranhuras | 0,8 % |
+| 3 ranhuras + limite 300 s | 0 % |
+| CAS, retenção 300 s | 3,8 % |
+| **CAS, retenção ≥ 600 s (= TTL)** | **0 %** |
+
+## Recomendação
+
+**CAS, com retenção ≥ 1 800 s desde a substituição e limite de publicação de 600 s.** Três ranhuras não bastam: falham com leitores atrasados ≥ 3 publicações e com CDN que ignore query strings. O limite de frequência não corrige A1/A2 sozinho, mas reduz o envio Git e o número de objetos. O porte exige alterar a lista de `publication.py` para `PUBLISHABLE` e a recolha de lixo em `git rm` (fora do âmbito; autorização própria).
 
 ## Vereditos
 
 | Item | Veredito |
 |---|---|
-| Correção dos quatro defeitos da PR #98 | Confirmada (offline) |
-| "Versão anterior sempre íntegra" | **Refutada** (A1, A2) |
-| Duas ranhuras atrás de CDN `max-age=600` com a cadência atual | **NO-GO** até medição em CDN real (limite superior 19 %; 0 % com cache única) |
-| Ativação dos snapshots | **NO-GO** até 1–5 e prova em staging |
+| A1–A6, C1–C2 no publicador e cliente V7.2 | **Corrigidos offline** (testes aprovados, sem xfail/todo) |
+| Três ranhuras como solução | **NO-GO** (insuficientes; provas acima) |
+| CAS + retenção + limite | **GO para staging** |
+| Ativação dos snapshots / alteração da PR #98 / produção | **NO-GO** (autorização própria; fim do período experimental do Brain V5) |
 
 ## Reproduzir
 
 ```sh
 export PYTHONDONTWRITEBYTECODE=1
-python3 -m pytest -q -rxX tests/test_v7_adversarial_103.py tests/test_v7_snapshot_publisher.py
-node --test tests/test_v7_adversarial_client.mjs
+python3 -m pytest -q tests/test_v7_adversarial_103.py tests/test_v7_snapshot_publisher.py
+node --test tests/test_v7_adversarial_client.mjs tests/test_v7_client_integrity.mjs
 python3 audits/v7/adversarial/cdn_slot_sim.py
+python3 audits/v7/adversarial/git_layout_cost.py --repo . --ref origin/main --revisions 40
 ```
 
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**

@@ -52,6 +52,25 @@ def simulate(times, ttl, slots, samples, seed=7):
     return {k: round(v / samples, 4) for k, v in res.items()}
 
 
+def simulate_cas(times, ttl, retain_s, keep_min, samples, seed=7):
+    """CAS com retenção contada desde a substituição: a revisão atual de um ponteiro obtido em f só é recolhida numa
+    publicação p com p - (instante em que foi substituída) > retain_s e pelo menos keep_min revisões mais recentes."""
+    rng = random.Random(seed)
+    lo, hi = times[0] + ttl, times[-1]
+    lost = 0
+    for _ in range(samples):
+        now = rng.uniform(lo, hi)
+        fetched = now - rng.uniform(0, ttl)
+        r = bisect.bisect_right(times, fetched) - 1            # revisão atual quando o ponteiro foi obtido
+        if r + 1 >= len(times) or times[r + 1] > now:
+            continue                                           # ainda é a atual
+        superseded = times[r + 1]
+        later = [p for p in times[r + 1:bisect.bisect_right(times, now)]]
+        if any(p - superseded > retain_s and i + 1 >= keep_min for i, p in enumerate(later)):
+            lost += 1
+    return {"current": round(1 - lost / samples, 4), "full_report": round(lost / samples, 4)}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--times", default=str(HERE / "publicacoes-report-7d.txt"))
@@ -71,6 +90,9 @@ def main():
         for slots in (2, 3, 4):
             r = simulate(ts, a.ttl, slots, a.samples)
             out["scenarios"].append({"rate_limit": label, "slots": slots, "publications": len(ts), **r})
+    for retain in (300, 600, 1800):
+        r = simulate_cas(times, a.ttl, retain, 2, a.samples)
+        out["scenarios"].append({"rate_limit": "sem limite", "layout": "cas", "retain_s": retain, "publications": len(times), **r})
     Path(a.out).write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(out, indent=1, ensure_ascii=False))
 

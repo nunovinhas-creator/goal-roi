@@ -1,50 +1,66 @@
-// Auditoria adversarial do cliente de integridade da PR #103 (audits/v7/snapshots/client_integrity.mjs).
-// Testes "todo" documentam defeitos: correm, mas não fazem falhar a suite. Quando corrigidos, passam a "ok"
-// e retira-se a marca todo.
+// Auditoria adversarial do cliente (PR #105): C1–C3 contra o cliente V7.2 (client_integrity_v2.mjs). Sem "todo".
 //   node --test tests/test_v7_adversarial_client.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {loadVerified, sha256Hex, NAMES} from '../audits/v7/snapshots/client_integrity.mjs';
+import {loadVerified, NAMES} from '../audits/v7/snapshots/client_integrity_v2.mjs';
+import {sha256Hex} from '../audits/v7/snapshots/client_integrity.mjs';
 
-async function revision(slot, tag, store) {
+async function casRevision(tag, store) {
   const files = {};
   for (const n of NAMES) {
     const body = JSON.stringify({n, tag});
-    const path = slot + '/dashboard-' + n + '.json';
+    const sha = await sha256Hex(body);
+    const path = 'objects/' + sha + '/dashboard-' + n + '.json';
     store.set(path, body);
-    files[n] = {path, sha256: await sha256Hex(body), bytes: body.length};
+    files[n] = {path, sha256: sha, bytes: body.length};
   }
-  return {slot, files};
+  return {layout: 'cas', files};
 }
 
-// C1 — o caminho vem do manifesto e é pedido tal como está: URL absoluta ou "../" são aceites.
-test('C1 caminhos do manifesto restritos a a|b/dashboard-<nome>.json', {todo: 'cliente pede qualquer caminho'}, async () => {
+const fetcher = (store, requested = []) => async p => { requested.push(p); if (!store.has(p)) throw new Error('404 ' + p); return store.get(p); };
+
+// C1 — caminhos restritos ao layout e ao SHA-256 declarado; nada fora disso é pedido.
+test('C1 caminhos do manifesto restritos a objects/<sha256>/dashboard-<nome>.json', async () => {
+  for (const evil of ['https://example.invalid/x.json', '../report.json', 'objects/' + '0'.repeat(64) + '/dashboard-summary.json',
+    'objects/%s/dashboard-signals.json', 'objects/abc/dashboard-summary.json?v=1']) {
+    const store = new Map();
+    const rev = await casRevision(1, store);
+    rev.files.summary.path = evil.replace('%s', rev.files.signals.sha256);
+    const requested = [];
+    const got = await loadVerified({history: [rev]}, fetcher(store, requested));
+    assert.equal(got, null, evil);
+    assert.deepEqual(requested, [], 'pedido feito apesar do caminho inválido: ' + evil);
+  }
   const store = new Map();
-  const rev = await revision('a', 1, store);
+  const rev = await casRevision(1, store);
   const requested = [];
-  rev.files.summary.path = 'https://example.invalid/x.json';
-  const fetchText = async p => { requested.push(p); const k = p.split('?')[0]; if (!store.has(k)) throw new Error('404'); return store.get(k); };
-  await loadVerified({current: rev, previous: null}, fetchText);
-  assert.ok(requested.every(p => /^[ab]\/dashboard-[a-z]+\.json\?v=[0-9a-f]{16}$/.test(p)), 'pedido fora do layout: ' + requested[0]);
+  assert.ok(await loadVerified({history: [rev]}, fetcher(store, requested)));
+  assert.ok(requested.every(p => /^objects\/[0-9a-f]{64}\/dashboard-[a-z]+\.json$/.test(p)), requested[0]);
 });
 
-// C2 — A-B-A: o ponteiro em cache CDN descreve ranhuras já reescritas; o cliente não volta a pedir o ponteiro.
-test('C2 ponteiro atrasado duas publicações: recupera relendo o ponteiro', {todo: 'loadVerified não relê o ponteiro'}, async () => {
+// C2 — ponteiro atrasado duas (ou mais) publicações: lê o que o ponteiro descreve; se já foi recolhido, relê o ponteiro.
+test('C2 ponteiro atrasado: recupera sem relatório completo', async () => {
   const store = new Map();
-  const r1 = await revision('a', 1, store), r2 = await revision('b', 2, store);
-  const stale = {current: r2, previous: r1};
-  const r3 = await revision('a', 3, store), r4 = await revision('b', 4, store);
-  const fresh = {current: r4, previous: r3};
-  const fetchText = async p => store.get(p.split('?')[0]);
-  const got = await loadVerified(stale, fetchText);
-  assert.ok(got, 'sem revisão: o painel descarrega o relatório completo (~4 MB) apesar de existir ' + JSON.stringify(Object.keys(fresh)));
+  const r1 = await casRevision(1, store), r2 = await casRevision(2, store);
+  const stale = {history: [r2, r1]};
+  const r3 = await casRevision(3, store), r4 = await casRevision(4, store);
+  const fresh = {history: [r4, r3]};
+  const kept = await loadVerified(stale, fetcher(store));
+  assert.equal(kept.which, 'current');
+  assert.equal(kept.refetched, false);
+  for (const r of [r1, r2]) for (const n of NAMES) store.delete(r.files[n].path); // recolha de lixo depois da retenção
+  assert.equal(await loadVerified(stale, fetcher(store)), null);                   // sem releitura: relatório completo
+  const got = await loadVerified(stale, fetcher(store), undefined, async () => fresh);
+  assert.equal(got.refetched, true);
+  assert.equal(got.files.summary.tag, 4);
 });
 
-// C3 — invariante que hoje se verifica: corpo de outra revisão com o mesmo caminho é sempre recusado.
-test('C3 corpo de outra revisão no mesmo caminho é recusado (tudo-ou-nada)', async () => {
+// C3 — corpo de outra revisão no mesmo caminho é recusado (tudo-ou-nada), e o recuo usa a anterior íntegra.
+test('C3 corpo adulterado é recusado e o recuo usa a anterior', async () => {
   const store = new Map();
-  const r1 = await revision('a', 1, store);
-  await revision('a', 3, store); // sobrescreve a/
-  const got = await loadVerified({current: r1, previous: null}, async p => store.get(p.split('?')[0]));
-  assert.equal(got, null);
+  const r1 = await casRevision(1, store), r2 = await casRevision(2, store);
+  store.set(r2.files.science.path, JSON.stringify({n: 'science', tag: 99}));
+  const got = await loadVerified({history: [r2, r1]}, fetcher(store));
+  assert.equal(got.which, 'older');
+  assert.equal(got.files.science.tag, 1);
 });
