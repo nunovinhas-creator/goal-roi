@@ -444,6 +444,39 @@ async function snapshots(browser, srvFactory) {
   } finally { await srv.close(); }
 }
 
+// Regressão (CI de 26/11/2026, PRs #101/#102): o relatório publica eventos de mercado sem "market" e/ou "selection"
+// (Betfair ao vivo, Polymarket). A falha só aparecia quando esse jogo era o mais recente; aqui é forçada e,
+// além disso, todos os jogos do relatório real são percorridos.
+const INVALID = /undefined|NaN|\[object Object\]|\bnull\b/;
+async function missingFields(browser, srv) {
+  const id = 'zz-campos-em-falta-20991231';
+  const latest = new Date(NOW - 60000).toISOString(), earlier = new Date(NOW - 120000).toISOString();
+  srv.set('/report.json', {body: variant(5, r => {
+    r.matches[id] = {teams: ['Equipa Casa', 'Equipa Fora'], events: [
+      {d: earlier, k: 'STAKE_LOAD', phase: 'live', market: '1x2', selection: 'Equipa Casa', odds: 2.1},
+      {d: earlier, k: 'POLYMARKET', phase: null, market: 'Polymarket'},
+      {d: latest, k: 'BETFAIR', phase: 'live', mult: 1, odds: 1.9}]};
+  })});
+  const {ctx, page, errors} = await open(browser, srv);
+  await page.evaluate(() => { location.hash = 'market'; });
+  await page.waitForSelector('[data-market]');
+  assert.equal(await page.locator('[data-market]').first().getAttribute('data-market'), id, 'o jogo sintético devia ser o mais recente');
+  const ids = await page.locator('[data-market]').evaluateAll(b => b.map(x => x.dataset.market));
+  assert.ok(ids.length > 1, 'relatório sem jogos com cronologia de mercado');
+  for (const mid of ids) {
+    await page.locator('[data-market="' + mid + '"]').click();
+    await page.waitForFunction(m => window.__V6.state.ui.market === m && document.querySelector('[data-market="' + m + '"]').getAttribute('aria-pressed') === 'true', mid);
+    const text = await page.locator('#view-market').innerText();
+    assert.ok(!INVALID.test(text), 'texto inválido em market/' + mid + ': ' + (text.match(/.{0,40}(undefined|NaN|\[object Object\]|\bnull\b).{0,20}/) || [''])[0]);
+  }
+  await page.locator('[data-market="' + id + '"]').click();
+  const text = await page.locator('#view-market').innerText();
+  assert.match(text, /mercado e seleção não identificados/, 'o campo em falta deve ser declarado, não omitido');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+  srv.clear();
+}
+
 function writeTmp(text) { const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'v6rep-')), 'report.json'); fs.writeFileSync(f, text); return f; }
 
 
@@ -457,6 +490,7 @@ function writeTmp(text) { const f = path.join(fs.mkdtempSync(path.join(os.tmpdir
     srv.clear();
     await run('visual: telemóvel, tablet e desktop em claro e escuro', () => visual(browser, srv));
     await run('Android 320–430 px sem overflow (claro e escuro)', () => narrow(browser, srv));
+    await run('campos de mercado em falta: sem "undefined" em nenhum jogo', () => missingFields(browser, srv));
     await run('snapshots: progressivo, seletivo, incompatível', () => snapshots(browser, start));
   } finally { await srv.close(); await browser.close(); }
   if (failures.length) { console.error(failures.length + ' falha(s)'); process.exit(1); }
