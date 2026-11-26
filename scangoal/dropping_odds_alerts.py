@@ -84,6 +84,9 @@ def parse(lines, sent_at):
     context = CONTEXT.fullmatch(lines[1])
     if not context:
         return Decision('not_football')
+    league = context[1].strip()
+    if not league:
+        return Decision('message_format')
     period = context[2]
     duration = COUNTDOWN.fullmatch(period)
     if not duration:
@@ -100,7 +103,6 @@ def parse(lines, sent_at):
     teams = tuple(TEAM_SEPARATOR.split(lines[2]))
     if len(teams) != 2 or not all(teams) or identity(teams[0]) == identity(teams[1]):
         return Decision('ambiguous_fixture', kickoff)
-    league = context[1].strip()
     fixture = (league, *teams)
     handicap = HANDICAP.fullmatch(lines[3])
     if not handicap:

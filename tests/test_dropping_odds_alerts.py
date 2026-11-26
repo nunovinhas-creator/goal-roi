@@ -133,6 +133,7 @@ class ParsingTests(unittest.TestCase):
         for (replacement, reason), field in zip(cases.items(), original):
             with self.subTest(replacement=replacement):
                 self.assertEqual(disposition(A.replace(field, replacement))[1], reason)
+        self.assertEqual(disposition(A.replace('League 2', ' '))[1], 'message_format')
 
     def test_calendar_and_daylight_changes(self):
         scenarios = [
