@@ -80,6 +80,30 @@ class TermuxInstall(unittest.TestCase):
         self.assertFalse((self.home / "brain").joinpath("goal-roi-selos").exists())
         self.assertEqual((self.home / "brain/brain-sync.sh").read_text(), "#!/bin/sh\necho brain\n")
 
+    def test_root_brain_sync_does_not_block_dedicated_sibling(self):
+        root_script = self.home / "brain-sync.sh"
+        root_script.write_text("#!/bin/sh\necho brain root\n")
+        r = self.sh("install.sh")
+        self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+        self.assertEqual(root_script.read_text(), "#!/bin/sh\necho brain root\n")
+        self.assertTrue((self.base / "bin/goal-roi-selo").is_file())
+
+    def test_cron_without_safe_minute_fails_closed(self):
+        for cron in ("*/5 * * * * $HOME/brain-sync.sh\n",
+                     "0 * * * * $HOME/brain-sync.sh\n20 * * * * $HOME/brain-sync.sh\n40 * * * * $HOME/brain-sync.sh\n"):
+            (self.home / ".crontab").write_text(cron)
+            r = self.sh("install.sh")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertEqual(self.cron(), cron)
+
+    def test_refuses_symlink_alias_into_protected_brain(self):
+        alias = self.home / "alias"
+        alias.symlink_to(self.home / "brain", target_is_directory=True)
+        r = self.sh("install.sh", env={**self.env, "GOAL_ROI_SEALS_HOME": str(alias / "selos")})
+        self.assertNotEqual(r.returncode, 0)
+        self.assertFalse((self.home / "brain/selos").exists())
+        self.assertEqual(self.cron(), self.brain_cron)
+
     def test_refuses_base_inside_brain_or_obsidian(self):
         for inside in (self.home / "brain" / "selos", self.home / "Obsidian" / "Vault" / "selos", self.home / "Obsidian"):
             r = self.sh("install.sh", env={**self.env, "GOAL_ROI_SEALS_HOME": str(inside)})

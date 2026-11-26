@@ -25,13 +25,29 @@ case "${PREFIX:-}" in *com.termux*) ;; *) [ "${TERMUX_TEST:-}" = 1 ] || die "cor
 
 # --- Não interferir com o Brain nem com o Obsidian -------------------------------------------------------------
 case "$BASE" in /*) ;; *) die "GOAL_ROI_SEALS_HOME tem de ser absoluto";; esac
+command -v realpath >/dev/null 2>&1 || die "falta realpath; instale coreutils"
+HOME_REAL=$(realpath -m -- "$HOME")
+BASE=$(realpath -m -- "$BASE")
+# Caminho interno e dedicado. Recusa symlinks que escapem de HOME, espaços e metacaracteres
+# que não podem ser usados com segurança no script gerado e no crontab.
+case "$BASE" in "$HOME_REAL"/*) ;; *) die "a pasta tem de ficar abaixo de HOME";; esac
+case "$BASE" in *[!a-zA-Z0-9_./-]*) die "use um caminho sem espaços ou metacaracteres";; esac
 protected=$(
-  { find "$HOME" -maxdepth 5 -name brain-sync.sh -type f 2>/dev/null | while read -r f; do dirname "$f"; done
-    find "$HOME" -maxdepth 5 -name .obsidian -type d 2>/dev/null | while read -r d; do dirname "$d"; done; } | sort -u)
-for p in $protected; do
+  { find "$HOME_REAL" -maxdepth 5 -name brain-sync.sh -type f 2>/dev/null | while IFS= read -r f; do
+      d=$(dirname "$f")
+      # O script pode estar diretamente em HOME: protege o ficheiro, não todos os irmãos.
+      if [ "$d" = "$HOME_REAL" ]; then printf '%s\n' "$f"; else printf '%s\n' "$d"; fi
+    done
+    find "$HOME_REAL" -maxdepth 5 -name .obsidian -type d 2>/dev/null | while IFS= read -r d; do dirname "$d"; done
+    printf '%s\n' "$HOME_REAL/goal-roi-brain"; } | sort -u)
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  p=$(realpath -m -- "$p")
   case "$BASE/" in "$p"/*) die "a pasta $BASE está dentro de $p (Brain/Obsidian); escolha outra";; esac
   case "$p/" in "$BASE"/*) die "a pasta do Brain/Obsidian $p ficaria dentro de $BASE; escolha outra";; esac
-done
+done <<PROTECTED
+$protected
+PROTECTED
 
 # --- Pacotes -------------------------------------------------------------------------------------------------
 if [ "${TERMUX_TEST:-}" != 1 ]; then
@@ -81,14 +97,23 @@ current=$(crontab -l 2>/dev/null || true)
 others=$(printf '%s\n' "$current" | grep -v "$TAG" || true)
 busy=$(printf '%s\n' "$others" | grep 'brain-sync' | awk '{print $1}' | grep -E '^[0-9]+$' || true)
 if printf '%s\n' "$others" | grep 'brain-sync' | awk '{print $1}' | grep -qvE '^[0-9]+$'; then
-  say "aviso: o brain-sync tem um minuto não fixo; os locks são separados e o ciclo corre com nice"
+  die "brain-sync tem minuto não fixo; não é possível garantir distância de 20 min"
 fi
-minute=17
-for m in 17 41 5 29 53; do
+minute=
+# Testar todos os minutos (não apenas cinco candidatos). Nunca aceitar colisão.
+for m in $(seq 0 59); do
   ok=1
-  for b in $busy; do d=$(( (m - b + 60) % 60 )); [ "$d" -lt 20 ] || [ "$d" -gt 40 ] && ok=0; done
+  for b in $busy; do
+    # Cron admite zero à esquerda; evitar interpretação octal pela shell.
+    b=$(printf '%s' "$b" | sed 's/^0*//')
+    b=${b:-0}
+    [ "$b" -le 59 ] || die "minuto inválido no brain-sync"
+    d=$(( (m - b + 60) % 60 ))
+    if [ "$d" -lt 20 ] || [ "$d" -gt 40 ]; then ok=0; fi
+  done
   [ "$ok" = 1 ] && { minute=$m; break; }
 done
+[ -n "$minute" ] || die "nenhum minuto respeita a distância de 20 min; crontab inalterado"
 line="$minute 5,17 * * * $SH $BASE/bin/goal-roi-selo $TAG"
 { [ -n "$others" ] && printf '%s\n' "$others"; printf '%s\n' "$line"; } | crontab -
 after=$(crontab -l | grep -v "$TAG" || true)
