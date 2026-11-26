@@ -89,8 +89,15 @@ def parse_kalshi(lines):
     lo, hi = Decimal(lo), Decimal(hi or lo)
     if lo <= 1 or hi < lo or money(volume, unit) <= 0:
         return "cotacao", {}
-    return "estrutura", {"phase": phase, "quote": "intervalo" if quote[3] else "pontual",
-                         "market": kalshi_market(label, teams), "kickoff": kickoff, "bet": False}
+    return "estrutura", {
+        "phase": phase, "quote": "intervalo" if quote[3] else "pontual",
+        "market": kalshi_market(label, teams), "kickoff": kickoff,
+        "teams": teams, "label": label, "odds_range": [str(lo), str(hi)],
+        "signal_volume_usd": str(money(volume, unit)),
+        "minute": int(live[1]) if live else None,
+        "score": [int(live[2]), int(live[3])] if live else None,
+        "bet": False,
+    }
 
 
 def parse_betfair_live(lines):
@@ -107,8 +114,14 @@ def parse_betfair_live(lines):
         return "cotacao_ou_volume", {}
     expected = "draw" if side == "X" else key_text(teams[int(side) - 1])
     match = key_text(label) in ({"draw", "x"} if side == "X" else {expected})
-    return "estrutura", {"score": [int(home), int(away)], "scope": "mercado_no_marcador",
-                         "volume_m": "M" in (unit, total_unit), "team_literal": match, "bet": False}
+    return "estrutura", {
+        "score": [int(home), int(away)], "scope": "mercado_no_marcador",
+        "volume_m": "M" in (unit, total_unit), "team_literal": match,
+        "teams": teams, "side": side, "odds": str(Decimal(odds)),
+        "selection_volume_usd": str(money(amount, unit)),
+        "volume_at_score_usd": str(money(total, total_unit)), "share_pct": int(share),
+        "bet": False,
+    }
 
 
 def provider(lines, parsed):

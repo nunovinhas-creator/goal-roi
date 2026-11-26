@@ -15,6 +15,8 @@ class AuditParserTests(unittest.TestCase):
             "📊 🟩 Kalshi · LIVE 44' 0:0\nCasa — Fora · Liga\nUnder 2.5 @1.45–1.49 · $7.6K")
         self.assertEqual((original["type"], family, classification), (None, "Kalshi", "kalshi_estrutura"))
         self.assertEqual((fields["market"], fields["quote"], fields["bet"]), ("total_jogo", "intervalo", False))
+        self.assertEqual((fields["odds_range"], fields["signal_volume_usd"], fields["minute"], fields["score"]),
+                         (["1.45", "1.49"], "7600.0", 44, [0, 0]))
 
     def test_unknown_contracts_do_not_guess(self):
         choices = {"not Casa": "contrato_negado", "1H Under 1.5": "primeira_parte",
@@ -42,8 +44,11 @@ class AuditParserTests(unittest.TestCase):
         old, (family, category, matched) = classify(text)
         self.assertEqual((old["type"], old["error"], old["bet"]), ("BETFAIR", "fields_missing", False))
         self.assertEqual((family, category), ("Betfair", "betfair_estrutura"))
-        self.assertEqual(matched, {"score": [0, 1], "scope": "mercado_no_marcador",
-                                   "volume_m": True, "team_literal": True, "bet": False})
+        self.assertEqual((matched["score"], matched["scope"], matched["volume_m"], matched["team_literal"]),
+                         ([0, 1], "mercado_no_marcador", True, True))
+        self.assertEqual((matched["odds"], matched["selection_volume_usd"], matched["volume_at_score_usd"],
+                          matched["share_pct"], matched["bet"]), ("4.00", "289000", "1200000.0", 74, False))
+        self.assertNotIn("global_market_volume", matched)
         old_text = text.replace("1X2 market at 0:1 $1.2M · live", "whole 1X2 market $390K")
         self.assertTrue(parser.parse(old_text)["bet"])
         self.assertEqual(parse_betfair_live(old_text.splitlines())[0], "cotacao_ou_volume")
