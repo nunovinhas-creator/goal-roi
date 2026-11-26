@@ -1,0 +1,122 @@
+{
+ "ttl_s": 600,
+ "publications": 1628,
+ "span_h": 167.9,
+ "gap_s": {
+  "p10": 112,
+  "p50": 381,
+  "p90": 577
+ },
+ "share_gap_below_ttl": 0.9115,
+ "share_two_pubs_within_ttl": 0.2663,
+ "scenarios": [
+  {
+   "rate_limit": "sem limite",
+   "slots": 2,
+   "publications": 1628,
+   "current": 0.8099,
+   "full_report": 0.1901
+  },
+  {
+   "rate_limit": "sem limite",
+   "slots": 3,
+   "publications": 1628,
+   "current": 0.9918,
+   "full_report": 0.0082
+  },
+  {
+   "rate_limit": "sem limite",
+   "slots": 4,
+   "publications": 1628,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 300 s",
+   "slots": 2,
+   "publications": 1097,
+   "current": 0.9707,
+   "full_report": 0.0293
+  },
+  {
+   "rate_limit": "limite 300 s",
+   "slots": 3,
+   "publications": 1097,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 300 s",
+   "slots": 4,
+   "publications": 1097,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 600 s",
+   "slots": 2,
+   "publications": 790,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 600 s",
+   "slots": 3,
+   "publications": 790,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 600 s",
+   "slots": 4,
+   "publications": 790,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 900 s",
+   "slots": 2,
+   "publications": 504,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 900 s",
+   "slots": 3,
+   "publications": 504,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "limite 900 s",
+   "slots": 4,
+   "publications": 504,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "sem limite",
+   "layout": "cas",
+   "retain_s": 300,
+   "publications": 1628,
+   "current": 0.9624,
+   "full_report": 0.0376
+  },
+  {
+   "rate_limit": "sem limite",
+   "layout": "cas",
+   "retain_s": 600,
+   "publications": 1628,
+   "current": 1.0,
+   "full_report": 0.0
+  },
+  {
+   "rate_limit": "sem limite",
+   "layout": "cas",
+   "retain_s": 1800,
+   "publications": 1628,
+   "current": 1.0,
+   "full_report": 0.0
+  }
+ ]
+}
