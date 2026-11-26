@@ -869,10 +869,21 @@ class IncrementalJournal(Harness):
         self.assertEqual(follower.tick(), 1)
 
 
+# The gated V6 snapshot step (PR #98) and its variable on the fast reads, pinned as exact text. strip_v6 removes only these
+# exact additions: an edit inside the step, or the variable placed in another step, is left in place, so every comparison
+# against the pinned production workflow fails.
+V6_STEP = "      # V6 dashboard snapshots (INACTIVE unless the repository variable GOAL_ROI_V6_SNAPSHOTS is 'on'). Reads the published\n      # report and the prospective summary; writes only docs/v6/snapshots/, published in the same commit as the report.\n      # Never blocks: on failure the previous manifest stays and the dashboard falls back to the full report.\n      # Activation: set the variable to 'on'. Reversal: unset it (the last snapshots are then detected as stale).\n      - name: V6 dashboard snapshots (inactive by default)\n        if: ${{ !cancelled() && vars.GOAL_ROI_V6_SNAPSHOTS == 'on' }}\n        continue-on-error: true\n        timeout-minutes: 2\n        env:\n          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n        run: python -u -m scangoal.dashboard_snapshots\n"
+V6_ENV = '          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n'
+V6_FAST_RUN = '        run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch'
+
+
 def strip_v6(text):
-    """collect.yml without the gated V6 dashboard snapshot step and its variable on the fast reads."""
-    text = re.sub(r'^      # V6 dashboard snapshots.*?(?=^      # Notices only on top of a published state)', '', text, flags=re.M | re.S)
-    return text.replace('          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n', '')
+    """collect.yml without the exact, pinned V6 additions."""
+    if text.count(V6_STEP) == 1:
+        text = text.replace(V6_STEP, '')
+    if text.count(V6_ENV + V6_FAST_RUN) == 1:
+        text = text.replace(V6_ENV + V6_FAST_RUN, V6_FAST_RUN)
+    return text
 
 
 class ProductionIsolation(unittest.TestCase):

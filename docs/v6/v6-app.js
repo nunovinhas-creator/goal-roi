@@ -170,7 +170,8 @@
     const changed = C.SNAPSHOTS.filter(k => switching || !S.manifest || S.manifest.files[k].sha256 !== manifest.files[k].sha256);
     if (!changed.length) { S.seq.accept(ticket, manifest.report_generated_at_utc); S.manifest = manifest; S.stats.notModified++; return 'inalterado'; }
     const load = async name => {
-      const body = await get(CFG.manifest.replace(/[^/]*$/, '') + manifest.files[name].path);
+      // O hash esperado vai na query string: uma cópia em cache de outra revisão não é reutilizada pelo CDN.
+      const body = await get(CFG.manifest.replace(/[^/]*$/, '') + manifest.files[name].path + '?v=' + manifest.files[name].sha256.slice(0, 16));
       S.stats.snapshotFetches++;
       const sha = await digest(body);
       let snap;

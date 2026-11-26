@@ -3,18 +3,22 @@
     GOAL_ROI_V6_SNAPSHOTS=on python -m scangoal.dashboard_snapshots
 
 Reads docs/report.json (the copy that is published), data/prospective_report.json and the frozen protocol, and writes only
-docs/v6/snapshots/. Nothing here changes the report, the prospective ledger, the protocol or any delivery state.
+the seven files of docs/v6/snapshots/ (six snapshots and the manifest). Nothing here changes the report, the prospective
+ledger, the protocol or any delivery state.
 
 Safety argument:
-- Coherence: the manifest records the SHA-256 of docs/report.json. If the report changes while the snapshots are built,
-  the build is discarded and the previous manifest stays.
-- Atomicity per revision: snapshot files are content-addressed (dashboard-<name>.<sha256 prefix>.json) and written before
-  the manifest, which is replaced last with an atomic rename. A reader sees either the old or the new manifest, and every
-  file either names resolves. The previous generation is kept, so a manifest cached by the CDN still resolves.
-- Concurrency: a file lock serialises the collection step and the fast reads. Git publication (scangoal.publication)
-  commits snapshots, manifest and report in the same commit.
-- Failure: any error leaves the previous manifest in place. The dashboard compares its revision with the report's and
-  falls back to the full report when the snapshots are behind, so a failed build never shows wrong data.
+- Stable names. Each snapshot keeps the same path in every revision (dashboard-<name>.json), so Git stores successive
+  revisions as deltas of the same path. Measured on 60 real report revisions: +4.0 KiB per revision against +18.9 KiB with
+  content-addressed names (audits/v6-intelligence/snapshots-integration.md).
+- Coherence: the manifest records the SHA-256 of docs/report.json and of every snapshot. If the report changes while the
+  snapshots are built, the build is discarded and the previous manifest stays.
+- Atomicity per revision: files are written to temporary names and renamed; the manifest is renamed last. Report,
+  snapshots and manifest are published in the same Git commit (scangoal.publication). A reader that sees files from
+  another revision (CDN cache) detects the SHA-256 mismatch and uses the full report for that cycle; the dashboard asks
+  for each file with the expected hash in the query string, so a cached copy of another revision is not reused.
+- Concurrency: a file lock serialises the collection step and the fast reads.
+- Failure: any error, including a malformed manifest, leaves the previous manifest in place. The dashboard compares its
+  revision with the report's and falls back to the full report when the snapshots are behind.
 - Exit codes: 0 done or inactive, 3 failed (the workflow step has continue-on-error and never blocks the collection).
 """
 
@@ -34,9 +38,13 @@ ENV = 'GOAL_ROI_V6_SNAPSHOTS'
 OUT = Path('docs/v6/snapshots')
 MANIFEST = 'dashboard-manifest.json'
 NAMES = ('summary', 'signals', 'performance', 'science', 'operations', 'learning')
+FILES = tuple('dashboard-%s.json' % name for name in NAMES)
+SCHEMA = 'goal_roi_dashboard_manifest_v6_1'
 BUILDER = Path('scripts/build_dashboard_snapshots.cjs')
 TIMEOUT_SECONDS = 90
-FILE = re.compile(r'dashboard-(%s)\.([0-9a-f]{16})\.json' % '|'.join(NAMES))
+SHA = re.compile(r'[0-9a-f]{64}')
+# Files of an earlier layout (content-addressed names) that may be left in the directory; removed on the next build.
+LEGACY = re.compile(r'dashboard-(%s)\.[0-9a-f]{16}\.json' % '|'.join(NAMES))
 
 
 class SnapshotError(RuntimeError):
@@ -59,20 +67,23 @@ def _locked(root):
         yield
 
 
-def _verify(manifest, staging, report_sha):
-    if manifest.get('schema') != 'goal_roi_dashboard_manifest_v6_1':
+def verify(manifest, directory, report_sha):
+    """Raises SnapshotError for any manifest that is not exactly the expected shape, or that does not match the files."""
+    if not isinstance(manifest, dict) or manifest.get('schema') != SCHEMA:
         raise SnapshotError('unexpected manifest schema')
     if manifest.get('report_sha256') != report_sha:
         raise SnapshotError('manifest does not describe the published report')
-    files = manifest.get('files') or {}
-    if sorted(files) != sorted(NAMES):
-        raise SnapshotError('manifest does not list every snapshot')
-    for name, entry in files.items():
-        match = FILE.fullmatch(entry.get('path', ''))
-        if not match or match[1] != name or not entry['sha256'].startswith(match[2]):
-            raise SnapshotError('snapshot name is not content-addressed: %s' % name)
-        body = staging / entry['path']
-        if _sha(body) != entry['sha256'] or body.stat().st_size != entry['bytes']:
+    files = manifest.get('files')
+    if not isinstance(files, dict) or sorted(files) != sorted(NAMES):
+        raise SnapshotError('manifest does not list exactly the six snapshots')
+    for name in NAMES:
+        entry = files[name]
+        if (not isinstance(entry, dict) or entry.get('path') != 'dashboard-%s.json' % name
+                or not isinstance(entry.get('sha256'), str) or not SHA.fullmatch(entry['sha256'])
+                or type(entry.get('bytes')) is not int or entry['bytes'] < 0):
+            raise SnapshotError('malformed manifest entry: %s' % name)
+        body = Path(directory) / entry['path']
+        if not body.is_file() or _sha(body) != entry['sha256'] or body.stat().st_size != entry['bytes']:
             raise SnapshotError('snapshot does not match its manifest entry: %s' % name)
 
 
@@ -92,44 +103,37 @@ def build(root='.', *, runner=subprocess.run, node=None):
         result = runner([node, str(root / BUILDER), '--report', str(report),
                          '--prospective', str(root / 'data' / 'prospective_report.json'),
                          '--protocol', str(root / 'scangoal' / 'prospective_protocol.json'),
-                         '--out', str(staging), '--hashed'],
+                         '--out', str(staging)],
                         cwd=root, capture_output=True, text=True, timeout=TIMEOUT_SECONDS)
         if result.returncode != 0:
             raise SnapshotError('builder failed: %s' % (result.stderr or result.stdout).strip()[:300])
-        manifest = json.loads((staging / MANIFEST).read_text(encoding='utf-8'))
-        _verify(manifest, staging, before)
+        try:
+            manifest = json.loads((staging / MANIFEST).read_text(encoding='utf-8'))
+        except (OSError, ValueError) as exc:
+            raise SnapshotError('builder wrote no readable manifest') from exc
+        verify(manifest, staging, before)
         if _sha(report) != before:
             raise SnapshotError('the report changed while the snapshots were built')
         out.mkdir(parents=True, exist_ok=True)
         current = out / MANIFEST
-        previous = None
-        if current.is_file():
-            try:
-                previous = json.loads(current.read_text(encoding='utf-8'))
-            except ValueError:
-                previous = None
-        if previous and previous.get('report_sha256') == before and previous.get('files') == manifest['files']:
+        try:
+            previous = json.loads(current.read_text(encoding='utf-8')) if current.is_file() else None
+        except ValueError:
+            previous = None
+        if isinstance(previous, dict) and previous.get('report_sha256') == before and previous.get('files') == manifest['files']:
             return 'unchanged'
-        # 1. content-addressed files (never overwrite a different body under the same name)
-        for entry in manifest['files'].values():
-            target = out / entry['path']
-            if target.is_file() and _sha(target) == entry['sha256']:
-                continue
-            temporary = target.with_name(target.name + '.tmp')
-            shutil.copyfile(staging / entry['path'], temporary)
-            os.replace(temporary, target)
-        # 2. the manifest last, atomically
-        temporary = current.with_name(MANIFEST + '.tmp')
+        # 1. the six snapshots, each through a temporary name and an atomic rename
+        for name in FILES:
+            temporary = out / (name + '.tmp')
+            shutil.copyfile(staging / name, temporary)
+            os.replace(temporary, out / name)
+        # 2. the manifest last
+        temporary = out / (MANIFEST + '.tmp')
         shutil.copyfile(staging / MANIFEST, temporary)
         os.replace(temporary, current)
-        # 3. keep this generation and the previous one; remove older snapshot files only
-        keep = {e['path'] for e in manifest['files'].values()}
-        if previous and isinstance(previous.get('files'), dict):
-            keep |= {e.get('path') for e in previous['files'].values() if isinstance(e, dict)}
+        # 3. nothing else stays in the directory (earlier layouts, orphan temporaries)
         for path in out.iterdir():
-            if FILE.fullmatch(path.name) and path.name not in keep:
-                path.unlink()
-            elif path.name.endswith('.tmp'):
+            if path.name not in FILES and path.name != MANIFEST and (LEGACY.fullmatch(path.name) or path.name.endswith('.tmp')):
                 path.unlink()
         return 'published'
 
@@ -152,7 +156,7 @@ def main():
     try:
         print('DASHBOARD_SNAPSHOTS', build())
         return 0
-    except (SnapshotError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
+    except Exception as exc:  # noqa: BLE001 - any failure is reported with exit code 3, never a traceback
         print('DASHBOARD_SNAPSHOTS_FAILED', type(exc).__name__, str(exc)[:300])
         return 3
 

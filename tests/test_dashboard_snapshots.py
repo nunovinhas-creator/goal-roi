@@ -61,14 +61,14 @@ class DashboardSnapshots(unittest.TestCase):
         self.assertEqual(D.publish_quietly(self.root, {D.ENV: 'off'}), 'inactive')
         self.assertEqual(D.publish_quietly(self.root, {D.ENV: 'ON '}), 'inactive')
 
-    def test_coherent_content_addressed_publication(self):
+    def test_coherent_stable_name_publication(self):
         self.assertEqual(D.build(self.root), 'published')
         m = _manifest(self.root)
         self.assertEqual(m['report_sha256'], _sha(self.root / 'docs/report.json'))
         for name, entry in m['files'].items():
-            path = self.root / D.OUT / entry['path']
-            self.assertRegex(entry['path'], r'^dashboard-%s\.[0-9a-f]{16}\.json$' % name)
-            self.assertEqual(_sha(path), entry['sha256'])
+            self.assertEqual(entry['path'], 'dashboard-%s.json' % name)
+            self.assertEqual(_sha(self.root / D.OUT / entry['path']), entry['sha256'])
+        self.assertEqual(sorted(p.name for p in (self.root / D.OUT).iterdir()), sorted(D.FILES + (D.MANIFEST,)))
         self.assertEqual(D.build(self.root), 'unchanged')
 
     def test_protected_inputs_untouched(self):
@@ -81,20 +81,40 @@ class DashboardSnapshots(unittest.TestCase):
         self.assertNotIn('publication.py', P.CODE_V2)
         self.assertNotIn('watch.py', P.CODE_V2)
 
-    def test_previous_generation_kept_older_pruned(self):
-        manifests = []
+    def test_successive_revisions_keep_seven_files_and_remove_legacy_layout(self):
+        legacy = self.root / D.OUT / 'dashboard-summary.0123456789abcdef.json'
+        legacy.parent.mkdir(parents=True)
+        legacy.write_text('{}')
+        (self.root / D.OUT / 'dashboard-signals.json.tmp').write_text('x')
         for step in range(3):
             report = json.loads((self.root / 'docs/report.json').read_text(encoding='utf-8'))
             report['messages'] += 1  # a new revision changes the summary snapshot
             (self.root / 'docs/report.json').write_text(json.dumps(report), encoding='utf-8')
             self.assertEqual(D.build(self.root), 'published')
-            manifests.append(_manifest(self.root))
-        names = {p.name for p in (self.root / D.OUT).iterdir()}
-        summaries = [m['files']['summary']['path'] for m in manifests]
-        self.assertEqual(len(set(summaries)), 3)
-        self.assertNotIn(summaries[0], names, 'the generation before the previous one is pruned')
-        self.assertIn(summaries[1], names, 'the previous generation stays for cached manifests')
-        self.assertIn(summaries[2], names)
+        self.assertEqual(sorted(p.name for p in (self.root / D.OUT).iterdir()), sorted(D.FILES + (D.MANIFEST,)))
+
+    def test_malformed_manifests_are_refused_not_crashing(self):
+        D.build(self.root)
+        good = _manifest(self.root)
+        sha = good['report_sha256']
+        bad = [None, [], {'schema': 'x'}, dict(good, files=None), dict(good, files={}), dict(good, files=dict(good['files'], extra={})),
+               dict(good, files=dict(good['files'], summary={'path': 1})), dict(good, files=dict(good['files'], summary=dict(good['files']['summary'], sha256=7))),
+               dict(good, files=dict(good['files'], summary=dict(good['files']['summary'], bytes='1'))),
+               dict(good, files=dict(good['files'], summary=dict(good['files']['summary'], path='../../etc/passwd'))),
+               dict(good, files=dict(good['files'], summary=dict(good['files']['summary'], path='dashboard-signals.json')))]
+        for manifest in bad:
+            with self.subTest(manifest=str(manifest)[:60]):
+                with self.assertRaises(D.SnapshotError):
+                    D.verify(manifest, self.root / D.OUT, sha)
+
+        def runner(cmd, **kwargs):  # builder writes an unreadable manifest
+            out = subprocess.run(cmd, **kwargs)
+            (Path(cmd[cmd.index('--out') + 1]) / D.MANIFEST).write_text('{"files": [1,')
+            return out
+        with self.assertRaises(D.SnapshotError):
+            D.build(self.root, runner=runner)
+        with mock.patch.object(D, 'build', side_effect=TypeError('boom')), mock.patch.dict(os.environ, {D.ENV: 'on'}):
+            self.assertEqual(D.main(), 3, 'any failure exits with 3, never a traceback')
 
     def test_failure_leaves_previous_manifest(self):
         D.build(self.root)
@@ -128,7 +148,7 @@ class DashboardSnapshots(unittest.TestCase):
         def runner(cmd, **kwargs):
             out = real(cmd, **kwargs)
             staging = Path(cmd[cmd.index('--out') + 1])
-            target = next(staging.glob('dashboard-learning.*.json'))
+            target = staging / 'dashboard-learning.json'
             target.write_text('{}', encoding='utf-8')
             return out
         with self.assertRaisesRegex(D.SnapshotError, 'does not match'):
@@ -160,9 +180,12 @@ class PublicationPaths(unittest.TestCase):
     def test_snapshot_paths_allowed_other_docs_refused(self):
         self.assertIn('docs/v6/snapshots', PATHS)
         publisher = Publisher.__new__(Publisher)
-        for changed, ok in ((['docs/v6/snapshots/dashboard-manifest.json', 'docs/report.json', 'data/x.json'], True),
+        allowed = ['docs/v6/snapshots/' + n for n in D.FILES + (D.MANIFEST,)]
+        for changed, ok in ((allowed + ['docs/report.json', 'data/x.json'], True),
                             (['docs/v6/v6-app.js'], False), (['docs/index.html'], False), (['scangoal/report.py'], False),
-                            (['docs/v6/snapshots-evil/x.json'], False)):
+                            (['docs/v6/snapshots-evil/x.json'], False), (['docs/v6/snapshots/dashboard-summary.json.tmp'], False),
+                            (['docs/v6/snapshots/index.html'], False), (['docs/v6/snapshots/dashboard-summary.0123456789abcdef.json'], False),
+                            (['docs/v6/snapshots/sub/dashboard-summary.json'], False), (['docs/v6/snapshots/dashboard-other.json'], False)):
             publisher.require = lambda *a, c=changed: '\0'.join(c)
             if ok:
                 publisher.check_paths('diff')
@@ -180,9 +203,6 @@ class PublicationPaths(unittest.TestCase):
                                          '- name: Publish the report before sending notices')]
         self.assertEqual(order, sorted(order), 'snapshots must follow the report and the ledger and precede the publication')
 
-
-if __name__ == '__main__':
-    unittest.main()
 
 
 @unittest.skipUnless(NODE, 'node indisponível')
@@ -253,7 +273,8 @@ class ProductionIsolationV6(unittest.TestCase):
     STEP = 'V6 dashboard snapshots (inactive by default)'
 
     def setUp(self):
-        from test_polymarket_observer import strip_v6
+        from test_polymarket_observer import strip_v6, V6_STEP, V6_ENV
+        self.strip, self.V6_STEP, self.V6_ENV = strip_v6, V6_STEP, V6_ENV
         from test_git_persistence import simulate_job
         self.simulate = simulate_job
         self.current = (ROOT / '.github/workflows/collect.yml').read_text(encoding='utf-8')
@@ -275,3 +296,53 @@ class ProductionIsolationV6(unittest.TestCase):
                     state, ran, skipped = self.simulate(self.current, failing, v6=v6)
                     self.assertEqual((state, strip(ran), strip(skipped)), reference)
                     self.assertIn(self.STEP, ran if v6 else skipped)
+
+
+    def test_every_mention_of_the_variable_is_inside_the_pinned_additions(self):
+        self.assertEqual(self.current.count(self.V6_STEP), 1)
+        self.assertEqual(self.current.count(self.V6_ENV), 2, 'the step env and the fast-reads env, nowhere else')
+        self.assertNotIn('GOAL_ROI_V6_SNAPSHOTS', self.original)
+
+    def test_guard_detects_edits_inside_the_step_or_the_variable_elsewhere(self):
+        sha = lambda t: hashlib.sha256(t.encode()).hexdigest()
+        mutations = {
+            'secret added to the step env': self.current.replace(
+                "          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n        run: python -u -m scangoal.dashboard_snapshots",
+                "          GOAL_ROI_V6_SNAPSHOTS: ${{ vars.GOAL_ROI_V6_SNAPSHOTS }}\n          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}\n        run: python -u -m scangoal.dashboard_snapshots"),
+            'continue-on-error removed': self.current.replace(
+                "vars.GOAL_ROI_V6_SNAPSHOTS == 'on' }}\n        continue-on-error: true\n", "vars.GOAL_ROI_V6_SNAPSHOTS == 'on' }}\n"),
+            'extra command in the step': self.current.replace("run: python -u -m scangoal.dashboard_snapshots\n",
+                                                               "run: python -u -m scangoal.dashboard_snapshots && git push\n"),
+            'variable passed to another step': self.current.replace(
+                "        run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader",
+                self.V6_ENV + "        run: timeout --signal=TERM --kill-after=10s 220s python -u -m scangoal.reader"),
+            'new step inside the region': self.current.replace(self.V6_STEP, self.V6_STEP + "      - name: Extra\n        run: echo x\n"),
+        }
+        for label, text in mutations.items():
+            with self.subTest(mutation=label):
+                self.assertTrue(text != self.current, 'mutation not applied: ' + label)
+                self.assertNotEqual(sha(self.strip(text)), MAIN_COLLECT_SHA256, 'guard did not detect: ' + label)
+
+
+class ReversalWithPendingPublications(unittest.TestCase):
+    """Reverting the code is safe only after a run with the variable off and no pending publication. With the variable
+    off nothing is written, so no pending bundle can carry snapshot paths; a deletion of the directory is publishable."""
+
+    def test_variable_off_writes_nothing_and_a_pending_bundle_cannot_carry_snapshots(self):
+        root = _sandbox()
+        self.addCleanup(shutil.rmtree, root, True)
+        self.assertEqual(D.publish_quietly(root, {}), 'inactive')
+        self.assertFalse((root / D.OUT).exists())
+        from scangoal import publication
+        staged = [name for name in publication.PATHS if (root / name).exists()]
+        self.assertNotIn('docs/v6/snapshots', staged)
+
+    def test_deleting_the_snapshot_directory_is_publishable(self):
+        publisher = Publisher.__new__(Publisher)
+        deletions = ['docs/v6/snapshots/' + n for n in D.FILES + (D.MANIFEST,)]
+        publisher.require = lambda *a: '\0'.join(deletions + ['docs/report.json'])
+        publisher.check_paths('diff')  # no exception: the cleanup commit goes through the same publisher
+
+
+if __name__ == '__main__':
+    unittest.main()
