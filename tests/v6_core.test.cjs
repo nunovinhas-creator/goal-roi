@@ -270,3 +270,31 @@ test('P1-2: manifesto com nomes endereçados por conteúdo é aceite; outros cam
   const bad2 = clone(m); bad2.files.summary.path = 'dashboard-signals.' + m.files.summary.sha256.slice(0, 16) + '.json';
   assert.equal(core.validateManifest(bad2).ok, false, 'nome de outro snapshot');
 });
+
+test('P3 auditoria: zeros publicados não viram "—"; semanas na hora de Lisboa; contexto das replicações', () => {
+  const r = clone(report);
+  r.questions[core.REFERENCE].wins = 0; r.questions[core.REFERENCE].pushes = 0;
+  const s = core.buildSummary(r, prospective, AT).data.reference;
+  assert.equal(s.wins, 0); assert.equal(s.pushes, 0);
+  // domingo 23:30 UTC no verão = segunda 00:30 em Lisboa: pertence à semana que começa nessa segunda
+  const weeks = core.periodTable([{d: '2026-06-14T23:30:00+00:00', w: 1, o: 2, t: 'STAKE_LOAD'}]).by_week;
+  assert.deepEqual(Object.keys(weeks), ['2026-06-15']);
+  const ctx = core.buildLearning(report).data.replicated_context;
+  assert.ok(ctx.min_decided <= ctx.median_decided && ctx.median_decided <= ctx.max_decided);
+  assert.ok(ctx.distinct_game_sets <= core.buildLearning(report).data.replicated_exploratory_total);
+});
+
+test('P3 auditoria: gerador usa caminhos da raiz, escreve de forma atómica e limpa ficheiros antigos', () => {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'v6gen-'));
+  fs.writeFileSync(path.join(out, 'dashboard-signals.0123456789abcdef.json'), '{}');   // geração antiga sem referência
+  fs.writeFileSync(path.join(out, 'dashboard-summary.json.tmp-999'), 'x');              // temporário órfão
+  fs.writeFileSync(path.join(out, 'outro.txt'), 'não é um snapshot');
+  const r = require('node:child_process').spawnSync(process.execPath, [path.join(ROOT, 'scripts/build_dashboard_snapshots.cjs'), '--out', out, '--hashed'], {cwd: os.tmpdir(), encoding: 'utf8'});
+  assert.equal(r.status, 0, r.stderr);
+  const names = fs.readdirSync(out);
+  assert.ok(!names.includes('dashboard-signals.0123456789abcdef.json'));
+  assert.ok(!names.some(n => n.includes('.tmp-')));
+  assert.ok(names.includes('outro.txt'), 'nunca apaga ficheiros que não são snapshots');
+  const m = JSON.parse(fs.readFileSync(path.join(out, 'dashboard-manifest.json'), 'utf8'));
+  for (const f of Object.values(m.files)) assert.ok(names.includes(f.path));
+});

@@ -6,6 +6,7 @@ coincidem com scangoal/prospective.py. Nada aqui escreve em data/ nem em docs/re
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -24,7 +25,11 @@ def _node():
 
 
 def _playwright():
-    return _node() and subprocess.run(['node', '-e', "require('playwright')"], cwd=ROOT, capture_output=True).returncode == 0
+    available = _node() and subprocess.run(['node', '-e', "require('playwright')"], cwd=ROOT, capture_output=True).returncode == 0
+    # Na CI o Playwright é obrigatório: a sua falta é um erro, nunca um teste ignorado em silêncio.
+    if not available and os.environ.get('CI'):
+        raise RuntimeError('Playwright em falta na CI: os testes de navegador da V6 não podem ser ignorados')
+    return available
 
 
 def _digest():

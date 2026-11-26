@@ -13,9 +13,11 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const core = require('../docs/v6/v6-core.js');
 
+// Caminhos por omissão relativos à raiz do repositório (não à diretoria de trabalho).
+const ROOT = path.join(__dirname, '..');
 function args(argv) {
-  const out = {report: 'data/report.json', prospective: 'data/prospective_report.json',
-    protocol: 'scangoal/prospective_protocol.json', out: 'build/dashboard-snapshots', hashed: false};
+  const out = {report: path.join(ROOT, 'data/report.json'), prospective: path.join(ROOT, 'data/prospective_report.json'),
+    protocol: path.join(ROOT, 'scangoal/prospective_protocol.json'), out: path.join(ROOT, 'build/dashboard-snapshots'), hashed: false};
   for (let i = 0; i < argv.length; i += 2) {
     const k = argv[i].replace(/^--/, '');
     if (k === 'hashed') { out.hashed = true; i--; continue; }
@@ -44,6 +46,8 @@ function build(opts) {
   const leaks = core.privacyFindings(files);
   if (leaks.length) throw new Error('dados privados detetados: ' + leaks.slice(0, 5).join(', '));
   fs.mkdirSync(opts.out, {recursive: true});
+  // Escrita atómica: cada ficheiro vai para um temporário e é renomeado; o manifesto é o último.
+  const atomic = (file, body) => { const tmp = file + '.tmp-' + process.pid; fs.writeFileSync(tmp, body); fs.renameSync(tmp, file); };
   const manifest = {schema: core.MANIFEST_SCHEMA, report_generated_at_utc: report.generated_at_utc,
     report_sha256: sha(reportBytes), report_bytes: reportBytes.length,
     prospective_sha256: prospective ? sha(fs.readFileSync(opts.prospective)) : null, redacted_fields: redacted, files: {}};
@@ -51,10 +55,16 @@ function build(opts) {
     const body = Buffer.from(JSON.stringify(files[name]) + '\n', 'utf8'), digest = sha(body);
     // --hashed: nome endereçado por conteúdo, para que caches e publicações concorrentes nunca misturem revisões.
     const file = opts.hashed ? 'dashboard-' + name + '.' + digest.slice(0, 16) + '.json' : core.FILE(name);
-    fs.writeFileSync(path.join(opts.out, file), body);
+    atomic(path.join(opts.out, file), body);
     manifest.files[name] = {path: file, sha256: digest, bytes: body.length};
   }
-  fs.writeFileSync(path.join(opts.out, 'dashboard-manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+  const previous = (() => { try { return JSON.parse(fs.readFileSync(path.join(opts.out, 'dashboard-manifest.json'), 'utf8')); } catch (e) { return null; } })();
+  atomic(path.join(opts.out, 'dashboard-manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+  // Limpeza: só ficheiros de snapshot que nem este manifesto nem o anterior referem (e temporários órfãos).
+  const keep = new Set(Object.values(manifest.files).map(f => f.path).concat(previous && previous.files ? Object.values(previous.files).map(f => f && f.path) : []));
+  for (const name of fs.readdirSync(opts.out)) {
+    if ((/^dashboard-[a-z]+(\.[0-9a-f]{16})?\.json$/.test(name) && name !== 'dashboard-manifest.json' && !keep.has(name)) || /\.tmp-\d+$/.test(name)) fs.unlinkSync(path.join(opts.out, name));
+  }
   return manifest;
 }
 
