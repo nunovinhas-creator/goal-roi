@@ -23,7 +23,7 @@ jobs:
     if: >-
       ${{ github.repository == 'nunovinhas-creator/goal-roi' &&
           github.ref == 'refs/heads/main' &&
-          (vars.GOAL_ROI_DROPPING_ODDS == 'shadow' || vars.GOAL_ROI_DROPPING_ODDS == 'on') &&
+          vars.GOAL_ROI_DROPPING_ODDS == 'shadow' &&
           (github.event_name == 'workflow_dispatch' ||
            (github.event.workflow_run.head_repository.full_name == github.repository &&
             github.event.workflow_run.head_branch == 'main')) }}
@@ -35,24 +35,14 @@ jobs:
           sparse-checkout: |
             /scangoal/
             /data/messages.jsonl
-            /requirements.txt
           sparse-checkout-cone-mode: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        if: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' }}
-        with:
-          python-version: '3.11'
-      - name: Install the existing Telegram transport dependencies
-        if: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' }}
-        run: pip install -r requirements.txt
       - name: Evaluate the published ScanGoal archive
         env:
           GOAL_ROI_DROPPING_ODDS: ${{ vars.GOAL_ROI_DROPPING_ODDS }}
-          GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN: ${{ vars.GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN }}
-          GOAL_ROI_DROPPING_ODDS_ON_SINCE: ${{ vars.GOAL_ROI_DROPPING_ODDS_ON_SINCE }}
-          TG_BOT_TOKEN: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' && secrets.TG_BOT_TOKEN || '' }}
-          TG_CHAT_ID: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' && secrets.TG_CHAT_ID || '' }}
+          COLLECTOR_RUN_ID: ${{ github.event.workflow_run.id || '' }}
           INITIALIZE: ${{ github.event_name == 'workflow_dispatch' && inputs.initialize }}
         run: |
           command=run
           if [[ "$INITIALIZE" == true ]]; then command=initialize; fi
+          printf 'DROPPING_ODDS_COLLECTOR_RUN %s\n' "$COLLECTOR_RUN_ID"
           timeout --signal=TERM --kill-after=3s 90s python3 -u -m scangoal.dropping_odds_alerts "$command"

@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import tempfile
 import threading
@@ -11,7 +12,7 @@ from unittest.mock import Mock, patch
 from urllib.error import HTTPError
 
 from scangoal import dropping_odds_alerts as alerts, notify
-from scangoal.dropping_odds_journal import GitJournal, Journal, JournalError, REF, utc
+from scangoal.dropping_odds_journal import GitJournal, Journal, JournalError, REF, WITNESS_REF, utc
 
 UTC = timezone.utc
 SENT = datetime(2026, 11, 26, 13, 53, 40, tzinfo=UTC)
@@ -214,11 +215,38 @@ class DeliveryTests(unittest.TestCase):
         self.fake.assert_not_called()
 
     def test_shadow_durable_decisions_both_percentages_and_no_send(self):
-        self.assertEqual(self.run_mode(SHADOW), {'eligible': 1})
-        signal = self.store.read().events[1]['signal']
+        counts = self.run_mode(SHADOW)
+        self.assertEqual(counts['eligible'], 1)
+        self.assertEqual([counts[f'shadow_{label}_eligible'] for label in alerts.EXPERIMENTS], [1, 0, 1, 1])
+        received, eligible = self.store.read().events
+        self.assertEqual(received['experiments'], {'unlimited': 'eligible', '5m': 'stale',
+                                                   '10m': 'eligible', '15m': 'eligible'})
+        self.assertEqual(received['latency'], {'sent_to_receipt_ms': 480000, 'receipt_to_evaluation_ms': 0,
+                                              'sent_to_evaluation_ms': 480000, 'first_receipt_utc': NOW.isoformat()})
+        signal = eligible['signal']
         self.assertEqual(signal['reported'], '18')
         self.assertEqual(Decimal(signal['calculated']).quantize(Decimal('.01')), Decimal('17.89'))
         self.assertFalse(self.run_mode(SHADOW))
+        self.fake.assert_not_called()
+
+    def test_shadow_thresholds_keep_independent_deduplication_across_restarts(self):
+        self.run_mode(SHADOW)
+        newer = row(2, A.replace('21 min', '14 min'), sent=SENT + timedelta(minutes=7),
+                    received=NOW - timedelta(seconds=30))
+        self.write(row(), newer)
+        self.run_mode(SHADOW)
+        events = self.store.read().events
+        self.assertEqual(events[-2]['experiments'], {'unlimited': 'duplicate', '5m': 'eligible',
+                                                     '10m': 'duplicate', '15m': 'duplicate'})
+        self.assertEqual(events[-2]['latency']['receipt_to_evaluation_ms'], 30000)
+        self.fake.assert_not_called()
+
+    def test_hosted_on_is_rejected_without_opening_git_or_telegram(self):
+        env = dict(ON, GITHUB_ACTIONS='true', GITHUB_REPOSITORY='nunovinhas-creator/goal-roi',
+                   GITHUB_REF='refs/heads/main')
+        with patch.dict(os.environ, env, clear=True), patch('sys.argv', ['alerts', 'run']), \
+                patch.object(alerts, 'GitJournal', side_effect=AssertionError):
+            self.assertEqual(alerts.main(), 3)
         self.fake.assert_not_called()
 
     def test_on_send_once_with_published_intent(self):
@@ -269,7 +297,36 @@ class DeliveryTests(unittest.TestCase):
         other_match = row(4, A.replace('Al Waab FC', 'Other Club'))
         self.run_mode()
         self.write(row(), edit, repeat, revised_quote, other_match)
-        self.assertEqual(self.run_mode(), {'duplicate': 2, 'sent': 1})
+        self.assertEqual(self.run_mode(), {'duplicate': 2, 'late_versions': 1, 'sent': 1})
+        self.assertEqual(self.fake.call_count, 2)
+        log = self.store.read()
+        audit = [event for event in log.events if event['status'] == 'late_versions']
+        self.assertEqual(len(audit), 1)
+        self.assertEqual(audit[0]['signal']['message_rule'], 'ambiguous_edit')
+        self.assertEqual(log.status[1], 'sent')
+        self.assertFalse(self.run_mode())
+
+    def test_team_order_case_and_unicode_spacing_preserve_exact_selected_team(self):
+        flipped = A.replace('Al-Mu Aidar – Al Waab FC', 'al waab fc – AL-MU AIDAR')
+        flipped = flipped.replace('Al Waab FC', 'AL\u00a0WAAB FC').replace('23543', '10')
+        other_side = A.replace('Al Waab FC (0)', 'Al-Mu Aidar (0)').replace('drop: Al Waab FC', 'drop: Al-Mu Aidar')
+        self.write(row(), row(2, flipped), row(3, other_side))
+        self.assertEqual(self.run_mode(), {'sent': 2, 'duplicate': 1})
+        self.assertIn('Al-Mu Aidar AH 0', self.fake.call_args.args[2])
+
+    def test_name_aliases_and_reused_ids_across_distinct_fixtures_are_not_inferred(self):
+        changed = A.replace('Al Waab FC', 'Al Waáb FC')
+        self.write(row(), row(2, changed))
+        self.assertEqual(self.run_mode(), {'sent': 2})
+
+    def test_kickoff_changes_and_new_provider_aliases_do_not_chain_the_time_window(self):
+        alias = A.replace('21 min', '23 min').replace('23543', '99')
+        self.write(row(), row(2, alias))
+        self.assertEqual(self.run_mode(), {'sent': 1, 'duplicate': 1})
+        delayed = alias.replace('23 min', '25 min').replace('2.46 → 2.02 (−18%)', '2.00 → 1.68 (−16%)')
+        different = alias.replace('23 min', '25 min').replace('go=99', 'go=77')
+        self.write(row(), row(2, alias), row(3, delayed), row(4, different))
+        self.assertEqual(self.run_mode(), {'conflicting_kickoff': 1, 'sent': 1})
         self.assertEqual(self.fake.call_count, 2)
 
     def test_pending_ack_lost_before_send_is_never_retried(self):
@@ -342,6 +399,14 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(self.archive.read_bytes(), before)
         self.fake.assert_not_called()
 
+    def test_timed_replay_does_not_use_receipt_as_evaluation(self):
+        self.write(row())
+        timestamp = SENT + timedelta(minutes=16)
+        result = alerts.replay(self.archive, None, {1: timestamp})
+        self.assertEqual(result['eligible'], 1)
+        self.assertEqual(result['experiments']['15m']['stale'], 1)
+        self.assertEqual(result['timings'][0]['latency']['receipt_to_evaluation_ms'], 480000)
+
 
 class GitIntegrationTests(unittest.TestCase):
     def setUp(self):
@@ -369,11 +434,71 @@ class GitIntegrationTests(unittest.TestCase):
         with self.assertRaises(JournalError):
             self.stores[1].bootstrap(BEFORE)
         snapshot = self.stores[1].read()
+        snapshot.append(1, 'received', NOW)
+        snapshot.append(1, 'rejected', NOW, reason='test')
+        witness = self.stores[1].tip
         self.git(self.remote, 'update-ref', '-d', REF)
         with self.assertRaises(JournalError):
             self.stores[1].publish(snapshot)
         with self.assertRaises(JournalError):
             self.stores[1].read()
+        self.assertEqual(self.git(self.remote, 'rev-parse', WITNESS_REF).decode().strip(), witness)
+        with self.assertRaises(JournalError):
+            GitJournal(self.path / '1').bootstrap(BEFORE)
+
+    def test_single_ref_rollback_and_witness_deletion_suspend_fresh_runner(self):
+        first, second = self.stores
+        origin = first.tip
+        sender = Mock()
+        self.assertEqual(alerts.run(self.archive, ON, first, sender, lambda: NOW), {'sent': 1})
+        tip = first.tip
+        for ref in (REF, WITNESS_REF):
+            with self.subTest(ref=ref):
+                self.git(self.remote, 'update-ref', ref, origin)
+                with self.assertRaises(JournalError):
+                    alerts.run(self.archive, ON, second, sender, lambda: NOW)
+                self.git(self.remote, 'update-ref', ref, tip)
+        self.git(self.remote, 'update-ref', '-d', WITNESS_REF)
+        with self.assertRaises(JournalError):
+            alerts.run(self.archive, ON, second, sender, lambda: NOW)
+        sender.assert_called_once()
+
+    def test_replayed_valid_tree_on_new_commit_is_detected_by_parent_log(self):
+        first, second = self.stores
+        origin = first.tip
+        alerts.run(self.archive, ON, first, Mock(), lambda: NOW)
+        tree = self.git(self.remote, 'rev-parse', f'{origin}^{{tree}}').decode().strip()
+        tip = self.git(self.remote, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                       'commit-tree', tree, '-p', first.tip, '-m', 'restored old valid snapshot').decode().strip()
+        for ref in (REF, WITNESS_REF):
+            self.git(self.remote, 'update-ref', ref, tip)
+        with self.assertRaisesRegex(JournalError, 'append-only'):
+            second.read()
+
+    def test_coordinated_rollback_is_detectable_only_with_newer_checkpoint(self):
+        first, second = self.stores
+        origin = first.tip
+        sender = Mock()
+        self.assertEqual(alerts.run(self.archive, ON, first, sender, lambda: NOW), {'sent': 1})
+        for ref in (REF, WITNESS_REF):
+            self.git(self.remote, 'update-ref', ref, origin)
+        with self.assertRaisesRegex(JournalError, 'append-only'):
+            first.read()
+        self.assertFalse(second.read().status)
+        self.assertEqual(alerts.run(self.archive, ON, second, sender, lambda: NOW), {'sent': 1})
+        self.assertEqual(sender.call_count, 2)
+
+    def test_atomic_push_rejection_changes_neither_ref_and_cannot_send(self):
+        store = self.stores[0]
+        before = self.git(self.remote, 'rev-parse', REF, WITNESS_REF)
+        hook = self.remote / 'hooks' / 'update'
+        hook.write_text(f'#!/bin/sh\n[ "$1" != "{WITNESS_REF}" ]\n', encoding='utf-8')
+        hook.chmod(0o755)
+        sender = Mock()
+        with self.assertRaises(JournalError):
+            alerts.run(self.archive, ON, store, sender, lambda: NOW)
+        self.assertEqual(self.git(self.remote, 'rev-parse', REF, WITNESS_REF), before)
+        sender.assert_not_called()
 
     def test_concurrent_runners_only_one_claims_and_main_is_untouched(self):
         barrier = threading.Barrier(2)

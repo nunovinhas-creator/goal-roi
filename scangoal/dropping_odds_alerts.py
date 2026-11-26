@@ -14,7 +14,7 @@ from pathlib import Path
 from uuid import uuid4
 from zoneinfo import ZoneInfo
 
-from .dropping_odds_journal import GitJournal, JournalError, utc
+from .dropping_odds_journal import GitJournal, JournalError, encode, utc
 from .store import data_dir, message_rows
 
 UTC = timezone.utc
@@ -33,7 +33,10 @@ LINK = re.compile(r'https://scangoal\.com/MySignals\.ashx\?go=([0-9]{1,20})')
 TEAM_SEPARATOR = re.compile(r'\s+[–—-]\s+')
 WARNING = '⚠ Not a bet and not a forecast: the signal flags a statistical anomaly in the match. The decision and the risk are yours.'
 AMBIGUOUS = {'message_format', 'invalid_metadata', 'invalid_countdown', 'ambiguous_fixture',
-             'ambiguous_selection', 'ambiguous_edit', 'invalid_handicap', 'percentage_mismatch', 'alert_too_long'}
+             'ambiguous_selection', 'ambiguous_edit', 'invalid_handicap', 'percentage_mismatch', 'alert_too_long',
+             'conflicting_kickoff', 'ambiguous_duplicate'}
+EXPERIMENTS = {'unlimited': None, **{f'{minutes}m': timedelta(minutes=minutes) for minutes in (5, 10, 15)}}
+KICKOFF_TOLERANCE = timedelta(minutes=2)
 
 
 def clean(text):
@@ -145,6 +148,7 @@ class Observation:
     sent: datetime
     received: datetime
     decision: Decision
+    first_received: datetime | None = None
 
 
 def observation(mid, rows):
@@ -163,8 +167,8 @@ def observation(mid, rows):
         original_texts = {clean(row['text']) for row in originals}
         version_texts = {clean(row['text']) for row in rows}
         if rows[0].get('edit_date_utc') is not None or len(original_texts) != 1 or version_texts != original_texts:
-            return Observation(mid, sent, available, Decision('ambiguous_edit'))
-        return Observation(mid, sent, available, parse(original_texts.pop(), sent))
+            return Observation(mid, sent, available, Decision('ambiguous_edit'), min(received))
+        return Observation(mid, sent, available, parse(original_texts.pop(), sent), min(received))
     except (KeyError, TypeError, ValueError, AttributeError, OverflowError):
         return Observation(mid, None, None, Decision('invalid_metadata'))
 
@@ -215,25 +219,62 @@ def snapshot(item):
     return result
 
 
+def latency(item, now):
+    if item.sent is None or item.first_received is None or now < item.received:
+        return None
+    millisecond = timedelta(milliseconds=1)
+    return {'sent_to_receipt_ms': (item.first_received - item.sent) // millisecond,
+            'receipt_to_evaluation_ms': (now - item.first_received) // millisecond,
+            'sent_to_evaluation_ms': (now - item.sent) // millisecond,
+            'first_receipt_utc': item.first_received.isoformat()}
+
+
+def version_digests(rows):
+    return list(dict.fromkeys(hashlib.sha256(encode(row)).hexdigest() for row in rows))
+
+
+@dataclass
+class QuoteGroup:
+    kickoff: datetime
+    provider_ids: set
+    prices: set
+
+
 class SeenQuotes:
     def __init__(self):
         self.matches = defaultdict(list)
 
-    def add(self, data):
+    def classify(self, data):
         if not isinstance(data, dict) or not {'teams', 'league', 'side', 'line', 'kickoff_utc',
                                                'go', 'initial', 'final'} <= data.keys():
             raise JournalError('missing eligible signal identity')
         try:
-            fixture = (identity(data['league']), *(identity(team) for team in data['teams']),
-                       data['side'], data['line'])
+            home, away = teams = tuple(identity(team) for team in data['teams'])
+            side = data['side']
+            if home == away or type(side) is not int or side not in (0, 1):
+                raise ValueError('invalid teams or selection')
+            fixture = (identity(data['league']), tuple(sorted(teams)), teams[side], data['line'])
             kickoff = utc(data['kickoff_utc'])
             quote = (data['initial'], data['final'])
+            provider_id = data['go']
             previous = self.matches[fixture]
-            duplicate = any(abs(kickoff - start) <= timedelta(minutes=2) and (go == data['go'] or odds == quote)
-                            for start, go, odds in previous)
-            if not duplicate:
-                previous.append((kickoff, data['go'], quote))
-            return duplicate
+            by_id = [group for group in previous if provider_id in group.provider_ids]
+            if by_id:
+                candidates = [group for group in by_id if abs(kickoff - group.kickoff) <= KICKOFF_TOLERANCE]
+                if not candidates:
+                    return 'conflicting_kickoff'
+            else:
+                candidates = [group for group in previous if quote in group.prices
+                              and abs(kickoff - group.kickoff) <= KICKOFF_TOLERANCE]
+            if len(candidates) > 1:
+                return 'ambiguous_duplicate'
+            if candidates:
+                group = candidates[0]
+                group.provider_ids.add(provider_id)
+                group.prices.add(quote)
+                return 'duplicate'
+            previous.append(QuoteGroup(kickoff, {provider_id}, {quote}))
+            return 'eligible'
         except (KeyError, TypeError, AttributeError, ValueError, OverflowError) as exc:
             raise JournalError('invalid eligible signal identity') from exc
 
@@ -271,14 +312,32 @@ def assess(item, now, max_age, seen, data):
         return item.decision.reason
     if len(alert(item)) > 3900:
         return 'alert_too_long'
-    return 'duplicate' if seen.add(data) else 'eligible'
+    return seen.classify(data)
+
+
+def measure_shadow(item, now, data, indexes):
+    return {label: assess(item, now, maximum, indexes[label], data) for label, maximum in EXPERIMENTS.items()}
+
+
+def shadow_indexes(events):
+    indexes = {label: SeenQuotes() for label in EXPERIMENTS}
+    for event in events:
+        if event['status'] == 'received' and 'experiments' in event:
+            for label, index in indexes.items():
+                if event['experiments'].get(label) in ('eligible', 'duplicate'):
+                    index.classify(event['signal'])
+        elif ((event['status'] == 'eligible' and event.get('mode') != 'shadow')
+              or (event['status'] == 'received' and event.get('decision_reason') in ('eligible', 'duplicate'))):
+            for index in indexes.values():
+                index.classify(event['signal'])
+    return indexes
 
 
 def sort_key(item):
     return (item.received or datetime.min.replace(tzinfo=UTC), item.mid)
 
 
-def replay(archive, max_age):
+def replay(archive, max_age, evaluation_times=None):
     """Replay the first observable version per Telegram ID at its recorded receipt time."""
     versions = archive_versions(archive)
     first = [observation(mid, rows[:1]) for mid, rows in versions.items()]
@@ -286,20 +345,36 @@ def replay(archive, max_age):
                'extra_telegram_versions': sum(len(rows) - 1 for rows in versions.values()),
                'same_day': 0, 'eligible': 0, 'ambiguous': 0, 'duplicates': 0, 'excluded': Counter(),
                'handicap_lines': Counter(), 'reported_drops': Counter(), 'final_odds': Counter(), 'alerts': []}
-    seen, fixtures = SeenQuotes(), set()
-    for item in sorted(first, key=sort_key):
+    seen, fixtures, indexes = SeenQuotes(), set(), shadow_indexes(())
+    summary['experiments'] = {label: Counter() for label in EXPERIMENTS}
+    summary['timings'] = []
+
+    def evaluation(item):
+        if evaluation_times is None:
+            return item.received
+        return evaluation_times[item.mid]
+
+    for item in sorted(first, key=lambda item: (evaluation(item) or datetime.min.replace(tzinfo=UTC), sort_key(item))):
+        now = evaluation(item)
         kickoff, quote = item.decision.kickoff, item.decision.quote
-        if item.decision.fixture and kickoff.astimezone(LISBON).date() == item.received.astimezone(LISBON).date():
+        if item.decision.fixture and kickoff.astimezone(LISBON).date() == now.astimezone(LISBON).date():
             summary['same_day'] += 1
-            fixtures.add((*(identity(part) for part in item.decision.fixture), kickoff.astimezone(LISBON).date()))
+            league, *teams = map(identity, item.decision.fixture)
+            fixtures.add((league, tuple(sorted(teams)), kickoff.astimezone(LISBON).date()))
         if quote:
             summary['handicap_lines'][canonical(quote.line)] += 1
             summary['reported_drops'][str(quote.reported)] += 1
             summary['final_odds'][canonical(quote.final)] += 1
-        reason = assess(item, item.received, max_age, seen, snapshot(item))
+        data = snapshot(item)
+        measured = measure_shadow(item, now, data, indexes)
+        for label, outcome in measured.items():
+            summary['experiments'][label][outcome] += 1
+        summary['timings'].append(dict(message_id=item.mid, latency=latency(item, now),
+                                       evaluation_utc=now.isoformat() if now else None, outcomes=measured))
+        reason = assess(item, now, max_age, seen, data)
         if reason == 'eligible':
             summary['eligible'] += 1
-            summary['alerts'].append({'message_id': item.mid, 'at_utc': item.received.isoformat(),
+            summary['alerts'].append({'message_id': item.mid, 'at_utc': now.isoformat(),
                                       'text': alert(item)})
         else:
             summary['excluded'][reason] += 1
@@ -344,24 +419,42 @@ def run(archive, env, store=None, sender=None, clock=None):
             counts['uncertain'] += 1
     seen = SeenQuotes()
     for event in journal.events:
-        if event['status'] == 'eligible':
-            if seen.add(event.get('signal')):
-                raise JournalError('duplicated eligible signal in journal')
-
-    observations = sorted((observation(mid, rows) for mid, rows in archive_versions(archive).items()
-                           if mid not in journal.status), key=sort_key)
+        if event['status'] == 'eligible' or (event['status'] == 'received'
+                                            and event.get('decision_reason') in ('eligible', 'duplicate')):
+            seen.classify(event.get('signal'))
+    experiments = shadow_indexes(journal.events) if selected == 'shadow' else None
+    versions = archive_versions(archive)
+    observations = []
+    for mid, rows in versions.items():
+        if mid not in journal.status:
+            observations.append(observation(mid, rows))
+            continue
+        unseen = [digest for digest in version_digests(rows) if digest not in journal.versions.get(mid, ())]
+        if unseen:
+            item = observation(mid, rows)
+            journal.append(mid, 'late_versions', now, versions=unseen, signal=snapshot(item),
+                           latency=latency(item, now))
+            counts['late_versions'] += len(unseen)
     token, chat = ('', '')
     if selected == 'on':
         token = (env.get('TG_BOT_TOKEN') or '').strip()
         chat = (env.get('TG_CHAT_ID') or '').strip()
 
-    for item in observations:
+    for item in sorted(observations, key=sort_key):
         if item.sent and item.sent <= max(journal.initialized_at, onset or journal.initialized_at):
             continue
         decision_time = clock()
         data = snapshot(item)
-        reason = assess(item, decision_time, maximum, seen, data)
-        journal.append(item.mid, 'received', decision_time, signal=data)
+        audit = dict(signal=data, versions=version_digests(versions[item.mid]), latency=latency(item, decision_time))
+        if experiments is not None:
+            audit['experiments'] = outcomes = measure_shadow(item, decision_time, data, experiments)
+            for label, outcome in outcomes.items():
+                counts[f'shadow_{label}_evaluated'] += 1
+                counts[f'shadow_{label}_eligible'] += outcome == 'eligible'
+            reason = outcomes['unlimited']
+        else:
+            reason = assess(item, decision_time, maximum, seen, data)
+        journal.append(item.mid, 'received', decision_time, decision_reason=reason, **audit)
         if reason != 'eligible':
             status = 'expired' if reason in ('started', 'stale') else 'rejected'
             journal.append(item.mid, status, decision_time, reason=reason)
@@ -410,12 +503,16 @@ def main():
     offline = commands.add_parser('replay')
     offline.add_argument('archive', type=Path)
     offline.add_argument('--max-age-minutes')
+    offline.add_argument('--evaluation-times', type=Path, help='JSON mapping Telegram IDs to UTC evaluation times')
     commands.add_parser('run')
     commands.add_parser('initialize')
     args = parser.parse_args()
     if args.command == 'replay':
         maximum = age_limit(args.max_age_minutes) if args.max_age_minutes else None
-        print(json.dumps(replay(args.archive, maximum), ensure_ascii=False, indent=2, sort_keys=True))
+        times = None
+        if args.evaluation_times:
+            times = {int(mid): utc(stamp) for mid, stamp in json.loads(args.evaluation_times.read_text()).items()}
+        print(json.dumps(replay(args.archive, maximum, times), ensure_ascii=False, indent=2, sort_keys=True))
         return 0
     if mode(os.environ) == 'off':
         return 0
@@ -424,12 +521,15 @@ def main():
                 or os.environ.get('GITHUB_REPOSITORY') != 'nunovinhas-creator/goal-roi'
                 or os.environ.get('GITHUB_REF') != 'refs/heads/main'):
             raise JournalError('live entry point requires the Goal-ROI workflow on main')
+        if mode(os.environ) != 'shadow':
+            raise JournalError('hosted execution restricted to shadow')
+        store = GitJournal()
         if args.command == 'initialize':
-            if mode(os.environ) != 'shadow':
-                raise JournalError('initialization requires shadow mode')
-            GitJournal().bootstrap(datetime.now(UTC))
+            store.bootstrap(datetime.now(UTC))
+            print('DROPPING_ODDS_CHECKPOINT', store.tip)
             return 0
-        counts = run(data_dir() / 'messages.jsonl', os.environ)
+        counts = run(data_dir() / 'messages.jsonl', os.environ, store)
+        print('DROPPING_ODDS_CHECKPOINT', store.tip)
         print('DROPPING_ODDS', json.dumps(counts, sort_keys=True))
         return 3 if counts['failed'] or counts['uncertain'] else 0
     except (OSError, JournalError, ValueError) as exc:
