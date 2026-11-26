@@ -48,7 +48,8 @@ async function start({root, ttl = 600, keyMode = 'full'} = {}) {
       entry = {body, at: clock, etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"'};
       cache.set(key, entry);
       stats.misses++;
-      const v = url.searchParams.get('v');
+      // Chave "envenenada": o corpo guardado não tem o SHA-256 que a chave promete (?v=<sha> ou objects/<sha>/…).
+      const v = url.searchParams.get('v') || (/^\/objects\/([0-9a-f]{64})\//.exec(url.pathname) || [])[1];
       if (v && crypto.createHash('sha256').update(body).digest('hex').slice(0, v.length) !== v) stats.poisoned_keys++;
     } else stats.hits++;
     const age = clock - entry.at;

@@ -3,69 +3,69 @@
  "ttl_s": 600,
  "results": [
   {
-   "name": "S1 TLS e leitura base",
+   "design": "v1",
+   "name": "S1",
    "keyMode": "full",
    "tls_without_ca": "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
    "read": {
     "which": "current",
-    "slot": "a",
     "generated": "2026-11-26T11:40:34.830598+00:00"
    },
    "stats": {
     "hits": 0,
     "misses": 7,
     "poisoned_keys": 0
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S2 ponteiro em cache, 1 publicação dentro do TTL",
+   "design": "v1",
+   "name": "S2",
    "keyMode": "full",
    "before": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "after": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "stats": {
     "hits": 7,
     "misses": 7,
     "poisoned_keys": 0
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S3 ponteiro e corpos na mesma cache, 2 publicações dentro do TTL (A-B-A)",
+   "design": "v1",
+   "name": "S3",
    "keyMode": "full",
    "before": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "during": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "after_ttl": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T12:10:34.830598+00:00"
    },
    "stats": {
     "hits": 7,
     "misses": 14,
     "poisoned_keys": 0
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S3b ponteiro atrasado noutro nível de cache (corpos sem cache), 2 publicações",
+   "design": "v1",
+   "name": "S3b",
    "keyMode": "full",
    "before": {
     "which": "current",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "during": {
@@ -74,69 +74,357 @@
    "second_reader": {
     "which": "full_report"
    },
-   "poisoned_after_during": 2,
    "after_ttl": {
     "which": "current",
-    "slot": "b",
-    "generated": "2026-11-26T12:10:34.830598+00:00"
+    "generated": "2026-11-26T12:20:34.830598+00:00"
    },
    "stats": {
     "hits": 4,
     "misses": 16,
     "poisoned_keys": 2
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S4 chave da CDN com query string",
+   "design": "v1",
+   "name": "S4-full",
    "keyMode": "full",
    "before": {
     "which": "current",
-    "slot": "a",
     "generated": "2026-11-26T11:40:34.830598+00:00"
    },
    "after_pointer_expiry": {
     "which": "current",
-    "slot": "a",
     "generated": "2026-11-26T12:00:34.830598+00:00"
    },
    "stats": {
     "hits": 4,
     "misses": 10,
     "poisoned_keys": 0
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S4 chave da CDN sem query string",
+   "design": "v1",
+   "name": "S4-path",
    "keyMode": "path",
    "before": {
     "which": "current",
-    "slot": "a",
     "generated": "2026-11-26T11:40:34.830598+00:00"
    },
    "after_pointer_expiry": {
     "which": "previous",
-    "slot": "b",
     "generated": "2026-11-26T11:50:34.830598+00:00"
    },
    "stats": {
     "hits": 1,
     "misses": 14,
     "poisoned_keys": 0
-   }
+   },
+   "unpublishable_files": null
   },
   {
-   "name": "S5 corpo atual corrompido na origem: recuo para a anterior",
+   "design": "v1",
+   "name": "S5",
    "keyMode": "full",
    "read": {
     "which": "previous",
-    "slot": "a",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "shared_with_previous": false,
+   "after_next_publish": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 16,
+    "poisoned_keys": 1
+   },
+   "unpublishable_files": null
+  },
+  {
+   "design": "slots3",
+   "name": "S1",
+   "keyMode": "full",
+   "tls_without_ca": "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+   "read": {
+    "which": "current",
     "generated": "2026-11-26T11:40:34.830598+00:00"
    },
    "stats": {
     "hits": 0,
-    "misses": 9,
+    "misses": 7,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S2",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 7,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S3",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after_ttl": {
+    "which": "current",
+    "generated": "2026-11-26T12:10:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 14,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S3b",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "full_report"
+   },
+   "second_reader": {
+    "which": "full_report"
+   },
+   "after_ttl": {
+    "which": "current",
+    "generated": "2026-11-26T12:20:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 10,
+    "misses": 16,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S4-full",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 14,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S4-path",
+   "keyMode": "path",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 14,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "slots3",
+   "name": "S5",
+   "keyMode": "full",
+   "read": {
+    "which": "previous",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "shared_with_previous": false,
+   "after_next_publish": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 16,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S1",
+   "keyMode": "full",
+   "tls_without_ca": "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+   "read": {
+    "which": "current",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 7,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S2",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 7,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S3",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after_ttl": {
+    "which": "current",
+    "generated": "2026-11-26T12:10:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 14,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S3b",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "second_reader": {
+    "which": "current",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after_ttl": {
+    "which": "current",
+    "generated": "2026-11-26T12:20:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 8,
+    "misses": 20,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S4-full",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 4,
+    "misses": 10,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S4-path",
+   "keyMode": "path",
+   "before": {
+    "which": "current",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 4,
+    "misses": 10,
+    "poisoned_keys": 0
+   },
+   "unpublishable_files": []
+  },
+  {
+   "design": "cas",
+   "name": "S5",
+   "keyMode": "full",
+   "read": {
+    "which": "full_report"
+   },
+   "shared_with_previous": true,
+   "after_next_publish": {
+    "which": "current",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 6,
+    "misses": 11,
     "poisoned_keys": 1
-   }
+   },
+   "unpublishable_files": []
   }
  ]
 }

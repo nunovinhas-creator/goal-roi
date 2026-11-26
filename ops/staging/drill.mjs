@@ -1,9 +1,13 @@
-// Ensaio de staging HTTPS local dos snapshots V7 (PR #103). Custo 0; nada sai da máquina; nada é publicado.
+// Ensaio de staging HTTPS local dos snapshots (PR #103 → V7.2 da PR #105). Custo 0; nada sai da máquina; nada é publicado.
 //
 //   node ops/staging/drill.mjs [--out ops/staging/resultados-staging.json]
 //
-// Cada cenário usa uma origem temporária nova, publicada com o publicador V7 e o builder real, servida por HTTPS
-// (CA efémera) através de uma CDN simulada (max-age=600). O cliente é client_integrity.mjs, com SHA-256.
+// Os mesmos cenários correm para três desenhos:
+//   v1     — publicador da PR #103 (2 ranhuras, ?v=) com client_integrity.mjs
+//   slots3 — publisher_v2 com 3 ranhuras e client_integrity_v2.mjs
+//   cas    — publisher_v2 com objetos imutáveis e client_integrity_v2.mjs (desenho recomendado)
+// Cada cenário: origem temporária nova, builder real a partir de cópias do relatório, HTTPS com CA efémera,
+// CDN simulada (max-age=600, chave com ou sem query string, relógio controlado).
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
@@ -11,86 +15,106 @@ import os from 'node:os';
 import path from 'node:path';
 import https from 'node:https';
 import {fileURLToPath} from 'node:url';
-import {loadVerified} from '../../audits/v7/snapshots/client_integrity.mjs';
+import * as v1 from '../../audits/v7/snapshots/client_integrity.mjs';
+import * as v2 from '../../audits/v7/snapshots/client_integrity_v2.mjs';
 
 const require = createRequire(import.meta.url);
 const {start} = require('./https_cdn.cjs');
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
+const POINTER = 'dashboard-manifest.json';
+export const DESIGNS = ['v1', 'slots3', 'cas'];
+const NAMES = '(summary|signals|performance|science|operations|learning)';
+const PUBLISHABLE = new RegExp('^(dashboard-manifest\\.json|objects/[0-9a-f]{64}/dashboard-' + NAMES + '\\.json|s[0-9]/dashboard-' + NAMES + '\\.json)$');
 
-function publish(origin, rev) {
-  const r = execFileSync('python3', [path.join(HERE, 'publish_rev.py'), '--out', origin, '--rev', String(rev)],
-    {cwd: ROOT, env: {...process.env, PYTHONDONTWRITEBYTECODE: '1'}, timeout: 120000});
-  return JSON.parse(r.toString());
+function publisher(design, origin, cdn, lockDir) {
+  return rev => JSON.parse(execFileSync('python3', [path.join(HERE, 'publish_rev.py'), '--out', origin, '--rev', String(rev),
+    '--design', design, '--now', String(cdn.now()), '--lock', path.join(lockDir, 'lock')],
+  {cwd: ROOT, env: {...process.env, PYTHONDONTWRITEBYTECODE: '1'}, timeout: 120000}).toString());
 }
 
 // gap: segundos simulados entre obter o ponteiro e pedir os corpos (latência real de um cliente).
-async function read(cdn, gap = 0) {
-  const pointer = JSON.parse(await cdn.get('dashboard-manifest.json'));
+async function read(design, cdn, gap = 0) {
+  const pointer = JSON.parse(await cdn.get(POINTER));
   cdn.advance(gap);
-  const got = await loadVerified(pointer, p => cdn.get(p));
-  return got ? {which: got.which, slot: got.revision.slot, generated: got.revision.report_generated_at_utc} : {which: 'full_report'};
+  const got = design === 'v1'
+    ? await v1.loadVerified(pointer, p => cdn.get(p))
+    : await v2.loadVerified(pointer, p => cdn.get(p), undefined, async () => JSON.parse(await cdn.get(POINTER)));
+  if (!got) return {which: 'full_report'};
+  const which = design === 'v1' ? got.which : (got.which === 'current' ? 'current' : 'previous');
+  return {which, generated: got.revision.report_generated_at_utc};
 }
 
-async function scenario(name, keyMode, fn) {
+async function scenario(design, name, keyMode, fn) {
   const origin = fs.mkdtempSync(path.join(os.tmpdir(), 'goal-roi-origin-'));
+  const lockDir = fs.mkdtempSync(path.join(os.tmpdir(), 'goal-roi-lock-'));
   const cdn = await start({root: origin, ttl: 600, keyMode});
-  try { return {name, keyMode, ...(await fn(cdn, origin)), stats: {hits: cdn.stats.hits, misses: cdn.stats.misses, poisoned_keys: cdn.stats.poisoned_keys}}; }
-  finally { await cdn.close(); fs.rmSync(origin, {recursive: true, force: true}); }
+  try {
+    const res = await fn(cdn, publisher(design, origin, cdn, lockDir), origin);
+    const files = [];
+    const walk = d => { for (const e of fs.readdirSync(d, {withFileTypes: true})) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else files.push(path.relative(origin, p).split(path.sep).join('/')); } };
+    walk(origin);
+    return {design, name, keyMode, ...res, stats: {hits: cdn.stats.hits, misses: cdn.stats.misses, poisoned_keys: cdn.stats.poisoned_keys},
+      unpublishable_files: design === 'v1' ? null : files.filter(f => !PUBLISHABLE.test(f))};
+  } finally { await cdn.close(); for (const d of [origin, lockDir]) fs.rmSync(d, {recursive: true, force: true}); }
 }
 
 const untrusted = base => new Promise(resolve => {
-  https.get(base + '/dashboard-manifest.json', {rejectUnauthorized: true}, () => resolve('aceite')).on('error', e => resolve(e.code || 'erro'));
+  https.get(base + '/' + POINTER, {rejectUnauthorized: true}, () => resolve('aceite')).on('error', e => resolve(e.code || 'erro'));
 });
 
-export async function drill() {
+export async function drill(designs = DESIGNS) {
   const results = [];
-  results.push(await scenario('S1 TLS e leitura base', 'full', async (cdn, origin) => {
-    publish(origin, 1);
-    return {tls_without_ca: await untrusted(cdn.base), read: await read(cdn)};
-  }));
-  results.push(await scenario('S2 ponteiro em cache, 1 publicação dentro do TTL', 'full', async (cdn, origin) => {
-    publish(origin, 1); publish(origin, 2);
-    const before = await read(cdn);
-    cdn.advance(120); publish(origin, 3); cdn.advance(120);
-    return {before, after: await read(cdn)};
-  }));
-  results.push(await scenario('S3 ponteiro e corpos na mesma cache, 2 publicações dentro do TTL (A-B-A)', 'full', async (cdn, origin) => {
-    publish(origin, 1); publish(origin, 2);
-    const before = await read(cdn);
-    cdn.advance(120); publish(origin, 3); cdn.advance(120); publish(origin, 4); cdn.advance(120);
-    const during = await read(cdn);
-    cdn.advance(600);
-    return {before, during, after_ttl: await read(cdn)};
-  }));
-  results.push(await scenario('S3b ponteiro atrasado noutro nível de cache (corpos sem cache), 2 publicações', 'full', async (cdn, origin) => {
-    publish(origin, 1); publish(origin, 2);
-    const before = await read(cdn);
-    // Ponteiro mantido (ex.: cache do navegador ou outro nó), corpos despejados (outro nó da CDN ou LRU).
-    cdn.purge(k => k === '/dashboard-manifest.json');
-    cdn.advance(120); publish(origin, 3); cdn.advance(120); publish(origin, 4); cdn.advance(120);
-    const during = await read(cdn);
-    const poisoned_after_during = cdn.stats.poisoned_keys;
-    const second_reader = await read(cdn);         // outro leitor com o mesmo ponteiro: chave já envenenada
-    cdn.advance(600);
-    return {before, during, second_reader, poisoned_after_during, after_ttl: await read(cdn)};
-  }));
-  for (const keyMode of ['full', 'path']) {
-    // Ponteiro e corpos guardados em instantes diferentes (10 s): o ponteiro expira primeiro.
-    results.push(await scenario('S4 chave da CDN ' + (keyMode === 'full' ? 'com' : 'sem') + ' query string', keyMode, async (cdn, origin) => {
-      publish(origin, 1);
-      const before = await read(cdn, 10);          // t=0 ponteiro r1 (a/); t=10 corpos a/ r1
-      publish(origin, 2); publish(origin, 3);      // r3 volta a a/
-      cdn.advance(590);                            // t=600: ponteiro expirado, corpos a/ frescos até t=610
-      return {before, after_pointer_expiry: await read(cdn)};
+  for (const d of designs) {
+    results.push(await scenario(d, 'S1', 'full', async (cdn, pub) => {
+      pub(1);
+      return {tls_without_ca: await untrusted(cdn.base), read: await read(d, cdn)};
+    }));
+    results.push(await scenario(d, 'S2', 'full', async (cdn, pub) => {   // ponteiro em cache, 1 publicação
+      pub(1); cdn.advance(60); pub(2);
+      const before = await read(d, cdn);
+      cdn.advance(120); pub(3); cdn.advance(120);
+      return {before, after: await read(d, cdn)};
+    }));
+    results.push(await scenario(d, 'S3', 'full', async (cdn, pub) => {   // mesma cache, 2 publicações (A-B-A)
+      pub(1); cdn.advance(60); pub(2);
+      const before = await read(d, cdn);
+      cdn.advance(120); pub(3); cdn.advance(120); pub(4); cdn.advance(120);
+      const during = await read(d, cdn);
+      cdn.advance(600);
+      return {before, during, after_ttl: await read(d, cdn)};
+    }));
+    results.push(await scenario(d, 'S3b', 'full', async (cdn, pub) => {  // níveis de cache diferentes, 3 publicações
+      pub(1); cdn.advance(60); pub(2);
+      const before = await read(d, cdn);
+      cdn.purge(k => k === '/' + POINTER);   // ponteiro mantido num nível; corpos despejados (outro nó, LRU)
+      cdn.advance(100); pub(3); cdn.advance(100); pub(4); cdn.advance(100); pub(5); cdn.advance(100);
+      const during = await read(d, cdn);
+      const second_reader = await read(d, cdn);
+      cdn.advance(600);
+      return {before, during, second_reader, after_ttl: await read(d, cdn)};
+    }));
+    for (const keyMode of ['full', 'path']) {
+      results.push(await scenario(d, 'S4-' + keyMode, keyMode, async (cdn, pub) => {  // CDN com/sem query string na chave
+        pub(1);
+        const before = await read(d, cdn, 10);   // t=0 ponteiro; t=10 corpos
+        cdn.advance(30); pub(2); cdn.advance(30); pub(3);
+        cdn.advance(530);                        // t=600: ponteiro expirado, corpos ainda frescos até t=610
+        return {before, after_pointer_expiry: await read(d, cdn)};
+      }));
+    }
+    results.push(await scenario(d, 'S5', 'full', async (cdn, pub, origin) => {  // corpo atual corrompido na origem
+      pub(1); cdn.advance(60); pub(2);
+      const pointer = JSON.parse(fs.readFileSync(path.join(origin, POINTER)));
+      const corrupted = pointer.current.files.signals.path;
+      fs.writeFileSync(path.join(origin, corrupted), '{}');
+      const shared = pointer.previous && pointer.previous.files.signals.path === corrupted;
+      const first = await read(d, cdn);
+      cdn.purge();                              // a CDN pode ter guardado o corpo corrompido: isolar a reparação
+      cdn.advance(60); pub(3);
+      return {read: first, shared_with_previous: !!shared, after_next_publish: await read(d, cdn)};
     }));
   }
-  results.push(await scenario('S5 corpo atual corrompido na origem: recuo para a anterior', 'full', async (cdn, origin) => {
-    publish(origin, 1); publish(origin, 2);
-    const pointer = JSON.parse(fs.readFileSync(path.join(origin, 'dashboard-manifest.json')));
-    fs.writeFileSync(path.join(origin, pointer.current.files.signals.path), '{}');
-    return {read: await read(cdn)};
-  }));
   return results;
 }
 
@@ -99,5 +123,5 @@ if (import.meta.url === 'file://' + process.argv[1]) {
   const out = i > 0 ? process.argv[i + 1] : path.join(HERE, 'resultados-staging.json');
   const res = await drill();
   fs.writeFileSync(out, JSON.stringify({generated_by: 'ops/staging/drill.mjs', ttl_s: 600, results: res}, null, 1) + '\n');
-  console.log(JSON.stringify(res, null, 1));
+  for (const r of res) console.log(JSON.stringify(r));
 }

@@ -1,69 +1,65 @@
-# Staging HTTPS isolado para os snapshots V7
+# Staging HTTPS dos snapshots
 
-Custo: 0 €. Não contrata serviços, não usa credenciais, não publica nada e não toca em `docs/`, `data/`, no Pages, nos workflows ou no Brain V5.
+Custo: 0 €. Não contrata serviços, não usa credenciais e não publica nada. Não toca em `docs/`, `data/`, Pages, workflows nem no Brain V5. Snapshots inativos.
 
-## 1. Staging local (pronto, executado)
+Este ramo inclui a PR #105 (publicador e cliente V7.2) e repete os cenários sobre HTTPS para os três desenhos.
+
+## 1. Staging local (executado)
 
 | Peça | Função |
 |---|---|
-| `https_cdn.cjs` | CA e certificado efémeros (openssl, 1 dia, só `localhost`/`127.0.0.1`), origem HTTPS com os cabeçalhos do Pages (`max-age=600`, ETag) e uma cache partilhada que imita a CDN: chave com ou sem query string, relógio simulado e contagem de chaves envenenadas. |
-| `publish_rev.py` | Publica uma revisão com o publicador V7 (PR #103) e o builder real, a partir de cópias do relatório. Recusa escrever em `docs/` ou `data/`. |
-| `drill.mjs` | Cenários S1–S5 com o cliente `client_integrity.mjs` (SHA-256 obrigatório). |
-| `tests/test_v7_staging_https.py` | Asserções sobre os cenários; corre na CI (`node` e `openssl` existem no ubuntu-24.04). |
-
-```sh
-node ops/staging/drill.mjs            # escreve ops/staging/resultados-staging.json
-python3 -m pytest -q tests/test_v7_staging_https.py
-```
+| `https_cdn.cjs` | CA e certificado efémeros; origem HTTPS com os cabeçalhos do Pages (`max-age=600`, ETag); CDN simulada com chave com ou sem query string, relógio controlado e contagem de chaves cujo corpo não tem o SHA prometido. |
+| `publish_rev.py` | Publica uma revisão com o builder real: `--design v1` (PR #103), `slots3` ou `cas` (PR #105). Recusa escrever em `docs/` ou `data/`. |
+| `drill.mjs` | Cenários S1–S5 para os três desenhos. |
+| `tests/test_v7_staging_https.py` | 7 testes sobre os resultados; corre na CI. |
 
 ### Resultados (`resultados-staging.json`)
 
-| Cenário | Resultado |
-|---|---|
-| S1 TLS e leitura base | Sem a CA, o TLS é recusado (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`); com a CA, lê `current`. |
-| S2 1 publicação dentro do TTL | `current` (atrasada, coerente). |
-| S3 ponteiro e corpos na mesma cache, 2 publicações | `current` atrasada e coerente: os corpos com `?v=` ficaram em cache ao mesmo tempo que o ponteiro e duram mais do que ele. Zero chaves envenenadas. |
-| S3b ponteiro num nível de cache, corpos noutro | **Relatório completo** para este leitor e para o seguinte; 2 chaves `?v=` passam a guardar bytes de outra revisão até ao fim do TTL. Recupera quando o ponteiro expira. |
-| S4 CDN com query string na chave | `current`. |
-| S4 CDN sem query string na chave | **`previous`** (dados atrasados) apesar de `current` existir: a CDN devolve corpos antigos pelo caminho. |
-| S5 corpo atual corrompido na origem | `previous`, como previsto. |
-
-Isto corrige o modelo da auditoria adversarial (PR #105): os 19 % de recurso ao relatório completo assumiam corpos sempre fora de cache. Com uma única cache partilhada, um ponteiro atrasado continua coerente (S3). O risco real existe quando o ponteiro e os corpos ficam em níveis diferentes: cache do navegador, outro nó da CDN ou despejo LRU (S3b). A frequência desse caso só se mede numa CDN real.
-
-## 2. Staging HTTPS remoto (preparado, não executado — exige autorização)
-
-O que só uma CDN real responde:
-
-1. A chave de cache do Pages/Fastly inclui a query string? (S4)
-2. Com que frequência há ponteiro e corpos em níveis ou nós diferentes? (S3b)
-3. p95 do primeiro conteúdo e da conclusão sobre HTTPS real (meta 2 s; laboratório 1,79 s).
-
-Opções sem custo, por ordem de preferência. Todas **publicam** conteúdo e por isso exigem autorização explícita:
-
-| Opção | Custo | Isolamento | Ressalva |
+| Cenário | v1 (#103) | 3 ranhuras | **CAS** |
 |---|---|---|---|
-| A. Repositório público novo só com dados sintéticos e GitHub Pages | 0 € (plano gratuito) | Total: outro repositório, sem dados reais | Publica uma página pública com dados fictícios. |
-| B. Implantação de pré-visualização Vercel (conta já ligada) só com dados sintéticos | 0 € no plano Hobby, se a conta for Hobby | Projeto novo, sem domínio de produção | Confirmar plano e limites antes; não é a mesma CDN do Pages (só responde a 3). |
-| C. Repositório privado com Pages | Exige plano pago | — | Excluída (custo). |
+| S1 TLS sem a CA | recusado | recusado | recusado |
+| S2 ponteiro em cache, 1 publicação | atual | atual | atual |
+| S3 mesma cache, 2 publicações | atual | atual | atual |
+| S3b ponteiro num nível, corpos noutro, 3 publicações | **relatório completo**; 2 chaves envenenadas | **relatório completo** | **atual**, 0 chaves envenenadas |
+| S4 CDN com query na chave | atual | atual | atual |
+| S4 CDN **sem** query na chave | **anterior (dados atrasados)** | atual (com mais publicações falharia) | **atual** |
+| S5 corpo atual corrompido na origem | anterior | anterior | relatório completo*; a publicação seguinte repara → atual |
 
-Procedimento para A, a executar só depois de autorização:
+\* No CAS, a revisão atual e a anterior partilhavam o objeto corrompido (conteúdo igual). O recuo não ajuda e o cliente usa o relatório completo, nunca dados errados. A publicação seguinte reescreve o objeto. Nas ranhuras, cada revisão tem cópia própria; é a única vantagem delas aqui.
 
-1. Criar o repositório de staging vazio (nome sugerido `goal-roi-staging`), público, sem segredos nem Actions.
-2. Gerar a origem com dados sintéticos: `python3 ops/staging/publish_rev.py --out <dir> --rev 1 --report <relatório-sintético>` (relatório sintético: cópia com equipas, mensagens e identificadores substituídos; nunca o relatório real).
-3. Publicar `<dir>` e uma página mínima com o cliente; ativar Pages na branch.
-4. Medir com `drill.mjs` adaptado a uma URL real (sem relógio simulado: intervalos reais de 2–10 min durante 2 h) e com `perf_p95.cjs` (20 repetições).
-5. Registar cabeçalhos `age`, `x-cache`, `x-served-by` e o resultado S3b/S4.
-6. Desativar o Pages e arquivar o repositório no fim. Nenhum passo toca no repositório de produção.
+Os três desenhos deixam na pasta servida só caminhos da lista `PUBLISHABLE` (compatível com o Pages: sem `_` nem `.` iniciais).
+
+## 2. Staging remoto — opção A (preparado, **não publicado**)
+
+GitHub Pages num repositório separado, **só com dados sintéticos**.
+
+| Peça | Função |
+|---|---|
+| `remote/synthetic.py` | Relatório e entrada prospetiva 100 % sintéticos ("Equipa A01…", ano 2030). Não lê dados reais. |
+| `remote/prepare_site.py` | Monta o site numa pasta nova fora do repositório: K revisões CAS, cliente V7.2, página `index.html` + `probe.mjs`, `.nojekyll` e `SITE-MANIFEST.json`. |
+| `remote/measure_remote.mjs` | Depois de publicado: a cada minuto regista `age`, `x-cache`, `x-served-by`, o resultado do cliente e se a CDN separa uma query string nova. Só aceita `https://<utilizador>.github.io/…`. |
+| `tests/test_v7_staging_remote_package.py` | Só dados sintéticos (nenhum nome de `team_aliases.json`, nem "scangoal" ou "Betfair"); layout publicável; hashes do manifesto; recusa de URL fora do Pages. |
+
+Verificação local: `prepare_site.py` + servidor local + Chromium. O cliente leu a revisão atual em 39 ms, sem erros.
+
+### Passos depois de autorização explícita (nenhum foi executado)
+
+1. Criar um repositório **público** novo e vazio, por exemplo `goal-roi-staging`, sem segredos nem Actions. O Pages é gratuito em repositórios públicos.
+2. `python3 ops/staging/remote/prepare_site.py --out ../goal-roi-staging-site --revisions 6`; fazer commit do conteúdo no repositório novo.
+3. Settings → Pages → origem "branch `main` / root".
+4. Durante 2 h, publicar uma revisão sintética nova a cada 2–10 min (mesmo script, `--revisions` crescente) e correr `node ops/staging/remote/measure_remote.mjs --base https://<utilizador>.github.io/goal-roi-staging --minutes 120`.
+5. p95 completo com `audits/v7/snapshots/perf_p95.cjs` (20 repetições) contra o URL de staging.
+6. No fim: desativar o Pages e arquivar ou apagar o repositório. Nada toca no repositório de produção.
 
 ### Critérios de aprovação
 
-- TLS válido; S1, S2 e S5 iguais ao local.
-- A chave da CDN inclui a query string (S4 com query = `current`).
-- S3b medido: fração de recursos ao relatório completo abaixo de 1 % com a correção de 3 ranhuras ou limite ≥ 600 s.
-- p95 completo ≤ 2 s em 20 repetições.
+- TLS válido; leitura `current` na primeira visita.
+- A chave da CDN inclui ou não a query string (registar); o CAS não depende disso.
+- Em 2 h com publicações a cada 2–10 min: zero leituras com dados errados; recurso ao relatório completo abaixo de 1 %.
+- p95 completo ≤ 2 s.
 
 ### Reversão
 
-Local: apagar as pastas temporárias (o ensaio já o faz). Remoto: desativar o Pages e arquivar ou apagar o repositório de staging. Não há estado em produção a reverter.
+Desativar o Pages e apagar o repositório de staging. Não há estado em produção.
 
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**
