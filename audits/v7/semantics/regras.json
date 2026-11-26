@@ -1,0 +1,25 @@
+{
+ "aviso": "Citações literais dos termos oficiais. Nenhuma regra aqui admite sinais: só define o que teria de ser verdade para uma futura admissão, sujeita a aprovação humana.",
+ "obtido_em_utc": "2026-11-26",
+ "fontes": {
+  "KALSHI_SOCCERGAME": {"url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERGAME.pdf", "contrato": "SOCCERGAMEWIN", "sha256": "bbab0420e9746da437bf08cb237709cd31d359f4ecb74db0e08585a2fc807dd2", "estado": "oficial"},
+  "KALSHI_SOCCERSPREAD": {"url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERSPREAD.pdf", "contrato": "SOCCERSPREADS", "sha256": "26f36cdb18fe3044a25f381df572b79c259a3261dc7e8cae22d666c1f3c2afc1", "estado": "oficial"},
+  "KALSHI_SOCCERTOTAL": {"url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERTOTAL.pdf", "contrato": "SOCCERTOTALS", "sha256": "8f3a7f1fcbb053afd945d58c0f1362955075011109e50d413f3ca42f78fbf0fd", "estado": "oficial"},
+  "KALSHI_SOCCERADVANCEMETHOD": {"url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERADVANCEMETHOD.pdf", "contrato": "SOCCERADVANCEMETHOD", "sha256": "c549b9edbc49e8811afde5b453bf7b58e2619acc8928f43e7878841dcedf9940", "estado": "oficial"},
+  "POLYMARKET": {"url": "https://docs.polymarket.us/faqs/sports-faqs", "estado": "fonte_oficial_nao_obtida", "motivo": "acesso de rede recusado nesta sessão; descrições de terceiros não são usadas"},
+  "STAKE": {"url": "https://stake.com/policies/sportsbook", "estado": "fonte_oficial_nao_obtida", "motivo": "acesso de rede recusado nesta sessão; descrições de terceiros não são usadas"}
+ },
+ "regras": {
+  "K-GW-SCOPE": {"fonte": "KALSHI_SOCCERGAME", "citacao": "<result scope> may take one of the following values, each as defined in the Payout Criterion: (i) \"first half,\" (ii) \"regulation time,\" (iii) \"second half,\" (iv) \"extra time,\" or (v) \"full match.\"", "leitura": "O mesmo rótulo de vencedor pode referir-se a cinco âmbitos. A mensagem do bot não indica o âmbito."},
+  "K-GW-DRAW": {"fonte": "KALSHI_SOCCERGAME", "citacao": "For any <soccer game> and <result scope>, the set comprising each participant's <team>-win iteration and the Draw iteration is mutually exclusive and collectively exhaustive", "leitura": "Vitória A, empate e vitória B são exaustivos dentro do âmbito: 'não A' = empate ou vitória B no mesmo âmbito."},
+  "K-GW-REG": {"fonte": "KALSHI_SOCCERGAME", "citacao": "regulation play meaning two halves of 45 minutes plus any stoppage time added by the match referee", "leitura": "Âmbito regulamentar = 90 min + descontos, como o 1X2 do parser."},
+  "K-GW-REG-DRAW": {"fonte": "KALSHI_SOCCERGAME", "citacao": "draws at the conclusion of regulation play do not constitute a win, regardless of whether <soccer game> is subsequently decided by extra time, penalty shootout", "leitura": "No âmbito regulamentar, prolongamento e penáltis não contam."},
+  "K-GW-FULL": {"fonte": "KALSHI_SOCCERGAME", "citacao": "\"Full match\" means the final result of <soccer game> as officially confirmed by the organizer of <soccer game>,", "leitura": "No âmbito 'full match' conta o resultado oficial final (pode incluir prolongamento e penáltis): difere do 1X2 em eliminatórias."},
+  "K-SP-PAYOUT": {"fonte": "KALSHI_SOCCERSPREAD", "citacao": "The Payout Criterion for the Contract encompasses the Expiration Values that <team> has won <time period> of <soccer game> by <above/below/exactly/at least/between> <count> goals.", "leitura": "Um spread Kalshi é 'equipa ganha por mais de N golos'. Só existe a forma vencedora; '+N' não tem contrato correspondente."},
+  "K-SP-DEFAULT": {"fonte": "KALSHI_SOCCERSPREAD", "citacao": "Where not specified otherwise, <time period> shall be understood to refer to the sum of regulation time and extra time.", "leitura": "Por omissão inclui prolongamento: igual ao handicap asiático em 90 min só em jogos sem prolongamento."},
+  "K-SP-TIE": {"fonte": "KALSHI_SOCCERSPREAD", "citacao": "If both teams are tied at the conclusion of <time period>, neither will have been considered to have won, the “spread” will be 0, and all markets shall resolve to “No”.", "leitura": "Empate = Não."},
+  "K-TO-DEFAULT": {"fonte": "KALSHI_SOCCERTOTAL", "citacao": "Extra-time goals are included unless explicitly excluded. Penalties are not included unless explicitly included.", "leitura": "Totais Kalshi incluem prolongamento por omissão."},
+  "K-ABANDON-90": {"fonte": "KALSHI_SOCCERSPREAD", "citacao": "if <soccer game> has reached ninety (90) minutes of play, or the governing league or organizer of <soccer game> declares <soccer game> complete, all markets shall instead be settled based on what has occurred as of that point", "leitura": "Abandono depois dos 90 min liquida pelo ocorrido; antes, preço justo da bolsa (não liquidável pelo parser)."},
+  "K-ADV-METHOD": {"fonte": "KALSHI_SOCCERADVANCEMETHOD", "citacao": "The Underlying for this Contract is whether <team> advances past <opponent> in <knockout tie> via <method>.", "leitura": "Apuramento é outro contrato; não é liquidável pelo resultado de um só jogo."}
+ }
+}
