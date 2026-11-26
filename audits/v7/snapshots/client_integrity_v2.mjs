@@ -13,31 +13,33 @@ const SLOT = new RegExp('^s[0-9]/dashboard-(' + N + ')\\.json$');
 
 export function safePath(revision, name) {
   const entry = revision && revision.files && revision.files[name];
-  if (!entry || typeof entry.path !== 'string' || !/^[0-9a-f]{64}$/.test(entry.sha256 || '')) return null;
+  if (!entry || typeof entry.path !== 'string' || typeof entry.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(entry.sha256) || !Number.isSafeInteger(entry.bytes) || entry.bytes < 0) return null;
   if (revision.layout === 'cas') {
     const m = CAS.exec(entry.path);
-    return m && m[2] === name && m[1] === entry.sha256 ? entry.path : null;
+    return m && m[0] === entry.path && m[2] === name && m[1] === entry.sha256 ? entry.path : null;
   }
   if (revision.layout === 'slots') {
     const m = SLOT.exec(entry.path);
-    return m && m[1] === name ? entry.path : null;
+    return m && m[0] === entry.path && m[1] === name ? entry.path : null;
   }
   return null;
 }
 
 export async function verifyRevision(revision, fetchText, subtle) {
   if (!revision || typeof revision !== 'object') return null;
+  if (!revision.files || Object.keys(revision.files).length !== NAMES.length) return null;
   const paths = {};
   for (const name of NAMES) {                      // valida todos os caminhos antes do primeiro pedido
     const p = safePath(revision, name);
     if (!p) return null;
     paths[name] = p;
   }
+  if (revision.layout === 'slots' && new Set(Object.values(paths).map(p => p.split('/')[0])).size !== 1) return null;
   const out = {};
   for (const name of NAMES) {
     let body;
     try { body = await fetchText(paths[name]); } catch (e) { return null; }
-    if (typeof body !== 'string' || await sha256Hex(body, subtle) !== revision.files[name].sha256) return null;
+    if (typeof body !== 'string' || new TextEncoder().encode(body).length !== revision.files[name].bytes || await sha256Hex(body, subtle) !== revision.files[name].sha256) return null;
     try { out[name] = JSON.parse(body); } catch (e) { return null; }
   }
   return out;

@@ -64,3 +64,25 @@ test('C3 corpo adulterado é recusado e o recuo usa a anterior', async () => {
   assert.equal(got.which, 'older');
   assert.equal(got.files.science.tag, 1);
 });
+
+test('C4 paths with trailing newline and invalid metadata rejected before requests', async () => {
+  for (const mutate of [
+    r => { r.files.summary.path += '\n'; },
+    r => { r.files.summary.bytes = -1; },
+    r => { r.files.summary.sha256 = [r.files.summary.sha256]; },
+    r => { r.files.extra = r.files.summary; }
+  ]) {
+    const store = new Map(), requested = [];
+    const revision = await casRevision(1, store);
+    mutate(revision);
+    assert.equal(await loadVerified({history: [revision]}, fetcher(store, requested)), null);
+    assert.deepEqual(requested, []);
+  }
+});
+
+test('C5 declared byte count must match even with a valid digest', async () => {
+  const store = new Map();
+  const rev = await casRevision(1, store);
+  rev.files.summary.bytes += 1;
+  assert.equal(await loadVerified({history: [rev]}, fetcher(store)), null);
+});
