@@ -48,6 +48,37 @@ class RemotePackage(unittest.TestCase):
             self.assertEqual(hashlib.sha256((self.site / rel).read_bytes()).hexdigest(), digest, rel)
         self.assertTrue((self.site / ".nojekyll").exists())
 
+    def test_remote_probe_reports_network_failure_without_throwing(self):
+        script = """
+import assert from 'node:assert/strict';
+import {sample, validateBase} from './ops/staging/remote/measure_remote.mjs';
+const base = validateBase('https://example.github.io/goal-roi-staging/');
+assert.equal(base, 'https://example.github.io/goal-roi-staging');
+const row = await sample(base, async () => { throw new Error('offline'); });
+assert.equal(row.which, 'unavailable');
+assert.equal(row.errors.length, 1);
+assert.throws(() => validateBase('https://example.github.io/goal-roi'));
+assert.throws(() => validateBase('https://example.github.io/goal-roi-staging?x=1'));
+"""
+        r = subprocess.run(["node", "--input-type=module", "-e", script], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+
+    def test_remote_probe_does_not_fetch_untrusted_manifest_path(self):
+        script = """
+import assert from 'node:assert/strict';
+import {sample} from './ops/staging/remote/measure_remote.mjs';
+const requested = [];
+const row = await sample('https://example.github.io/goal-roi-staging', async (url, options) => {
+  requested.push(url);
+  assert.equal(options.redirect, 'error');
+  return new Response(JSON.stringify({current: {files: {summary: {path: '../unsafe'}}}}));
+});
+assert.equal(row.which, 'full_report_required');
+assert.ok(requested.every(url => url.endsWith('/dashboard-manifest.json')));
+"""
+        r = subprocess.run(["node", "--input-type=module", "-e", script], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+
     def test_measure_script_refuses_non_pages_base(self):
         r = subprocess.run(["node", "ops/staging/remote/measure_remote.mjs", "--base", "https://example.com/x"], cwd=ROOT, capture_output=True)
         self.assertEqual(r.returncode, 2)

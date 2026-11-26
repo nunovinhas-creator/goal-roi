@@ -1,24 +1,76 @@
-// Medição do staging remoto (opção A). SÓ depois de autorização e publicação do repositório de staging.
-//   node ops/staging/remote/measure_remote.mjs --base https://<utilizador>.github.io/<repo-staging> [--minutes 120] [--every 60]
-// Regista, a cada intervalo: cabeçalhos de cache do ponteiro (age, x-cache, x-served-by, cache-control, etag), o resultado do
-// cliente V7.2 (current/previous/full_report, releitura) e a resposta da CDN a uma query string nova num objeto (a chave
-// inclui a query? compara x-cache/age). Só pedidos GET ao repositório de staging; sem credenciais.
+// Medidor de staging exclusivamente sintético. GET sem credenciais, sem redirects.
 import {loadVerified} from '../../../audits/v7/snapshots/client_integrity_v2.mjs';
+import {pathToFileURL} from 'node:url';
 
-const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
-const base = arg('base');
-if (!base || !/^https:\/\/[a-z0-9-]+\.github\.io\//.test(base + '/')) { console.error('indique --base https://<utilizador>.github.io/<repo>'); process.exit(2); }
-const minutes = Number(arg('minutes', 120)), every = Number(arg('every', 60));
-const head = r => Object.fromEntries(['age', 'x-cache', 'x-served-by', 'cache-control', 'etag'].map(h => [h, r.headers.get(h)]));
-const get = async p => { const r = await fetch(base + '/snapshots/' + p); if (!r.ok) throw new Error(r.status + ' ' + p); return {text: await r.text(), h: head(r)}; };
-for (let t = 0; t <= minutes * 60; t += every) {
-  const t0 = Date.now();
-  const ptr = await get('dashboard-manifest.json');
-  const pointer = JSON.parse(ptr.text);
-  const got = await loadVerified(pointer, async p => (await get(p)).text, undefined, async () => JSON.parse((await get('dashboard-manifest.json')).text));
-  const obj = pointer.current.files.summary.path;
-  const a = await get(obj), b = await get(obj + '?probe=' + t0);
-  console.log(JSON.stringify({at: new Date(t0).toISOString(), pointer_headers: ptr.h, which: got ? got.which : 'full_report',
-    refetched: got ? got.refetched : null, ms: Date.now() - t0, object_headers: a.h, query_variant_headers: b.h}));
-  await new Promise(r => setTimeout(r, every * 1000));
+export function validateBase(value) {
+  const u = new URL(value);
+  if (u.protocol !== 'https:' || !/^[a-z0-9-]+\.github\.io$/.test(u.hostname) ||
+      u.port || u.username || u.password || u.search || u.hash ||
+      !/^\/[a-z0-9-]*staging[a-z0-9-]*\/?$/.test(u.pathname)) {
+    throw new Error('indique um repositório separado de staging em github.io');
+  }
+  return u.origin + u.pathname.replace(/\/$/, '');
 }
+
+const head = r => Object.fromEntries(['age', 'x-cache', 'x-served-by', 'cache-control', 'etag'].map(h => [h, r.headers.get(h)]));
+
+export async function sample(base, fetchImpl = fetch) {
+  const t0 = Date.now(), errors = [];
+  const result = {at: new Date(t0).toISOString(), which: 'unavailable', refetched: null, errors};
+  const get = async (p, reload = false) => {
+    const r = await fetchImpl(base + '/snapshots/' + p, {
+      redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(10000),
+      ...(reload ? {cache: 'no-cache'} : {})
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return {text: await r.text(), h: head(r)};
+  };
+  try {
+    const ptr = await get('dashboard-manifest.json');
+    result.pointer_headers = ptr.h;
+    const pointer = JSON.parse(ptr.text);
+    const got = await loadVerified(pointer, async p => {
+      try { return (await get(p)).text; }
+      catch (e) { errors.push('object: ' + e.message); throw e; }
+    }, undefined, async () => {
+      try { return JSON.parse((await get('dashboard-manifest.json', true)).text); }
+      catch (e) { errors.push('refetch: ' + e.message); throw e; }
+    });
+    result.which = got ? got.which : 'full_report_required';
+    result.refetched = got ? got.refetched : null;
+    result.published_at = got ? got.revision.published_at : null;
+    result.generated_at = got ? got.revision.report_generated_at_utc : null;
+    // Só sondar caminhos que o cliente já tenha validado integralmente.
+    if (got) {
+      try {
+        const obj = got.revision.files.summary.path;
+        const a = await get(obj), b = await get(obj + '?probe=' + t0);
+        result.object_headers = a.h;
+        result.query_variant_headers = b.h;
+      } catch (e) { errors.push('cache_probe: ' + e.message); }
+    }
+  } catch (e) { errors.push('sample: ' + e.message); }
+  result.ms = Date.now() - t0;
+  return result;
+}
+
+async function main() {
+  const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
+  let base;
+  try { base = validateBase(arg('base')); }
+  catch (e) { console.error(e.message); process.exitCode = 2; return; }
+  const minutes = Number(arg('minutes', 120)), every = Number(arg('every', 60));
+  if (!Number.isFinite(minutes) || minutes <= 0 || minutes > 120 ||
+      !Number.isFinite(every) || every < 10 || every > 3600) {
+    console.error('duração/intervalo inválidos'); process.exitCode = 2; return;
+  }
+  const end = Date.now() + minutes * 60000;
+  do {
+    console.log(JSON.stringify(await sample(base)));
+    const remaining = end - Date.now();
+    if (remaining <= 0) break;
+    await new Promise(r => setTimeout(r, Math.min(every * 1000, remaining)));
+  } while (Date.now() < end);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
