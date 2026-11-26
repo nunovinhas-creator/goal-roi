@@ -2,7 +2,7 @@
 //   node --test tests/test_v7_adversarial_client.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {loadVerified, NAMES} from '../audits/v7/snapshots/client_integrity_v2.mjs';
+import {loadVerified, NAMES, createMonotonicReader} from '../audits/v7/snapshots/client_integrity_v2.mjs';
 import {sha256Hex} from '../audits/v7/snapshots/client_integrity.mjs';
 
 async function casRevision(tag, store) {
@@ -85,4 +85,77 @@ test('C5 declared byte count must match even with a valid digest', async () => {
   const rev = await casRevision(1, store);
   rev.files.summary.bytes += 1;
   assert.equal(await loadVerified({history: [rev]}, fetcher(store)), null);
+});
+
+
+// Exact chronological revision labels from staging run 45836535343, 26 Nov 2026.
+// Fixture bodies are synthetic; this replays observed ordering, not network timing.
+const observed = [6,7,7,7,7,7,7,7,7,7,7,8,7,7,8,8,8,8,8,8,8,9,8,9,9,9,9,9,9,9,9,10,10,9,10,10,10,10,10,10,10,11,10,11,10,11,11,11,11,11,11,11,12,11,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14,14,14,14,14,15,15,15,14,14,15,15,14,15,14,15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16];
+function stamp(r, n) {
+  return Object.assign(r, {published_at: n * 600,
+    report_generated_at_utc: new Date(Date.UTC(2030, 0, 1) + n * 1200000).toISOString()});
+}
+test('C6 replay 120 CDN observations: reject all 11 regressions without losing verified content', async () => {
+  const store = new Map(), revisions = new Map();
+  for (let n = 6; n <= 16; n++) revisions.set(n, stamp(await casRevision(n, store), n));
+  const reader = createMonotonicReader();
+  let max = 0, retained = 0;
+  for (const n of observed) {
+    const got = await reader.read({history: [revisions.get(n)]}, fetcher(store), undefined,
+      async () => ({history: [revisions.get(n)]}));
+    max = Math.max(max, n);
+    assert.equal(got.files.summary.tag, max);
+    assert.equal(got.revision.published_at, max * 600);
+    assert.equal(got.observed_published_at, n * 600);
+    if (n < max) {
+      retained++;
+      assert.equal(got.which, 'retained');
+      assert.equal(got.stale, true);
+      assert.equal(got.reason, 'regression');
+    }
+  }
+  assert.equal(observed.length, 120);
+  assert.equal(retained, 11);
+});
+test('C7 stale pointer refetch recovers; equal timestamp conflict and corrupt content never replace accepted bundle', async () => {
+  const store = new Map();
+  const r1 = stamp(await casRevision(1, store), 1), r2 = stamp(await casRevision(2, store), 2),
+    r3 = stamp(await casRevision(3, store), 3);
+  const reader = createMonotonicReader();
+  await reader.read({history: [r2]}, fetcher(store));
+  const got = await reader.read({history: [r1]}, fetcher(store), undefined, async () => ({history: [r3]}));
+  assert.equal(got.files.summary.tag, 3);
+  assert.equal(got.refetched, true);
+  const conflict = stamp(await casRevision(99, store), 3);
+  assert.equal((await reader.read({history: [conflict]}, fetcher(store))).reason, 'conflict');
+  const r4 = stamp(await casRevision(4, store), 4);
+  store.delete(r4.files.science.path);
+  assert.equal((await reader.read({history: [r4]}, fetcher(store))).files.summary.tag, 3);
+});
+test('C8 reload revalidates stored bundle; offline retention is labelled stale', async () => {
+  const map = new Map(), storage = {getItem: k => map.get(k) ?? null, setItem: (k,v) => map.set(k,v)};
+  const store = new Map(), r2 = stamp(await casRevision(2, store), 2);
+  const first = createMonotonicReader({storage});
+  const got = await first.read({history: [r2]}, fetcher(store));
+  got.files.summary.tag = 999;
+  const next = createMonotonicReader({storage});
+  const restored = await next.read(null, fetcher(new Map()));
+  assert.equal(restored.files.summary.tag, 2);
+  assert.equal(restored.which, 'retained');
+  assert.equal(restored.stale, true);
+  const [key, raw] = [...map][0];
+  const bad = JSON.parse(raw); bad.bodies[r2.files.summary.path] = '{}';
+  map.set(key, JSON.stringify(bad));
+  const broken = await createMonotonicReader({storage}).read(null, fetcher(store));
+  assert.equal(broken.which, 'unavailable');
+  assert.equal(broken.storage_error, true);
+});
+test('C9 concurrent reads and source timestamp regression cannot roll back visible data', async () => {
+  const store = new Map(), r1 = stamp(await casRevision(1, store), 1), r2 = stamp(await casRevision(2, store), 2);
+  const reader = createMonotonicReader();
+  const [a,b] = await Promise.all([reader.read({history:[r2]},fetcher(store)),reader.read({history:[r1]},fetcher(store))]);
+  assert.equal(a.files.summary.tag, 2); assert.equal(b.files.summary.tag, 2);
+  const r3 = stamp(await casRevision(3, store), 3);
+  r3.report_generated_at_utc = r1.report_generated_at_utc;
+  assert.equal((await reader.read({history:[r3]},fetcher(store))).reason, 'regression');
 });
