@@ -63,3 +63,95 @@ export async function loadVerified(pointer, fetchText, subtle, refetchPointer) {
   const again = await firstIntact(fresh, fetchText, subtle);
   return again ? Object.assign(again, {refetched: true}) : null; // null: usar o relatório completo
 }
+
+
+// V7 staging: session-scoped high-water mark, not a guarantee of CDN freshness.
+// Store the complete verified bundle, never combine files from different revisions.
+// Retained data is explicitly stale; a cold session cannot know unseen revisions.
+export function createMonotonicReader({storage = null, key = 'v7-staging-verified-v1'} = {}) {
+  let accepted = null, hydrated = false, tail = Promise.resolve(), storageError = false;
+  const identity = r => JSON.stringify([r.published_at, r.report_generated_at_utc,
+    ...NAMES.map(n => [r.files[n].sha256, r.files[n].bytes])]);
+  const metadata = r => r && typeof r.published_at === 'number' &&
+    Number.isFinite(r.published_at) && r.published_at >= 0 &&
+    typeof r.report_generated_at_utc === 'string' &&
+    Number.isFinite(Date.parse(r.report_generated_at_utc));
+  const compare = r => {
+    if (!metadata(r)) return 'invalid';
+    if (!accepted) return 'new';
+    const a = accepted.revision;
+    if (r.published_at < a.published_at ||
+        Date.parse(r.report_generated_at_utc) < Date.parse(a.report_generated_at_utc)) return 'regression';
+    if (r.published_at === a.published_at) return identity(r) === identity(a) ? 'same' : 'conflict';
+    return 'new';
+  };
+  async function restore(subtle) {
+    if (hydrated) return;
+    hydrated = true;
+    if (!storage) return;
+    try {
+      const raw = storage.getItem(key);
+      if (raw === null) return;
+      const saved = JSON.parse(raw);
+      if (!metadata(saved.revision)) throw new Error('invalid cached metadata');
+      const files = await verifyRevision(saved.revision, async p => saved.bodies[p], subtle);
+      if (!files) throw new Error('invalid cached bundle');
+      accepted = {revision: saved.revision, files, bodies: saved.bodies};
+    } catch { storageError = true; }
+  }
+  async function candidate(pointer, fetchText, subtle) {
+    const history = pointer && Array.isArray(pointer.history) ? pointer.history :
+      [pointer && pointer.current, pointer && pointer.previous];
+    for (let i = 0; i < history.length; i++) {
+      const revision = history[i];
+      if (!metadata(revision)) continue;
+      const bodies = Object.create(null);
+      let files;
+      try {
+        files = await verifyRevision(revision, async p => {
+          const body = await fetchText(p); bodies[p] = body; return body;
+        }, subtle);
+      } catch { continue; }
+      if (!files) continue;
+      const state = compare(revision);
+      if (state === 'regression' || state === 'conflict') return {state, observed: revision.published_at};
+      if (state === 'invalid') continue;
+      return {state, observed: revision.published_at, entry: {revision, files, bodies}, index: i};
+    }
+    return {state: 'unavailable', observed: null};
+  }
+  function expose(which, observed, refetched, reason) {
+    return {which, observed_published_at: observed, refetched, reason, storage_error: storageError,
+      stale: which !== 'current', revision: accepted ? structuredClone(accepted.revision) : null,
+      files: accepted ? structuredClone(accepted.files) : null};
+  }
+  async function run(pointer, fetchText, subtle, refetchPointer) {
+    await restore(subtle);
+    const initial = await candidate(pointer, fetchText, subtle);
+    let got = initial, refetched = false;
+    // Retry on a valid but regressed/conflicting pointer as well as an invalid one.
+    if (!got.entry && refetchPointer) {
+      refetched = true;
+      try { got = await candidate(await refetchPointer(), fetchText, subtle); }
+      catch { got = {state: 'unavailable', observed: null}; }
+    }
+    if (!got.entry) return expose(accepted ? 'retained' : 'unavailable', initial.observed,
+      refetched, initial.state);
+    accepted = structuredClone(got.entry);
+    if (storage) {
+      try {
+        storage.setItem(key, JSON.stringify({revision: accepted.revision, bodies: accepted.bodies}));
+      } catch { storageError = true; }
+    }
+    return expose(got.index === 0 ? 'current' : 'older', initial.observed, refetched,
+      refetched ? initial.state : null);
+  }
+  return {
+    read(pointer, fetchText, subtle, refetchPointer) {
+      // Serialize overlapping refreshes: a slow older request cannot undo a newer one.
+      const work = tail.then(() => run(pointer, fetchText, subtle, refetchPointer));
+      tail = work.catch(() => {});
+      return work;
+    }
+  };
+}
