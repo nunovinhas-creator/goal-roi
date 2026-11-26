@@ -2264,13 +2264,15 @@
    "attempt_utc": "2026-11-26T19:30:36+00:00",
    "chars": 224,
    "created_utc": "2026-11-26T19:30:36+00:00",
+   "done_utc": "2026-11-26T19:30:36+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "b2a058f42408cf1aebfe48c24a0260c4eb52f67946a769c7f14432cc06e8b98d",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:blackpool-vs-leicester-20261124|5ae5ff3666fe": {
    "attempt_id": "9c3f12fb861346e8811f124cf382cbb0",
@@ -7056,12 +7058,17 @@
    "state": "delivered"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|a1d708cb8c1d": {
+   "attempt_id": "002f59aa797f4018bd6b290213f59a5e",
+   "attempt_utc": "2026-11-26T19:30:39+00:00",
+   "chars": 202,
    "created_utc": "2026-11-26T19:30:36+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "01f1099a0962709cfa98704bb59174dbe186b4230f390675788d0c4bc78f7ae4",
+   "state": "in_flight"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|bbb4653ed7a1": {
    "attempt_id": "7f16b8de950d4ba29ade244deddaa394",
@@ -10160,7 +10167,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 647,
+  "delivered": 648,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T19:28:20+00:00",
@@ -10468,6 +10475,7 @@
   "2026-11-26T19:22:39+00:00|AaB Aalborg — Esbjerg|Over 5": true,
   "2026-11-26T19:23:12+00:00|NEC Nijmegen — Rennes|Over 3.5": true,
   "2026-11-26T19:25:10+00:00|Celta Vigo — Bournemouth|Over 3.5": true,
+  "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5": true,
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)": true
  },
  "migrations": {
@@ -12198,6 +12206,9 @@
   "item|id:olympiacos-vs-ac-milan-20261126|Asian Total|Over 5": {
    "at_utc": "2026-11-26T19:14:59+00:00"
   },
+  "item|id:olympiacos-vs-ac-milan-20261126|Asian Total|Over 5.5": {
+   "at_utc": "2026-11-26T19:30:36+00:00"
+  },
   "item|id:olympiacos-vs-ac-milan-20261126|Asian Total|Under 2": {
    "at_utc": "2026-11-26T17:55:12+00:00"
   },
@@ -12836,7 +12847,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 959,
+ "sent_total": 960,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -14074,6 +14085,7 @@
   "2026-11-26T19:22:39+00:00|AaB Aalborg — Esbjerg|Over 5",
   "2026-11-26T19:23:12+00:00|NEC Nijmegen — Rennes|Over 3.5",
   "2026-11-26T19:25:10+00:00|Celta Vigo — Bournemouth|Over 3.5",
+  "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5",
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)"
  ]
 }
