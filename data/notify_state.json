@@ -2245,12 +2245,17 @@
    "state": "delivered"
   },
   "game|id:besiktas-vs-hapoel-beer-sheva-20261126|4d181f131829": {
+   "attempt_id": "8b868aa6a71941e6a9e7257180fdeb8e",
+   "attempt_utc": "2026-11-26T19:51:05+00:00",
+   "chars": 239,
    "created_utc": "2026-11-26T19:51:03+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "850cf3396299ac7a4a471979291ae5e43cf982fd65ed56c0a39e81d6a58de714",
+   "state": "in_flight"
   },
   "game|id:besiktas-vs-hapoel-beer-sheva-20261126|641c0b21d43b": {
    "attempt_id": "29b840cdc2d64f54a00ee9aae727f3cb",
@@ -8849,13 +8854,15 @@
    "attempt_utc": "2026-11-26T19:51:04+00:00",
    "chars": 214,
    "created_utc": "2026-11-26T19:51:03+00:00",
+   "done_utc": "2026-11-26T19:51:03+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "1d86445f57f442da51e13f9a3415ba019c4b3a3ab6ce815636febf704d5c32c3",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:sparta-prague-vs-az-alkmaar-20261126|a785c44d3212": {
    "attempt_id": "5a4d90a749124527b7874d955e562e74",
@@ -10205,7 +10212,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 650,
+  "delivered": 651,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T19:43:14+00:00",
@@ -10516,6 +10523,7 @@
   "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5": true,
   "2026-11-26T19:27:21+00:00|Union St Gilloise — Lech Poznan|Draw": true,
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)": true,
+  "2026-11-26T19:41:04+00:00|Besiktas — Hapoel Beer Sheva|Draw or Hapoel Be`er Sheva FC": true,
   "2026-11-26T19:43:15+00:00|Sparta Prague — AZ Alkmaar|AZ Alkmaar": true
  },
  "migrations": {
@@ -10817,10 +10825,10 @@
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": 40,
   "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00": 28,
   "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 23,
-  "Stake | Dia = dia de semana & Mercado = outros mercados & Momento do aviso = mais de 45 min depois do início": 17,
+  "Stake | Dia = dia de semana & Mercado = outros mercados & Momento do aviso = mais de 45 min depois do início": 20,
   "Stake | Dia = dia de semana & Mercado = outros mercados & Número de apostas = uma": 44,
   "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 53,
-  "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 29,
+  "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 30,
   "Stake | Dia = fim de semana": 114,
   "Stake | Dia = fim de semana & Número de apostas = uma": 101,
   "Stake | Dia = fim de semana & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 80,
@@ -10830,7 +10838,7 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 42,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 30,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
-  "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 31,
+  "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 32,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 25,
   "Stake | Golos até ao sinal = nenhum & Momento do aviso = até 45 min depois do início": 32,
   "Stake | Hora (UTC) = noite & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 22,
@@ -11197,6 +11205,9 @@
   },
   "item|id:besiktas-vs-hapoel-beer-sheva-20261126|Asian Total|Over 4.5": {
    "at_utc": "2026-11-26T17:32:13+00:00"
+  },
+  "item|id:besiktas-vs-hapoel-beer-sheva-20261126|Double Chance|Draw or Hapoel Be`er Sheva FC": {
+   "at_utc": "2026-11-26T19:51:03+00:00"
   },
   "item|id:besiktas-vs-hapoel-beer-sheva-20261126|Total Bookings|Over 6.5": {
    "at_utc": "2026-11-26T18:14:21+00:00"
@@ -12895,7 +12906,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 962,
+ "sent_total": 963,
  "statuses": {
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
@@ -14143,6 +14154,7 @@
   "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5",
   "2026-11-26T19:27:21+00:00|Union St Gilloise — Lech Poznan|Draw",
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)",
+  "2026-11-26T19:41:04+00:00|Besiktas — Hapoel Beer Sheva|Draw or Hapoel Be`er Sheva FC",
   "2026-11-26T19:43:15+00:00|Sparta Prague — AZ Alkmaar|AZ Alkmaar"
  ]
 }
