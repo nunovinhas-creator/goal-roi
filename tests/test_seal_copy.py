@@ -121,6 +121,52 @@ class SealTests(unittest.TestCase):
         self.assertEqual(S.seal(self.repo, self.dest, self.commits[-1])["seq"], 4)
         S.verify(self.dest)
 
+    def test_prune_recovers_after_tombstone_before_rename(self):
+        from unittest.mock import patch
+        self.seal_all()
+        later = datetime.now(timezone.utc) + timedelta(days=60)
+        with patch.object(S.os, "rename", side_effect=OSError("interrupção")):
+            with self.assertRaises(OSError):
+                S.prune(self.dest, now=later)
+        self.assertEqual(S.verify(self.dest)["seals"], 3)
+        S.prune(self.dest, now=later)
+        self.assertEqual(S.verify(self.dest)["pruned"], 2)
+        self.assertEqual(S.verify(self.dest)["seals"], 1)
+
+    def test_prune_recovers_after_atomic_removal_before_delete(self):
+        from unittest.mock import patch
+        self.seal_all()
+        later = datetime.now(timezone.utc) + timedelta(days=60)
+        with patch.object(S, "discard_hidden", side_effect=OSError("interrupção")):
+            with self.assertRaises(OSError):
+                S.prune(self.dest, now=later)
+        self.assertEqual(S.verify(self.dest)["seals"], 1)
+        self.assertEqual(len(list(S.seals_dir(self.dest).glob(".pruned-*"))), 2)
+        S.prune(self.dest, now=later)
+        self.assertEqual(list(S.seals_dir(self.dest).glob(".pruned-*")), [])
+        self.assertEqual(S.verify(self.dest)["pruned"], 2)
+
+    def test_corrupted_older_seal_blocks_append_and_prune(self):
+        self.seal_all()
+        p = S.list_seals(self.dest)[0] / "sources.tar.xz"
+        p.chmod(0o644)
+        p.write_bytes(b"invalid")
+        new_commit = self.commit(3)
+        with self.assertRaises(S.SealError):
+            S.seal(self.repo, self.dest, new_commit)
+        with self.assertRaises(S.SealError):
+            S.prune(self.dest, now=datetime.now(timezone.utc) + timedelta(days=60))
+        self.assertEqual(len(S.list_seals(self.dest)), 3)
+        self.assertFalse((self.dest / "PRUNED.jsonl").exists())
+
+    def test_duplicate_tombstone_is_detected(self):
+        self.seal_all()
+        S.prune(self.dest, now=datetime.now(timezone.utc) + timedelta(days=60))
+        p = self.dest / "PRUNED.jsonl"
+        p.write_text(p.read_text() + p.read_text().splitlines()[0] + "\n")
+        with self.assertRaisesRegex(S.SealError, "duplicada"):
+            S.verify(self.dest)
+
     def test_refuses_commit_that_is_not_a_descendant(self):
         S.seal(self.repo, self.dest, self.commits[-1])
         with self.assertRaisesRegex(S.SealError, "não descende"):

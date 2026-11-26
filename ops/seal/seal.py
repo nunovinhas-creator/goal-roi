@@ -107,6 +107,8 @@ def seal(repo, dest, ref="HEAD", fetch=False, fail_before_rename=False):
     commit = git(repo, "rev-parse", ref + "^{commit}").decode().strip()
     existing = list_seals(dest)
     prev_hash, seq = None, 1
+    if existing or tombstones(dest):
+        verify(dest)  # nunca acrescentar a uma cadeia já danificada
     if existing:
         last, prev_hash = read_seal(existing[-1])
         seq = last["seq"] + 1
@@ -115,9 +117,6 @@ def seal(repo, dest, ref="HEAD", fetch=False, fail_before_rename=False):
         # Só avança: um commit que não descende do último selado indica ref errada ou história reescrita.
         if subprocess.run(["git", "-C", str(repo), "merge-base", "--is-ancestor", last["commit"], commit], capture_output=True).returncode:
             raise SealError("o commit %s não descende do último selado %s" % (commit[:12], last["commit"][:12]))
-    elif tombstones(dest):
-        t = tombstones(dest)[-1]
-        prev_hash, seq = t["seal"], t["seq"] + 1
     names = [n for n in git(repo, "ls-tree", "-r", "--name-only", commit, "data").decode().splitlines() if n not in VIEWS]
     names += [n for n in EXTRA if git(repo, "ls-tree", "--name-only", commit, n).strip()]
     files = {n: git(repo, "show", "%s:%s" % (commit, n)) for n in names}
@@ -155,11 +154,18 @@ def seal(repo, dest, ref="HEAD", fetch=False, fail_before_rename=False):
 
 def verify(dest, max_age_h=None, now=None):
     """Verifica todos os selos e a cadeia (incluindo lápides de selos podados). Levanta SealError."""
-    links = {t["seq"]: (t["seal"], t["prev"]) for t in tombstones(dest)}
+    records = tombstones(dest)
+    links = {}
+    for record in records:
+        seq = record["seq"]
+        link = (record["seal"], record["prev"])
+        if seq in links:
+            raise SealError("lápide duplicada para seq %d" % seq)
+        links[seq] = link
     last = None
     for path in list_seals(dest):
         data, h = read_seal(path)
-        if data["seq"] in links and links[data["seq"]][0] != h:
+        if data["seq"] in links and links[data["seq"]] != (h, data["prev_seal"]):
             raise SealError("seq %d duplicado com outro selo" % data["seq"])
         links[data["seq"]] = (h, data["prev_seal"])
         last = data
@@ -175,10 +181,12 @@ def verify(dest, max_age_h=None, now=None):
         raise SealError("o primeiro selo aponta para um anterior")
     if last is None:
         raise SealError("todos os selos foram podados")
+    if last["seq"] != seqs[-1] or last["seq"] in {r["seq"] for r in records}:
+        raise SealError("último selo não está disponível ou foi marcado para poda")
     age_h = ((now or datetime.now(timezone.utc)) - datetime.fromisoformat(last["sealed_utc"])).total_seconds() / 3600
     if max_age_h is not None and age_h > max_age_h:
         raise SealError("último selo com %.1f h (máximo %s h)" % (age_h, max_age_h))
-    return {"seals": len(list_seals(dest)), "pruned": len(tombstones(dest)), "last_seq": last["seq"], "last_commit": last["commit"],
+    return {"seals": len(list_seals(dest)), "pruned": len(records), "last_seq": last["seq"], "last_commit": last["commit"],
             "last_commit_utc": last["commit_utc"], "age_h": round(age_h, 2)}
 
 
@@ -211,8 +219,38 @@ def restore(dest, out, seq=None):
     return {"restored_seq": data["seq"], "commit": data["commit"], "files": len(data["files"])}
 
 
+def write_tombstones(dest, records):
+    """Substitui o registo completo atomicamente, antes de retirar qualquer selo."""
+    dest = Path(dest)
+    fd, tmp = tempfile.mkstemp(prefix=".pruned-", dir=dest)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as log:
+            for record in records:
+                log.write(json.dumps(record, sort_keys=True) + "\n")
+            log.flush()
+            os.fsync(log.fileno())
+        os.replace(tmp, dest / "PRUNED.jsonl")
+        fsync_dir(dest)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+
+
+def discard_hidden(path):
+    # Só para uma pasta já retirada atomicamente do conjunto de selos visíveis.
+    os.chmod(path, 0o755)
+    for f in path.iterdir():
+        if not f.is_symlink():
+            os.chmod(f, stat.S_IWUSR | stat.S_IRUSR)
+    shutil.rmtree(path)
+    fsync_dir(path.parent)
+
+
 def prune(dest, keep_days=30, now=None):
-    """Mantém todos os selos dos últimos keep_days e o último de cada semana ISO; o resto vira lápide."""
+    """Poda recuperável: regista, retira atomicamente, só depois elimina."""
+    if keep_days < 0:
+        raise SealError("retenção inválida")
+    verify(dest)  # não eliminar nada se a cadeia já estiver danificada
     now = now or datetime.now(timezone.utc)
     seals = list_seals(dest)
     keep, weekly = set(), {}
@@ -223,24 +261,43 @@ def prune(dest, keep_days=30, now=None):
             keep.add(p)
         weekly[t.isocalendar()[:2]] = p
     keep |= set(weekly.values())
-    if seals:
-        keep.add(seals[-1])
+    keep.add(seals[-1])
+    records = tombstones(dest)
+    indexed = {r["seq"]: r for r in records}
+    root = seals_dir(dest)
     removed = []
-    with open(Path(dest) / "PRUNED.jsonl", "a") as log:
-        for p in seals:
-            if p in keep:
-                continue
-            data, h = read_seal(p)
-            log.write(json.dumps({"seq": data["seq"], "seal": h, "prev": data["prev_seal"], "commit": data["commit"],
-                                  "pruned_utc": now.replace(microsecond=0).isoformat()}) + "\n")
-            log.flush()
-            os.fsync(log.fileno())
-            for f in p.iterdir():
-                os.chmod(f, stat.S_IWUSR | stat.S_IRUSR)
-            os.chmod(p, 0o755)
-            shutil.rmtree(p)
-            removed.append(data["seq"])
+    for p in seals:
+        data, h = read_seal(p)
+        # Se houve interrupção depois de escrever a lápide, concluir a poda mesmo
+        # que a política de retenção tenha mudado entretanto.
+        if data["seq"] not in indexed and p in keep:
+            continue
+        if p == seals[-1]:
+            raise SealError("recusa podar o último selo")
+        if data["seq"] not in indexed:
+            rec = {"seq": data["seq"], "seal": h, "prev": data["prev_seal"], "commit": data["commit"],
+                   "pruned_utc": now.replace(microsecond=0).isoformat()}
+            write_tombstones(dest, records + [rec])
+            records.append(rec)
+            indexed[data["seq"]] = rec
+        hidden = root / (".pruned-" + p.name)
+        if hidden.exists():
+            raise SealError("pasta de poda pendente inesperada")
+        os.rename(p, hidden)
+        fsync_dir(root)
+        removed.append(data["seq"])
     verify(dest)
+    # Retomar eliminações interrompidas, apenas se a lápide correspondente existir.
+    for hidden in root.glob(".pruned-*"):
+        if hidden.is_symlink() or not hidden.is_dir():
+            raise SealError("entrada de poda inválida")
+        try:
+            seq = int(hidden.name.removeprefix(".pruned-").split("-")[0])
+        except ValueError as exc:
+            raise SealError("nome de poda inválido") from exc
+        if seq not in indexed or hidden.name != ".pruned-%06d-%s" % (seq, indexed[seq]["commit"][:12]):
+            raise SealError("pasta de poda sem lápide correspondente")
+        discard_hidden(hidden)
     return {"removed": removed, "kept": len(list_seals(dest))}
 
 
@@ -262,7 +319,7 @@ def main():
             res = restore(a.dest, a.out, a.seq)
         else:
             res = prune(a.dest, a.keep_days)
-    except SealError as e:
+    except (SealError, OSError, ValueError, KeyError, TypeError, tarfile.TarError, lzma.LZMAError, subprocess.CalledProcessError) as e:
         print(json.dumps({"error": str(e)}, ensure_ascii=False))
         sys.exit(2)
     print(json.dumps(res, ensure_ascii=False))
