@@ -3681,13 +3681,15 @@
    "attempt_utc": "2026-11-26T21:02:43+00:00",
    "chars": 218,
    "created_utc": "2026-11-26T21:02:41+00:00",
+   "done_utc": "2026-11-26T21:02:41+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d82ff7463c00d43ac803b4c2808e9f3bd93754d05a54c478b592c7daa8a191f3",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:cusco-fc-vs-ad-tarma-20261116|546b773be657": {
    "attempt_utc": "2026-11-16T21:28:30+00:00",
@@ -6018,12 +6020,17 @@
    "state": "delivered"
   },
   "game|id:lyon-vs-lillestrom-20261126|50202e22f99e": {
+   "attempt_id": "6201852b39734d5a957ae5aed5a2abae",
+   "attempt_utc": "2026-11-26T21:02:44+00:00",
+   "chars": 179,
    "created_utc": "2026-11-26T21:02:41+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "2bad7b38d3eab9ef0fcfc850a339e477722d291e34e96ffb3a43fd72b2a0ac00",
+   "state": "in_flight"
   },
   "game|id:malawi-vs-egypt-20261117|9fcc2fe8c526": {
    "attempt_utc": "2026-11-17T14:47:46+00:00",
@@ -10362,7 +10369,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 661,
+  "delivered": 662,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T20:53:56+00:00",
@@ -10687,6 +10694,7 @@
   "2026-11-26T20:17:13+00:00|Juventus — Omonia Nicosia|Juventus": true,
   "2026-11-26T20:23:21+00:00|Juventus — Omonia Nicosia|AH1(-0.5)": true,
   "2026-11-26T20:55:01+00:00|CSKA Sofia — Trabzonspor|Over 2.5": true,
+  "2026-11-26T20:55:01+00:00|Lyon — Lillestrom|Over 1.5": true,
   "2026-11-26T20:57:30+00:00|Borac Banja Luka — Atalanta|Over 4": true
  },
  "migrations": {
@@ -10985,6 +10993,7 @@
   "Stake | Competição = liga & Dia = fim de semana": 94,
   "Stake | Competição = liga & Dia = fim de semana & Número de apostas = uma": 82,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 22,
+  "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Stake | Competição = liga & Mercado = outros mercados": 89,
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 69,
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 75,
@@ -12211,6 +12220,9 @@
   "item|id:luanda-villa-sc-vs-equity-fc-20261124|Asian Total|Over 3": {
    "at_utc": "2026-11-24T13:28:03+00:00"
   },
+  "item|id:lyon-vs-lillestrom-20261126|Asian Total|Over 1.5": {
+   "at_utc": "2026-11-26T21:02:41+00:00"
+  },
   "item|id:malawi-vs-egypt-20261117|1X2|2": {
    "at_utc": "2026-11-17T14:47:46+00:00"
   },
@@ -13119,7 +13131,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 973,
+ "sent_total": 974,
  "statuses": {
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
@@ -14387,6 +14399,7 @@
   "2026-11-26T20:17:13+00:00|Juventus — Omonia Nicosia|Juventus",
   "2026-11-26T20:23:21+00:00|Juventus — Omonia Nicosia|AH1(-0.5)",
   "2026-11-26T20:55:01+00:00|CSKA Sofia — Trabzonspor|Over 2.5",
+  "2026-11-26T20:55:01+00:00|Lyon — Lillestrom|Over 1.5",
   "2026-11-26T20:57:30+00:00|Borac Banja Luka — Atalanta|Over 4"
  ]
 }
