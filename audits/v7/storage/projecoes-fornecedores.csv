@@ -1,0 +1,25 @@
+scenario,days,bytes,basis
+pages_latest_steady,30,5374339,"just the deployed site, uncompressed"
+pages_artifact_staging_7d,30,3919692,"one isolated daily build, rolling retention model"
+r2_standard_daily_journal_2_site_artifacts,30,2308473,compressed journal and two latest site artifacts
+r2_antipattern_full_report_copies,30,2199270150,"full gzip of each report, no differential storage"
+d1_index_only_estimated,30,865321,"index measured in local SQLite, provider storage overhead excluded"
+portable_two_verified_journal_copies,30,2377122,two complete independent copies of the synthetic journal model
+pages_latest_steady,90,5374339,"just the deployed site, uncompressed"
+pages_artifact_staging_7d,90,3919692,"one isolated daily build, rolling retention model"
+r2_standard_daily_journal_2_site_artifacts,90,4671137,compressed journal and two latest site artifacts
+r2_antipattern_full_report_copies,90,6597810450,"full gzip of each report, no differential storage"
+d1_index_only_estimated,90,2595924,"index measured in local SQLite, provider storage overhead excluded"
+portable_two_verified_journal_copies,90,7102450,two complete independent copies of the synthetic journal model
+pages_latest_steady,365,5374339,"just the deployed site, uncompressed"
+pages_artifact_staging_7d,365,3919692,"one isolated daily build, rolling retention model"
+r2_standard_daily_journal_2_site_artifacts,365,15395617,compressed journal and two latest site artifacts
+r2_antipattern_full_report_copies,365,26757786825,"full gzip of each report, no differential storage"
+d1_index_only_estimated,365,10470807,"index measured in local SQLite, provider storage overhead excluded"
+portable_two_verified_journal_copies,365,28551410,two complete independent copies of the synthetic journal model
+pages_latest_steady,1825,5374339,"just the deployed site, uncompressed"
+pages_artifact_staging_7d,1825,3919692,"one isolated daily build, rolling retention model"
+r2_standard_daily_journal_2_site_artifacts,1825,72431620,compressed journal and two latest site artifacts
+r2_antipattern_full_report_copies,1825,133788934125,"full gzip of each report, no differential storage"
+d1_index_only_estimated,1825,52333831,"index measured in local SQLite, provider storage overhead excluded"
+portable_two_verified_journal_copies,1825,142623416,two complete independent copies of the synthetic journal model
