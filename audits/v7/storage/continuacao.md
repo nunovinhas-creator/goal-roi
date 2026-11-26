@@ -42,6 +42,17 @@ O benchmark de relatório atual usa cópia descartável da worktree da PR, subst
 
 Prioridade alta é garantir integridade e preservar o protocolo e o registo, seguida da avaliação de desempenho e custo. Um novo PR operacional deve ter autorização própria. Não alterar PR #98 nem o Brain V5 durante o período experimental.
 
+## Estado após a continuação de 26/11/2026
+
+Ramo `claude/goal-roi-v7-continuacao-ozagkj` (inclui as PRs #101 e #102 por merge, sem as alterar).
+
+1. **PR #98:** os quatro defeitos estão corrigidos num protótipo isolado (`audits/v7/snapshots/`). Falta: portar para um ramo próprio da V6.1 com autorização, prova em HTTPS/CDN de staging e medição periódica do p95 (margem atual ~0,21 s).
+2. **Parser:** classes semânticas fechadas para os 105 Kalshi, 52 negados e 144 Polymarket (`audits/v7/parser/SEMANTICA.md`). Falta: regras escritas de cada contrato, revisão humana da lista `aliases_para_revisao_humana`, liquidante para negação/spread e corpus etiquetado. Spreads contraditórios, `12`, nomes sem lado e cabeçalhos sem relógio ficam em quarentena.
+3. **Arquivo:** prova byte a byte de todas as fontes e vistas, índice, retenção e exportação feitas (`audits/v7/storage/ARQUITETURA.md`). Falta: piloto da cópia selada a 12 h num disco fora do GitHub e decisão (com autorização) sobre retirar as vistas do Git.
+4. **Continuidade:** restauração a partir de espelho verificada em 7 cenários (`restore_drill.py`). Falta: ensaio num fornecedor realmente distinto e instrução humana para erro de credenciais (sem automação).
+
+Comandos de reprodução: ver os README de cada pasta e `ARQUITETURA.md`.
+
 ## Protocolo para incidentes futuros
 
 - Identificar primeiro a última revisão válida, usando commit, manifestos e hashes, e verificar se a falha vem de recolha, autenticação, publicação ou CDN. Manter datas de corte e de disponibilidade separadas.

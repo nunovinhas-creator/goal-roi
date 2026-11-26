@@ -18,4 +18,17 @@ O protótipo gerou localmente um tar compatível com o formato Pages, com seis s
 
 [Draft de auditoria do parser](https://github.com/nunovinhas-creator/goal-roi/pull/101) · [Draft de armazenamento](https://github.com/nunovinhas-creator/goal-roi/pull/102) · [Auditoria técnica](auditoria-tecnica.md)
 
+## Atualização — continuação de 26/11/2026
+
+Retoma do trabalho do Codex no ramo `claude/goal-roi-v7-continuacao-ozagkj`, que junta as PRs #101 e #102 sem as alterar. A PR #98, a produção, o Brain V5, o protocolo e o registo prospetivo não foram tocados.
+
+| Componente | Resultado novo | Veredito |
+|---|---|---|
+| Reprodução | Censo do parser, continuidade (24/72 h) e watchdog dão JSON idêntico ao do Codex no corte e3a0760. Os quatro defeitos da PR #98 reproduzem-se. | **GO** |
+| Parser — semântica | Dos 105 nomes Kalshi: 73 aliases do vencedor, 9 alias + handicap, 20 código `12`, 3 sem lado. 52 negados (50 equipa, 2 resultado exato). Polymarket: 2 spreads contraditórios, 12 cabeçalhos sem relógio. [SEMANTICA.md](../parser/SEMANTICA.md) | **NO-GO** para qualquer admissão; zero admissões |
+| Snapshots — correções | Publicador isolado com duas ranhuras, ponteiro atómico e fixação conjunta de relatório, entrada prospetiva e protocolo; cliente só por SHA-256. Corrupção reparada, 0 revisões misturadas em 7 pontos de interrupção + SIGKILL, entrada prospetiva divergente recusada, adulteração de igual comprimento recusada. [README](../snapshots/README.md) | **GO** para revisão offline; **NO-GO** para ativação |
+| Snapshots — desempenho | 20 repetições: primeiro conteúdo p50/p95 1,21/1,25 s, completo 1,76/1,79 s (também com CPU ocupada). Os 2,15/2,78 s anteriores não se reproduzem. | **GO** em laboratório; falta staging HTTPS/CDN |
+| Arquivo — todas as fontes | 240 revisões reais byte-idênticas; índice reconstruído idêntico; retenção das vistas com lápides; exportação idêntica. Por commit, o segmentado custa ~8× os deltas Git; selado a cada 12 h, ~1,2 MB/dia (~2,2 GB em 5 anos). As vistas são 80% do pack diário (38,1 MB/dia). [ARQUITETURA.md](ARQUITETURA.md) | **GO** para cópia selada a 12 h; **NO-GO** para segmentado por commit e para mudar rotas |
+| Restauração | 7/7 cenários: perda do Git, bloco e HEAD corrompidos, espelho incompleto (recusa), espelho atrasado (RPO declarado), restauração interrompida, bundle sem cadeia (recusa). | **GO** offline; **NO-GO** para recuperação automática |
+
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**
