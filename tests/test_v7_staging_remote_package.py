@@ -79,6 +79,15 @@ assert.ok(requested.every(url => url.endsWith('/dashboard-manifest.json')));
         r = subprocess.run(["node", "--input-type=module", "-e", script], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
 
+    def test_chromium_persistence_and_degraded_modes(self):
+        probe = subprocess.run(["node", "-e", "require('playwright')"], cwd=ROOT, capture_output=True)
+        if probe.returncode:
+            self.skipTest("playwright indisponível")
+        r = subprocess.run(["node", "tests/v7_browser_persistence.cjs", str(self.site)],
+                           cwd=ROOT, capture_output=True, text=True, timeout=120)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("BROWSER PASS", r.stdout)
+
     def test_measure_script_refuses_non_pages_base(self):
         r = subprocess.run(["node", "ops/staging/remote/measure_remote.mjs", "--base", "https://example.com/x"], cwd=ROOT, capture_output=True)
         self.assertEqual(r.returncode, 2)

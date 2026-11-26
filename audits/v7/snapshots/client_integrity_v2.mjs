@@ -68,7 +68,7 @@ export async function loadVerified(pointer, fetchText, subtle, refetchPointer) {
 // V7 staging: session-scoped high-water mark, not a guarantee of CDN freshness.
 // Store the complete verified bundle, never combine files from different revisions.
 // Retained data is explicitly stale; a cold session cannot know unseen revisions.
-export function createMonotonicReader({storage = null, key = 'v7-staging-verified-v1'} = {}) {
+export function createMonotonicReader({storage = null, key = 'v7-staging-verified-v1', lock = null} = {}) {
   let accepted = null, hydrated = false, tail = Promise.resolve(), storageError = false;
   const identity = r => JSON.stringify([r.published_at, r.report_generated_at_utc,
     ...NAMES.map(n => [r.files[n].sha256, r.files[n].bytes])]);
@@ -86,7 +86,7 @@ export function createMonotonicReader({storage = null, key = 'v7-staging-verifie
     return 'new';
   };
   async function restore(subtle) {
-    if (hydrated) return;
+    if (hydrated && !lock) return;
     hydrated = true;
     if (!storage) return;
     try {
@@ -96,7 +96,9 @@ export function createMonotonicReader({storage = null, key = 'v7-staging-verifie
       if (!metadata(saved.revision)) throw new Error('invalid cached metadata');
       const files = await verifyRevision(saved.revision, async p => saved.bodies[p], subtle);
       if (!files) throw new Error('invalid cached bundle');
-      accepted = {revision: saved.revision, files, bodies: saved.bodies};
+      const state = compare(saved.revision);
+      if (state === 'new' || state === 'same') accepted = {revision: saved.revision, files, bodies: saved.bodies};
+      else if (state === 'conflict') storageError = true;
     } catch { storageError = true; }
   }
   async function candidate(pointer, fetchText, subtle) {
@@ -122,7 +124,7 @@ export function createMonotonicReader({storage = null, key = 'v7-staging-verifie
   }
   function expose(which, observed, refetched, reason) {
     return {which, observed_published_at: observed, refetched, reason, storage_error: storageError,
-      stale: which !== 'current', revision: accepted ? structuredClone(accepted.revision) : null,
+      stale: which !== 'current', freshness: 'unverified', revision: accepted ? structuredClone(accepted.revision) : null,
       files: accepted ? structuredClone(accepted.files) : null};
   }
   async function run(pointer, fetchText, subtle, refetchPointer) {
@@ -149,7 +151,15 @@ export function createMonotonicReader({storage = null, key = 'v7-staging-verifie
   return {
     read(pointer, fetchText, subtle, refetchPointer) {
       // Serialize overlapping refreshes: a slow older request cannot undo a newer one.
-      const work = tail.then(() => run(pointer, fetchText, subtle, refetchPointer));
+      const work = tail.then(async () => {
+        if (!lock) return run(pointer, fetchText, subtle, refetchPointer);
+        try { return await lock(() => run(pointer, fetchText, subtle, refetchPointer)); }
+        catch {
+          storageError = true;
+          // Never write shared storage without the lock. Keep a verified in-memory bundle if available.
+          return expose(accepted ? 'retained' : 'unavailable', null, false, 'lock_unavailable');
+        }
+      });
       tail = work.catch(() => {});
       return work;
     }

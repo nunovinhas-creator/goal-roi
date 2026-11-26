@@ -183,3 +183,34 @@ test('C10 HTTPS probe reports observed regression separately from retained visib
   assert.equal(second.stale, true);
   assert.equal(reloads, 1);
 });
+
+
+test('C11 shared storage is reread under lock; older tabs cannot overwrite newer bundle', async () => {
+  const map = new Map(), storage = {getItem: k => map.get(k) ?? null, setItem: (k,v) => map.set(k,v)};
+  let tail = Promise.resolve();
+  const lock = fn => { const job = tail.then(fn); tail = job.catch(() => {}); return job; };
+  const store = new Map(), r1 = stamp(await casRevision(1, store), 1), r2 = stamp(await casRevision(2, store), 2);
+  const a = createMonotonicReader({storage, lock}), b = createMonotonicReader({storage, lock});
+  await a.read({history:[r1]}, fetcher(store));
+  await b.read({history:[r2]}, fetcher(store));
+  const got = await a.read({history:[r1]}, fetcher(store));
+  assert.equal(got.files.summary.tag, 2);
+  assert.equal(got.stale, true);
+  const fresh = await createMonotonicReader({storage, lock}).read(null, fetcher(store));
+  assert.equal(fresh.files.summary.tag, 2);
+});
+
+test('C12 storage failure degrades explicitly; lock failure does not write unprotected', async () => {
+  const store = new Map(), r1 = stamp(await casRevision(1, store), 1);
+  const broken = {getItem: () => null, setItem: () => { throw Error('quota'); }};
+  const got = await createMonotonicReader({storage:broken}).read({history:[r1]}, fetcher(store));
+  assert.equal(got.storage_error, true);
+  assert.equal(got.freshness, 'unverified');
+  let writes = 0;
+  const unavailable = await createMonotonicReader({
+    storage:{getItem:()=>null,setItem:()=>writes++}, lock: async () => { throw Error('lock'); }
+  }).read({history:[r1]}, fetcher(store));
+  assert.equal(unavailable.which, 'unavailable');
+  assert.equal(unavailable.storage_error, true);
+  assert.equal(writes, 0);
+});

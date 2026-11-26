@@ -27,9 +27,18 @@ INDEX = """<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name
 """
 PROBE = """import {createMonotonicReader} from './client/client_integrity_v2.mjs';
 const out = document.getElementById('out');
-let storage = null;
-try { storage = window.sessionStorage; } catch {}
-const reader = createMonotonicReader({storage});
+let storage = null, lock = null, storageMode = 'memory';
+try {
+  if (navigator.locks && typeof navigator.locks.request === 'function') {
+    storage = window.localStorage;
+    lock = fn => navigator.locks.request('v7-staging-shared-verified-v2', {mode: 'exclusive'}, fn);
+    storageMode = 'shared';
+  }
+} catch {}
+if (!storage) {
+  try { storage = window.sessionStorage; storageMode = 'session'; } catch {}
+}
+const reader = createMonotonicReader({storage, lock, key: 'v7-staging-verified-v2'});
 const get = async (p, refresh = false) => {
   const r = await fetch(p, {cache: refresh ? 'reload' : 'no-cache', redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(10000)});
   if (!r.ok) throw new Error(r.status + ' ' + p);
@@ -43,6 +52,7 @@ async function refresh() {
   const got = await reader.read(initial, p => get('snapshots/' + p), undefined, () => pointer(true));
   out.textContent = JSON.stringify({which: got.which, stale: got.stale, reason: got.reason,
     refetched: got.refetched, storage_available: !!storage, storage_error: got.storage_error,
+    storage_mode: storageMode, freshness: got.freshness,
     observed_published_at: got.observed_published_at,
     visible_published_at: got.revision?.published_at ?? null,
     generated: got.revision?.report_generated_at_utc ?? null, ms: Math.round(performance.now() - t0)}, null, 1);
