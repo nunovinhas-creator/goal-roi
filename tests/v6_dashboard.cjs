@@ -207,6 +207,15 @@ async function functional(browser, srv) {
   assert.deepEqual(errors, []);
   await ctx.close();
 
+  // Defeito de produção (26/11): um fragmento de 512 bytes devolvido como corpo do pedido completo. A página recupera.
+  srv.state.truncateAfterRange = true;
+  ({ctx, page, errors} = await open(browser, srv));
+  assert.equal(await mode(page), 'relatório', 'a página tem de recuperar de um corpo truncado');
+  assert.ok(srv.state.log.some(l => l.truncated), 'o defeito não foi simulado');
+  assert.equal(await page.locator('#banner-error').isHidden(), true);
+  srv.state.truncateAfterRange = false;
+  await ctx.close();
+
   // Revisão mais antiga servida depois de uma mais recente: recusada.
   const newer = variant(5, r => { r.generated_at_utc = new Date(NOW - 60000).toISOString(); });
   const older = variant(5, r => { r.generated_at_utc = new Date(NOW - 3600000).toISOString(); r.unique_bets = r.unique_bets; });

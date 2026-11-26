@@ -105,13 +105,13 @@
   const verdictBox = () => '<span class="verdict">' + esc(verdictText()) + '</span>';
 
   // ---------- rede ----------
-  async function get(url) {
+  async function get(url, mode) {
     const ctl = typeof AbortController === 'function' ? new AbortController() : null;
     const timer = ctl && setTimeout(() => ctl.abort(), CFG.timeoutMs);
     S.stats.requests++;
     try {
       // no-cache: revalida com ETag/Last-Modified. Um relatório inalterado custa uma resposta 304 em vez de 3 MB.
-      const res = await fetch(url, {cache: 'no-cache', signal: ctl ? ctl.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer'});
+      const res = await fetch(url, {cache: mode || 'no-cache', signal: ctl ? ctl.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer'});
       if (!res.ok) { const e = new Error('HTTP ' + res.status + ' em ' + url.split('/').pop()); e.status = res.status; throw e; }
       const text = await res.text();
       S.stats.bytes += text.length;
@@ -138,7 +138,9 @@
     const timer = ctl && setTimeout(() => ctl.abort(), CFG.timeoutMs);
     S.stats.requests++;
     try {
-      const res = await fetch(CFG.report, {cache: 'no-cache', headers: {Range: 'bytes=0-511'}, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl ? ctl.signal : undefined});
+      // URL próprio e sem cache: o fragmento de 512 bytes nunca pode ocupar a entrada de cache do relatório completo
+      // (em produção, um 206 em cache chegou a ser devolvido como corpo do pedido completo seguinte).
+      const res = await fetch(CFG.report + (CFG.report.includes('?') ? '&' : '?') + 'probe=1', {cache: 'no-store', headers: {Range: 'bytes=0-511'}, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl ? ctl.signal : undefined});
       if (res.status === 206) { const t = await res.text(); S.stats.bytes += t.length; const m = t.match(REV); return {rev: m ? m[1] : null, full: null}; }
       if (res.ok) { const t = await res.text(); S.stats.bytes += t.length; const m = t.slice(0, 512).match(REV); return {rev: m ? m[1] : null, full: t}; } // Range ignorado
       return {rev: null, full: null, error: 'HTTP ' + res.status};
@@ -202,10 +204,15 @@
     if (S.mode === 'relatório' && probe.rev && probe.rev === S.appliedRevision && !pros.changed && !probe.full) {
       S.seq.accept(ticket, probe.rev); S.stats.notModified++; return;
     }
-    const text = probe.full || await get(CFG.report);
+    let text = probe.full || await get(CFG.report);
     let report = null;
     if (text !== S.reportText || pros.changed || S.mode !== 'relatório') {
-      try { report = JSON.parse(text); } catch (e) { throw new Error('relatório ilegível'); }
+      try { report = JSON.parse(text); }
+      catch (e) {
+        // Corpo truncado ou de outra resposta em cache: um novo pedido, sem cache e com URL único, antes de desistir.
+        text = await get(CFG.report + (CFG.report.includes('?') ? '&' : '?') + 'full=' + Date.now(), 'reload');
+        try { report = JSON.parse(text); } catch (e2) { throw new Error('relatório ilegível'); }
+      }
       const v = C.validateReport(report);
       if (!v.ok) throw new Error('relatório recusado: ' + v.problems.slice(0, 3).join('; '));
     }
