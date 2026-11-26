@@ -13,8 +13,10 @@ from decimal import Decimal, localcontext
 from pathlib import Path
 from uuid import uuid4
 from zoneinfo import ZoneInfo
+from urllib.request import Request, urlopen
+from urllib.error import URLError
 
-from .dropping_odds_journal import GitJournal, JournalError, encode, utc
+from .dropping_odds_journal import GitJournal, JournalError, encode, utc, ANCHOR_REF
 from .store import data_dir, message_rows
 
 UTC = timezone.utc
@@ -395,7 +397,34 @@ def age_limit(value):
     return timedelta(minutes=int(value))
 
 
-def run(archive, env, store=None, sender=None, clock=None):
+def anchor_policy():
+    branch = ANCHOR_REF.removeprefix('refs/heads/')
+    url = 'https://api.github.com/repos/nunovinhas-creator/goal-roi/rules/branches/' + branch
+    request = Request(url, headers={'Accept': 'application/vnd.github+json',
+                                    'User-Agent': 'goal-roi-dropping-odds'})
+    try:
+        with urlopen(request, timeout=8) as response:
+            rules = json.loads(response.read(1000000))
+        types = {rule['type'] for rule in rules}
+    except (OSError, ValueError, TypeError, KeyError, URLError) as exc:
+        raise JournalError('cannot verify anchor branch rules') from exc
+    if not {'deletion', 'non_fast_forward'} <= types:
+        raise JournalError('anchor branch deletion and force-push protections required')
+
+
+def pilot_deadline(env, now):
+    if env.get('GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN') not in ('5', '10', '15'):
+        raise ValueError('explicit approved pilot age of 5, 10 or 15 minutes required')
+    start = utc(env.get('GOAL_ROI_DROPPING_ODDS_ON_SINCE', ''))
+    end = utc(env.get('GOAL_ROI_DROPPING_ODDS_ON_UNTIL', ''))
+    local = now.astimezone(LISBON)
+    midnight = datetime.combine(local.date() + timedelta(days=1), datetime.min.time(), LISBON)
+    if not (start <= now < end <= midnight and start.astimezone(LISBON).date() == local.date()):
+        raise ValueError('pilot must be explicitly authorized for the current Lisbon day')
+    return end
+
+
+def run(archive, env, store=None, sender=None, clock=None, deadline=None, before_send=None):
     selected = mode(env)
     if selected == 'off':
         return Counter()
@@ -476,8 +505,10 @@ def run(archive, env, store=None, sender=None, clock=None):
         text = alert(item)
         journal.append(item.mid, 'pending', clock(), intent=uuid4().hex)
         store.publish(journal)
+        if before_send is not None:
+            before_send()
         send_time = clock()
-        reason = temporal(item, send_time, maximum)
+        reason = 'pilot_ended' if deadline is not None and send_time >= deadline else temporal(item, send_time, maximum)
         if reason != 'eligible':
             status = 'expired'
         else:
@@ -506,6 +537,8 @@ def main():
     offline.add_argument('--evaluation-times', type=Path, help='JSON mapping Telegram IDs to UTC evaluation times')
     commands.add_parser('run')
     commands.add_parser('initialize')
+    anchor = commands.add_parser('anchor')
+    anchor.add_argument('checkpoint')
     args = parser.parse_args()
     if args.command == 'replay':
         maximum = age_limit(args.max_age_minutes) if args.max_age_minutes else None
@@ -521,14 +554,20 @@ def main():
                 or os.environ.get('GITHUB_REPOSITORY') != 'nunovinhas-creator/goal-roi'
                 or os.environ.get('GITHUB_REF') != 'refs/heads/main'):
             raise JournalError('live entry point requires the Goal-ROI workflow on main')
-        if mode(os.environ) != 'shadow':
-            raise JournalError('hosted execution restricted to shadow')
-        store = GitJournal()
-        if args.command == 'initialize':
-            store.bootstrap(datetime.now(UTC))
+        selected = mode(os.environ)
+        deadline = pilot_deadline(os.environ, datetime.now(UTC)) if selected == 'on' else None
+        store = GitJournal(require_anchor=selected == 'on', guard=anchor_policy)
+        if args.command in ('initialize', 'anchor'):
+            if selected != 'shadow':
+                raise JournalError('initialization and anchoring require shadow')
+            if args.command == 'initialize':
+                store.bootstrap(datetime.now(UTC))
+            else:
+                store.anchor(args.checkpoint)
             print('DROPPING_ODDS_CHECKPOINT', store.tip)
             return 0
-        counts = run(data_dir() / 'messages.jsonl', os.environ, store)
+        counts = run(data_dir() / 'messages.jsonl', os.environ, store, deadline=deadline,
+                     before_send=store.assert_current if selected == 'on' else None)
         print('DROPPING_ODDS_CHECKPOINT', store.tip)
         print('DROPPING_ODDS', json.dumps(counts, sort_keys=True))
         return 3 if counts['failed'] or counts['uncertain'] else 0
