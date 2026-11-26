@@ -4330,13 +4330,15 @@
    "attempt_utc": "2026-11-26T20:15:41+00:00",
    "chars": 203,
    "created_utc": "2026-11-26T20:15:41+00:00",
+   "done_utc": "2026-11-26T20:15:41+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "99bb6980ce0f61d0212ba0b5823c06480ebadb650e17a4d3a66170202ecdd9ab",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:galatasaray-vs-aston-villa-20261124|016ec5107f09": {
    "attempt_id": "ea99678e6dfa4cd3af0ae729f156bd99",
@@ -6154,12 +6156,17 @@
    "state": "delivered"
   },
   "game|id:manchester-united-vs-brentford-20261128|eed1d88f74e7": {
+   "attempt_id": "68350ea2bcec4ed5abcbde52c890328e",
+   "attempt_utc": "2026-11-26T20:15:43+00:00",
+   "chars": 215,
    "created_utc": "2026-11-26T20:15:41+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "e2667beb4a87e53995df62e278e561e1daea02d17cadc607676738700f25a354",
+   "state": "in_flight"
   },
   "game|id:manta-vs-delfin-20261122|0fc16f6927e5": {
    "attempt_utc": "2026-11-22T16:44:10+00:00",
@@ -10280,7 +10287,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 655,
+  "delivered": 656,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T20:07:03+00:00",
@@ -10599,7 +10606,8 @@
   "2026-11-26T19:49:34+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-0.5)": true,
   "2026-11-26T19:51:28+00:00|Besiktas — Hapoel Beer Sheva|Draw": true,
   "2026-11-26T20:02:32+00:00|Besiktas — Hapoel Beer Sheva|Over 1.5": true,
-  "2026-11-26T20:06:46+00:00|Freiburg — Twente|Twente": true
+  "2026-11-26T20:06:46+00:00|Freiburg — Twente|Twente": true,
+  "2026-11-26T20:06:46+00:00|Manchester United — Brentford|Manchester United": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -12146,6 +12154,9 @@
   "item|id:manchester-city-vs-napoli-20261124|Polymarket|AH2(-0.5)": {
    "at_utc": "2026-11-24T21:50:47+00:00"
   },
+  "item|id:manchester-united-vs-brentford-20261128|1x2|Manchester United": {
+   "at_utc": "2026-11-26T20:15:41+00:00"
+  },
   "item|id:manta-vs-delfin-20261122|Asian Total|Over 2.5": {
    "at_utc": "2026-11-22T16:00:32+00:00"
   },
@@ -13006,7 +13017,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 967,
+ "sent_total": 968,
  "statuses": {
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
@@ -14262,6 +14273,7 @@
   "2026-11-26T19:49:34+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-0.5)",
   "2026-11-26T19:51:28+00:00|Besiktas — Hapoel Beer Sheva|Draw",
   "2026-11-26T20:02:32+00:00|Besiktas — Hapoel Beer Sheva|Over 1.5",
-  "2026-11-26T20:06:46+00:00|Freiburg — Twente|Twente"
+  "2026-11-26T20:06:46+00:00|Freiburg — Twente|Twente",
+  "2026-11-26T20:06:46+00:00|Manchester United — Brentford|Manchester United"
  ]
 }
