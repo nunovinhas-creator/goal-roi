@@ -1,0 +1,48 @@
+name: Dropping Odds Handicap
+on:
+  workflow_run:
+    workflows: ['Collect ScanGoal']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      initialize:
+        description: 'Create the Dropping Odds journal for the first shadow run'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scangoal-dropping-odds
+  cancel-in-progress: false
+
+jobs:
+  dropping-odds:
+    if: >-
+      ${{ github.repository == 'nunovinhas-creator/goal-roi' &&
+          github.ref == 'refs/heads/main' &&
+          vars.GOAL_ROI_DROPPING_ODDS == 'shadow' &&
+          (github.event_name == 'workflow_dispatch' ||
+           (github.event.workflow_run.head_repository.full_name == github.repository &&
+            github.event.workflow_run.head_branch == 'main')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: |
+            /scangoal/
+            /data/messages.jsonl
+          sparse-checkout-cone-mode: false
+      - name: Evaluate the published ScanGoal archive
+        env:
+          GOAL_ROI_DROPPING_ODDS: ${{ vars.GOAL_ROI_DROPPING_ODDS }}
+          COLLECTOR_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+          INITIALIZE: ${{ github.event_name == 'workflow_dispatch' && inputs.initialize }}
+        run: |
+          command=run
+          if [[ "$INITIALIZE" == true ]]; then command=initialize; fi
+          printf 'DROPPING_ODDS_COLLECTOR_RUN %s\n' "$COLLECTOR_RUN_ID"
+          timeout --signal=TERM --kill-after=3s 90s python3 -u -m scangoal.dropping_odds_alerts "$command"

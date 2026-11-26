@@ -119,7 +119,8 @@ class WorkflowInstall(unittest.TestCase):
         workflows = ROOT/'.github/workflows'
         initializer = 'initialize-workers-ai-budget.yml'
         self.assertEqual(sorted(p.name for p in workflows.iterdir()),
-                         ['collect.yml', 'continuity.yml', initializer, 'polymarket-rehearsal.yml', 'tests.yml'])
+                         ['collect.yml', 'continuity.yml', 'dropping-odds.yml', initializer,
+                          'polymarket-rehearsal.yml', 'tests.yml'])
         rehearsal = (workflows/'polymarket-rehearsal.yml').read_text(encoding='utf-8')
         self.assertIn('permissions:\n  contents: read\njobs:', rehearsal)
         self.assertIn('persist-credentials: false', rehearsal)
@@ -129,6 +130,22 @@ class WorkflowInstall(unittest.TestCase):
         self.assertEqual(re.findall(r'^on: (.+)$', text, re.M), ['workflow_dispatch'])
         self.assertIn('permissions:\n  contents: write\n\njobs:', text)
         self.assertNotIn('scangoal-write', text)
+
+    def test_dropping_odds_workflow_is_isolated_and_opt_in(self):
+        text = (ROOT/'.github/workflows/dropping-odds.yml').read_text(encoding='utf-8')
+        self.assertIn("    workflows: ['Collect ScanGoal']\n    types: [completed]\n    branches: [main]", text)
+        self.assertIn("github.event.workflow_run.head_repository.full_name == github.repository", text)
+        self.assertIn("github.ref == 'refs/heads/main'", text)
+        self.assertIn("vars.GOAL_ROI_DROPPING_ODDS == 'shadow' &&", text)
+        self.assertNotIn("vars.GOAL_ROI_DROPPING_ODDS == 'on'", text)
+        self.assertIn('  group: scangoal-dropping-odds\n  cancel-in-progress: false', text)
+        self.assertIn('    timeout-minutes: 2', text)
+        self.assertIn('timeout --signal=TERM --kill-after=3s 90s', text)
+        self.assertEqual(re.findall(r'uses: ([^\s#]+)', text), ['actions/checkout@' + CHECKOUT_SHA])
+        self.assertNotIn('secrets.', text)
+        self.assertNotIn('dropping-odds', self.text)
+        self.assertNotIn('scangoal-write', text)
+        self.assertNotIn('pull_request_target', text)
 
     def test_permissions_timeout_and_start_stamp(self):
         self.assertIn('permissions:\n  contents: write\n  actions: write\n'
