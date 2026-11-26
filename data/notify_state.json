@@ -973,12 +973,17 @@
    "state": "delivered"
   },
   "game|id:ajax-vs-thun-20261126|6ac439ed69ba": {
+   "attempt_id": "f87d78c382884da59ce7a08b4eb6a80a",
+   "attempt_utc": "2026-11-26T18:48:41+00:00",
+   "chars": 188,
    "created_utc": "2026-11-26T18:48:40+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "f2f4627ca4a6bfa377890bdf15b0151cfd405ea5e02fa5af5089af8f5c741cfd",
+   "state": "in_flight"
   },
   "game|id:al-ahli-vs-al-nasr-riyadh-20261120|be3c9eb6f973": {
    "attempt_utc": "2026-11-20T15:50:30+00:00",
@@ -5007,13 +5012,15 @@
    "attempt_utc": "2026-11-26T18:48:40+00:00",
    "chars": 199,
    "created_utc": "2026-11-26T18:48:40+00:00",
+   "done_utc": "2026-11-26T18:48:40+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "147b95fc236673496643f434fb02660727352fa52b3a2ea0f5067c19ee214e70",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:jablonec-vs-lugano-20261126|7d82c53481af": {
    "attempt_id": "e838f347d5d1447d8d296e3bcd5f5c28",
@@ -9777,7 +9784,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 622,
+  "delivered": 623,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T18:42:44+00:00",
@@ -10058,6 +10065,7 @@
   "2026-11-26T18:20:30+00:00|Pafos FC — Midtjylland|Midtjylland": true,
   "2026-11-26T18:27:57+00:00|Hearts — Monaco|AS Monaco (-0.75)": true,
   "2026-11-26T18:37:48+00:00|Ajax — Thun|Ajax (-3.25)": true,
+  "2026-11-26T18:43:17+00:00|Ajax — Thun|Under 4.5": true,
   "2026-11-26T18:45:00+00:00|Jablonec — Lugano|Lugano (0)": true
  },
  "migrations": {
@@ -10270,8 +10278,8 @@
   "Polymarket | Competição = liga & Momento = antes do jogo": 102,
   "Polymarket | Competição = liga & Momento = antes do jogo & Quota de mercado = 80 % ou mais": 87,
   "Polymarket | Competição = liga & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 94,
-  "Polymarket | Competição = liga & Momento = durante o jogo": 66,
-  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 51,
+  "Polymarket | Competição = liga & Momento = durante o jogo": 71,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 55,
   "Polymarket | Competição = liga & Número de apostas = uma": 85,
   "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 74,
   "Polymarket | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não": 111,
@@ -10295,7 +10303,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 14,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 31,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo": 44,
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo & Número de apostas = várias": 34,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo & Número de apostas = várias": 35,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias & Valor da aposta = menos de 10 mil $": 53,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 86,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": 59,
@@ -10443,6 +10451,9 @@
   },
   "item|id:ajax-vs-thun-20261126|Asian Handicap|Ajax (-3.25)": {
    "at_utc": "2026-11-26T18:42:44+00:00"
+  },
+  "item|id:ajax-vs-thun-20261126|Asian Total|Under 4.5": {
+   "at_utc": "2026-11-26T18:48:40+00:00"
   },
   "item|id:al-ahli-vs-al-nasr-riyadh-20261120|Al Nassr Total|Over 1.5": {
    "at_utc": "2026-11-20T15:50:30+00:00"
@@ -12345,7 +12356,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 934,
+ "sent_total": 935,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -13556,6 +13567,7 @@
   "2026-11-26T18:20:30+00:00|Pafos FC — Midtjylland|Midtjylland",
   "2026-11-26T18:27:57+00:00|Hearts — Monaco|AS Monaco (-0.75)",
   "2026-11-26T18:37:48+00:00|Ajax — Thun|Ajax (-3.25)",
+  "2026-11-26T18:43:17+00:00|Ajax — Thun|Under 4.5",
   "2026-11-26T18:45:00+00:00|Jablonec — Lugano|Lugano (0)"
  ]
 }
