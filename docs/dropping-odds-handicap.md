@@ -92,15 +92,25 @@ python -m scangoal.dropping_odds_alerts replay /tmp/goal-roi-dropping-odds-repla
 
 ## Testes e isolamento
 
-A suite Python da revisão de base passou 1 127 testes. Os 27 testes novos passaram em execução isolada. Exercitam os exemplos, mercados, precisão, relógios, edições, concorrência em Git local, corrupção, interrupções e todos os modos. O transporte Telegram foi simulado, incluindo 429, 503, timeout e entrega incerta. A suite Node de continuidade passou 12 testes na base e na branch. O YAML e o Bash do novo workflow passaram validação de sintaxe.
+A suite Python da revisão de base passou 1 127 testes. Os 27 testes do módulo passaram em execução isolada. Exercitam os exemplos, mercados, precisão, relógios, edições, concorrência em Git local, corrupção, interrupções e todos os modos. O transporte Telegram foi simulado, incluindo 429, 503, timeout e entrega incerta. A suite Node de continuidade passou 12 testes na base e na branch. O YAML e o Bash do novo workflow passaram validação de sintaxe. O teste da lista exata de workflows inclui agora o novo ficheiro e ganhou uma verificação dedicada das condições de execução, dos limites e do isolamento.
 
-A diferença contém só os cinco ficheiros novos abaixo. O arquivo original e a cópia de replay tiveram o mesmo SHA-256 antes e depois do ensaio. A comparação base/feature com inputs idênticos e relógio fixo usa os resultados do relatório, do simulador, dos alertas gerais e Stake e do registo prospetivo.
+A diferença contém cinco ficheiros novos e uma alteração num teste existente. O arquivo original e a cópia de replay tiveram o mesmo SHA-256 antes e depois do ensaio. A comparação offline, com entradas idênticas e relógio fixo em 26 de novembro de 2026 às 14:20:13 de Lisboa, produziu os mesmos SHA-256 na base e na branch.
 
-- `.github/workflows/dropping-odds.yml`
-- `scangoal/dropping_odds_alerts.py`
-- `scangoal/dropping_odds_journal.py`
-- `tests/test_dropping_odds_alerts.py`
-- `docs/dropping-odds-handicap.md`
+| Saída comparada | SHA-256 de ambas as revisões |
+| --- | --- |
+| Relatório completo | `30dc96a23383b756c0aa32726b80d125640925af6ee4d5859eedadfe22e83952` |
+| Simulador | `1b952e7546673657935f1676f7b18e2dc8ceea3af7e18573345e5e9ad2f0a518` |
+| Pré-visualização e estado simulado dos alertas gerais | `ef8633695440ff822137d39abc89eb07a26f5e584cc68a936f02226f3c9c79b8` |
+| Seleções Stake naquele instante | `4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945` |
+| Resumo prospetivo | `11ffa14091749516d985ac5de742744f4a0c91c6639de3e2c4eb3854eb08bb05` |
+| Registo prospetivo verificado, 444 entradas | `6f8a453950cef1a934bd1ba8bdbca97b6a1c97b5a8d5d7af47843cf5d86cede3` |
+
+- Criado `.github/workflows/dropping-odds.yml`
+- Criado `scangoal/dropping_odds_alerts.py`
+- Criado `scangoal/dropping_odds_journal.py`
+- Criado `tests/test_dropping_odds_alerts.py`
+- Criado `docs/dropping-odds-handicap.md`
+- Modificado `tests/test_collector_install.py`
 
 ## Recursos, custo e riscos residuais
 
@@ -116,7 +126,7 @@ A diferença contém só os cinco ficheiros novos abaixo. O arquivo original e a
 1. **Ativar sombra.** Depois de revisão e disponibilização do workflow em `main`, definir a variável de repositório `GOAL_ROI_DROPPING_ODDS=shadow`. Na primeira instalação, executar manualmente **Dropping Odds Handicap** com `initialize=true`. A inicialização tem de encontrar a referência ausente e grava o momento a partir do qual se observam sinais novos. As execuções seguintes podem seguir a conclusão da recolha. Acompanhar os resultados do job e a referência Git. Manter a antiguidade como proposta até aprovação própria.
 2. **Inspecionar.** Depois de `git fetch origin refs/notes/goal-roi-dropping-odds`, calcular a chave com `printf %s dropping_odds_log.jsonl | git hash-object --stdin` e ler a nota com `git show FETCH_HEAD:<chave>`. Usar `dropping_odds_state.json` no mesmo procedimento para consultar o estado.
 3. **Desativar imediatamente.** Definir `GOAL_ROI_DROPPING_ODDS=off` ou remover a variável e cancelar execuções ativas de **Dropping Odds Handicap**. Um pedido já aceite pelo Telegram pode ter sido entregue. Conservar a referência de auditoria.
-4. **Reverter.** Se o módulo vier a integrar `main`, reverter o commit de código em `main` através da revisão habitual, depois da desativação. Preservar a referência de auditoria para evitar perda do histórico de deduplicação. Após corrupção ou perda de estado, restaurar o último instantâneo íntegro verificável sob revisão e manter `off` até essa verificação.
+4. **Reverter.** Se o módulo vier a integrar `main`, reverter a alteração da PR em `main` através da revisão habitual, depois da desativação. Preservar a referência de auditoria para evitar perda do histórico de deduplicação. Após corrupção ou perda de estado, restaurar o último instantâneo íntegro verificável sob revisão e manter `off` até essa verificação.
 5. **Envio efetivo.** Requer decisão posterior. Após aprovação, fixar `GOAL_ROI_DROPPING_ODDS_ON_SINCE` em UTC no momento autorizado, incluindo em cada reativação, e definir `GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN` com o limite aprovado antes de selecionar `on`.
 
 **GO para revisão independente da PR em draft. NO-GO para produção enquanto faltar validação em sombra alojada e aprovação do limite e dos envios.**
