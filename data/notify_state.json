@@ -7062,13 +7062,15 @@
    "attempt_utc": "2026-11-26T19:30:39+00:00",
    "chars": 202,
    "created_utc": "2026-11-26T19:30:36+00:00",
+   "done_utc": "2026-11-26T19:30:36+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "01f1099a0962709cfa98704bb59174dbe186b4230f390675788d0c4bc78f7ae4",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|bbb4653ed7a1": {
    "attempt_id": "7f16b8de950d4ba29ade244deddaa394",
@@ -9374,12 +9376,17 @@
    "state": "delivered"
   },
   "game|id:union-st-gilloise-vs-lech-poznan-20261126|2bfa3b0d77bc": {
+   "attempt_id": "daa8c0108b15414cafc249cdffb93f4b",
+   "attempt_utc": "2026-11-26T19:30:41+00:00",
+   "chars": 195,
    "created_utc": "2026-11-26T19:30:36+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "e4197013a2e38a19f46d825da8386d39ba69c0db4fab2c679abb3549a2a54d4f",
+   "state": "in_flight"
   },
   "game|id:universitario-de-vinto-vs-cd-gualberto-villarroel-20261124|7883fe858daa": {
    "attempt_id": "55a1ad331df64124aa494001dade6635",
@@ -10167,7 +10174,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 648,
+  "delivered": 649,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T19:28:20+00:00",
@@ -10476,6 +10483,7 @@
   "2026-11-26T19:23:12+00:00|NEC Nijmegen — Rennes|Over 3.5": true,
   "2026-11-26T19:25:10+00:00|Celta Vigo — Bournemouth|Over 3.5": true,
   "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5": true,
+  "2026-11-26T19:27:21+00:00|Union St Gilloise — Lech Poznan|Draw": true,
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)": true
  },
  "migrations": {
@@ -12740,6 +12748,9 @@
   "item|id:union-berlin-vs-leipzig-20261121|1x2|RB Leipzig": {
    "at_utc": "2026-11-21T14:52:32+00:00"
   },
+  "item|id:union-st-gilloise-vs-lech-poznan-20261126|1x2|Draw": {
+   "at_utc": "2026-11-26T19:30:36+00:00"
+  },
   "item|id:universitario-de-vinto-vs-cd-gualberto-villarroel-20261124|Polymarket|AH2(+0.5)": {
    "at_utc": "2026-11-23T21:48:44+00:00"
   },
@@ -12847,7 +12858,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 960,
+ "sent_total": 961,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -14086,6 +14097,7 @@
   "2026-11-26T19:23:12+00:00|NEC Nijmegen — Rennes|Over 3.5",
   "2026-11-26T19:25:10+00:00|Celta Vigo — Bournemouth|Over 3.5",
   "2026-11-26T19:27:21+00:00|Olympiacos — AC Milan|Over 5.5",
+  "2026-11-26T19:27:21+00:00|Union St Gilloise — Lech Poznan|Draw",
   "2026-11-26T19:27:22+00:00|Besiktas — Hapoel Beer Sheva|Besiktas (-1)"
  ]
 }
