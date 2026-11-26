@@ -70,5 +70,32 @@ class PagesSite(unittest.TestCase):
         self.assertEqual(found, INVENTORY, "consumidor novo ou removido: rever ops/reports-out-of-git/README.md antes da fase 2")
 
 
+
+class ConsumerCheckScript(unittest.TestCase):
+    """O verificador que o operador corre no Brain/Termux distingue o relatório prospetivo dos relatórios gerados."""
+
+    def run_on(self, files):
+        with tempfile.TemporaryDirectory() as d:
+            for name, text in files.items():
+                (Path(d) / name).write_text(text)
+            return subprocess.run(["sh", str(ROOT / "ops/reports-out-of-git/check_consumers.sh"), d], capture_output=True, text=True)
+
+    def test_prospective_only_is_clean(self):
+        r = self.run_on({"ciclo.py": "p = 'data/prospective_report.json'\n",
+                         "sync.sh": "curl https://raw.githubusercontent.com/x/y/main/data/prospective_report.json\n"})
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_generated_report_references_are_flagged(self):
+        for text in ("open('data/report.json')", "curl https://nunovinhas-creator.github.io/goal-roi/report.json",
+                     "url = 'https://raw.githubusercontent.com/nunovinhas-creator/goal-roi/main/docs/bets.csv'"):
+            r = self.run_on({"x.py": text + "\n"})
+            self.assertEqual(r.returncode, 1, text)
+            self.assertIn("x.py:1:", r.stdout)
+
+    def test_usage_error(self):
+        r = subprocess.run(["sh", str(ROOT / "ops/reports-out-of-git/check_consumers.sh")], capture_output=True)
+        self.assertEqual(r.returncode, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

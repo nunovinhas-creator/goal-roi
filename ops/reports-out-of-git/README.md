@@ -15,7 +15,13 @@ Os relatórios gerados (`data/report.json`, `docs/report.json`, `docs/bets.csv`)
 | Pages: painel clássico (`docs/dashboard.js`) | `report.json` | `fetch('report.json')` relativo ao site | Nenhum, se o site publicar o mesmo caminho |
 | Pages: V6.1 (`docs/v6/v6-app.js`) | `../report.json`, `snapshots/…` | idem | Nenhum, idem |
 | Android | o site Pages | HTTP | Nenhum, idem (validar no dispositivo) |
-| Brain V5 (fora do repositório) | caminhos prospetivos; sincronização Termux | Git/raw | **Por validar.** O registo diz que lê os caminhos prospetivos, que ficam. Se ler `data/report.json` por Git ou raw, a fase 2 parte-o |
+| Brain V5: `ciclo.py`, `sincronizar.py` | relatório **prospetivo** | Git/raw | Nenhum (confirmado pelo responsável: não usam o relatório geral) |
+| Brain V5: restantes scripts e `brain-sync.sh` (repositório privado `goal-roi-brain`) | desconhecido | — | **Por confirmar.** A leitura do repositório foi recusada nesta sessão. Correr `check_consumers.sh` no repositório e na pasta Termux (abaixo) |
+| Avisos Telegram (`scangoal/notify.py`, `PAGE`) | ligação para a raiz do site | HTTP | Nenhum, se o site mantiver o endereço |
+| `docs/index.html` (botões "Descarregar CSV" e "Abrir JSON") | `bets.csv`, `report.json` | ligações relativas | Nenhum: o site publica os mesmos caminhos |
+| `audits/dashboard-ux/capture.cjs`, `audits/v6-intelligence/measure.cjs` | `docs/report.json` | ficheiro local num checkout | Ferramentas de auditoria: gerar o relatório localmente (`python -m scangoal.report`) ou descarregá-lo do site |
+| Repositórios públicos `Monte-Carlos`, `ET-spotter`, `tens-direito`, `tensdireito-content-engine` | — | — | Nenhuma referência ao goal-roi (pesquisa de código a 26/11/2026) |
+| Terceiros que leiam o site público | `/report.json`, `/bets.csv` | HTTP | Nenhum, se o site mantiver os caminhos; desconhecidos que usem `raw.githubusercontent.com` partem na fase 2 (a opção B mitiga) |
 | `raw.githubusercontent.com/…/main/data/prospective_report.json` (V6) | registo prospetivo | raw | Nenhum: não é vista, fica no Git |
 | `scangoal/report.py` | escreve `data/report.json` e `docs/bets.csv` | ficheiro local | Nenhum (continua a escrever localmente) |
 | `scangoal/watch.py` | escreve `docs/report.json` | ficheiro local | Precisa de publicar o site no fim do ciclo |
@@ -24,6 +30,14 @@ Os relatórios gerados (`data/report.json`, `docs/report.json`, `docs/bets.csv`)
 | `scangoal/publication.py` | `PATHS` inclui `docs/report.json`, `docs/bets.csv` | lista de caminhos permitidos | Retirar da lista na fase 2 |
 | `.github/workflows/collect.yml` | `cp data/report.json docs/report.json` | passo do workflow | Substituir pela publicação do site |
 | `scripts/*cutover*.py`, `post_cutover_check.py` | `git show <commit>:data/report.json` | história | Continuam a funcionar para commits antigos; deixam de servir para commits futuros |
+
+### Verificação do Brain e do Termux (só leitura, a correr pelo responsável)
+
+```sh
+sh ops/reports-out-of-git/check_consumers.sh ~/goal-roi-brain ~/caminho-do-termux
+```
+
+Lista cada referência a `report.json` ou `bets.csv` (o relatório prospetivo é excluído), ao site ou ao `raw` do goal-roi. Código 0 = nenhuma; 1 = rever antes da fase 2. Não altera nada; não toca no `brain-sync.sh`.
 
 `tests/test_pages_site.py` fixa este inventário: uma referência nova em `scangoal/` ou `.github/` faz o teste falhar e obriga a rever a tabela.
 
@@ -48,7 +62,7 @@ Recomendação: **A, com B como passo intermédio**. A preserva os caminhos púb
 3. Critério: durante 7 dias, o `report.json` servido tem o SHA-256 igual ao do commit da mesma recolha (`site-manifest.json`), e o painel clássico, a V6.1 e o Android funcionam.
 
 **Fase 2 (deixar de versionar; exige autorização e validação do Brain).**
-1. Confirmar no Brain V5 e no Termux que nenhum lê `data/report.json`, `docs/report.json` ou `docs/bets.csv` por Git ou raw.
+1. Confirmar no Brain V5 e no Termux, com `check_consumers.sh` (código 0), que nenhum lê `data/report.json`, `docs/report.json` ou `docs/bets.csv` por Git ou raw. `ciclo.py` e `sincronizar.py` já estão confirmados.
 2. Um commit normal: `git rm --cached data/report.json docs/report.json docs/bets.csv` e `.gitignore`. A história anterior fica intacta e consultável.
 3. Retirar os caminhos de `publication.py` (`PATHS`) e o `cp` de `collect.yml`. `watch.py` volta a publicar o site no fim do ciclo.
 4. `certification --activate`: documentar a obtenção do relatório publicado a partir do site com conferência do SHA do manifesto.
