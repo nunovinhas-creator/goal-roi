@@ -4516,13 +4516,15 @@
    "attempt_utc": "2026-11-26T18:00:59+00:00",
    "chars": 181,
    "created_utc": "2026-11-26T18:00:59+00:00",
+   "done_utc": "2026-11-26T18:00:59+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "8f8d72d7f0a50ac59051a154b9aebe8b31eb47f7b86b73d8d09ea9bb2b7c0aac",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:hearts-vs-monaco-20261126|6ac576b42111": {
    "attempt_id": "31d56a328576456ea607e3920f551b53",
@@ -6636,12 +6638,17 @@
    "state": "delivered"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|ca508b958893": {
+   "attempt_id": "83c42403c5cf4d6fae84c11d6aec838f",
+   "attempt_utc": "2026-11-26T18:01:01+00:00",
+   "chars": 200,
    "created_utc": "2026-11-26T18:00:59+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "77b4506189b2288e8a75eed8798a08865e97acd5b023773c2e8f8ad82553f6e1",
+   "state": "in_flight"
   },
   "game|id:olympiacos-vs-ac-milan-20261126|f4ef33a25de0": {
    "attempt_id": "810b3f33cf6a489f80479440026a3cd1",
@@ -9612,7 +9619,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 611,
+  "delivered": 612,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T17:55:12+00:00",
@@ -9881,6 +9888,7 @@
   "2026-11-26T17:36:19+00:00|Olympiacos — AC Milan|AC Milan": true,
   "2026-11-26T17:38:33+00:00|Olympiacos — AC Milan|AH1(+0.5)": true,
   "2026-11-26T17:49:04+00:00|Olympiacos — AC Milan|Under 2": true,
+  "2026-11-26T17:53:19+00:00|Olympiacos — AC Milan|AC Milan": true,
   "2026-11-26T17:55:13+00:00|Hearts — Monaco|AS Monaco": true
  },
  "migrations": {
@@ -11538,6 +11546,9 @@
   "item|id:olympiacos-vs-ac-milan-20261126|Asian Total|Under 2.75": {
    "at_utc": "2026-11-26T17:11:54+00:00"
   },
+  "item|id:olympiacos-vs-ac-milan-20261126|Draw No Bet|AC Milan": {
+   "at_utc": "2026-11-26T18:00:59+00:00"
+  },
   "item|id:olympiacos-vs-ac-milan-20261126|Polymarket|AH1(+0.5)": {
    "at_utc": "2026-11-26T17:41:43+00:00"
   },
@@ -12131,7 +12142,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 923,
+ "sent_total": 924,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -13330,6 +13341,7 @@
   "2026-11-26T17:36:19+00:00|Olympiacos — AC Milan|AC Milan",
   "2026-11-26T17:38:33+00:00|Olympiacos — AC Milan|AH1(+0.5)",
   "2026-11-26T17:49:04+00:00|Olympiacos — AC Milan|Under 2",
+  "2026-11-26T17:53:19+00:00|Olympiacos — AC Milan|AC Milan",
   "2026-11-26T17:55:13+00:00|Hearts — Monaco|AS Monaco"
  ]
 }
