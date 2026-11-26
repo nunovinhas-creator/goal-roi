@@ -4805,12 +4805,17 @@
    "state": "delivered"
   },
   "game|id:hajduk-split-vs-sint-truiden-20261126|5a079ba8951b": {
+   "attempt_id": "d4eeb9325d4246c48b71046429d19b1e",
+   "attempt_utc": "2026-11-26T21:26:04+00:00",
+   "chars": 201,
    "created_utc": "2026-11-26T21:26:03+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "fba4cf1b19ca3bb59b7c81fd675719f02bf812efed1e46de67e4568de8e5df7a",
+   "state": "in_flight"
   },
   "game|id:hammarby-vs-ifk-goteborg-20261123|5a204c1463f3": {
    "attempt_id": "b6bda9a5c2ab4835a478014bde8e7a0b",
@@ -5492,13 +5497,15 @@
    "attempt_utc": "2026-11-26T21:26:03+00:00",
    "chars": 212,
    "created_utc": "2026-11-26T21:26:03+00:00",
+   "done_utc": "2026-11-26T21:26:03+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "dfa28abe04ae8259497ea4c91aa829db7a44c89aad23815801673d7c8346cfa6",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:juventus-vs-venezia-20261122|f1bd3961b539": {
    "attempt_utc": "2026-11-22T13:14:08+00:00",
@@ -10430,7 +10437,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 665,
+  "delivered": 666,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T21:19:14+00:00",
@@ -10760,6 +10767,7 @@
   "2026-11-26T21:01:29+00:00|CSKA Sofia — Trabzonspor|PFC CSKA Sofia (-0.5)": true,
   "2026-11-26T21:01:30+00:00|CSKA Sofia — Trabzonspor|PFC CSKA Sofia (-0.75)": true,
   "2026-11-26T21:01:32+00:00|Hoffenheim — SK Sturm Graz|Under 3.5": true,
+  "2026-11-26T21:17:28+00:00|Hajduk Split — Sint Truiden|Over 3": true,
   "2026-11-26T21:20:30+00:00|Juventus — Omonia Nicosia|Over 4": true
  },
  "migrations": {
@@ -10953,7 +10961,7 @@
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": 26,
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": 84,
-  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos": 35,
+  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos": 38,
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": 31,
   "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 47,
   "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 51,
@@ -12026,6 +12034,9 @@
   },
   "item|id:guyana-vs-puerto-rico-20261116|Asian Total|Over 4": {
    "at_utc": "2026-11-16T20:22:19+00:00"
+  },
+  "item|id:hajduk-split-vs-sint-truiden-20261126|Asian Total|Over 3": {
+   "at_utc": "2026-11-26T21:26:03+00:00"
   },
   "item|id:hammarby-vs-ifk-goteborg-20261123|Asian Total|Over 3.5": {
    "at_utc": "2026-11-23T17:33:20+00:00"
@@ -13208,7 +13219,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 977,
+ "sent_total": 978,
  "statuses": {
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
@@ -14481,6 +14492,7 @@
   "2026-11-26T21:01:29+00:00|CSKA Sofia — Trabzonspor|PFC CSKA Sofia (-0.5)",
   "2026-11-26T21:01:30+00:00|CSKA Sofia — Trabzonspor|PFC CSKA Sofia (-0.75)",
   "2026-11-26T21:01:32+00:00|Hoffenheim — SK Sturm Graz|Under 3.5",
+  "2026-11-26T21:17:28+00:00|Hajduk Split — Sint Truiden|Over 3",
   "2026-11-26T21:20:30+00:00|Juventus — Omonia Nicosia|Over 4"
  ]
 }
