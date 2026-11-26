@@ -1,0 +1,195 @@
+{
+ "aviso": "Citações literais dos termos oficiais. Nenhuma regra aqui admite sinais: só define o que teria de ser verdade para uma futura admissão, sujeita a aprovação humana.",
+ "obtido_em_utc": "2026-11-26",
+ "fontes": {
+  "KALSHI_SOCCERGAME": {
+   "url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERGAME.pdf",
+   "contrato": "SOCCERGAMEWIN",
+   "sha256": "bbab0420e9746da437bf08cb237709cd31d359f4ecb74db0e08585a2fc807dd2",
+   "estado": "oficial"
+  },
+  "KALSHI_SOCCERSPREAD": {
+   "url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERSPREAD.pdf",
+   "contrato": "SOCCERSPREADS",
+   "sha256": "26f36cdb18fe3044a25f381df572b79c259a3261dc7e8cae22d666c1f3c2afc1",
+   "estado": "oficial"
+  },
+  "KALSHI_SOCCERTOTAL": {
+   "url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERTOTAL.pdf",
+   "contrato": "SOCCERTOTALS",
+   "sha256": "8f3a7f1fcbb053afd945d58c0f1362955075011109e50d413f3ca42f78fbf0fd",
+   "estado": "oficial"
+  },
+  "KALSHI_SOCCERADVANCEMETHOD": {
+   "url": "https://kalshi-public-docs.s3.amazonaws.com/contract_terms/SOCCERADVANCEMETHOD.pdf",
+   "contrato": "SOCCERADVANCEMETHOD",
+   "sha256": "c549b9edbc49e8811afde5b453bf7b58e2619acc8928f43e7878841dcedf9940",
+   "estado": "oficial"
+  },
+  "POLYMARKET": {
+   "url": "https://docs.polymarket.us/faqs/sports-faqs.md",
+   "tipo": "md",
+   "sha256": "040caacbf98663411549cd32fc4d8362a4315d855e7dc245bd46dacccec83c22",
+   "estado": "oficial",
+   "ambito": "Polymarket US (bolsa regulada nos EUA); não define as regras dos mercados internacionais"
+  },
+  "STAKE": {
+   "url": "https://stake.com/policies/sportsbook",
+   "estado": "fonte_oficial_nao_obtida",
+   "motivo": "o domínio responde 403 com desafio de navegador (proteção do site); não contornado"
+  },
+  "POLYMARKET_INTL": {
+   "url": "https://docs.polymarket.com/concepts/resolution.md",
+   "tipo": "md",
+   "sha256": "81be64368630d9fef90dc566f6311b91a87b4149abffe586c469626692f73f11",
+   "estado": "oficial",
+   "ambito": "Polymarket internacional: cada mercado tem regras próprias; o texto de cada mercado não foi obtido (outro domínio)"
+  },
+  "STAKE_HELP_AH": {
+   "url": "https://help.stake.com/en/articles/10004266-what-is-asian-handicap-betting",
+   "tipo": "html_article",
+   "estado": "oficial",
+   "ambito": "centro de ajuda da Stake (texto explicativo; remete para as regras do sportsbook, não obtidas)"
+  },
+  "STAKE_HELP_AT": {
+   "url": "https://help.stake.com/en/articles/5086225-how-do-asian-totals-work",
+   "tipo": "html_article",
+   "estado": "oficial",
+   "ambito": "centro de ajuda da Stake (texto explicativo; remete para as regras do sportsbook, não obtidas)"
+  },
+  "STAKE_HELP_VOID": {
+   "url": "https://help.stake.com/en/articles/4828278-what-does-it-mean-when-a-bet-is-voided",
+   "tipo": "html_article",
+   "estado": "oficial",
+   "ambito": "centro de ajuda da Stake (texto explicativo; remete para as regras do sportsbook, não obtidas)"
+  },
+  "STAKE_HELP_EH": {
+   "url": "https://help.stake.com/en/articles/5178307-what-is-the-3-way-european-handicap-bet-and-how-does-it-work",
+   "tipo": "html_article",
+   "estado": "oficial",
+   "ambito": "centro de ajuda da Stake (texto explicativo; remete para as regras do sportsbook, não obtidas)"
+  }
+ },
+ "regras": {
+  "K-GW-SCOPE": {
+   "fonte": "KALSHI_SOCCERGAME",
+   "citacao": "<result scope> may take one of the following values, each as defined in the Payout Criterion: (i) \"first half,\" (ii) \"regulation time,\" (iii) \"second half,\" (iv) \"extra time,\" or (v) \"full match.\"",
+   "leitura": "O mesmo rótulo de vencedor pode referir-se a cinco âmbitos. A mensagem do bot não indica o âmbito."
+  },
+  "K-GW-DRAW": {
+   "fonte": "KALSHI_SOCCERGAME",
+   "citacao": "For any <soccer game> and <result scope>, the set comprising each participant's <team>-win iteration and the Draw iteration is mutually exclusive and collectively exhaustive",
+   "leitura": "Vitória A, empate e vitória B são exaustivos dentro do âmbito: 'não A' = empate ou vitória B no mesmo âmbito."
+  },
+  "K-GW-REG": {
+   "fonte": "KALSHI_SOCCERGAME",
+   "citacao": "regulation play meaning two halves of 45 minutes plus any stoppage time added by the match referee",
+   "leitura": "Âmbito regulamentar = 90 min + descontos, como o 1X2 do parser."
+  },
+  "K-GW-REG-DRAW": {
+   "fonte": "KALSHI_SOCCERGAME",
+   "citacao": "draws at the conclusion of regulation play do not constitute a win, regardless of whether <soccer game> is subsequently decided by extra time, penalty shootout",
+   "leitura": "No âmbito regulamentar, prolongamento e penáltis não contam."
+  },
+  "K-GW-FULL": {
+   "fonte": "KALSHI_SOCCERGAME",
+   "citacao": "\"Full match\" means the final result of <soccer game> as officially confirmed by the organizer of <soccer game>,",
+   "leitura": "No âmbito 'full match' conta o resultado oficial final (pode incluir prolongamento e penáltis): difere do 1X2 em eliminatórias."
+  },
+  "K-SP-PAYOUT": {
+   "fonte": "KALSHI_SOCCERSPREAD",
+   "citacao": "The Payout Criterion for the Contract encompasses the Expiration Values that <team> has won <time period> of <soccer game> by <above/below/exactly/at least/between> <count> goals.",
+   "leitura": "Um spread Kalshi é 'equipa ganha por mais de N golos'. Só existe a forma vencedora; '+N' não tem contrato correspondente."
+  },
+  "K-SP-DEFAULT": {
+   "fonte": "KALSHI_SOCCERSPREAD",
+   "citacao": "Where not specified otherwise, <time period> shall be understood to refer to the sum of regulation time and extra time.",
+   "leitura": "Por omissão inclui prolongamento: igual ao handicap asiático em 90 min só em jogos sem prolongamento."
+  },
+  "K-SP-TIE": {
+   "fonte": "KALSHI_SOCCERSPREAD",
+   "citacao": "If both teams are tied at the conclusion of <time period>, neither will have been considered to have won, the “spread” will be 0, and all markets shall resolve to “No”.",
+   "leitura": "Empate = Não."
+  },
+  "K-TO-DEFAULT": {
+   "fonte": "KALSHI_SOCCERTOTAL",
+   "citacao": "Extra-time goals are included unless explicitly excluded. Penalties are not included unless explicitly included.",
+   "leitura": "Totais Kalshi incluem prolongamento por omissão."
+  },
+  "K-ABANDON-90": {
+   "fonte": "KALSHI_SOCCERSPREAD",
+   "citacao": "if <soccer game> has reached ninety (90) minutes of play, or the governing league or organizer of <soccer game> declares <soccer game> complete, all markets shall instead be settled based on what has occurred as of that point",
+   "leitura": "Abandono depois dos 90 min liquida pelo ocorrido; antes, preço justo da bolsa (não liquidável pelo parser)."
+  },
+  "K-ADV-METHOD": {
+   "fonte": "KALSHI_SOCCERADVANCEMETHOD",
+   "citacao": "The Underlying for this Contract is whether <team> advances past <opponent> in <knockout tie> via <method>.",
+   "leitura": "Apuramento é outro contrato; não é liquidável pelo resultado de um só jogo."
+  },
+  "PM-US-SOCCER-REG": {
+   "fonte": "POLYMARKET",
+   "citacao": "All markets are based on the result at the end of 90 minutes plus stoppage, unless explicitly stated otherwise. Extra time, golden goals, and penalty shootouts are not included unless the Contract Terms specify otherwise.",
+   "leitura": "Na Polymarket US, futebol = 90 min + descontos por omissão, como o liquidante do parser."
+  },
+  "PM-US-SOCCER-DRAW": {
+   "fonte": "POLYMARKET",
+   "citacao": "For any market in which a draw is a listed outcome (league or group-stage matches), the market refers to regulation time only.",
+   "leitura": "Com empate como resultado listado, só conta o tempo regulamentar."
+  },
+  "PM-US-WINNER-TIE": {
+   "fonte": "POLYMARKET",
+   "citacao": "Three Contracts per game (Team A Win, Team B Win, Draw). Exactly one settles at $1.00, the others at $0.00.",
+   "leitura": "'Não A' = empate ou vitória B."
+  },
+  "PM-US-SPREAD": {
+   "fonte": "POLYMARKET",
+   "citacao": "Half-point spreads (e.g. -3.5) are used to avoid ties.",
+   "leitura": "Linhas de meio ponto: sem devoluções."
+  },
+  "PM-US-SPREAD-SIDES": {
+   "fonte": "POLYMARKET",
+   "citacao": "The Chiefs Contract settles at $1.00 if they win by 4 or more. The Eagles Contract settles at $1.00 if they lose by 3 or fewer or win outright.",
+   "leitura": "Um spread tem dois contratos: o favorito com -N e o adversário com +N. Confirma a hipótese de que, em 'X (-N) (Y)', Y pode ser o lado comprado, mas só para a Polymarket US."
+  },
+  "PM-US-POSTPONE-FLIP": {
+   "fonte": "POLYMARKET",
+   "citacao": "if a postponed match is rescheduled with the home and away team designations reversed, the original Contract settles at LFMP",
+   "leitura": "Jogo adiado com casa/fora trocados: preço justo, não liquidável pelo parser."
+  },
+  "PM-US-CANCEL": {
+   "fonte": "POLYMARKET",
+   "citacao": "If a game is canceled and not rescheduled before the Contract’s expiration date, the Contract settles at last fair market prices as of the time the cancellation was officially announced.",
+   "leitura": "Cancelamento: preço justo, não liquidável pelo parser."
+  },
+  "PM-INTL-RULES": {
+   "fonte": "POLYMARKET_INTL",
+   "citacao": "Always read the resolution rules before trading. The market title describes the question, but the rules define how it resolves.",
+   "leitura": "Na Polymarket internacional não há regra geral de futebol: vale o texto de cada mercado."
+  },
+  "ST-AH-PERIOD": {
+   "fonte": "STAKE_HELP_AH",
+   "citacao": "When you place a bet, the handicap line is used to adjust the final score of the period for which you wagered.",
+   "leitura": "O handicap aplica-se ao resultado final do período; o artigo não diz como trata golos anteriores a uma aposta ao vivo nem se o período por omissão exclui prolongamento."
+  },
+  "ST-AT-QUARTER": {
+   "fonte": "STAKE_HELP_AT",
+   "citacao": "Quarter lines (.25/.75) is when your wagered amount is split in half between the nearest whole and half market lines.",
+   "leitura": "Linhas de quarto: meia vitória ou meia derrota, como o parser."
+  },
+  "ST-AT-WHOLE": {
+   "fonte": "STAKE_HELP_AT",
+   "citacao": "This means that bets are void if the total number of goals scored is equal to the line offered.",
+   "leitura": "Linha inteira igual ao total: devolução."
+  },
+  "ST-VOID-ABANDON": {
+   "fonte": "STAKE_HELP_VOID",
+   "citacao": "If a match is canceled or abandoned before completion, all bets placed on that match are generally voided.",
+   "leitura": "Abandono: devolução (\"generally\": as regras do sportsbook, não obtidas, prevalecem)."
+  },
+  "ST-VOID-RULES": {
+   "fonte": "STAKE_HELP_VOID",
+   "citacao": "The odds provider may void bets placed on incorrect offers as outlined in the sportsbook rules.",
+   "leitura": "As regras vinculativas estão no sportsbook (stake.com/policies), não obtidas."
+  }
+ }
+}
