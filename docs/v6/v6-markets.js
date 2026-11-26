@@ -19,10 +19,10 @@
   // (preço e volume próprios), não de canal. Sinais analíticos do próprio canal não são uma fonte de mercado.
   const MARKET_SOURCES = {BETFAIR: 'Betfair', POLYMARKET: 'Polymarket', STAKE_LOAD: 'Stake'};
   const CATEGORIES = {
-    convergencia: 'Convergência entre fontes independentes',
-    repeticao: 'Repetição na mesma fonte',
-    exclusivas_entre_fontes: 'Seleções mutuamente exclusivas entre fontes',
-    exclusivas_mesma_fonte: 'Seleções opostas na mesma fonte',
+    convergencia: 'Convergência entre plataformas distintas',
+    repeticao: 'Repetição na mesma plataforma',
+    exclusivas_entre_fontes: 'Seleções mutuamente exclusivas entre plataformas',
+    exclusivas_mesma_fonte: 'Seleções opostas na mesma plataforma',
     compativeis: 'Mercados compatíveis',
     nao_comparaveis: 'Mercados não comparáveis',
     divergencia_temporal: 'Divergência temporal',
@@ -167,7 +167,7 @@
     if (rel.relation === 'nao_comparaveis') return Object.assign(out, {category: 'nao_comparaveis'});
     if (rel.relation === 'insuficiente') return Object.assign(out, {category: 'insuficiente'});
     if (rel.relation === 'compativeis') return Object.assign(out, {category: 'compativeis'});
-    if (!srcA || !srcB) return Object.assign(out, {category: 'insuficiente', reason: 'sinal analítico do canal, não é uma fonte de mercado independente'});
+    if (!srcA || !srcB) return Object.assign(out, {category: 'insuficiente', reason: 'sinal analítico do canal, não é uma plataforma de mercado'});
     const t1 = Date.parse(sa.d), t2 = Date.parse(sb.d);
     if (!Number.isFinite(t1) || !Number.isFinite(t2)) return Object.assign(out, {category: 'insuficiente', reason: 'hora do sinal desconhecida'});
     if (srcA === srcB) return Object.assign(out, {category: rel.relation === 'equivalentes' ? 'repeticao' : 'exclusivas_mesma_fonte'});

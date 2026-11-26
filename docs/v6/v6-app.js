@@ -51,9 +51,9 @@
   // Um estado decisório só é mostrado se o relatório prospetivo cumprir o protocolo; caso contrário, "certificação inválida".
   const statusLabel = (map, status, valid) => (!valid && status !== 'insufficient_games') ? ['certificação inválida', 'bad'] : (map[status] || [String(status || '—'), '']);
   // Relações do motor de mercados (v6-markets.js): rótulo e gravidade visual.
-  const REL = {exclusivas_entre_fontes: ['seleções exclusivas entre fontes', 'bad'], convergencia: ['convergência entre fontes', 'info'],
-    divergencia_temporal: ['divergência temporal', 'warn'], concordancia_nao_contemporanea: ['concordância não contemporânea', ''], exclusivas_mesma_fonte: ['opostas na mesma fonte', ''], compativeis: ['compatíveis', ''],
-    repeticao: ['repetição na mesma fonte', ''], insuficiente: ['evidência insuficiente', 'warn'], nao_comparaveis: ['não comparáveis', '']};
+  const REL = {exclusivas_entre_fontes: ['seleções exclusivas entre plataformas', 'bad'], convergencia: ['convergência entre plataformas', 'info'],
+    divergencia_temporal: ['divergência temporal', 'warn'], concordancia_nao_contemporanea: ['concordância não contemporânea', ''], exclusivas_mesma_fonte: ['opostas na mesma plataforma', ''], compativeis: ['compatíveis', ''],
+    repeticao: ['repetição na mesma plataforma', ''], insuficiente: ['evidência insuficiente', 'warn'], nao_comparaveis: ['não comparáveis', '']};
   const relTag = k => k ? tag(REL[k][0], REL[k][1]) : tag('um só sinal', '');
   const REL_ORDER = Object.keys(REL);
   function relationsBlock(r, limit) {
@@ -66,7 +66,7 @@
       (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + x.a.market + ' ' + x.a.selection) + ' × ' +
         esc(x.b.source + ' · ' + x.b.market + ' ' + x.b.selection) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
         (total > pairs.length ? '<p class="note" style="padding:0 12px">A mostrar ' + int(pairs.length) + ' de ' + int(total) + ' pares, os mais graves primeiro.</p>' : '') : '') +
-      '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação de produção (linhas asiáticas, devoluções e meias). Plataformas distintas, mesmo canal de recolha.</p>';
+      '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação de produção (linhas asiáticas, devoluções e meias). Plataformas distintas chegam pelo mesmo canal de recolha: a independência estatística entre elas não está demonstrada, e uma convergência não é uma confirmação independente.</p>';
   }
   const VERD = {'favorável': 'good', 'misto': 'warn', 'contraditório': '', 'evitar': 'bad', 'sem evidência': ''};
   // O relatório chama "contraditório" a qualquer jogo com seleções diferentes no mesmo mercado (brain.py), mesmo que
@@ -501,7 +501,7 @@
     for (const m of sg.markets) for (const [k, v] of Object.entries(m.relations.counts)) tot[k] = (tot[k] || 0) + v;
     html += panel('Relações em todos os jogos com cronologia', table(['Relação', {t: 'Pares', n: 1}], REL_ORDER.map(k => '<tr>' + td(relTag(k)) + td(int(tot[k] || 0), 'n') + '</tr>')
       .concat(['<tr>' + td('observações repetidas (não são pares)') + td(int(tot.observacoes_repetidas || 0), 'n') + '</tr>']), 'Relações agregadas') +
-      '<p class="note" style="padding:0 12px 12px">"Exclusivas" significa que não existe resultado final em que ambas ganhem. Pares compatíveis (por exemplo Over 1,5 e Under 3,5) não são contradições. Opostas na mesma fonte não contam como contradição entre fontes. Sinais afastados no tempo ou em fases diferentes são divergência temporal. Mercados de cantos, cartões, partes do jogo ou totais por equipa não são comparáveis. Na dúvida, evidência insuficiente.</p>',
+      '<p class="note" style="padding:0 12px 12px">"Exclusivas" significa que não existe resultado final em que ambas ganhem. Pares compatíveis (por exemplo Over 1,5 e Under 3,5) não são contradições. Opostas na mesma plataforma não contam como contradição entre plataformas. Sinais afastados no tempo ou em fases diferentes são divergência temporal. Mercados de cantos, cartões, partes do jogo ou totais por equipa não são comparáveis. Na dúvida, evidência insuficiente.</p>',
       {fold: 1, span: 'span-6', flush: true, meta: 'pares de seleções distintas'});
     const pm = sg.price_move;
     if (pm) {
@@ -553,7 +553,7 @@
       '<label>Leitura do relatório<select name="verdict">' + '<option value="">Todas</option>' + verdicts.map(v => '<option value="' + esc(v) + '"' + (v === f.verdict ? ' selected' : '') + '>' + esc(VLABEL(v)) + '</option>').join('') + '</select></label>' +
       '<label>Odd mín.<input type="number" step="0.01" min="1" name="min" value="' + esc(f.min) + '" inputmode="decimal"></label>' +
       '<label>Odd máx.<input type="number" step="0.01" min="1" name="max" value="' + esc(f.max) + '" inputmode="decimal"></label>' +
-      '<label class="check"><input type="checkbox" name="conflict"' + (f.conflict ? ' checked' : '') + '> Só seleções exclusivas entre fontes</label></form>';
+      '<label class="check"><input type="checkbox" name="conflict"' + (f.conflict ? ' checked' : '') + '> Só seleções exclusivas entre plataformas</label></form>';
     html += '<div id="radar-results">' + radarResults(sg) + '</div>';
     return html;
   }
