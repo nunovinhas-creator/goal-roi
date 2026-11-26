@@ -92,6 +92,26 @@ class ConsumerCheckScript(unittest.TestCase):
             self.assertEqual(r.returncode, 1, text)
             self.assertIn("x.py:1:", r.stdout)
 
+    def test_prospective_reference_does_not_hide_generated_reference(self):
+        r = self.run_on({"x.py": "a = 'prospective_report.json'; b = 'report.json'\n"})
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn("x.py:1:", r.stdout)
+
+    def test_simple_dynamic_reference_is_flagged(self):
+        r = self.run_on({"x.py": "p = 'report' + '.json'\n"})
+        self.assertEqual(r.returncode, 1, r.stdout)
+
+    def test_missing_file_is_not_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = subprocess.run(["sh", str(ROOT / "ops/reports-out-of-git/check_consumers.sh"),
+                                str(Path(d) / "missing")], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 2)
+
+    def test_output_does_not_include_source_line(self):
+        r = self.run_on({"x.py": "p = 'report.json'; example_secret = 'TEST_SECRET'\n"})
+        self.assertEqual(r.returncode, 1)
+        self.assertNotIn("TEST_SECRET", r.stdout)
+
     def test_usage_error(self):
         r = subprocess.run(["sh", str(ROOT / "ops/reports-out-of-git/check_consumers.sh")], capture_output=True)
         self.assertEqual(r.returncode, 2)
