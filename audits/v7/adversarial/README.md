@@ -22,6 +22,8 @@ Os quatro defeitos da PR #98 continuam corrigidos (11 testes existentes passam).
 
 ## Cache CDN × ranhuras (`cdn_slot_sim.py`)
 
+**Limite superior.** O staging HTTPS (PR #106, `ops/staging/`) mostrou que, com ponteiro e corpos na mesma cache, um ponteiro atrasado continua coerente: os corpos com `?v=` ficam em cache com ele. Os valores abaixo só se aplicam quando ponteiro e corpos estão em níveis ou nós de cache diferentes (cache do navegador, outro nó, despejo LRU). A frequência real só se mede numa CDN real.
+
 Publicações: os 1 628 instantes em que `docs/report.json` mudou em `main` entre 19/11 e 26/11/2026 (`publicacoes-report-7d.txt`). Intervalo p10/p50/p90: 112/381/577 s. Em 26,6 % dos casos há duas publicações em menos de 600 s. Modelo: idade do ponteiro em cache uniforme em [0, 600] s (pior caso), corpos com chave nova. É um limite superior, porque o Pages cancela implantações sobrepostas.
 
 | Limite entre publicações de snapshots | 2 ranhuras | 3 ranhuras | 4 ranhuras |
@@ -45,7 +47,7 @@ Publicações: os 1 628 instantes em que `docs/report.json` mudou em `main` entr
 |---|---|
 | Correção dos quatro defeitos da PR #98 | Confirmada (offline) |
 | "Versão anterior sempre íntegra" | **Refutada** (A1, A2) |
-| Duas ranhuras atrás de CDN `max-age=600` com a cadência atual | **NO-GO** (19 % de recursos ao relatório completo no pior caso) |
+| Duas ranhuras atrás de CDN `max-age=600` com a cadência atual | **NO-GO** até medição em CDN real (limite superior 19 %; 0 % com cache única) |
 | Ativação dos snapshots | **NO-GO** até 1–5 e prova em staging |
 
 ## Reproduzir
