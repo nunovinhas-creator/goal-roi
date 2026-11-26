@@ -10018,6 +10018,19 @@
    "sha256": "d586a10e7263af5394ee7caedd3c53e4f075f9fb5b1c46484b39d59897580892",
    "state": "delivered"
   },
+  "game|id:venezia-vs-bologna-20261127|760ac3792a3a": {
+   "attempt_id": "392c3bee874e4a7ba71abff6232add1e",
+   "attempt_utc": "2026-11-26T22:38:19+00:00",
+   "chars": 178,
+   "created_utc": "2026-11-26T22:38:19+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "a746b36e174489baca517b73ec8e1b20f3b34ea868e5e1e71b58de5f61625903",
+   "state": "in_flight"
+  },
   "game|id:verspah-oita-vs-fc-tiamo-hirakata-20261121|74dc4d52aa40": {
    "attempt_utc": "2026-11-21T05:19:37+00:00",
    "chars": 215,
@@ -10705,7 +10718,7 @@
    "hypotheses": 16862,
    "settled_bets": 2054,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 489,
+   "statuses": 493,
    "validation_state": "not_activated"
   }
  },
@@ -10910,6 +10923,7 @@
   "2026-11-25T21:12:48+00:00|Stoke — Millwall|Over 3": true,
   "2026-11-25T21:22:29+00:00|Paris Saint Germain — Roma|Over 4": true,
   "2026-11-25T21:24:29+00:00|Lille — Bayern Munchen|AH2(+0.5)": true,
+  "2026-11-25T21:33:53+00:00|Venezia — Bologna|2": true,
   "2026-11-25T21:43:17+00:00|Paris Saint Germain — Roma|AH1(+0.5)": true,
   "2026-11-25T21:45:11+00:00|Sporting Lisbon — Manchester United|X": true,
   "2026-11-25T21:46:56+00:00|Paris Saint Germain — Roma|X": true,
@@ -11211,7 +11225,7 @@
   "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 16,
   "Betfair | Dia = dia de semana & Quota de mercado = menos de 80 % & Volume na seleção = menos de 10 mil $": 13,
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 30,
-  "Betfair | Dia = dia de semana & Tamanho do mercado = 10 mil $ ou mais": 34,
+  "Betfair | Dia = dia de semana & Tamanho do mercado = 10 mil $ ou mais": 35,
   "Betfair | Dia = dia de semana & Tamanho do mercado = menos de 10 mil $": 11,
   "Betfair | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 16,
   "Betfair | Faixa de odd = odd acima de 3,00 & Momento = durante o jogo": 38,
@@ -13462,6 +13476,9 @@
   "item|id:velez-sarsfield-vs-belgrano-20261121|Total Corners|Over 8.5": {
    "at_utc": "2026-11-20T23:20:36+00:00"
   },
+  "item|id:venezia-vs-bologna-20261127|1X2|2": {
+   "at_utc": "2026-11-26T22:38:19+00:00"
+  },
   "item|id:verspah-oita-vs-fc-tiamo-hirakata-20261121|Asian Total|Over 3.5": {
    "at_utc": "2026-11-21T05:19:37+00:00"
   },
@@ -13541,6 +13558,7 @@
  },
  "sent_total": 992,
  "statuses": {
+  "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -13629,6 +13647,7 @@
   "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -13640,7 +13659,9 @@
   "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": "abandonada",
   "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
+  "Jogo aberto | Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = sim": "abandonada",
   "Jogo aberto | Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Marcador no momento = empatado & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Marcador no momento = empatado & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "abandonada",
@@ -14733,6 +14754,7 @@
   "2026-11-25T21:12:48+00:00|Stoke — Millwall|Over 3",
   "2026-11-25T21:22:29+00:00|Paris Saint Germain — Roma|Over 4",
   "2026-11-25T21:24:29+00:00|Lille — Bayern Munchen|AH2(+0.5)",
+  "2026-11-25T21:33:53+00:00|Venezia — Bologna|2",
   "2026-11-25T21:43:17+00:00|Paris Saint Germain — Roma|AH1(+0.5)",
   "2026-11-25T21:45:11+00:00|Sporting Lisbon — Manchester United|X",
   "2026-11-25T21:46:56+00:00|Paris Saint Germain — Roma|X",
