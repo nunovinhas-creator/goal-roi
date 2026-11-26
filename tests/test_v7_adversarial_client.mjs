@@ -159,3 +159,27 @@ test('C9 concurrent reads and source timestamp regression cannot roll back visib
   r3.report_generated_at_utc = r1.report_generated_at_utc;
   assert.equal((await reader.read({history:[r3]},fetcher(store))).reason, 'regression');
 });
+
+
+test('C10 HTTPS probe reports observed regression separately from retained visible revision', async () => {
+  const {sampleVisible} = await import('../ops/staging/remote/measure_remote.mjs');
+  const store = new Map(), r1 = stamp(await casRevision(1, store), 1), r2 = stamp(await casRevision(2, store), 2);
+  let remote = r2, reloads = 0;
+  const fetchImpl = async (url, options) => {
+    assert.equal(options.redirect, 'error'); assert.equal(options.credentials, 'omit');
+    if (options.cache === 'reload') reloads++;
+    const path = url.split('/snapshots/')[1];
+    return path === 'dashboard-manifest.json' ? new Response(JSON.stringify({history:[remote]})) :
+      new Response(store.get(path), {status: store.has(path) ? 200 : 404});
+  };
+  const reader = createMonotonicReader(), base = 'https://example.github.io/goal-roi-staging';
+  const first = await sampleVisible(base, reader, fetchImpl);
+  assert.equal(first.visible_published_at, 1200);
+  remote = r1;
+  const second = await sampleVisible(base, reader, fetchImpl);
+  assert.equal(second.observed_published_at, 600);
+  assert.equal(second.visible_published_at, 1200);
+  assert.equal(second.which, 'retained');
+  assert.equal(second.stale, true);
+  assert.equal(reloads, 1);
+});
