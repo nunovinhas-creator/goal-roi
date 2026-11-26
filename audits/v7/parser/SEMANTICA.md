@@ -55,6 +55,8 @@ Total 105, igual ao contador `market:selecao_sem_vinculo_literal`.
 | Spreads Polymarket contraditórios, `12`, nomes sem lado e cabeçalhos sem relógio | **NO-GO permanente** sem informação externa: quarentena |
 | Reprocessamento do histórico ou do registo prospetivo | **NO-GO** (protocolo congelado) |
 
+A tabela revista à mão `data/team_aliases.json` (13 entradas, nome do bot → fornecedores de resultados) não cobre nenhum destes aliases e tem outro propósito (identidade para resultados, não rótulos de mercado). Não deve ser estendida sem a mesma revisão humana.
+
 Ordem sugerida para a revisão humana: (1) aliases da tabela em `aliases_para_revisao_humana`; (2) regra de liquidação regulamentar Kalshi para `not <equipa>`; (3) convenção do sinal e lado nos spreads. Cada passo exige diferencial com o parser em uso e nenhum efeito no contador antes de nova aprovação.
 
 **RENTABILIDADE NÃO DEMONSTRADA — NENHUMA ESTRATÉGIA VALIDADA.**
