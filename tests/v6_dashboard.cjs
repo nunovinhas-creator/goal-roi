@@ -42,6 +42,11 @@ async function open(browser, srv, opts = {}) {
     class FixedDate extends RealDate { constructor(...a) { super(...(a.length ? a : [RealDate.now() + offset])); } static now() { return RealDate.now() + offset; } }
     window.Date = FixedDate;
   }, [Object.assign({}, V6_CONFIG, opts.config || {}), NOW]);
+  if (opts.wideFonts) await page.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
+    const st = document.createElement('style');
+    st.textContent = ':root{--sans:"DejaVu Sans",Verdana,sans-serif !important;--mono:"DejaVu Sans Mono",monospace !important}';
+    document.head.appendChild(st);
+  }));
   await page.goto(srv.base + '/v6/' + (opts.hash ? '#' + opts.hash : ''));
   if (opts.wait !== false) await page.waitForFunction(() => window.__V6 && window.__V6.state.mode && !window.__V6.state.busy, null, {timeout: 30000});
   return {ctx, page, errors};
@@ -71,8 +76,9 @@ async function visual(browser, srv) {
 // Android estreito: nenhuma vista, gaveta ou separador pode criar scroll horizontal entre 320 e 430 px.
 async function narrow(browser, srv) {
   for (const width of [320, 340, 360, 375, 390, 412, 430]) for (const scheme of ['light', 'dark']) {
+    // No modo escuro usam-se fontes largas (DejaVu, como num runner Ubuntu): o resultado não pode depender das fontes locais.
     const {ctx, page, errors} = await open(browser, srv, {device: {viewport: {width, height: 800}, isMobile: true, hasTouch: true}, scheme,
-      config: {protocol: '/__raw/prospective_protocol.json'}});
+      config: {protocol: '/__raw/prospective_protocol.json'}, wideFonts: scheme === 'dark'});
     for (const v of VIEWS) {
       await page.evaluate(h => { location.hash = h; }, v);
       await page.waitForSelector('#view-' + v + ' h2');
