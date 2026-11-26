@@ -8994,6 +8994,19 @@
    "sha256": "b5717edd385072f9adb0facb0ea99c474ccbed670e814af8d0a92d9a0c89f85d",
    "state": "delivered"
   },
+  "regime|OPEN_GAME|estável>piorou|2026-11-26": {
+   "attempt_id": "b9e91a574a07457b9263645c668fb811",
+   "attempt_utc": "2026-11-26T14:34:01+00:00",
+   "chars": 171,
+   "created_utc": "2026-11-26T14:34:01+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "regime",
+   "sha256": "689a434e9cf152bf0eaf31c7c2b76f38f187fa6c2c362b433a22b8bb8a9e7ebd",
+   "state": "in_flight"
+  },
   "regime|POLYMARKET|estável>piorou|2026-11-24": {
    "attempt_id": "103cb82004804be69a3aeb3a9022a236",
    "attempt_utc": "2026-11-24T20:01:12+00:00",
@@ -9358,13 +9371,13 @@
  "health": {
   "reference": {
    "bsd_results": 66,
-   "eligible": 2508,
+   "eligible": 2509,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 148,
-   "hypotheses": 16231,
-   "settled_bets": 1916,
+   "hypotheses": 16233,
+   "settled_bets": 1917,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 438,
+   "statuses": 443,
    "validation_state": "not_activated"
   }
  },
@@ -11774,7 +11787,7 @@
  "operational_regime": {
   "BETFAIR/live": "poucos dados",
   "BETFAIR/pre": "poucos dados",
-  "OPEN_GAME": "estável",
+  "OPEN_GAME": "piorou",
   "POLYMARKET": "estável",
   "STAKE_LOAD": "estável",
   "TOTALS_FORM": "estável",
@@ -11825,7 +11838,9 @@
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": "promissora",
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": "promissora",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Dia = fim de semana & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
+  "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Faixa de odd = odd 1,50 a 2,00 & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
+  "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Confiança indicada pelo bot = menos de 95 % & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
@@ -11854,6 +11869,7 @@
   "Jogo aberto | Faixa de odd = odd até 1,50 & Parte do jogo = 2.ª parte": "abandonada",
   "Jogo aberto | Faixa de odd = odd até 1,50 & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Jogo aberto | Faixa de odd = odd até 1,50 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Jogo aberto | Golos até ao sinal = 1 ou 2 & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Minuto = 31 a 60 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Parte do jogo = 2.ª parte & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
@@ -11866,6 +11882,7 @@
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
+  "Jogo aberto | Golos em falta para ganhar = até 1 golo & Minuto = 61 em diante & Ritmo indicado pelo bot = menos de 90": "abandonada",
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Hora (UTC) = tarde & Marcador no momento = empatado & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "abandonada",
@@ -11878,6 +11895,7 @@
   "Jogo aberto | Marcador no momento = empatado & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Jogo aberto | Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Jogo aberto | Minuto = 61 em diante & Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Ritmo indicado pelo bot = menos de 90": "abandonada",
+  "Jogo aberto | Minuto = 61 em diante & Ritmo indicado pelo bot = menos de 90 & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Jogo aberto | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Polymarket | Competição = liga & Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00": "abandonada",
   "Polymarket | Competição = liga & Dia = dia de semana & Mercado = golos (mais/menos)": "abandonada",
