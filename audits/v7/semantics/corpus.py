@@ -10,7 +10,7 @@ Decisões possíveis (nenhuma admite):
 - condicional_revisao_humana: há regra oficial; a equivalência com o liquidante depende de factos que a mensagem
   não traz (âmbito do contrato, formato da competição, alias revisto).
 - quarentena_permanente: a mensagem é ambígua por construção; nenhuma regra externa a resolve.
-- bloqueado_sem_fonte_oficial: não há regra oficial obtida para a família ou o contrato.
+- bloqueado_sem_fonte_oficial: falta a regra oficial vinculativa (para a Stake, as regras do sportsbook).
 """
 import argparse
 import hashlib
@@ -41,6 +41,21 @@ KALSHI = {
     "nao_resultado_exato": ([], "bloqueado_sem_fonte_oficial", "termos Kalshi de resultado exato não obtidos; sem liquidante"),
     "relogio_ausente": ([], "quarentena_permanente", "cabeçalho LIVE sem minuto nem marcador: fase não verificável"),
 }
+PM_BASE = ["PM-US-SOCCER-REG", "PM-US-SOCCER-DRAW", "PM-INTL-RULES", "PM-US-CANCEL", "PM-US-POSTPONE-FLIP"]
+PM_PLATFORM = "plataforma do sinal (Polymarket US ou internacional) e, se internacional, o texto de regras do mercado"
+# Classe Polymarket -> (regras, decisão, o que falta). As regras US só valem se o mercado for da Polymarket US.
+POLY = {
+    "alias_vencedor": (PM_BASE + ["PM-US-WINNER-TIE"], "condicional_revisao_humana", PM_PLATFORM + "; alias revisto"),
+    "nao_equipa_alias": (PM_BASE + ["PM-US-WINNER-TIE"], "condicional_revisao_humana", PM_PLATFORM + "; 'não A' = empate ou vitória B; alias revisto"),
+    "spread_coerente": (PM_BASE + ["PM-US-SPREAD", "PM-US-SPREAD-SIDES"], "condicional_revisao_humana",
+                        PM_PLATFORM + "; convenção '(Y)' = lado comprado confirmada no mercado; alias revisto"),
+    "total_equipa": (PM_BASE, "condicional_revisao_humana", PM_PLATFORM + "; liquidante de total por equipa"),
+    "apuramento": (["PM-INTL-RULES"], "bloqueado_sem_fonte_oficial", "apuramento depende de prolongamento/penáltis e das regras do mercado"),
+    "mercado_jogador": (["PM-INTL-RULES"], "bloqueado_sem_fonte_oficial", "estatística de jogador; regras do mercado não obtidas"),
+}
+STAKE_RULES_BY_CLASS = {"mercado_base_nao_liquidado": ["ST-AH-PERIOD", "ST-AT-QUARTER", "ST-AT-WHOLE", "ST-VOID-ABANDON", "ST-VOID-RULES"]}
+STAKE_MISSING = ("regras do sportsbook Stake não obtidas (403 com desafio de navegador): período por omissão, prolongamento e "
+                 "handicap/totais ao vivo")
 POLY_PERMANENT = {"spread_contraditorio", "nome_sem_lado", "codigo_12_dupla_hipotese", "relogio_ausente", "nao_equipa_sem_lado",
                   "spread_lado_nao_resolvido", "total_equipa_sem_lado"}
 
@@ -102,14 +117,16 @@ def build(archive):
                 klass = sp.polymarket_semantics(selection, teams or [])
             else:
                 klass, selection = "relogio_ausente", None
-            decision = "quarentena_permanente" if klass in POLY_PERMANENT else "bloqueado_sem_fonte_oficial"
-            rows.append(entry(mid, "Polymarket", None, category, selection, teams, klass, [], decision,
-                              "regras oficiais Polymarket não obtidas (POLYMARKET em regras.json)"))
+            if klass in POLY_PERMANENT:
+                rules, decision, missing = [], "quarentena_permanente", "ambíguo por construção"
+            else:
+                rules, decision, missing = POLY[klass]
+            rows.append(entry(mid, "Polymarket", None, category, selection, teams, klass, rules, decision, missing))
         elif family == "Stake" and category == "interpretada" and parsed and parsed.get("market"):
             if parser.settle(parsed.get("market"), parsed.get("selection"), [2, 1], parsed.get("teams")) is None:
                 klass, why = stake_class(parsed["market"])
                 rows.append(entry(mid, "Stake", parsed.get("phase"), parsed["market"], parsed.get("selection"), parsed.get("teams"),
-                                  klass, [], "bloqueado_sem_fonte_oficial", why + "; regras oficiais Stake não obtidas"))
+                                  klass, STAKE_RULES_BY_CLASS.get(klass, []), "bloqueado_sem_fonte_oficial", why + "; " + STAKE_MISSING))
     rows.sort(key=lambda r: (r["familia"], r["classe"], r["ref"]))
     return rows
 

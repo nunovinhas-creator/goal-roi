@@ -46,13 +46,20 @@ class Corpus(unittest.TestCase):
         for r in self.rows:
             if r["decisao"] == "condicional_revisao_humana":
                 self.assertTrue(r["regras"], r["classe"])
-                self.assertEqual(r["familia"], "Kalshi")
+                self.assertIn(r["familia"], ("Kalshi", "Polymarket"))
+                self.assertTrue(r["falta"])
 
-    def test_sources_without_official_rules_are_never_conditional(self):
+    def test_stake_without_binding_rules_is_never_conditional(self):
+        self.assertEqual(self.rules["fontes"]["STAKE"]["estado"], "fonte_oficial_nao_obtida")
         for r in self.rows:
-            if r["familia"] in ("Polymarket", "Stake"):
-                self.assertNotEqual(r["decisao"], "condicional_revisao_humana")
-                self.assertEqual(r["regras"], [])
+            if r["familia"] == "Stake":
+                self.assertEqual(r["decisao"], "bloqueado_sem_fonte_oficial")
+
+    def test_polymarket_conditional_rows_name_the_platform_gap(self):
+        for r in self.rows:
+            if r["familia"] == "Polymarket" and r["decisao"] == "condicional_revisao_humana":
+                self.assertIn("plataforma do sinal", r["falta"])
+                self.assertIn("PM-INTL-RULES", r["regras"])
 
     def test_totals_match_the_audited_probe(self):
         probe = json.loads((ROOT / "audits/v7/parser/sonda-semantica.json").read_text(encoding="utf-8"))["classes"]
@@ -104,12 +111,16 @@ class Regeneration(unittest.TestCase):
             self.assertEqual(out.read_bytes(), (SEM / "corpus.jsonl").read_bytes())
 
 
-@unittest.skipUnless(os.environ.get("V7_KALSHI_PDF_DIR") and shutil.which("pdftotext"), "PDFs oficiais não indicados (V7_KALSHI_PDF_DIR)")
+RULES_DIR = os.environ.get("V7_RULES_DIR") or os.environ.get("V7_KALSHI_PDF_DIR")
+
+
+@unittest.skipUnless(RULES_DIR and shutil.which("pdftotext"), "fontes oficiais não indicadas (V7_RULES_DIR)")
 class OfficialQuotes(unittest.TestCase):
     def test_hashes_and_quotes(self):
         from audits.v7.semantics import fetch_sources
-        res = fetch_sources.check(os.environ["V7_KALSHI_PDF_DIR"], offline=True)
-        self.assertTrue(all(v in ("igual", "fonte_oficial_nao_obtida") for v in res["fontes"].values()), res["fontes"])
+        res = fetch_sources.check(RULES_DIR, offline=True)
+        self.assertTrue(all(v in ("igual", "fonte_oficial_nao_obtida", "sem_hash_estavel") for v in res["fontes"].values()), res["fontes"])
+        self.assertEqual(len(res["citacoes"]), 24)
         self.assertTrue(all(res["citacoes"].values()), res["citacoes"])
 
 
