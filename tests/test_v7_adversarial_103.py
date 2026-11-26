@@ -205,6 +205,44 @@ class CasInvariants(unittest.TestCase):
         self.assertNotEqual(rev["inputs"], self.pointer["current"]["inputs"])
         self.assertLess(rev["published_at"], self.pointer["current"]["published_at"])
 
+    def test_malformed_pointer_cannot_redirect_repair(self):
+        self.fx.n -= 2
+        self.fx.revise()
+        outside = self.fx.out.parent / "outside.json"
+        outside.write_bytes(b"do not modify")
+        pointer = self.fx.pointer()
+        pointer["current"]["files"]["summary"]["path"] = "../outside.json"
+        pointer["history"][0] = pointer["current"]
+        raw = json.dumps(pointer).encode()
+        (self.fx.out / P.POINTER).write_bytes(raw)
+        self.assertIsNone(P.read_verified(self.fx.out))
+        with self.assertRaises(P.SnapshotError):
+            self.fx.build()
+        self.assertEqual(outside.read_bytes(), b"do not modify")
+        self.assertEqual((self.fx.out / P.POINTER).read_bytes(), raw)
+
+    def test_malformed_history_is_refused_without_replacing_pointer(self):
+        for history in (None, {}, [None], []):
+            pointer = dict(self.pointer, history=history)
+            raw = json.dumps(pointer).encode()
+            (self.fx.out / P.POINTER).write_bytes(raw)
+            self.assertIsNone(P.read_verified(self.fx.out))
+            with self.assertRaises(P.SnapshotError):
+                self.fx.build()
+            self.assertEqual((self.fx.out / P.POINTER).read_bytes(), raw)
+
+    def test_symlink_object_is_not_repaired_outside_store(self):
+        self.fx.n -= 2
+        self.fx.revise()
+        body = self.fx.body(self.pointer["current"], "summary")
+        outside = self.fx.out.parent / "outside.json"
+        outside.write_bytes(b"keep")
+        body.unlink()
+        body.symlink_to(outside)
+        with self.assertRaises(P.SnapshotError):
+            self.fx.build()
+        self.assertEqual(outside.read_bytes(), b"keep")
+
     def test_corrupted_current_same_inputs_is_repaired(self):
         self.fx.n -= 2
         self.fx.revise()  # volta às entradas da revisão atual (rev 2)

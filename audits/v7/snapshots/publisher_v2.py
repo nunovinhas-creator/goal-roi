@@ -21,6 +21,7 @@ import contextlib
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -81,24 +82,72 @@ def read_pointer(out):
     return data if isinstance(data, dict) and data.get("schema") == SCHEMA else None
 
 
-def verify_revision(revision, out):
-    """Levanta SnapshotError se a revisão não estiver íntegra (caminho, tamanho, SHA-256 e, em cas, nome = SHA)."""
+def validate_metadata(revision):
+    """Valida o manifesto sem tocar nos caminhos indicados por ele."""
     if not isinstance(revision, dict) or revision.get("layout") not in ("cas", "slots"):
         raise SnapshotError("revisão malformada")
     files = revision.get("files")
-    if not isinstance(files, dict) or sorted(files) != sorted(NAMES):
+    if not isinstance(files, dict) or set(files) != set(NAMES):
         raise SnapshotError("a revisão não lista exatamente os seis snapshots")
+    inputs = revision.get("inputs")
+    if not isinstance(inputs, dict) or set(inputs) != set(INPUTS) or any(
+            not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v) for v in inputs.values()):
+        raise SnapshotError("hashes das entradas inválidos")
+    when = revision.get("published_at")
+    if type(when) not in (int, float) or not math.isfinite(when):
+        raise SnapshotError("instante de publicação inválido")
+    slots = set()
     for name in NAMES:
         entry = files[name]
-        path = entry.get("path", "") if isinstance(entry, dict) else ""
-        m = (CAS_PATH if revision["layout"] == "cas" else SLOT_PATH).match(path)
+        if not isinstance(entry, dict):
+            raise SnapshotError("entrada inválida: %s" % name)
+        path, digest, size = entry.get("path"), entry.get("sha256"), entry.get("bytes")
+        if not isinstance(path, str) or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or type(size) is not int or size < 0:
+            raise SnapshotError("metadados inválidos: %s" % name)
+        m = (CAS_PATH if revision["layout"] == "cas" else SLOT_PATH).fullmatch(path)
         if not m or m.group(2) != name:
             raise SnapshotError("caminho inesperado: %s" % name)
-        if revision["layout"] == "cas" and m.group(1) != entry.get("sha256"):
+        if revision["layout"] == "cas" and m.group(1) != digest:
             raise SnapshotError("objeto com nome diferente do conteúdo: %s" % name)
-        body = Path(out) / path
-        if not body.is_file() or body.stat().st_size != entry.get("bytes") or sha(body) != entry.get("sha256"):
-            raise SnapshotError("corpo não coincide com o manifesto: %s" % name)
+        slots.add(m.group(1))
+    if revision["layout"] == "slots" and len(slots) != 1:
+        raise SnapshotError("revisão mistura ranhuras")
+
+
+def validate_pointer(pointer):
+    if not isinstance(pointer, dict) or pointer.get("schema") != SCHEMA:
+        raise SnapshotError("ponteiro inválido")
+    history = pointer.get("history")
+    if not isinstance(history, list) or not history or pointer.get("current") != history[0] or pointer.get("previous") != (history[1] if len(history) > 1 else None):
+        raise SnapshotError("histórico do ponteiro incoerente")
+    for revision in history:
+        validate_metadata(revision)
+        if revision["layout"] != history[0]["layout"]:
+            raise SnapshotError("histórico mistura layouts")
+
+
+def checked_body(out, path):
+    root = Path(out).resolve()
+    body = root / path
+    # Uma ligação simbólica pode redirecionar a leitura/reparação para fora do CAS.
+    if body.resolve() != body:
+        raise SnapshotError("ligação simbólica no caminho de snapshot")
+    return body
+
+
+def verify_revision(revision, out):
+    """Valida metadados, caminhos, tamanho e SHA-256 de todos os corpos."""
+    validate_metadata(revision)
+    for name in NAMES:
+        entry = revision["files"][name]
+        try:
+            body = checked_body(out, entry["path"])
+            if not body.is_file() or body.stat().st_size != entry["bytes"] or sha(body) != entry["sha256"]:
+                raise SnapshotError("corpo não coincide com o manifesto: %s" % name)
+        except (OSError, RuntimeError) as exc:
+            if isinstance(exc, SnapshotError):
+                raise
+            raise SnapshotError("corpo ilegível: %s" % name) from exc
 
 
 def _intact(revision, out):
@@ -112,7 +161,11 @@ def _intact(revision, out):
 def read_verified(out):
     """Para leitores: a revisão mais recente íntegra do histórico do ponteiro (current, previous, …) ou None."""
     pointer = read_pointer(out)
-    for rev in (pointer or {}).get("history", []):
+    try:
+        validate_pointer(pointer)
+    except SnapshotError:
+        return None
+    for rev in pointer["history"]:
         if _intact(rev, out):
             return rev
     return None
@@ -120,8 +173,7 @@ def read_verified(out):
 
 def verify_live(out, inputs):
     pointer = read_pointer(out)
-    if pointer is None:
-        raise SnapshotError("sem ponteiro válido")
+    validate_pointer(pointer)
     verify_revision(pointer["current"], out)
     if pointer["current"].get("inputs") != digests(inputs):
         raise SnapshotError("o ponteiro não descreve as entradas atuais")
@@ -159,7 +211,7 @@ class Publisher:
 
     def _write(self, bodies, paths):
         for name in NAMES:
-            dst = self.out / paths[name]
+            dst = checked_body(self.out, paths[name])
             if self.layout == "cas" and dst.is_file() and sha(dst) == sha_bytes(bodies[name]):
                 continue  # objeto imutável já presente e íntegro
             _atomic_write(bodies[name], dst)
@@ -205,18 +257,20 @@ class Publisher:
                     raise SnapshotError("o builder não escreveu %s" % name)
                 bodies[name] = body.read_bytes()
             pointer = read_pointer(self.out)
-            history = list(pointer.get("history", [])) if pointer else []
+            if (self.out / POINTER).exists() or (self.out / POINTER).is_symlink():
+                validate_pointer(pointer)
+            history = list(pointer["history"]) if pointer else []
             current = pointer.get("current") if pointer else None
             if current and current.get("layout") != self.layout:
                 raise SnapshotError("layout diferente do publicado; migração exige decisão própria")
             same = bool(current) and current.get("inputs") == before and all(
-                current["files"][n]["sha256"] == sha_bytes(bodies[n]) for n in NAMES)
+                current["files"][n]["sha256"] == sha_bytes(bodies[n]) and current["files"][n]["bytes"] == len(bodies[n]) for n in NAMES)
             if same:
                 if _intact(current, self.out):
                     return "unchanged"
                 # Mesma revisão com corpo corrompido: repõe os bytes esperados nos mesmos caminhos.
                 for name in NAMES:
-                    dst = self.out / current["files"][name]["path"]
+                    dst = checked_body(self.out, current["files"][name]["path"])
                     if not dst.is_file() or sha(dst) != current["files"][name]["sha256"]:
                         _atomic_write(bodies[name], dst)
                         _fsync_dir(dst.parent)
