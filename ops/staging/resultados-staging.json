@@ -1,0 +1,142 @@
+{
+ "generated_by": "ops/staging/drill.mjs",
+ "ttl_s": 600,
+ "results": [
+  {
+   "name": "S1 TLS e leitura base",
+   "keyMode": "full",
+   "tls_without_ca": "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+   "read": {
+    "which": "current",
+    "slot": "a",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 7,
+    "poisoned_keys": 0
+   }
+  },
+  {
+   "name": "S2 ponteiro em cache, 1 publicação dentro do TTL",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 7,
+    "poisoned_keys": 0
+   }
+  },
+  {
+   "name": "S3 ponteiro e corpos na mesma cache, 2 publicações dentro do TTL (A-B-A)",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "after_ttl": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T12:10:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 7,
+    "misses": 14,
+    "poisoned_keys": 0
+   }
+  },
+  {
+   "name": "S3b ponteiro atrasado noutro nível de cache (corpos sem cache), 2 publicações",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "during": {
+    "which": "full_report"
+   },
+   "second_reader": {
+    "which": "full_report"
+   },
+   "poisoned_after_during": 2,
+   "after_ttl": {
+    "which": "current",
+    "slot": "b",
+    "generated": "2026-11-26T12:10:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 4,
+    "misses": 16,
+    "poisoned_keys": 2
+   }
+  },
+  {
+   "name": "S4 chave da CDN com query string",
+   "keyMode": "full",
+   "before": {
+    "which": "current",
+    "slot": "a",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "current",
+    "slot": "a",
+    "generated": "2026-11-26T12:00:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 4,
+    "misses": 10,
+    "poisoned_keys": 0
+   }
+  },
+  {
+   "name": "S4 chave da CDN sem query string",
+   "keyMode": "path",
+   "before": {
+    "which": "current",
+    "slot": "a",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "after_pointer_expiry": {
+    "which": "previous",
+    "slot": "b",
+    "generated": "2026-11-26T11:50:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 1,
+    "misses": 14,
+    "poisoned_keys": 0
+   }
+  },
+  {
+   "name": "S5 corpo atual corrompido na origem: recuo para a anterior",
+   "keyMode": "full",
+   "read": {
+    "which": "previous",
+    "slot": "a",
+    "generated": "2026-11-26T11:40:34.830598+00:00"
+   },
+   "stats": {
+    "hits": 0,
+    "misses": 9,
+    "poisoned_keys": 1
+   }
+  }
+ ]
+}
