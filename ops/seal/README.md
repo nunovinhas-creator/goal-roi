@@ -25,6 +25,10 @@ python3 ops/seal/seal.py prune   --dest <pasta> --keep-days 30
 
 `ops/seal/run_12h.sh` faz o ciclo completo (fetch, selo, verificação, poda). Termina com código ≠ 0 em qualquer falha: código 2 para integridade ou cadeia, outro para erro de git ou rede.
 
+## Instalação no Termux (escolhida)
+
+Ver [`termux/README.md`](termux/README.md): instalador idempotente, ciclo de 12 h com lock, registo de falhas, retenção e recuperação manual, sem interferir com o Brain, o Obsidian ou o `brain-sync.sh`.
+
 ## Onde correr (armazenamento já disponível)
 
 A cópia só é independente se ficar **fora do GitHub**. Por ordem de preferência:
