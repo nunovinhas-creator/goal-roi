@@ -2523,12 +2523,17 @@
    "state": "delivered"
   },
   "game|id:brann-vs-agf-aarhus-20261126|d507afd9c89e": {
+   "attempt_id": "5d1a33a0c74c4cc09c0aa33781ca7850",
+   "attempt_utc": "2026-11-26T19:09:16+00:00",
+   "chars": 210,
    "created_utc": "2026-11-26T19:09:14+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "de3d0fb6107f77a0d3652bac5a29b0c7f00b726abead5556cfab417bff211438",
+   "state": "in_flight"
   },
   "game|id:brentford-vs-everton-20261123|01853c3576b4": {
    "attempt_id": "9a509aff6e584d59bee9274d2509c632",
@@ -8920,13 +8925,15 @@
    "attempt_utc": "2026-11-26T19:09:14+00:00",
    "chars": 182,
    "created_utc": "2026-11-26T19:09:14+00:00",
+   "done_utc": "2026-11-26T19:09:14+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "cb26d665530fd0da3aab16bbf3876341318c653bd106941884b9b6d1f9c97e4b",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:tottenham-vs-ipswich-20261121|4744d5ce12f5": {
    "attempt_utc": "2026-11-21T14:31:56+00:00",
@@ -9897,7 +9904,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 630,
+  "delivered": 631,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T19:05:38+00:00",
@@ -10187,6 +10194,7 @@
   "2026-11-26T18:53:23+00:00|Olympiacos — AC Milan|Yes": true,
   "2026-11-26T19:02:29+00:00|Besiktas — Hapoel Beer Sheva|Besiktas": true,
   "2026-11-26T19:02:34+00:00|Olympiacos — AC Milan|Under 3.5": true,
+  "2026-11-26T19:07:01+00:00|Brann — AGF Aarhus|Over 6": true,
   "2026-11-26T19:07:17+00:00|Torreense — Celtic|Under 3.5": true
  },
  "migrations": {
@@ -10373,17 +10381,17 @@
   "Jogo aberto | Competição = liga & Dia = fim de semana & Parte do jogo = 2.ª parte": 104,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = 90 ou mais": 47,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 47,
-  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 50,
+  "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 51,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Marcador no momento = diferença de 2 ou mais golos & Sinal anterior de outro tipo no mesmo jogo = não": 44,
   "Jogo aberto | Confiança indicada pelo bot = 95 % ou mais & Ritmo indicado pelo bot = menos de 90": 36,
   "Jogo aberto | Dia = dia de semana & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Jogo aberto | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": 26,
   "Jogo aberto | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 29,
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": 84,
-  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos": 34,
+  "Jogo aberto | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = noite & Marcador no momento = diferença de 2 ou mais golos": 35,
   "Jogo aberto | Golos até ao sinal = 1 ou 2 & Marcador no momento = diferença de 2 ou mais golos": 31,
   "Jogo aberto | Golos até ao sinal = 3 ou mais & Golos em falta para ganhar = até 1 golo & Ritmo indicado pelo bot = 90 ou mais": 47,
-  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 50,
+  "Jogo aberto | Golos até ao sinal = 3 ou mais & Marcador no momento = diferença de 2 ou mais golos & Parte do jogo = 2.ª parte": 51,
   "Jogo aberto | Golos em falta para ganhar = até 1 golo & Hora (UTC) = noite": 45,
   "Jogo aberto | Hora (UTC) = noite": 53,
   "Jogo aberto | Hora (UTC) = noite & Parte do jogo = 2.ª parte": 41,
@@ -10920,6 +10928,9 @@
   },
   "item|id:brann-vs-agf-aarhus-20261126|1x2|Aarhus": {
    "at_utc": "2026-11-26T17:03:52+00:00"
+  },
+  "item|id:brann-vs-agf-aarhus-20261126|Asian Total|Over 6": {
+   "at_utc": "2026-11-26T19:09:14+00:00"
   },
   "item|id:brentford-vs-everton-20261123|Asian Handicap|Everton (0.5)": {
    "at_utc": "2026-11-23T03:42:02+00:00"
@@ -12501,7 +12512,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 942,
+ "sent_total": 943,
  "statuses": {
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50 & Golos em falta para ganhar = até 1 golo": "abandonada",
@@ -13721,6 +13732,7 @@
   "2026-11-26T18:53:23+00:00|Olympiacos — AC Milan|Yes",
   "2026-11-26T19:02:29+00:00|Besiktas — Hapoel Beer Sheva|Besiktas",
   "2026-11-26T19:02:34+00:00|Olympiacos — AC Milan|Under 3.5",
+  "2026-11-26T19:07:01+00:00|Brann — AGF Aarhus|Over 6",
   "2026-11-26T19:07:17+00:00|Torreense — Celtic|Under 3.5"
  ]
 }
