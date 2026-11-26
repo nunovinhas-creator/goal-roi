@@ -4,6 +4,8 @@ Custo 0 €. Não usa credenciais e nunca faz push. Não lê, não escreve e nã
 
 ## Instalação (uma vez)
 
+**Pré-requisito:** esta PR (#108) integrada em `main`, porque o instalador copia `ops/seal/seal.py` de `origin/main`. Antes disso, o instalador termina com erro sem alterar o crontab.
+
 No Termux:
 
 ```sh
