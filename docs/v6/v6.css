@@ -349,3 +349,7 @@ details.inner > summary { cursor: pointer; font-weight: 600; font-size: 13px; pa
 }
 .game > button > span:first-child { display: block; min-width: 0; }
 .game .title { display: block; }
+/* filtros: nunca mais largos do que o ecrã, com qualquer fonte (opções longas incluídas) */
+.filters label { min-width: 0; max-width: 100%; }
+.filters select, .filters input { max-width: 100%; min-width: 0; }
+@media (max-width: 640px) { .filters select, .filters input[type="search"] { width: 100%; } }
