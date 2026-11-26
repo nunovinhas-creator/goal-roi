@@ -45,6 +45,11 @@
     'earlier edge did not replicate; no ROI validation without executable prices and known costs': 'A vantagem anterior não se replicou; sem validação de ROI sem preços executáveis e custos conhecidos.',
     'the prospective cohort has no independent evidence of temporal order': 'a coorte prospetiva não tem evidência independente da ordem temporal'};
   const note = t => esc(NOTES[t] || t || '');
+  // Mercado e seleção de um sinal. Há eventos publicados sem estes campos (por exemplo Betfair ao vivo e Polymarket):
+  // nunca se mostra "undefined"/"null"; mostra-se que o campo não foi identificado.
+  const known = v => v !== null && v !== undefined && String(v).trim() !== '';
+  const pick = (market, selection, sep) => known(market) || known(selection)
+    ? [market, selection].filter(known).join(sep === undefined ? ' ' : sep) : 'mercado e seleção não identificados';
   const tag = (text, kind) => '<span class="tag ' + (kind || '') + '">' + esc(text) + '</span>';
   const H1S = {insufficient_games: ['amostra insuficiente', 'warn'], supported_predictive_only: ['suportada (só preditiva)', 'good'], not_supported: ['não suportada', 'bad']};
   const H2S = {insufficient_games: ['amostra insuficiente', 'warn'], descriptive_only: ['apenas descritiva', 'info']};
@@ -63,8 +68,8 @@
     const pairs = (r.pairs || []).slice().sort((a, b) => REL_ORDER.indexOf(a.category) - REL_ORDER.indexOf(b.category)).slice(0, limit || 12);
     const total = r.pairs_total || (r.pairs || []).length;
     return table(['Relação', {t: 'Ocorrências', n: 1}], counts, 'Relações entre sinais') +
-      (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + x.a.market + ' ' + x.a.selection) + ' × ' +
-        esc(x.b.source + ' · ' + x.b.market + ' ' + x.b.selection) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
+      (pairs.length ? '<ul class="list">' + pairs.map(x => '<li>' + relTag(x.category) + ' <small>' + esc(x.a.source + ' · ' + pick(x.a.market, x.a.selection)) + ' × ' +
+        esc(x.b.source + ' · ' + pick(x.b.market, x.b.selection)) + ' — ' + esc(x.reason || '') + '</small></li>').join('') + '</ul>' +
         (total > pairs.length ? '<p class="note" style="padding:0 12px">A mostrar ' + int(pairs.length) + ' de ' + int(total) + ' pares, os mais graves primeiro.</p>' : '') : '') +
       '<p class="note" style="padding:0 12px 12px">Cada par é comparado em todos os resultados finais possíveis com as regras de liquidação do parser de produção (linhas asiáticas, devoluções e meias). Duas extensões são da V6 e não são aplicadas pelo relatório: Draw No Bet como handicap 0 e handicap asiático ao vivo da Stake contado a partir do marcador no momento do sinal. Sinais contemporâneos: até 6 h de diferença antes do jogo e até 10 min durante o jogo. Plataformas distintas chegam pelo mesmo canal de recolha: a independência estatística entre elas não está demonstrada, e uma convergência não é uma confirmação independente.</p>';
   }
@@ -491,7 +496,7 @@
       const series = {};
       for (const e of sel.series) if (isNum(e.odds)) {
         const key = e.source;
-        (series[key] = series[key] || []).push({x: Date.parse(e.d), y: e.odds, label: when(e.d) + ' · ' + e.source + ' · ' + e.selection + ' @ ' + n(e.odds, 2) + (isNum(e.total) ? ' · vol. ' + int(e.total) : '')});
+        (series[key] = series[key] || []).push({x: Date.parse(e.d), y: e.odds, label: when(e.d) + ' · ' + e.source + ' · ' + pick(null, e.selection) + ' @ ' + n(e.odds, 2) + (isNum(e.total) ? ' · vol. ' + int(e.total) : '')});
       }
       const xs = sel.series.map(e => Date.parse(e.d)).filter(Number.isFinite), short = xs.length && Math.max(...xs) - Math.min(...xs) < 36 * 3600000;
       const chart = lineChart(Object.entries(series).map(([k, pts]) => ({name: k, cls: 's-' + k, points: pts})), {fy: v => n(v, 2), fx: v => (short ? when : day)(new Date(v).toISOString()), label: 'Odds observadas por fonte'});
@@ -543,7 +548,7 @@
   function radarFilter(items) {
     const f = S.ui.radar, q = f.q.trim().toLowerCase();
     const min = parseFloat(String(f.min).replace(',', '.')), max = parseFloat(String(f.max).replace(',', '.'));
-    return items.filter(it => (!q || (it.match + ' ' + it.league + ' ' + it.selection + ' ' + it.market).toLowerCase().includes(q)) &&
+    return items.filter(it => (!q || [it.match, it.league, it.selection, it.market].filter(known).join(' ').toLowerCase().includes(q)) &&
       (!f.source || it.source === f.source) && (!f.phase || it.phase === f.phase) && (!f.verdict || it.verdict === f.verdict) &&
       (!f.conflict || exclusiveGame(it.match_id)) && (!Number.isFinite(min) || it.odds >= min) && (!Number.isFinite(max) || it.odds <= max));
   }
@@ -584,11 +589,11 @@
     if (!g) return;
     const market = sg.markets.find(m => m.match_id === id);
     const relations = gameRelations(id);
-    const chrono = (market ? market.series.map(e => ({d: e.d, source: e.source, text: e.market + ' · ' + e.selection + (isNum(e.odds) ? ' @ ' + n(e.odds, 2) : '') + (isNum(e.total) ? ' · volume do mercado ' + int(e.total) : '') + (e.phase ? ' · ' + (e.phase === 'live' ? 'ao vivo' : 'antes do jogo') : '')}))
-      : g.signals.map(s => ({d: s.date_utc, source: s.source, text: s.market + ' · ' + s.selection + ' @ ' + n(s.odds, 2) + (s.phase ? ' · ' + s.phase : '')})));
+    const chrono = (market ? market.series.map(e => ({d: e.d, source: e.source, text: pick(e.market, e.selection, ' · ') + (isNum(e.odds) ? ' @ ' + n(e.odds, 2) : '') + (isNum(e.total) ? ' · volume do mercado ' + int(e.total) : '') + (e.phase ? ' · ' + (e.phase === 'live' ? 'ao vivo' : 'antes do jogo') : '')}))
+      : g.signals.map(s => ({d: s.date_utc, source: s.source, text: pick(s.market, s.selection, ' · ') + ' @ ' + n(s.odds, 2) + (s.phase ? ' · ' + s.phase : '')})));
     const ev = list => list.length ? '<ul>' + list.slice(0, 8).map(h => '<li><div>' + esc(h.id) + '</div><small class="note">' + int(h.games) + ' jogos · ' + int(h.hits) + ' acertos em ' + int(h.n) +
       ' · necessário ' + pct(h.break_even) + ' · P(acima) ' + pct(h.prob_above, 0) + ' · ' + esc(h.status || '') + '<br>Prospetivo: ' + econ(h.prospective && h.prospective.status) + '</small></li>').join('') + '</ul>' : '<p class="note">Nenhuma.</p>';
-    const content = g.signals.map(s => '<section class="panel"><header><h3>' + esc(s.market + ' · ' + s.selection) + '</h3><span class="meta">' + when(s.date_utc) + '</span></header><div class="body stack">' +
+    const content = g.signals.map(s => '<section class="panel"><header><h3>' + esc(pick(s.market, s.selection, ' · ')) + '</h3><span class="meta">' + when(s.date_utc) + '</span></header><div class="body stack">' +
       '<dl class="facts"><dt>Fonte</dt><dd>' + src(s.source) + ' · ' + esc(s.family || s.type) + '</dd><dt>Fase</dt><dd>' + esc(s.when || s.phase || '—') + (isNum(s.minute) ? ' · ' + s.minute + '′' : '') + '</dd>' +
       '<dt>Odd</dt><dd>' + n(s.odds, 2) + (isNum(s.odds_last) && s.odds_last !== s.odds ? ' → ' + n(s.odds_last, 2) : '') + ' · ' + esc(s.odds_band || '') + '</dd>' +
       '<dt>Reforço</dt><dd>' + (s.max_mult > 1 ? '×' + s.max_mult : 'nenhum') + '</dd><dt>Quota</dt><dd>' + (isNum(s.share) ? n(s.share) + ' %' : '—') + '</dd>' +
