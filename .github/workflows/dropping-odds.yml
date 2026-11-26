@@ -10,6 +10,10 @@ on:
         description: 'Create the Dropping Odds journal for the first shadow run'
         type: boolean
         default: false
+      anchor_checkpoint:
+        description: 'Verified current checkpoint; set only to attach protected anchor in shadow'
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -23,12 +27,12 @@ jobs:
     if: >-
       ${{ github.repository == 'nunovinhas-creator/goal-roi' &&
           github.ref == 'refs/heads/main' &&
-          vars.GOAL_ROI_DROPPING_ODDS == 'shadow' &&
+          (vars.GOAL_ROI_DROPPING_ODDS == 'shadow' || vars.GOAL_ROI_DROPPING_ODDS == 'on') &&
           (github.event_name == 'workflow_dispatch' ||
            (github.event.workflow_run.head_repository.full_name == github.repository &&
             github.event.workflow_run.head_branch == 'main')) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -39,10 +43,21 @@ jobs:
       - name: Evaluate the published ScanGoal archive
         env:
           GOAL_ROI_DROPPING_ODDS: ${{ vars.GOAL_ROI_DROPPING_ODDS }}
+          GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN: ${{ vars.GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN }}
+          GOAL_ROI_DROPPING_ODDS_ON_SINCE: ${{ vars.GOAL_ROI_DROPPING_ODDS_ON_SINCE }}
+          GOAL_ROI_DROPPING_ODDS_ON_UNTIL: ${{ vars.GOAL_ROI_DROPPING_ODDS_ON_UNTIL }}
+          TG_BOT_TOKEN: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' && secrets.TG_BOT_TOKEN || '' }}
+          TG_CHAT_ID: ${{ vars.GOAL_ROI_DROPPING_ODDS == 'on' && secrets.TG_CHAT_ID || '' }}
+          ANCHOR_CHECKPOINT: ${{ github.event_name == 'workflow_dispatch' && inputs.anchor_checkpoint || '' }}
           COLLECTOR_RUN_ID: ${{ github.event.workflow_run.id || '' }}
           INITIALIZE: ${{ github.event_name == 'workflow_dispatch' && inputs.initialize }}
         run: |
           command=run
           if [[ "$INITIALIZE" == true ]]; then command=initialize; fi
           printf 'DROPPING_ODDS_COLLECTOR_RUN %s\n' "$COLLECTOR_RUN_ID"
-          timeout --signal=TERM --kill-after=3s 90s python3 -u -m scangoal.dropping_odds_alerts "$command"
+          if [[ -n "$ANCHOR_CHECKPOINT" ]]; then
+            [[ "$INITIALIZE" != true && "$GOAL_ROI_DROPPING_ODDS" == shadow ]]
+            timeout --signal=TERM --kill-after=3s 180s python3 -u -m scangoal.dropping_odds_alerts anchor "$ANCHOR_CHECKPOINT"
+          else
+            timeout --signal=TERM --kill-after=3s 180s python3 -u -m scangoal.dropping_odds_alerts "$command"
+          fi

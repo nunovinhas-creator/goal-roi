@@ -500,6 +500,47 @@ class GitIntegrationTests(unittest.TestCase):
         self.assertEqual(self.git(self.remote, 'rev-parse', REF, WITNESS_REF), before)
         sender.assert_not_called()
 
+    def test_protected_anchor_detects_coordinated_notes_rollback(self):
+        from scangoal.dropping_odds_journal import ANCHOR_REF
+        first, second = self.stores
+        first.guard = second.guard = lambda: None
+        first.anchor(first.tip)
+        origin = first.tip
+        second.require_anchor = True
+        sender = Mock()
+        self.assertEqual(alerts.run(self.archive, ON, second, sender, lambda: NOW,
+                                    before_send=second.assert_current), {'sent': 1})
+        self.assertEqual(self.git(self.remote, 'rev-parse', ANCHOR_REF).decode().strip(), second.tip)
+        for ref in (REF, WITNESS_REF):
+            self.git(self.remote, 'update-ref', ref, origin)
+        fresh = GitJournal(self.path / '0', require_anchor=True, guard=lambda: None)
+        with self.assertRaises(JournalError):
+            alerts.run(self.archive, ON, fresh, sender, lambda: NOW)
+        sender.assert_called_once()
+
+    def test_anchor_absent_or_policy_missing_never_sends(self):
+        sender = Mock()
+        fresh = GitJournal(self.path / '1', require_anchor=True, guard=lambda: None)
+        with self.assertRaises(JournalError):
+            alerts.run(self.archive, ON, fresh, sender, lambda: NOW)
+        first = self.stores[0]
+        with self.assertRaises(JournalError):
+            first.anchor(first.tip)
+        sender.assert_not_called()
+
+    def test_pilot_deadline_and_expiry_after_intent(self):
+        env = dict(ON, GOAL_ROI_DROPPING_ODDS_ON_SINCE=SENT.isoformat(),
+                   GOAL_ROI_DROPPING_ODDS_ON_UNTIL=(NOW + timedelta(minutes=1)).isoformat())
+        self.assertEqual(alerts.pilot_deadline(env, NOW), NOW + timedelta(minutes=1))
+        for changes in ({'GOAL_ROI_DROPPING_ODDS_MAX_AGE_MIN': '20'},
+                        {'GOAL_ROI_DROPPING_ODDS_ON_UNTIL': (NOW + timedelta(days=1)).isoformat()}):
+            with self.assertRaises(ValueError):
+                alerts.pilot_deadline(dict(env, **changes), NOW)
+        sender = Mock()
+        self.assertEqual(alerts.run(self.archive, ON, self.stores[0], sender, lambda: NOW,
+                                    deadline=NOW), {'expired': 1})
+        sender.assert_not_called()
+
     def test_concurrent_runners_only_one_claims_and_main_is_untouched(self):
         barrier = threading.Barrier(2)
         before = self.git(self.remote, 'for-each-ref', 'refs/heads')

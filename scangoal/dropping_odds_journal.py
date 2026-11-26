@@ -9,6 +9,8 @@ from uuid import uuid4
 REF = 'refs/notes/goal-roi-dropping-odds'
 WITNESS_REF = 'refs/notes/goal-roi-dropping-odds-witness'
 REFS = (REF, WITNESS_REF)
+ANCHOR_REF = 'refs/heads/goal-roi-dropping-odds-anchor'
+ALL_REFS = (*REFS, ANCHOR_REF)
 NAMES = ('dropping_odds_state.json', 'dropping_odds_log.jsonl')
 TRANSITIONS = {
     None: {'received'},
@@ -98,10 +100,13 @@ class Journal:
 class GitJournal:
     """Publish both notes and the witness by atomic, leased updates to both refs."""
 
-    def __init__(self, root='.', remote='origin'):
+    def __init__(self, root='.', remote='origin', *, require_anchor=False, guard=None):
         self.root, self.remote = root, remote
         self.tip = None
         self.checkpoint = None
+        self.require_anchor = require_anchor
+        self.guard = guard
+        self.active_refs = REFS
         # Each stable Git object name addresses one note in the shared commit tree.
         self.notes = [self._git('hash-object', '-w', '--stdin', data=name.encode()).decode().strip()
                       for name in NAMES]
@@ -119,7 +124,7 @@ class GitJournal:
         return completed.stdout
 
     def _remote_tips(self):
-        answer = self._git('ls-remote', '--refs', self.remote, *REFS).decode()
+        answer = self._git('ls-remote', '--refs', self.remote, *ALL_REFS).decode()
         tips = dict((ref, tip) for tip, ref in (row.split('\t') for row in answer.splitlines()))
         return tips
 
@@ -133,10 +138,37 @@ class GitJournal:
         journal = Journal.load(state, log)
         return journal, (journal.initialized_at, log)
 
+    def _check_guard(self):
+        if self.guard is None:
+            raise JournalError('anchor policy cannot be verified')
+        self.guard()
+
+    def anchor(self, expected):
+        if not re.fullmatch(r'[0-9a-f]{40}', expected):
+            raise JournalError('explicit verified checkpoint required')
+        self.read()
+        if self.active_refs != REFS or self.tip != expected:
+            raise JournalError('anchor already present or checkpoint changed')
+        self._check_guard()
+        self._git('push', '--atomic', '--porcelain',
+                  f'--force-with-lease={ANCHOR_REF}:', self.remote, f'{self.tip}:{ANCHOR_REF}')
+        self.active_refs = ALL_REFS
+        self.assert_current()
+
+    def assert_current(self):
+        if self.active_refs != ALL_REFS:
+            raise JournalError('protected anchor required')
+        self._check_guard()
+        if self._remote_tips() != dict.fromkeys(ALL_REFS, self.tip):
+            raise JournalError('journal and anchor changed or disagree')
+
     def read(self):
         tips = self._remote_tips()
-        if set(tips) != set(REFS) or tips[REF] != tips[WITNESS_REF]:
+        self.active_refs = ALL_REFS if ANCHOR_REF in tips or self.require_anchor else REFS
+        if set(tips) != set(self.active_refs) or len(set(tips.values())) != 1:
             raise JournalError('journal and witness missing or disagree')
+        if self.active_refs == ALL_REFS:
+            self._check_guard()
         tip = tips[REF]
         self._git('fetch', '--no-tags', '--depth=2', self.remote, REF)
         if self._git('rev-parse', 'FETCH_HEAD').decode().strip() != tip:
@@ -181,7 +213,9 @@ class GitJournal:
                            'Dropping Odds journal ' + uuid4().hex).decode().strip()
         # The new commit always descends from the exact snapshot read by this writer.
         # A lost reply or a competing writer leaves this process without authority to send.
-        leases = [f'--force-with-lease={ref}:{self.tip or ""}' for ref in REFS]
-        refspecs = [f'{commit}:{ref}' for ref in REFS]
+        if self.active_refs == ALL_REFS:
+            self._check_guard()
+        leases = [f'--force-with-lease={ref}:{self.tip or ""}' for ref in self.active_refs]
+        refspecs = [f'{commit}:{ref}' for ref in self.active_refs]
         self._git('push', '--atomic', '--porcelain', *leases, self.remote, *refspecs)
         self.tip, self.checkpoint = commit, checkpoint
