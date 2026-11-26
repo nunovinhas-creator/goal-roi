@@ -2517,13 +2517,15 @@
    "attempt_utc": "2026-11-26T21:02:41+00:00",
    "chars": 222,
    "created_utc": "2026-11-26T21:02:41+00:00",
+   "done_utc": "2026-11-26T21:02:41+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "2dbb587eb327e9f599f44c50d85f5f0d2cdc4e320e48beade51ce2adcf7f5175",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:borussia-monchengladbach-vs-dortmund-20261121|d77e6aef53e0": {
    "attempt_utc": "2026-11-21T13:25:24+00:00",
@@ -3675,12 +3677,17 @@
    "state": "delivered"
   },
   "game|id:cska-sofia-vs-trabzonspor-20261126|f23a3182637e": {
+   "attempt_id": "3537e33152d0417e909a07808b9b7142",
+   "attempt_utc": "2026-11-26T21:02:43+00:00",
+   "chars": 218,
    "created_utc": "2026-11-26T21:02:41+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "d82ff7463c00d43ac803b4c2808e9f3bd93754d05a54c478b592c7daa8a191f3",
+   "state": "in_flight"
   },
   "game|id:cusco-fc-vs-ad-tarma-20261116|546b773be657": {
    "attempt_utc": "2026-11-16T21:28:30+00:00",
@@ -10355,7 +10362,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 660,
+  "delivered": 661,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-26T20:53:56+00:00",
@@ -10679,6 +10686,7 @@
   "2026-11-26T20:06:46+00:00|Manchester United — Brentford|Manchester United": true,
   "2026-11-26T20:17:13+00:00|Juventus — Omonia Nicosia|Juventus": true,
   "2026-11-26T20:23:21+00:00|Juventus — Omonia Nicosia|AH1(-0.5)": true,
+  "2026-11-26T20:55:01+00:00|CSKA Sofia — Trabzonspor|Over 2.5": true,
   "2026-11-26T20:57:30+00:00|Borac Banja Luka — Atalanta|Over 4": true
  },
  "migrations": {
@@ -11683,6 +11691,9 @@
   },
   "item|id:cska-sofia-vs-trabzonspor-20261126|1x2|Trabzonspor": {
    "at_utc": "2026-11-26T12:09:33+00:00"
+  },
+  "item|id:cska-sofia-vs-trabzonspor-20261126|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-26T21:02:41+00:00"
   },
   "item|id:cusco-fc-vs-ad-tarma-20261116|Asian Total|Over 4": {
    "at_utc": "2026-11-16T21:28:30+00:00"
@@ -13108,7 +13119,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 972,
+ "sent_total": 973,
  "statuses": {
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Forma de golos | Faixa de odd = odd até 1,50": "abandonada",
@@ -14375,6 +14386,7 @@
   "2026-11-26T20:06:46+00:00|Manchester United — Brentford|Manchester United",
   "2026-11-26T20:17:13+00:00|Juventus — Omonia Nicosia|Juventus",
   "2026-11-26T20:23:21+00:00|Juventus — Omonia Nicosia|AH1(-0.5)",
+  "2026-11-26T20:55:01+00:00|CSKA Sofia — Trabzonspor|Over 2.5",
   "2026-11-26T20:57:30+00:00|Borac Banja Luka — Atalanta|Over 4"
  ]
 }
