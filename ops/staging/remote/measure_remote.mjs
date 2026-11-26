@@ -54,6 +54,36 @@ export async function sample(base, fetchImpl = fetch) {
   return result;
 }
 
+
+// Separate session-visible measurement. Do not substitute this for the raw CDN gate.
+// A caller must retain the same reader for the entire measurement window.
+export async function sampleVisible(base, reader, fetchImpl = fetch) {
+  base = validateBase(base);
+  const t0 = Date.now(), errors = [];
+  const get = async (path, reload = false) => {
+    const response = await fetchImpl(base + '/snapshots/' + path, {
+      redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(10000),
+      ...(reload ? {cache: 'reload'} : {})
+    });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.text();
+  };
+  const pointer = async (reload = false) => {
+    try { return JSON.parse(await get('dashboard-manifest.json', reload)); }
+    catch (e) { errors.push('pointer: ' + e.message); return null; }
+  };
+  const got = await reader.read(await pointer(), async path => {
+    try { return await get(path); }
+    catch (e) { errors.push('object: ' + e.message); throw e; }
+  }, undefined, () => pointer(true));
+  return {at: new Date(t0).toISOString(), which: got.which, stale: got.stale,
+    reason: got.reason, refetched: got.refetched,
+    observed_published_at: got.observed_published_at,
+    visible_published_at: got.revision?.published_at ?? null,
+    generated_at: got.revision?.report_generated_at_utc ?? null,
+    errors, ms: Date.now() - t0};
+}
+
 async function main() {
   const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
   let base;
