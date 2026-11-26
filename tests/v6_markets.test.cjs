@@ -113,9 +113,14 @@ test('liquidações asiáticas: quartos, devoluções e meias', () => {
 });
 
 test('ao vivo: marcador restringe resultados; handicap ao vivo exige convenção e marcador', () => {
-  // A 3-0, Under 2,5 já está perdido e Over 2,5 ganho: compatíveis com qualquer vitória da casa
+  // A 3-0, Over 2,5 já está ganho: uma seleção já decidida pelo marcador não sustenta nenhuma relação
   const o = sig(S, 'Asian Total', 'Over 2.5', {phase: 'live', score_at_signal: [3, 0]});
-  assert.equal(rel(o, sig(P, '1x2', 'Sporting', {phase: 'live', score_at_signal: [3, 0]})), 'compativeis');
+  assert.equal(rel(o, sig(P, '1x2', 'Sporting', {phase: 'live', score_at_signal: [3, 0]})), 'insuficiente');
+  // A 1-0, Over 0,5 ganho; a 2-0, Over 1,5 ganho: ambas decididas, nunca "convergência"
+  assert.equal(cat(sig(S, 'Asian Total', 'Over 0.5', {phase: 'live', score_at_signal: [1, 0]}),
+    sig(P, 'Asian Total', 'Over 1.5', {phase: 'live', score_at_signal: [2, 0], d: at(5)})), 'insuficiente');
+  // Uma seleção ainda em aberto continua comparável
+  assert.equal(rel(sig(S, 'Asian Total', 'Over 3.5', {phase: 'live', score_at_signal: [2, 0]}), sig(P, '1x2', 'Sporting', {phase: 'live', score_at_signal: [2, 0]})), 'compativeis');
   // Handicap ao vivo da Stake conta a partir do marcador: Sporting (-0.5) a 1-0 precisa de mais um golo de margem
   const ah = M.parse(sig(S, 'Asian Handicap', 'Sporting (-0.5)', {phase: 'live', score_at_signal: [1, 0]}), TEAMS);
   assert.equal(ah.rule(1, 0), -1); assert.equal(ah.rule(2, 0), 1);
@@ -123,6 +128,12 @@ test('ao vivo: marcador restringe resultados; handicap ao vivo exige convenção
   assert.equal(rel(sig(P, 'Polymarket', 'AH1(-0.5)', {phase: 'live', score_at_signal: [0, 0]}), sig(S, '1x2', 'Sporting')), 'insuficiente');
   // marcadores impossíveis na mesma sequência de golos
   assert.equal(rel(sig(S, 'Asian Total', 'Over 2.5', {phase: 'live', score_at_signal: [2, 0]}), sig(P, 'Asian Total', 'Over 2.5', {phase: 'live', score_at_signal: [0, 1]})), 'insuficiente');
+});
+
+test('linhas fora do intervalo de resultados avaliado não produzem relações', () => {
+  assert.equal(rel(sig(S, 'Asian Handicap', 'Sporting (+13)'), sig(P, 'Polymarket', 'AH2(+14)')), 'insuficiente');
+  assert.equal(rel(sig(S, 'Asian Total', 'Over 11.5'), sig(P, 'Asian Total', 'Under 11.5')), 'insuficiente');
+  assert.equal(rel(sig(S, 'Asian Handicap', 'Sporting (-6)'), sig(P, 'Polymarket', 'AH2(+6)')), 'exclusivas');
 });
 
 test('identidade do jogo e análise agregada', () => {

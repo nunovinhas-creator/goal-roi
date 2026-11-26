@@ -76,6 +76,7 @@
       const m = sel.match(/^(over|under)\s+([0-9]+(?:\.[0-9]+)?)$/i);
       const line = m ? asianLine(m[2]) : null;
       if (line === null) return weak('linha de golos ilegível');
+      if (line > MAX_GOALS - 2) return weak('linha fora do intervalo de resultados avaliado');
       const over = m[1].toLowerCase() === 'over';
       rule = (h, a) => (over ? quarter(h + a, -line) : quarter(-(h + a), line));
       key = 'total|' + (over ? 'over' : 'under') + '|' + line;
@@ -108,6 +109,7 @@
         s = m ? side(m[1], teams) : null; line = m ? asianLine(m[2]) : null;
       }
       if ((s !== '1' && s !== '2') || line === null) return weak('handicap ilegível ou equipa ambígua');
+      if (Math.abs(line) > MAX_GOALS / 2) return weak('linha fora do intervalo de resultados avaliado');
       if (live) {
         // Ao vivo, o handicap asiático de casa de apostas conta a partir do marcador no momento da aposta.
         // A convenção da Polymarket ao vivo não está documentada: não se compara.
@@ -141,8 +143,11 @@
       // marcadores que não podem pertencer à mesma sequência de golos: identidade do jogo duvidosa
       return {relation: 'insuficiente', reason: 'marcadores incompatíveis entre sinais ao vivo'};
     }
+    const scores = reachable(a, b);
+    const decided = x => scores.every(([h, g]) => x.rule(h, g) === x.rule(scores[0][0], scores[0][1]));
+    if (decided(a) || decided(b)) return {relation: 'insuficiente', reason: 'seleção já decidida pelo marcador no momento do sinal'};
     let equal = true, bothWin = false, bothNonLose = false, sharedPush = false;
-    for (const [h, g] of reachable(a, b)) {
+    for (const [h, g] of scores) {
       const x = a.rule(h, g), y = b.rule(h, g);
       if (x !== y) equal = false;
       if (x > 0 && y > 0) bothWin = true;
