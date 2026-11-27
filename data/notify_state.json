@@ -7335,12 +7335,17 @@
    "state": "delivered"
   },
   "game|id:nottingham-forest-vs-chelsea-20261127|c514401b5fcd": {
+   "attempt_id": "018780f766694bc7a687d3450dac6a47",
+   "attempt_utc": "2026-11-27T05:17:14+00:00",
+   "chars": 217,
    "created_utc": "2026-11-27T05:17:13+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "c7f6e2fa454a248e1050d9fb04548c6522799fd6ac505612e6495cdf4cf9ce31",
+   "state": "in_flight"
   },
   "game|id:nurnberg-vs-eintracht-braunschweig-20261121|cb03e0614fac": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
@@ -9387,13 +9392,15 @@
    "attempt_utc": "2026-11-27T05:17:13+00:00",
    "chars": 198,
    "created_utc": "2026-11-27T05:17:13+00:00",
+   "done_utc": "2026-11-27T05:17:13+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "4977a710814476bdb55b608987f0e14398393c7ac3547ac18fbe532a3f7c082c",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:sparta-prague-vs-az-alkmaar-20261126|5cef99f21bd1": {
    "attempt_id": "7942f146479643eaa3bd14790d76d620",
@@ -10848,7 +10855,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 689,
+  "delivered": 690,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-27T05:09:44+00:00",
@@ -11202,6 +11209,7 @@
   "2026-11-27T02:08:31+00:00|Pachuca — Chivas Guadalajara|Over 2.5": true,
   "2026-11-27T03:07:18+00:00|Veroskronos Tsuno — Gakunan F Mosuperio|Over 5": true,
   "2026-11-27T03:22:37+00:00|Leon — Cruz Azul|Club León": true,
+  "2026-11-27T05:08:51+00:00|Nottingham Forest — Chelsea|AH2(+0.5)": true,
   "2026-11-27T05:10:36+00:00|Southampton — Middlesbrough|X": true
  },
  "migrations": {
@@ -11436,7 +11444,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos) & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 79,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Quota de mercado = menos de 80 %": 55,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 24,
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": 51,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = sim": 53,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Mercado = outro mercado & Valor da aposta = menos de 10 mil $": 48,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": 42,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Número de apostas = várias": 87,
@@ -13036,6 +13044,9 @@
   "item|id:nottingham-forest-vs-chelsea-20261127|Asian Handicap|Chelsea (0)": {
    "at_utc": "2026-11-26T12:09:33+00:00"
   },
+  "item|id:nottingham-forest-vs-chelsea-20261127|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-27T05:17:13+00:00"
+  },
   "item|id:nurnberg-vs-eintracht-braunschweig-20261121|Asian Total|Under 2.75": {
    "at_utc": "2026-11-21T11:45:27+00:00"
   },
@@ -13746,7 +13757,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1001,
+ "sent_total": 1002,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -15085,6 +15096,7 @@
   "2026-11-27T02:08:31+00:00|Pachuca — Chivas Guadalajara|Over 2.5",
   "2026-11-27T03:07:18+00:00|Veroskronos Tsuno — Gakunan F Mosuperio|Over 5",
   "2026-11-27T03:22:37+00:00|Leon — Cruz Azul|Club León",
+  "2026-11-27T05:08:51+00:00|Nottingham Forest — Chelsea|AH2(+0.5)",
   "2026-11-27T05:10:36+00:00|Southampton — Middlesbrough|X"
  ]
 }
