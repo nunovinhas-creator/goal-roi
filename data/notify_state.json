@@ -5442,13 +5442,15 @@
    "attempt_utc": "2026-11-27T09:49:00+00:00",
    "chars": 186,
    "created_utc": "2026-11-27T09:49:00+00:00",
+   "done_utc": "2026-11-27T09:49:00+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "aa66c5ced4dfbab257e1a56ab88fe6de91a2360dc27be2db9145d3e8ff98048d",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:israel-vs-austria-20261117|0c11ee2360c2": {
    "attempt_utc": "2026-11-17T20:28:44+00:00",
@@ -6062,12 +6064,17 @@
    "state": "delivered"
   },
   "game|id:levante-vs-racing-santander-20261127|56c98a628f38": {
+   "attempt_id": "ff7499c4da9743378f8942e76cb51216",
+   "attempt_utc": "2026-11-27T09:49:02+00:00",
+   "chars": 216,
    "created_utc": "2026-11-27T09:49:00+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "ac59b8fd41bc7f039dcd154246c6cfc6fd3207ec556553bc71f83a614660666f",
+   "state": "in_flight"
   },
   "game|id:levante-vs-racing-santander-20261127|57593676f16b": {
    "attempt_id": "0c7df5c56d0b4b5ba265798adaac19a4",
@@ -10968,7 +10975,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 697,
+  "delivered": 698,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-27T09:40:59+00:00",
@@ -11330,6 +11337,7 @@
   "2026-11-27T07:48:13+00:00|Macarthur FC — Melbourne City|2": true,
   "2026-11-27T07:48:13+00:00|Nottingham Forest — Chelsea|2": true,
   "2026-11-27T08:51:15+00:00|Macarthur FC — Melbourne City|Melbourne City": true,
+  "2026-11-27T09:38:53+00:00|Levante — Racing Santander|Under 3.5": true,
   "2026-11-27T09:38:58+00:00|Ipswich — Aston Villa|2": true
  },
  "migrations": {
@@ -11595,7 +11603,7 @@
   "Polymarket | Hora (UTC) = noite & Número de apostas = várias & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 69,
   "Polymarket | Hora (UTC) = tarde & Mercado = golos (mais/menos) & Número de apostas = várias": 47,
   "Polymarket | Mercado = golos (mais/menos) & Momento = antes do jogo & Quota de mercado = 80 % ou mais": 78,
-  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 76,
+  "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 %": 77,
   "Polymarket | Mercado = golos (mais/menos) & Número de apostas = várias & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 41,
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = 80 % ou mais": 92,
   "Polymarket | Mercado = golos (mais/menos) & Quota de mercado = menos de 80 % & Valor da aposta = menos de 10 mil $": 64,
@@ -12879,6 +12887,9 @@
   "item|id:levante-vs-racing-santander-20261127|1X2|1": {
    "at_utc": "2026-11-26T22:24:21+00:00"
   },
+  "item|id:levante-vs-racing-santander-20261127|Asian Total|Under 3.5": {
+   "at_utc": "2026-11-27T09:49:00+00:00"
+  },
   "item|id:liechtenstein-u19-vs-turkiye-u19-20261117|Asian Total|Over 4": {
    "at_utc": "2026-11-17T10:53:21+00:00"
   },
@@ -13898,7 +13909,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1009,
+ "sent_total": 1010,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -15245,6 +15256,7 @@
   "2026-11-27T07:48:13+00:00|Macarthur FC — Melbourne City|2",
   "2026-11-27T07:48:13+00:00|Nottingham Forest — Chelsea|2",
   "2026-11-27T08:51:15+00:00|Macarthur FC — Melbourne City|Melbourne City",
+  "2026-11-27T09:38:53+00:00|Levante — Racing Santander|Under 3.5",
   "2026-11-27T09:38:58+00:00|Ipswich — Aston Villa|2"
  ]
 }
