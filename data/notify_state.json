@@ -5244,13 +5244,15 @@
    "attempt_utc": "2026-11-27T20:50:08+00:00",
    "chars": 193,
    "created_utc": "2026-11-27T20:50:08+00:00",
+   "done_utc": "2026-11-27T20:50:08+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "f11cf980de684a7ff508a559d0d8caf2c96362eb599beac5d2278e3f8f79e084",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:guadeloupe-vs-bermuda-20261116|124b4a951d05": {
    "attempt_utc": "2026-11-16T20:24:17+00:00",
@@ -6407,12 +6409,17 @@
    "state": "delivered"
   },
   "game|id:levante-vs-racing-santander-20261127|029201d9debb": {
+   "attempt_id": "8cb28ff354424f2487468a058c4205b1",
+   "attempt_utc": "2026-11-27T20:50:10+00:00",
+   "chars": 222,
    "created_utc": "2026-11-27T20:50:08+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "77b0870db69af2b098c97e61ee1103f21cecdb08f4415ad263e631d0c89baf22",
+   "state": "in_flight"
   },
   "game|id:levante-vs-racing-santander-20261127|23155bbcf918": {
    "attempt_id": "a3258faca2724ef19398c46d4bf88baf",
@@ -11718,7 +11725,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 745,
+  "delivered": 746,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-27T20:48:01+00:00",
@@ -12139,6 +12146,7 @@
   "2026-11-27T20:34:59+00:00|Etoile Carouge Fc — Stade Lausanne-Ouchy|Over 3": true,
   "2026-11-27T20:37:21+00:00|Winterthur — Rapperswil-Jona|Over 7": true,
   "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5": true,
+  "2026-11-27T20:47:53+00:00|Levante — Racing Santander|Over 2.5": true,
   "2026-11-27T20:47:56+00:00|Groningen — Willem II|Under 1.5": true
  },
  "migrations": {
@@ -12468,7 +12476,7 @@
   "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 29,
   "Stake | Dia = dia de semana & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Stake | Dia = dia de semana & Mercado = outros mercados": 56,
-  "Stake | Dia = dia de semana & Mercado = outros mercados & Momento do aviso = mais de 45 min depois do início": 20,
+  "Stake | Dia = dia de semana & Mercado = outros mercados & Momento do aviso = mais de 45 min depois do início": 23,
   "Stake | Dia = dia de semana & Mercado = outros mercados & Número de apostas = uma": 50,
   "Stake | Dia = dia de semana & Número de apostas = uma": 78,
   "Stake | Dia = dia de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 53,
@@ -13792,6 +13800,9 @@
   "item|id:levante-vs-racing-santander-20261127|Polymarket|AH2(+0.5)": {
    "at_utc": "2026-11-27T20:23:23+00:00"
   },
+  "item|id:levante-vs-racing-santander-20261127|Total Goals|Over 2.5": {
+   "at_utc": "2026-11-27T20:50:08+00:00"
+  },
   "item|id:liechtenstein-u19-vs-turkiye-u19-20261117|Asian Total|Over 4": {
    "at_utc": "2026-11-17T10:53:21+00:00"
   },
@@ -14889,7 +14900,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1057,
+ "sent_total": 1058,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -16309,6 +16320,7 @@
   "2026-11-27T20:34:59+00:00|Etoile Carouge Fc — Stade Lausanne-Ouchy|Over 3",
   "2026-11-27T20:37:21+00:00|Winterthur — Rapperswil-Jona|Over 7",
   "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5",
+  "2026-11-27T20:47:53+00:00|Levante — Racing Santander|Over 2.5",
   "2026-11-27T20:47:56+00:00|Groningen — Willem II|Under 1.5"
  ]
 }
