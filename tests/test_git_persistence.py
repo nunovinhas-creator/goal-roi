@@ -616,6 +616,22 @@ class ChainContinuityTests(unittest.TestCase):
             self.assertIn('perda de autorização Telegram', sent[0][2])
             self.assertEqual(json.loads(sandbox.remote_file('data/notify_auth_health.json'))['claimed_at_utc'], at.isoformat())
 
+    def test_recent_authorization_warning_does_not_suppress_dispatch_failure(self):
+        from datetime import datetime, timezone, timedelta
+        from unittest.mock import patch
+        from scangoal import notify
+        when = datetime(2026, 11, 27, 18, 37, tzinfo=timezone.utc)
+        auth = {'TG_BOT_TOKEN': 'synthetic', 'TG_CHAT_ID': 'synthetic', 'TG_AUTHORIZATION_LOST': '1'}
+        sent = []
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
+            sender = lambda *args: sent.append(args[-1])
+            self.assertTrue(notify.failure(sender, when, auth))
+            both = dict(auth, NEXT_COLLECTION_FAILED='1')
+            self.assertTrue(notify.failure(sender, when + timedelta(minutes=1), both))
+            self.assertFalse(notify.failure(sender, when + timedelta(minutes=2), both))
+        self.assertEqual(len(sent), 2)
+        self.assertIn('O lançamento da recolha seguinte também falhou.', sent[1])
+
     def test_a_successful_run_stays_green_and_does_not_warn(self):
         conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), None)
         self.assertEqual(conclusion, 'success')

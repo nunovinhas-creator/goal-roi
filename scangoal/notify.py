@@ -1543,7 +1543,9 @@ def failure(sender=send, now=None, env=None):
         return False
     directory = data_dir()
     directory.mkdir(parents=True, exist_ok=True)
-    path = directory / ('notify_auth_health.json' if authorization_lost else 'notify_health.json')
+    # Uma reserva recente de autorização não pode suprimir uma falha do despacho.
+    auth_notice = authorization_lost and not next_failed
+    path = directory / ('notify_auth_health.json' if auth_notice else 'notify_health.json')
     stamp = iso(now)
     with outbox_lock(directory):
         previous = json.loads(path.read_text()) if path.exists() else {}
@@ -1555,9 +1557,9 @@ def failure(sender=send, now=None, env=None):
             store = FileStore(directory)
             publish = durability(env, store)
             publish.paths = [os.path.relpath(path.resolve(), Path(publish.root).resolve())]
-            category = 'auth-health' if authorization_lost else 'health'
+            category = 'auth-health' if auth_notice else 'health'
             if not publish(category + '|' + stamp):
-                if authorization_lost:
+                if auth_notice:
                     print('NOTIFY_AUTH_CLAIM_NOT_PUBLISHED')
                 return False
         text = 'A recolha do goal-roi falhou às %s UTC.' % now.strftime('%H:%M')
