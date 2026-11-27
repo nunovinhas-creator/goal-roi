@@ -282,18 +282,35 @@ def event_binding(mid, target, event):
 
 def capture_result_versions(state, found, events, observed_at, *, conflicting=None):
     """Capture every FT version returned by the ordinary quota-limited queries."""
-    previous_bindings = {stored['bsd_id']: mid for mid, stored in state['results'].items()
-                         if type(stored.get('bsd_id')) is int}
+    previous_bindings = {}
+    for snapshots in (state['results'], state.get('first_results')):
+        if isinstance(snapshots, dict):
+            for mid, stored in snapshots.items():
+                if isinstance(stored, dict) and type(provider_id := stored.get('bsd_id')) is int:
+                    previous_bindings.setdefault(provider_id, set()).add(mid)
+    for mid, versions in state.get('ft_versions', {}).items():
+        if not isinstance(versions, list):
+            continue
+        for version in versions:
+            if not isinstance(version, dict):
+                continue
+            snapshot = version.get('snapshot')
+            ids = (version.get('provider_id'), snapshot.get('bsd_id') if isinstance(snapshot, dict) else None)
+            for provider_id in ids:
+                if type(provider_id) is int:
+                    previous_bindings.setdefault(provider_id, set()).add(mid)
     batch = {mid: [row] for mid, row in found.items()}
     batch.update(conflicting or {})
     batch = {mid: rows for mid, rows in batch.items()
              if ft_time_valid(chronology.parse_utc(rows[0].get('event_date')), observed_at, observed_at, None, observed_at)
-             and previous_bindings.get(rows[0]['bsd_id'], mid) == mid}
+             and previous_bindings.get(rows[0]['bsd_id'], {mid}) == {mid}}
     by_provider_id = {}
     for event in events:
         if isinstance(event, dict) and type(event.get('id')) is int:
             by_provider_id.setdefault(event['id'], []).append(event)
     for match_id, stored in {**state['results'], **{mid: rows[0] for mid, rows in batch.items()}}.items():
+        if stored.get('recheck_conflict') is True:
+            continue  # The recheck already matched and deduplicated these evidence-only rows.
         bound = stored.get('identity_method') in ('provider_id', BSD_COMPETITION_IDENTITY)
         bound_id = stored.get('bsd_id') if match_id in batch or bound else None
         by_league = stored.get('identity_method') == BSD_COMPETITION_IDENTITY
@@ -312,7 +329,7 @@ def capture_result_versions(state, found, events, observed_at, *, conflicting=No
                 if update not in batch.setdefault(match_id, []):
                     batch[match_id].append(update)
     for match_id, rows in batch.items():
-        has_conflict = len({tuple(row['ft']) for row in rows}) > 1
+        has_conflict = rows[0].get('recheck_conflict') is True or len({tuple(row['ft']) for row in rows}) > 1
         if has_conflict:
             rows = sorted(rows, key=lambda row: (row['ft'], json.dumps(row, sort_keys=True)), reverse=True)
         for row in rows:
