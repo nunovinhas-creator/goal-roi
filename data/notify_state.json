@@ -6379,12 +6379,17 @@
    "state": "delivered"
   },
   "game|id:levante-vs-racing-santander-20261127|25b5b19dd21f": {
+   "attempt_id": "2466276688a34100b538e1c7a4bb8153",
+   "attempt_utc": "2026-11-27T20:23:25+00:00",
+   "chars": 217,
    "created_utc": "2026-11-27T20:23:23+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "6496eefdcb02385769a8e0ea3279fff77c4e482643867c51a5e600501e8a4ad4",
+   "state": "in_flight"
   },
   "game|id:levante-vs-racing-santander-20261127|2d9640cc2a98": {
    "attempt_id": "d65b53fc30364ac386a774c26433995e",
@@ -7962,13 +7967,15 @@
    "attempt_utc": "2026-11-27T20:23:23+00:00",
    "chars": 234,
    "created_utc": "2026-11-27T20:23:23+00:00",
+   "done_utc": "2026-11-27T20:23:23+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "cc43b8039440adda16d12d965727259091dd6e03c82f83277bb0ba34149c82fd",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:nurnberg-vs-eintracht-braunschweig-20261121|cb03e0614fac": {
    "attempt_utc": "2026-11-21T11:45:27+00:00",
@@ -11598,7 +11605,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 738,
+  "delivered": 739,
   "uncertain": 5
  },
  "format_last_run_utc": "2026-11-27T20:14:02+00:00",
@@ -12011,6 +12018,7 @@
   "2026-11-27T19:55:00+00:00|Werder Bremen — Borussia Monchengladbach|Borussia Monchengladbach": true,
   "2026-11-27T19:57:11+00:00|Brest — Paris F.C.|Paris FC": true,
   "2026-11-27T20:03:21+00:00|Como — Juventus|1": true,
+  "2026-11-27T20:11:28+00:00|Levante — Racing Santander|AH2(+0.5)": true,
   "2026-11-27T20:14:19+00:00|Nottingham Forest — Chelsea|Nottingham Forest": true
  },
  "migrations": {
@@ -12228,8 +12236,8 @@
   "Polymarket | Competição = liga & Momento = antes do jogo & Quota de mercado = 80 % ou mais": 87,
   "Polymarket | Competição = liga & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 94,
   "Polymarket | Competição = liga & Momento = antes do jogo & Valor da aposta = 10 mil $ ou mais": 76,
-  "Polymarket | Competição = liga & Momento = durante o jogo": 75,
-  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 57,
+  "Polymarket | Competição = liga & Momento = durante o jogo": 76,
+  "Polymarket | Competição = liga & Momento = durante o jogo & Número de apostas = várias": 59,
   "Polymarket | Competição = liga & Número de apostas = uma": 85,
   "Polymarket | Competição = liga & Número de apostas = várias & Quota de mercado = menos de 80 %": 74,
   "Polymarket | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não": 116,
@@ -12255,7 +12263,7 @@
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 14,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo & Valor da aposta = menos de 10 mil $": 31,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo": 44,
-  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo & Número de apostas = várias": 36,
+  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Momento = durante o jogo & Número de apostas = várias": 38,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Número de apostas = várias & Valor da aposta = menos de 10 mil $": 53,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 86,
   "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Quota de mercado = menos de 80 %": 59,
@@ -13646,6 +13654,9 @@
   "item|id:levante-vs-racing-santander-20261127|Polymarket|AH1(-0.5)": {
    "at_utc": "2026-11-27T15:36:09+00:00"
   },
+  "item|id:levante-vs-racing-santander-20261127|Polymarket|AH2(+0.5)": {
+   "at_utc": "2026-11-27T20:23:23+00:00"
+  },
   "item|id:liechtenstein-u19-vs-turkiye-u19-20261117|Asian Total|Over 4": {
    "at_utc": "2026-11-17T10:53:21+00:00"
   },
@@ -14734,7 +14745,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1050,
+ "sent_total": 1051,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -16145,6 +16156,7 @@
   "2026-11-27T19:55:00+00:00|Werder Bremen — Borussia Monchengladbach|Borussia Monchengladbach",
   "2026-11-27T19:57:11+00:00|Brest — Paris F.C.|Paris FC",
   "2026-11-27T20:03:21+00:00|Como — Juventus|1",
+  "2026-11-27T20:11:28+00:00|Levante — Racing Santander|AH2(+0.5)",
   "2026-11-27T20:14:19+00:00|Nottingham Forest — Chelsea|Nottingham Forest"
  ]
 }
