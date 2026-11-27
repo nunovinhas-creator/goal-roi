@@ -24,6 +24,7 @@ class Observation:
     fixture_id: str | None = None
     link: str | None = None
     provider_record: dict | None = None
+    recheck_conflict: bool = False
 
 
 def score_pair(score):
@@ -96,6 +97,7 @@ def resolve(evidence, *, kickoff, as_of):
         return Resolution()
 
     events = {}
+    recheck_conflict_at = None
     for i, row in enumerate(rows):
         if isinstance(row, dict):
             known = utc(row.get("known_utc"))
@@ -110,6 +112,8 @@ def resolve(evidence, *, kickoff, as_of):
             continue
         events.setdefault(row.available_at, []).append(
             ((row.source, row.record_id), row.published_at or row.observed_at, row.score, row.observed_at))
+        if row.recheck_conflict and (recheck_conflict_at is None or row.available_at < recheck_conflict_at):
+            recheck_conflict_at = row.available_at
 
     latest, score, conflict, since, observed = {}, None, False, None, None
     first_score, first_consensus = None, None
@@ -121,7 +125,8 @@ def resolve(evidence, *, kickoff, as_of):
             elif version == current[0]:
                 current[1].add(value)
         scores = {value for _, values in latest.values() for value in values}
-        now_conflict = len(scores) != 1 or None in scores
+        now_conflict = (len(scores) != 1 or None in scores
+                        or (recheck_conflict_at is not None and available >= recheck_conflict_at))
         now_score = None if now_conflict else next(iter(scores))
         if (score, conflict) != (now_score, now_conflict):
             score, conflict, since = now_score, now_conflict, available
@@ -179,11 +184,13 @@ def remember_provider_results(state, matched, stamp, *, update_snapshot=True):
         score = score_pair(info.get("ft"))
         if score is None:
             continue
-        snapshot = deepcopy({k: v for k, v in info.items() if k != "matched_at_utc"})
+        snapshot = deepcopy({k: v for k, v in info.items() if k not in ("matched_at_utc", "recheck_conflict")})
         snapshot["ft"] = list(score)
         row = {"ft": list(score), "period": info.get("period", "regulation"),
                "provider_id": info.get("bsd_id"), "kickoff_utc": info.get("event_date"),
                "fixture_id": match_id, "snapshot": snapshot}
+        if info.get("recheck_conflict") is True:
+            row["recheck_conflict"] = True
         history = state.setdefault("ft_versions", {}).setdefault(match_id, [])
         previous = state["results"].get(match_id)
         version = dict(row, observed_at=stamp.isoformat(), available_at=stamp.isoformat())
@@ -249,7 +256,8 @@ def _provider_observation(mid, version, source, as_of=None):
             or snapshot.get("bsd_id") != version.get("provider_id") or utc(snapshot.get("event_date")) != kickoff):
         return None
     return Observation(source, mid, "regulation", score, observed, available, kickoff=kickoff, fixture_id=mid,
-                       link=snapshot.get("link"), provider_record=snapshot)
+                       link=snapshot.get("link"), provider_record=snapshot,
+                       recheck_conflict=version.get("recheck_conflict") is True)
 
 
 def _provider_record(row):
@@ -270,7 +278,10 @@ def provider_snapshot(state, source, as_of):
     visible = {}
     def order(row):
         return utc(row["observed_at"]), utc(row["available_at"])
-    for mid, candidates in provider_records(state, source, as_of).items():
+    for mid, observations in provider_observations(state, source, as_of=as_of, include_legacy=True).items():
+        if any(row.recheck_conflict for row in observations):
+            continue
+        candidates = [_provider_record(row) for row in observations]
         latest = max(candidates, key=order)
         # Two different versions at the same observation leave the result in conflict.
         tied = [row for row in candidates if order(row) == order(latest)]
