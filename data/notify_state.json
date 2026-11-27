@@ -2826,12 +2826,17 @@
    "state": "delivered"
   },
   "game|id:brest-vs-paris-f-c-20261127|93b50af164c5": {
+   "attempt_id": "533e8989252b4e07897e67830cc709a7",
+   "attempt_utc": "2026-11-27T12:04:51+00:00",
+   "chars": 204,
    "created_utc": "2026-11-27T12:04:49+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "fbb70ed1a6e737ee6bd3001d862c3cf006c36583a4957bfb868ac36b424e497b",
+   "state": "in_flight"
   },
   "game|id:brest-vs-paris-f-c-20261127|c8f7c0c490a1": {
    "attempt_id": "9aba32a6ee2e49509e2c41718e902028",
@@ -4203,13 +4208,15 @@
    "attempt_utc": "2026-11-27T12:04:49+00:00",
    "chars": 182,
    "created_utc": "2026-11-27T12:04:49+00:00",
+   "done_utc": "2026-11-27T12:04:49+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "d02a269732c4ebd1bed919e7a90697a5190eff1dc2d411dba09c5cfb511d4839",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:faroe-islands-u19-vs-azerbaijan-u19-20261117|e9bd7780f4a2": {
    "attempt_utc": "2026-11-17T16:42:01+00:00",
@@ -11028,7 +11035,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 701,
+  "delivered": 702,
   "uncertain": 4
  },
  "format_last_run_utc": "2026-11-27T11:59:40+00:00",
@@ -11394,6 +11401,7 @@
   "2026-11-27T09:38:58+00:00|Ipswich — Aston Villa|2": true,
   "2026-11-27T11:35:41+00:00|Almeria — Sporting Gijon|Almeria": true,
   "2026-11-27T11:53:56+00:00|Maccabi Yavne — Maccabi Ironi Ashdod|Over 7": true,
+  "2026-11-27T11:59:26+00:00|Brest — Paris F.C.|Paris FC": true,
   "2026-11-27T12:01:15+00:00|Everton — Liverpool|2": true
  },
  "migrations": {
@@ -12226,6 +12234,9 @@
   },
   "item|id:brest-vs-paris-f-c-20261127|1X2|2": {
    "at_utc": "2026-11-27T07:29:25+00:00"
+  },
+  "item|id:brest-vs-paris-f-c-20261127|1x2 (2up)|Paris FC": {
+   "at_utc": "2026-11-27T12:04:49+00:00"
   },
   "item|id:brighton-vs-cs-universitatea-craiova-20261126|Brighton Total|Over 2.5": {
    "at_utc": "2026-11-26T17:25:32+00:00"
@@ -13975,7 +13986,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1013,
+ "sent_total": 1014,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -15329,6 +15340,7 @@
   "2026-11-27T09:38:58+00:00|Ipswich — Aston Villa|2",
   "2026-11-27T11:35:41+00:00|Almeria — Sporting Gijon|Almeria",
   "2026-11-27T11:53:56+00:00|Maccabi Yavne — Maccabi Ironi Ashdod|Over 7",
+  "2026-11-27T11:59:26+00:00|Brest — Paris F.C.|Paris FC",
   "2026-11-27T12:01:15+00:00|Everton — Liverpool|2"
  ]
 }
