@@ -4,16 +4,16 @@ Para que os alertas de sinais ao vivo cheguem em cerca de 2 minutos em vez de 10
 - Uma só ligação ao Telegram por execução, mantida aberta entre leituras (não entra e sai a cada leitura).
 - Cada leitura pede só as últimas FAST_RECENT mensagens; a recolha completa (reader) continua a reler as 400.
 - Quando há mensagens novas, refaz o relatório e envia os avisos. Sem novidades, não faz nada.
-- Nunca falha a execução: perante um erro (incluindo um pedido do Telegram para esperar) pára de ler e limita-se a
-  aguardar o resto do tempo, para a cadência das recolhas não mudar. Duas leituras falhadas seguidas: pára.
-- Só depois de aguardar o tempo todo: código de saída FAILED_EXIT se parou por falhas seguidas, se não arrancou, ou se o
-  relatório ou os avisos falharam (o workflow tolera-o com continue-on-error; uma falha isolada recuperada não conta).
+- Pára as leituras perante perda definitiva de autorização ou duas falhas consecutivas.
+- Mantém a espera até ao fim da janela e sai com FAILED_EXIT perante essas falhas, ou perante erro de arranque,
+  relatório ou avisos. O workflow tolera esse código e continua a cadeia.
 """
 import asyncio, json, os, pathlib, shutil, sys, time
 from datetime import datetime, timezone
 
 from . import reader
 from .store import append_versions, data_dir
+from .telegram_diagnostics import check_background_rpc_error, error_fields, is_definitive_auth_error
 
 WATCH_SECONDS = int(os.environ.get('WATCH_SECONDS', '480'))
 INTERVAL = int(os.environ.get('WATCH_INTERVAL', '120'))
@@ -39,6 +39,7 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
     refreshed = pending = False
     failures = 0
     longest = estimate
+    authorization_error = None
 
     def fits():
         if hard is None or clock() - start + longest <= hard:
@@ -56,7 +57,7 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
         except Exception as exc:
             pending = True
             failures += 1
-            print('WATCH_REPORT_FAILED', type(exc).__name__)
+            print('WATCH_REPORT_FAILED', *error_fields(exc))
         else:
             refreshed, pending, failures = True, False, 0
             print('WATCH_REPORT_COMPLETED')
@@ -72,9 +73,12 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
             update()
         try:
             added = await read()
-        except Exception as exc:      # o tipo basta; nunca imprimir segredos
+        except Exception as exc:
             fails += 1
-            print('WATCH_READ_FAILED', type(exc).__name__)
+            print('WATCH_READ_FAILED', *error_fields(exc))
+            if is_definitive_auth_error(exc):
+                authorization_error = exc
+                break
             continue
         fails, done = 0, done + 1
         if added and failures < 2:
@@ -85,6 +89,8 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
         update()
     if pending and problems is not None:
         problems.append('report_failed')
+    if authorization_error is not None:
+        raise authorization_error
     return done
 
 
@@ -122,19 +128,23 @@ async def watch():
         except PublicationError as exc:
             # Reads stay independent of publication. Every refresh retries the publication first and sends nothing
             # while it fails, so a pending transaction can never be overtaken by a notice.
-            print('WATCH_PUBLICATION_PENDING', exc)
+            print('WATCH_PUBLICATION_PENDING', *error_fields(exc))
     client = reader.make_client()
     state = {'entity': None}
 
     async def read():
-        if not client.is_connected():
-            await asyncio.wait_for(client.connect(), 30)
-        if state['entity'] is None:
-            if not await client.is_user_authorized():
-                raise RuntimeError('session not authorized')
-            state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
-        now = reader.iso(datetime.now(timezone.utc))
-        rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
+        check_background_rpc_error(client)
+        try:
+            if not client.is_connected():
+                await asyncio.wait_for(client.connect(), 30)
+            if state['entity'] is None:
+                state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
+            now = reader.iso(datetime.now(timezone.utc))
+            rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
+        except (ConnectionError, asyncio.CancelledError):
+            if not asyncio.current_task().cancelling():
+                check_background_rpc_error(client, definitive_only=False)
+            raise
         now = reader.stamp_receipt(rows)
         added = append_versions(rows)
         path = data_dir() / 'state.json'
@@ -150,10 +160,15 @@ async def watch():
     problems = []
     try:
         done = await rounds(read, lambda: refresh(publisher), problems=problems, hard=HARD_SECONDS)
+        check_background_rpc_error(client)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)
         return done
+    except Exception as exc:
+        if is_definitive_auth_error(exc):
+            print('WATCH_PROBLEMS authorization_lost')
+        raise
     finally:
         try:
             await client.disconnect()
@@ -167,7 +182,7 @@ def main():
         try:
             print('WATCH_DONE reads', asyncio.run(watch()))
         except Exception as exc:
-            print('WATCH_FAILED', type(exc).__name__)
+            print('WATCH_FAILED', *error_fields(exc))
             code = FAILED_EXIT
     else:
         print('WATCH_NOT_CONFIGURED')

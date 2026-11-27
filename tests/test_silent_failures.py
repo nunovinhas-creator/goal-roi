@@ -337,8 +337,12 @@ class FastReads(unittest.TestCase):
         s = steps()
         fast = s['Fast reads every 2 minutes until the next collection (read-only)']
         self.assertIn('        continue-on-error: true', fast)
+        self.assertIn('        if: ${{ !cancelled() }}', fast)
         self.assertIn('        run: timeout --signal=TERM --kill-after=10s 540s python -u -m scangoal.watch', fast)
+        self.assertIn("        if: ${{ !cancelled() && steps.fast.outcome != 'skipped' }}",
+                      s['Commit data from the fast reads'])
         start = '\n'.join(s['Start the next collection'])
+        self.assertIn("        if: ${{ !cancelled() && github.ref_name == 'main' }}", start)
         self.assertIn('if [ "${{ steps.fast.outcome }}" = "skipped" ]; then sleep 480; fi', start)   # failure != skipped
 
 
@@ -374,7 +378,7 @@ class NextCollection(unittest.TestCase):
         """The step's script, run like Actions runs it (bash -e -o pipefail), with `gh` replaced by a failing stub."""
         lines = steps()['Start the next collection']
         script = '\n'.join(l[10:] for l in lines[lines.index('        run: |') + 1:] if l.startswith('          '))
-        script = script.replace('${{ steps.fast.outcome }}', 'success')
+        script = script.replace('${{ steps.fast.outcome }}', 'failure')
         with tempfile.TemporaryDirectory() as d:
             for name, body in (('python', 'echo "HTTP 500" >&2; exit 1'), ('sleep', 'exit 0')):
                 stub = Path(d) / name

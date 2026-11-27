@@ -8,6 +8,7 @@ import asyncio, json, os, sys
 from datetime import datetime, timezone
 
 from .chronology import archive_snapshot
+from .telegram_diagnostics import check_background_rpc_error, client_logger, error_fields
 
 RECENT = int(os.environ.get('SCANGOAL_RECENT', '400'))
 
@@ -29,7 +30,8 @@ def make_client():
     from telethon.sessions import StringSession
     session = ''.join(os.environ['TG_SESSION'].split())
     return TelegramClient(StringSession(session), int(os.environ['TG_API_ID']), os.environ['TG_API_HASH'],
-                          receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1)
+                          receive_updates=False, flood_sleep_threshold=0, connection_retries=1, request_retries=1,
+                          raise_last_call_error=True, base_logger=client_logger)
 
 
 async def fetch(client, entity, limit, now, **bounds):
@@ -117,11 +119,11 @@ async def collect():
     if not windows.exists():
         write_json(windows, {'full_high_id': last_id, 'intervals': []})
     now = iso(datetime.now(timezone.utc))
-    await asyncio.wait_for(client.connect(), 30)
+    failed = False
     try:
-        if not await client.is_user_authorized():
-            print('SCANGOAL_READ_FAILED SESSION_NOT_AUTHORIZED')  # nunca entra em login interativo
-            return 1
+        await asyncio.wait_for(client.connect(), 30)
+        # A resolução e a leitura já são RPC autenticados. O helper de autorização do
+        # Telethon converte erros RPC em False e pode devolver um resultado em cache.
         entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
         async with asyncio.timeout(150):
             rows, oldest, present = await fetch(client, entity, RECENT, now)
@@ -132,9 +134,19 @@ async def collect():
             async with asyncio.timeout(15):
                 await recover_page(client, entity, directory, state, now)
         except Exception as exc:
-            print('SCANGOAL_BACKFILL_PENDING', type(exc).__name__)
+            print('SCANGOAL_BACKFILL_PENDING', *error_fields(exc))
+    except BaseException as exc:
+        failed = True
+        if isinstance(exc, (ConnectionError, asyncio.CancelledError)) and not asyncio.current_task().cancelling():
+            check_background_rpc_error(client, definitive_only=False)
+        raise
     finally:
-        await client.disconnect()
+        try:
+            await client.disconnect()
+        except Exception as exc:
+            if not failed:
+                raise
+            print('SCANGOAL_DISCONNECT_FAILED', *error_fields(exc))
     # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
     stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
     missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
@@ -149,8 +161,8 @@ async def collect():
 def main():
     try:
         sys.exit(asyncio.run(collect()))
-    except Exception as exc:  # o tipo basta; nunca imprimir segredos
-        print('SCANGOAL_READ_FAILED', type(exc).__name__)
+    except Exception as exc:
+        print('SCANGOAL_READ_FAILED', *error_fields(exc))
         sys.exit(1)
 
 
