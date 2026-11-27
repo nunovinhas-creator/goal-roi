@@ -5239,6 +5239,19 @@
    "sha256": "b423c13d7d4a9077f8c7a7461dfa8f001aa4a92c32a7a2ab238074fcb4b74328",
    "state": "delivered"
   },
+  "game|id:groningen-vs-willem-ii-20261127|25192bd66819": {
+   "attempt_id": "c7b33ea0074242d0b87f1e9524262f71",
+   "attempt_utc": "2026-11-27T20:50:08+00:00",
+   "chars": 193,
+   "created_utc": "2026-11-27T20:50:08+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "f11cf980de684a7ff508a559d0d8caf2c96362eb599beac5d2278e3f8f79e084",
+   "state": "in_flight"
+  },
   "game|id:guadeloupe-vs-bermuda-20261116|124b4a951d05": {
    "attempt_utc": "2026-11-16T20:24:17+00:00",
    "chars": 1240,
@@ -6392,6 +6405,14 @@
    "kind": "hint",
    "sha256": "398e545ce6318afd2d5e29d975157448cf374977295d88d43f446cc65ff8a786",
    "state": "delivered"
+  },
+  "game|id:levante-vs-racing-santander-20261127|029201d9debb": {
+   "created_utc": "2026-11-27T20:50:08+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
   },
   "game|id:levante-vs-racing-santander-20261127|23155bbcf918": {
    "attempt_id": "a3258faca2724ef19398c46d4bf88baf",
@@ -11704,10 +11725,10 @@
  "health": {
   "reference": {
    "bsd_results": 67,
-   "eligible": 2786,
+   "eligible": 2789,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 169,
-   "hypotheses": 17441,
+   "hypotheses": 17455,
    "settled_bets": 2093,
    "status_rules": "chronological_eprocess_v3",
    "statuses": 512,
@@ -12117,7 +12138,8 @@
   "2026-11-27T20:29:09+00:00|Werder Bremen — Borussia Monchengladbach|Over 5.5": true,
   "2026-11-27T20:34:59+00:00|Etoile Carouge Fc — Stade Lausanne-Ouchy|Over 3": true,
   "2026-11-27T20:37:21+00:00|Winterthur — Rapperswil-Jona|Over 7": true,
-  "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5": true
+  "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5": true,
+  "2026-11-27T20:47:56+00:00|Groningen — Willem II|Under 1.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -12330,7 +12352,8 @@
   "Jogo aberto | Ritmo indicado pelo bot = menos de 90": 86,
   "Polymarket | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Mercado = golos (mais/menos)": 93,
   "Polymarket | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Momento = antes do jogo": 91,
-  "Polymarket | Competição = liga & Golos até ao sinal = 1 ou 2 & Número de apostas = várias": 25,
+  "Polymarket | Competição = liga & Golos até ao sinal = 1 ou 2 & Número de apostas = várias": 27,
+  "Polymarket | Competição = liga & Minuto = 61 em diante": 29,
   "Polymarket | Competição = liga & Momento = antes do jogo": 102,
   "Polymarket | Competição = liga & Momento = antes do jogo & Quota de mercado = 80 % ou mais": 87,
   "Polymarket | Competição = liga & Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não": 94,
@@ -12395,7 +12418,8 @@
   "Polymarket | Mercado = outro mercado & Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não": 83,
   "Polymarket | Mercado = outro mercado & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 48,
-  "Polymarket | Minuto = 61 em diante": 34,
+  "Polymarket | Minuto = 61 em diante": 38,
+  "Polymarket | Minuto = 61 em diante & Número de apostas = várias": 25,
   "Polymarket | Minuto = 61 em diante & Valor da aposta = menos de 10 mil $": 27,
   "Polymarket | Momento = antes do jogo": 134,
   "Polymarket | Momento = antes do jogo & Número de apostas = uma": 80,
@@ -13497,6 +13521,9 @@
   },
   "item|id:groningen-vs-sc-heerenveen-20261121|Asian Total|Over 3.5": {
    "at_utc": "2026-11-21T07:10:59+00:00"
+  },
+  "item|id:groningen-vs-willem-ii-20261127|Asian Total|Under 1.5": {
+   "at_utc": "2026-11-27T20:50:08+00:00"
   },
   "item|id:guadeloupe-vs-bermuda-20261116|Asian Total|Over 3": {
    "at_utc": "2026-11-16T20:24:17+00:00"
@@ -16281,6 +16308,7 @@
   "2026-11-27T20:29:09+00:00|Werder Bremen — Borussia Monchengladbach|Over 5.5",
   "2026-11-27T20:34:59+00:00|Etoile Carouge Fc — Stade Lausanne-Ouchy|Over 3",
   "2026-11-27T20:37:21+00:00|Winterthur — Rapperswil-Jona|Over 7",
-  "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5"
+  "2026-11-27T20:37:28+00:00|Nottingham Forest — Chelsea|Over 3.5",
+  "2026-11-27T20:47:56+00:00|Groningen — Willem II|Under 1.5"
  ]
 }
