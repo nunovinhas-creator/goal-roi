@@ -8,8 +8,10 @@ import asyncio, json, os, sys
 from datetime import datetime, timezone
 
 from .chronology import archive_snapshot
-from .telegram_diagnostics import check_background_rpc_error, client_logger, error_fields
+from .telegram_diagnostics import (check_background_rpc_error, client_logger, diagnosed_session,
+                                   error_fields, is_definitive_auth_error)
 
+AUTHORIZATION_EXIT = 4
 RECENT = int(os.environ.get('SCANGOAL_RECENT', '400'))
 
 
@@ -119,41 +121,41 @@ async def collect():
     if not windows.exists():
         write_json(windows, {'full_high_id': last_id, 'intervals': []})
     now = iso(datetime.now(timezone.utc))
-    failed = False
-    try:
-        await asyncio.wait_for(client.connect(), 30)
-        # A resolução e a leitura já são RPC autenticados. O helper de autorização do
-        # Telethon converte erros RPC em False e pode devolver um resultado em cache.
-        entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
-        async with asyncio.timeout(150):
-            rows, oldest, present = await fetch(client, entity, RECENT, now)
+    async with diagnosed_session(client, 'SCANGOAL'):
+        try:
+            await asyncio.wait_for(client.connect(), 30)
+            # A resolução e a leitura são os pedidos autenticados que já existiam.
+            entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
+            async with asyncio.timeout(150):
+                rows, oldest, present = await fetch(client, entity, RECENT, now)
+        except (ConnectionError, asyncio.CancelledError):
+            if not asyncio.current_task().cancelling():
+                check_background_rpc_error(client, definitive_only=False)
+            raise
         now = stamp_receipt(rows)
         added = append_versions(rows)
         state = record_window(directory, previous, last_id, oldest, present, now)
+        # A frescura descreve a leitura principal já gravada, mesmo se a
+        # autorização se perder no backfill ou durante a desconexão.
+        stored = {i for i, _ in load_seen(directory / 'messages.jsonl')[0]}
+        missing = sorted(i for i in stored if oldest and oldest <= i and i not in present)
+        write_collection_state(path, previous, {'last_run_utc': now, 'read': len(rows),
+                                               'new_versions': added, 'missing_ids': missing})
+        if last_id and oldest and oldest > last_id + 1:
+            print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
         try:
+            check_background_rpc_error(client)
             async with asyncio.timeout(15):
                 await recover_page(client, entity, directory, state, now)
+        except asyncio.CancelledError:
+            if not asyncio.current_task().cancelling():
+                check_background_rpc_error(client)
+            raise
         except Exception as exc:
             print('SCANGOAL_BACKFILL_PENDING', *error_fields(exc))
-    except BaseException as exc:
-        failed = True
-        if isinstance(exc, (ConnectionError, asyncio.CancelledError)) and not asyncio.current_task().cancelling():
-            check_background_rpc_error(client, definitive_only=False)
-        raise
-    finally:
-        try:
-            await client.disconnect()
-        except Exception as exc:
-            if not failed:
+            if is_definitive_auth_error(exc):
                 raise
-            print('SCANGOAL_DISCONNECT_FAILED', *error_fields(exc))
-    # Mensagens guardadas que já não existem na conversa (dentro da janela lida): o bot apagou-as. O registo mantém-nas.
-    stored = {i for i, _ in load_seen(data_dir() / 'messages.jsonl')[0]}
-    missing = sorted(i for i in stored if oldest and i >= oldest and i not in present)
-    # Estado da recolha: prova de que correu, mesmo quando não há mensagens novas.
-    write_collection_state(path, previous, {'last_run_utc': now, 'read': len(rows), 'new_versions': added, 'missing_ids': missing})
-    if last_id and oldest and oldest > last_id + 1:
-        print('SCANGOAL_GAP_POSSIBLE last_id', last_id, 'oldest_read', oldest)
+            check_background_rpc_error(client)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)
     return 0
 
@@ -161,9 +163,9 @@ async def collect():
 def main():
     try:
         sys.exit(asyncio.run(collect()))
-    except Exception as exc:
+    except (Exception, asyncio.CancelledError) as exc:
         print('SCANGOAL_READ_FAILED', *error_fields(exc))
-        sys.exit(1)
+        sys.exit(AUTHORIZATION_EXIT if is_definitive_auth_error(exc) else 1)
 
 
 if __name__ == '__main__':

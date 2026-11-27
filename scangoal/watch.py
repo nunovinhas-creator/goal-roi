@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 from . import reader
 from .store import append_versions, data_dir
-from .telegram_diagnostics import check_background_rpc_error, error_fields, is_definitive_auth_error
+from .telegram_diagnostics import check_background_rpc_error, diagnosed_session, error_fields, is_definitive_auth_error
 
 WATCH_SECONDS = int(os.environ.get('WATCH_SECONDS', '480'))
 INTERVAL = int(os.environ.get('WATCH_INTERVAL', '120'))
@@ -158,22 +158,13 @@ async def watch():
         return added
 
     problems = []
-    try:
+    async with diagnosed_session(client, 'WATCH', tolerate_disconnect_error=True):
         done = await rounds(read, lambda: refresh(publisher), problems=problems, hard=HARD_SECONDS)
         check_background_rpc_error(client)
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)
-        return done
-    except Exception as exc:
-        if is_definitive_auth_error(exc):
-            print('WATCH_PROBLEMS authorization_lost')
-        raise
-    finally:
-        try:
-            await client.disconnect()
-        except Exception:
-            pass
+    return done
 
 
 def main():
@@ -181,7 +172,7 @@ def main():
     if all(os.environ.get(k, '').strip() for k in ('TG_API_ID', 'TG_API_HASH', 'TG_SESSION', 'TG_SCANGOAL')):
         try:
             print('WATCH_DONE reads', asyncio.run(watch()))
-        except Exception as exc:
+        except (Exception, asyncio.CancelledError) as exc:
             print('WATCH_FAILED', *error_fields(exc))
             code = FAILED_EXIT
     else:

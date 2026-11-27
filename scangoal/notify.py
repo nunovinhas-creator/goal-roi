@@ -1534,15 +1534,16 @@ def run_checked():
 
 
 def failure(sender=send, now=None, env=None):
-    """Chamado só quando a recolha falha. No máximo um aviso por hora (primeiros 10 minutos de cada hora), exceto quando
-    falhou o lançamento da execução seguinte (NEXT_COLLECTION_FAILED=1): aí a cadeia parou e não haverá outra oportunidade."""
+    """Avisa sobre a cadeia ou a perda de autorização, com uma reserva horária por categoria."""
     env = os.environ if env is None else env
     token, chat, now = env.get('TG_BOT_TOKEN', '').strip(), env.get('TG_CHAT_ID', '').strip(), now or datetime.now(UTC)
-    if not token or not chat or (now.minute >= 10 and env.get('NEXT_COLLECTION_FAILED', '').strip() != '1'):
+    authorization_lost = env.get('TG_AUTHORIZATION_LOST') == '1'
+    next_failed = env.get('NEXT_COLLECTION_FAILED', '').strip() == '1'
+    if not token or not chat or (now.minute >= 10 and not (authorization_lost or next_failed)):
         return False
     directory = data_dir()
     directory.mkdir(parents=True, exist_ok=True)
-    path = directory / 'notify_health.json'
+    path = directory / ('notify_auth_health.json' if authorization_lost else 'notify_health.json')
     stamp = iso(now)
     with outbox_lock(directory):
         previous = json.loads(path.read_text()) if path.exists() else {}
@@ -1554,9 +1555,17 @@ def failure(sender=send, now=None, env=None):
             store = FileStore(directory)
             publish = durability(env, store)
             publish.paths = [os.path.relpath(path.resolve(), Path(publish.root).resolve())]
-            if not publish('health|' + stamp):
+            category = 'auth-health' if authorization_lost else 'health'
+            if not publish(category + '|' + stamp):
+                if authorization_lost:
+                    print('NOTIFY_AUTH_CLAIM_NOT_PUBLISHED')
                 return False
-        sender(token, chat, 'A recolha do goal-roi falhou às %s UTC. Vê as execuções em https://github.com/nunovinhas-creator/goal-roi/actions' % now.strftime('%H:%M'))
+        text = 'A recolha do goal-roi falhou às %s UTC.' % now.strftime('%H:%M')
+        if authorization_lost:
+            text = 'A recolha do goal-roi está degradada por perda de autorização Telegram às %s UTC.' % now.strftime('%H:%M')
+            if next_failed:
+                text += ' O lançamento da recolha seguinte também falhou.'
+        sender(token, chat, text + ' Vê as execuções em https://github.com/nunovinhas-creator/goal-roi/actions')
         return True
 
 

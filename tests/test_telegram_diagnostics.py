@@ -2,28 +2,31 @@
 
 import asyncio
 import io
+import json
 import logging
 import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
 from datetime import datetime, timezone
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 from telethon import errors, functions
 
-from scangoal import reader, telegram_diagnostics, watch
+from scangoal import reader, store, telegram_diagnostics, watch
 
 
 SIMULATED_DETAIL = 'marcador-sintético\n::warning::texto de diagnóstico'
 
 
 class Client:
-    def __init__(self, failure_at=None, error=None, disconnect_error=None):
+    def __init__(self, failure_at=None, error=None, disconnect_error=None, background_on_disconnect=None):
         self.failure_at = failure_at
         self.error = error
         self.disconnect_error = disconnect_error
+        self.background_on_disconnect = background_on_disconnect
         self.connected = False
         self.calls = []
         self._updates_error = None
@@ -44,13 +47,14 @@ class Client:
         self.record('get_entity')
         return 'bot'
 
-    async def iter_messages(self, _entity, *, limit):
-        self.record('iter_messages')
-        yield SimpleNamespace(id=1, raw_text='mensagem sintética', date=datetime.now(timezone.utc), buttons=None)
+    async def iter_messages(self, _entity, *, limit, **bounds):
+        self.record('recover_page' if bounds else 'iter_messages')
+        yield SimpleNamespace(id=7 if bounds else 42, raw_text='mensagem sintética', date=datetime.now(timezone.utc), buttons=None)
 
     async def disconnect(self):
         self.record('disconnect')
         self.connected = False
+        self._updates_error = self.background_on_disconnect or self._updates_error
         if self.disconnect_error:
             raise self.disconnect_error
 
@@ -58,9 +62,11 @@ class Client:
 class TelegramDiagnostics(unittest.TestCase):
     def setUp(self):
         directory = self.enterContext(tempfile.TemporaryDirectory())
+        self.directory = Path(directory)
+        self.output = self.directory / 'step-output'
         self.enterContext(patch.dict(os.environ, {
             'SCANGOAL_DATA_DIR': directory, 'TG_SESSION': '', 'TG_API_ID': '1', 'TG_API_HASH': 'abc',
-            'TG_SCANGOAL': 'bot',
+            'TG_SCANGOAL': 'bot', 'GITHUB_OUTPUT': str(self.output),
         }, clear=True))
 
     def run_cli(self, main):
@@ -104,7 +110,8 @@ class TelegramDiagnostics(unittest.TestCase):
                         asyncio.run(reader.collect())
                 self.assertIs(raised.exception, error)
                 self.assertEqual(client.calls, attempted + ['disconnect'])
-                self.assertEqual(out.getvalue().strip(), 'SCANGOAL_DISCONNECT_FAILED RuntimeError')
+                self.assertIn('SCANGOAL_DISCONNECT_FAILED RuntimeError', out.getvalue())
+                self.assertIn('SCANGOAL_AUTHORIZATION_LOST AuthKeyUnregisteredError code=401', out.getvalue())
 
     def test_reader_cli_emits_rpc_class_and_safe_number_only(self):
         error = errors.RPCError(request=None, message=SIMULATED_DETAIL, code=401)
@@ -268,3 +275,137 @@ class TelegramDiagnostics(unittest.TestCase):
                         asyncio.run(entrypoint())
                 self.assertIs(raised.exception, error)
                 self.assertEqual(client.calls, ['connect', 'disconnect'])
+
+
+    def prepare_pending_page(self):
+        store.append_versions([{'message_id': 41, 'text': 'histórico sintético'}])
+        journal = self.directory / 'messages.jsonl'
+        ledger = self.directory / 'prospective_ledger.jsonl'
+        ledger.write_bytes(b'{"synthetic":true}\n')
+        window = self.directory / 'collection_windows.json'
+        gap = {'after_id': 1, 'before_id': 10, 'cursor': 10, 'status': 'pending'}
+        window.write_text(json.dumps({'full_high_id': 41, 'intervals': [gap]}))
+        return journal, journal.read_bytes(), ledger, ledger.read_bytes(), window, gap
+
+    def test_backfill_revocation_fails_after_saving_recent_messages_and_receipt(self):
+        journal, history, ledger, ledger_before, window, gap = self.prepare_pending_page()
+        revocation = errors.SessionRevokedError(request=None)
+        client = Client('recover_page', revocation)
+        with patch.object(reader, 'make_client', return_value=client):
+            code, output = self.run_cli(reader.main)
+        self.assertEqual(code, reader.AUTHORIZATION_EXIT)
+        self.assertIn('SCANGOAL_BACKFILL_PENDING SessionRevokedError code=401', output)
+        self.assertIn('SCANGOAL_READ_FAILED SessionRevokedError code=401', output)
+        self.assertNotIn('SCANGOAL_READ_OK', output)
+        self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+        self.assertEqual(json.loads(window.read_text())['intervals'], [gap])
+        self.assertTrue(journal.read_bytes().startswith(history))
+        self.assertEqual([row['message_id'] for _, row in store.message_rows(journal)], [41, 42])
+        self.assertEqual(ledger.read_bytes(), ledger_before)
+        receipt = json.loads((self.directory / 'state.json').read_text())
+        self.assertEqual(receipt['read'], 1)
+        self.assertEqual(receipt['new_versions'], 1)
+        self.assertEqual(client.calls, ['connect', 'get_entity', 'iter_messages', 'recover_page', 'disconnect'])
+
+    def test_reader_asynchronous_revocation_during_disconnect_fails_with_receipt(self):
+        revocation = errors.SessionRevokedError(request=None)
+        client = Client(background_on_disconnect=revocation)
+        with patch.object(reader, 'make_client', return_value=client):
+            code, output = self.run_cli(reader.main)
+        self.assertEqual(code, reader.AUTHORIZATION_EXIT)
+        self.assertIn('SCANGOAL_READ_FAILED SessionRevokedError code=401', output)
+        self.assertNotIn('SCANGOAL_READ_OK', output)
+        self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+        self.assertEqual(json.loads((self.directory / 'state.json').read_text())['read'], 1)
+
+    def assert_watch_disconnect_revocation(self, *, asynchronous):
+        revocation = errors.SessionRevokedError(request=None)
+        client = Client(**{'background_on_disconnect' if asynchronous else 'disconnect_error': revocation})
+        async def read_once(read, *_args, **_kwargs):
+            await read()
+            return 1
+        clock = SimpleNamespace(monotonic=lambda: 100, sleep=Mock())
+        with patch.dict(os.environ, TG_SESSION='sintética'), patch.object(reader, 'make_client', return_value=client), \
+                patch.object(watch, 'rounds', read_once), patch.object(watch, 'time', clock):
+            code, output = self.run_cli(watch.main)
+        self.assertEqual(code, watch.FAILED_EXIT)
+        self.assertIn('WATCH_FAILED SessionRevokedError code=401', output)
+        self.assertNotIn('WATCH_DONE', output)
+        self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+        clock.sleep.assert_called_once_with(watch.WATCH_SECONDS)
+        self.assertEqual(client.calls, ['connect', 'get_entity', 'iter_messages', 'disconnect'])
+
+    def test_watch_direct_revocation_during_disconnect_never_reports_success(self):
+        self.assert_watch_disconnect_revocation(asynchronous=False)
+
+    def test_watch_asynchronous_revocation_during_disconnect_never_reports_success(self):
+        self.assert_watch_disconnect_revocation(asynchronous=True)
+
+    def test_primary_read_exception_identity_survives_cleanup_and_async_revocation(self):
+        for primary in (TimeoutError(SIMULATED_DETAIL), ValueError(SIMULATED_DETAIL),
+                        errors.AuthKeyUnregisteredError(request=None)):
+            with self.subTest(primary=type(primary)):
+                self.output.unlink(missing_ok=True)
+                cleanup = RuntimeError(SIMULATED_DETAIL)
+                client = Client('iter_messages', primary, disconnect_error=cleanup,
+                                background_on_disconnect=errors.SessionRevokedError(request=None))
+                with patch.object(reader, 'make_client', return_value=client), redirect_stdout(io.StringIO()) as output:
+                    with self.assertRaises(type(primary)) as raised:
+                        asyncio.run(reader.collect())
+                self.assertIs(raised.exception, primary)
+                self.assertIn('SCANGOAL_DISCONNECT_FAILED RuntimeError', output.getvalue())
+                self.assertNotIn('::warning', output.getvalue())
+                self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+
+    def test_cancel_during_disconnect_after_read_failure_remains_cancelled(self):
+        async def scenario():
+            closing = asyncio.Event()
+            revocation = errors.SessionRevokedError(request=None)
+            client = Client('iter_messages', ValueError('synthetic primary'))
+            async def close():
+                client._updates_error = revocation
+                closing.set()
+                await asyncio.Future()
+            with patch.object(reader, 'make_client', return_value=client), patch.object(client, 'disconnect', close):
+                task = asyncio.create_task(reader.collect())
+                await closing.wait()
+                task.cancel('synthetic cancellation')
+                with self.assertRaisesRegex(asyncio.CancelledError, 'synthetic cancellation'):
+                    await task
+        asyncio.run(scenario())
+        self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+
+    def test_reader_backfill_transient_and_unknown_remain_pending(self):
+        self.prepare_pending_page()
+        for failure in (TimeoutError(SIMULATED_DETAIL), RuntimeError(SIMULATED_DETAIL)):
+            with self.subTest(failure=type(failure)), patch.object(reader, 'make_client',
+                    return_value=Client('recover_page', failure)):
+                code, output = self.run_cli(reader.main)
+                self.assertEqual(code, 0)
+                self.assertIn('SCANGOAL_BACKFILL_PENDING ' + type(failure).__name__, output)
+                self.assertFalse(self.output.exists())
+
+
+    def test_child_backfill_cancellation_preserves_background_rpc_error(self):
+        self.prepare_pending_page()
+        revocation = errors.SessionRevokedError(request=None)
+        client = Client()
+        async def interrupted_page(*args):
+            client._updates_error = revocation
+            raise asyncio.CancelledError(SIMULATED_DETAIL)
+        with patch.object(reader, 'make_client', return_value=client), patch.object(reader, 'recover_page', interrupted_page):
+            with self.assertRaises(errors.SessionRevokedError) as raised:
+                asyncio.run(reader.collect())
+        self.assertIs(raised.exception, revocation)
+        self.assertEqual(self.output.read_text(), 'authorization=lost\n')
+
+    def test_cli_cancellation_logs_class_without_raw_details(self):
+        for entrypoint, function, expected in ((reader.main, 'collect', 'SCANGOAL_READ_FAILED'),
+                                               (watch.main, 'watch', 'WATCH_FAILED')):
+            with self.subTest(entrypoint=entrypoint), patch.dict(os.environ, TG_SESSION='sintética'), \
+                    patch.object(reader if function == 'collect' else watch, function,
+                                 AsyncMock(side_effect=asyncio.CancelledError(SIMULATED_DETAIL))), \
+                    patch.object(watch, 'time', SimpleNamespace(monotonic=lambda: 0, sleep=Mock())):
+                code, output = self.run_cli(entrypoint)
+            self.assertNotEqual(code, 0)
+            self.assertEqual(output.strip(), expected + ' CancelledError')
