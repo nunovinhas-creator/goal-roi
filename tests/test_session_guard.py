@@ -4,17 +4,21 @@ Tudo offline: nenhum cliente real, nenhuma ligação ao Telegram, nenhum segredo
 mesmos nomes das do Telethon (a classificação é por nome). Os dados vão para diretórios temporários."""
 import asyncio
 import hashlib
+import hmac
 import io
 import json
 import os
 import re
+import select
+import subprocess
+import sys
 import tempfile
 import threading
 import unittest
 from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from scangoal import reader, session_guard as sg, store
 
@@ -46,8 +50,7 @@ class Classification(unittest.TestCase):
         self.assertEqual(sg.classify(child()).kind, 'SESSION_REVOKED')
 
     def test_network_failures_are_transient_and_never_definitive(self):
-        for exc in (ConnectionResetError(), TimeoutError(), asyncio.TimeoutError(), OSError('network down'),
-                    error('ServerError', RPCError)(), error('FloodWaitError', RPCError)()):
+        for exc in (ConnectionResetError(), TimeoutError(), asyncio.TimeoutError(), error('ServerError', RPCError)()):
             d = sg.classify(exc)
             self.assertEqual((d.kind, d.definitive, d.retry), ('TRANSIENT', False, True), type(exc).__name__)
 
@@ -101,36 +104,151 @@ class BreakerTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.breaker = sg.Breaker(Path(self.tmp.name) / 'breaker.json')
+        self.fp = sg.fingerprint(FAKE_SESSION, FAKE_HASH)
         self.revoked = sg.Diagnosis('SESSION_REVOKED', True, False)
         self.transient = sg.Diagnosis('TRANSIENT', False, True)
 
     def test_seven_consecutive_revocations_raise_exactly_one_alert(self):
-        actions = [self.breaker.decide(self.revoked, 'aaaa1111', NOW + timedelta(minutes=14 * i)) for i in range(7)]
-        self.assertEqual(actions, ['alert'] + ['skip'] * 6)
+        self.assertEqual(self.breaker.decide(self.revoked, self.fp, NOW).action, 'alert')
+        self.breaker.confirm_alert(self.fp, now=NOW)
+        actions = [self.breaker.decide(self.revoked, self.fp, NOW + timedelta(minutes=14 * i)).action
+                   for i in range(1, 7)]
+        self.assertEqual(actions, ['skip'] * 6)
 
     def test_alert_repeats_only_after_the_reminder_interval(self):
-        self.breaker.decide(self.revoked, 'aaaa1111', NOW)
-        self.assertEqual(self.breaker.decide(self.revoked, 'aaaa1111', NOW + timedelta(hours=23)), 'skip')
-        self.assertEqual(self.breaker.decide(self.revoked, 'aaaa1111', NOW + timedelta(hours=25)), 'alert')
+        self.breaker.decide(self.revoked, self.fp, NOW)
+        self.breaker.confirm_alert(self.fp, now=NOW)
+        self.assertEqual(self.breaker.decide(self.revoked, self.fp, NOW + timedelta(hours=23)).action, 'skip')
+        self.assertEqual(self.breaker.decide(self.revoked, self.fp, NOW + timedelta(hours=25)).action, 'alert')
+
+    def test_unconfirmed_delivery_does_not_suppress_the_next_alert(self):
+        self.assertEqual(self.breaker.decide(self.revoked, self.fp, NOW).action, 'alert')
+        self.assertIsNone(self.breaker.load().get('alerted_utc'))
+        next_cycle = NOW + timedelta(minutes=14)
+        other_runner = sg.Breaker(self.breaker.path)
+        self.assertEqual(other_runner.decide(self.revoked, self.fp, next_cycle).action, 'alert')
+        other_runner.confirm_alert(self.fp, now=next_cycle)
+        self.assertEqual(self.breaker.decide(self.revoked, self.fp, next_cycle).action, 'skip')
 
     def test_transient_failures_never_open_the_breaker(self):
         for i in range(20):
-            self.assertEqual(self.breaker.decide(self.transient, 'aaaa1111', NOW + timedelta(minutes=i)), 'proceed')
+            self.assertEqual(self.breaker.decide(self.transient, self.fp, NOW + timedelta(minutes=i)).action, 'retry')
         self.assertFalse(self.breaker.load().get('open'))
 
     def test_replacing_the_secret_closes_the_breaker_and_a_new_revocation_alerts_again(self):
-        self.breaker.decide(self.revoked, 'aaaa1111', NOW)
-        self.assertEqual(self.breaker.decide(None, 'bbbb2222', NOW + timedelta(hours=2)), 'proceed')
-        self.assertEqual(self.breaker.decide(self.revoked, 'bbbb2222', NOW + timedelta(days=8)), 'alert')
+        new_fp = sg.fingerprint('different synthetic session', FAKE_HASH)
+        self.breaker.decide(self.revoked, self.fp, NOW)
+        self.assertEqual(self.breaker.before_connect(self.fp, now=NOW).action, 'skip')
+        self.assertEqual(self.breaker.before_connect(new_fp, now=NOW).action, 'proceed')
+        self.assertEqual(self.breaker.decide(None, new_fp, NOW + timedelta(hours=2)).action, 'proceed')
+        self.assertEqual(self.breaker.decide(self.revoked, new_fp, NOW + timedelta(days=8)).action, 'alert')
 
-    def test_a_working_session_closes_an_open_breaker(self):
-        self.breaker.decide(self.revoked, 'aaaa1111', NOW)
-        self.assertEqual(self.breaker.decide(None, 'aaaa1111', NOW + timedelta(minutes=5)), 'proceed')
-        self.assertFalse(self.breaker.load()['open'])
+    def test_open_breaker_skips_the_connection_factory(self):
+        now = datetime.now(timezone.utc)
+        self.breaker.decide(self.revoked, self.fp, now)
+        self.breaker.confirm_alert(self.fp, now=now)
+        connect = Mock(side_effect=AssertionError('connection factory called'))
+        decision = asyncio.run(self.breaker.run(self.fp, connect, object()))
+        self.assertEqual(decision.action, 'skip')
+        connect.assert_not_called()
 
-    def test_corrupt_state_fails_open_toward_trying_the_session(self):
-        Path(self.tmp.name, 'breaker.json').write_text('{broken')
-        self.assertEqual(self.breaker.decide(None, 'aaaa1111', NOW), 'proceed')
+    def test_run_retries_an_unconfirmed_alert_without_reconnecting(self):
+        class RejectedConnection:
+            async def __aenter__(self):
+                raise error('SessionRevokedError', RPCError)('sensitive mock error')
+
+            async def __aexit__(self, *exc):
+                pass
+
+        connect = Mock(side_effect=RejectedConnection)
+        alert = AsyncMock(side_effect=[False, True])
+
+        async def run_three_cycles():
+            request = object()
+            await self.breaker.run(self.fp, connect, request, alert=alert)
+            self.assertIsNone(self.breaker.load().get('alerted_utc'))
+            await self.breaker.run(self.fp, connect, request, alert=alert)
+            self.assertIsNotNone(self.breaker.load().get('alerted_utc'))
+            await self.breaker.run(self.fp, connect, request, alert=alert)
+
+        asyncio.run(run_three_cycles())
+        connect.assert_called_once()
+        self.assertEqual(alert.await_count, 2)
+
+    def test_alert_transport_error_preserves_pending_delivery_and_releases_the_lease(self):
+        self.breaker.decide(self.revoked, self.fp, NOW)
+        connect = Mock(side_effect=AssertionError('connection factory called'))
+        alert = AsyncMock(side_effect=[ConnectionError('synthetic transport failure'), True])
+
+        async def fail_then_retry():
+            with self.assertRaises(ConnectionError):
+                await self.breaker.run(self.fp, connect, object(), alert=alert)
+            self.assertIsNone(self.breaker.load().get('alerted_utc'))
+            await self.breaker.run(self.fp, connect, object(), alert=alert)
+            self.assertIsNotNone(self.breaker.load().get('alerted_utc'))
+
+        asyncio.run(fail_then_retry())
+        connect.assert_not_called()
+
+    def test_invalid_state_is_rejected_and_preserved_before_connection(self):
+        self.breaker.decide(self.revoked, self.fp, NOW)
+        valid = self.breaker.load()
+        invalid_states = (
+            '{broken', 'null', '[]', '"not a state"', '{}',
+            json.dumps(valid)[:-1] + ', "open": true}',
+            json.dumps({**valid, 'open': 'yes'}),
+            json.dumps({**valid, 'fingerprint': 42}),
+            json.dumps({**valid, 'fingerprint': self.fp[:8]}),
+            json.dumps({**valid, 'opened_utc': ''}),
+            json.dumps({**valid, 'alerted_utc': 'invalid'}),
+            json.dumps({**valid, 'alerted_utc': '2026-11-27T18:14:00'}),
+            json.dumps({**valid, 'version': True}),
+            json.dumps({**valid, 'version': 2}),
+        )
+        for raw in invalid_states:
+            with self.subTest(raw=raw):
+                self.breaker.path.write_text(raw, encoding='utf-8')
+                connect = Mock(side_effect=AssertionError('connection factory called'))
+                with self.assertRaises(sg.GuardStateError):
+                    asyncio.run(self.breaker.run(self.fp, connect, object()))
+                connect.assert_not_called()
+                self.assertEqual(self.breaker.path.read_text(encoding='utf-8'), raw)
+
+    def test_expected_state_missing_on_a_runner_prevents_a_connection(self):
+        required = sg.Breaker(self.breaker.path, require_existing=True)
+        connect = Mock(side_effect=AssertionError('connection factory called'))
+        with self.assertRaises(sg.GuardStateError):
+            asyncio.run(required.run(self.fp, connect, object()))
+        connect.assert_not_called()
+        self.assertFalse(required.path.exists())
+
+        required.initialize()
+        self.assertEqual(required.before_connect(self.fp, now=NOW).action, 'proceed')
+        required.decide(self.revoked, self.fp, NOW)
+        required.initialize()
+        self.assertEqual(required.before_connect(self.fp, now=NOW).action, 'skip')
+
+    def test_separate_runner_processes_need_an_explicitly_shared_state_path(self):
+        script = '''
+import sys
+from scangoal import session_guard as sg
+
+path, fingerprint, operation = sys.argv[1:]
+breaker = sg.Breaker(path)
+if operation == 'record':
+    print(breaker.decide(sg.Diagnosis('SESSION_REVOKED', True, False), fingerprint).action)
+else:
+    print(breaker.before_connect(fingerprint).action)
+'''
+        fresh_path = Path(self.tmp.name) / 'independent-runner' / 'breaker.json'
+        cases = ((self.breaker.path, 'record', 'alert'), (self.breaker.path, 'check', 'skip'),
+                 (fresh_path, 'check', 'proceed'))
+        for path, operation, expected in cases:
+            with self.subTest(operation=operation, path=path):
+                result = subprocess.run([sys.executable, '-B', '-c', script, str(path), self.fp, operation],
+                                        cwd=Path(__file__).resolve().parents[1], env={}, check=True,
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.stdout.strip(), expected)
 
     def test_state_file_holds_no_secret(self):
         self.breaker.decide(self.revoked, sg.fingerprint(FAKE_SESSION, FAKE_HASH), NOW)
@@ -140,12 +258,18 @@ class BreakerTests(unittest.TestCase):
 
 
 class FingerprintAndRedaction(unittest.TestCase):
-    def test_fingerprint_is_stable_short_and_keyed(self):
+    def test_fingerprint_is_stable_and_uses_the_complete_keyed_sha256(self):
         a = sg.fingerprint(FAKE_SESSION, FAKE_HASH)
         self.assertEqual(a, sg.fingerprint(' ' + FAKE_SESSION[:100] + '\n' + FAKE_SESSION[100:], FAKE_HASH))
-        self.assertEqual(len(a), 8)
+        self.assertEqual(a, hmac.new(FAKE_HASH.encode(), FAKE_SESSION.encode(), hashlib.sha256).hexdigest())
         self.assertNotEqual(a, sg.fingerprint(FAKE_SESSION, 'f' * 32))
         self.assertNotEqual(a, sg.fingerprint(FAKE_SESSION[:-1] + 'B', FAKE_HASH))
+
+    def test_fingerprints_distinguish_a_known_32_bit_collision(self):
+        first = sg.fingerprint('synthetic-18247', 'synthetic-key')
+        second = sg.fingerprint('synthetic-44445', 'synthetic-key')
+        self.assertEqual(first[:8], second[:8])
+        self.assertNotEqual(first, second)
 
     def test_redact_removes_session_hash_and_bot_token(self):
         text = f'erro {FAKE_SESSION} hash={FAKE_HASH} bot={FAKE_BOT} fim'
@@ -178,24 +302,61 @@ class LeaseTests(unittest.TestCase):
 
     def test_second_holder_is_refused_while_the_first_holds_it(self):
         a, b = sg.Lease(self.path, owner='runner-a'), sg.Lease(self.path, owner='runner-b')
+        self.addCleanup(a.release)
+        self.addCleanup(b.release)
         self.assertTrue(a.acquire())
         self.assertFalse(b.acquire())
         a.release()
         self.assertTrue(b.acquire())
 
-    def test_expired_lease_of_a_dead_holder_can_be_taken(self):
+    def test_elapsed_ttl_cannot_evict_an_active_holder(self):
         clock = [NOW]
         a = sg.Lease(self.path, ttl=timedelta(minutes=20), owner='a', clock=lambda: clock[0])
         b = sg.Lease(self.path, ttl=timedelta(minutes=20), owner='b', clock=lambda: clock[0])
-        self.assertTrue(a.acquire())
-        clock[0] += timedelta(minutes=21)
+        self.addCleanup(b.release)
+        with a:
+            clock[0] += timedelta(minutes=21)
+            self.assertFalse(b.acquire())
         self.assertTrue(b.acquire())
+
+    def test_process_death_releases_the_lock_without_waiting_for_ttl(self):
+        script = '''
+import sys
+import time
+from datetime import timedelta
+from scangoal import session_guard as sg
+
+with sg.Lease(sys.argv[1], ttl=timedelta(days=1), owner='child'):
+    print('acquired', flush=True)
+    time.sleep(30)
+'''
+        with subprocess.Popen([sys.executable, '-B', '-c', script, str(self.path)],
+                              cwd=Path(__file__).resolve().parents[1], env={}, stdout=subprocess.PIPE,
+                              text=True) as holder:
+            contender = sg.Lease(self.path, owner='parent')
+            self.addCleanup(contender.release)
+            try:
+                ready, _, _ = select.select([holder.stdout], [], [], 5)
+                self.assertTrue(ready, 'child process did not acquire the lock')
+                self.assertEqual(holder.stdout.readline().strip(), 'acquired')
+                self.assertFalse(contender.acquire())
+            finally:
+                holder.kill()
+                holder.wait(timeout=5)
+            self.assertTrue(contender.acquire())
 
     def test_release_by_a_non_owner_does_not_free_the_lease(self):
         a, b = sg.Lease(self.path, owner='a'), sg.Lease(self.path, owner='b')
-        a.acquire()
-        b.release()
-        self.assertFalse(b.acquire())
+        self.addCleanup(b.release)
+        with a:
+            b.release()
+            self.assertFalse(b.acquire())
+
+    def test_another_instance_cannot_reenter_using_the_same_owner_label(self):
+        a, b = sg.Lease(self.path, owner='same label'), sg.Lease(self.path, owner='same label')
+        self.addCleanup(b.release)
+        with a:
+            self.assertFalse(b.acquire())
 
     def test_many_simultaneous_contenders_yield_exactly_one_holder(self):
         winners, barrier = [], threading.Barrier(16)
@@ -204,18 +365,23 @@ class LeaseTests(unittest.TestCase):
             lease = sg.Lease(self.path, owner=f'c{i}')
             barrier.wait()
             if lease.acquire():
-                winners.append(i)
+                winners.append(lease)
         threads = [threading.Thread(target=contend, args=(i,)) for i in range(16)]
         [t.start() for t in threads]
         [t.join() for t in threads]
-        self.assertEqual(len(winners), 1)
+        try:
+            self.assertEqual(len(winners), 1)
+        finally:
+            for lease in winners:
+                lease.release()
 
     def test_context_manager_raises_session_in_use(self):
         with sg.Lease(self.path, owner='a'):
             with self.assertRaisesRegex(RuntimeError, 'SESSION_IN_USE'):
                 with sg.Lease(self.path, owner='b'):
                     pass
-        self.assertFalse(self.path.exists())
+        with sg.Lease(self.path, owner='b'):
+            pass
 
 
 class FakeMessage:
