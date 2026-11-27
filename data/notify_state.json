@@ -1169,12 +1169,17 @@
    "state": "delivered"
   },
   "game|id:al-ittihad-ksa-vs-neom-sc-20261127|f1fcc154e624": {
+   "attempt_id": "119ebbde1c8e4787b3ec3e6fc20d7cf1",
+   "attempt_utc": "2026-11-27T17:49:17+00:00",
+   "chars": 207,
    "created_utc": "2026-11-27T17:49:14+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "bc84a2642ea27b0c9542a7a27ec2e1b2f769bb45b0e09660db577e55ad1d12b8",
+   "state": "in_flight"
   },
   "game|id:al-jeel-vs-al-saqer-fc-20261123|22a687cfb617": {
    "attempt_id": "78a19c92690b497e99dd33e1e131ffae",
@@ -10924,13 +10929,15 @@
    "attempt_utc": "2026-11-27T17:49:15+00:00",
    "chars": 243,
    "created_utc": "2026-11-27T17:49:14+00:00",
+   "done_utc": "2026-11-27T17:49:14+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "c08957f5460d6e2065e9ce3a9bd8ea5a86b21c12c1895fe3f42561ea8effbb86",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:werder-bremen-vs-borussia-monchengladbach-20261127|f60cc3f68198": {
    "attempt_id": "156503a5f80c4ae4ad715fb75b038614",
@@ -11433,7 +11440,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 727,
+  "delivered": 728,
   "uncertain": 5
  },
  "format_last_run_utc": "2026-11-27T17:42:41+00:00",
@@ -11830,6 +11837,7 @@
   "2026-11-27T16:54:51+00:00|Caykur Rizespor — Kasimpasa|1": true,
   "2026-11-27T17:03:57+00:00|Lusail — Al-Arabi Doha|Over 0.5": true,
   "2026-11-27T17:12:40+00:00|Deportivo Cuenca — Manta|Under 1.5": true,
+  "2026-11-27T17:40:28+00:00|Al Ittihad (ksa) — Neom SC|Over 2.75": true,
   "2026-11-27T17:46:13+00:00|Werder Bremen — Borussia Monchengladbach|AH1(-0.5)": true
  },
  "migrations": {
@@ -12132,7 +12140,7 @@
   "Polymarket | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não": 58,
   "Polymarket | Sinal anterior de outro tipo no mesmo jogo = não": 121,
   "Polymarket | Valor da aposta = 10 mil $ ou mais": 94,
-  "Stake | Competição = liga & Dia = dia de semana": 62,
+  "Stake | Competição = liga & Dia = dia de semana": 63,
   "Stake | Competição = liga & Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00": 25,
   "Stake | Competição = liga & Dia = dia de semana & Mercado = golos (total asiático)": 32,
   "Stake | Competição = liga & Dia = dia de semana & Mercado = outros mercados": 47,
@@ -12149,7 +12157,7 @@
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 69,
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 75,
   "Stake | Competição = liga & Sinal anterior de outro tipo no mesmo jogo = sim": 70,
-  "Stake | Dia = dia de semana": 86,
+  "Stake | Dia = dia de semana": 87,
   "Stake | Dia = dia de semana & Faixa de odd = odd 1,50 a 2,00 & Número de apostas = uma": 40,
   "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00": 32,
   "Stake | Dia = dia de semana & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 26,
@@ -12161,7 +12169,7 @@
   "Stake | Dia = dia de semana & Número de apostas = uma": 75,
   "Stake | Dia = dia de semana & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 53,
   "Stake | Dia = dia de semana & Número de apostas = uma & Valor da aposta = menos de 10 mil $": 46,
-  "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 63,
+  "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": 64,
   "Stake | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 31,
   "Stake | Dia = dia de semana & Valor da aposta = menos de 10 mil $": 54,
   "Stake | Dia = fim de semana": 114,
@@ -12282,6 +12290,9 @@
   },
   "item|id:al-gharafa-vs-al-arabi-doha-20261120|Asian Total|Over 4.5": {
    "at_utc": "2026-11-20T16:00:22+00:00"
+  },
+  "item|id:al-ittihad-ksa-vs-neom-sc-20261127|Asian Total|Over 2.75": {
+   "at_utc": "2026-11-27T17:49:14+00:00"
   },
   "item|id:al-jeel-vs-al-saqer-fc-20261123|Asian Total|Over 5": {
    "at_utc": "2026-11-23T15:48:03+00:00"
@@ -14505,7 +14516,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1039,
+ "sent_total": 1040,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
@@ -15892,6 +15903,7 @@
   "2026-11-27T16:54:51+00:00|Caykur Rizespor — Kasimpasa|1",
   "2026-11-27T17:03:57+00:00|Lusail — Al-Arabi Doha|Over 0.5",
   "2026-11-27T17:12:40+00:00|Deportivo Cuenca — Manta|Under 1.5",
+  "2026-11-27T17:40:28+00:00|Al Ittihad (ksa) — Neom SC|Over 2.75",
   "2026-11-27T17:46:13+00:00|Werder Bremen — Borussia Monchengladbach|AH1(-0.5)"
  ]
 }
