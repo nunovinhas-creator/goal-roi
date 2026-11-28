@@ -4773,13 +4773,15 @@
    "attempt_utc": "2026-11-28T13:34:52+00:00",
    "chars": 227,
    "created_utc": "2026-11-28T13:34:52+00:00",
+   "done_utc": "2026-11-28T13:34:52+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "cf34bf71be5665247dba8dd3238c28b196044688717e11c267f0c2a10e003a55",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:fc-andorra-vs-leganes-20261120|82a500c4b60d": {
    "attempt_utc": "2026-11-20T20:07:41+00:00",
@@ -10437,12 +10439,17 @@
    "state": "delivered"
   },
   "game|id:sbv-excelsior-vs-telstar-20261128|cd8a837a60d8": {
+   "attempt_id": "f75ea445c7fa427baf98ea2ad2269eb6",
+   "attempt_utc": "2026-11-28T13:34:53+00:00",
+   "chars": 197,
    "created_utc": "2026-11-28T13:34:52+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "5afb32d8d60fddb15eb744834346000eb6fd7000aeac6462a49b6753a471d453",
+   "state": "in_flight"
   },
   "game|id:schalke-vs-stuttgart-20261121|546bdb00dfd8": {
    "attempt_utc": "2026-11-21T19:11:08+00:00",
@@ -12486,7 +12493,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 789,
+  "delivered": 790,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T13:29:04+00:00",
@@ -12952,6 +12959,7 @@
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5": true,
   "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio": true,
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5": true,
+  "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5": true,
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6": true
  },
  "migrations": {
@@ -15485,6 +15493,9 @@
   "item|id:saudi-arabia-vs-uzbekistan-20261117|Asian Total|Over 4": {
    "at_utc": "2026-11-17T16:56:12+00:00"
   },
+  "item|id:sbv-excelsior-vs-telstar-20261128|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-28T13:34:52+00:00"
+  },
   "item|id:schalke-vs-stuttgart-20261121|Asian Total|Over 0.5": {
    "at_utc": "2026-11-21T19:11:08+00:00"
   },
@@ -15865,7 +15876,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1101,
+ "sent_total": 1102,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17343,6 +17354,7 @@
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5",
   "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio",
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5",
+  "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5",
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6"
  ]
 }
