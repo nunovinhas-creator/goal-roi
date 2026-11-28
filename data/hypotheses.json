@@ -1534,6 +1534,21 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Antecedência = 60 min ou menos & Odd depois do sinal = desceu": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "60 min ou menos"
+   ],
+   [
+    "Odd depois do sinal",
+    "desceu"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Antecedência = 60 min ou menos & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-23T11:15:15+00:00",
   "conditions": [
@@ -35682,6 +35697,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = fim de semana & Reforço = reforço ×4 ou mais & Seleção = equipa da casa": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Reforço",
+    "reforço ×4 ou mais"
+   ],
+   [
+    "Seleção",
+    "equipa da casa"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = fim de semana & Reforço = reforço ×4 ou mais & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-28T13:46:04+00:00",
   "conditions": [
@@ -36876,6 +36910,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Odd depois do sinal = desceu": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Odd depois do sinal",
+    "desceu"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Odd depois do sinal = subiu": {
   "born_utc": "2026-11-13T10:46:54+00:00",
   "conditions": [
@@ -36985,6 +37038,25 @@
    [
     "Quota depois do sinal",
     "desceu"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Quota depois do sinal = subiu": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Quota depois do sinal",
+    "subiu"
    ]
   ],
   "family": "Betfair",
@@ -37832,6 +37904,25 @@
    [
     "Quota depois do sinal",
     "desceu"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Faixa de odd = odd 1,50 a 2,00 & Odd depois do sinal = desceu & Quota depois do sinal = subiu": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Odd depois do sinal",
+    "desceu"
+   ],
+   [
+    "Quota depois do sinal",
+    "subiu"
    ]
   ],
   "family": "Betfair",
@@ -38694,6 +38785,25 @@
    [
     "Tamanho do mercado",
     "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Faixa de odd = odd 1,50 a 2,00 & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = menos de 10 mil $": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Tamanho do mercado",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Betfair",
@@ -58779,6 +58889,25 @@
   "reason": "Mercado com quota baixa e tamanho de mercado reduzido",
   "source": "llm"
  },
+ "Betfair | Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Velocidade do reforço = ×4 em 30 min ou menos": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em 30 min ou menos"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Hora (UTC) = tarde & Quota de mercado = menos de 80 % & Velocidade do reforço = ×4 em mais de 30 min": {
   "born_utc": "2026-11-24T00:55:08+00:00",
   "conditions": [
@@ -59222,6 +59351,25 @@
    [
     "Velocidade do reforço",
     "×4 em mais de 30 min"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Hora (UTC) = tarde & Quota depois do sinal = subiu & Volume na seleção = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Quota depois do sinal",
+    "subiu"
+   ],
+   [
+    "Volume na seleção",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Betfair",
@@ -69318,6 +69466,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Odd depois do sinal = desceu & Seleção = equipa da casa & Volume na seleção = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Odd depois do sinal",
+    "desceu"
+   ],
+   [
+    "Seleção",
+    "equipa da casa"
+   ],
+   [
+    "Volume na seleção",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Odd depois do sinal = desceu & Seleção = equipa da casa & Volume na seleção = menos de 10 mil $": {
   "born_utc": "2026-11-26T19:00:38+00:00",
   "conditions": [
@@ -72571,6 +72738,25 @@
    [
     "Tamanho do mercado",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Outros sinais no mesmo jogo = jogo com um só tipo de sinal & Quota de mercado = menos de 80 % & Velocidade do reforço = ×4 em 30 min ou menos": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em 30 min ou menos"
    ]
   ],
   "family": "Betfair",
@@ -78481,6 +78667,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não & Velocidade do reforço = ×4 em 30 min ou menos": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em 30 min ou menos"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não & Velocidade do reforço = ×4 em mais de 30 min": {
   "born_utc": "2026-11-14T01:49:19+00:00",
   "conditions": [
@@ -82390,6 +82595,25 @@
    [
     "Velocidade do reforço",
     "×4 em 30 min ou menos"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Seleção = equipa da casa & Velocidade do reforço = ×4 em 30 min ou menos & Volume na seleção = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Seleção",
+    "equipa da casa"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em 30 min ou menos"
+   ],
+   [
+    "Volume na seleção",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Betfair",
@@ -90068,6 +90292,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Dia = fim de semana & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Dia = fim de semana & Hora (UTC) = tarde & Parte do jogo = 1.ª parte": {
   "born_utc": "2026-11-28T13:25:50+00:00",
   "conditions": [
@@ -90561,6 +90804,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Dia = fim de semana & Minuto = 61 em diante & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T12:23:38+00:00",
   "conditions": [
@@ -90749,6 +91011,25 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Dia = fim de semana & Parte do jogo = 2.ª parte & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
    ]
   ],
   "family": "Forma de golos",
@@ -91598,6 +91879,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Faixa de odd = odd 1,50 a 2,00 & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
    ]
   ],
   "family": "Forma de golos",
@@ -94454,6 +94754,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ],
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde & Parte do jogo = 2.ª parte": {
   "born_utc": "2026-11-14T15:01:27+00:00",
   "conditions": [
@@ -96086,6 +96405,25 @@
   "family": "Forma de golos",
   "source": "gerador"
  },
+ "Forma de golos | Hora (UTC) = tarde & Minuto = 61 em diante & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
  "Forma de golos | Hora (UTC) = tarde & Minuto = 61 em diante & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-14T16:28:25+00:00",
   "conditions": [
@@ -96168,6 +96506,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = tarde & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Parte do jogo = 2.ª parte": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ],
+   [
+    "Parte do jogo",
+    "2.ª parte"
    ]
   ],
   "family": "Forma de golos",
@@ -112609,6 +112966,78 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = taça & Confiança indicada pelo bot = menos de 95 % & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "menos de 95 %"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Confiança indicada pelo bot = menos de 95 % & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "menos de 95 %"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Confiança indicada pelo bot = menos de 95 % & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Confiança indicada pelo bot",
+    "menos de 95 %"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Dia = fim de semana": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = taça & Faixa de odd = odd 1,50 a 2,00": {
   "born_utc": "2026-11-20T13:01:21+00:00",
   "conditions": [
@@ -112700,6 +113129,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = taça & Faixa de odd = odd 1,50 a 2,00 & Ritmo indicado pelo bot = menos de 90": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Ritmo indicado pelo bot",
+    "menos de 90"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = taça & Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": {
   "born_utc": "2026-11-25T13:19:28+00:00",
   "conditions": [
@@ -112729,6 +113177,63 @@
    [
     "Golos até ao sinal",
     "1 ou 2"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Golos até ao sinal = 1 ou 2 & Golos em falta para ganhar = até 1 golo": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Golos em falta para ganhar",
+    "até 1 golo"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Golos até ao sinal = 1 ou 2 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Competição = taça & Golos até ao sinal = 1 ou 2 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "taça"
+   ],
+   [
+    "Golos até ao sinal",
+    "1 ou 2"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Jogo aberto",
@@ -310758,6 +311263,25 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "sim"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = tarde & Liga = German Bundesliga & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T13:55:54+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Liga",
+    "German Bundesliga"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Stake",
