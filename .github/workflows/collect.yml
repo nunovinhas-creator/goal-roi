@@ -29,6 +29,7 @@ jobs:
       - run: |
           echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
           printf 'GOAL_ROI_PUBLICATION_DIR=%s/goal-roi-publication\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
+          printf 'SCANGOAL_AUTH_ALERT_DIR=%s/goal-roi-auth-alert\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
         with:
           ref: main
@@ -38,6 +39,15 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install -r requirements.txt
+      - name: Start Telegram authorization alert worker
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          mkdir -p "$SCANGOAL_AUTH_ALERT_DIR"
+          nohup python -u -m scangoal.authorization_alerts </dev/null >"$SCANGOAL_AUTH_ALERT_DIR/worker.log" 2>&1 &
+          printf '%s\n' "$!" > "$SCANGOAL_AUTH_ALERT_DIR/pid"
       # Git is the only durable store. A transaction left by a lost runner is replayed (or, after its attempts, set
       # aside) before anything else writes. Its failure blocks notices for this run, never the reads below.
       - name: Resume pending publication
@@ -199,13 +209,25 @@ jobs:
           timeout 85s python scripts/dispatch_collection.py
       # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
       - name: Tell the user when a collection fails (at most once an hour)
-        if: ${{ (failure() || steps.reader.outputs.authorization == 'lost' || steps.fast.outputs.authorization == 'lost') && !cancelled() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
-        continue-on-error: ${{ steps.reader.outputs.authorization == 'lost' || steps.fast.outputs.authorization == 'lost' }}
+        if: ${{ failure() && !cancelled() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
         env:
-          TG_AUTHORIZATION_LOST: ${{ (steps.reader.outputs.authorization == 'lost' || steps.fast.outputs.authorization == 'lost') && '1' || '' }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}
           NOTIFY_DURABLE: git
         run: python -u -m scangoal.notify --failure
-
+      - name: Report Telegram authorization alert worker outcome
+        if: ${{ always() && !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [[ ! -f "$SCANGOAL_AUTH_ALERT_DIR/pid" ]]; then
+            echo '::warning::Telegram authorization alert worker did not start.'
+            exit 1
+          fi
+          touch "$SCANGOAL_AUTH_ALERT_DIR/stop"
+          timeout 65s bash -c 'while [[ ! -f "$1/stopped" ]] && kill -0 "$(cat "$1/pid")" 2>/dev/null; do sleep 1; done' _ "$SCANGOAL_AUTH_ALERT_DIR" || true
+          tail -n 30 "$SCANGOAL_AUTH_ALERT_DIR/worker.log"
+          if [[ ! -f "$SCANGOAL_AUTH_ALERT_DIR/stopped" ]]; then
+            echo '::warning::Telegram authorization alert worker could not finish. Consult the incident state.'
+            exit 1
+          fi

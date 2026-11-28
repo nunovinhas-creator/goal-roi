@@ -5,6 +5,8 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
+from . import authorization_events
+
 
 # Os logs internos do Telethon podem formatar mensagens RPC e pedidos.
 # Os pontos de entrada registam campos controlados a partir das exceções.
@@ -59,6 +61,7 @@ def check_background_rpc_error(client, *, definitive_only=True):
 
 
 def report_authorization_loss(prefix, error):
+    authorization_events.loss(error)
     marker = 'WATCH_PROBLEMS authorization_lost' if prefix == 'WATCH' else 'SCANGOAL_AUTHORIZATION_LOST'
     print(marker, *error_fields(error))
     output = os.environ.get('GITHUB_OUTPUT')

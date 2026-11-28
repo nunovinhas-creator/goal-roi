@@ -489,7 +489,7 @@ class FastReadsRetryTests(GitPersistenceTests):
         self.assertEqual(self.sb.shim_log('pushes'), ['2'])
 
 
-def simulate_job(text, failing, shadow=True, authorization_source=None):
+def simulate_job(text, failing, shadow=True):
     """Avaliação das condições dos passos como no GitHub Actions (só as expressões usadas neste workflow): o passo `failing`
     falha; devolve (conclusão do job, passos executados, passos saltados)."""
     names, steps = re.findall(r'^      - name: (.+)$', text, re.M), {}
@@ -512,8 +512,6 @@ def simulate_job(text, failing, shadow=True, authorization_source=None):
             # P2 Polymarket (ativação): simula o observador ligado; os seus passos toleram falhas.
             "vars.GOAL_ROI_POLYMARKET_SHADOW == 'on'": shadow,
         }
-        auth_condition = "steps.reader.outputs.authorization == 'lost' || steps.fast.outputs.authorization == 'lost'"
-        facts["(failure() || " + auth_condition + ")"] = failed or authorization_source is not None
         go = all(facts[part] for part in cond.split(' && '))
         if not go:
             skipped.append(name)
@@ -559,15 +557,14 @@ class ChainContinuityTests(unittest.TestCase):
         self.assertIn(STEPS[0], ran)
         self.assertIn(self.NEXT, ran)
 
-    def test_authorization_loss_stays_green_but_notifies_after_publication_and_dispatch(self):
+    def test_fast_authorization_loss_keeps_chain_green_and_skips_generic_notice(self):
         workflow = WORKFLOW.read_text(encoding='utf-8')
-        for source in ('reader', 'fast'):
-            with self.subTest(source=source):
-                failed = 'Fast reads every 2 minutes until the next collection (read-only)' if source == 'fast' else None
-                conclusion, ran, _ = simulate_job(workflow, failed, authorization_source=source)
-                self.assertEqual(conclusion, 'success')
-                self.assertLess(ran.index(STEPS[1]), ran.index(self.NEXT))
-                self.assertLess(ran.index(self.NEXT), ran.index(self.TELL))
+        conclusion, ran, skipped = simulate_job(
+            workflow, 'Fast reads every 2 minutes until the next collection (read-only)')
+        self.assertEqual(conclusion, 'success')
+        self.assertLess(ran.index('Start Telegram authorization alert worker'), ran.index(self.READ))
+        self.assertLess(ran.index(STEPS[1]), ran.index(self.NEXT))
+        self.assertIn(self.TELL, skipped)
 
     def test_reader_shell_tolerates_only_certified_authorization_exit(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -594,43 +591,6 @@ class ChainContinuityTests(unittest.TestCase):
             outcome = subprocess.run(['bash', '-eo', 'pipefail', '-c', script], env=env, capture_output=True, check=True)
             self.assertIn(b'::warning title=Telegram authorization lost::', outcome.stdout)
             self.assertIn('Telegram authorization lost. Collection is degraded.', summary.read_text())
-
-    def test_authorization_alert_deduplicates_across_independent_git_checkouts(self):
-        from datetime import datetime, timezone, timedelta
-        from unittest.mock import patch
-        from scangoal import notify
-        at = datetime(2026, 11, 27, 18, 37, tzinfo=timezone.utc)
-        env = {'TG_BOT_TOKEN': 'synthetic', 'TG_CHAT_ID': 'synthetic', 'TG_AUTHORIZATION_LOST': '1',
-               'GITHUB_REF_NAME': 'main', 'NOTIFY_DURABLE': 'git'}
-        sent = []
-        with tempfile.TemporaryDirectory() as folder:
-            sandbox = Sandbox(folder)
-            first, stale = sandbox.clone('first'), sandbox.clone('stale')
-            def send_now(checkout, now):
-                with patch.dict(os.environ, SCANGOAL_DATA_DIR=str(checkout / 'data')):
-                    return notify.failure(lambda *args: sent.append(args), now, env)
-            self.assertTrue(send_now(first, at))
-            self.assertFalse(send_now(stale, at + timedelta(minutes=2)))
-            self.assertFalse(send_now(sandbox.clone('fresh'), at + timedelta(minutes=3)))
-            self.assertEqual(len(sent), 1)
-            self.assertIn('perda de autorização Telegram', sent[0][2])
-            self.assertEqual(json.loads(sandbox.remote_file('data/notify_auth_health.json'))['claimed_at_utc'], at.isoformat())
-
-    def test_recent_authorization_warning_does_not_suppress_dispatch_failure(self):
-        from datetime import datetime, timezone, timedelta
-        from unittest.mock import patch
-        from scangoal import notify
-        when = datetime(2026, 11, 27, 18, 37, tzinfo=timezone.utc)
-        auth = {'TG_BOT_TOKEN': 'synthetic', 'TG_CHAT_ID': 'synthetic', 'TG_AUTHORIZATION_LOST': '1'}
-        sent = []
-        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, SCANGOAL_DATA_DIR=folder):
-            sender = lambda *args: sent.append(args[-1])
-            self.assertTrue(notify.failure(sender, when, auth))
-            both = dict(auth, NEXT_COLLECTION_FAILED='1')
-            self.assertTrue(notify.failure(sender, when + timedelta(minutes=1), both))
-            self.assertFalse(notify.failure(sender, when + timedelta(minutes=2), both))
-        self.assertEqual(len(sent), 2)
-        self.assertIn('O lançamento da recolha seguinte também falhou.', sent[1])
 
     def test_a_successful_run_stays_green_and_does_not_warn(self):
         conclusion, ran, skipped = simulate_job(WORKFLOW.read_text(encoding='utf-8'), None)

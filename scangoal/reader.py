@@ -7,6 +7,7 @@ em cada execução para apanhar as edições em que o bot acrescenta o resultado
 import asyncio, json, os, sys
 from datetime import datetime, timezone
 
+from . import authorization_events
 from .chronology import archive_snapshot
 from .telegram_diagnostics import (check_background_rpc_error, client_logger, diagnosed_session,
                                    error_fields, is_definitive_auth_error)
@@ -126,6 +127,7 @@ async def collect():
             await asyncio.wait_for(client.connect(), 30)
             # A resolução e a leitura são os pedidos autenticados que já existiam.
             entity = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
+            proof = authorization_events.recovery_token() if RECENT > 0 else None
             async with asyncio.timeout(150):
                 rows, oldest, present = await fetch(client, entity, RECENT, now)
         except (ConnectionError, asyncio.CancelledError):
@@ -156,6 +158,7 @@ async def collect():
             if is_definitive_auth_error(exc):
                 raise
             check_background_rpc_error(client)
+    authorization_events.recovered(proof)
     print('SCANGOAL_READ_OK read', len(rows), 'new_versions', added)
     return 0
 
