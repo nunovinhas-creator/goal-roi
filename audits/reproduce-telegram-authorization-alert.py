@@ -14,8 +14,19 @@ from scangoal import authorization_alerts as alerts
 from scangoal import authorization_events as events
 
 
-def git(*args):
-    return subprocess.run(['git', *args], check=True, capture_output=True, text=True).stdout.strip()
+def git(*args, payload=None):
+    return subprocess.run(['git', *args], input=payload, check=True, capture_output=True, text=True).stdout.strip()
+
+
+def seed_local(origin):
+    command = ('--git-dir', str(origin))
+    blob = git(*command, 'hash-object', '-w', '--stdin', payload=json.dumps(alerts.initial_state()))
+    tree = git(*command, 'mktree', payload=f'100644 blob {blob}\tincident.json\n')
+    tip = git(*command, '-c', 'user.name=Offline test', '-c', 'user.email=test@example.invalid',
+              'commit-tree', tree, '-m', 'Synthetic authorised bootstrap')
+    for ref in (alerts.REF, alerts.WITNESS):
+        git(*command, 'update-ref', ref, tip)
+    return tip
 
 
 WORKER = """
@@ -51,7 +62,7 @@ def await_file(path):
 
 
 def emit(spool, kind, **fields):
-    with patch.dict(os.environ, SCANGOAL_AUTH_ALERT_DIR=str(spool)):
+    with patch.dict(os.environ, SCANGOAL_AUTH_ALERT_DIR=str(spool), GOAL_ROI_TELEGRAM_AUTH_ALERTS='on'):
         events.emit(kind, **fields)
 
 
@@ -60,6 +71,7 @@ def same_episode_parallel_gits():
         root = Path(folder)
         origin = root / 'bare'
         git('init', '--bare', '-q', str(origin))
+        seed = seed_local(origin)
         first, second = root / 'first', root / 'second'
         for checkout in (first, second):
             git('clone', '-q', str(origin), str(checkout))
@@ -87,7 +99,20 @@ def same_episode_parallel_gits():
                           'reservation_ack_ms': ms(ack), 'send_ms': ms(record['attempted_at']),
                           'confirmed_ms': ms(record['finished_at'])}))
         assert 0 <= ms(ack) <= ms(record['attempted_at']) <= ms(record['finished_at']) < 300_000
-        assert git('--git-dir', str(origin), 'for-each-ref', '--format=%(refname)') == alerts.REF
+        assert set(git('--git-dir', str(origin), 'for-each-ref', '--format=%(refname)').splitlines()) == {alerts.REF, alerts.WITNESS}
+        tip = alerts.GitState(first).read()[0]
+        git('--git-dir', str(origin), 'update-ref', alerts.REF, seed, tip)
+        cold = root / 'cold'
+        git('clone', '-q', str(origin), str(cold))
+        try:
+            alerts.Alerts(alerts.GitState(cold)).detect(events.utc_now(), 'SessionRevokedError')
+        except alerts.StateUnavailable:
+            pass
+        else:
+            raise AssertionError('stale restoration must be rejected')
+        assert sent.read_text().splitlines() == ['called']
+        git('--git-dir', str(origin), 'update-ref', alerts.REF, tip, seed)
+        print('Stale restore rejected by independent witness')
 
         for name in ('stopped', 'stop'):
             (spool2 / name).unlink(missing_ok=True)

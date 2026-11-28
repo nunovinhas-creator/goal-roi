@@ -910,10 +910,10 @@ class ProductionIsolation(unittest.TestCase):
     def test_production_workflow_untouched(self):
         self.assertNotIn(self.MARKER, self.original)
         self.assertNotIn('polymarket', self.original.lower())
-        # Incident alert draft authorizes the worker wiring. Previous pin:
+        # PR #116 protects operational state and reports the worker without draining. Previous pin:
         # 57f58ee635d7ebd4518a4f5b4156f2c759128afe7ab2ba200c47d25d1cde6cb8
         self.assertEqual(hashlib.sha256(self.original.encode()).hexdigest(),
-                         '9d0dd877403fbd11c516ccfe43cd921315f240f30166b553252f4cba3facdac9')
+                         'a91ece0e0090ec858928bb16636a7bdacb9a2bc72535fabd4039d6278d7d957c')
 
     def test_patch_only_adds_gated_bounded_non_blocking_steps(self):
         blocks, names = self.blocks(self.patched)

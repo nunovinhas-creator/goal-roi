@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -16,6 +17,7 @@ from telethon.errors import SessionRevokedError
 
 from scangoal import authorization_alerts as alerts
 from scangoal import authorization_events as events
+from scangoal import authorization_status as status
 from scangoal import notify, reader, watch
 from test_telegram_diagnostics import Client
 
@@ -31,6 +33,7 @@ class GitAlerts(unittest.TestCase):
         self.git('init', '--bare', '-q', str(self.origin))
         self.checkout = self.clone('first')
         self.storage = alerts.GitState(self.checkout)
+        self.bootstrap = self.seed(alerts.initial_state())
         self.time = NOW
         self.sender = Mock()
         self.alerts = self.worker(self.storage, self.sender)
@@ -42,6 +45,121 @@ class GitAlerts(unittest.TestCase):
         path = self.root / name
         self.git('clone', '-q', str(self.origin), str(path))
         return path
+
+    def seed(self, state):
+        command = ['git', '--git-dir', str(self.origin)]
+        def run(*args, payload=None):
+            return subprocess.run([*command, *args], input=payload, text=True, check=True,
+                                  capture_output=True).stdout.strip()
+        blob = run('hash-object', '-w', '--stdin', payload=state if isinstance(state, str) else json.dumps(state))
+        tree = run('mktree', payload=f'100644 blob {blob}\tincident.json\n')
+        tip = run('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                  'commit-tree', tree, '-m', 'authorised synthetic bootstrap')
+        for ref in (alerts.REF, alerts.WITNESS):
+            run('update-ref', ref, tip)
+        return tip
+
+    def test_missing_ref_never_initializes_or_sends(self):
+        for ref in (alerts.REF, alerts.WITNESS):
+            self.git('--git-dir', str(self.origin), 'update-ref', '-d', ref)
+            with self.assertRaises(alerts.StateUnavailable):
+                self.detect()
+        with self.assertRaises(alerts.StateUnavailable):
+            self.storage.write('', alerts.initial_state())
+        self.assertEqual(self.git('--git-dir', str(self.origin), 'for-each-ref'), '')
+        self.sender.assert_not_called()
+
+    def test_invalid_remote_record_blocks_send_before_reservation(self):
+        state = alerts.initial_state()
+        incident = 'e' * 32
+        state.update(active=incident, incidents={incident: {
+            'status': 'reserved', 'error': REVOCATION, 'detected_at': self.time.isoformat()}})
+        # Inject directly into both remote refs, bypassing the production writer.
+        for invalid in (state, json.dumps(alerts.initial_state()).replace('"version": 1', '"version": 1, "version": 1')):
+            with self.subTest(invalid=invalid):
+                self.seed(invalid)
+                with self.assertRaises(alerts.StateUnavailable):
+                    self.detect()
+        self.sender.assert_not_called()
+
+    def test_deleted_and_stale_restored_ref_cannot_repeat_a_confirmed_attempt(self):
+        incident, state = self.detect()
+        self.alerts.deliver(incident, state)
+        confirmed_tip, _ = self.storage.read()
+        self.git('--git-dir', str(self.origin), 'update-ref', '-d', alerts.REF, confirmed_tip)
+        self.assertFalse(self.storage.write(confirmed_tip, state))
+        first = self.worker(alerts.GitState(self.clone('after-deletion')), self.sender)
+        with self.assertRaises(alerts.StateUnavailable):
+            self.detect(first)
+        self.git('--git-dir', str(self.origin), 'update-ref', alerts.REF, self.bootstrap)
+        second = self.worker(alerts.GitState(self.clone('after-stale-restore')), self.sender)
+        with self.assertRaises(alerts.StateUnavailable):
+            self.detect(second)
+        self.sender.assert_called_once()
+        self.git('--git-dir', str(self.origin), 'update-ref', alerts.REF, confirmed_tip, self.bootstrap)
+        _, recovered = self.detect(second)
+        second.deliver(incident, recovered)
+        self.sender.assert_called_once()
+
+    def test_stale_witness_blocks_read_and_partial_write(self):
+        incident, state = self.detect()
+        self.alerts.deliver(incident, state)
+        tip, state = self.storage.read()
+        self.git('--git-dir', str(self.origin), 'update-ref', alerts.WITNESS, self.bootstrap, tip)
+        with self.assertRaises(alerts.StateUnavailable):
+            self.storage.read()
+        self.assertFalse(self.storage.write(tip, state))
+        self.assertEqual(self.git('--git-dir', str(self.origin), 'rev-parse', alerts.REF), tip)
+        self.sender.assert_called_once()
+
+    def test_protected_refs_allow_atomic_advances_and_forbid_delete_and_rewind(self):
+        hook = self.origin / 'hooks/pre-receive'
+        hook.write_text("""#!/bin/sh
+while read -r old new ref; do
+  case "$ref" in
+    refs/heads/goal-roi-telegram-auth-alert-state|refs/heads/goal-roi-telegram-auth-alert-witness)
+      [ "$new" != 0000000000000000000000000000000000000000 ] || exit 1
+      [ "$old" != 0000000000000000000000000000000000000000 ] || exit 1
+      git merge-base --is-ancestor "$old" "$new" || exit 1
+      ;;
+  esac
+done
+""")
+        hook.chmod(0o755)
+        incident, state = self.detect()
+        self.alerts.deliver(incident, state)
+        tip, _ = self.storage.read()
+        for ref in (alerts.REF, alerts.WITNESS):
+            for refspec in (':' + ref, self.bootstrap + ':' + ref):
+                result = subprocess.run(['git', '-C', str(self.checkout), 'push', '--force', 'origin', refspec],
+                                        capture_output=True)
+                self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(self.git('--git-dir', str(self.origin), 'rev-parse', ref), tip)
+        self.sender.assert_called_once()
+        fixture = ROOT / 'ops/authorization-alert'
+        exclusion = set((fixture / 'branch-cleanup-exclusions.txt').read_text().splitlines())
+        policy = json.loads((fixture / 'ruleset.json').read_text())
+        self.assertEqual(exclusion, {alerts.REF, alerts.WITNESS})
+        self.assertEqual(set(policy['conditions']['ref_name']['include']), exclusion)
+        self.assertEqual({r['type'] for r in policy['rules']}, {'creation', 'deletion', 'non_fast_forward'})
+        self.assertEqual(policy['bypass_actors'], [])
+
+    def test_restarted_worker_mentions_abandoned_without_resending(self):
+        incident, state = self.detect()
+        # Durable claim followed by SIGKILL: outcome is absent.
+        def claim(current):
+            current['incidents'][incident].update(status='attempting', attempt_id='a'*32,
+                                                 reserved_at=self.time.isoformat(), claimed_at=self.time.isoformat())
+            return True
+        self.storage.update(claim)
+        spool = self.root / 'spool'
+        spool.mkdir()
+        (spool / 'stop').touch()
+        service = self.worker(alerts.GitState(self.clone('restarted')), self.sender)
+        alerts.run(spool, service)
+        snapshot = json.loads((spool / 'status.json').read_text())
+        self.assertEqual(snapshot['current'], ['abandoned', incident])
+        self.sender.assert_not_called()
 
     def worker(self, storage, sender):
         return alerts.Alerts(storage, 'synthetic', 'synthetic', sender, lambda: self.time.isoformat())
@@ -197,11 +315,91 @@ class DetectionHandoff(unittest.TestCase):
     def setUp(self):
         self.dir = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self.enterContext(patch.dict(os.environ, {'SCANGOAL_AUTH_ALERT_DIR': str(self.dir),
+                                                 'GOAL_ROI_TELEGRAM_AUTH_ALERTS': 'on',
                                                  'SCANGOAL_DATA_DIR': str(self.dir / 'data'), 'TG_SCANGOAL': 'synthetic'},
                                      clear=True))
 
     def queued(self):
         return [json.loads(path.read_text()) for path in sorted(self.dir.glob('*.event'))]
+
+    def test_default_off_and_invalid_values_leave_existing_diagnosis(self):
+        for flag in (None, '', 'off', 'On', ' on', 'invalid'):
+            with self.subTest(flag=flag), patch.dict(os.environ), patch.object(alerts, 'run') as worker:
+                os.environ['GITHUB_REF'] = 'refs/heads/main'
+                if flag is None:
+                    os.environ.pop('GOAL_ROI_TELEGRAM_AUTH_ALERTS', None)
+                else:
+                    os.environ['GOAL_ROI_TELEGRAM_AUTH_ALERTS'] = flag
+                marker = self.dir / 'github-output'
+                marker.unlink(missing_ok=True)
+                os.environ['GITHUB_OUTPUT'] = str(marker)
+                with patch.object(reader, 'make_client', return_value=Client('connect', SessionRevokedError(request=None))):
+                    with self.assertRaises(SessionRevokedError):
+                        asyncio.run(reader.collect())
+                self.assertEqual(marker.read_text(), 'authorization=lost\n')
+                alerts.main()
+                worker.assert_not_called()
+                self.assertEqual(self.queued(), [])
+                self.assertEqual(status.summarize(self.dir), [('disabled', '')])
+                self.assertFalse((self.dir / 'stop').exists())
+
+    def test_worker_launch_shell_uses_case_sensitive_gate(self):
+        workflow = (ROOT / '.github/workflows/collect.yml').read_text()
+        script = workflow.split('- name: Start Telegram authorization alert worker', 1)[1].split('        run: |\n', 1)[1]
+        script = '\n'.join(line[10:] for line in script.splitlines() if line.startswith('          '))
+        with tempfile.TemporaryDirectory() as folder:
+            worker_dir = Path(folder) / 'worker'
+            for flag in ('', 'off', 'ON', ' on', 'invalid'):
+                result = subprocess.run(['/bin/bash', '-e', '-c', script],
+                                        env={'PATH': '/usr/bin:/bin', 'SCANGOAL_AUTH_ALERT_DIR': str(worker_dir),
+                                             'GOAL_ROI_TELEGRAM_AUTH_ALERTS': flag}, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertFalse(worker_dir.exists())
+
+    def test_summary_reports_all_states_and_keeps_degraded_outcomes_after_recovery(self):
+        incident = 'a' * 32
+        (self.dir / 'pid').write_text(str(os.getpid()))
+        (self.dir / 'stopped').touch()
+        output = self.dir / 'summary'
+        with patch.dict(os.environ, GITHUB_STEP_SUMMARY=str(output)):
+            reporter = status.Reporter(self.dir)
+            for code in status.LABELS:
+                if code == 'disabled':
+                    continue
+                reporter(code, incident)
+                stdout = io.StringIO()
+                with contextlib.redirect_stdout(stdout):
+                    status.main()
+                self.assertIn(status.LABELS[code], stdout.getvalue())
+                self.assertIn(status.LABELS[code], output.read_text())
+                if code in status.WARNINGS:
+                    self.assertIn('::warning', stdout.getvalue())
+            reporter('healthy')
+            self.assertIn(('rejected', incident), status.summarize(self.dir))
+            self.assertIn(('uncertain', incident), status.summarize(self.dir))
+            self.assertIn(('abandoned', incident), status.summarize(self.dir))
+
+    def test_summary_for_unavailable_and_stalled_worker_never_waits(self):
+        (self.dir / 'pid').write_text(str(os.getpid()))
+        status.Reporter(self.dir)('state_unavailable')
+        events.loss(SessionRevokedError(request=None))
+        start = time.monotonic()
+        with patch('time.sleep', side_effect=AssertionError('unexpected drain wait')):
+            notices = status.summarize(self.dir)
+        self.assertLess(time.monotonic() - start, 1)
+        self.assertTrue((self.dir / 'stop').exists())
+        self.assertIn(('state_unavailable', ''), notices)
+        self.assertIn(('worker_interrupted', ''), notices)
+        workflow = (ROOT / '.github/workflows/collect.yml').read_text()
+        self.assertIn('timeout-minutes: 18', workflow)
+        self.assertNotRegex(workflow.split('Report Telegram authorization alert worker outcome')[1], r'(?:timeout|sleep|while)')
+        self.assertLess(workflow.index('Start the next collection'), workflow.index('Report Telegram authorization alert worker outcome'))
+
+    def test_summary_reports_worker_exit_even_with_live_pid_and_healthy_snapshot(self):
+        (self.dir / 'pid').write_text(str(os.getpid()))
+        status.Reporter(self.dir)('healthy')
+        (self.dir / 'exited').touch()
+        self.assertEqual(status.summarize(self.dir), [('healthy', ''), ('worker_interrupted', '')])
 
     def test_reader_connect_and_disconnect_emit_without_bot_credentials(self):
         for phase in ('connect', 'disconnect_error', 'background_on_disconnect'):

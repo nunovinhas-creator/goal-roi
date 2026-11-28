@@ -24,12 +24,16 @@ jobs:
     # 15 min of normal work + 3 min reserved for the optional BSD recovery tail (hard cap 150 s):
     # a run that fits 15 min without the tail can never be cut because of it.
     timeout-minutes: 18
+    env:
+      GOAL_ROI_TELEGRAM_AUTH_ALERTS: ${{ vars.GOAL_ROI_TELEGRAM_AUTH_ALERTS }}
     steps:
       # BSD recovery tail only: real job start, so the tail can prove its margin to timeout-minutes.
       - run: |
           echo "GOAL_ROI_JOB_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
           printf 'GOAL_ROI_PUBLICATION_DIR=%s/goal-roi-publication\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
-          printf 'SCANGOAL_AUTH_ALERT_DIR=%s/goal-roi-auth-alert\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
+          if [[ "$GOAL_ROI_TELEGRAM_AUTH_ALERTS" == on ]]; then
+            printf 'SCANGOAL_AUTH_ALERT_DIR=%s/goal-roi-auth-alert\n' "${RUNNER_TEMP:?}" >> "$GITHUB_ENV"
+          fi
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0 (= tag v4, 2026-11-16)
         with:
           ref: main
@@ -45,6 +49,7 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
+          [[ "$GOAL_ROI_TELEGRAM_AUTH_ALERTS" == on ]] || exit 0
           mkdir -p "$SCANGOAL_AUTH_ALERT_DIR"
           nohup python -u -m scangoal.authorization_alerts </dev/null >"$SCANGOAL_AUTH_ALERT_DIR/worker.log" 2>&1 &
           printf '%s\n' "$!" > "$SCANGOAL_AUTH_ALERT_DIR/pid"
@@ -219,15 +224,5 @@ jobs:
       - name: Report Telegram authorization alert worker outcome
         if: ${{ always() && !cancelled() }}
         continue-on-error: true
-        run: |
-          if [[ ! -f "$SCANGOAL_AUTH_ALERT_DIR/pid" ]]; then
-            echo '::warning::Telegram authorization alert worker did not start.'
-            exit 1
-          fi
-          touch "$SCANGOAL_AUTH_ALERT_DIR/stop"
-          timeout 65s bash -c 'while [[ ! -f "$1/stopped" ]] && kill -0 "$(cat "$1/pid")" 2>/dev/null; do sleep 1; done' _ "$SCANGOAL_AUTH_ALERT_DIR" || true
-          tail -n 30 "$SCANGOAL_AUTH_ALERT_DIR/worker.log"
-          if [[ ! -f "$SCANGOAL_AUTH_ALERT_DIR/stopped" ]]; then
-            echo '::warning::Telegram authorization alert worker could not finish. Consult the incident state.'
-            exit 1
-          fi
+        # The worker drains during the existing steps. The report adds no waiting.
+        run: python -u -m scangoal.authorization_status

@@ -13,7 +13,13 @@ def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
 
+def enabled():
+    return os.environ.get('GOAL_ROI_TELEGRAM_AUTH_ALERTS') == 'on'
+
+
 def spool():
+    if not enabled():
+        return None
     path = os.environ.get('SCANGOAL_AUTH_ALERT_DIR')
     return Path(path) if path else None
 
