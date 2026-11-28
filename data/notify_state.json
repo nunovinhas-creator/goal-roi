@@ -8930,6 +8930,19 @@
    "sha256": "afcbf3fc8cc19883f08080fc1aff73c1b0e5dce5b4740692541d6f223f660242",
    "state": "delivered"
   },
+  "game|id:paderborn-vs-schalke-20261128|6773c971c845": {
+   "attempt_id": "8a6258a1630e41fdabe57bc10224e015",
+   "attempt_utc": "2026-11-28T14:05:34+00:00",
+   "chars": 187,
+   "created_utc": "2026-11-28T14:05:34+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "239c5a8287f68e861c2ec9f8a864388fa814b005fbc45e06d464d0f13b86b6e2",
+   "state": "in_flight"
+  },
   "game|id:pafos-fc-vs-midtjylland-20261126|b8254c108432": {
    "attempt_id": "7293333e3dec4a8bb5588ec844f54f76",
    "attempt_utc": "2026-11-26T18:22:48+00:00",
@@ -9595,6 +9608,14 @@
    "kind": "hint",
    "sha256": "044df2c11126dc7a94a3f5fcd9c8db3b408376c07a4bd51da72058757d70bacc",
    "state": "delivered"
+  },
+  "game|id:real-betis-vs-rayo-vallecano-20261128|589d410e773a": {
+   "created_utc": "2026-11-28T14:05:34+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
   },
   "game|id:real-betis-vs-rayo-vallecano-20261128|6f25ea766526": {
    "attempt_id": "e9dfa688da0a4b1da2ffeb849379543f",
@@ -12539,13 +12560,13 @@
  "health": {
   "reference": {
    "bsd_results": 68,
-   "eligible": 2952,
+   "eligible": 2961,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 185,
-   "hypotheses": 18259,
-   "settled_bets": 2209,
+   "hypotheses": 18272,
+   "settled_bets": 2213,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 525,
+   "statuses": 526,
    "validation_state": "not_activated"
   }
  },
@@ -13002,7 +13023,8 @@
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5": true,
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6": true,
   "2026-11-28T13:49:24+00:00|Apea Akrotiriou — Akritas Chlorakas|Over 3": true,
-  "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3": true
+  "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3": true,
+  "2026-11-28T14:02:13+00:00|Paderborn — Schalke|Schalke 04": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -13376,6 +13398,7 @@
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma": 24,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 49,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Número de apostas = uma": 41,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Valor da aposta = 10 mil $ ou mais": 26,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 19,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 63,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": 36,
@@ -15209,6 +15232,9 @@
   "item|id:pachuca-vs-toluca-20261122|Draw No Bet|Deportivo Toluca": {
    "at_utc": "2026-11-21T22:22:49+00:00"
   },
+  "item|id:paderborn-vs-schalke-20261128|1x2|Schalke 04": {
+   "at_utc": "2026-11-28T14:05:34+00:00"
+  },
   "item|id:pafos-fc-vs-midtjylland-20261126|1x2|Midtjylland": {
    "at_utc": "2026-11-26T18:22:48+00:00"
   },
@@ -16009,6 +16035,7 @@
   "Jogo aberto | Dia = fim de semana & Faixa de odd = odd até 1,50": "abandonada",
   "Jogo aberto | Dia = fim de semana & Golos até ao sinal = 1 ou 2 & Ritmo indicado pelo bot = 90 ou mais": "abandonada",
   "Jogo aberto | Dia = fim de semana & Golos em falta para ganhar = até 1 golo & Hora (UTC) = tarde": "abandonada",
+  "Jogo aberto | Dia = fim de semana & Hora (UTC) = tarde & Marcador no momento = empatado": "abandonada",
   "Jogo aberto | Dia = fim de semana & Marcador no momento = empatado & Minuto = 31 a 60": "abandonada",
   "Jogo aberto | Dia = fim de semana & Marcador no momento = empatado & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": "abandonada",
   "Jogo aberto | Dia = fim de semana & Marcador no momento = empatado & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -17410,6 +17437,7 @@
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5",
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6",
   "2026-11-28T13:49:24+00:00|Apea Akrotiriou — Akritas Chlorakas|Over 3",
-  "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3"
+  "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3",
+  "2026-11-28T14:02:13+00:00|Paderborn — Schalke|Schalke 04"
  ]
 }
