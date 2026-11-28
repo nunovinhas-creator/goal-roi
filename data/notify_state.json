@@ -4497,13 +4497,15 @@
    "attempt_utc": "2026-11-28T11:25:12+00:00",
    "chars": 227,
    "created_utc": "2026-11-28T11:25:12+00:00",
+   "done_utc": "2026-11-28T11:25:12+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "5cb747a4e579e65e12c8216220db4bd579a3b685856514b679379f51e53ef537",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:ec-flamengo-women-vs-botafogo-rj-women-20261118|5ba7a1b27e76": {
    "attempt_utc": "2026-11-18T20:32:22+00:00",
@@ -5351,12 +5353,17 @@
    "state": "delivered"
   },
   "game|id:gazisehir-gaziantep-vs-amedspor-20261128|ad080fa3c0b9": {
+   "attempt_id": "f9f3e680ddd5448ab672e86259574c06",
+   "attempt_utc": "2026-11-28T11:25:14+00:00",
+   "chars": 205,
    "created_utc": "2026-11-28T11:25:12+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "c3fe1d0a66682c854145e05e42972abde18cdaca13b06eca8380fcb036e10bc3",
+   "state": "in_flight"
   },
   "game|id:gc-mascara-vs-mc-saida-20261120|c20c1645b380": {
    "attempt_utc": "2026-11-20T15:25:54+00:00",
@@ -12328,7 +12335,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 779,
+  "delivered": 780,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T11:17:18+00:00",
@@ -12784,7 +12791,8 @@
   "2026-11-28T10:50:09+00:00|Customs United — Padriew City|Over 3": true,
   "2026-11-28T10:52:23+00:00|Stal Rzeszow U19 — Escola Varsovia U19|Over 8": true,
   "2026-11-28T10:59:08+00:00|Hertha Berlin — Karlsruhe|Hertha BSC": true,
-  "2026-11-28T11:20:49+00:00|Dynamo Kiev — Chernomorets Odessa|FC Dynamo Kiev (-1.5)": true
+  "2026-11-28T11:20:49+00:00|Dynamo Kiev — Chernomorets Odessa|FC Dynamo Kiev (-1.5)": true,
+  "2026-11-28T11:20:49+00:00|Gazisehir Gaziantep — Amedspor|Over 2.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -13118,7 +13126,7 @@
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 38,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 50,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 26,
-  "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 38,
+  "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Stake | Competição = liga & Mercado = outros mercados": 91,
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 69,
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 75,
@@ -13171,7 +13179,7 @@
   "Stake | Hora (UTC) = tarde": 80,
   "Stake | Marcador no momento = empatado & Momento do aviso = até 45 min depois do início": 33,
   "Stake | Marcador no momento = empatado & Número de apostas = uma & Valor da aposta = menos de 10 mil $": 34,
-  "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 50,
+  "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 51,
   "Stake | Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 23,
   "Stake | Mercado = outros mercados": 108,
   "Stake | Mercado = outros mercados & Número de apostas = uma": 92,
@@ -14194,6 +14202,9 @@
   },
   "item|id:garudayaksa-vs-pss-sleman-20261124|Asian Total|Over 3": {
    "at_utc": "2026-11-24T10:22:39+00:00"
+  },
+  "item|id:gazisehir-gaziantep-vs-amedspor-20261128|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-28T11:25:12+00:00"
   },
   "item|id:gc-mascara-vs-mc-saida-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T15:25:54+00:00"
@@ -15667,7 +15678,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1091,
+ "sent_total": 1092,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17136,6 +17147,7 @@
   "2026-11-28T10:50:09+00:00|Customs United — Padriew City|Over 3",
   "2026-11-28T10:52:23+00:00|Stal Rzeszow U19 — Escola Varsovia U19|Over 8",
   "2026-11-28T10:59:08+00:00|Hertha Berlin — Karlsruhe|Hertha BSC",
-  "2026-11-28T11:20:49+00:00|Dynamo Kiev — Chernomorets Odessa|FC Dynamo Kiev (-1.5)"
+  "2026-11-28T11:20:49+00:00|Dynamo Kiev — Chernomorets Odessa|FC Dynamo Kiev (-1.5)",
+  "2026-11-28T11:20:49+00:00|Gazisehir Gaziantep — Amedspor|Over 2.5"
  ]
 }
