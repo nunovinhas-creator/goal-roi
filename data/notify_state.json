@@ -9016,13 +9016,15 @@
    "attempt_utc": "2026-11-28T05:43:52+00:00",
    "chars": 212,
    "created_utc": "2026-11-28T05:43:48+00:00",
+   "done_utc": "2026-11-28T05:43:48+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "4e71567d774037deb640ae017bbb5f554d21ba96179030ffa8f3d737b3784689",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:persib-bandung-vs-seoul-20261125|43eff4ead4c4": {
    "attempt_id": "68675e44b7e34b5faa7090f03e3fa183",
@@ -9096,12 +9098,17 @@
    "state": "delivered"
   },
   "game|id:preston-lions-vs-apia-leichhardt-tigers-20261128|070b7bdfce7c": {
+   "attempt_id": "f047812fb67346e6ad0fef376818f8f6",
+   "attempt_utc": "2026-11-28T05:43:53+00:00",
+   "chars": 222,
    "created_utc": "2026-11-28T05:43:48+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "39fe81fa04bce050d6fabb7a617591e64062e194aef33ecc41ffc42fb53c0af3",
+   "state": "in_flight"
   },
   "game|id:preston-lions-vs-south-hobart-20261119|1f47adb779aa": {
    "attempt_utc": "2026-11-19T09:33:01+00:00",
@@ -12148,7 +12155,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 767,
+  "delivered": 768,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T05:34:08+00:00",
@@ -12590,6 +12597,7 @@
   "2026-11-28T03:11:47+00:00|Shimizu — Urawa|AH1(+0.5)": true,
   "2026-11-28T03:32:03+00:00|Salt Lake — Vancouver|Vancouver Whitecaps": true,
   "2026-11-28T04:42:23+00:00|Real Madrid — Alaves|Deportivo Alaves (2.5)": true,
+  "2026-11-28T05:32:10+00:00|Preston Lions — APIA Leichhardt Tigers|Over 3.75": true,
   "2026-11-28T05:33:55+00:00|Partizan Belgrade — Radnicki Nis|Over 3.5": true,
   "2026-11-28T05:39:05+00:00|Kashima — Okayama|Kashima Antlers": true,
   "2026-11-28T05:39:05+00:00|Kobe — JEF United Chiba|Vissel Kobe": true
@@ -12926,7 +12934,7 @@
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 38,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 50,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 26,
-  "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 34,
+  "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 37,
   "Stake | Competição = liga & Mercado = outros mercados": 91,
   "Stake | Competição = liga & Número de apostas = uma & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 69,
   "Stake | Competição = liga & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 75,
@@ -12978,6 +12986,8 @@
   "Stake | Hora (UTC) = tarde": 80,
   "Stake | Marcador no momento = empatado & Momento do aviso = até 45 min depois do início": 33,
   "Stake | Marcador no momento = empatado & Número de apostas = uma & Valor da aposta = menos de 10 mil $": 33,
+  "Stake | Mercado = golos (total asiático) & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = não": 49,
+  "Stake | Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 23,
   "Stake | Mercado = outros mercados": 108,
   "Stake | Mercado = outros mercados & Número de apostas = uma": 92,
   "Stake | Mercado = outros mercados & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": 75,
@@ -14834,6 +14844,9 @@
   "item|id:porto-vs-paredes-20261120|Porto to Score in Both Halves|Yes": {
    "at_utc": "2026-11-20T20:20:59+00:00"
   },
+  "item|id:preston-lions-vs-apia-leichhardt-tigers-20261128|Asian Total|Over 3.75": {
+   "at_utc": "2026-11-28T05:43:48+00:00"
+  },
   "item|id:preston-lions-vs-south-hobart-20261119|1st Half - Asian Total|Over 1.5": {
    "at_utc": "2026-11-19T08:59:51+00:00"
   },
@@ -15436,7 +15449,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1079,
+ "sent_total": 1080,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -16892,6 +16905,7 @@
   "2026-11-28T03:11:47+00:00|Shimizu — Urawa|AH1(+0.5)",
   "2026-11-28T03:32:03+00:00|Salt Lake — Vancouver|Vancouver Whitecaps",
   "2026-11-28T04:42:23+00:00|Real Madrid — Alaves|Deportivo Alaves (2.5)",
+  "2026-11-28T05:32:10+00:00|Preston Lions — APIA Leichhardt Tigers|Over 3.75",
   "2026-11-28T05:33:55+00:00|Partizan Belgrade — Radnicki Nis|Over 3.5",
   "2026-11-28T05:39:05+00:00|Kashima — Okayama|Kashima Antlers",
   "2026-11-28T05:39:05+00:00|Kobe — JEF United Chiba|Vissel Kobe"
