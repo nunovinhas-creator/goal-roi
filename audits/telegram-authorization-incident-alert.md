@@ -6,6 +6,8 @@ Esta correção parte de `fcaadaaa2e8343a49dda2f457aed6e650a940574` da PR #116. 
 
 A variável de repositório `GOAL_ROI_TELEGRAM_AUTH_ALERTS` tem de conter exatamente `on`. A comparação na shell e em Python é sensível a maiúsculas. Ausência, vazio, `off` e qualquer outro valor deixam o mecanismo desligado. Neste modo o workflow não cria a pasta do worker nem arranca o processo. O reader e o watch mantêm o diagnóstico e não emitem eventos. O aviso genérico de falha do despacho continua independente.
 
+Quando o mecanismo está desligado, uma indicação `authorization=lost` do reader ou do watch habilita o aviso de autorização já validado na #115. O passo de resumo decide se deve usar essa via com a mesma comparação literal usada no arranque do worker. O aviso mantém a posição após o despacho, os requisitos de publicação e a reserva durável de uma hora. Uma falha do aviso de autorização é tolerada neste fluxo. Quando a variável vale `on`, o worker é a única via para avisar da perda de autorização. A condição habitual do aviso para falhas independentes do workflow continua aplicável.
+
 ## Preparação autorizada das referências
 
 A referência operacional `refs/heads/goal-roi-telegram-auth-alert-state` e a testemunha `refs/heads/goal-roi-telegram-auth-alert-witness` têm de existir e apontar para o mesmo commit. Não há inicialização automática. A leitura falha se faltar uma referência, houver divergência, Git estiver inacessível ou o JSON falhar a validação. A reclamação de tentativa exige um push atómico confirmado para as duas referências. O commit tem como pai o tip observado. Os leases impedem a recriação ou substituição fora da posição observada durante uma corrida.
@@ -57,6 +59,15 @@ node --test --test-isolation=none ops/continuity/watchdog.test.mjs tests/v6_core
 actionlint -shellcheck= .github/workflows/collect.yml .github/workflows/continuity.yml
 PYTHONPATH=. python audits/reproduce-telegram-authorization-alert.py
 ```
+
+A regressão do aviso com o worker desligado é coberta por:
+
+```sh
+python -m unittest discover -s tests -p test_git_persistence.py -k ChainContinuityTests -v
+python -m unittest discover -s tests -p test_silent_failures.py -k NextCollection -v
+```
+
+No SHA `c67852431c10f895ab8aba4bb7994d155b24a789`, o reader simulado emitiu `authorization=lost` e o seu passo saiu com código 0. O worker estava desligado. O workflow simulado ficou verde, saltou o notificador e produziu zero mensagens sintéticas. Com a correção, o mesmo caso ativou a via da #115 e produziu uma mensagem sintética, com a conclusão ainda verde. Os testes cobrem a exclusão da via antiga com o worker ligado e o aviso independente de falha do despacho.
 
 Os testes de Git escrevem apenas em remotos bare temporários. A fixture prova a ausência de auto-inicialização, a rejeição de JSON inválido, o bloqueio de um restauro desatualizado visto de um checkout frio, a aceitação de avanços atómicos e a rejeição de eliminação e recuo sob uma regra local equivalente. Os testes de workflow exercitam o opt-in estrito, o diagnóstico com a variável desligada, a visibilidade dos estados e a ausência de espera perante um worker bloqueado.
 

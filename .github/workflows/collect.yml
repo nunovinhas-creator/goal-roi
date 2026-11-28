@@ -191,6 +191,9 @@ jobs:
           if [ "$TG_AUTHORIZATION_LOST" = 1 ]; then
             echo '::warning title=Telegram authorization lost::Collection is degraded. A previously successful read does not establish current authorization.'
             echo 'Telegram authorization lost. Collection is degraded. See the reader and watch diagnostics.' >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$GOAL_ROI_TELEGRAM_AUTH_ALERTS" != on ]]; then
+              echo 'authorization_fallback=true' >> "$GITHUB_OUTPUT"
+            fi
           fi
       - name: Preserve pending data and intent for the next runner
         if: ${{ always() && !cancelled() && steps.publication.outputs.pending == 'true' }}
@@ -214,8 +217,10 @@ jobs:
           timeout 85s python scripts/dispatch_collection.py
       # Último passo, para também ver a falha do lançamento anterior (a cadeia parou: avisa sem esperar pela hora certa).
       - name: Tell the user when a collection fails (at most once an hour)
-        if: ${{ failure() && !cancelled() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
+        if: ${{ (failure() || steps.publication.outputs.authorization_fallback == 'true') && !cancelled() && steps.resume.outcome == 'success' && steps.publication.outputs.pending != 'true' }}
+        continue-on-error: ${{ steps.publication.outputs.authorization_fallback == 'true' }}
         env:
+          TG_AUTHORIZATION_LOST: ${{ steps.publication.outputs.authorization_fallback == 'true' && '1' || '' }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}

@@ -362,6 +362,8 @@ class NextCollection(unittest.TestCase):
         self.assertIn("steps.resume.outcome == 'success'", condition)
         self.assertIn("steps.publication.outputs.pending != 'true'", condition)
         self.assertIn("          NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}", s[notice])
+        self.assertIn("          TG_AUTHORIZATION_LOST: ${{ steps.publication.outputs.authorization_fallback == 'true' && '1' || '' }}", s[notice])
+        self.assertIn("        continue-on-error: ${{ steps.publication.outputs.authorization_fallback == 'true' }}", s[notice])
         self.assertIn('        run: python -u -m scangoal.notify --failure', s[notice])
         self.assertEqual(sum(n.startswith('Tell the user') for n in names), 1)       # one mechanism, not two
 

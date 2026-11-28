@@ -910,10 +910,10 @@ class ProductionIsolation(unittest.TestCase):
     def test_production_workflow_untouched(self):
         self.assertNotIn(self.MARKER, self.original)
         self.assertNotIn('polymarket', self.original.lower())
-        # PR #116 protects operational state and reports the worker without draining. Previous pin:
-        # 57f58ee635d7ebd4518a4f5b4156f2c759128afe7ab2ba200c47d25d1cde6cb8
+        # PR #116 restores the authorization fallback when the worker is off. Previous pin:
+        # a91ece0e0090ec858928bb16636a7bdacb9a2bc72535fabd4039d6278d7d957c
         self.assertEqual(hashlib.sha256(self.original.encode()).hexdigest(),
-                         'a91ece0e0090ec858928bb16636a7bdacb9a2bc72535fabd4039d6278d7d957c')
+                         'e1a6e5c4e00e6274581fea425e59eb2b14f3b6639e647de589c7bb5fde36287c')
 
     def test_patch_only_adds_gated_bounded_non_blocking_steps(self):
         blocks, names = self.blocks(self.patched)
