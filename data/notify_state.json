@@ -7370,6 +7370,19 @@
    "sha256": "9fba2e9dc2091ad1d26f93772b898806a56f3f6d85bdd5cf75f0d0ce48c63d65",
    "state": "delivered"
   },
+  "game|id:malaga-vs-athletic-bilbao-20261128|fce13869f366": {
+   "attempt_id": "0bbc79a0d2b84aa28f326960c556f254",
+   "attempt_utc": "2026-11-28T14:34:17+00:00",
+   "chars": 197,
+   "created_utc": "2026-11-28T14:34:17+00:00",
+   "events": [
+    "pending",
+    "intent"
+   ],
+   "kind": "hint",
+   "sha256": "0739401e6d57a5763101cb36117aec63e6e60f1b4a0fb6bc2a3cf1dde7f7932e",
+   "state": "in_flight"
+  },
   "game|id:malawi-vs-egypt-20261117|9fcc2fe8c526": {
    "attempt_utc": "2026-11-17T14:47:46+00:00",
    "chars": 136,
@@ -12267,6 +12280,14 @@
    "sha256": "f1bee9d9055c17a778f787b4cc9e58816509d3b44c15ff38693a9a1d4cb7a8d1",
    "state": "delivered"
   },
+  "game|id:zebbug-rangers-vs-santa-lucia-20261128|8bce37d12f4a": {
+   "created_utc": "2026-11-28T14:34:17+00:00",
+   "events": [
+    "pending"
+   ],
+   "kind": "hint",
+   "state": "pending"
+  },
   "game|id:zetech-sparks-fc-women-vs-vihiga-queens-fc-women-20261121|1a744d8564c8": {
    "attempt_utc": "2026-11-21T14:28:51+00:00",
    "chars": 243,
@@ -12704,13 +12725,13 @@
  "health": {
   "reference": {
    "bsd_results": 68,
-   "eligible": 2987,
+   "eligible": 2996,
    "evidence_scope": "eligible_bets_only",
    "hl_results": 185,
-   "hypotheses": 18343,
-   "settled_bets": 2216,
+   "hypotheses": 18357,
+   "settled_bets": 2223,
    "status_rules": "chronological_eprocess_v3",
-   "statuses": 526,
+   "statuses": 532,
    "validation_state": "not_activated"
   }
  },
@@ -13180,7 +13201,8 @@
   "2026-11-28T14:19:15+00:00|Sheff Wed — Reading|Sheffield Wednesday": true,
   "2026-11-28T14:22:21+00:00|Cincinnati — Nashville|Under 3": true,
   "2026-11-28T14:22:22+00:00|Philadelphia — New England|Under 3.25": true,
-  "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5": true
+  "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5": true,
+  "2026-11-28T14:29:37+00:00|Malaga — Athletic Bilbao|Under 2.5": true
  },
  "migrations": {
   "eligible_statuses_v1": {
@@ -15028,6 +15050,9 @@
   "item|id:maccabi-yavne-vs-maccabi-ironi-ashdod-20261127|Asian Total|Over 7": {
    "at_utc": "2026-11-27T11:59:40+00:00"
   },
+  "item|id:malaga-vs-athletic-bilbao-20261128|Asian Total|Under 2.5": {
+   "at_utc": "2026-11-28T14:34:17+00:00"
+  },
   "item|id:malawi-vs-egypt-20261117|1X2|2": {
    "at_utc": "2026-11-17T14:47:46+00:00"
   },
@@ -16150,14 +16175,20 @@
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
+  "Betfair | Antecedência = mais de 60 min & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Volume na seleção = menos de 10 mil $": "abandonada",
+  "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
+  "Betfair | Antecedência = mais de 60 min & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Tamanho do mercado = 10 mil $ ou mais": "promissora",
   "Betfair | Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Dia = dia de semana & Tamanho do mercado = 10 mil $ ou mais": "promissora",
   "Betfair | Momento = antes do jogo & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
+  "Betfair | Momento = antes do jogo & Tamanho do mercado = menos de 10 mil $": "abandonada",
+  "Betfair | Outros sinais no mesmo jogo = jogo com vários tipos de sinal & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço": "abandonada",
   "Betfair | Quota de mercado = menos de 80 % & Reforço = sem reforço & Volume na seleção = menos de 10 mil $": "abandonada",
   "Betfair | Quota de mercado = menos de 80 % & Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
+  "Betfair | Sinal anterior de outro tipo no mesmo jogo = não & Volume na seleção = menos de 10 mil $": "abandonada",
   "Forma de golos | Competição = liga & Dia = dia de semana & Parte do jogo = 2.ª parte": "abandonada",
   "Forma de golos | Competição = liga & Faixa de odd = odd até 1,50": "abandonada",
   "Forma de golos | Competição = liga & Golos até ao sinal = nenhum & Minuto = 31 a 60": "abandonada",
@@ -17642,6 +17673,7 @@
   "2026-11-28T14:19:15+00:00|Sheff Wed — Reading|Sheffield Wednesday",
   "2026-11-28T14:22:21+00:00|Cincinnati — Nashville|Under 3",
   "2026-11-28T14:22:22+00:00|Philadelphia — New England|Under 3.25",
-  "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5"
+  "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5",
+  "2026-11-28T14:29:37+00:00|Malaga — Athletic Bilbao|Under 2.5"
  ]
 }
