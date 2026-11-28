@@ -910,10 +910,10 @@ class ProductionIsolation(unittest.TestCase):
     def test_production_workflow_untouched(self):
         self.assertNotIn(self.MARKER, self.original)
         self.assertNotIn('polymarket', self.original.lower())
-        # Updated once for the authorized B4 step 'Prospective ledger (append-only)' (2026-11-24); previous pin:
-        # 1146e7e68f2034c1970c42b5c28a94db07c018bcb2fa1b9298d8a2dd9d129e7d
+        # PR #115 authorizes the Telegram status and alert wiring. Previous pin:
+        # ec1b092e988e20786f495892a1ff0713e689901c5ef8a764112b2f4595318e21
         self.assertEqual(hashlib.sha256(self.original.encode()).hexdigest(),
-                         'ec1b092e988e20786f495892a1ff0713e689901c5ef8a764112b2f4595318e21')
+                         '57f58ee635d7ebd4518a4f5b4156f2c759128afe7ab2ba200c47d25d1cde6cb8')
 
     def test_patch_only_adds_gated_bounded_non_blocking_steps(self):
         blocks, names = self.blocks(self.patched)
