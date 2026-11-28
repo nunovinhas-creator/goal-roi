@@ -1007,12 +1007,17 @@
    "state": "delivered"
   },
   "game|id:acs-viitorul-selimbar-vs-csa-steaua-20261128|cf4c8ad2032b": {
+   "attempt_id": "5251a7dd373f4138bdadefc69e39c4c8",
+   "attempt_utc": "2026-11-28T10:25:42+00:00",
+   "chars": 229,
    "created_utc": "2026-11-28T10:25:40+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "039b44584efae542adee53bddf3ea5ddf7bcffb626b8f6e840e0c657a720c507",
+   "state": "in_flight"
   },
   "game|id:ad-ceuta-fc-vs-almeria-20261123|afeb503fd406": {
    "attempt_id": "abb0a11e1ad84426ad26ff8511b5dcc5",
@@ -9429,13 +9434,15 @@
    "attempt_utc": "2026-11-28T10:25:40+00:00",
    "chars": 217,
    "created_utc": "2026-11-28T10:25:40+00:00",
+   "done_utc": "2026-11-28T10:25:40+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "935df40c13a4f116b9e007e6b6c1d3a7f2d536aed70c14bec6ed6afb285dc1f0",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:real-madrid-vs-alaves-20261128|25a089e4862b": {
    "attempt_id": "6366f8d75dda46d0b5897d6206fa023f",
@@ -12253,7 +12260,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 774,
+  "delivered": 775,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T10:19:29+00:00",
@@ -12704,6 +12711,7 @@
   "2026-11-28T09:40:52+00:00|Bayswater City — Sydney United|Over 1.5": true,
   "2026-11-28T09:54:24+00:00|Bali United Pusam — Bhayangkara Surabaya|Over 4": true,
   "2026-11-28T10:00:24+00:00|Central Coast Mariners — Auckland FC|Over 5": true,
+  "2026-11-28T10:21:53+00:00|ACS Viitorul Selimbar — CSA Steaua|Over 3.5": true,
   "2026-11-28T10:22:21+00:00|Real Betis — Rayo Vallecano|AH1(-0.5)": true
  },
  "migrations": {
@@ -13133,6 +13141,9 @@
   },
   "item|id:ac-savoia-1908-vs-sorrento-20261121|Asian Total|Over 3": {
    "at_utc": "2026-11-21T17:53:42+00:00"
+  },
+  "item|id:acs-viitorul-selimbar-vs-csa-steaua-20261128|Asian Total|Over 3.5": {
+   "at_utc": "2026-11-28T10:25:40+00:00"
   },
   "item|id:ad-ceuta-fc-vs-almeria-20261123|1x2 (2up)|Almeria": {
    "at_utc": "2026-11-23T19:09:06+00:00"
@@ -15572,7 +15583,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1086,
+ "sent_total": 1087,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17034,6 +17045,7 @@
   "2026-11-28T09:40:52+00:00|Bayswater City — Sydney United|Over 1.5",
   "2026-11-28T09:54:24+00:00|Bali United Pusam — Bhayangkara Surabaya|Over 4",
   "2026-11-28T10:00:24+00:00|Central Coast Mariners — Auckland FC|Over 5",
+  "2026-11-28T10:21:53+00:00|ACS Viitorul Selimbar — CSA Steaua|Over 3.5",
   "2026-11-28T10:22:21+00:00|Real Betis — Rayo Vallecano|AH1(-0.5)"
  ]
 }
