@@ -9342,12 +9342,17 @@
    "state": "delivered"
   },
   "game|id:philadelphia-vs-new-england-20261129|d7f6ed7df6f0": {
+   "attempt_id": "b33b53879bec4f47ae05bd3b623204c8",
+   "attempt_utc": "2026-11-28T14:27:23+00:00",
+   "chars": 199,
    "created_utc": "2026-11-28T14:27:21+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "d51900313145c22d44cb2114234b847edda82cbc7982cb8ba42039de8ac248dc",
+   "state": "in_flight"
   },
   "game|id:piast-gliwice-vs-korona-20261120|5139ff565ef3": {
    "attempt_utc": "2026-11-20T18:27:33+00:00",
@@ -12113,13 +12118,15 @@
    "attempt_utc": "2026-11-28T14:27:21+00:00",
    "chars": 212,
    "created_utc": "2026-11-28T14:27:21+00:00",
+   "done_utc": "2026-11-28T14:27:21+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "7c97d4346152b8d4b45a9fed643eff7e6c27ecf1af8dab392e85e525569d4d4f",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:west-brom-vs-bristol-city-20261128|876d402f066c": {
    "attempt_id": "77f5d518f667400dbed187ff50c80f52",
@@ -12667,7 +12674,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 800,
+  "delivered": 801,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T14:20:03+00:00",
@@ -13146,6 +13153,7 @@
   "2026-11-28T14:08:32+00:00|West Brom — Bristol City|Over 2.75": true,
   "2026-11-28T14:08:33+00:00|Derby — Watford|Derby County": true,
   "2026-11-28T14:08:33+00:00|Derby — Watford|Derby County (-0.25)": true,
+  "2026-11-28T14:22:22+00:00|Philadelphia — New England|Under 3.25": true,
   "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5": true
  },
  "migrations": {
@@ -15444,6 +15452,9 @@
   "item|id:persipa-pati-vs-persiba-bantul-20261117|Asian Total|Over 4.75": {
    "at_utc": "2026-11-17T09:54:01+00:00"
   },
+  "item|id:philadelphia-vs-new-england-20261129|Asian Total|Under 3.25": {
+   "at_utc": "2026-11-28T14:27:21+00:00"
+  },
   "item|id:piast-gliwice-vs-korona-20261120|Asian Total|Over 3": {
    "at_utc": "2026-11-20T18:27:33+00:00"
   },
@@ -16100,7 +16111,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1112,
+ "sent_total": 1113,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17592,6 +17603,7 @@
   "2026-11-28T14:08:32+00:00|West Brom — Bristol City|Over 2.75",
   "2026-11-28T14:08:33+00:00|Derby — Watford|Derby County",
   "2026-11-28T14:08:33+00:00|Derby — Watford|Derby County (-0.25)",
+  "2026-11-28T14:22:22+00:00|Philadelphia — New England|Under 3.25",
   "2026-11-28T14:22:33+00:00|West Brom — Bristol City|Under 2.5"
  ]
 }
