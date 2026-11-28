@@ -5777,13 +5777,15 @@
    "attempt_utc": "2026-11-28T15:18:08+00:00",
    "chars": 201,
    "created_utc": "2026-11-28T15:18:08+00:00",
+   "done_utc": "2026-11-28T15:18:08+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "81d1e86f25ad42b31ff94b7b637618975a288f28d5539b8eb471946009a08d9f",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:hammarby-vs-ifk-goteborg-20261123|5a204c1463f3": {
    "attempt_id": "b6bda9a5c2ab4835a478014bde8e7a0b",
@@ -7692,12 +7694,17 @@
    "state": "delivered"
   },
   "game|id:manchester-united-vs-brentford-20261128|4cf30211c052": {
+   "attempt_id": "822f98c42ed3407f9014585067084dda",
+   "attempt_utc": "2026-11-28T15:18:10+00:00",
+   "chars": 228,
    "created_utc": "2026-11-28T15:18:08+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "12a4ab86677909de3dcb03fdaf44bb7530710edac770a9525ec32457d6b560a6",
+   "state": "in_flight"
   },
   "game|id:manchester-united-vs-brentford-20261128|59b1df894e89": {
    "attempt_id": "888150ff5e15495db9c9ca301d5dfb28",
@@ -12898,7 +12905,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 817,
+  "delivered": 818,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T15:07:46+00:00",
@@ -13395,6 +13402,7 @@
   "2026-11-28T14:48:48+00:00|Avellino U19 — Salernitana U19|Over 3": true,
   "2026-11-28T14:51:34+00:00|Magesi — Lerumo Lions|Over 4": true,
   "2026-11-28T14:54:29+00:00|US Pergolettese U19 — Novara U19|Over 4": true,
+  "2026-11-28T15:04:06+00:00|Manchester United — Brentford|Over 3.5": true,
   "2026-11-28T15:04:07+00:00|Hamburg — Bayern Munchen|Over 1.5": true
  },
  "migrations": {
@@ -13724,10 +13732,10 @@
   "Stake | Competição = liga & Dia = fim de semana": 94,
   "Stake | Competição = liga & Dia = fim de semana & Número de apostas = uma": 82,
   "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados": 67,
-  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00": 60,
+  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00": 61,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 22,
-  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 39,
-  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 52,
+  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 40,
+  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 53,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 27,
   "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Stake | Competição = liga & Mercado = outros mercados": 91,
@@ -13764,15 +13772,15 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 36,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": 68,
-  "Stake | Faixa de odd = odd 2,00 a 3,00": 73,
+  "Stake | Faixa de odd = odd 2,00 a 3,00": 74,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 30,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma": 24,
-  "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 50,
-  "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Número de apostas = uma": 42,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 51,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Número de apostas = uma": 43,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Valor da aposta = 10 mil $ ou mais": 26,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 19,
-  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 64,
-  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": 37,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 65,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": 38,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 31,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Valor da aposta = 10 mil $ ou mais": 45,
   "Stake | Golos até ao sinal = nenhum & Momento do aviso = até 45 min depois do início": 32,
@@ -15330,6 +15338,9 @@
   "item|id:manchester-united-vs-brentford-20261128|Total Bookings|Over 4.5": {
    "at_utc": "2026-11-28T14:50:17+00:00"
   },
+  "item|id:manchester-united-vs-brentford-20261128|Total Goals|Over 3.5": {
+   "at_utc": "2026-11-28T15:18:08+00:00"
+  },
   "item|id:manta-vs-delfin-20261122|Asian Total|Over 2.5": {
    "at_utc": "2026-11-22T16:00:32+00:00"
   },
@@ -16403,7 +16414,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1129,
+ "sent_total": 1130,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -17936,6 +17947,7 @@
   "2026-11-28T14:48:48+00:00|Avellino U19 — Salernitana U19|Over 3",
   "2026-11-28T14:51:34+00:00|Magesi — Lerumo Lions|Over 4",
   "2026-11-28T14:54:29+00:00|US Pergolettese U19 — Novara U19|Over 4",
+  "2026-11-28T15:04:06+00:00|Manchester United — Brentford|Over 3.5",
   "2026-11-28T15:04:07+00:00|Hamburg — Bayern Munchen|Over 1.5"
  ]
 }
