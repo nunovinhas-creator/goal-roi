@@ -7107,12 +7107,17 @@
    "state": "delivered"
   },
   "game|id:lincoln-vs-wolverhampton-20261128|59334cb2c222": {
+   "attempt_id": "97650012bac8410f8aae06e79ff3d2e1",
+   "attempt_utc": "2026-11-28T13:34:55+00:00",
+   "chars": 201,
    "created_utc": "2026-11-28T13:34:52+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "4aebcc044c6780a03b34f09de61897c24ff3856db4c02df6fdee40977f864148",
+   "state": "in_flight"
   },
   "game|id:liverpool-vs-manchester-united-20261122|137df20dec87": {
    "attempt_utc": "2026-11-22T14:32:24+00:00",
@@ -10443,13 +10448,15 @@
    "attempt_utc": "2026-11-28T13:34:53+00:00",
    "chars": 197,
    "created_utc": "2026-11-28T13:34:52+00:00",
+   "done_utc": "2026-11-28T13:34:52+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "5afb32d8d60fddb15eb744834346000eb6fd7000aeac6462a49b6753a471d453",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:schalke-vs-stuttgart-20261121|546bdb00dfd8": {
    "attempt_utc": "2026-11-21T19:11:08+00:00",
@@ -12493,7 +12500,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 790,
+  "delivered": 791,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T13:29:04+00:00",
@@ -12959,6 +12966,7 @@
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5": true,
   "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio": true,
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5": true,
+  "2026-11-28T13:28:45+00:00|Lincoln — Wolverhampton|Over 1.5": true,
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5": true,
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6": true
  },
@@ -13292,7 +13300,7 @@
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00": 59,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 22,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 38,
-  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 50,
+  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 51,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 26,
   "Stake | Competição = liga & Mercado = golos (total asiático) & Sinal anterior de outro tipo no mesmo jogo = não": 39,
   "Stake | Competição = liga & Mercado = outros mercados": 91,
@@ -13334,7 +13342,8 @@
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma": 24,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 49,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados & Número de apostas = uma": 41,
-  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 62,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Momento do aviso = mais de 45 min depois do início & Número de apostas = uma": 19,
+  "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 63,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma & Sinal anterior de outro tipo no mesmo jogo = sim": 36,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Sinal anterior de outro tipo no mesmo jogo = não": 30,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Valor da aposta = 10 mil $ ou mais": 45,
@@ -14746,6 +14755,9 @@
   "item|id:lille-vs-lyon-20261121|Asian Total|Under 2.5": {
    "at_utc": "2026-11-21T14:35:18+00:00"
   },
+  "item|id:lincoln-vs-wolverhampton-20261128|Total Goals|Over 1.5": {
+   "at_utc": "2026-11-28T13:34:52+00:00"
+  },
   "item|id:liverpool-vs-manchester-united-20261122|Asian Total|Over 3.5": {
    "at_utc": "2026-11-22T16:12:38+00:00"
   },
@@ -15876,7 +15888,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1102,
+ "sent_total": 1103,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17354,6 +17366,7 @@
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5",
   "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio",
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5",
+  "2026-11-28T13:28:45+00:00|Lincoln — Wolverhampton|Over 1.5",
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5",
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6"
  ]
