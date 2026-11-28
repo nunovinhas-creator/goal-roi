@@ -9310,13 +9310,15 @@
    "attempt_utc": "2026-11-28T12:56:00+00:00",
    "chars": 189,
    "created_utc": "2026-11-28T12:56:00+00:00",
+   "done_utc": "2026-11-28T12:56:00+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "f39c39bd0d0d1e3552e82584fe86eeb623935de67e460b4728ad11b6555a1a58",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:pro-patria-vs-sanremese-20261125|7d6f47735dd7": {
    "attempt_id": "9b1031ddb8174802b1586783e9aa8ef5",
@@ -11232,12 +11234,17 @@
    "state": "delivered"
   },
   "game|id:torino-vs-lazio-20261128|0e714d31a65f": {
+   "attempt_id": "ce928743bb424c88bd02b476489842da",
+   "attempt_utc": "2026-11-28T12:56:03+00:00",
+   "chars": 187,
    "created_utc": "2026-11-28T12:56:00+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "5201a16d875422ff5945dc03603ceb3a0a52a9432431c31d27e53afcab40780c",
+   "state": "in_flight"
   },
   "game|id:torino-vs-lazio-20261128|eee5365c4815": {
    "attempt_id": "01951c1f8cb7436c979ddc1eba4aee33",
@@ -12448,7 +12455,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 787,
+  "delivered": 788,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T12:48:46+00:00",
@@ -12912,6 +12919,7 @@
   "2026-11-28T12:31:53+00:00|Samsunspor — Genclerbirligi|Over 2.5": true,
   "2026-11-28T12:34:23+00:00|AVS — Leixoes|Over 6.5": true,
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5": true,
+  "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio": true,
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5": true
  },
  "migrations": {
@@ -13241,7 +13249,7 @@
   "Stake | Competição = liga & Dia = fim de semana": 94,
   "Stake | Competição = liga & Dia = fim de semana & Número de apostas = uma": 82,
   "Stake | Competição = liga & Faixa de odd = odd 1,50 a 2,00 & Mercado = outros mercados": 67,
-  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00": 58,
+  "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00": 59,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 22,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 38,
   "Stake | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Número de apostas = uma": 50,
@@ -13281,7 +13289,7 @@
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não": 46,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = menos de 10 mil $": 36,
   "Stake | Faixa de odd = odd 1,50 a 2,00 & Sinal anterior de outro tipo no mesmo jogo = sim": 68,
-  "Stake | Faixa de odd = odd 2,00 a 3,00": 71,
+  "Stake | Faixa de odd = odd 2,00 a 3,00": 72,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite": 30,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Hora (UTC) = noite & Número de apostas = uma": 24,
   "Stake | Faixa de odd = odd 2,00 a 3,00 & Mercado = outros mercados": 49,
@@ -15628,6 +15636,9 @@
   "item|id:torino-vs-lazio-20261128|1X2|2": {
    "at_utc": "2026-11-26T22:24:21+00:00"
   },
+  "item|id:torino-vs-lazio-20261128|1x2|Lazio": {
+   "at_utc": "2026-11-28T12:56:00+00:00"
+  },
   "item|id:torreense-vs-celtic-20261126|Asian Total|Under 3": {
    "at_utc": "2026-11-26T19:14:59+00:00"
   },
@@ -15819,7 +15830,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1099,
+ "sent_total": 1100,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17293,6 +17304,7 @@
   "2026-11-28T12:31:53+00:00|Samsunspor — Genclerbirligi|Over 2.5",
   "2026-11-28T12:34:23+00:00|AVS — Leixoes|Over 6.5",
   "2026-11-28T12:43:41+00:00|Real Betis — Rayo Vallecano|Over 3.5",
+  "2026-11-28T12:48:20+00:00|Torino — Lazio|Lazio",
   "2026-11-28T12:51:00+00:00|Preston — Norwich|Over 0.5"
  ]
 }
