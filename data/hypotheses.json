@@ -4562,6 +4562,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Antecedência = mais de 60 min & Dia = fim de semana & Velocidade do reforço = ×4 em mais de 30 min": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "mais de 60 min"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em mais de 30 min"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Antecedência = mais de 60 min & Dia = fim de semana & Volume na seleção = 10 mil $ ou mais": {
   "born_utc": "2026-11-28T08:47:14+00:00",
   "conditions": [
@@ -13257,6 +13276,25 @@
    [
     "Tamanho do mercado",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Competição = liga & Dia = fim de semana & Velocidade do reforço = ×4 em mais de 30 min": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em mais de 30 min"
    ]
   ],
   "family": "Betfair",
@@ -30126,6 +30164,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = dia de semana & Quota de mercado = 80 % ou mais & Velocidade do reforço = ×4 em mais de 30 min": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "dia de semana"
+   ],
+   [
+    "Quota de mercado",
+    "80 % ou mais"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em mais de 30 min"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = dia de semana & Quota de mercado = 80 % ou mais & Volume na seleção = 10 mil $ ou mais": {
   "born_utc": "2026-11-16T15:15:49+00:00",
   "conditions": [
@@ -36123,6 +36180,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Dia = fim de semana & Quota de mercado = menos de 80 % & Velocidade do reforço = ×4 em mais de 30 min": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em mais de 30 min"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Dia = fim de semana & Quota de mercado = menos de 80 % & Volume na seleção = 10 mil $ ou mais": {
   "born_utc": "2026-11-15T17:00:57+00:00",
   "conditions": [
@@ -37165,6 +37241,25 @@
    [
     "Tamanho do mercado",
     "menos de 10 mil $"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Dia = fim de semana & Sinal anterior de outro tipo no mesmo jogo = não & Velocidade do reforço = ×4 em mais de 30 min": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Velocidade do reforço",
+    "×4 em mais de 30 min"
    ]
   ],
   "family": "Betfair",
@@ -107814,6 +107909,25 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Minuto = 61 em diante": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Competição",
+    "liga"
+   ],
+   [
+    "Faixa de odd",
+    "odd 2,00 a 3,00"
+   ],
+   [
+    "Minuto",
+    "61 em diante"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Competição = liga & Faixa de odd = odd 2,00 a 3,00 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-14T14:36:09+00:00",
   "conditions": [
@@ -156379,6 +156493,51 @@
   "family": "Jogo aberto",
   "source": "gerador"
  },
+ "Jogo aberto | Liga = Italian Serie B & Minuto = 31 a 60": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Italian Serie B"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Liga = Italian Serie B & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Italian Serie B"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com vários tipos de sinal"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
+ "Jogo aberto | Liga = Italian Serie B & Sinal anterior de outro tipo no mesmo jogo = sim": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Italian Serie B"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "sim"
+   ]
+  ],
+  "family": "Jogo aberto",
+  "source": "gerador"
+ },
  "Jogo aberto | Liga = Italian Serie C": {
   "born_utc": "2026-11-14T17:46:45+00:00",
   "conditions": [
@@ -193613,6 +193772,63 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Liga = Dutch Eredivisie & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Liga = Dutch Eredivisie & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Liga = Dutch Eredivisie & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd 1,50 a 2,00"
+   ],
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Faixa de odd = odd 1,50 a 2,00 & Liga = England Championship": {
   "born_utc": "2026-11-24T18:36:55+00:00",
   "conditions": [
@@ -222709,6 +222925,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Hora (UTC) = tarde & Liga = Dutch Eredivisie & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "tarde"
+   ],
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Hora (UTC) = tarde & Liga = England Premier League": {
   "born_utc": "2026-11-21T13:32:26+00:00",
   "conditions": [
@@ -227854,6 +228089,25 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Liga = Dutch Eredivisie & Mercado = golos (mais/menos) & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Mercado",
+    "golos (mais/menos)"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Liga = Dutch Eredivisie & Mercado = outro mercado": {
   "born_utc": "2026-11-22T14:49:11+00:00",
   "conditions": [
@@ -228070,6 +228324,21 @@
   "family": "Polymarket",
   "source": "gerador"
  },
+ "Polymarket | Liga = Dutch Eredivisie & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
  "Polymarket | Liga = Dutch Eredivisie & Outros sinais no mesmo jogo = jogo com vários tipos de sinal": {
   "born_utc": "2026-11-22T11:15:07+00:00",
   "conditions": [
@@ -228167,6 +228436,25 @@
    [
     "Sinal anterior de outro tipo no mesmo jogo",
     "não"
+   ]
+  ],
+  "family": "Polymarket",
+  "source": "gerador"
+ },
+ "Polymarket | Liga = Dutch Eredivisie & Sinal anterior de outro tipo no mesmo jogo = não & Valor da aposta = 10 mil $ ou mais": {
+  "born_utc": "2026-11-28T15:27:33+00:00",
+  "conditions": [
+   [
+    "Liga",
+    "Dutch Eredivisie"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ],
+   [
+    "Valor da aposta",
+    "10 mil $ ou mais"
    ]
   ],
   "family": "Polymarket",
