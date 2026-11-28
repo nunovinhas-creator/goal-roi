@@ -2079,13 +2079,15 @@
    "attempt_utc": "2026-11-28T12:42:11+00:00",
    "chars": 169,
    "created_utc": "2026-11-28T12:42:11+00:00",
+   "done_utc": "2026-11-28T12:42:11+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "f04e2b481dfebde436561841d5ea6af9fb51c5b114ff03aaa3e7bafe40014f44",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:azam-vs-al-ahli-tripoli-20261127|696d29307753": {
    "attempt_id": "edfea1a45e8447d5af3f6a7c462bdd6a",
@@ -10164,12 +10166,17 @@
    "state": "delivered"
   },
   "game|id:samsunspor-vs-genclerbirligi-20261128|04c5ede9a8ef": {
+   "attempt_id": "d19afbc7278249918e8bb189ab02d8e4",
+   "attempt_utc": "2026-11-28T12:42:13+00:00",
+   "chars": 199,
    "created_utc": "2026-11-28T12:42:11+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "b161af19f7e4dc8cacb2d0061a3dd521500d67ede80c914abd99df67c17a38f2",
+   "state": "in_flight"
   },
   "game|id:san-jose-earthquakes-vs-houston-dynamo-20261125|63f39cb93243": {
    "attempt_id": "cf33e272abdd4cafb84b29000b2f77ad",
@@ -12403,7 +12410,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 784,
+  "delivered": 785,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T12:33:56+00:00",
@@ -12864,6 +12871,7 @@
   "2026-11-28T11:50:11+00:00|Bandirmaspor — Batman Petrolspor|Over 3": true,
   "2026-11-28T11:50:31+00:00|Sivasspor — Bodrumspor|Over 3": true,
   "2026-11-28T12:25:58+00:00|Rubin Kazan — Akron Tolyatti|Over 4": true,
+  "2026-11-28T12:31:53+00:00|Samsunspor — Genclerbirligi|Over 2.5": true,
   "2026-11-28T12:34:23+00:00|AVS — Leixoes|Over 6.5": true
  },
  "migrations": {
@@ -15343,6 +15351,9 @@
   "item|id:salt-lake-vs-vancouver-20261128|1x2|Vancouver Whitecaps": {
    "at_utc": "2026-11-28T03:38:38+00:00"
   },
+  "item|id:samsunspor-vs-genclerbirligi-20261128|Asian Total|Over 2.5": {
+   "at_utc": "2026-11-28T12:42:11+00:00"
+  },
   "item|id:san-jose-earthquakes-vs-houston-dynamo-20261125|Asian Total|Over 2.5": {
    "at_utc": "2026-11-24T23:39:16+00:00"
   },
@@ -15762,7 +15773,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1096,
+ "sent_total": 1097,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17236,6 +17247,7 @@
   "2026-11-28T11:50:11+00:00|Bandirmaspor — Batman Petrolspor|Over 3",
   "2026-11-28T11:50:31+00:00|Sivasspor — Bodrumspor|Over 3",
   "2026-11-28T12:25:58+00:00|Rubin Kazan — Akron Tolyatti|Over 4",
+  "2026-11-28T12:31:53+00:00|Samsunspor — Genclerbirligi|Over 2.5",
   "2026-11-28T12:34:23+00:00|AVS — Leixoes|Over 6.5"
  ]
 }
