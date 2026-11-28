@@ -1573,12 +1573,17 @@
    "state": "delivered"
   },
   "game|id:apea-akrotiriou-vs-akritas-chlorakas-20261128|469c9266790f": {
+   "attempt_id": "5d7b18ac469c4418bd7d15128bcad2f1",
+   "attempt_utc": "2026-11-28T13:59:51+00:00",
+   "chars": 219,
    "created_utc": "2026-11-28T13:59:49+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "bd4f97dc89245d8357fd073b84ba25d69eb08d8d12c8bb179ef1d317bfb9979f",
+   "state": "in_flight"
   },
   "game|id:arminia-bielefeld-vs-magdeburg-20261120|6bcee4b7e851": {
    "attempt_utc": "2026-11-20T18:58:09+00:00",
@@ -8586,13 +8591,15 @@
    "attempt_utc": "2026-11-28T13:59:49+00:00",
    "chars": 175,
    "created_utc": "2026-11-28T13:59:49+00:00",
+   "done_utc": "2026-11-28T13:59:49+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "ab2b948bcf25d92b44c0edd5ad98816fbcd37e32e717970f35c0e0a9bfaf6d91",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:ofi-crete-vs-rsc-anderlecht-20261126|78e6500fcba2": {
    "attempt_id": "2e414795672e495d82984eaf9d5c6aec",
@@ -12523,7 +12530,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 792,
+  "delivered": 793,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T13:50:00+00:00",
@@ -12992,6 +12999,7 @@
   "2026-11-28T13:28:45+00:00|Lincoln — Wolverhampton|Over 1.5": true,
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5": true,
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6": true,
+  "2026-11-28T13:49:24+00:00|Apea Akrotiriou — Akritas Chlorakas|Over 3": true,
   "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3": true
  },
  "migrations": {
@@ -13539,6 +13547,9 @@
   },
   "item|id:annecy-vs-clermont-foot-20261120|Asian Total|Over 4": {
    "at_utc": "2026-11-20T20:20:59+00:00"
+  },
+  "item|id:apea-akrotiriou-vs-akritas-chlorakas-20261128|Asian Total|Over 3": {
+   "at_utc": "2026-11-28T13:59:49+00:00"
   },
   "item|id:arminia-bielefeld-vs-magdeburg-20261120|Asian Total|Over 2.5": {
    "at_utc": "2026-11-20T14:40:04+00:00"
@@ -15915,7 +15926,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1104,
+ "sent_total": 1105,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Volume na seleção = menos de 10 mil $": "abandonada",
@@ -17396,6 +17407,7 @@
   "2026-11-28T13:28:45+00:00|Lincoln — Wolverhampton|Over 1.5",
   "2026-11-28T13:28:53+00:00|Sbv Excelsior — Telstar|Under 2.5",
   "2026-11-28T13:31:32+00:00|Fc Agricola Borcea — CSA Axiopolis|Over 6",
+  "2026-11-28T13:49:24+00:00|Apea Akrotiriou — Akritas Chlorakas|Over 3",
   "2026-11-28T13:52:37+00:00|OCPAM — Reims|Over 3"
  ]
 }
