@@ -11,7 +11,7 @@ Para que os alertas de sinais ao vivo cheguem em cerca de 2 minutos em vez de 10
 import asyncio, json, os, pathlib, shutil, sys, time
 from datetime import datetime, timezone
 
-from . import reader
+from . import authorization_events, reader
 from .store import append_versions, data_dir
 from .telegram_diagnostics import check_background_rpc_error, diagnosed_session, error_fields, is_definitive_auth_error
 
@@ -77,6 +77,7 @@ async def rounds(read, on_new, sleep=asyncio.sleep, clock=time.monotonic, total=
             fails += 1
             print('WATCH_READ_FAILED', *error_fields(exc))
             if is_definitive_auth_error(exc):
+                authorization_events.loss(exc)
                 authorization_error = exc
                 break
             continue
@@ -130,7 +131,7 @@ async def watch():
             # while it fails, so a pending transaction can never be overtaken by a notice.
             print('WATCH_PUBLICATION_PENDING', *error_fields(exc))
     client = reader.make_client()
-    state = {'entity': None}
+    state = {'entity': None, 'proof': None}
 
     async def read():
         check_background_rpc_error(client)
@@ -140,6 +141,7 @@ async def watch():
             if state['entity'] is None:
                 state['entity'] = await asyncio.wait_for(client.get_entity(os.environ['TG_SCANGOAL'].strip()), 30)
             now = reader.iso(datetime.now(timezone.utc))
+            proof = authorization_events.recovery_token() if FAST_RECENT > 0 else None
             rows, _, _ = await asyncio.wait_for(reader.fetch(client, state['entity'], FAST_RECENT, now), 45)
         except (ConnectionError, asyncio.CancelledError):
             if not asyncio.current_task().cancelling():
@@ -152,6 +154,8 @@ async def watch():
             st = json.loads(path.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             st = {}
+        if proof is not None:
+            state['proof'] = proof
         latest = dict(st, last_run_utc=now, last_fast_read_utc=now)
         reader.write_collection_state(path, st, latest)
         print('WATCH_READ_OK read', len(rows), 'new_versions', added)
@@ -164,6 +168,7 @@ async def watch():
         if problems:
             print('WATCH_PROBLEMS', ' '.join(sorted(set(problems))))
             raise WatchStopped(done)
+    authorization_events.recovered(state['proof'])
     return done
 
 

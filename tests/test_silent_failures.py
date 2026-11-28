@@ -354,14 +354,16 @@ class NextCollection(unittest.TestCase):
         s = steps()
         names = list(s)
         notice = next(n for n in names if n.startswith('Tell the user when a collection fails'))
-        self.assertEqual(names[-1], notice)                                       # last step
-        self.assertEqual(names[-2], 'Start the next collection')
+        self.assertLess(names.index('Start the next collection'), names.index(notice))
+        self.assertEqual(names[-1], 'Report Telegram authorization alert worker outcome')
         self.assertIn('        id: next', s['Start the next collection'])
         condition, = (line for line in s[notice] if line.strip().startswith('if:'))
         self.assertIn('failure()', condition)
         self.assertIn("steps.resume.outcome == 'success'", condition)
         self.assertIn("steps.publication.outputs.pending != 'true'", condition)
         self.assertIn("          NEXT_COLLECTION_FAILED: ${{ steps.next.outcome == 'failure' && '1' || '' }}", s[notice])
+        self.assertIn("          TG_AUTHORIZATION_LOST: ${{ steps.publication.outputs.authorization_fallback == 'true' && '1' || '' }}", s[notice])
+        self.assertIn("        continue-on-error: ${{ steps.publication.outputs.authorization_fallback == 'true' }}", s[notice])
         self.assertIn('        run: python -u -m scangoal.notify --failure', s[notice])
         self.assertEqual(sum(n.startswith('Tell the user') for n in names), 1)       # one mechanism, not two
 
@@ -428,9 +430,11 @@ class Steps(unittest.TestCase):
         self.assertEqual(tolerated, ['Fast reads every 2 minutes until the next collection (read-only)',
                                      # B4 (autorizado em 2026-11-24): registo prospetivo, só acrescenta, nunca bloqueia a recolha.
                                      'Prospective ledger (append-only)',
+                                     'Report Telegram authorization alert worker outcome',
                                      'Results from BSD (hourly at most; skipped without key)',
                                      'Results from Highlightly (every 90 minutes at most; skipped without key)',
                                      # P2 Polymarket (ativação): observador sombra, só leitura, nunca bloqueia a recolha.
+                                     'Start Telegram authorization alert worker',
                                      'Start the Polymarket shadow observer (inactive by default)',
                                      'Stop the Polymarket shadow observer and add its observations (inactive by default)',
                                      "Telegram notices through the user's bot (skipped without keys)"])
