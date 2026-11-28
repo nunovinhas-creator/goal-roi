@@ -3366,6 +3366,25 @@
   "family": "Betfair",
   "source": "gerador"
  },
+ "Betfair | Antecedência = mais de 60 min & Dia = fim de semana & Faixa de odd = odd acima de 3,00": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Antecedência",
+    "mais de 60 min"
+   ],
+   [
+    "Dia",
+    "fim de semana"
+   ],
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
  "Betfair | Antecedência = mais de 60 min & Dia = fim de semana & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
   "born_utc": "2026-11-28T04:01:01+00:00",
   "conditions": [
@@ -42509,6 +42528,25 @@
    [
     "Outros sinais no mesmo jogo",
     "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Betfair",
+  "source": "gerador"
+ },
+ "Betfair | Faixa de odd = odd acima de 3,00 & Hora (UTC) = manhã & Quota de mercado = menos de 80 %": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Faixa de odd",
+    "odd acima de 3,00"
+   ],
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Quota de mercado",
+    "menos de 80 %"
    ]
   ],
   "family": "Betfair",
@@ -90041,6 +90079,44 @@
    [
     "Minuto",
     "31 a 60"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = manhã & Minuto = 31 a 60 & Outros sinais no mesmo jogo = jogo com um só tipo de sinal": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Outros sinais no mesmo jogo",
+    "jogo com um só tipo de sinal"
+   ]
+  ],
+  "family": "Forma de golos",
+  "source": "gerador"
+ },
+ "Forma de golos | Hora (UTC) = manhã & Minuto = 31 a 60 & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Minuto",
+    "31 a 60"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
    ]
   ],
   "family": "Forma de golos",
@@ -297675,6 +297751,44 @@
    [
     "Momento do aviso",
     "mais de 45 min depois do início"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = manhã & Momento do aviso = mais de 45 min depois do início & Sinal anterior de outro tipo no mesmo jogo = não": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Momento do aviso",
+    "mais de 45 min depois do início"
+   ],
+   [
+    "Sinal anterior de outro tipo no mesmo jogo",
+    "não"
+   ]
+  ],
+  "family": "Stake",
+  "source": "gerador"
+ },
+ "Stake | Hora (UTC) = manhã & Momento do aviso = mais de 45 min depois do início & Valor da aposta = menos de 10 mil $": {
+  "born_utc": "2026-11-28T06:24:53+00:00",
+  "conditions": [
+   [
+    "Hora (UTC)",
+    "manhã"
+   ],
+   [
+    "Momento do aviso",
+    "mais de 45 min depois do início"
+   ],
+   [
+    "Valor da aposta",
+    "menos de 10 mil $"
    ]
   ],
   "family": "Stake",
