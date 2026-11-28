@@ -6815,13 +6815,15 @@
    "attempt_utc": "2026-11-28T15:23:07+00:00",
    "chars": 197,
    "created_utc": "2026-11-28T15:23:06+00:00",
+   "done_utc": "2026-11-28T15:23:06+00:00",
    "events": [
     "pending",
-    "intent"
+    "intent",
+    "delivered"
    ],
    "kind": "hint",
    "sha256": "68062dc49f11b02e8d95f9b6027491448aac90c05d66cb1f81a3fa4594091cb3",
-   "state": "in_flight"
+   "state": "delivered"
   },
   "game|id:leeds-vs-coventry-20261128|b4b5536760be": {
    "attempt_id": "0ff2d35c1ca949f4829db3b2896c3b2e",
@@ -7707,12 +7709,17 @@
    "state": "delivered"
   },
   "game|id:manchester-united-vs-brentford-20261128|378f4dc8cd88": {
+   "attempt_id": "a96d6b7a76c64f39a19b11edc7cec676",
+   "attempt_utc": "2026-11-28T15:23:08+00:00",
+   "chars": 238,
    "created_utc": "2026-11-28T15:23:06+00:00",
    "events": [
-    "pending"
+    "pending",
+    "intent"
    ],
    "kind": "hint",
-   "state": "pending"
+   "sha256": "1827a8ea90ce0814ef15038d41c247316902e1a1e6a39213d76fe0d1ba050353",
+   "state": "in_flight"
   },
   "game|id:manchester-united-vs-brentford-20261128|4cf30211c052": {
    "attempt_id": "822f98c42ed3407f9014585067084dda",
@@ -12928,7 +12935,7 @@
   }
  },
  "delivery_counts": {
-  "delivered": 819,
+  "delivered": 820,
   "uncertain": 6
  },
  "format_last_run_utc": "2026-11-28T15:18:08+00:00",
@@ -13427,6 +13434,7 @@
   "2026-11-28T14:54:29+00:00|US Pergolettese U19 — Novara U19|Over 4": true,
   "2026-11-28T15:04:06+00:00|Manchester United — Brentford|Over 3.5": true,
   "2026-11-28T15:04:07+00:00|Hamburg — Bayern Munchen|Over 1.5": true,
+  "2026-11-28T15:13:57+00:00|Manchester United — Brentford|Manchester United": true,
   "2026-11-28T15:17:32+00:00|Leeds — Coventry|Leeds United": true
  },
  "migrations": {
@@ -15359,6 +15367,9 @@
   "item|id:manchester-united-vs-brentford-20261128|Asian Total|Over 3.5": {
    "at_utc": "2026-11-28T14:50:17+00:00"
   },
+  "item|id:manchester-united-vs-brentford-20261128|Match Result|Manchester United": {
+   "at_utc": "2026-11-28T15:23:06+00:00"
+  },
   "item|id:manchester-united-vs-brentford-20261128|Polymarket|AH2(+0.5)": {
    "at_utc": "2026-11-27T14:06:17+00:00"
   },
@@ -16441,7 +16452,7 @@
   "TOTALS_FORM": "poucos dados",
   "WEAKENED_LINEUP": "poucos dados"
  },
- "sent_total": 1131,
+ "sent_total": 1132,
  "statuses": {
   "Betfair | Antecedência = mais de 60 min & Competição = liga & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
   "Betfair | Antecedência = mais de 60 min & Dia = dia de semana & Sinal anterior de outro tipo no mesmo jogo = não": "abandonada",
@@ -17976,6 +17987,7 @@
   "2026-11-28T14:54:29+00:00|US Pergolettese U19 — Novara U19|Over 4",
   "2026-11-28T15:04:06+00:00|Manchester United — Brentford|Over 3.5",
   "2026-11-28T15:04:07+00:00|Hamburg — Bayern Munchen|Over 1.5",
+  "2026-11-28T15:13:57+00:00|Manchester United — Brentford|Manchester United",
   "2026-11-28T15:17:32+00:00|Leeds — Coventry|Leeds United"
  ]
 }
